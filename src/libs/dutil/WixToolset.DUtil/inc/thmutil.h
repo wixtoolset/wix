@@ -8,6 +8,7 @@ extern "C" {
 
 // forward declare
 
+typedef struct _THEME_CONTROL THEME_CONTROL;
 typedef struct _THEME THEME;
 
 #define ReleaseTheme(p) if (p) { ThemeFree(p); p = NULL; }
@@ -194,11 +195,12 @@ struct THEME_ASSIGN_CONTROL_ID
 {
     WORD wId;       // id to apply to control
     LPCWSTR wzName; // name of control to match
+    const THEME_CONTROL** ppControl;
 };
 
 const WORD THEME_FIRST_ASSIGN_CONTROL_ID = 0x4000; // Recommended first control id to be assigned.
 
-struct THEME_CONTROL
+typedef struct _THEME_CONTROL
 {
     THEME_CONTROL_TYPE type;
 
@@ -296,7 +298,7 @@ struct THEME_CONTROL
     HWND hWnd;
     DWORD dwData; // type specific data
     THEME* pTheme;
-};
+} THEME_CONTROL;
 
 
 struct THEME_IMAGELIST
@@ -580,8 +582,7 @@ HRESULT DAPI ThemeLoadStrings(
 
  *******************************************************************/
 HRESULT DAPI ThemeLoadRichEditFromFile(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in_z LPCWSTR wzFileName,
     __in HMODULE hModule
     );
@@ -591,19 +592,7 @@ HRESULT DAPI ThemeLoadRichEditFromFile(
 
  *******************************************************************/
 HRESULT DAPI ThemeLoadRichEditFromResource(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
-    __in_z LPCSTR szResourceName,
-    __in HMODULE hModule
-    );
-
-/********************************************************************
- ThemeLoadRichEditFromResourceToHWnd - Attach a richedit control (by 
-                                       HWND) to resource data.
-
- *******************************************************************/
-HRESULT DAPI ThemeLoadRichEditFromResourceToHWnd(
-    __in HWND hWnd,
+    __in const THEME_CONTROL* pThemeControl,
     __in_z LPCSTR szResourceName,
     __in HMODULE hModule
     );
@@ -682,18 +671,28 @@ ThemeShowChild - shows a control's specified child control, hiding the rest.
 
 *******************************************************************/
 void DAPI ThemeShowChild(
-    __in THEME* pTheme,
     __in THEME_CONTROL* pParentControl,
     __in DWORD dwIndex
     );
 
 /********************************************************************
- ThemeControlExists - check if a control with the specified id exists.
+ ThemeControlExistsByHwnd - check if a control with the specified hWnd exists.
 
  *******************************************************************/
-BOOL DAPI ThemeControlExists(
+BOOL DAPI ThemeControlExistsByHWnd(
     __in const THEME* pTheme,
-    __in DWORD dwControl
+    __in HWND hWnd,
+    __out_opt const THEME_CONTROL** ppThemeControl
+    );
+
+/********************************************************************
+ ThemeControlExistsById - check if a control with the specified id exists.
+
+ *******************************************************************/
+BOOL DAPI ThemeControlExistsById(
+    __in const THEME* pTheme,
+    __in WORD wId,
+    __out_opt const THEME_CONTROL** ppThemeControl
     );
 
 /********************************************************************
@@ -701,8 +700,7 @@ BOOL DAPI ThemeControlExists(
 
  *******************************************************************/
 void DAPI ThemeControlEnable(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in BOOL fEnable
     );
 
@@ -711,8 +709,7 @@ void DAPI ThemeControlEnable(
 
  *******************************************************************/
 BOOL DAPI ThemeControlEnabled(
-    __in THEME* pTheme,
-    __in DWORD dwControl
+    __in const THEME_CONTROL* pThemeControl
     );
 
 /********************************************************************
@@ -720,8 +717,7 @@ BOOL DAPI ThemeControlEnabled(
 
  *******************************************************************/
 void DAPI ThemeControlElevates(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in BOOL fElevates
     );
 
@@ -730,8 +726,7 @@ void DAPI ThemeControlElevates(
 
  *******************************************************************/
 void DAPI ThemeShowControl(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in int nCmdShow
     );
 
@@ -741,8 +736,7 @@ conditional text and notes.
 
 *******************************************************************/
 void DAPI ThemeShowControlEx(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in int nCmdShow
     );
 
@@ -751,24 +745,7 @@ void DAPI ThemeShowControlEx(
 
  *******************************************************************/
 BOOL DAPI ThemeControlVisible(
-    __in THEME* pTheme,
-    __in DWORD dwControl
-    );
-
-BOOL DAPI ThemePostControlMessage(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
-    __in UINT Msg,
-    __in WPARAM wParam,
-    __in LPARAM lParam
-    );
-
-LRESULT DAPI ThemeSendControlMessage(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
-    __in UINT Msg,
-    __in WPARAM wParam,
-    __in LPARAM lParam
+    __in const THEME_CONTROL* pThemeControl
     );
 
 /********************************************************************
@@ -790,34 +767,12 @@ HRESULT DAPI ThemeDrawControl(
     );
 
 /********************************************************************
- ThemeHoverControl - mark a control as hover.
-
-*******************************************************************/
-BOOL DAPI ThemeHoverControl(
-    __in THEME* pTheme,
-    __in HWND hwndParent,
-    __in HWND hwndControl
-    );
-
-/********************************************************************
  ThemeIsControlChecked - gets whether a control is checked. Only
                          really useful for checkbox controls.
 
 *******************************************************************/
 BOOL DAPI ThemeIsControlChecked(
-    __in THEME* pTheme,
-    __in DWORD dwControl
-    );
-
-/********************************************************************
- ThemeSetControlColor - sets the color of text for a control.
-
-*******************************************************************/
-BOOL DAPI ThemeSetControlColor(
-    __in THEME* pTheme,
-    __in HDC hdc,
-    __in HWND hWnd,
-    __out HBRUSH* phBackgroundBrush
+    __in const THEME_CONTROL* pThemeControl
     );
 
 /********************************************************************
@@ -826,8 +781,7 @@ BOOL DAPI ThemeSetControlColor(
 
 *******************************************************************/
 HRESULT DAPI ThemeSetProgressControl(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in DWORD dwProgressPercentage
     );
 
@@ -837,8 +791,7 @@ HRESULT DAPI ThemeSetProgressControl(
 
 *******************************************************************/
 HRESULT DAPI ThemeSetProgressControlColor(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in DWORD dwColorIndex
     );
 
@@ -847,8 +800,7 @@ HRESULT DAPI ThemeSetProgressControlColor(
 
 *******************************************************************/
 HRESULT DAPI ThemeSetTextControl(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in_z_opt LPCWSTR wzText
     );
 
@@ -858,8 +810,7 @@ ThemeSetTextControl - sets the text of a control and optionally
 
 *******************************************************************/
 HRESULT DAPI ThemeSetTextControlEx(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in BOOL fUpdate,
     __in_z_opt LPCWSTR wzText
     );
@@ -869,8 +820,7 @@ HRESULT DAPI ThemeSetTextControlEx(
 
 *******************************************************************/
 HRESULT DAPI ThemeGetTextControl(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __inout_z LPWSTR* psczText
     );
 
@@ -889,8 +839,7 @@ HRESULT DAPI ThemeUpdateCaption(
 
 *******************************************************************/
 void DAPI ThemeSetFocus(
-    __in THEME* pTheme,
-    __in DWORD dwControl
+    __in const THEME_CONTROL* pThemeControl
     );
 
 #ifdef __cplusplus

@@ -44,7 +44,6 @@ const DWORD THEME_INVALID_ID = 0xFFFFFFFF;
 const COLORREF THEME_INVISIBLE_COLORREF = 0xFFFFFFFF;
 const DWORD GROW_FONT_INSTANCES = 3;
 const DWORD GROW_IMAGE_INSTANCES = 5;
-const DWORD GROW_WINDOW_TEXT = 250;
 
 static Gdiplus::GdiplusStartupInput vgsi;
 static Gdiplus::GdiplusStartupOutput vgso = { };
@@ -70,16 +69,29 @@ enum INTERNAL_CONTROL_STYLE
     INTERNAL_CONTROL_STYLE_OWNER_DRAW = 0x0010,
 };
 
-struct MEMBUFFER_FOR_RICHEDIT
-{
-    BYTE* rgbData;
-    DWORD cbData;
-
-    DWORD iData;
-};
-
 
 // prototypes
+/********************************************************************
+ ThemeHoverControl - mark a control as hover.
+
+*******************************************************************/
+static BOOL ThemeHoverControl(
+    __in THEME* pTheme,
+    __in HWND hwndParent,
+    __in HWND hwndControl
+    );
+
+/********************************************************************
+ ThemeSetControlColor - sets the color of text for a control.
+
+*******************************************************************/
+static BOOL ThemeSetControlColor(
+    __in THEME* pTheme,
+    __in HDC hdc,
+    __in HWND hWnd,
+    __out HBRUSH* phBackgroundBrush
+    );
+
 static HRESULT RegisterWindowClasses(
     __in_opt HMODULE hModule
     );
@@ -258,11 +270,11 @@ static HRESULT ParseNotes(
     );
 static HRESULT StopBillboard(
     __in THEME* pTheme,
-    __in DWORD dwControl
+    __in THEME_CONTROL* pControl
     );
 static HRESULT StartBillboard(
     __in THEME* pTheme,
-    __in DWORD dwControl
+    __in THEME_CONTROL* pControl
     );
 static HRESULT EnsureFontInstance(
     __in THEME* pTheme,
@@ -290,7 +302,6 @@ static HRESULT LoadControls(
     __in_opt THEME_CONTROL* pParentControl
     );
 static HRESULT ShowControl(
-    __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in int nCmdShow,
     __in BOOL fSaveEditboxes,
@@ -375,18 +386,6 @@ static HRESULT DrawProgressBarImage(
 static BOOL DrawHoverControl(
     __in THEME* pTheme,
     __in BOOL fHover
-    );
-static DWORD CALLBACK RichEditStreamFromFileHandleCallback(
-    __in DWORD_PTR dwCookie,
-    __in_bcount(cb) LPBYTE pbBuff,
-    __in LONG cb,
-    __in LONG *pcb
-    );
-static DWORD CALLBACK RichEditStreamFromMemoryCallback(
-    __in DWORD_PTR dwCookie,
-    __in_bcount(cb) LPBYTE pbBuff,
-    __in LONG cb,
-    __in LONG *pcb
     );
 static void FreeFontInstance(
     __in THEME_FONT_INSTANCE* pFontInstance
@@ -474,6 +473,11 @@ static BOOL OnWmNotify(
     __in LPNMHDR lParam,
     __in const THEME_CONTROL* pThemeControl,
     __inout LRESULT* plResult
+    );
+static const THEME_CONTROL* FindControlFromId(
+    __in const THEME* pTheme,
+    __in WORD wId,
+    __in_opt const THEME_CONTROL* pParentControl = NULL
     );
 static const THEME_CONTROL* FindControlFromHWnd(
     __in const THEME* pTheme,
@@ -974,83 +978,39 @@ LExit:
 
 
 DAPI_(HRESULT) ThemeLoadRichEditFromFile(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in_z LPCWSTR wzFileName,
     __in HMODULE hModule
     )
 {
-    HRESULT hr = S_OK;
-    LPWSTR sczFile = NULL;
-    HANDLE hFile = INVALID_HANDLE_VALUE;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
+    HRESULT hr = E_INVALIDARG;
 
-    hr = PathRelativeToModule(&sczFile, wzFileName, hModule);
-    ThmExitOnFailure(hr, "Failed to read resource data.");
-
-    hFile = ::CreateFileW(sczFile, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-    if (INVALID_HANDLE_VALUE == hFile)
+    if (pThemeControl)
     {
-        ThmExitWithLastError(hr, "Failed to open RTF file.");
+        AssertSz(THEME_CONTROL_TYPE_RICHEDIT == pThemeControl->type, "ThemeLoadRichEditFromFile called for non-RichEdit control.");
+
+        hr = WnduLoadRichEditFromFile(pThemeControl->hWnd, wzFileName, hModule);
     }
-    else
-    {
-        LONGLONG llRtfSize;
-        hr = FileSizeByHandle(hFile, &llRtfSize);
-        if (SUCCEEDED(hr))
-        {
-            ::SendMessageW(hWnd, EM_EXLIMITTEXT, 0, static_cast<LPARAM>(llRtfSize));
-        }
-
-        EDITSTREAM es = { };
-        es.pfnCallback = RichEditStreamFromFileHandleCallback;
-        es.dwCookie = reinterpret_cast<DWORD_PTR>(hFile);
-
-        ::SendMessageW(hWnd, EM_STREAMIN, SF_RTF, reinterpret_cast<LPARAM>(&es));
-        hr = es.dwError;
-        ThmExitOnFailure(hr, "Failed to update RTF stream.");
-    }
-
-LExit:
-    ReleaseStr(sczFile);
-    ReleaseFile(hFile);
 
     return hr;
 }
 
 
 DAPI_(HRESULT) ThemeLoadRichEditFromResource(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in_z LPCSTR szResourceName,
     __in HMODULE hModule
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    return ThemeLoadRichEditFromResourceToHWnd(hWnd, szResourceName, hModule);
-}
+    HRESULT hr = E_INVALIDARG;
 
-DAPI_(HRESULT) ThemeLoadRichEditFromResourceToHWnd(
-    __in HWND hWnd,
-    __in_z LPCSTR szResourceName,
-    __in HMODULE hModule
-    )
-{
-    HRESULT hr = S_OK;
-    MEMBUFFER_FOR_RICHEDIT buffer = { };
-    EDITSTREAM es = { };
+    if (pThemeControl)
+    {
+        AssertSz(THEME_CONTROL_TYPE_RICHEDIT == pThemeControl->type, "ThemeLoadRichEditFromResource called for non-RichEdit control.");
 
-    hr = ResReadData(hModule, szResourceName, reinterpret_cast<LPVOID*>(&buffer.rgbData), &buffer.cbData);
-    ThmExitOnFailure(hr, "Failed to read resource data.");
+        hr = WnduLoadRichEditFromResource(pThemeControl->hWnd, szResourceName, hModule);
+    }
 
-    es.pfnCallback = RichEditStreamFromMemoryCallback;
-    es.dwCookie = reinterpret_cast<DWORD_PTR>(&buffer);
-
-    ::SendMessageW(hWnd, EM_STREAMIN, SF_RTF, reinterpret_cast<LPARAM>(&es));
-    hr = es.dwError;
-    ThmExitOnFailure(hr, "Failed to update RTF stream.");
-
-LExit:
     return hr;
 }
 
@@ -1293,141 +1253,127 @@ LExit:
 }
 
 
-DAPI_(BOOL) ThemeControlExists(
+DAPI_(BOOL) ThemeControlExistsByHWnd(
     __in const THEME* pTheme,
-    __in DWORD dwControl
+    __in HWND hWnd,
+    __out_opt const THEME_CONTROL** ppThemeControl
     )
 {
-    BOOL fExists = FALSE;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    if (hWnd)
+    const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, hWnd);
+
+    if (ppThemeControl)
     {
-        const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, hWnd);
-        fExists = (pControl && hWnd == pControl->hWnd);
+        *ppThemeControl = pControl;
     }
 
-    return fExists;
+    return NULL != pControl;
+}
+
+
+DAPI_(BOOL) ThemeControlExistsById(
+    __in const THEME* pTheme,
+    __in WORD wId,
+    __out_opt const THEME_CONTROL** ppThemeControl
+    )
+{
+    const THEME_CONTROL* pControl = FindControlFromId(pTheme, wId);
+
+    if (ppThemeControl)
+    {
+        *ppThemeControl = pControl;
+    }
+
+    return NULL != pControl;
 }
 
 
 DAPI_(void) ThemeControlEnable(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in BOOL fEnable
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hWnd));
-    if (pControl)
+    if (pThemeControl)
     {
+        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(pThemeControl);
         pControl->dwInternalStyle = fEnable ? (pControl->dwInternalStyle & ~INTERNAL_CONTROL_STYLE_DISABLED) : (pControl->dwInternalStyle | INTERNAL_CONTROL_STYLE_DISABLED);
-        ::EnableWindow(hWnd, fEnable);
+        ::EnableWindow(pControl->hWnd, fEnable);
 
         if (pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_HIDE_WHEN_DISABLED)
         {
-            ::ShowWindow(hWnd, fEnable ? SW_SHOW : SW_HIDE);
+            ::ShowWindow(pControl->hWnd, fEnable ? SW_SHOW : SW_HIDE);
         }
     }
 }
 
 
 DAPI_(BOOL) ThemeControlEnabled(
-    __in THEME* pTheme,
-    __in DWORD dwControl
+    __in const THEME_CONTROL* pThemeControl
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, hWnd);
-    return pControl && !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_DISABLED);
+    BOOL fEnabled = FALSE;
+
+    if (pThemeControl)
+    {
+        fEnabled = !(pThemeControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_DISABLED);
+    }
+
+    return fEnabled;
 }
 
 
 DAPI_(void) ThemeControlElevates(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in BOOL fElevates
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    ::SendMessageW(hWnd, BCM_SETSHIELD, 0, fElevates);
+    if (pThemeControl)
+    {
+        ::SendMessageW(pThemeControl->hWnd, BCM_SETSHIELD, 0, fElevates);
+    }
 }
 
 
 DAPI_(void) ThemeShowControl(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in int nCmdShow
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    ::ShowWindow(hWnd, nCmdShow);
-
-    // Save the control's visible state.
-    THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hWnd));
-    if (pControl)
+    if (pThemeControl)
     {
+        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(pThemeControl);
+        ::ShowWindow(pControl->hWnd, nCmdShow);
+
+        // Save the control's visible state.
         pControl->dwInternalStyle = (SW_HIDE == nCmdShow) ? (pControl->dwInternalStyle | INTERNAL_CONTROL_STYLE_HIDDEN) : (pControl->dwInternalStyle & ~INTERNAL_CONTROL_STYLE_HIDDEN);
     }
 }
 
 
 DAPI_(void) ThemeShowControlEx(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in int nCmdShow
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hWnd));
-    if (pControl)
+    if (pThemeControl)
     {
-        ShowControl(pTheme, pControl, nCmdShow, THEME_CONTROL_TYPE_EDITBOX == pControl->type, THEME_SHOW_PAGE_REASON_REFRESH, 0, NULL);
+        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(pThemeControl);
+        ShowControl(pControl, nCmdShow, THEME_CONTROL_TYPE_EDITBOX == pControl->type, THEME_SHOW_PAGE_REASON_REFRESH, 0, NULL);
     }
 }
 
 
 DAPI_(BOOL) ThemeControlVisible(
-    __in THEME* pTheme,
-    __in DWORD dwControl
+    __in const THEME_CONTROL* pThemeControl
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    return ::IsWindowVisible(hWnd);
-}
+    BOOL fVisible = FALSE;
 
-
-DAPI_(BOOL) ThemePostControlMessage(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
-    __in UINT Msg,
-    __in WPARAM wParam,
-    __in LPARAM lParam
-    )
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-
-    if (!::PostMessageW(hWnd, Msg, wParam, lParam))
+    if (pThemeControl)
     {
-        er = ::GetLastError();
-        hr = HRESULT_FROM_WIN32(er);
+        fVisible = ::IsWindowVisible(pThemeControl->hWnd);
     }
 
-    return SUCCEEDED(hr);
-}
-
-
-DAPI_(LRESULT) ThemeSendControlMessage(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
-    __in UINT Msg,
-    __in WPARAM wParam,
-    __in LPARAM lParam
-    )
-{
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    return ::SendMessageW(hWnd, Msg, wParam, lParam);
+    return fVisible;
 }
 
 
@@ -1453,9 +1399,15 @@ DAPI_(HRESULT) ThemeDrawControl(
     )
 {
     HRESULT hr = S_OK;
-    const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, pdis->hwndItem);
+    const THEME_CONTROL* pControl = NULL;
+    BOOL fExists = ThemeControlExistsByHWnd(pTheme, pdis->hwndItem, &pControl);
 
-    AssertSz(pControl, "Expected control window from owner draw window.");
+    AssertSz(fExists, "Expected control window from owner draw window.");
+    if (!fExists)
+    {
+        ExitFunction1(hr = E_INVALIDARG);
+    }
+
     AssertSz(pControl->hWnd == pdis->hwndItem, "Expected control window to match owner draw window.");
     AssertSz(pControl->nWidth < 1 || pControl->nWidth == pdis->rcItem.right - pdis->rcItem.left, "Expected control window width to match owner draw window width.");
     AssertSz(pControl->nHeight < 1 || pControl->nHeight == pdis->rcItem.bottom - pdis->rcItem.top, "Expected control window height to match owner draw window height.");
@@ -1492,7 +1444,7 @@ LExit:
 }
 
 
-DAPI_(BOOL) ThemeHoverControl(
+static BOOL ThemeHoverControl(
     __in THEME* pTheme,
     __in HWND hwndParent,
     __in HWND hwndControl
@@ -1519,16 +1471,21 @@ DAPI_(BOOL) ThemeHoverControl(
 
 
 DAPI_(BOOL) ThemeIsControlChecked(
-    __in THEME* pTheme,
-    __in DWORD dwControl
+    __in const THEME_CONTROL* pThemeControl
     )
 {
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    return BST_CHECKED == ::SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+    BOOL fChecked = FALSE;
+
+    if (pThemeControl)
+    {
+        fChecked = BST_CHECKED == ::SendMessageW(pThemeControl->hWnd, BM_GETCHECK, 0, 0);
+    }
+
+    return fChecked;
 }
 
 
-DAPI_(BOOL) ThemeSetControlColor(
+static BOOL ThemeSetControlColor(
     __in THEME* pTheme,
     __in HDC hdc,
     __in HWND hWnd,
@@ -1537,6 +1494,7 @@ DAPI_(BOOL) ThemeSetControlColor(
 {
     THEME_FONT* pFont = NULL;
     BOOL fHasBackground = FALSE;
+    const THEME_CONTROL* pControl = NULL;
 
     *phBackgroundBrush = NULL;
 
@@ -1544,10 +1502,9 @@ DAPI_(BOOL) ThemeSetControlColor(
     {
         pFont = (THEME_INVALID_ID == pTheme->dwFontId) ? NULL : pTheme->rgFonts + pTheme->dwFontId;
     }
-    else
+    else if (ThemeControlExistsByHWnd(pTheme, hWnd, &pControl))
     {
-        const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, hWnd);
-        pFont = (!pControl || THEME_INVALID_ID == pControl->dwFontId) ? NULL : pTheme->rgFonts + pControl->dwFontId;
+        pFont = THEME_INVALID_ID == pControl->dwFontId ? NULL : pTheme->rgFonts + pControl->dwFontId;
     }
 
     if (pFont)
@@ -1577,44 +1534,40 @@ DAPI_(BOOL) ThemeSetControlColor(
 
 
 DAPI_(HRESULT) ThemeSetProgressControl(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in DWORD dwProgressPercentage
     )
 {
-    HRESULT hr = E_NOTFOUND;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
+    HRESULT hr = E_INVALIDARG;
 
-    if (hWnd)
+    if (pThemeControl && THEME_CONTROL_TYPE_PROGRESSBAR == pThemeControl->type)
     {
-        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hWnd));
-        if (pControl && THEME_CONTROL_TYPE_PROGRESSBAR == pControl->type)
+        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(pThemeControl);
+
+        DWORD dwCurrentProgress = LOWORD(pControl->dwData);
+
+        if (dwCurrentProgress != dwProgressPercentage)
         {
-            DWORD dwCurrentProgress = LOWORD(pControl->dwData);
+            DWORD dwColor = HIWORD(pControl->dwData);
+            pControl->dwData = MAKEDWORD(dwProgressPercentage, dwColor);
 
-            if (dwCurrentProgress != dwProgressPercentage)
+            if (pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_OWNER_DRAW)
             {
-                DWORD dwColor = HIWORD(pControl->dwData);
-                pControl->dwData = MAKEDWORD(dwProgressPercentage, dwColor);
-
-                if (pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_OWNER_DRAW)
+                if (!::InvalidateRect(pControl->hWnd, NULL, FALSE))
                 {
-                    if (!::InvalidateRect(hWnd, NULL, FALSE))
-                    {
-                        ThmExitWithLastError(hr, "Failed to invalidate progress bar window.");
-                    }
+                    ThmExitWithLastError(hr, "Failed to invalidate progress bar window.");
                 }
-                else
-                {
-                    ::SendMessageW(hWnd, PBM_SETPOS, dwProgressPercentage, 0);
-                }
-
-                hr = S_OK;
             }
             else
             {
-                hr = S_FALSE;
+                ::SendMessageW(pControl->hWnd, PBM_SETPOS, dwProgressPercentage, 0);
             }
+
+            hr = S_OK;
+        }
+        else
+        {
+            hr = S_FALSE;
         }
     }
 
@@ -1624,37 +1577,37 @@ LExit:
 
 
 DAPI_(HRESULT) ThemeSetProgressControlColor(
-    __in THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in DWORD dwColorIndex
     )
 {
-    HRESULT hr = S_FALSE;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    if (hWnd)
+    HRESULT hr = E_INVALIDARG;
+
+    // Only set color on owner draw progress bars.
+    if (pThemeControl && THEME_CONTROL_TYPE_PROGRESSBAR == pThemeControl->type && (pThemeControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_OWNER_DRAW))
     {
-        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hWnd));
+        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(pThemeControl);
 
-        // Only set color on owner draw progress bars.
-        if (pControl && (pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_OWNER_DRAW) && THEME_CONTROL_TYPE_PROGRESSBAR == pControl->type)
+        if (pControl->ProgressBar.cImageRef <= dwColorIndex)
         {
-            if (pControl->ProgressBar.cImageRef <= dwColorIndex)
+            ThmExitWithRootFailure(hr, E_INVALIDARG, "Invalid progress bar color index: %u", dwColorIndex);
+        }
+
+        if (HIWORD(pControl->dwData) != dwColorIndex)
+        {
+            DWORD dwCurrentProgress =  LOWORD(pControl->dwData);
+            pControl->dwData = MAKEDWORD(dwCurrentProgress, dwColorIndex);
+
+            if (!::InvalidateRect(pControl->hWnd, NULL, FALSE))
             {
-                ThmExitWithRootFailure(hr, E_INVALIDARG, "Invalid progress bar color index: %u", dwColorIndex);
+                ThmExitWithLastError(hr, "Failed to invalidate progress bar window.");
             }
 
-            if (HIWORD(pControl->dwData) != dwColorIndex)
-            {
-                DWORD dwCurrentProgress =  LOWORD(pControl->dwData);
-                pControl->dwData = MAKEDWORD(dwCurrentProgress, dwColorIndex);
-
-                if (!::InvalidateRect(hWnd, NULL, FALSE))
-                {
-                    ThmExitWithLastError(hr, "Failed to invalidate progress bar window.");
-                }
-
-                hr = S_OK;
-            }
+            hr = S_OK;
+        }
+        else
+        {
+            hr = S_FALSE;
         }
     }
 
@@ -1664,41 +1617,40 @@ LExit:
 
 
 DAPI_(HRESULT) ThemeSetTextControl(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in_z_opt LPCWSTR wzText
     )
 {
-    return ThemeSetTextControlEx(pTheme, dwControl, FALSE, wzText);
+    return ThemeSetTextControlEx(pThemeControl, FALSE, wzText);
 }
 
 
 DAPI_(HRESULT) ThemeSetTextControlEx(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __in BOOL fUpdate,
     __in_z_opt LPCWSTR wzText
     )
 {
-    HRESULT hr = S_OK;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
+    HRESULT hr = E_INVALIDARG;
 
-    if (hWnd)
+    if (pThemeControl)
     {
         if (fUpdate)
         {
-            ::ShowWindow(hWnd, SW_HIDE);
+            ::ShowWindow(pThemeControl->hWnd, SW_HIDE);
         }
 
-        if (!::SetWindowTextW(hWnd, wzText))
+        if (!::SetWindowTextW(pThemeControl->hWnd, wzText))
         {
             ThmExitWithLastError(hr, "Failed to set control text.");
         }
 
         if (fUpdate)
         {
-            ::ShowWindow(hWnd, SW_SHOW);
+            ::ShowWindow(pThemeControl->hWnd, SW_SHOW);
         }
+
+        hr = S_OK;
     }
 
 LExit:
@@ -1707,50 +1659,17 @@ LExit:
 
 
 DAPI_(HRESULT) ThemeGetTextControl(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
+    __in const THEME_CONTROL* pThemeControl,
     __inout_z LPWSTR* psczText
     )
 {
-    HRESULT hr = S_OK;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    SIZE_T cbSize = 0;
-    DWORD cchText = 0;
-    DWORD cchTextRead = 0;
+    HRESULT hr = E_INVALIDARG;
 
-    // Ensure the string has room for at least one character.
-    hr = StrMaxLength(*psczText, &cbSize);
-    ThmExitOnFailure(hr, "Failed to get text buffer length.");
-
-    cchText = (DWORD)min(DWORD_MAX, cbSize);
-
-    if (!cchText)
+    if (pThemeControl)
     {
-        cchText = GROW_WINDOW_TEXT;
-
-        hr = StrAlloc(psczText, cchText);
-        ThmExitOnFailure(hr, "Failed to grow text buffer.");
+        hr = WnduGetControlText(pThemeControl->hWnd, psczText);
     }
 
-    // Read (and keep growing buffer) until we finally read less than there
-    // is room in the buffer.
-    for (;;)
-    {
-        cchTextRead = ::GetWindowTextW(hWnd, *psczText, cchText);
-        if (cchTextRead + 1 < cchText)
-        {
-            break;
-        }
-        else
-        {
-            cchText = cchTextRead + GROW_WINDOW_TEXT;
-
-            hr = StrAlloc(psczText, cchText);
-            ThmExitOnFailure(hr, "Failed to grow text buffer again.");
-        }
-    }
-
-LExit:
     return hr;
 }
 
@@ -1771,25 +1690,26 @@ LExit:
 
 
 DAPI_(void) ThemeSetFocus(
-    __in THEME* pTheme,
-    __in DWORD dwControl
+    __in const THEME_CONTROL* pThemeControl
     )
 {
-    HWND hwndFocus = ::GetDlgItem(pTheme->hwndParent, dwControl); 
-    if (hwndFocus && !ThemeControlEnabled(pTheme, dwControl)) 
-    { 
-        hwndFocus = ::GetNextDlgTabItem(pTheme->hwndParent, hwndFocus, FALSE); 
-    }
+    if (pThemeControl)
+    {
+        HWND hwndFocus = pThemeControl->hWnd;
+        if (hwndFocus && !ThemeControlEnabled(pThemeControl))
+        {
+            hwndFocus = ::GetNextDlgTabItem(pThemeControl->pTheme->hwndParent, hwndFocus, FALSE);
+        }
 
-    if (hwndFocus) 
-    { 
-        ::SetFocus(hwndFocus); 
+        if (hwndFocus)
+        {
+            ::SetFocus(hwndFocus);
+        }
     }
 }
 
 
 DAPI_(void) ThemeShowChild(
-    __in THEME* pTheme,
     __in THEME_CONTROL* pParentControl,
     __in DWORD dwIndex
     )
@@ -1798,7 +1718,7 @@ DAPI_(void) ThemeShowChild(
     for (DWORD i = 0; i < pParentControl->cControls; ++i)
     {
         THEME_CONTROL* pControl = pParentControl->rgControls + i;
-        ShowControl(pTheme, pControl, dwIndex == i ? SW_SHOW : SW_HIDE, FALSE, THEME_SHOW_PAGE_REASON_DEFAULT, 0, NULL);
+        ShowControl(pControl, dwIndex == i ? SW_SHOW : SW_HIDE, FALSE, THEME_SHOW_PAGE_REASON_DEFAULT, 0, NULL);
     }
 }
 
@@ -4322,28 +4242,24 @@ LExit:
 
 static HRESULT StartBillboard(
     __in THEME* pTheme,
-    __in DWORD dwControl
+    __in THEME_CONTROL* pControl
     )
 {
     HRESULT hr = E_NOTFOUND;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
+    UINT_PTR idEvent = reinterpret_cast<UINT_PTR>(pControl);
 
-    if (hWnd)
+    if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
     {
-        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hWnd));
-        if (pControl && THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
+        // kick off
+        pControl->dwData = 0;
+        OnBillboardTimer(pTheme, pTheme->hwndParent, idEvent);
+
+        if (!::SetTimer(pTheme->hwndParent, idEvent, pControl->wBillboardInterval, NULL))
         {
-            // kick off
-            pControl->dwData = 0;
-            OnBillboardTimer(pTheme, pTheme->hwndParent, dwControl);
-
-            if (!::SetTimer(pTheme->hwndParent, pControl->wId, pControl->wBillboardInterval, NULL))
-            {
-                ThmExitWithLastError(hr, "Failed to start billboard.");
-            }
-
-            hr = S_OK;
+            ThmExitWithLastError(hr, "Failed to start billboard.");
         }
+
+        hr = S_OK;
     }
 
 LExit:
@@ -4353,23 +4269,19 @@ LExit:
 
 static HRESULT StopBillboard(
     __in THEME* pTheme,
-    __in DWORD dwControl
+    __in THEME_CONTROL* pControl
     )
 {
     HRESULT hr = E_NOTFOUND;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
+    UINT_PTR idEvent = reinterpret_cast<UINT_PTR>(pControl);
 
-    if (hWnd)
+    if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
     {
-        const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, hWnd);
-        if (pControl && THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
-        {
-            ThemeControlEnable(pTheme, dwControl, FALSE);
+        ThemeControlEnable(pControl, FALSE);
 
-            if (::KillTimer(pTheme->hwndParent, pControl->wId))
-            {
-                hr = S_OK;
-            }
+        if (::KillTimer(pTheme->hwndParent, idEvent))
+        {
+            hr = S_OK;
         }
     }
 
@@ -5039,81 +4951,33 @@ static void FreeImageInstance(
 }
 
 
-static DWORD CALLBACK RichEditStreamFromFileHandleCallback(
-    __in DWORD_PTR dwCookie,
-    __in_bcount(cb) LPBYTE pbBuff,
-    __in LONG cb,
-    __in LONG* pcb
-    )
-{
-    HRESULT hr = S_OK;
-    HANDLE hFile = reinterpret_cast<HANDLE>(dwCookie);
-
-    if (!::ReadFile(hFile, pbBuff, cb, reinterpret_cast<DWORD*>(pcb), NULL))
-    {
-        ThmExitWithLastError(hr, "Failed to read file");
-    }
-
-LExit:
-    return hr;
-}
-
-
-static DWORD CALLBACK RichEditStreamFromMemoryCallback(
-    __in DWORD_PTR dwCookie,
-    __in_bcount(cb) LPBYTE pbBuff,
-    __in LONG cb,
-    __in LONG* pcb
-    )
-{
-    HRESULT hr = S_OK;
-    MEMBUFFER_FOR_RICHEDIT* pBuffer = reinterpret_cast<MEMBUFFER_FOR_RICHEDIT*>(dwCookie);
-    DWORD cbCopy = 0;
-
-    if (pBuffer->iData < pBuffer->cbData)
-    {
-        cbCopy = min(static_cast<DWORD>(cb), pBuffer->cbData - pBuffer->iData);
-        memcpy(pbBuff, pBuffer->rgbData + pBuffer->iData, cbCopy);
-
-        pBuffer->iData += cbCopy;
-        Assert(pBuffer->iData <= pBuffer->cbData);
-    }
-
-    *pcb = cbCopy;
-    return hr;
-}
-
-
 static void CALLBACK OnBillboardTimer(
-    __in THEME* pTheme,
+    __in THEME* /*pTheme*/,
     __in HWND hwnd,
     __in UINT_PTR idEvent
     )
 {
-    HWND hwndControl = ::GetDlgItem(hwnd, static_cast<int>(idEvent));
-    if (hwndControl)
+    THEME_CONTROL* pControl = reinterpret_cast<THEME_CONTROL*>(idEvent);
+
+    if (pControl)
     {
-        THEME_CONTROL* pControl = const_cast<THEME_CONTROL*>(FindControlFromHWnd(pTheme, hwndControl));
-        AssertSz(pControl && THEME_CONTROL_TYPE_BILLBOARD == pControl->type, "Only billboard controls should get billboard timer messages.");
+        AssertSz(THEME_CONTROL_TYPE_BILLBOARD == pControl->type, "Only billboard controls should get billboard timer messages.");
 
-        if (pControl)
+        if (pControl->dwData < pControl->cControls)
         {
-            if (pControl->dwData < pControl->cControls)
-            {
-                ThemeShowChild(pTheme, pControl, pControl->dwData);
-            }
-            else if (pControl->fBillboardLoops)
-            {
-                pControl->dwData = 0;
-                ThemeShowChild(pTheme, pControl, pControl->dwData);
-            }
-            else // no more looping
-            {
-                ::KillTimer(hwnd, idEvent);
-            }
-
-            ++pControl->dwData;
+            ThemeShowChild(pControl, pControl->dwData);
         }
+        else if (pControl->fBillboardLoops)
+        {
+            pControl->dwData = 0;
+            ThemeShowChild(pControl, pControl->dwData);
+        }
+        else // no more looping
+        {
+            ::KillTimer(hwnd, idEvent);
+        }
+
+        ++pControl->dwData;
     }
 }
 
@@ -5151,7 +5015,7 @@ static void OnBrowseDirectory(
 
         if (pTargetControl && THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type && !pTargetControl->fDisableVariableFunctionality)
         {
-            hr = ThemeSetTextControl(pTheme, pTargetControl->wId, wzPath);
+            hr = ThemeSetTextControl(pTargetControl, wzPath);
             ThmExitOnFailure(hr, "Failed to set text on editbox: %ls", pTargetControl->sczName);
         }
         else if (pTheme->pfnSetStringVariable)
@@ -5161,7 +5025,7 @@ static void OnBrowseDirectory(
         }
         else if (pTargetControl)
         {
-            hr = ThemeSetTextControl(pTheme, pTargetControl->wId, wzPath);
+            hr = ThemeSetTextControl(pTargetControl, wzPath);
             ThmExitOnFailure(hr, "Failed to set text on control: %ls", pTargetControl->sczName);
         }
 
@@ -5252,13 +5116,13 @@ static BOOL OnButtonClicked(
         case THEME_CONTROL_TYPE_CHECKBOX:
             if (pTheme->pfnSetNumericVariable && pControl->sczName && *pControl->sczName)
             {
-                BOOL fChecked = ThemeIsControlChecked(pTheme, pControl->wId);
+                BOOL fChecked = ThemeIsControlChecked(pControl);
                 pTheme->pfnSetNumericVariable(pControl->sczName, fChecked ? 1 : 0, pTheme->pvVariableContext);
                 fRefresh = TRUE;
             }
             break;
         case THEME_CONTROL_TYPE_RADIOBUTTON:
-            if (pTheme->pfnSetStringVariable && pControl->sczVariable && *pControl->sczVariable && ThemeIsControlChecked(pTheme, pControl->wId))
+            if (pTheme->pfnSetStringVariable && pControl->sczVariable && *pControl->sczVariable && ThemeIsControlChecked(pControl))
             {
                 pTheme->pfnSetStringVariable(pControl->sczVariable, pControl->sczValue, FALSE, pTheme->pvVariableContext);
                 fRefresh = TRUE;
@@ -5384,6 +5248,42 @@ LExit:
     ReleaseStr(sczLink);
 
     return fProcessed;
+}
+
+static const THEME_CONTROL* FindControlFromId(
+    __in const THEME* pTheme,
+    __in WORD wId,
+    __in_opt const THEME_CONTROL* pParentControl
+    )
+{
+    DWORD cControls = 0;
+    THEME_CONTROL* rgControls = NULL;
+    const THEME_CONTROL* pChildControl = NULL;
+
+    GetControls(pTheme, pParentControl, cControls, rgControls);
+
+    // Breadth first search since control ids are technically only valid for direct child windows of a specific parent window.
+    for (DWORD i = 0; i < cControls; ++i)
+    {
+        if (wId == rgControls[i].wId)
+        {
+            return rgControls + i;
+        }
+    }
+
+    for (DWORD i = 0; i < cControls; ++i)
+    {
+        if (0 < rgControls[i].cControls)
+        {
+            pChildControl = FindControlFromId(pTheme, wId, rgControls + i);
+            if (pChildControl)
+            {
+                return pChildControl;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 static BOOL OnNotifyEnMsgFilter(
@@ -5638,7 +5538,6 @@ LExit:
 
 
 static HRESULT ShowControl(
-    __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in int nCmdShow,
     __in BOOL fSaveEditboxes,
@@ -5654,13 +5553,14 @@ static HRESULT ShowControl(
     LPWSTR sczText = NULL;
     THEME_SAVEDVARIABLE* pSavedVariable = NULL;
     BOOL fHide = SW_HIDE == nCmdShow;
+    THEME* pTheme = pControl->pTheme;
     THEME_PAGE* pPage = ThemeGetPage(pTheme, dwPageId);
 
     // Save the editbox value if necessary (other control types save their values immediately).
     if (pTheme->pfnSetStringVariable && !pControl->fDisableVariableFunctionality &&
         fSaveEditboxes && THEME_CONTROL_TYPE_EDITBOX == pControl->type && pControl->sczName && *pControl->sczName)
     {
-        hr = ThemeGetTextControl(pTheme, pControl->wId, &sczText);
+        hr = ThemeGetTextControl(pControl, &sczText);
         ThmExitOnFailure(hr, "Failed to get the text for control: %ls", pControl->sczName);
 
         hr = pTheme->pfnSetStringVariable(pControl->sczName, sczText, FALSE, pTheme->pvVariableContext);
@@ -5675,7 +5575,7 @@ static HRESULT ShowControl(
 
         if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
         {
-            StopBillboard(pTheme, pControl->wId);
+            StopBillboard(pTheme, pControl);
         }
 
         ExitFunction();
@@ -5767,7 +5667,7 @@ static HRESULT ShowControl(
                 ReleaseNullStr(sczText);
             }
 
-            ThemeSetTextControl(pTheme, pControl->wId, sczText);
+            ThemeSetTextControl(pControl, sczText);
 
             if (wzNote && *wzNote)
             {
@@ -5811,7 +5711,7 @@ static HRESULT ShowControl(
                     ++iPageControl;
                 }
 
-                ThemeSendControlMessage(pTheme, pControl->wId, BM_SETCHECK, SUCCEEDED(hr) && llValue ? BST_CHECKED : BST_UNCHECKED, 0);
+                ::SendMessageW(pControl->hWnd, BM_SETCHECK, SUCCEEDED(hr) && llValue ? BST_CHECKED : BST_UNCHECKED, 0);
             }
 
             // If this is an editbox control,
@@ -5838,7 +5738,7 @@ static HRESULT ShowControl(
                     ++iPageControl;
                 }
 
-                ThemeSetTextControl(pTheme, pControl->wId, sczText);
+                ThemeSetTextControl(pControl, sczText);
             }
         }
 
@@ -5901,11 +5801,11 @@ static HRESULT ShowControl(
     {
         if (fEnabled)
         {
-            StartBillboard(pTheme, pControl->wId);
+            StartBillboard(pTheme, pControl);
         }
         else
         {
-            StopBillboard(pTheme, pControl->wId);
+            StopBillboard(pTheme, pControl);
         }
     }
 
@@ -5944,7 +5844,7 @@ static HRESULT ShowControls(
         // Only look at non-page controls and the specified page's controls.
         if (!pControl->wPageId || pControl->wPageId == dwPageId)
         {
-            hr = ShowControl(pTheme, pControl, nCmdShow, fSaveEditboxes, reason, dwPageId, &hwndFocus);
+            hr = ShowControl(pControl, nCmdShow, fSaveEditboxes, reason, dwPageId, &hwndFocus);
             ThmExitOnFailure(hr, "Failed to show control '%ls' at index %d.", pControl->sczName, i);
         }
     }
@@ -6509,7 +6409,7 @@ static HRESULT LoadControls(
             HRESULT hrFormat = pTheme->pfnFormatString(pControl->sczText, &sczText, pTheme->pvVariableContext);
             if (SUCCEEDED(hrFormat))
             {
-                ThemeSetTextControl(pTheme, pControl->wId, sczText);
+                ThemeSetTextControl(pControl, sczText);
             }
         }
 

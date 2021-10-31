@@ -365,18 +365,23 @@ private:
 
     void UpdateProgressBarProgress()
     {
+        const THEME_CONTROL* pControlProgressbarImage = NULL;
+        const THEME_CONTROL* pControlProgressbarStandard = NULL;
         static DWORD dwProgress = 0;
         DWORD dwCurrent = dwProgress < 100 ? dwProgress : 200 - dwProgress;
 
+        ThemeControlExistsById(m_pBafTheme, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_IMAGE, &pControlProgressbarImage);
+        ThemeControlExistsById(m_pBafTheme, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_STANDARD, &pControlProgressbarStandard);
+
         if (0 == dwProgress || 100 == dwProgress)
         {
-            ThemeSetProgressControlColor(m_pBafTheme, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_IMAGE, 100 == dwProgress ? 1 : 0);
+            ThemeSetProgressControlColor(pControlProgressbarImage, 100 == dwProgress ? 1 : 0);
         }
 
         dwProgress = (dwProgress + 10) % 200;
 
-        ThemeSetProgressControl(m_pBafTheme, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_IMAGE, dwCurrent);
-        ThemeSetProgressControl(m_pBafTheme, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_STANDARD, dwCurrent);
+        ThemeSetProgressControl(pControlProgressbarImage, dwCurrent);
+        ThemeSetProgressControl(pControlProgressbarStandard, dwCurrent);
     }
 
 public:

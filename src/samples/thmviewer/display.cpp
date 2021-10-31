@@ -188,7 +188,7 @@ static DWORD WINAPI DisplayThreadProc(
                             THEME_CONTROL* pControl = pCurrentHandle->pTheme->rgControls + i;
                             if (!pControl->wPageId)
                             {
-                                ThemeShowControl(pCurrentHandle->pTheme, pControl->wId, nCmdShow);
+                                ThemeShowControl(pControl, nCmdShow);
                             }
                         }
 
@@ -264,7 +264,7 @@ static LRESULT CALLBACK DisplayWndProc(
         break;
 
     case WM_TIMER:
-        if (!lParam && SUCCEEDED(ThemeSetProgressControl(pHandleTheme->pTheme, wParam, dwProgress)))
+        if (!lParam && SUCCEEDED(ThemeSetProgressControl(reinterpret_cast<THEME_CONTROL*>(wParam), dwProgress)))
         {
             dwProgress += rand() % 10 + 1;
             if (dwProgress > 100)
@@ -322,12 +322,12 @@ static BOOL DisplayOnThmLoadedControl(
     // Pre-populate some control types with data.
     if (THEME_CONTROL_TYPE_RICHEDIT == pControl->type)
     {
-        hr = ThemeLoadRichEditFromResource(pTheme, pControl->wId, MAKEINTRESOURCEA(THMVWR_RES_RICHEDIT_FILE), ::GetModuleHandleW(NULL));
+        hr = WnduLoadRichEditFromResource(pControl->hWnd, MAKEINTRESOURCEA(THMVWR_RES_RICHEDIT_FILE), ::GetModuleHandleW(NULL));
         ExitOnFailure(hr, "Failed to load richedit text.");
     }
     else if (THEME_CONTROL_TYPE_PROGRESSBAR == pControl->type)
     {
-        DWORD dwId = ::SetTimer(pTheme->hwndParent, pControl->wId, 500, NULL);
+        DWORD dwId = ::SetTimer(pTheme->hwndParent, reinterpret_cast<UINT_PTR>(pControl), 500, NULL);
         dwId = dwId; // prevents warning in "ship" build.
         Assert(dwId == pControl->wId);
     }

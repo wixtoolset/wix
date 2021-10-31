@@ -28,6 +28,7 @@
 #include "shelutil.h"
 #include "strutil.h"
 #include "thmutil.h"
+#include "wndutil.h"
 
 #include "resource.h"
 
