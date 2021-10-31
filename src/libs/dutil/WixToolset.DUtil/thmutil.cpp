@@ -502,7 +502,8 @@ static LRESULT CALLBACK ControlGroupDefWindowProc(
     __in HWND hWnd,
     __in UINT uMsg,
     __in WPARAM wParam,
-    __in LPARAM lParam
+    __in LPARAM lParam,
+    __in BOOL fDialog
     );
 static LRESULT CALLBACK PanelWndProc(
     __in HWND hWnd,
@@ -837,6 +838,7 @@ DAPI_(void) ThemeInitializeWindowClass(
     )
 {
     pWndClass->style = CS_HREDRAW | CS_VREDRAW;
+    pWndClass->cbWndExtra = DLGWINDOWEXTRA;
     pWndClass->hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
 
     pWndClass->lpfnWndProc = pfnWndProc;
@@ -1120,7 +1122,7 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
         }
     }
 
-    return ControlGroupDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
+    return ControlGroupDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam, TRUE);
 }
 
 
@@ -1703,7 +1705,7 @@ DAPI_(void) ThemeSetFocus(
 
         if (hwndFocus)
         {
-            ::SetFocus(hwndFocus);
+            ::SendMessage(pThemeControl->pTheme->hwndParent, WM_NEXTDLGCTL, (WPARAM)hwndFocus, TRUE);
         }
     }
 }
@@ -5304,7 +5306,7 @@ static BOOL OnNotifyEnMsgFilter(
             {
                 BOOL fShift = 0x8000 & ::GetKeyState(VK_SHIFT);
                 HWND hwndFocus = ::GetNextDlgTabItem(pTheme->hwndParent, pThemeControl->hWnd, fShift);
-                ::SetFocus(hwndFocus);
+                ::SendMessage(pTheme->hwndParent, WM_NEXTDLGCTL, (WPARAM)hwndFocus, TRUE);
 
                 fProcessed = TRUE;
             }
@@ -5493,6 +5495,11 @@ static HRESULT SizeListViewColumns(
     int iExtraAvailableSize;
     THEME_COLUMN* pColumn = NULL;
 
+    if (!pControl->hWnd)
+    {
+        ExitFunction();
+    }
+
     if (!::GetWindowRect(pControl->hWnd, &rcParent))
     {
         ThmExitWithLastError(hr, "Failed to get window rect of listview control.");
@@ -5548,7 +5555,7 @@ static HRESULT ShowControl(
 {
     HRESULT hr = S_OK;
     DWORD iPageControl = 0;
-    HWND hwndFocus = NULL;
+    HWND hwndFocus = phwndFocus ? *phwndFocus : NULL;
     LPWSTR sczFormatString = NULL;
     LPWSTR sczText = NULL;
     THEME_SAVEDVARIABLE* pSavedVariable = NULL;
@@ -5851,7 +5858,7 @@ static HRESULT ShowControls(
 
     if (hwndFocus)
     {
-        ::SetFocus(hwndFocus);
+        ::SendMessage(pTheme->hwndParent, WM_NEXTDLGCTL, (WPARAM)hwndFocus, TRUE);
     }
 
 LExit:
@@ -5864,7 +5871,8 @@ static LRESULT CALLBACK ControlGroupDefWindowProc(
     __in HWND hWnd,
     __in UINT uMsg,
     __in WPARAM wParam,
-    __in LPARAM lParam
+    __in LPARAM lParam,
+    __in BOOL fDialog
     )
 {
     LRESULT lres = 0;
@@ -5879,6 +5887,9 @@ static LRESULT CALLBACK ControlGroupDefWindowProc(
             return TRUE;
 
         case WM_CTLCOLORBTN: __fallthrough;
+        case WM_CTLCOLOREDIT: __fallthrough;
+        case WM_CTLCOLORLISTBOX: __fallthrough;
+        case WM_CTLCOLORSCROLLBAR: __fallthrough;
         case WM_CTLCOLORSTATIC:
         {
             HBRUSH hBrush = NULL;
@@ -5935,10 +5946,15 @@ static LRESULT CALLBACK ControlGroupDefWindowProc(
                 }
             }
             break;
+
+        case WM_CLOSE: __fallthrough;
+        case WM_ERASEBKGND:
+            fDialog = FALSE;
+            break;
         }
     }
 
-    return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+    return fDialog ? ::DefDlgProcW(hWnd, uMsg, wParam, lParam) : ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
 
@@ -5979,7 +5995,7 @@ static LRESULT CALLBACK PanelWndProc(
         break;
     }
 
-    return ControlGroupDefWindowProc(pControl ? pControl->pTheme : NULL, hWnd, uMsg, wParam, lParam);
+    return ControlGroupDefWindowProc(pControl ? pControl->pTheme : NULL, hWnd, uMsg, wParam, lParam, FALSE);
 }
 
 static LRESULT CALLBACK StaticOwnerDrawWndProc(
