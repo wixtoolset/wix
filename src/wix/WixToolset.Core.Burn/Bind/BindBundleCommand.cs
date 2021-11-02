@@ -296,13 +296,15 @@ namespace WixToolset.Core.Burn
                 }
 
                 // Give the embedded payloads without an embedded id yet an embedded id.
+                var payloadIndex = 0;
                 foreach (var payload in payloadSymbols.Values)
                 {
                     Debug.Assert(PackagingType.Unknown != payload.Packaging);
 
                     if (PackagingType.Embedded == payload.Packaging && String.IsNullOrEmpty(payload.EmbeddedId))
                     {
-                        payload.EmbeddedId = Guid.NewGuid().ToString("N");
+                        payload.EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnAuthoredContainerEmbeddedIdFormat, payloadIndex);
+                        ++payloadIndex;
                     }
                 }
             }

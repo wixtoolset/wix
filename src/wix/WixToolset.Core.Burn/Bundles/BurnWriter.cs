@@ -91,9 +91,9 @@ namespace WixToolset.Core.Burn.Bundles
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_ORIGINALSIGNATUREOFFSET, 0);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_ORIGINALSIGNATURESIZE, 0);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_FORMAT, 1); // Hard-coded to CAB for now.
+            this.AttachedContainers.Clear();
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_COUNT, 0);
-            this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_UXSIZE, 0);
-            for (uint i = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0; i < BURN_SECTION_SIZE; i += sizeof(UInt32))
+            for (uint i = BURN_SECTION_OFFSET_UXSIZE; i < this.wixburnMaxContainers; i += sizeof(UInt32))
             {
                 this.WriteToBurnSectionOffset(i, 0);
             }
@@ -119,6 +119,39 @@ namespace WixToolset.Core.Burn.Bundles
         }
 
         /// <summary>
+        /// Appends the non-UX attached containers from the reader to this bundle.
+        /// </summary>
+        /// <param name="reader">The source bundle.</param>
+        /// <returns>true if the container data is successfully appended; false otherwise.</returns>
+        public bool ReattachContainers(BurnReader reader)
+        {
+            if (this.AttachedContainers.Count == 0 || reader.AttachedContainers.Count < 2)
+            {
+                return false;
+            }
+
+            this.RememberThenResetSignature();
+
+            var uxContainerSlot = this.AttachedContainers[0];
+            this.AttachedContainers.Clear();
+            this.AttachedContainers.Add(uxContainerSlot);
+
+            uint nextAddress = this.EngineSize;
+            for (int i = 1; i < reader.AttachedContainers.Count; i++)
+            {
+                ContainerSlot cntnr = reader.AttachedContainers[i];
+
+                reader.Stream.Seek(nextAddress, SeekOrigin.Begin);
+                // TODO: verify that the size in the section data is 0 or the same size.
+                this.AppendContainer(reader.Stream, cntnr.Size, BurnCommon.Container.Attached);
+
+                nextAddress += cntnr.Size;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Appends a UX or Attached container to the exe and updates the ".wixburn" section data to point to it.
         /// </summary>
         /// <param name="containerStream">File stream to append to the current exe.</param>
@@ -127,38 +160,23 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
         public bool AppendContainer(Stream containerStream, long containerSize, BurnCommon.Container container)
         {
-            UInt32 burnSectionCount = 0;
-            UInt32 burnSectionOffsetSize = 0;
-
-            if (containerSize == 0)
-            {
-                return false;
-            }
+            uint containerCount = (uint)this.AttachedContainers.Count;
+            uint burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + (containerCount * sizeof(UInt32));
+            var containerSlot = new ContainerSlot((uint)containerSize);
 
             switch (container)
             {
                 case Container.UX:
-                    burnSectionCount = 1;
-                    burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE;
-                    // TODO: verify that the size in the section data is 0 or the same size.
-                    this.EngineSize += (uint)containerSize;
-                    this.UXSize = (uint)containerSize;
+                    if (containerCount != 0)
+                    {
+                        Debug.Assert(false);
+                        return false;
+                    }
+
+                    this.EngineSize += containerSlot.Size;
                     break;
 
                 case Container.Attached:
-                    // TODO: verify that the size in the section data is 0 or the same size.
-                    uint nextAddress = this.EngineSize;
-                    foreach (ContainerSlot cntnr in this.AttachedContainers)
-                    {
-                        if (cntnr.Address >= nextAddress)
-                        {
-                            nextAddress = cntnr.Address + cntnr.Size;
-                        }
-                    }
-
-                    this.AttachedContainers.Add(new ContainerSlot(nextAddress, (uint)containerSize));
-                    burnSectionCount = 1 + (uint)this.AttachedContainers.Count;
-                    burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + ((uint)this.AttachedContainers.Count * 4);
                     break;
 
                 default:
@@ -166,7 +184,9 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
             }
 
-            return this.AppendContainer(containerStream, (UInt32)containerSize, burnSectionOffsetSize, burnSectionCount);
+            this.AttachedContainers.Add(containerSlot);
+            ++containerCount;
+            return this.AppendContainer(containerStream, containerSlot.Size, burnSectionOffsetSize, containerCount);
         }
 
         public void RememberThenResetSignature()
@@ -225,10 +245,10 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 return false;
             }
-            if (burnSectionOffsetSize > (BURN_SECTION_SIZE - sizeof(UInt32)))
+            if (burnSectionOffsetSize > (this.wixburnRawDataSize - sizeof(UInt32)))
             {
                 this.invalidBundle = true;
-                this.Messaging.Write(BurnBackendErrors.TooManyAttachedContainers(BURN_SECTION_MAX_ATTACHEDCONTAINER_COUNT));
+                this.Messaging.Write(BurnBackendErrors.TooManyAttachedContainers(this.wixburnMaxContainers));
                 return false;
             }
 

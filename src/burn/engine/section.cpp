@@ -26,7 +26,7 @@ typedef struct _BURN_SECTION_HEADER
 
     DWORD dwFormat;
     DWORD cContainers;
-    DWORD rgcbContainers[116];
+    DWORD rgcbContainers[1];
 } BURN_SECTION_HEADER;
 
 static HRESULT VerifySectionMatchesMemoryPEHeader(
@@ -53,6 +53,7 @@ extern "C" HRESULT SectionInitialize(
     IMAGE_SECTION_HEADER sectionHeader = { };
     DWORD_PTR dwOriginalChecksumAndSignatureOffset = 0;
     BURN_SECTION_HEADER* pBurnSectionHeader = NULL;
+    DWORD cMaxContainers = 0;
 
     pSection->hEngineFile = hEngineFile;
     ExitOnInvalidHandleWithLastError(pSection->hEngineFile, hr, "Failed to open handle to engine process path.");
@@ -142,8 +143,7 @@ extern "C" HRESULT SectionInitialize(
         }
         if (sizeof(IMAGE_SECTION_HEADER) > cbRead)
         {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-            ExitOnRootFailure(hr, "Failed to read complete image section header, index: %u", i);
+            ExitWithRootFailure(hr, E_INVALIDDATA, "Failed to read complete image section header, index: %u", i);
         }
 
         // compare header name
@@ -156,8 +156,7 @@ extern "C" HRESULT SectionInitialize(
         // fail if we hit the end
         if (i + 1 >= ntHeader.FileHeader.NumberOfSections)
         {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-            ExitOnRootFailure(hr, "Failed to find Burn section.");
+            ExitWithRootFailure(hr, E_INVALIDDATA, "Failed to find Burn section.");
         }
     }
 
@@ -168,8 +167,7 @@ extern "C" HRESULT SectionInitialize(
     // check size of section
     if (sizeof(BURN_SECTION_HEADER) > sectionHeader.SizeOfRawData)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to read section info, data to short: %u", sectionHeader.SizeOfRawData);
+        ExitWithRootFailure(hr, E_INVALIDDATA, "Failed to read section info, data too short: %u", sectionHeader.SizeOfRawData);
     }
 
     // allocate buffer for section info
@@ -193,15 +191,19 @@ extern "C" HRESULT SectionInitialize(
     }
     else if (sectionHeader.SizeOfRawData > cbRead)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to read complete section info.");
+        ExitWithRootFailure(hr, E_INVALIDDATA, "Failed to read complete section info.");
     }
 
     // validate version of section info
     if (BURN_SECTION_VERSION != pBurnSectionHeader->dwVersion)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to read section info, unsupported version: %08x", pBurnSectionHeader->dwVersion);
+        ExitWithRootFailure(hr, E_INVALIDDATA, "Failed to read section info, unsupported version: %08x", pBurnSectionHeader->dwVersion);
+    }
+
+    cMaxContainers = (sectionHeader.SizeOfRawData - offsetof(BURN_SECTION_HEADER, rgcbContainers)) / sizeof(DWORD);
+    if (cMaxContainers < pBurnSectionHeader->cContainers)
+    {
+        ExitWithRootFailure(hr, E_INVALIDDATA, "Invalid section info, cContainers too large: %u", pBurnSectionHeader->cContainers);
     }
 
     hr = FileSizeByHandle(pSection->hSourceEngineFile, &llSize);

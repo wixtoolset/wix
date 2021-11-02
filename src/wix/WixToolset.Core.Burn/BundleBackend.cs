@@ -67,7 +67,7 @@ namespace WixToolset.Core.Burn
             using (var reader = BurnReader.Open(messaging, context.InputFilePath))
             {
                 reader.ExtractUXContainer(uxExtractPath, context.IntermediateFolder);
-                reader.ExtractAttachedContainers(context.ExportBasePath);
+                reader.ExtractAttachedContainers(context.ExportBasePath, context.IntermediateFolder);
             }
 
             return null;

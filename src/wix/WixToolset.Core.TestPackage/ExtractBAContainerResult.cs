@@ -47,12 +47,18 @@ namespace WixToolset.Core.TestPackage
         public bool Success { get; set; }
 
         /// <summary>
+        /// Whether attached containers extraction succeeded.
+        /// </summary>
+        public bool? AttachedContainersSuccess { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         public ExtractBAContainerResult AssertSuccess()
         {
             Assert.True(this.Success);
+            Assert.True(!this.AttachedContainersSuccess.HasValue || this.AttachedContainersSuccess.Value);
             return this;
         }
 
