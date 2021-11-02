@@ -125,8 +125,8 @@ namespace WixToolsetTest.CoreIntegration
 
                     var msiPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='test.msi']");
                     var msiPayload = (XmlNode)Assert.Single(msiPayloads);
-                    Assert.Equal("<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='WixAttachedContainer' />",
-                        msiPayload.GetTestXml(new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } }));
+                    Assert.Equal("<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
+                        msiPayload.GetTestXml(new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash" } } }));
                 }
 
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);
@@ -156,6 +156,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePath = Path.Combine(baseFolder, @"bin\test.exe");
                 var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
+                var attachedFolderPath = Path.Combine(baseFolder, "attached");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
                 var result = WixRunner.Execute(false, new[] // TODO: go back to elevating warnings as errors.
@@ -186,6 +187,9 @@ namespace WixToolsetTest.CoreIntegration
                     "<trustInfo xmlns=\"urn:schemas-microsoft-com:asm.v3\"><security><requestedPrivileges><requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\" /></requestedPrivileges></security></trustInfo>" +
                     "<application xmlns=\"urn:schemas-microsoft-com:asm.v3\"><windowsSettings><dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">true/pm</dpiAware><dpiAwareness xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">PerMonitorV2, PerMonitor</dpiAwareness></windowsSettings></application>" +
                     "</assembly>", actualManifestData);
+
+                var extractResult = BundleExtractor.ExtractAllContainers(null, exePath, baFolderPath, attachedFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
             }
         }
 

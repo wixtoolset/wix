@@ -18,5 +18,6 @@ static DWORD dwOriginalSignatureSize = 0;
 
 static DWORD dwContainerFormat = 1;
 static DWORD dwContainerCount = 0;
-static DWORD qwAttachedContainerSizes[116]; // Including UX container
+// (512 (minimum section size) - 48 (size of above data)) / 4 (size of DWORD)
+static DWORD qwAttachedContainerSizes[116];
 #pragma data_seg(pop)

@@ -189,15 +189,14 @@ namespace WixToolsetTest.CoreIntegration
                                             .Cast<XmlElement>()
                                             .Select(e => e.GetTestXml(ignoreAttributesByElementName))
                                             .ToArray();
-
-                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash"} } };
-                var ignoreAttributesWithSrc = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } };
-                Assert.Equal(5, payloads.Length);
-                Assert.Equal(@"<Payload Id='burn.exe' FilePath='burn.exe' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='PackagesContainer' />", payloads[0].GetTestXml(ignoreAttributesWithSrc));
-                Assert.Equal(@"<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com/id/test.msi/test.msi' Packaging='external' SourcePath='test.msi' />", payloads[1].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='LayoutOnlyPayload' FilePath='DownloadUrlPlaceholdersBundle.wxs' FileSize='*' Hash='*' LayoutOnly='yes' DownloadUrl='http://example.com/id/LayoutOnlyPayload/DownloadUrlPlaceholdersBundle.wxs' Packaging='external' SourcePath='DownloadUrlPlaceholdersBundle.wxs' />", payloads[2].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fhuZsOcBDTuIX8rF96kswqI6SnuI' FilePath='MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/test.msiid/fhuZsOcBDTuIX8rF96kswqI6SnuI/MsiPackage/test.txt' Packaging='external' SourcePath='MsiPackage\test.txt' />", payloads[3].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='faf_OZ741BG7SJ6ZkcIvivZ2Yzo8' FilePath='MsiPackage\Shared.dll' FileSize='*' Hash='*' DownloadUrl='http://example.com/test.msiid/faf_OZ741BG7SJ6ZkcIvivZ2Yzo8/MsiPackage/Shared.dll' Packaging='external' SourcePath='MsiPackage\Shared.dll' />", payloads[4].GetTestXml(ignoreAttributes));
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Payload Id='burn.exe' FilePath='burn.exe' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='PackagesContainer' />",
+                    "<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com/id/test.msi/test.msi' Packaging='external' SourcePath='test.msi' />",
+                    "<Payload Id='LayoutOnlyPayload' FilePath='DownloadUrlPlaceholdersBundle.wxs' FileSize='*' Hash='*' LayoutOnly='yes' DownloadUrl='http://example.com/id/LayoutOnlyPayload/DownloadUrlPlaceholdersBundle.wxs' Packaging='external' SourcePath='DownloadUrlPlaceholdersBundle.wxs' />",
+                   @"<Payload Id='fhuZsOcBDTuIX8rF96kswqI6SnuI' FilePath='MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/test.msiid/fhuZsOcBDTuIX8rF96kswqI6SnuI/MsiPackage/test.txt' Packaging='external' SourcePath='MsiPackage\test.txt' />",
+                   @"<Payload Id='faf_OZ741BG7SJ6ZkcIvivZ2Yzo8' FilePath='MsiPackage\Shared.dll' FileSize='*' Hash='*' DownloadUrl='http://example.com/test.msiid/faf_OZ741BG7SJ6ZkcIvivZ2Yzo8/MsiPackage/Shared.dll' Packaging='external' SourcePath='MsiPackage\Shared.dll' />",
+                }, payloads);
 
                 var containers = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Container")
                                               .Cast<XmlElement>()

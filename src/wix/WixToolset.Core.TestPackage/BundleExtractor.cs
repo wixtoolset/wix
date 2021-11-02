@@ -22,41 +22,45 @@ namespace WixToolset.Core.TestPackage
         /// <returns></returns>
         public static ExtractBAContainerResult ExtractBAContainer(IMessaging messaging, string bundleFilePath, string destinationFolderPath, string tempFolderPath)
         {
+            return ExtractAllContainers(messaging, bundleFilePath, destinationFolderPath, null, tempFolderPath);
+        }
+
+        /// <summary>
+        /// Extracts the BA container.
+        /// </summary>
+        /// <param name="messaging"></param>
+        /// <param name="bundleFilePath">Path to the bundle.</param>
+        /// <param name="baFolderPath">Path to extract BA to.</param>
+        /// <param name="otherContainersFolderPath">Path to extract other attached containers to.</param>
+        /// <param name="tempFolderPath">Temp path for extraction.</param>
+        /// <returns></returns>
+        public static ExtractBAContainerResult ExtractAllContainers(IMessaging messaging, string bundleFilePath, string baFolderPath, string otherContainersFolderPath, string tempFolderPath)
+        {
             var result = new ExtractBAContainerResult();
             Directory.CreateDirectory(tempFolderPath);
             using (var burnReader = BurnReader.Open(messaging, bundleFilePath))
             {
-                result.Success = burnReader.ExtractUXContainer(destinationFolderPath, tempFolderPath);
+                result.Success = burnReader.ExtractUXContainer(baFolderPath, tempFolderPath);
+
+                if (otherContainersFolderPath != null)
+                {
+                    result.AttachedContainersSuccess = burnReader.ExtractAttachedContainers(otherContainersFolderPath, tempFolderPath);
+                }
             }
 
             if (result.Success)
             {
-                result.ManifestDocument = LoadBurnManifest(destinationFolderPath);
+                result.ManifestDocument = LoadBurnManifest(baFolderPath);
                 result.ManifestNamespaceManager = GetBurnNamespaceManager(result.ManifestDocument, "burn");
 
-                result.BADataDocument = LoadBAData(destinationFolderPath);
+                result.BADataDocument = LoadBAData(baFolderPath);
                 result.BADataNamespaceManager = GetBADataNamespaceManager(result.BADataDocument, "ba");
 
-                result.BundleExtensionDataDocument = LoadBundleExtensionData(destinationFolderPath);
+                result.BundleExtensionDataDocument = LoadBundleExtensionData(baFolderPath);
                 result.BundleExtensionDataNamespaceManager = GetBundleExtensionDataNamespaceManager(result.BundleExtensionDataDocument, "be");
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Extracts the attached container.
-        /// </summary>
-        /// <param name="messaging"></param>
-        /// <param name="bundleFilePath">Path to the bundle.</param>
-        /// <param name="destinationFolderPath">Path to extract to.</param>
-        /// <returns>True if there was an attached container.</returns>
-        public static bool ExtractAttachedContainers(IMessaging messaging, string bundleFilePath, string destinationFolderPath)
-        {
-            using (var burnReader = BurnReader.Open(messaging, bundleFilePath))
-            {
-                return burnReader.ExtractAttachedContainers(destinationFolderPath);
-            }
         }
 
         /// <summary>

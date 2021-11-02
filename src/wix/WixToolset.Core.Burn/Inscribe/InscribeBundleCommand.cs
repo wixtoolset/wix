@@ -31,22 +31,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 FileSystem.CopyFile(this.Context.SignedEngineFile, tempFile, allowHardlink: false);
                 using (BurnWriter writer = BurnWriter.Open(this.Messaging, tempFile))
                 {
-                    if (reader.Version != writer.Version)
-                    {
-                        this.Messaging.Write(BurnBackendErrors.IncompatibleWixBurnSection(this.Context.InputFilePath, reader.Version));
-                    }
-
-                    writer.AttachedContainers.Clear();
-                    writer.RememberThenResetSignature();
-                    foreach (ContainerSlot cntnr in reader.AttachedContainers)
-                    {
-                        if (cntnr.Size > 0)
-                        {
-                            reader.Stream.Seek(cntnr.Address, SeekOrigin.Begin);
-                            writer.AppendContainer(reader.Stream, cntnr.Size, BurnCommon.Container.Attached);
-                            inscribed = true;
-                        }
-                    }
+                    inscribed = writer.ReattachContainers(reader);
                 }
             }
 
