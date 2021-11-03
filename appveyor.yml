@@ -5,7 +5,7 @@ branches:
     - master
     - develop
 
-image: Previous Visual Studio 2019
+image: vs2019-16-11-2
 
 version: 0.0.0.{build}
 configuration: Release
