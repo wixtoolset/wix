@@ -35,7 +35,8 @@ DECLARE_INTERFACE_IID_(IBAFunctions, IBootstrapperApplication, "0FB445ED-17BD-49
     STDMETHOD(OnThemeControlLoading)(
         __in LPCWSTR wzName,
         __inout BOOL* pfProcessed,
-        __inout WORD* pwId
+        __inout WORD* pwId,
+        __inout BOOL* pfDisableAutomaticFunctionality
         ) = 0;
 
     // OnThemeControlWmCommand - Called when WM_COMMAND is received for a control.

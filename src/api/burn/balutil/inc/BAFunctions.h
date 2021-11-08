@@ -141,6 +141,7 @@ struct BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS
     DWORD cbSize;
     BOOL fProcessed;
     WORD wId;
+    BOOL fDisableAutomaticFunctionality;
 };
 
 struct BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_ARGS

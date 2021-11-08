@@ -835,7 +835,8 @@ public: // IBAFunctions
     virtual STDMETHODIMP OnThemeControlLoading(
         __in LPCWSTR /*wzName*/,
         __inout BOOL* /*pfProcessed*/,
-        __inout WORD* /*pwId*/
+        __inout WORD* /*pwId*/,
+        __inout BOOL* /*pfDisableAutomaticFunctionality*/
         )
     {
         return S_OK;

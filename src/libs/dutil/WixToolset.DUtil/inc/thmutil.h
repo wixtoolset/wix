@@ -196,6 +196,7 @@ struct THEME_ASSIGN_CONTROL_ID
     WORD wId;       // id to apply to control
     LPCWSTR wzName; // name of control to match
     const THEME_CONTROL** ppControl;
+    BOOL fDisableAutomaticFunctionality; // prevent declarative functionality from interfering with the application's imperative code
 };
 
 const WORD THEME_FIRST_ASSIGN_CONTROL_ID = 0x4000; // Recommended first control id to be assigned.
@@ -223,7 +224,7 @@ typedef struct _THEME_CONTROL
 
     LPWSTR sczEnableCondition;
     LPWSTR sczVisibleCondition;
-    BOOL fDisableVariableFunctionality;
+    BOOL fDisableAutomaticFunctionality;
 
     union
     {
@@ -470,6 +471,8 @@ typedef struct _THEME_LOADINGCONTROL_RESULTS
     // The values [100, THEME_FIRST_ASSIGN_CONTROL_ID) are reserved for thmutil.
     // Due to this value being packed into 16 bits for many system window messages, this is restricted to a WORD.
     WORD wId;
+    // Used to prevent declarative functionality from interfering with the application's imperative code.
+    BOOL fDisableAutomaticFunctionality;
 } THEME_LOADINGCONTROL_RESULTS;
 
 
