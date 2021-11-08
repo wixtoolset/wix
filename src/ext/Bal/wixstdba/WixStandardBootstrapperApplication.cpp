@@ -275,7 +275,8 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnDetectPackageComplete(
         __in LPCWSTR wzPackageId,
         __in HRESULT /*hrStatus*/,
-        __in BOOTSTRAPPER_PACKAGE_STATE state
+        __in BOOTSTRAPPER_PACKAGE_STATE state,
+        __in BOOL /*fCached*/
         )
     {
         WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
