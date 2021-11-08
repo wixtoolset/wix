@@ -295,7 +295,8 @@ static void UnloadThemeControls(
 static HRESULT OnLoadingControl(
     __in THEME* pTheme,
     __in const THEME_CONTROL* pControl,
-    __inout WORD* pwId
+    __inout WORD* pwId,
+    __inout BOOL* pfDisableAutomaticFunctionality
     );
 static HRESULT LoadControls(
     __in THEME* pTheme,
@@ -3432,9 +3433,6 @@ static HRESULT ParseControl(
         pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_HIDE_WHEN_DISABLED;
     }
 
-    hr = XmlGetYesNoAttribute(pixn, L"DisableAutomaticBehavior", &pControl->fDisableVariableFunctionality);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control DisableAutomaticBehavior attribute.");
-
     hr = ParseActions(pixn, pControl);
     ThmExitOnFailure(hr, "Failed to parse action nodes of the control.");
 
@@ -5002,6 +5000,7 @@ static void OnBrowseDirectory(
     {
         // Since editbox changes aren't immediately saved off, we have to treat them differently.
         THEME_CONTROL* pTargetControl = NULL;
+        BOOL fSetVariable = NULL != pTheme->pfnSetStringVariable;
 
         for (DWORD i = 0; i < pTheme->cControls; ++i)
         {
@@ -5015,20 +5014,17 @@ static void OnBrowseDirectory(
             }
         }
 
-        if (pTargetControl && THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type && !pTargetControl->fDisableVariableFunctionality)
+        if (pTargetControl && !pTargetControl->fDisableAutomaticFunctionality && (!fSetVariable || THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type))
         {
+            fSetVariable = FALSE;
             hr = ThemeSetTextControl(pTargetControl, wzPath);
-            ThmExitOnFailure(hr, "Failed to set text on editbox: %ls", pTargetControl->sczName);
+            ThmExitOnFailure(hr, "Failed to set text on control: %ls", pTargetControl->sczName);
         }
-        else if (pTheme->pfnSetStringVariable)
+
+        if (fSetVariable)
         {
             hr = pTheme->pfnSetStringVariable(pAction->BrowseDirectory.sczVariableName, wzPath, FALSE, pTheme->pvVariableContext);
             ThmExitOnFailure(hr, "Failed to set variable: %ls", pAction->BrowseDirectory.sczVariableName);
-        }
-        else if (pTargetControl)
-        {
-            hr = ThemeSetTextControl(pTargetControl, wzPath);
-            ThmExitOnFailure(hr, "Failed to set text on control: %ls", pTargetControl->sczName);
         }
 
         ThemeShowPageEx(pTheme, pTheme->dwCurrentPageId, SW_SHOW, THEME_SHOW_PAGE_REASON_REFRESH);
@@ -5051,7 +5047,7 @@ static BOOL OnButtonClicked(
 
     if (THEME_CONTROL_TYPE_BUTTON == pControl->type || THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
     {
-        if (pControl->cActions)
+        if (!pControl->fDisableAutomaticFunctionality && pControl->cActions)
         {
             fHandled = TRUE;
             THEME_ACTION* pChosenAction = pControl->pDefaultAction;
@@ -5109,7 +5105,7 @@ static BOOL OnButtonClicked(
             }
         }
     }
-    else if (!pControl->fDisableVariableFunctionality && (pTheme->pfnSetNumericVariable || pTheme->pfnSetStringVariable))
+    else if (!pControl->fDisableAutomaticFunctionality && (pTheme->pfnSetNumericVariable || pTheme->pfnSetStringVariable))
     {
         BOOL fRefresh = FALSE;
 
@@ -5564,7 +5560,7 @@ static HRESULT ShowControl(
     THEME_PAGE* pPage = ThemeGetPage(pTheme, dwPageId);
 
     // Save the editbox value if necessary (other control types save their values immediately).
-    if (pTheme->pfnSetStringVariable && !pControl->fDisableVariableFunctionality &&
+    if (pTheme->pfnSetStringVariable && !pControl->fDisableAutomaticFunctionality &&
         fSaveEditboxes && THEME_CONTROL_TYPE_EDITBOX == pControl->type && pControl->sczName && *pControl->sczName)
     {
         hr = ThemeGetTextControl(pControl, &sczText);
@@ -5591,7 +5587,7 @@ static HRESULT ShowControl(
     BOOL fEnabled = !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_DISABLED);
     BOOL fVisible = !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_HIDDEN);
 
-    if (!pControl->fDisableVariableFunctionality)
+    if (!pControl->fDisableAutomaticFunctionality)
     {
         if (pTheme->pfnEvaluateCondition)
         {
@@ -6017,7 +6013,8 @@ static LRESULT CALLBACK StaticOwnerDrawWndProc(
 static HRESULT OnLoadingControl(
     __in THEME* pTheme,
     __in const THEME_CONTROL* pControl,
-    __inout WORD* pwId
+    __inout WORD* pwId,
+    __inout BOOL* pfDisableAutomaticFunctionality
     )
 {
     HRESULT hr = S_OK;
@@ -6037,6 +6034,7 @@ static HRESULT OnLoadingControl(
         if (SUCCEEDED(hr))
         {
             *pwId = loadingControlResults.wId;
+            *pfDisableAutomaticFunctionality = loadingControlResults.fDisableAutomaticFunctionality;
         }
     }
 
@@ -6238,7 +6236,7 @@ static HRESULT LoadControls(
 
         // Default control ids to the next id, unless there is a specific id to assign to a control.
         WORD wControlId = THEME_FIRST_AUTO_ASSIGN_CONTROL_ID;
-        hr = OnLoadingControl(pTheme, pControl, &wControlId);
+        hr = OnLoadingControl(pTheme, pControl, &wControlId, &pControl->fDisableAutomaticFunctionality);
         ThmExitOnFailure(hr, "ThmLoadingControl failed.");
 
         // This range is reserved for thmutil. The process will run out of available window handles before reaching the end of the range.
@@ -6256,7 +6254,7 @@ static HRESULT LoadControls(
         BOOL fDisabled = pControl->dwStyle & WS_DISABLED;
 
         // If the control is supposed to be initially visible and it has a VisibleCondition, check if it's true.
-        if (fVisible && pControl->sczVisibleCondition && pTheme->pfnEvaluateCondition && !pControl->fDisableVariableFunctionality)
+        if (fVisible && pControl->sczVisibleCondition && pTheme->pfnEvaluateCondition && !pControl->fDisableAutomaticFunctionality)
         {
             hr = pTheme->pfnEvaluateCondition(pControl->sczVisibleCondition, &fVisible, pTheme->pvVariableContext);
             ThmExitOnFailure(hr, "Failed to evaluate VisibleCondition: %ls", pControl->sczVisibleCondition);
@@ -6275,7 +6273,7 @@ static HRESULT LoadControls(
         }
 
         // If the control is supposed to be initially enabled and it has an EnableCondition, check if it's true.
-        if (!fDisabled && pControl->sczEnableCondition && pTheme->pfnEvaluateCondition && !pControl->fDisableVariableFunctionality)
+        if (!fDisabled && pControl->sczEnableCondition && pTheme->pfnEvaluateCondition && !pControl->fDisableAutomaticFunctionality)
         {
             BOOL fEnable = TRUE;
 

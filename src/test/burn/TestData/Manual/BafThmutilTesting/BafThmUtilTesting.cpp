@@ -46,7 +46,8 @@ public: // IBAFunctions
     virtual STDMETHODIMP OnThemeControlLoading(
         __in LPCWSTR wzName,
         __inout BOOL* pfProcessed,
-        __inout WORD* pwId
+        __inout WORD* pwId,
+        __inout BOOL* /*pfDisableAutomaticFunctionality*/
         )
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzName, -1, L"InstallTestButton", -1))

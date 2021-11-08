@@ -327,9 +327,10 @@ static BOOL DisplayOnThmLoadedControl(
     }
     else if (THEME_CONTROL_TYPE_PROGRESSBAR == pControl->type)
     {
-        DWORD dwId = ::SetTimer(pTheme->hwndParent, reinterpret_cast<UINT_PTR>(pControl), 500, NULL);
-        dwId = dwId; // prevents warning in "ship" build.
-        Assert(dwId == pControl->wId);
+        UINT_PTR timerId = reinterpret_cast<UINT_PTR>(pControl);
+        UINT_PTR id = ::SetTimer(pTheme->hwndParent, timerId, 500, NULL);
+        id = id; // prevents warning in "ship" build.
+        Assert(id == timerId);
     }
 
 LExit:

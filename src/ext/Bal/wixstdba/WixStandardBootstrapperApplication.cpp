@@ -2927,6 +2927,7 @@ private:
 
                 fProcessed = TRUE;
                 pResults->wId = pAssignControl->wId;
+                pResults->fDisableAutomaticFunctionality = pAssignControl->fDisableAutomaticFunctionality;
                 ExitFunction();
             }
         }
@@ -2938,6 +2939,7 @@ private:
 
             themeControlLoadingResults.cbSize = sizeof(themeControlLoadingResults);
             themeControlLoadingResults.wId = pResults->wId;
+            themeControlLoadingResults.fDisableAutomaticFunctionality = pResults->fDisableAutomaticFunctionality;
 
             hr = m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLLOADING, &themeControlLoadingArgs, &themeControlLoadingResults, m_pvBAFunctionsProcContext);
 
@@ -2953,6 +2955,7 @@ private:
                 {
                     fProcessed = TRUE;
                     pResults->wId = themeControlLoadingResults.wId;
+                    pResults->fDisableAutomaticFunctionality = themeControlLoadingResults.fDisableAutomaticFunctionality;
                 }
             }
         }
@@ -4040,7 +4043,7 @@ LExit:
         BalExitOnNullWithLastError(pfnBAFunctionsCreate, hr, "Failed to get BAFunctionsCreate entry-point from: %ls", sczBafPath);
 
         bafCreateArgs.cbSize = sizeof(bafCreateArgs);
-        bafCreateArgs.qwBAFunctionsAPIVersion = MAKEQWORDVERSION(2021, 9, 20, 0);
+        bafCreateArgs.qwBAFunctionsAPIVersion = MAKEQWORDVERSION(2021, 11, 8, 0);
         bafCreateArgs.pBootstrapperCreateArgs = &m_createArgs;
 
         bafCreateResults.cbSize = sizeof(bafCreateResults);
@@ -4138,138 +4141,161 @@ public:
         pAssignControl->wId = WIXSTDBA_CONTROL_INSTALL_BUTTON;
         pAssignControl->wzName = L"InstallButton";
         pAssignControl->ppControl = &m_pControlInstallButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlInstallButton = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EULA_RICHEDIT;
         pAssignControl->wzName = L"EulaRichedit";
         pAssignControl->ppControl = &m_pControlEulaRichedit;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlEulaRichedit = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EULA_LINK;
         pAssignControl->wzName = L"EulaHyperlink";
         pAssignControl->ppControl = &m_pControlEulaHyperlink;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlEulaHyperlink = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX;
         pAssignControl->wzName = L"EulaAcceptCheckbox";
         pAssignControl->ppControl = &m_pControlEulaAcceptCheckbox;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlEulaAcceptCheckbox = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_REPAIR_BUTTON;
         pAssignControl->wzName = L"RepairButton";
         pAssignControl->ppControl = &m_pControlRepairButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlRepairButton = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_UNINSTALL_BUTTON;
         pAssignControl->wzName = L"UninstallButton";
         pAssignControl->ppControl = &m_pControlUninstallButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlUninstallButton = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT;
         pAssignControl->wzName = L"CacheProgressPackageText";
         pAssignControl->ppControl = &m_pControlCacheProgressPackageText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlCacheProgressPackageText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_BAR;
         pAssignControl->wzName = L"CacheProgressbar";
         pAssignControl->ppControl = &m_pControlCacheProgressbar;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlCacheProgressbar = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_TEXT;
         pAssignControl->wzName = L"CacheProgressText";
         pAssignControl->ppControl = &m_pControlCacheProgressText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlCacheProgressText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT;
         pAssignControl->wzName = L"ExecuteProgressPackageText";
         pAssignControl->ppControl = &m_pControlExecuteProgressPackageText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlExecuteProgressPackageText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_BAR;
         pAssignControl->wzName = L"ExecuteProgressbar";
         pAssignControl->ppControl = &m_pControlExecuteProgressbar;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlExecuteProgressbar = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_TEXT;
         pAssignControl->wzName = L"ExecuteProgressText";
         pAssignControl->ppControl = &m_pControlExecuteProgressText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlExecuteProgressText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_ACTIONDATA_TEXT;
         pAssignControl->wzName = L"ExecuteProgressActionDataText";
         pAssignControl->ppControl = &m_pControlExecuteProgressActionDataText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlExecuteProgressActionDataText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT;
         pAssignControl->wzName = L"OverallProgressPackageText";
         pAssignControl->ppControl = &m_pControlOverallProgressPackageText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlOverallProgressPackageText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_PROGRESS_BAR;
         pAssignControl->wzName = L"OverallProgressbar";
         pAssignControl->ppControl = &m_pControlOverallProgressbar;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlOverallProgressbar = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_CALCULATED_PROGRESS_BAR;
         pAssignControl->wzName = L"OverallCalculatedProgressbar";
         pAssignControl->ppControl = &m_pControlOverallCalculatedProgressbar;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlOverallCalculatedProgressbar = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_PROGRESS_TEXT;
         pAssignControl->wzName = L"OverallProgressText";
         pAssignControl->ppControl = &m_pControlOverallProgressText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlOverallProgressText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON;
         pAssignControl->wzName = L"ProgressCancelButton";
         pAssignControl->ppControl = &m_pControlProgressCancelButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlProgressCancelButton = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_LAUNCH_BUTTON;
         pAssignControl->wzName = L"LaunchButton";
         pAssignControl->ppControl = &m_pControlLaunchButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlLaunchButton = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON;
         pAssignControl->wzName = L"SuccessRestartButton";
         pAssignControl->ppControl = &m_pControlSuccessRestartButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlSuccessRestartButton = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK;
         pAssignControl->wzName = L"FailureLogFileLink";
         pAssignControl->ppControl = &m_pControlFailureLogFileLink;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlFailureLogFileLink = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT;
         pAssignControl->wzName = L"FailureMessageText";
         pAssignControl->ppControl = &m_pControlFailureMessageText;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlFailureMessageText = NULL;
         ++pAssignControl;
 
         pAssignControl->wId = WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON;
         pAssignControl->wzName = L"FailureRestartButton";
         pAssignControl->ppControl = &m_pControlFailureRestartButton;
+        pAssignControl->fDisableAutomaticFunctionality = TRUE;
         m_pControlFailureRestartButton = NULL;
 
         C_ASSERT(LAST_WIXSTDBA_CONTROL == WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON + 1);
