@@ -35,7 +35,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <ExceptionHandling>false</ExceptionHandling>
       <ControlFlowGuard>Guard</ControlFlowGuard>
-      <AdditionalOptions>-YlprecompDefine</AdditionalOptions>
+      <AdditionalOptions>-YlprecompDefine /w44263</AdditionalOptions>
       <AdditionalOptions Condition=" $(PlatformToolset.StartsWith('v14')) ">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation Condition=" $(NUMBER_OF_PROCESSORS) &gt; 4 ">true</MultiProcessorCompilation>
     </ClCompile>
