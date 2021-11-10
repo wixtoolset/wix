@@ -28,12 +28,13 @@
     <Image Id="progressbar" ImageResource="30" />
     <Image Id="progressbar_reverse" ImageResource="31" />
 
+    <ImageList Name="Stars">
+        <ImageListItem ImageResource="2" />
+        <ImageListItem ImageResource="3" />
+        <ImageListItem ImageResource="4" />
+    </ImageList>
+
     <Window Width="600" Height="450" FontId="Default" Caption="BafThmUtilTestingTheme" HexStyle="10cf0000" AutoResize="yes">
-        <ImageList Name="Stars">
-            <ImageListItem ImageResource="2" />
-            <ImageListItem ImageResource="3" />
-            <ImageListItem ImageResource="4" />
-        </ImageList>
         <Page Name="Transparency">
             <Label X="6" Y="6" Width="-6" Height="94" FontId="Default">
                 This page has three versions of an image. The top image is a bitmap with a transparent background, the yellow star should be visible but its black background should not (this is currently broken). The middle image is the same bitmap except the black background is fully opaque so the yellow star should be visible on a black background. The bottom image in a PNG version of the top image and should look exactly the same.

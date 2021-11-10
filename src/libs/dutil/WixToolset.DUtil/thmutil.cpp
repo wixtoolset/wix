@@ -1834,6 +1834,10 @@ static HRESULT ParseTheme(
     hr = ParseImages(hModule, wzRelativePath, pThemeElement, pTheme);
     ThmExitOnFailure(hr, "Failed to parse theme images.");
 
+    // Parse any image lists.
+    hr = ParseImageLists(hModule, wzRelativePath, pThemeElement, pTheme);
+    ThmExitOnFailure(hr, "Failed to parse image lists.");
+
     // Parse the window element.
     hr = ParseWindow(hModule, wzRelativePath, pThemeElement, pTheme);
     ThmExitOnFailure(hr, "Failed to parse theme window element.");
@@ -2597,10 +2601,6 @@ static HRESULT ParseWindow(
     {
         ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window elements must contain either the Caption or StringId attribute.");
     }
-
-    // Parse any image lists.
-    hr = ParseImageLists(hModule, wzRelativePath, pixn, pTheme);
-    ThmExitOnFailure(hr, "Failed to parse image lists.");
 
     // Parse the pages.
     hr = ParsePages(hModule, wzRelativePath, pixn, pTheme);
