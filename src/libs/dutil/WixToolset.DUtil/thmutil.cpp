@@ -6363,15 +6363,15 @@ static HRESULT LoadControls(
                 {
                     ::SendMessageW(pControl->hWnd, LVM_SETIMAGELIST, static_cast<WPARAM>(LVSIL_NORMAL), reinterpret_cast<LPARAM>(pControl->ListView.rghImageList[0]));
                 }
-                else if (pControl->ListView.rghImageList[1])
+                if (pControl->ListView.rghImageList[1])
                 {
                     ::SendMessageW(pControl->hWnd, LVM_SETIMAGELIST, static_cast<WPARAM>(LVSIL_SMALL), reinterpret_cast<LPARAM>(pControl->ListView.rghImageList[1]));
                 }
-                else if (pControl->ListView.rghImageList[2])
+                if (pControl->ListView.rghImageList[2])
                 {
                     ::SendMessageW(pControl->hWnd, LVM_SETIMAGELIST, static_cast<WPARAM>(LVSIL_STATE), reinterpret_cast<LPARAM>(pControl->ListView.rghImageList[2]));
                 }
-                else if (pControl->ListView.rghImageList[3])
+                if (pControl->ListView.rghImageList[3])
                 {
                     ::SendMessageW(pControl->hWnd, LVM_SETIMAGELIST, static_cast<WPARAM>(LVSIL_GROUPHEADER), reinterpret_cast<LPARAM>(pControl->ListView.rghImageList[3]));
                 }
