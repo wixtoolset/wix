@@ -42,7 +42,7 @@
     <Error Condition="!Exists('$(RootPackagesFolder)xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
 
-  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
+  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x86" />
   <Target Name="Test" DependsOnTargets="Build">
     <xunit Assemblies="$(TargetPath)" />
   </Target>
