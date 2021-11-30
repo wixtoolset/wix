@@ -4,6 +4,7 @@ namespace WixToolsetTest.CoreIntegration
 {
     using System;
     using System.IO;
+    using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
@@ -35,6 +36,40 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(exePath));
+            }
+        }
+
+        [Fact]
+        public void CanBuildPackageWithBindVariables()
+        {
+            var folder = TestData.Get(@"TestData", "BindVariables");
+            var dotDataFolder = TestData.Get(@"TestData", ".Data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(intermediateFolder, @"test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageWithBindVariables.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", folder,
+                    "-bindpath", dotDataFolder,
+                    "-o", msiPath,
+                });
+
+                result.AssertSuccess();
+
+                var queryResults = Query.QueryDatabase(msiPath, new[] { "Property" }).ToDictionary(s => s.Split('\t')[0]);
+                Assert.Equal("Property:ProductVersion\t3.14.1703.0", queryResults["Property:ProductVersion"]);
+                Assert.Equal("Property:TestPackageManufacturer\tExample Corporation", queryResults["Property:TestPackageManufacturer"]);
+                Assert.Equal("Property:TestPackageName\tPacakgeWithBindVariables", queryResults["Property:TestPackageName"]);
+                Assert.Equal("Property:TestPackageVersion\t3.14.1703.0", queryResults["Property:TestPackageVersion"]);
+                Assert.Equal("Property:TestTextVersion\tv", queryResults["Property:TestTextVersion"]);
+                Assert.False(queryResults.ContainsKey("Property:TestTextLanguage"));
             }
         }
 

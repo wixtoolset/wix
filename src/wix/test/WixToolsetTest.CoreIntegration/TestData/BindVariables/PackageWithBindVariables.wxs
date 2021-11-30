@@ -1,0 +1,20 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="PacakgeWithBindVariables" Version="!(bind.fileversion.TestBinaryFile)" Manufacturer="Example Corporation" UpgradeCode="00000000-0000-0000-0000-000000000000">
+
+    <Property Id="TestPackageManufacturer" Value="!(bind.Property.Manufacturer)" />
+    <Property Id="TestPackageName" Value="!(bind.Property.ProductName)" />
+    <Property Id="TestPackageVersion" Value="!(bind.Property.ProductVersion)" />
+
+    <Property Id="TestTextVersion" Value="v!(bind.fileversion.TestTextFile)" />
+    <Property Id="TestTextLangauge" Value="!(bind.filelanguage.TestTextFile)" />
+
+    <Feature Id="ProductFeature">
+      <Component Directory="ProgramFiles6432Folder" Subdirectory="test">
+        <File Id="TestBinaryFile" Source="burn.exe" />
+      </Component>
+      <Component Directory="ProgramFiles6432Folder" Subdirectory="test">
+        <File Id="TestTextFile" Source="data\test.txt" />
+      </Component>
+    </Feature>
+  </Package>
+</Wix>
