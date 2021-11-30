@@ -195,22 +195,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     facade.Language = language;
                 }
+            }
 
-                // Populate the binder variables for this file information if requested.
-                if (null != this.VariableCache)
-                {
-                    if (!String.IsNullOrEmpty(facade.Version))
-                    {
-                        var key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", facade.Id);
-                        this.VariableCache[key] = facade.Version;
-                    }
-
-                    if (!String.IsNullOrEmpty(facade.Language))
-                    {
-                        var key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", facade.Id);
-                        this.VariableCache[key] = facade.Language;
-                    }
-                }
+            // Populate the binder variables for this file information if requested.
+            if (null != this.VariableCache)
+            {
+                this.VariableCache[$"fileversion.{facade.Id}"] = facade.Version ?? String.Empty;
+                this.VariableCache[$"filelanguage.{facade.Id}"] = facade.Language ?? String.Empty;
             }
 
             // If this is a CLR assembly, load the assembly and get the assembly name information
