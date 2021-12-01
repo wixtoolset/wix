@@ -6,7 +6,6 @@
 
     <!-- Build -->
 
-    <!-- Let bextutil build balutil. -->
     <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x86;PlatformToolset=v140" />
     <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x64;PlatformToolset=v140" />
     <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x86;PlatformToolset=v141" />
@@ -15,12 +14,14 @@
     <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x86" />
     <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=ARM64" />
-    
-    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x86;PlatformToolset=v140" />
-    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x64;PlatformToolset=v140" />
-    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x86;PlatformToolset=v141" />
-    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x64;PlatformToolset=v141" />
-    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=ARM64;PlatformToolset=v141" />
+
+    <ProjectReference Include="balutil\balutil.vcxproj" Properties="Platform=x86;PlatformToolset=v140" />
+    <ProjectReference Include="balutil\balutil.vcxproj" Properties="Platform=x64;PlatformToolset=v140" />
+    <ProjectReference Include="balutil\balutil.vcxproj" Properties="Platform=x86;PlatformToolset=v141" />
+    <ProjectReference Include="balutil\balutil.vcxproj" Properties="Platform=x64;PlatformToolset=v141" />
+    <ProjectReference Include="balutil\balutil.vcxproj" Properties="Platform=ARM64;PlatformToolset=v141" />
+
+    <!-- Let mbanative build balutil for latest toolset. -->
     <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x86" />
     <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=ARM64" />
