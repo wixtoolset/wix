@@ -5,7 +5,7 @@
             <PayloadGroupRef Id="publish.Example.EarliestCoreMBA.trimmedscd" />
         </BootstrapperApplication>
         <Chain>
-            <ExePackage DetectCondition="none" SourceFile="c:\windows\system32\kernel32.dll" PerMachine="yes" />
+            <ExePackage DetectCondition="none" SourceFile="..\.data\notanexe.exe" PerMachine="yes" />
         </Chain>
     </Bundle>
 </Wix>
