@@ -39,17 +39,20 @@ namespace WixToolset.Core.Native
             {
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true,
                 ErrorDialog = false,
                 UseShellExecute = false
             };
 
-            var stdoutLines = new List<string>();
+            var outputLines = new List<string>();
 
             using (var process = Process.Start(wixNativeInfo))
             {
-                process.OutputDataReceived += (s, a) => stdoutLines.Add(a.Data);
+                process.OutputDataReceived += (s, a) => outputLines.Add(a.Data);
+                process.ErrorDataReceived += (s, a) => outputLines.Add(a.Data);
                 process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
 
                 if (this.stdinLines.Count > 0)
                 {
@@ -69,11 +72,11 @@ namespace WixToolset.Core.Native
 
                 if (process.ExitCode != 0)
                 {
-                    throw new Win32Exception(process.ExitCode);
+                    throw WixNativeException.FromOutputLines(process.ExitCode, outputLines);
                 }
             }
 
-            return stdoutLines;
+            return outputLines;
         }
 
         private static void EnsurePathToWixNativeExeSet()
