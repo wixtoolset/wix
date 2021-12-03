@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.BurnE2E
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using WixBuildTools.TestSupport;
@@ -17,22 +18,34 @@ namespace WixToolsetTest.BurnE2E
         [Fact]
         public void CanCache5GBFile()
         {
-            var packageA = this.CreatePackageInstaller("PackageA");
-            var bundleC = this.CreateBundleInstaller("BundleC");
-
-            packageA.VerifyInstalled(false);
-
             // Recreate the 5GB payload to avoid having to copy it to the VM to run the tests.
+            const long FiveGB = 5_368_709_120;
+            const long OneGB = 1_073_741_824;
             var targetFilePath = Path.Combine(this.TestContext.TestDataFolder, "fivegb.file");
+
+            // If the drive has less than 5GB (for the test file) plus 1GB (for working space), then
+            // skip the test.
+            var drive = new DriveInfo(targetFilePath.Substring(0, 1));
+            if (drive.AvailableFreeSpace < FiveGB + OneGB)
+            {
+                Console.WriteLine("Skipping CanCache5GBFile() test because there is not enough disk space available to run the test.");
+                return;
+            }
+
             if (!File.Exists(targetFilePath))
             {
                 var testTool = new TestTool(Path.Combine(TestData.Get(), "win-x86", "TestExe.exe"))
                 {
-                    Arguments = "/lf \"" + targetFilePath + "|5368709120\"",
+                    Arguments = "/lf \"" + targetFilePath + $"|{FiveGB}\"",
                     ExpectedExitCode = 0,
                 };
                 testTool.Run(true);
             }
+
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundleC = this.CreateBundleInstaller("BundleC");
+
+            packageA.VerifyInstalled(false);
 
             bundleC.Install();
             bundleC.VerifyRegisteredAndInPackageCache();
