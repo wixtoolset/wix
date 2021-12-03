@@ -1,14 +1,15 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
+#include "fileutil.h"
 
-static HRESULT CompressFiles(HANDLE hCab);
-static void __stdcall CabNamesCallback(LPWSTR wzFirstCabName, LPWSTR wzNewCabName, LPWSTR wzFileToken);
+static HRESULT CompressFiles(__in HANDLE hCab);
+static void __stdcall CabNamesCallback(__in_z LPWSTR wzFirstCabName, __in_z LPWSTR wzNewCabName, __in_z LPWSTR wzFileToken);
 
 
 HRESULT SmartCabCommand(
     __in int argc,
-    __in LPWSTR argv[]
+    __in_ecount(argc) LPWSTR argv[]
 )
 {
     HRESULT hr = E_INVALIDARG;
@@ -66,6 +67,9 @@ HRESULT SmartCabCommand(
 
     if (uiFileCount > 0)
     {
+        hr = WixNativeReadStdinPreamble();
+        ExitOnFailure(hr, "failed to read stdin preamble before smartcabbing");
+
         hr = CompressFiles(hCab);
         ExitOnFailure(hr, "failed to compress files into cabinet: %ls", wzCabPath);
     }
@@ -151,9 +155,9 @@ LExit:
 // Second argument is name of the new cabinet that would be formed by splitting e.g. "cab1b.cab"
 // Third argument is the file token of the first file present in the splitting cabinet
 static void __stdcall CabNamesCallback(
-    __in LPWSTR wzFirstCabName,
-    __in LPWSTR wzNewCabName,
-    __in LPWSTR wzFileToken
+    __in_z LPWSTR wzFirstCabName,
+    __in_z LPWSTR wzNewCabName,
+    __in_z LPWSTR wzFileToken
 )
 {
     ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls\t%ls\t%ls", wzFirstCabName, wzNewCabName, wzFileToken);

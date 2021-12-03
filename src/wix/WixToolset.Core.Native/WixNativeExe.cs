@@ -4,7 +4,6 @@ namespace WixToolset.Core.Native
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
 
@@ -53,6 +52,9 @@ namespace WixToolset.Core.Native
                 process.ErrorDataReceived += (s, a) => outputLines.Add(a.Data);
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
+
+                // Send the stdin preamble.
+                process.StandardInput.WriteLine(":");
 
                 if (this.stdinLines.Count > 0)
                 {
