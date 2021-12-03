@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <aclapi.h>
 #include <mergemod.h>
+#include <strsafe.h>
 
 #include "dutil.h"
 #include "conutil.h"
@@ -13,7 +14,8 @@
 #include "cabcutil.h"
 #include "cabutil.h"
 
-HRESULT SmartCabCommand(int argc, LPWSTR argv[]);
-HRESULT ResetAclsCommand(int argc, LPWSTR argv[]);
-HRESULT EnumCabCommand(int argc, LPWSTR argv[]);
-HRESULT ExtractCabCommand(int argc, LPWSTR argv[]);
+HRESULT WixNativeReadStdinPreamble();
+HRESULT SmartCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
+HRESULT ResetAclsCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
+HRESULT EnumCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
+HRESULT ExtractCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);

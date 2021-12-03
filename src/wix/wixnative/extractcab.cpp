@@ -2,12 +2,12 @@
 
 #include "precomp.h"
 
-static HRESULT ProgressCallback(BOOL fBeginFile, LPCWSTR wzFileId, LPVOID pvContext);
+static HRESULT ProgressCallback(__in BOOL fBeginFile, __in_z LPCWSTR wzFileId, __in_opt LPVOID pvContext);
 
 
 HRESULT ExtractCabCommand(
     __in int argc,
-    __in LPWSTR argv[]
+    __in_ecount(argc) LPWSTR argv[]
 )
 {
     HRESULT hr = E_INVALIDARG;
@@ -37,8 +37,8 @@ LExit:
 
 static HRESULT ProgressCallback(
     __in BOOL fBeginFile,
-    __in LPCWSTR wzFileId,
-    __in LPVOID /*pvContext*/
+    __in_z LPCWSTR wzFileId,
+    __in_opt LPVOID /*pvContext*/
 )
 {
     if (fBeginFile)

@@ -57,19 +57,6 @@ namespace WixToolset.Core.Native
             }
 
             wixnative.Run();
-
-#if TOOD_ERROR_HANDLING
-            catch (COMException ce)
-            {
-                // If we get a "the file exists" error, we must have a full temp directory - so report the issue
-                if (0x80070050 == unchecked((uint)ce.ErrorCode))
-                {
-                    throw new WixException(WixErrors.FullTempDirectory("WSC", Path.GetTempPath()));
-                }
-
-                throw;
-            }
-#endif
         }
 
         /// <summary>

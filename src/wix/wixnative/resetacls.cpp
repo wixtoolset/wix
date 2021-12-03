@@ -2,7 +2,9 @@
 
 #include "precomp.h"
 
-HRESULT ResetAclsCommand(int argc, LPWSTR argv[])
+HRESULT ResetAclsCommand(
+    __in int argc,
+    __in_ecount(argc) LPWSTR argv[])
 {
     Unused(argc);
     Unused(argv);
@@ -23,6 +25,9 @@ HRESULT ResetAclsCommand(int argc, LPWSTR argv[])
     {
         ConsoleExitOnLastError(hr, CONSOLE_COLOR_RED, "failed to initialize ACL");
     }
+
+    hr = WixNativeReadStdinPreamble();
+    ExitOnFailure(hr, "failed to read stdin preamble before resetting ACLs");
 
     // Reset the existing security permissions on each provided file.
     for (;;)

@@ -36,3 +36,31 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     ConsoleUninitialize();
     return HRESULT_CODE(hr);
 }
+
+HRESULT WixNativeReadStdinPreamble()
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczLine = NULL;
+    size_t cchPreamble = 0;
+
+    // Read the first line to determine if a byte-order-mark was prepended to stdin.
+    // A byte-order-mark is not normally expected but has been seen in some CI/CD systems.
+    // The preable is a single line with ":".
+    hr = ConsoleReadW(&sczLine);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to read preamble from stdin");
+
+    hr = ::StringCchLengthW(sczLine, STRSAFE_MAX_CCH, &cchPreamble);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to get length of stdin preamble");
+
+    // Ensure the preamble ends with ":" and ignore anything before that (since it may be a BOM).
+    if (!cchPreamble || sczLine[cchPreamble - 1] != L':')
+    {
+        hr = E_INVALIDDATA;
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "expected ':' as preamble on first line of stdin");
+    }
+
+LExit:
+    ReleaseStr(sczLine);
+
+    return hr;
+}
