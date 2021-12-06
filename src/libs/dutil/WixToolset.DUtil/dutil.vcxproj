@@ -34,7 +34,6 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>dutil</TargetName>
     <MultiTargetLibrary>true</MultiTargetLibrary>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset native library foundation</Description>
     <PackageId>WixToolset.DUtil</PackageId>

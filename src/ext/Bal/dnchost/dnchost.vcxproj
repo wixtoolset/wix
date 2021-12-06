@@ -31,7 +31,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B6F70281-6583-4138-BB7F-AABFEBBB3CA2}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>dnchost</TargetName>
     <ProjectModuleDefinitionFile>dnchost.def</ProjectModuleDefinitionFile>

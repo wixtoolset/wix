@@ -32,7 +32,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{12C87C77-3547-44F8-8134-29BC915CB19D}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>mbahost</TargetName>
     <ProjectModuleDefinitionFile>mbahost.def</ProjectModuleDefinitionFile>

@@ -35,7 +35,6 @@
     <ProjectGuid>{CB3FB8C4-14BF-4EA6-9F01-7FB258E5AEF3}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>iisca</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>iisca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Iis CustomAction</Description>

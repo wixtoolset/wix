@@ -24,7 +24,6 @@
     <ProjectGuid>{55D5BA28-D427-4F53-80C2-FE9EF23C1553}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>SfxCA</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>EntryPoints.def</ProjectModuleDefinitionFile>
   </PropertyGroup>

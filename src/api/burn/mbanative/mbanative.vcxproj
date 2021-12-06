@@ -32,11 +32,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{665E0441-17F9-4105-B202-EDF274657F6E}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>mbanative</TargetName>
     <ProjectModuleDefinitionFile>mbanative.def</ProjectModuleDefinitionFile>
-    <EnableSourceLink Condition=" '$(PlatformToolset)'=='v140' ">false</EnableSourceLink>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

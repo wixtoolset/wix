@@ -10,19 +10,9 @@
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)native\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v140')) ">
+  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v14')) ">
     <Link>
-      <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v140\$(PlatformTarget)\wcautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v141')) ">
-    <Link>
-      <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v141\$(PlatformTarget)\wcautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v142')) ">
-    <Link>
-      <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v142\$(PlatformTarget)\wcautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v14\$(PlatformTarget)\wcautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

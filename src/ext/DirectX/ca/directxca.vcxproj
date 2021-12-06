@@ -32,7 +32,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{76542B28-0FFD-47D3-AD6A-D0F20FA875AC}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>directxca</TargetName>
     <ProjectModuleDefinitionFile>directx.def</ProjectModuleDefinitionFile>

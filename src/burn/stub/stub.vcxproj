@@ -34,7 +34,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <ProjectSubSystem>Windows</ProjectSubSystem>
     <TargetName>burn</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <GenerateManifest>false</GenerateManifest>
     <Description>Native component of WixToolset.Burn</Description>

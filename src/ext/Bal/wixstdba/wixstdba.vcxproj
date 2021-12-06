@@ -32,7 +32,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{41085A22-E6AA-4E8B-AB1B-DDEE0DC89DFA}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>WixStdBA</TargetName>
     <ProjectModuleDefinitionFile>wixstdba.def</ProjectModuleDefinitionFile>
