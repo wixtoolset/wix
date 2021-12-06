@@ -19,13 +19,8 @@
   <files>
     <file src="$projectFolder$\build\$id$.props" target="build\" />
     <file src="$projectFolder$\inc\*" target="build\native\include" />
-    <file src="..\..\v140\x64\wcautil.lib" target="build\native\v140\x64" />
-    <file src="..\..\v140\x86\wcautil.lib" target="build\native\v140\x86" />
-    <file src="..\..\v141\x64\wcautil.lib" target="build\native\v141\x64" />
-    <file src="..\..\v141\x86\wcautil.lib" target="build\native\v141\x86" />
-    <file src="..\..\v141\ARM64\wcautil.lib" target="build\native\v141\ARM64" />
-    <file src="..\..\v142\x64\wcautil.lib" target="build\native\v142\x64" />
-    <file src="..\..\v142\x86\wcautil.lib" target="build\native\v142\x86" />
-    <file src="..\..\v142\ARM64\wcautil.lib" target="build\native\v142\ARM64" />
+    <file src="..\..\v143\x64\wcautil.lib" target="build\native\v14\x64" />
+    <file src="..\..\v143\x86\wcautil.lib" target="build\native\v14\x86" />
+    <file src="..\..\v143\ARM64\wcautil.lib" target="build\native\v14\ARM64" />
   </files>
 </package>

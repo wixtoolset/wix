@@ -32,12 +32,10 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8497EC72-B8D0-4272-A9D0-7E9D871CEFBF}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectSubSystem>Console</ProjectSubSystem>
     <TargetName>wixnative</TargetName>
     <Description>WiX Native Processing</Description>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

@@ -9,4 +9,8 @@
     <Description>Classes for reading and writing resource data in executable files</Description>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+  </ItemGroup>
 </Project>

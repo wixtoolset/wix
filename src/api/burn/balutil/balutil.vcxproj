@@ -33,7 +33,6 @@
     <ProjectGuid>{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>balutil</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Bootstrapper Application Layer native utility library</Description>
     <PackageId>WixToolset.BalUtil</PackageId>

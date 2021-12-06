@@ -33,7 +33,6 @@
     <ProjectGuid>{630C1EE7-2517-4A8C-83E3-DA1150308B58}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>utilbe</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>utilbe.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Util BundleExtension</Description>

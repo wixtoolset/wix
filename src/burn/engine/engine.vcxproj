@@ -33,7 +33,6 @@
     <ProjectGuid>{8119537D-E1D9-6591-D51A-49768A2F9C37}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>engine</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Burn</Description>
   </PropertyGroup>

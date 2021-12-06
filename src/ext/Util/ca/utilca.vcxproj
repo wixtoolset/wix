@@ -33,7 +33,6 @@
     <ProjectGuid>{076018F7-19BD-423A-ABBF-229273DA08D8}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>utilca</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>utilca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Util CustomAction</Description>
