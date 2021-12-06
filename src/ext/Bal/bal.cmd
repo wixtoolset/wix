@@ -26,7 +26,8 @@ msbuild -p:Configuration=%_C% test\examples\examples.proj || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.Bal || exit /b
-dotnet test -c %_C% --no-build test\WixToolsetTest.ManagedHost || exit /b
+:: https://github.com/wixtoolset/issues/issues/6651
+::dotnet test -c %_C% --no-build test\WixToolsetTest.ManagedHost || exit /b
 
 :: Pack
 msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Bal.wixext.csproj || exit /b

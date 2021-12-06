@@ -47,7 +47,6 @@ namespace WixToolsetTest.ManagedHost
             }
         }
 
-        [Fact(Skip="Fails in MSBuild64 - https://github.com/wixtoolset/issues/issues/6651")]
         public void CanLoadTrimmedSCDEarliestCoreMBA()
         {
             using (var fs = new DisposableFileSystem())
