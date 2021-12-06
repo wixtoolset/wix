@@ -17,7 +17,6 @@
     <ProjectGuid>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>uica</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <ProjectModuleDefinitionFile>uica.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset UI CustomAction</Description>

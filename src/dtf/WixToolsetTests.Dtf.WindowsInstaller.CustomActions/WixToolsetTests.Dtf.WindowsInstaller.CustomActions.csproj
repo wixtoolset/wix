@@ -11,7 +11,7 @@
     <SignOutput>false</SignOutput>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Compile Include="CustomActionTest.cs" />
   </ItemGroup>
@@ -25,6 +25,10 @@
       <Project>{16F5202F-9276-4166-975C-C9654BAF8012}</Project>
       <Name>WixToolsetTests.Dtf.WindowsInstaller</Name>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
   </ItemGroup>
   
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

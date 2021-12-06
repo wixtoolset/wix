@@ -32,7 +32,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>BAFunctions</TargetName>
     <ProjectModuleDefinitionFile>bafunctions.def</ProjectModuleDefinitionFile>

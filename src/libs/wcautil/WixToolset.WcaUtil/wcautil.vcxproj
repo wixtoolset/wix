@@ -34,7 +34,6 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>wcautil</TargetName>
     <MultiTargetLibrary>true</MultiTargetLibrary>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Custom Action native utility library</Description>
     <PackageId>WixToolset.WcaUtil</PackageId>

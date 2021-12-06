@@ -32,7 +32,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{90743805-C043-47C7-B5FF-8F5EE5C8A2DE}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>httpca</TargetName>
     <ProjectModuleDefinitionFile>wixhttpca.def</ProjectModuleDefinitionFile>

@@ -8,15 +8,12 @@
     <PlatformFolder Condition=" '$(PlatformFolder)' == '' ">$(Platform)</PlatformFolder>
     <IntDir>$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformFolder)\</IntDir>
     <OutDir>$(OutputPath)$(PlatformFolder)\</OutDir>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(CLRSupport)'!='true' ">
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <NuGetTargetMoniker>native,Version=v0.0</NuGetTargetMoniker>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'=='' AND '$(VisualStudioVersion)'>='15.0'">
-    <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -35,8 +32,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <ExceptionHandling>false</ExceptionHandling>
       <ControlFlowGuard>Guard</ControlFlowGuard>
-      <AdditionalOptions>-YlprecompDefine /w44263</AdditionalOptions>
-      <AdditionalOptions Condition=" $(PlatformToolset.StartsWith('v14')) ">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:threadSafeInit- -YlprecompDefine /w44263</AdditionalOptions>
       <MultiProcessorCompilation Condition=" $(NUMBER_OF_PROCESSORS) &gt; 4 ">true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
@@ -53,7 +49,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectAdditionalLinkLibraries);advapi32.lib;comdlg32.lib;user32.lib;oleaut32.lib;gdi32.lib;shell32.lib;ole32.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);$(AdditionalMultiTargetLibraryPath);$(ArmLibraryDirectories);$(ProjectAdditionalLinkLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions Condition=" $(PlatformToolset.StartsWith('v14')) ">/IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
 

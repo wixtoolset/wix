@@ -11,7 +11,7 @@
     <SignOutput>false</SignOutput>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Compile Include="EmbeddedExternalUI.cs" />
     <Compile Include="Schema.cs" />
@@ -19,14 +19,14 @@
     <Compile Include="WindowsInstallerTransactions.cs" />
     <Compile Include="WindowsInstallerUtils.cs" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj">
       <Project>{85225597-5121-4361-8332-4E3246D5BBF5}</Project>
@@ -34,5 +34,9 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+  </ItemGroup>
+  
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

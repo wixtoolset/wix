@@ -30,7 +30,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{565E99AE-975F-4F26-8A6E-852603386A80}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>BafThmUtilTesting</TargetName>
     <ProjectModuleDefinitionFile>BafThmUtilTesting.def</ProjectModuleDefinitionFile>

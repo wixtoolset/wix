@@ -25,11 +25,9 @@
     <ProjectGuid>{45308B85-0628-4978-8FC8-6AD9E1AD5949}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>vsca</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>vsca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset VS CustomAction</Description>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

@@ -33,7 +33,6 @@
     <ProjectGuid>{06027492-1CB9-48BC-B31E-C1F9356ED07E}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>bextutil</TargetName>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Bundle Extension native utility library</Description>
     <PackageId>WixToolset.BextUtil</PackageId>

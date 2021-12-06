@@ -22,4 +22,8 @@
   <ItemGroup Condition=" '$(TargetFramework)'=='net20' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+  </ItemGroup>
 </Project>
