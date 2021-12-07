@@ -319,10 +319,12 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR /*wzPackageId*/,
         __in BOOL /*fExecute*/,
         __in BOOTSTRAPPER_ACTION_STATE /*action*/,
+        __in BOOTSTRAPPER_MSI_FILE_VERSIONING /*recommendedFileVersioning*/,
         __inout BOOL* pfCancel,
         __inout BURN_MSI_PROPERTY* /*pActionMsiProperty*/,
         __inout INSTALLUILEVEL* /*pUiLevel*/,
-        __inout BOOL* /*pfDisableExternalUiHandler*/
+        __inout BOOL* /*pfDisableExternalUiHandler*/,
+        __inout BOOTSTRAPPER_MSI_FILE_VERSIONING* /*pFileVersioning*/
         )
     {
         *pfCancel |= CheckCanceled();

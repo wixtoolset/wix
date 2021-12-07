@@ -373,24 +373,18 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanMsiPackage"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="fExecute"></param>
-        /// <param name="action"></param>
-        /// <param name="fCancel"></param>
-        /// <param name="actionMsiProperty"></param>
-        /// <param name="uiLevel"></param>
-        /// <param name="fDisableExternalUiHandler"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanMsiPackage(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.Bool)] bool fExecute,
             [MarshalAs(UnmanagedType.U4)] ActionState action,
+            [MarshalAs(UnmanagedType.U4)] BOOTSTRAPPER_MSI_FILE_VERSIONING recommendedFileVersioning,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel,
             [MarshalAs(UnmanagedType.U4)] ref BURN_MSI_PROPERTY actionMsiProperty,
             [MarshalAs(UnmanagedType.U4)] ref INSTALLUILEVEL uiLevel,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fDisableExternalUiHandler
+            [MarshalAs(UnmanagedType.Bool)] ref bool fDisableExternalUiHandler,
+            [MarshalAs(UnmanagedType.U4)] ref BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning
             );
 
         /// <summary>
@@ -1849,6 +1843,25 @@ namespace WixToolset.Mba.Core
         /// Opts out of the engine behavior of trying to uninstall itself when no non-permanent packages are installed.
         /// </summary>
         SkipCleanup,
+    }
+
+    /// <summary>
+    /// The file versioning options for REINSTALLMODE, see https://docs.microsoft.com/en-us/windows/win32/msi/reinstallmode.
+    /// </summary>
+    public enum BOOTSTRAPPER_MSI_FILE_VERSIONING
+    {
+        /// <summary>
+        /// o
+        /// </summary>
+        Older,
+        /// <summary>
+        /// e
+        /// </summary>
+        Equal,
+        /// <summary>
+        /// a
+        /// </summary>
+        All,
     }
 
     /// <summary>

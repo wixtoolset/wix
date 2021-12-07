@@ -480,6 +480,23 @@ extern "C" LPCSTR LoggingPackageRegistrationStateToString(
     }
 }
 
+extern "C" LPCSTR LoggingMsiFileVersioningToString(
+    __in BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning
+    )
+{
+    switch (fileVersioning)
+    {
+    case BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER:
+        return "o";
+    case BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER_OR_EQUAL:
+        return "e";
+    case BOOTSTRAPPER_MSI_FILE_VERSIONING_ALL:
+        return "a";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingMsiFeatureStateToString(
     __in BOOTSTRAPPER_FEATURE_STATE featureState
     )

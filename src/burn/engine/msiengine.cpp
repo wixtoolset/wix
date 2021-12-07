@@ -958,8 +958,8 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
         pAction->msiPackage.rgFeatures = rgRollbackFeatureActions;
         rgRollbackFeatureActions = NULL;
 
-        hr = MsiEngineCalculateInstallUiLevel(display, pUserExperience, pPackage->sczId, FALSE, pAction->msiPackage.action,
-            &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler);
+        hr = MsiEnginePlanPackageOptions(display, pUserExperience, pPackage->sczId, FALSE, pAction->msiPackage.action,
+            &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler, &pAction->msiPackage.fileVersioning);
         ExitOnFailure(hr, "Failed to get msi ui options.");
 
         LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
@@ -984,8 +984,8 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
         pAction->msiPackage.rgFeatures = rgFeatureActions;
         rgFeatureActions = NULL;
 
-        hr = MsiEngineCalculateInstallUiLevel(display, pUserExperience, pPackage->sczId, TRUE, pAction->msiPackage.action,
-            &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler);
+        hr = MsiEnginePlanPackageOptions(display, pUserExperience, pPackage->sczId, TRUE, pAction->msiPackage.action,
+            &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler, &pAction->msiPackage.fileVersioning);
         ExitOnFailure(hr, "Failed to get msi ui options.");
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
@@ -1153,10 +1153,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     }
 
     // set up properties
-    hr = MsiEngineConcatProperties(pPackage->Msi.rgProperties, pPackage->Msi.cProperties, pVariables, fRollback, &sczProperties, FALSE);
+    hr = MsiEngineConcatPackageProperties(pPackage->Msi.rgProperties, pPackage->Msi.cProperties, pVariables, fRollback, &sczProperties, FALSE);
     ExitOnFailure(hr, "Failed to add properties to argument string.");
 
-    hr = MsiEngineConcatProperties(pPackage->Msi.rgProperties, pPackage->Msi.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
+    hr = MsiEngineConcatPackageProperties(pPackage->Msi.rgProperties, pPackage->Msi.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
     ExitOnFailure(hr, "Failed to add obfuscated properties to argument string.");
 
     // add feature action properties
@@ -1173,10 +1173,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     hr = ConcatPatchProperty(pCache, pPackage, fRollback, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
 
-    hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, !pPackage->Msi.cFeatures, &sczProperties);
     ExitOnFailure(hr, "Failed to add action property to argument string.");
 
-    hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczObfuscatedProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, !pPackage->Msi.cFeatures, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), sczMsiPath, sczObfuscatedProperties ? sczObfuscatedProperties : L"");
@@ -1187,9 +1187,6 @@ extern "C" HRESULT MsiEngineExecutePackage(
     switch (pExecuteAction->msiPackage.action)
     {
     case BOOTSTRAPPER_ACTION_STATE_INSTALL:
-        hr = StrAllocConcatSecure(&sczProperties, L" REBOOT=ReallySuppress", 0);
-        ExitOnFailure(hr, "Failed to add reboot suppression property on install.");
-
         hr = WiuInstallProduct(sczMsiPath, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to install MSI package.");
 
@@ -1197,17 +1194,6 @@ extern "C" HRESULT MsiEngineExecutePackage(
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
-        // If feature selection is not enabled, then reinstall the existing features to ensure they get
-        // updated.
-        if (0 == pPackage->Msi.cFeatures)
-        {
-            hr = StrAllocConcatSecure(&sczProperties, L" REINSTALL=ALL", 0);
-            ExitOnFailure(hr, "Failed to add reinstall all property on minor upgrade.");
-        }
-
-        hr = StrAllocConcatSecure(&sczProperties, L" REINSTALLMODE=\"vomus\" REBOOT=ReallySuppress", 0);
-        ExitOnFailure(hr, "Failed to add reinstall mode and reboot suppression properties on minor upgrade.");
-
         hr = WiuInstallProduct(sczMsiPath, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to perform minor upgrade of MSI package.");
 
@@ -1217,31 +1203,11 @@ extern "C" HRESULT MsiEngineExecutePackage(
     case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_MEND: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
-        {
-        LPCWSTR wzReinstallAll = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action ||
-                                  pPackage->Msi.cFeatures) ? L"" : L" REINSTALL=ALL";
-        LPCWSTR wzReinstallMode = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action || BOOTSTRAPPER_ACTION_STATE_MEND == pExecuteAction->msiPackage.action) ? L"o" : L"e";
-
-        hr = StrAllocFormattedSecure(&sczProperties, L"%ls%ls REINSTALLMODE=\"cmus%ls\" REBOOT=ReallySuppress", sczProperties ? sczProperties : L"", wzReinstallAll, wzReinstallMode);
-        ExitOnFailure(hr, "Failed to add reinstall mode and reboot suppression properties on repair.");
-        }
-
-        // Ignore all dependencies, since the Burn engine already performed the check.
-        hr = StrAllocFormattedSecure(&sczProperties, L"%ls %ls=ALL", sczProperties, DEPENDENCY_IGNOREDEPENDENCIES);
-        ExitOnFailure(hr, "Failed to add the list of dependencies to ignore to the properties.");
-
         hr = WiuInstallProduct(sczMsiPath, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to run maintenance mode for MSI package.");
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        hr = StrAllocConcatSecure(&sczProperties, L" REBOOT=ReallySuppress", 0);
-        ExitOnFailure(hr, "Failed to add reboot suppression property on uninstall.");
-
-        // Ignore all dependencies, since the Burn engine already performed the check.
-        hr = StrAllocFormattedSecure(&sczProperties, L"%ls %ls=ALL", sczProperties, DEPENDENCY_IGNOREDEPENDENCIES);
-        ExitOnFailure(hr, "Failed to add the list of dependencies to ignore to the properties.");
-
         hr = WiuConfigureProductEx(pPackage->Msi.sczProductCode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT, sczProperties, &restart);
         if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr)
         {
@@ -1283,13 +1249,55 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT MsiEngineConcatActionProperty(
+extern "C" HRESULT MsiEngineConcatBurnProperties(
+    __in BOOTSTRAPPER_ACTION_STATE action,
     __in BURN_MSI_PROPERTY actionMsiProperty,
+    __in BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning,
+    __in BOOL fMsiPackage,
+    __in BOOL fFeatureSelectionEnabled,
     __deref_out_z LPWSTR* psczProperties
     )
 {
     HRESULT hr = S_OK;
     LPCWSTR wzPropertyName = NULL;
+    LPCWSTR wzReinstallModeOptions = NULL;
+    LPCWSTR wzFileVersioning = L"";
+    BOOL fReinstallAll = FALSE;
+    BOOL fIgnoreDependencies = FALSE;
+
+    switch (action)
+    {
+    case BOOTSTRAPPER_ACTION_STATE_INSTALL:
+        wzReinstallModeOptions = L"mus";
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
+        if (fMsiPackage)
+        {
+            // If feature selection is not enabled,
+            // then reinstall the existing features to ensure they get updated.
+            fReinstallAll = !fFeatureSelectionEnabled;
+
+            wzReinstallModeOptions = L"vmus";
+        }
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MEND: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MODIFY:
+        if (fMsiPackage)
+        {
+            fReinstallAll = BOOTSTRAPPER_ACTION_STATE_MODIFY != action && !fFeatureSelectionEnabled;
+            wzReinstallModeOptions = L"cmus";
+            fIgnoreDependencies = TRUE;
+        }
+        else
+        {
+            wzReinstallModeOptions = L"mus";
+        }
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
+        fIgnoreDependencies = TRUE;
+        break;
+    }
 
     switch (actionMsiProperty)
     {
@@ -1313,11 +1321,46 @@ extern "C" HRESULT MsiEngineConcatActionProperty(
         ExitOnFailure(hr, "Failed to add burn action property.");
     }
 
+    if (fReinstallAll)
+    {
+        hr = StrAllocConcatSecure(psczProperties, L" REINSTALL=ALL", 0);
+        ExitOnFailure(hr, "Failed to add reinstall all property.");
+    }
+
+    if (wzReinstallModeOptions)
+    {
+        switch (fileVersioning)
+        {
+        case BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER:
+            wzFileVersioning = L"o";
+            break;
+        case BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER_OR_EQUAL:
+            wzFileVersioning = L"e";
+            break;
+        case BOOTSTRAPPER_MSI_FILE_VERSIONING_ALL:
+            wzFileVersioning = L"a";
+            break;
+        }
+
+        hr = StrAllocConcatFormattedSecure(psczProperties, L" REINSTALLMODE=\"%ls%ls\"", wzReinstallModeOptions, wzFileVersioning);
+        ExitOnFailure(hr, "Failed to add reinstall mode.");
+    }
+
+    hr = StrAllocConcatSecure(psczProperties, L" REBOOT=ReallySuppress", 0);
+    ExitOnFailure(hr, "Failed to add reboot suppression property.");
+
+    if (fIgnoreDependencies)
+    {
+        // Ignore all dependencies, since the Burn engine already performed the check.
+        hr = StrAllocConcatFormattedSecure(psczProperties, L" %ls=ALL", DEPENDENCY_IGNOREDEPENDENCIES);
+        ExitOnFailure(hr, "Failed to add the list of dependencies to ignore to the properties.");
+    }
+
 LExit:
     return hr;
 }
 
-extern "C" HRESULT MsiEngineConcatProperties(
+extern "C" HRESULT MsiEngineConcatPackageProperties(
     __in_ecount(cProperties) BURN_MSIPROPERTY* rgProperties,
     __in DWORD cProperties,
     __in BURN_VARIABLES* pVariables,
@@ -1379,7 +1422,7 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
+extern "C" HRESULT MsiEnginePlanPackageOptions(
     __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzPackageId,
@@ -1387,11 +1430,13 @@ extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
     __in BOOTSTRAPPER_ACTION_STATE actionState,
     __out BURN_MSI_PROPERTY* pActionMsiProperty,
     __out INSTALLUILEVEL* pUiLevel,
-    __out BOOL* pfDisableExternalUiHandler
+    __out BOOL* pfDisableExternalUiHandler,
+    __out BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
     )
 {
     *pUiLevel = INSTALLUILEVEL_NONE;
     *pfDisableExternalUiHandler = FALSE;
+    *pFileVersioning = BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER;
 
     if (BOOTSTRAPPER_DISPLAY_FULL == display ||
         BOOTSTRAPPER_DISPLAY_PASSIVE == display)
@@ -1406,6 +1451,7 @@ extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
         break;
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
         *pActionMsiProperty = BURN_MSI_PROPERTY_REPAIR;
+        *pFileVersioning = BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER_OR_EQUAL;
         break;
     case BOOTSTRAPPER_ACTION_STATE_MODIFY:
         *pActionMsiProperty = BURN_MSI_PROPERTY_MODIFY;
@@ -1415,7 +1461,7 @@ extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
         break;
     }
 
-    return UserExperienceOnPlanMsiPackage(pUserExperience, wzPackageId, fExecute, actionState, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler);
+    return UserExperienceOnPlanMsiPackage(pUserExperience, wzPackageId, fExecute, actionState, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler, pFileVersioning);
 }
 
 extern "C" void MsiEngineUpdateInstallRegistrationState(

@@ -2596,7 +2596,7 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %hs, file versioning: %hs, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, LoggingBoolToString(pAction->msiPackage.fDisableExternalUiHandler), LoggingMsiFileVersioningToString(pAction->msiPackage.fileVersioning), pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
         for (DWORD j = 0; j < pAction->msiPackage.pPackage->Msi.cSlipstreamMspPackages; ++j)
         {
             const BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pAction->msiPackage.pPackage->Msi.rgSlipstreamMsps + j;
@@ -2605,7 +2605,7 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %hs, file versioning: %hs, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, LoggingBoolToString(pAction->mspTarget.fPerMachineTarget), LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, LoggingBoolToString(pAction->mspTarget.fDisableExternalUiHandler), LoggingMsiFileVersioningToString(pAction->mspTarget.fileVersioning), pAction->mspTarget.sczLogPath);
         for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
         {
             LogStringLine(PlanDumpLevel, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].pTargetProduct->dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);
