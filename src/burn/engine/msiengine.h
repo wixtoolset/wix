@@ -70,11 +70,15 @@ HRESULT MsiEngineExecutePackage(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
-HRESULT MsiEngineConcatActionProperty(
+HRESULT MsiEngineConcatBurnProperties(
+    __in BOOTSTRAPPER_ACTION_STATE action,
     __in BURN_MSI_PROPERTY actionMsiProperty,
+    __in BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning,
+    __in BOOL fMsiPackage,
+    __in BOOL fFeatureSelectionEnabled,
     __deref_out_z LPWSTR* psczProperties
     );
-HRESULT MsiEngineConcatProperties(
+HRESULT MsiEngineConcatPackageProperties(
     __in_ecount(cProperties) BURN_MSIPROPERTY* rgProperties,
     __in DWORD cProperties,
     __in BURN_VARIABLES* pVariables,
@@ -82,7 +86,7 @@ HRESULT MsiEngineConcatProperties(
     __deref_out_z LPWSTR* psczProperties,
     __in BOOL fObfuscateHiddenVariables
     );
-HRESULT MsiEngineCalculateInstallUiLevel(
+HRESULT MsiEnginePlanPackageOptions(
     __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzPackageId,
@@ -90,7 +94,8 @@ HRESULT MsiEngineCalculateInstallUiLevel(
     __in BOOTSTRAPPER_ACTION_STATE actionState,
     __out BURN_MSI_PROPERTY* pActionMsiProperty,
     __out INSTALLUILEVEL* pUiLevel,
-    __out BOOL* pfDisableExternalUiHandler
+    __out BOOL* pfDisableExternalUiHandler,
+    __out BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
     );
 void MsiEngineUpdateInstallRegistrationState(
     __in BURN_EXECUTE_ACTION* pAction,

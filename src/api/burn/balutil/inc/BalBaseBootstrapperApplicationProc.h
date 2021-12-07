@@ -510,7 +510,7 @@ static HRESULT BalBaseBAProcOnPlanMsiPackage(
     __inout BA_ONPLANMSIPACKAGE_RESULTS* pResults
     )
 {
-    return pBA->OnPlanMsiPackage(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, &pResults->fCancel, &pResults->actionMsiProperty, &pResults->uiLevel, &pResults->fDisableExternalUiHandler);
+    return pBA->OnPlanMsiPackage(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, pArgs->recommendedFileVersioning, &pResults->fCancel, &pResults->actionMsiProperty, &pResults->uiLevel, &pResults->fDisableExternalUiHandler, &pResults->fileVersioning);
 }
 
 static HRESULT BalBaseBAProcOnBeginMsiTransactionBegin(

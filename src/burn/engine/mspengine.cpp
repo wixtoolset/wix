@@ -629,16 +629,26 @@ extern "C" HRESULT MspEngineExecutePackage(
     }
 
     // set up properties
-    hr = MsiEngineConcatProperties(pExecuteAction->mspTarget.pPackage->Msp.rgProperties, pExecuteAction->mspTarget.pPackage->Msp.cProperties, pVariables, fRollback, &sczProperties, FALSE);
+    hr = MsiEngineConcatPackageProperties(pExecuteAction->mspTarget.pPackage->Msp.rgProperties, pExecuteAction->mspTarget.pPackage->Msp.cProperties, pVariables, fRollback, &sczProperties, FALSE);
     ExitOnFailure(hr, "Failed to add properties to argument string.");
 
-    hr = MsiEngineConcatProperties(pExecuteAction->mspTarget.pPackage->Msp.rgProperties, pExecuteAction->mspTarget.pPackage->Msp.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
+    hr = MsiEngineConcatPackageProperties(pExecuteAction->mspTarget.pPackage->Msp.rgProperties, pExecuteAction->mspTarget.pPackage->Msp.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
     ExitOnFailure(hr, "Failed to add properties to obfuscated argument string.");
 
-    hr = MsiEngineConcatActionProperty(pExecuteAction->mspTarget.actionMsiProperty, &sczProperties);
+    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL != pExecuteAction->mspTarget.action)
+    {
+        hr = StrAllocConcatFormattedSecure(&sczProperties, L" PATCH=\"%ls\"", sczPatches);
+        ExitOnFailure(hr, "Failed to add PATCH property to argument string.");
+
+        hr = StrAllocConcatFormatted(&sczObfuscatedProperties, L" PATCH=\"%ls\"", sczPatches);
+        ExitOnFailure(hr, "Failed to add PATCH property to obfuscated argument string.");
+    }
+
+    // Always add Burn properties last.
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.actionMsiProperty, pExecuteAction->mspTarget.fileVersioning, FALSE, FALSE, &sczProperties);
     ExitOnFailure(hr, "Failed to add action property to argument string.");
 
-    hr = MsiEngineConcatActionProperty(pExecuteAction->mspTarget.actionMsiProperty, &sczObfuscatedProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.actionMsiProperty, pExecuteAction->mspTarget.fileVersioning, FALSE, FALSE, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PATCH_PACKAGE, pExecuteAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pExecuteAction->mspTarget.action), sczPatches, sczObfuscatedProperties, pExecuteAction->mspTarget.sczTargetProductCode);
@@ -650,27 +660,11 @@ extern "C" HRESULT MspEngineExecutePackage(
     {
     case BOOTSTRAPPER_ACTION_STATE_INSTALL: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
-        hr = StrAllocConcatSecure(&sczProperties, L" PATCH=\"", 0);
-        ExitOnFailure(hr, "Failed to add PATCH property on install.");
-
-        hr = StrAllocConcatSecure(&sczProperties, sczPatches, 0);
-        ExitOnFailure(hr, "Failed to add patches to PATCH property on install.");
-
-        hr = StrAllocConcatSecure(&sczProperties, L"\" REBOOT=ReallySuppress", 0);
-        ExitOnFailure(hr, "Failed to add reboot suppression property on install.");
-
         hr = WiuConfigureProductEx(pExecuteAction->mspTarget.sczTargetProductCode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_DEFAULT, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to install MSP package.");
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        hr = StrAllocConcatSecure(&sczProperties, L" REBOOT=ReallySuppress", 0);
-        ExitOnFailure(hr, "Failed to add reboot suppression property on uninstall.");
-
-        // Ignore all dependencies, since the Burn engine already performed the check.
-        hr = StrAllocFormattedSecure(&sczProperties, L"%ls %ls=ALL", sczProperties, DEPENDENCY_IGNOREDEPENDENCIES);
-        ExitOnFailure(hr, "Failed to add the list of dependencies to ignore to the properties.");
-
         hr = WiuRemovePatches(sczPatches, pExecuteAction->mspTarget.sczTargetProductCode, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to uninstall MSP package.");
         break;
@@ -1128,8 +1122,8 @@ static HRESULT PlanTargetProduct(
         hr = StrAllocString(&pAction->mspTarget.sczTargetProductCode, pTargetProduct->wzTargetProductCode, 0);
         ExitOnFailure(hr, "Failed to copy target product code.");
 
-        hr = MsiEngineCalculateInstallUiLevel(display, pUserExperience, pPackage->sczId, !fRollback, pAction->mspTarget.action,
-            &pAction->mspTarget.actionMsiProperty, &pAction->mspTarget.uiLevel, &pAction->mspTarget.fDisableExternalUiHandler);
+        hr = MsiEnginePlanPackageOptions(display, pUserExperience, pPackage->sczId, !fRollback, pAction->mspTarget.action,
+            &pAction->mspTarget.actionMsiProperty, &pAction->mspTarget.uiLevel, &pAction->mspTarget.fDisableExternalUiHandler, &pAction->mspTarget.fileVersioning);
         ExitOnFailure(hr, "Failed to get msp ui options.");
 
         // If this is a per-machine target product, then the plan needs to be per-machine as well.

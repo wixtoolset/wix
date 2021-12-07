@@ -1433,15 +1433,16 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanMsiPackage(string wzPackageId, bool fExecute, ActionState action, ref bool fCancel, ref BURN_MSI_PROPERTY actionMsiProperty, ref INSTALLUILEVEL uiLevel, ref bool fDisableExternalUiHandler)
+        int IBootstrapperApplication.OnPlanMsiPackage(string wzPackageId, bool fExecute, ActionState action, BOOTSTRAPPER_MSI_FILE_VERSIONING recommendedFileVersioning, ref bool fCancel, ref BURN_MSI_PROPERTY actionMsiProperty, ref INSTALLUILEVEL uiLevel, ref bool fDisableExternalUiHandler, ref BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning)
         {
-            PlanMsiPackageEventArgs args = new PlanMsiPackageEventArgs(wzPackageId, fExecute, action, fCancel, actionMsiProperty, uiLevel, fDisableExternalUiHandler);
+            PlanMsiPackageEventArgs args = new PlanMsiPackageEventArgs(wzPackageId, fExecute, action, recommendedFileVersioning, fCancel, actionMsiProperty, uiLevel, fDisableExternalUiHandler, fileVersioning);
             this.OnPlanMsiPackage(args);
 
             fCancel = args.Cancel;
             actionMsiProperty = args.ActionMsiProperty;
             uiLevel = args.UiLevel;
             fDisableExternalUiHandler = args.DisableExternalUiHandler;
+            fileVersioning = args.FileVersioning;
             return args.HResult;
         }
 

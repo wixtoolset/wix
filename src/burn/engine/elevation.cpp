@@ -1002,6 +1002,9 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.fDisableExternalUiHandler);
     ExitOnFailure(hr, "Failed to write fDisableExternalUiHandler to message buffer.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.fileVersioning);
+    ExitOnFailure(hr, "Failed to write fileVersioning to message buffer.");
+
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.action);
     ExitOnFailure(hr, "Failed to write action to message buffer.");
 
@@ -1082,6 +1085,9 @@ extern "C" HRESULT ElevationExecuteMspPackage(
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.fDisableExternalUiHandler);
     ExitOnFailure(hr, "Failed to write fDisableExternalUiHandler to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.fileVersioning);
+    ExitOnFailure(hr, "Failed to write fileVersioning to message buffer.");
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.action);
     ExitOnFailure(hr, "Failed to write action to message buffer.");
@@ -2603,6 +2609,9 @@ static HRESULT OnExecuteMsiPackage(
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.fDisableExternalUiHandler);
     ExitOnFailure(hr, "Failed to read fDisableExternalUiHandler.");
 
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.fileVersioning);
+    ExitOnFailure(hr, "Failed to read fileVersioning.");
+
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.action);
     ExitOnFailure(hr, "Failed to read action.");
 
@@ -2702,6 +2711,9 @@ static HRESULT OnExecuteMspPackage(
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.fDisableExternalUiHandler);
     ExitOnFailure(hr, "Failed to read fDisableExternalUiHandler.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.fileVersioning);
+    ExitOnFailure(hr, "Failed to read fileVersioning.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.action);
     ExitOnFailure(hr, "Failed to read action.");

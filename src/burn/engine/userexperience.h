@@ -440,7 +440,8 @@ BAAPI UserExperienceOnPlanMsiPackage(
     __in BOOTSTRAPPER_ACTION_STATE action,
     __inout BURN_MSI_PROPERTY* pActionMsiProperty,
     __inout INSTALLUILEVEL* pUiLevel,
-    __inout BOOL* pfDisableExternalUiHandler
+    __inout BOOL* pfDisableExternalUiHandler,
+    __inout BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
     );
 BAAPI UserExperienceOnPlannedPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,

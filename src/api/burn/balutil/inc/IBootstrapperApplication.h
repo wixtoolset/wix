@@ -208,10 +208,12 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z LPCWSTR wzPackageId,
         __in BOOL fExecute, // false means rollback.
         __in BOOTSTRAPPER_ACTION_STATE action,
+        __in BOOTSTRAPPER_MSI_FILE_VERSIONING recommendedFileVersioning,
         __inout BOOL* pfCancel,
         __inout BURN_MSI_PROPERTY* pActionMsiProperty,
         __inout INSTALLUILEVEL* pUiLevel,
-        __inout BOOL* pfDisableExternalUiHandler
+        __inout BOOL* pfDisableExternalUiHandler,
+        __inout BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
         ) = 0;
 
     // OnPlanPackageComplete - called after the engine has completed getting the BA's input

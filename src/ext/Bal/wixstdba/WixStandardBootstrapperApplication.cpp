@@ -462,10 +462,12 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR wzPackageId,
         __in BOOL fExecute,
         __in BOOTSTRAPPER_ACTION_STATE action,
+        __in BOOTSTRAPPER_MSI_FILE_VERSIONING recommendedFileVersioning,
         __inout BOOL* pfCancel,
         __inout BURN_MSI_PROPERTY* pActionMsiProperty,
         __inout INSTALLUILEVEL* pUiLevel,
-        __inout BOOL* pfDisableExternalUiHandler
+        __inout BOOL* pfDisableExternalUiHandler,
+        __inout BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
         )
     {
         HRESULT hr = S_OK;
@@ -501,7 +503,7 @@ public: // IBootstrapperApplication
         }
 
     LExit:
-        return __super::OnPlanMsiPackage(wzPackageId, fExecute, action, pfCancel, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler);
+        return __super::OnPlanMsiPackage(wzPackageId, fExecute, action, recommendedFileVersioning, pfCancel, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler, pFileVersioning);
     }
 
 

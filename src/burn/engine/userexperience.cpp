@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 8, 10, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 12, 7, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -1896,7 +1896,8 @@ EXTERN_C BAAPI UserExperienceOnPlanMsiPackage(
     __in BOOTSTRAPPER_ACTION_STATE action,
     __inout BURN_MSI_PROPERTY* pActionMsiProperty,
     __inout INSTALLUILEVEL* pUiLevel,
-    __inout BOOL* pfDisableExternalUiHandler
+    __inout BOOL* pfDisableExternalUiHandler,
+    __inout BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
     )
 {
     HRESULT hr = S_OK;
@@ -1907,11 +1908,13 @@ EXTERN_C BAAPI UserExperienceOnPlanMsiPackage(
     args.wzPackageId = wzPackageId;
     args.fExecute = fExecute;
     args.action = action;
+    args.recommendedFileVersioning = *pFileVersioning;
 
     results.cbSize = sizeof(results);
     results.actionMsiProperty = *pActionMsiProperty;
     results.uiLevel = *pUiLevel;
     results.fDisableExternalUiHandler = *pfDisableExternalUiHandler;
+    results.fileVersioning = args.recommendedFileVersioning;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanMsiPackage failed.");
@@ -1923,6 +1926,7 @@ EXTERN_C BAAPI UserExperienceOnPlanMsiPackage(
     *pActionMsiProperty = results.actionMsiProperty;
     *pUiLevel = results.uiLevel;
     *pfDisableExternalUiHandler = results.fDisableExternalUiHandler;
+    *pFileVersioning = results.fileVersioning;
 
 LExit:
     return hr;

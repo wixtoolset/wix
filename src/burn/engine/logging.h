@@ -106,6 +106,10 @@ LPCSTR LoggingPackageRegistrationStateToString(
     __in BURN_PACKAGE_REGISTRATION_STATE registrationState
     );
 
+LPCSTR LoggingMsiFileVersioningToString(
+    __in BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning
+    );
+
 LPCSTR LoggingMsiFeatureStateToString(
     __in BOOTSTRAPPER_FEATURE_STATE featureState
     );

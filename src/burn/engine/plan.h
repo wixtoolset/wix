@@ -175,6 +175,7 @@ typedef struct _BURN_EXECUTE_ACTION
             INSTALLUILEVEL uiLevel;
             BOOL fDisableExternalUiHandler;
             BOOTSTRAPPER_ACTION_STATE action;
+            BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning;
 
             BOOTSTRAPPER_FEATURE_ACTION* rgFeatures;
         } msiPackage;
@@ -190,6 +191,7 @@ typedef struct _BURN_EXECUTE_ACTION
             INSTALLUILEVEL uiLevel;
             BOOL fDisableExternalUiHandler;
             BOOTSTRAPPER_ACTION_STATE action;
+            BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning;
 
             BURN_ORDERED_PATCHES* rgOrderedPatches;
             DWORD cOrderedPatches;

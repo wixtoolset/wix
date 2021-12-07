@@ -902,15 +902,17 @@ namespace WixToolset.Mba.Core
     public class PlanMsiPackageEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public PlanMsiPackageEventArgs(string packageId, bool shouldExecute, ActionState action, bool cancelRecommendation, BURN_MSI_PROPERTY actionMsiProperty, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler)
+        public PlanMsiPackageEventArgs(string packageId, bool shouldExecute, ActionState action, BOOTSTRAPPER_MSI_FILE_VERSIONING recommendedFileVersioning, bool cancelRecommendation, BURN_MSI_PROPERTY actionMsiProperty, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler, BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.ShouldExecute = shouldExecute;
             this.Action = action;
+            this.RecommendedFileVersioning = recommendedFileVersioning;
             this.ActionMsiProperty = actionMsiProperty;
             this.UiLevel = uiLevel;
             this.DisableExternalUiHandler = disableExternalUiHandler;
+            this.FileVersioning = fileVersioning;
         }
 
         /// <summary>
@@ -929,6 +931,11 @@ namespace WixToolset.Mba.Core
         public ActionState Action { get; private set; }
 
         /// <summary>
+        /// Gets the recommended file versioning for the package.
+        /// </summary>
+        public BOOTSTRAPPER_MSI_FILE_VERSIONING RecommendedFileVersioning { get; private set; }
+
+        /// <summary>
         /// Gets or sets the requested MSI property to add.
         /// </summary>
         public BURN_MSI_PROPERTY ActionMsiProperty { get; set; }
@@ -942,6 +949,11 @@ namespace WixToolset.Mba.Core
         /// Gets or sets whether Burn is requested to set up an external UI handler.
         /// </summary>
         public bool DisableExternalUiHandler { get; set; }
+
+        /// <summary>
+        /// Gets or sets the requested file versioning.
+        /// </summary>
+        public BOOTSTRAPPER_MSI_FILE_VERSIONING FileVersioning { get; set; }
     }
 
     /// <summary>
