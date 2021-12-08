@@ -310,11 +310,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
-        Mend,
-
-        /// <summary>
-        /// 
-        /// </summary>
         Repair,
 
         /// <summary>
@@ -491,11 +486,6 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         Present,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Mend,
 
         /// <summary>
         /// 

@@ -790,7 +790,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     {
     case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
     case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
-        if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_MEND == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
+        if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
         {
             hr = VerCompareParsedVersions(pVersion, pInstalledVersion, &nCompareResult);
             ExitOnFailure(hr, "Failed to compare '%ls' to '%ls' for planning.", pVersion->sczVersion, pInstalledVersion->sczVersion);
@@ -801,10 +801,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             if (nCompareResult > 0)
             {
                 execute = BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE;
-            }
-            else if (BOOTSTRAPPER_REQUEST_STATE_MEND == pPackage->requested)
-            {
-                execute = BOOTSTRAPPER_ACTION_STATE_MEND;
             }
             else if (BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
             {
@@ -835,7 +831,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
-        case BOOTSTRAPPER_REQUEST_STATE_MEND: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
             break;
@@ -882,7 +877,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             // remove the package during rollback.
             if (pPackage->fUninstallable &&
                 (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested ||
-                 BOOTSTRAPPER_REQUEST_STATE_MEND == pPackage->requested ||
                  BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested))
             {
                 rollback = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
@@ -1201,7 +1195,6 @@ extern "C" HRESULT MsiEngineExecutePackage(
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
-    case BOOTSTRAPPER_ACTION_STATE_MEND: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
         hr = WiuInstallProduct(sczMsiPath, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to run maintenance mode for MSI package.");
@@ -1281,7 +1274,6 @@ extern "C" HRESULT MsiEngineConcatBurnProperties(
         }
         break;
     case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
-    case BOOTSTRAPPER_ACTION_STATE_MEND: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_MODIFY:
         if (fMsiPackage)
         {
