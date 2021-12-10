@@ -1169,6 +1169,23 @@ public: // IBootstrapperApplication
         return hr;
     }
 
+    virtual STDMETHODIMP OnSetUpdateComplete(
+        __in HRESULT hrStatus,
+        __in_z_opt LPCWSTR wzPreviousPackageId,
+        __in_z_opt LPCWSTR wzNewPackageId
+        )
+    {
+        BAL_INFO_PACKAGE* pPackage = NULL;
+
+        if (SUCCEEDED(hrStatus) && wzNewPackageId &&
+            SUCCEEDED(BalInfoAddUpdateBundleAsPackage(&m_Bundle.packages, wzNewPackageId, wzPreviousPackageId, &pPackage)))
+        {
+            InitializePackageInfoForPackage(pPackage);
+        }
+
+        return S_OK;
+    }
+
     virtual STDMETHODIMP_(void) BAProcFallback(
         __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
         __in const LPVOID pvArgs,
@@ -1399,6 +1416,12 @@ public: // IBootstrapperApplication
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANROLLBACKBOUNDARY:
             OnPlanRollbackBoundaryFallback(reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATEBEGIN:
+            OnSetUpdateBeginFallback(reinterpret_cast<BA_ONSETUPDATEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONSETUPDATEBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATECOMPLETE:
+            OnSetUpdateCompleteFallback(reinterpret_cast<BA_ONSETUPDATECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONSETUPDATECOMPLETE_RESULTS*>(pvResults));
             break;
         default:
 #ifdef DEBUG
@@ -2001,6 +2024,22 @@ private: // privates
         BOOL fTransaction = pResults->fTransaction;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANROLLBACKBOUNDARY, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_ROLLBACK_BOUNDARY, m_hModule, pArgs->wzRollbackBoundaryId, LoggingBoolToString(fTransaction), LoggingBoolToString(pResults->fTransaction));
+    }
+
+    void OnSetUpdateBeginFallback(
+        __in BA_ONSETUPDATEBEGIN_ARGS* pArgs,
+        __inout BA_ONSETUPDATEBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONSETUPDATEBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnSetUpdateCompleteFallback(
+        __in BA_ONSETUPDATECOMPLETE_ARGS* pArgs,
+        __inout BA_ONSETUPDATECOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONSETUPDATECOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
 

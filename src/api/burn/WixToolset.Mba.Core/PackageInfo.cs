@@ -51,6 +51,11 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         PatchBundle,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        UpdateBundle,
     }
 
     /// <summary>
@@ -265,6 +270,20 @@ namespace WixToolset.Mba.Core
                 default:
                     throw new Exception(string.Format("Unknown related bundle type: {0}", relationType));
             }
+
+            return package;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static IPackageInfo GetUpdateBundleAsPackage(string id)
+        {
+            PackageInfo package = new PackageInfo();
+            package.Id = id;
+            package.Type = PackageType.UpdateBundle;
 
             return package;
         }

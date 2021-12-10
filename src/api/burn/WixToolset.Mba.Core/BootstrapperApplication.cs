@@ -253,6 +253,12 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public event EventHandler<CachePayloadExtractCompleteEventArgs> CachePayloadExtractComplete;
 
+        /// <inheritdoc/>
+        public event EventHandler<SetUpdateBeginEventArgs> SetUpdateBegin;
+
+        /// <inheritdoc/>
+        public event EventHandler<SetUpdateCompleteEventArgs> SetUpdateComplete;
+
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
@@ -1225,6 +1231,32 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="SetUpdateBegin"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnSetUpdateBegin(SetUpdateBeginEventArgs args)
+        {
+            EventHandler<SetUpdateBeginEventArgs> handler = this.SetUpdateBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="SetUpdateComplete"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnSetUpdateComplete(SetUpdateCompleteEventArgs args)
+        {
+            EventHandler<SetUpdateCompleteEventArgs> handler = this.SetUpdateComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
 
         int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
@@ -1891,6 +1923,22 @@ namespace WixToolset.Mba.Core
         {
             CachePayloadExtractCompleteEventArgs args = new CachePayloadExtractCompleteEventArgs(wzContainerId, wzPayloadId, hrStatus);
             this.OnCachePayloadExtractComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnSetUpdateBegin()
+        {
+            SetUpdateBeginEventArgs args = new SetUpdateBeginEventArgs();
+            this.OnSetUpdateBegin(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnSetUpdateComplete(int hrStatus, string wzPreviousPackageId, string wzNewPackageId)
+        {
+            SetUpdateCompleteEventArgs args = new SetUpdateCompleteEventArgs(hrStatus, wzPreviousPackageId, wzNewPackageId);
+            this.OnSetUpdateComplete(args);
 
             return args.HResult;
         }

@@ -41,6 +41,14 @@ namespace WixToolset.Mba.Core
             return package;
         }
 
+        /// <inheritdoc/>
+        public IPackageInfo AddUpdateBundleAsPackage(SetUpdateCompleteEventArgs e)
+        {
+            var package = PackageInfo.GetUpdateBundleAsPackage(e.NewPackageId);
+            this.Packages.Add(package.Id, package);
+            return package;
+        }
+
         /// <summary>
         /// Parses BA manifest from the given stream.
         /// </summary>

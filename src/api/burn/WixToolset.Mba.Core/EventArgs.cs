@@ -2230,4 +2230,41 @@ namespace WixToolset.Mba.Core
         /// </summary>
         public string PayloadId { get; private set; }
     }
+
+    /// <summary>
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.SetUpdateBegin"/>.
+    /// </summary>
+    [Serializable]
+    public class SetUpdateBeginEventArgs : HResultEventArgs
+    {
+        /// <summary />
+        public SetUpdateBeginEventArgs()
+        {
+        }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.SetUpdateComplete"/>
+    /// </summary>
+    [Serializable]
+    public class SetUpdateCompleteEventArgs : StatusEventArgs
+    {
+        /// <summary />
+        public SetUpdateCompleteEventArgs(int hrStatus, string previousPackageId, string newPackageId)
+            : base(hrStatus)
+        {
+            this.PreviousPackageId = previousPackageId;
+            this.NewPackageId = newPackageId;
+        }
+
+        /// <summary>
+        /// Gets the identifier of the update package that was removed.
+        /// </summary>
+        public string PreviousPackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier of the update package that was added.
+        /// </summary>
+        public string NewPackageId { get; private set; }
+    }
 }
