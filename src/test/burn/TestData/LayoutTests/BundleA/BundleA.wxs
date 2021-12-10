@@ -7,20 +7,14 @@
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" />
     </PackageGroup>
 
-    <!-- Reenable when fixed
     <Container Id="PackagesContainer" Name="packages.cab" DownloadUrl="$(var.WebServerBaseUrl)BundleA/{2}">
-    -->
-    <Container Id="PackagesContainer" Name="packages.cab" DownloadUrl="$(var.WebServerBaseUrl)BundleA/packages.cab">
       <PackageGroupRef Id="BundlePackages" />
     </Container>
   </Fragment>
 
   <Fragment>
     <PayloadGroup Id="LayoutOnlyPayloads">
-      <Payload Id="LayoutOnlyPayload" SourceFile="$(sys.SOURCEFILEPATH)" Compressed="no" DownloadUrl="$(var.WebServerBaseUrl)BundleA/LayoutOnlyPayload" />
-      <!-- Reenable when fixed
       <Payload Id="LayoutOnlyPayload" SourceFile="$(sys.SOURCEFILEPATH)" Compressed="no" DownloadUrl="$(var.WebServerBaseUrl)BundleA/{1}" />
-      -->
     </PayloadGroup>
   </Fragment>
 </Wix>

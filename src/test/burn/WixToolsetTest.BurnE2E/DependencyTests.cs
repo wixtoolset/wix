@@ -40,7 +40,7 @@ namespace WixToolsetTest.BurnE2E
             packageF.VerifyInstalled(false);
         }
 
-        [Fact (Skip = "https://github.com/wixtoolset/issues/issues/6387")]
+        [Fact (Skip = "https://github.com/wixtoolset/issues/issues/6401")]
         public void CanKeepSameExactPackageAfterUpgradingBundleWithSlipstreamedPatch()
         {
             var originalVersion = "1.0.0.0";
@@ -124,7 +124,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
 #if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6387")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
 #else
         [Fact(Skip = "addon/patch related bundle")]
 #endif
@@ -169,7 +169,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
 #if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6387")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
 #else
         [Fact(Skip = "addon/patch related bundle")]
 #endif
@@ -344,7 +344,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
 #if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6387")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
 #else
         [Fact(Skip = "addon/patch related bundle")]
 #endif
