@@ -990,6 +990,20 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnSetUpdateBegin()
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnSetUpdateComplete(
+        __in HRESULT /*hrStatus*/,
+        __in_z_opt LPCWSTR /*wzPreviousPackageId*/,
+        __in_z_opt LPCWSTR /*wzNewPackageId*/
+        )
+    {
+        return S_OK;
+    }
+
 public: //CBalBaseBootstrapperApplication
     virtual STDMETHODIMP Initialize(
         __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs

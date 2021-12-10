@@ -666,6 +666,24 @@ static HRESULT BalBaseBAProcOnCachePayloadExtractComplete(
     return pBA->OnCachePayloadExtractComplete(pArgs->wzContainerId, pArgs->wzPayloadId, pArgs->hrStatus);
 }
 
+static HRESULT BalBaseBAProcOnSetUpdateBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONSETUPDATEBEGIN_ARGS* /*pArgs*/,
+    __inout BA_ONSETUPDATEBEGIN_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnSetUpdateBegin();
+}
+
+static HRESULT BalBaseBAProcOnSetUpdateComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONSETUPDATECOMPLETE_ARGS* pArgs,
+    __inout BA_ONSETUPDATECOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnSetUpdateComplete(pArgs->hrStatus, pArgs->wzPreviousPackageId, pArgs->wzNewPackageId);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -903,6 +921,12 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANROLLBACKBOUNDARY:
             hr = BalBaseBAProcOnPlanRollbackBoundary(pBA, reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATEBEGIN:
+            hr = BalBaseBAProcOnSetUpdateBegin(pBA, reinterpret_cast<BA_ONSETUPDATEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONSETUPDATEBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATECOMPLETE:
+            hr = BalBaseBAProcOnSetUpdateComplete(pBA, reinterpret_cast<BA_ONSETUPDATECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONSETUPDATECOMPLETE_RESULTS*>(pvResults));
             break;
         }
     }

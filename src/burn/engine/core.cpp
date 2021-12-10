@@ -1193,7 +1193,7 @@ extern "C" HRESULT CoreCreateUpdateBundleCommandLine(
 {
     HRESULT hr = S_OK;
 
-    hr = CoreRecreateCommandLine(psczCommandLine, BOOTSTRAPPER_ACTION_INSTALL, pInternalCommand, pCommand, BOOTSTRAPPER_RELATION_NONE, FALSE);
+    hr = CoreRecreateCommandLine(psczCommandLine, BOOTSTRAPPER_ACTION_INSTALL, pInternalCommand, pCommand, BOOTSTRAPPER_RELATION_UPDATE, FALSE);
     ExitOnFailure(hr, "Failed to recreate update bundle command-line.");
 
 LExit:

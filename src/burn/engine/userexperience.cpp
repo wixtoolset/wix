@@ -2241,6 +2241,50 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnSetUpdateBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONSETUPDATEBEGIN_ARGS args = { };
+    BA_ONSETUPDATEBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATEBEGIN, &args, &results);
+    ExitOnFailure(hr, "BA OnSetUpdateBegin failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnSetUpdateComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in HRESULT hrStatus,
+    __in_z_opt LPCWSTR wzPreviousPackageId,
+    __in_z_opt LPCWSTR wzNewPackageId
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONSETUPDATECOMPLETE_ARGS args = { };
+    BA_ONSETUPDATECOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.hrStatus = hrStatus;
+    args.wzPreviousPackageId = wzPreviousPackageId;
+    args.wzNewPackageId = wzNewPackageId;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATECOMPLETE, &args, &results);
+    ExitOnFailure(hr, "BA OnSetUpdateComplete failed.");
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnShutdown(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __inout BOOTSTRAPPER_SHUTDOWN_ACTION* pAction

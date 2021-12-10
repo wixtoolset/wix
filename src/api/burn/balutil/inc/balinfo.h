@@ -16,6 +16,7 @@ typedef enum BAL_INFO_PACKAGE_TYPE
     BAL_INFO_PACKAGE_TYPE_BUNDLE_UPGRADE,
     BAL_INFO_PACKAGE_TYPE_BUNDLE_ADDON,
     BAL_INFO_PACKAGE_TYPE_BUNDLE_PATCH,
+    BAL_INFO_PACKAGE_TYPE_BUNDLE_UPDATE,
 } BAL_INFO_PACKAGE_TYPE;
 
 typedef enum _BAL_INFO_RESTART
@@ -125,9 +126,21 @@ DAPI_(HRESULT) BalInfoParseFromXml(
  ********************************************************************/
 DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
     __in BAL_INFO_PACKAGES* pPackages,
-    __in LPCWSTR wzId,
+    __in_z LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPerMachine,
+    __out_opt BAL_INFO_PACKAGE** ppPackage
+    );
+
+
+/*******************************************************************
+ BalInfoAddUpdateBundleAsPackage - adds an update bundle as a package.
+
+ ********************************************************************/
+DAPI_(HRESULT) BalInfoAddUpdateBundleAsPackage(
+    __in BAL_INFO_PACKAGES* pPackages,
+    __in_z LPCWSTR wzId,
+    __in_z LPCWSTR wzPreviousId,
     __out_opt BAL_INFO_PACKAGE** ppPackage
     );
 

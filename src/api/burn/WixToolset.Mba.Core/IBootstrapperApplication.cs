@@ -1097,6 +1097,24 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
             int hrStatus
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.SetUpdateBegin"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnSetUpdateBegin();
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.SetUpdateComplete"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnSetUpdateComplete(
+            int hrStatus,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPreviousPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzNewPackageId
+            );
     }
 
     /// <summary>

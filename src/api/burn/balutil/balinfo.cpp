@@ -166,7 +166,7 @@ LExit:
 
 DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
     __in BAL_INFO_PACKAGES* pPackages,
-    __in LPCWSTR wzId,
+    __in_z LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL /*fPerMachine*/,
     __out_opt BAL_INFO_PACKAGE** ppPackage
@@ -217,6 +217,47 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
     pPackage->type = type;
 
     // TODO: try to look up the DisplayName and Description in Add/Remove Programs with the wzId.
+
+    if (ppPackage)
+    {
+        *ppPackage = pPackage;
+    }
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalInfoAddUpdateBundleAsPackage(
+    __in BAL_INFO_PACKAGES* pPackages,
+    __in_z LPCWSTR wzId,
+    __in_z LPCWSTR /*wzPreviousId*/,
+    __out_opt BAL_INFO_PACKAGE** ppPackage
+    )
+{
+    HRESULT hr = S_OK;
+    BAL_INFO_PACKAGE* pPackage = NULL;
+
+    // Check to see if the bundle is already in the list of packages.
+    for (DWORD i = 0; i < pPackages->cPackages; ++i)
+    {
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzId, -1, pPackages->rgPackages[i].sczId, -1))
+        {
+            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS));
+        }
+    }
+
+    // Add the update bundle as a package.
+    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pPackages->rgPackages), pPackages->cPackages + 1, sizeof(BAL_INFO_PACKAGE), 2);
+    ExitOnFailure(hr, "Failed to allocate memory for update bundle package information.");
+
+    pPackage = pPackages->rgPackages + pPackages->cPackages;
+    ++pPackages->cPackages;
+
+    hr = StrAllocString(&pPackage->sczId, wzId, 0);
+    ExitOnFailure(hr, "Failed to copy update bundle package id.");
+
+    pPackage->type = BAL_INFO_PACKAGE_TYPE_BUNDLE_UPDATE;
 
     if (ppPackage)
     {

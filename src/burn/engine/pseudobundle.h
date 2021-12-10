@@ -32,6 +32,18 @@ HRESULT PseudoBundleInitializePassthrough(
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_PACKAGE* pPackage
     );
+HRESULT PseudoBundleInitializeUpdateBundle(
+    __in BURN_PACKAGE* pPackage,
+    __in_z LPCWSTR wzId,
+    __in_z LPCWSTR wzCacheId,
+    __in_z LPCWSTR wzFilePath,
+    __in_z LPCWSTR wzLocalSource,
+    __in_z_opt LPCWSTR wzDownloadSource,
+    __in DWORD64 qwSize,
+    __in_z LPCWSTR wzInstallArguments,
+    __in_opt const BYTE* pbHash,
+    __in const DWORD cbHash
+    );
 
 #if defined(__cplusplus)
 }

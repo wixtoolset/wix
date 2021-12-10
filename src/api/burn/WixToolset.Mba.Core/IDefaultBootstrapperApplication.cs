@@ -344,6 +344,16 @@ namespace WixToolset.Mba.Core
         event EventHandler<RollbackMsiTransactionCompleteEventArgs> RollbackMsiTransactionComplete;
 
         /// <summary>
+        /// Fired when the engine has begun to setup the update package.
+        /// </summary>
+        event EventHandler<SetUpdateBeginEventArgs> SetUpdateBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed setting up the update package.
+        /// </summary>
+        event EventHandler<SetUpdateCompleteEventArgs> SetUpdateComplete;
+
+        /// <summary>
         /// Fired when the engine is shutting down the bootstrapper application.
         /// </summary>
         event EventHandler<ShutdownEventArgs> Shutdown;

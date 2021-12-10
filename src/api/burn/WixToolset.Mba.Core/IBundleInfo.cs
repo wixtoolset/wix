@@ -40,5 +40,12 @@ namespace WixToolset.Mba.Core
         /// <param name="e"></param>
         /// <returns>The created <see cref="IPackageInfo"/>.</returns>
         IPackageInfo AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e);
+
+        /// <summary>
+        /// Adds an update bundle as a package.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns>The created <see cref="IPackageInfo"/>.</returns>
+        IPackageInfo AddUpdateBundleAsPackage(SetUpdateCompleteEventArgs e);
     }
 }

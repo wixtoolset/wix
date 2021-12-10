@@ -658,4 +658,12 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z_opt LPCWSTR wzPayloadId,
         __in HRESULT hrStatus
         ) = 0;
+
+    STDMETHOD(OnSetUpdateBegin)() = 0;
+
+    STDMETHOD(OnSetUpdateComplete)(
+        __in HRESULT hrStatus,
+        __in_z_opt LPCWSTR wzPreviousPackageId,
+        __in_z_opt LPCWSTR wzNewPackageId
+        ) = 0;
 };

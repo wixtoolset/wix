@@ -240,3 +240,80 @@ LExit:
     ReleaseStr(sczArguments);
     return hr;
 }
+
+extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
+    __in BURN_PACKAGE* pPackage,
+    __in_z LPCWSTR wzId,
+    __in_z LPCWSTR wzCacheId,
+    __in_z LPCWSTR wzFilePath,
+    __in_z LPCWSTR wzLocalSource,
+    __in_z_opt LPCWSTR wzDownloadSource,
+    __in DWORD64 qwSize,
+    __in_z LPCWSTR wzInstallArguments,
+    __in_opt const BYTE* pbHash,
+    __in const DWORD cbHash
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_PAYLOAD* pPayload = NULL;
+
+    // Initialize the single payload, and fill out all the necessary fields
+    pPackage->payloads.rgItems = (BURN_PAYLOAD_GROUP_ITEM*)MemAlloc(sizeof(BURN_PAYLOAD_GROUP_ITEM), TRUE);
+    ExitOnNull(pPackage->payloads.rgItems, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload group inside of update bundle struct");
+    pPackage->payloads.cItems = 1;
+
+    pPayload = (BURN_PAYLOAD*)MemAlloc(sizeof(BURN_PAYLOAD), TRUE);
+    ExitOnNull(pPayload, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload inside of update bundle struct");
+    pPackage->payloads.rgItems[0].pPayload = pPayload;
+    pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
+    pPayload->qwFileSize = qwSize;
+    pPayload->verification = BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE;
+
+    hr = StrAllocString(&pPayload->sczKey, wzId, 0);
+    ExitOnFailure(hr, "Failed to copy key for pseudo bundle payload.");
+
+    hr = StrAllocString(&pPayload->sczFilePath, wzFilePath, 0);
+    ExitOnFailure(hr, "Failed to copy filename for pseudo bundle.");
+
+    hr = StrAllocString(&pPayload->sczSourcePath, wzLocalSource, 0);
+    ExitOnFailure(hr, "Failed to copy local source path for pseudo bundle.");
+
+    if (wzDownloadSource && *wzDownloadSource)
+    {
+        hr = StrAllocString(&pPayload->downloadSource.sczUrl, wzDownloadSource, 0);
+        ExitOnFailure(hr, "Failed to copy download source for pseudo bundle.");
+    }
+
+    if (pbHash)
+    {
+        pPayload->pbHash = static_cast<BYTE*>(MemAlloc(cbHash, FALSE));
+        ExitOnNull(pPayload->pbHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for update bundle payload hash.");
+
+        pPayload->cbHash = cbHash;
+        memcpy_s(pPayload->pbHash, pPayload->cbHash, pbHash, cbHash);
+    }
+
+    pPackage->Exe.fPseudoBundle = TRUE;
+
+    pPackage->type = BURN_PACKAGE_TYPE_EXE;
+    pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+    pPackage->qwInstallSize = qwSize;
+    pPackage->qwSize = qwSize;
+    pPackage->fVital = TRUE;
+
+    hr = StrAllocString(&pPackage->sczId, wzId, 0);
+    ExitOnFailure(hr, "Failed to copy id for update bundle.");
+
+    hr = StrAllocString(&pPackage->sczCacheId, wzCacheId, 0);
+    ExitOnFailure(hr, "Failed to copy cache id for update bundle.");
+
+    hr = StrAllocString(&pPackage->Exe.sczInstallArguments, wzInstallArguments, 0);
+    ExitOnFailure(hr, "Failed to copy install arguments for update bundle package");
+
+    // Assume the update bundle has the same engine version as this one.
+    pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_BURN;
+    pPackage->Exe.fSupportsAncestors = TRUE;
+
+LExit:
+    return hr;
+}

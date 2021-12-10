@@ -505,6 +505,15 @@ BAAPI UserExperienceOnRollbackMsiTransactionComplete(
     __in LPCWSTR wzTransactionId,
     __in HRESULT hrStatus
     );
+BAAPI UserExperienceOnSetUpdateBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    );
+BAAPI UserExperienceOnSetUpdateComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in HRESULT hrStatus,
+    __in_z_opt LPCWSTR wzPreviousPackageId,
+    __in_z_opt LPCWSTR wzNewPackageId
+    );
 BAAPI UserExperienceOnShutdown(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __inout BOOTSTRAPPER_SHUTDOWN_ACTION* pAction
