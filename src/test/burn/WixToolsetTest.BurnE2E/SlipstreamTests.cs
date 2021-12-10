@@ -266,7 +266,7 @@ namespace WixToolsetTest.BurnE2E
             packageBv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6359")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6402")]
         public void CanAutomaticallyPredetermineSlipstreamPatchesAtBuildTime()
         {
             var testRegistryValueA = "PackageA";

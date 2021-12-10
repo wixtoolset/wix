@@ -55,7 +55,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6380")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6675")]
         public void CanPatchSwidTag()
         {
             var originalVersion = "1.0.0.0";
