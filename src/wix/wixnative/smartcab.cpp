@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include "fileutil.h"
 
 static HRESULT CompressFiles(__in HANDLE hCab);
 static void __stdcall CabNamesCallback(__in_z LPWSTR wzFirstCabName, __in_z LPWSTR wzNewCabName, __in_z LPWSTR wzFileToken);
