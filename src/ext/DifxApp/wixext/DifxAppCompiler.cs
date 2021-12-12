@@ -38,7 +38,6 @@ namespace WixToolset.DifxApp
             {
                 case "Component":
                     var componentId = context["ComponentId"];
-                    var directoryId = context["DirectoryId"];
                     var componentWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
@@ -67,6 +66,9 @@ namespace WixToolset.DifxApp
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             int attributes = 0;
             var sequence = CompilerConstants.IntegerNotSet;
+
+            // See https://github.com/wixtoolset/issues/issues/6648. DifxApp is deprecated so warn the user.
+            this.Messaging.Write(WarningMessages.DeprecatedElement(sourceLineNumbers, node.Name.LocalName));
 
             // check the number of times a Driver element has been nested under this Component element
             if (null != componentId)
