@@ -20,8 +20,8 @@
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
     <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp3.1\</WixBinDir>
-    <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net461\x86\</WixBinDir>
-    <WixBinDir64 Condition=" '$(WixBinDir64)' == '' and '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net461\x64\</WixBinDir64>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net472\x86\</WixBinDir>
+    <WixBinDir64 Condition=" '$(WixBinDir64)' == '' and '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net472\x64\</WixBinDir64>
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
     <WixTasksPath64 Condition=" '$(WixTasksPath64)' == '' and '$(WixBinDir64)' != '' ">$(WixBinDir64)WixToolset.BuildTasks.dll</WixTasksPath64>
   </PropertyGroup>

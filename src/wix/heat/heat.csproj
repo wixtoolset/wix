@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>Harvester</Description>
     <Title>WiX Harvester</Title>
@@ -46,7 +46,7 @@
     <PackageReference Include="System.DirectoryServices" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net461' and '$(OS)' != 'Windows_NT'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net472' and '$(OS)' != 'Windows_NT'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
   </ItemGroup>
 </Project>

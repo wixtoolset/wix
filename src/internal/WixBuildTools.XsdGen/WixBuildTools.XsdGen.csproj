@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <!-- <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks> -->
-    <TargetFrameworks>net461</TargetFrameworks>
+    <!-- <TargetFrameworks>netcoreapp2.0;net472</TargetFrameworks> -->
+    <TargetFrameworks>net472</TargetFrameworks>
     <IsTool>true</IsTool>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
@@ -17,7 +17,7 @@
     <Content Include="build\WixBuildTools.XsdGen.targets" PackagePath="build\" />
     <Content Include="buildCrossTargeting\WixBuildTools.XsdGen.targets" PackagePath="buildCrossTargeting\" />
 
-    <Content Include="$(OutputPath)net461\$(TargetFileName)" PackagePath="tools\full" />
+    <Content Include="$(OutputPath)net472\$(TargetFileName)" PackagePath="tools\full" />
     <!-- <Content Include="$(OutputPath)netcoreapp2.0\$(TargetFileName)" PackagePath="tools\core" /> -->
   </ItemGroup>
 
