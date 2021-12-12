@@ -17,15 +17,15 @@ namespace WixToolsetTest.Dependency
             var folder = TestData.Get(@"TestData\UsingProvides");
             var build = new Builder(folder, typeof(DependencyExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "CustomAction", "WixDependencyProvider")
+            var results = build.BuildAndQuery(Build, "CustomAction", "Wix4DependencyProvider")
                                .Select(r => Regex.Replace(r, "{[^}]*}", "{*}"))
                                .ToArray();
             WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:Wix4DependencyCheck_X86\t1\tDependencyCA_X86\tWixDependencyCheck\t",
                 "CustomAction:Wix4DependencyRequire_X86\t1\tDependencyCA_X86\tWixDependencyRequire\t",
-                "WixDependencyProvider:dep74OfIcniaqxA7EprRGBw4Oyy3r8\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
-                "WixDependencyProvider:depTpv28q7slcxvXPWmU4Z0GfbiI.4\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t{*}\t\t\t",
+                "Wix4DependencyProvider:dep74OfIcniaqxA7EprRGBw4Oyy3r8\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
+                "Wix4DependencyProvider:depTpv28q7slcxvXPWmU4Z0GfbiI.4\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t{*}\t\t\t",
             }, results);
         }
 

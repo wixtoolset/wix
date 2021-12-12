@@ -33,12 +33,12 @@ namespace WixToolset.Core
 
         public static Message ProvidesKeyNotFound(SourceLineNumber sourceLineNumbers, string id)
         {
-            return Message(sourceLineNumbers, Ids.ProvidesKeyNotFound, "The provider key with identifier {0} was not found in the WixDependencyProvider table. Related registry rows will not be removed from authoring.", id);
+            return Message(sourceLineNumbers, Ids.ProvidesKeyNotFound, "The provider key with identifier {0} was not found in the Wix4DependencyProvider table. Related registry rows will not be removed from authoring.", id);
         }
 
         public static Message RequiresKeyNotFound(SourceLineNumber sourceLineNumbers, string id)
         {
-            return Message(sourceLineNumbers, Ids.RequiresKeyNotFound, "The dependency key with identifier {0} was not found in the WixDependency table. Related registry rows will not be removed from authoring.", id);
+            return Message(sourceLineNumbers, Ids.RequiresKeyNotFound, "The dependency key with identifier {0} was not found in the Wix4Dependency table. Related registry rows will not be removed from authoring.", id);
         }
 
         public static Message Win64Component(SourceLineNumber sourceLineNumbers, string componentId)
