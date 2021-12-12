@@ -29,8 +29,9 @@ namespace WixToolsetTest.DifxApp
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            var result = WixRunner.Execute(warningsAsErrors: false, args).AssertSuccess();
+
+            Assert.Single(result.Messages.Where(m => m.Id == (int)WixToolset.Data.WarningMessages.Ids.DeprecatedElement));
         }
     }
 }
