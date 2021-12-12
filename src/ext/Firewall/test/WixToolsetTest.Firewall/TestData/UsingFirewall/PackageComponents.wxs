@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
-  <Fragment>
-    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-       <Component>
-         <File Source="example.txt" />
-         <fw:FirewallException Id="ExampleFirewall" Description="An example firewall" Name="example" Port="42">
-           <fw:RemoteAddress Value="*" />
-         </fw:FirewallException>
-       </Component>
-    </ComponentGroup>
-  </Fragment>
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Name="fw.exe" Source="example.txt">
+                    <Shortcut Id="FwShortcut" Directory="INSTALLFOLDER" Name="Firewall" />
+                    <fw:FirewallException Id="ExampleFirewall" Description="An example firewall" Name="example" Port="42" Outbound="true">
+                        <fw:RemoteAddress Value="*" />
+                    </fw:FirewallException>
+                </File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
 </Wix>

@@ -25,7 +25,7 @@ namespace WixToolsetTest.Firewall
                 "CustomAction:Wix4RollbackFirewallExceptionsUninstall_X86\t3329\tWix4FWCA_X86\tExecFirewallExceptions\t",
                 "CustomAction:Wix4SchedFirewallExceptionsInstall_X86\t1\tWix4FWCA_X86\tSchedFirewallExceptionsInstall\t",
                 "CustomAction:Wix4SchedFirewallExceptionsUninstall_X86\t1\tWix4FWCA_X86\tSchedFirewallExceptionsUninstall\t",
-                "Wix4FirewallException:ExampleFirewall\texample\t*\t42\t6\t\t0\t2147483647\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example firewall\t1",
+                "Wix4FirewallException:ExampleFirewall\texample\t*\t42\t6\t[#filNdJBJmq3UCUIwmXS8x21aAsvqzk]\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tAn example firewall\t2",
             }, results);
         }
 
@@ -44,20 +44,7 @@ namespace WixToolsetTest.Firewall
                 "CustomAction:Wix4RollbackFirewallExceptionsUninstall_A64\t3329\tWix4FWCA_A64\tExecFirewallExceptions\t",
                 "CustomAction:Wix4SchedFirewallExceptionsInstall_A64\t1\tWix4FWCA_A64\tSchedFirewallExceptionsInstall\t",
                 "CustomAction:Wix4SchedFirewallExceptionsUninstall_A64\t1\tWix4FWCA_A64\tSchedFirewallExceptionsUninstall\t",
-                "Wix4FirewallException:ExampleFirewall\texample\t*\t42\t6\t\t0\t2147483647\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example firewall\t1",
-            }, results);
-        }
-
-        [Fact]
-        public void CanBuildUsingOutboundFirewall()
-        {
-            var folder = TestData.Get(@"TestData\UsingOutboundFirewall");
-            var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
-
-            var results = build.BuildAndQuery(Build, "Wix4FirewallException");
-            Assert.Equal(new[]
-            {
-                "Wix4FirewallException:fex.5c8b_4C0THcQTvn8tpwhoRrgck\texample\t*\t42\t6\t\t0\t2147483647\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example outbound firewall\t2",
+                "Wix4FirewallException:ExampleFirewall\texample\t*\t42\t6\t[#filNdJBJmq3UCUIwmXS8x21aAsvqzk]\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tAn example firewall\t2",
             }, results);
         }
 
