@@ -6,14 +6,14 @@
 #define INITIAL_STRINGDICT_SIZE 4
 
 LPCWSTR vcsDependencyProviderQuery =
-    L"SELECT `WixDependencyProvider`.`WixDependencyProvider`, `WixDependencyProvider`.`Component_`, `WixDependencyProvider`.`ProviderKey`, `WixDependencyProvider`.`Attributes` "
-    L"FROM `WixDependencyProvider`";
+    L"SELECT `Wix4DependencyProvider`.`Wix4DependencyProvider`, `Wix4DependencyProvider`.`Component_`, `Wix4DependencyProvider`.`ProviderKey`, `Wix4DependencyProvider`.`Attributes` "
+    L"FROM `Wix4DependencyProvider`";
 enum eDependencyProviderQuery { dpqId = 1, dpqComponent, dpqProviderKey, dpqAttributes };
 
 LPCWSTR vcsDependencyQuery =
-    L"SELECT `WixDependency`.`WixDependency`, `WixDependencyProvider`.`Component_`, `WixDependency`.`ProviderKey`, `WixDependency`.`MinVersion`, `WixDependency`.`MaxVersion`, `WixDependency`.`Attributes` "
-    L"FROM `WixDependencyProvider`, `WixDependency`, `WixDependencyRef` "
-    L"WHERE `WixDependency`.`WixDependency` = `WixDependencyRef`.`WixDependency_` AND `WixDependencyProvider`.`WixDependencyProvider` = `WixDependencyRef`.`WixDependencyProvider_`";
+    L"SELECT `Wix4Dependency`.`Wix4Dependency`, `Wix4DependencyProvider`.`Component_`, `Wix4Dependency`.`ProviderKey`, `Wix4Dependency`.`MinVersion`, `Wix4Dependency`.`MaxVersion`, `Wix4Dependency`.`Attributes` "
+    L"FROM `Wix4DependencyProvider`, `Wix4Dependency`, `Wix4DependencyRef` "
+    L"WHERE `Wix4Dependency`.`Wix4Dependency` = `Wix4DependencyRef`.`Wix4Dependency_` AND `Wix4DependencyProvider`.`Wix4DependencyProvider` = `Wix4DependencyRef`.`Wix4DependencyProvider_`";
 enum eDependencyComponentQuery { dqId = 1, dqComponent, dqProviderKey, dqMinVersion, dqMaxVersion, dqAttributes };
 
 static HRESULT EnsureRequiredDependencies(
@@ -134,8 +134,8 @@ static HRESULT EnsureRequiredDependencies(
     UINT cDependencies = 0;
     PMSIHANDLE hDependencyRec = NULL;
 
-    // Skip the dependency check if the WixDependency table is missing (no dependencies to check for).
-    hr = WcaTableExists(L"WixDependency");
+    // Skip the dependency check if the Wix4Dependency table is missing (no dependencies to check for).
+    hr = WcaTableExists(L"Wix4Dependency");
     if (S_FALSE == hr)
     {
         WcaLog(LOGMSG_STANDARD, "Skipping the dependency check since no dependencies are authored.");
@@ -143,7 +143,7 @@ static HRESULT EnsureRequiredDependencies(
     }
 
     // If the table exists but not the others, the database was not authored correctly.
-    ExitOnFailure(hr, "Failed to check if the WixDependency table exists.");
+    ExitOnFailure(hr, "Failed to check if the Wix4Dependency table exists.");
 
     // Initialize the dictionary to keep track of unique dependency keys.
     hr = DictCreateStringList(&sdDependencies, INITIAL_STRINGDICT_SIZE, DICT_FLAG_CASEINSENSITIVE);
@@ -159,10 +159,10 @@ static HRESULT EnsureRequiredDependencies(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, dqId, &sczId);
-        ExitOnFailure(hr, "Failed to get WixDependency.WixDependency.");
+        ExitOnFailure(hr, "Failed to get Wix4Dependency.Wix4Dependency.");
 
         hr = WcaGetRecordString(hRec, dqComponent, &sczComponent);
-        ExitOnFailure(hr, "Failed to get WixDependencyProvider.Component_.");
+        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Component_.");
 
         // Skip the current component if its not being installed or reinstalled.
         tComponentAction = WcaGetComponentToDo(sczComponent);
@@ -173,16 +173,16 @@ static HRESULT EnsureRequiredDependencies(
         }
 
         hr = WcaGetRecordString(hRec, dqProviderKey, &sczProviderKey);
-        ExitOnFailure(hr, "Failed to get WixDependency.ProviderKey.");
+        ExitOnFailure(hr, "Failed to get Wix4Dependency.ProviderKey.");
 
         hr = WcaGetRecordString(hRec, dqMinVersion, &sczMinVersion);
-        ExitOnFailure(hr, "Failed to get WixDependency.MinVersion.");
+        ExitOnFailure(hr, "Failed to get Wix4Dependency.MinVersion.");
 
         hr = WcaGetRecordString(hRec, dqMaxVersion, &sczMaxVersion);
-        ExitOnFailure(hr, "Failed to get WixDependency.MaxVersion.");
+        ExitOnFailure(hr, "Failed to get Wix4Dependency.MaxVersion.");
 
         hr = WcaGetRecordInteger(hRec, dqAttributes, &iAttributes);
-        ExitOnFailure(hr, "Failed to get WixDependency.Attributes.");
+        ExitOnFailure(hr, "Failed to get Wix4Dependency.Attributes.");
 
         // Check the registry to see if the required providers (dependencies) exist.
         hr = DepCheckDependency(hkHive, sczProviderKey, sczMinVersion, sczMaxVersion, iAttributes, sdDependencies, &rgDependencies, &cDependencies);
@@ -278,15 +278,15 @@ static HRESULT EnsureAbsentDependents(
     UINT cDependents = 0;
     PMSIHANDLE hDependencyRec = NULL;
 
-    // Skip the dependent check if the WixDependencyProvider table is missing (no dependency providers).
-    hr = WcaTableExists(L"WixDependencyProvider");
+    // Skip the dependent check if the Wix4DependencyProvider table is missing (no dependency providers).
+    hr = WcaTableExists(L"Wix4DependencyProvider");
     if (S_FALSE == hr)
     {
         WcaLog(LOGMSG_STANDARD, "Skipping the dependents check since no dependency providers are authored.");
         ExitFunction1(hr = S_OK);
     }
 
-    ExitOnFailure(hr, "Failed to check if the WixDependencyProvider table exists.");
+    ExitOnFailure(hr, "Failed to check if the Wix4DependencyProvider table exists.");
 
     // Split the IGNOREDEPENDENCIES property for use below if set. If it is "ALL", then quit now.
     hr = SplitIgnoredDependents(&sdIgnoredDependents);
@@ -317,10 +317,10 @@ static HRESULT EnsureAbsentDependents(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, dpqId, &sczId);
-        ExitOnFailure(hr, "Failed to get WixDependencyProvider.WixDependencyProvider.");
+        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Wix4DependencyProvider.");
 
         hr = WcaGetRecordString(hRec, dpqComponent, &sczComponent);
-        ExitOnFailure(hr, "Failed to get WixDependencyProvider.Component.");
+        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Component.");
 
         // Skip the current component if its not being uninstalled.
         tComponentAction = WcaGetComponentToDo(sczComponent);
@@ -331,10 +331,10 @@ static HRESULT EnsureAbsentDependents(
         }
 
         hr = WcaGetRecordString(hRec, dpqProviderKey, &sczProviderKey);
-        ExitOnFailure(hr, "Failed to get WixDependencyProvider.ProviderKey.");
+        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.ProviderKey.");
 
         hr = WcaGetRecordInteger(hRec, dpqAttributes, &iAttributes);
-        ExitOnFailure(hr, "Failed to get WixDependencyProvider.Attributes.");
+        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Attributes.");
 
         // Check the registry to see if the provider has any dependents registered.
         hr = DepCheckDependents(hkHive, sczProviderKey, iAttributes, sdIgnoredDependents, &rgDependents, &cDependents);

@@ -1733,7 +1733,7 @@ namespace WixToolset.Data.WindowsInstaller
         );
 
         public static readonly TableDefinition WixDependencyProvider = new TableDefinition(
-            "WixDependencyProvider",
+            "Wix4DependencyProvider",
             SymbolDefinitions.WixDependencyProvider,
             new[]
             {
@@ -1748,7 +1748,7 @@ namespace WixToolset.Data.WindowsInstaller
         );
 
         public static readonly TableDefinition WixDependency = new TableDefinition(
-            "WixDependency",
+            "Wix4Dependency",
             SymbolDefinitions.WixDependency,
             new[]
             {
@@ -1762,12 +1762,12 @@ namespace WixToolset.Data.WindowsInstaller
         );
 
         public static readonly TableDefinition WixDependencyRef = new TableDefinition(
-            "WixDependencyRef",
+            "Wix4DependencyRef",
             SymbolDefinitions.WixDependencyRef,
             new[]
             {
-                new ColumnDefinition("WixDependencyProvider_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "WixDependencyProvider", keyColumn: 1, description: "Foreign key into the Component table.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("WixDependency_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "WixDependency", keyColumn: 1, description: "Foreign key into the WixDependency table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("WixDependencyProvider_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4DependencyProvider", keyColumn: 1, description: "Foreign key into the Component table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("WixDependency_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4Dependency", keyColumn: 1, description: "Foreign key into the WixDependency table.", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: false
         );
