@@ -509,7 +509,7 @@ StrAllocStringAnsi - allocates or reuses dynamic string memory and copies in an 
 
 NOTE: caller is responsible for freeing ppwz even if function fails
 NOTE: cchSource must equal the length of wzSource (not including the NULL terminator)
-NOTE: if cchSource == 0, length of wzSource is used instead
+NOTE: if cchSource == 0, length of szSource is used instead
 ********************************************************************/
 extern "C" HRESULT DAPI StrAllocStringAnsi(
     __deref_out_ecount_z(cchSource+1) LPWSTR* ppwz,
