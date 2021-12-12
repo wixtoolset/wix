@@ -45,7 +45,7 @@ extern "C" UINT __stdcall UninstallSqlData(
     UINT er = ERROR_SUCCESS;
 
     // initialize
-    hr = WcaInitialize(hInstall, "UninstallCertificates");
+    hr = WcaInitialize(hInstall, "UninstallSqlData");
     ExitOnFailure(hr, "Failed to initialize");
 
     hr = ConfigureSqlData(SCA_ACTION_UNINSTALL);
