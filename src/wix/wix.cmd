@@ -37,19 +37,19 @@ dotnet test -c %_C% --no-build test\WixToolsetTest.Heat || exit /b
 :: Publish
 msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=netcoreapp3.1 -p:PublishDir=%_P%wix\ wix\wix.csproj || exit /b
 
-msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=win-x86 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net461\x86\buildtasks\ WixToolset.BuildTasks\WixToolset.BuildTasks.csproj || exit /b
-msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=win-x86 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net461\x86\heat\ heat\heat.csproj || exit /b
-msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=win-x86 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net461\x86\wix\ wix\wix.csproj || exit /b
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net461\x86\buildtasks %_P%\WixToolset.Sdk\tools\net461\x86 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net461\x86\heat %_P%\WixToolset.Sdk\tools\net461\x86 %_RCO%
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net461\x86\wix %_P%\WixToolset.Sdk\tools\net461\x86 %_RCO%
+msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=win-x86 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net472\x86\buildtasks\ WixToolset.BuildTasks\WixToolset.BuildTasks.csproj || exit /b
+msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=win-x86 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net472\x86\heat\ heat\heat.csproj || exit /b
+msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=win-x86 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net472\x86\wix\ wix\wix.csproj || exit /b
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x86\buildtasks %_P%\WixToolset.Sdk\tools\net472\x86 %_RCO% /XF Microsoft.Build.*.dll
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x86\heat %_P%\WixToolset.Sdk\tools\net472\x86 %_RCO%
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x86\wix %_P%\WixToolset.Sdk\tools\net472\x86 %_RCO%
 
-msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=win-x64 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net461\x64\buildtasks\ WixToolset.BuildTasks\WixToolset.BuildTasks.csproj || exit /b
-msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=win-x64 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net461\x64\heat\ heat\heat.csproj || exit /b
-msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=win-x64 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net461\x64\wix\ wix\wix.csproj || exit /b
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net461\x64\buildtasks %_P%\WixToolset.Sdk\tools\net461\x64 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net461\x64\heat %_P%\WixToolset.Sdk\tools\net461\x64 %_RCO%
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net461\x64\wix %_P%\WixToolset.Sdk\tools\net461\x64 %_RCO%
+msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=win-x64 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net472\x64\buildtasks\ WixToolset.BuildTasks\WixToolset.BuildTasks.csproj || exit /b
+msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=win-x64 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net472\x64\heat\ heat\heat.csproj || exit /b
+msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=win-x64 -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\net472\x64\wix\ wix\wix.csproj || exit /b
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\buildtasks %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO% /XF Microsoft.Build.*.dll
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\heat %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO%
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\wix %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO%
 
 msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=netcoreapp3.1 -p:UseAppHost=false -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\netcoreapp3.1\buildtasks\ WixToolset.BuildTasks\WixToolset.BuildTasks.csproj || exit /b
 msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=netcoreapp3.1 -p:UseAppHost=false -p:PublishDir=%_P_OBJ%WixToolset.Sdk\separate\netcoreapp3.1\heat\ heat\heat.csproj || exit /b
@@ -61,7 +61,7 @@ robocopy %_P_OBJ%\WixToolset.Sdk\separate\netcoreapp3.1\wix %_P%\WixToolset.Sdk\
 msbuild -t:Publish -p:Configuration=%_C% -p:PublishDir=%_P%WixToolset.Sdk\ WixToolset.Sdk\WixToolset.Sdk.csproj || exit /b
 
 :: TODO - used by MsbuildFixture.ReportsInnerExceptionForUnexpectedExceptions test
-:: msbuild -t:Publish -Restore -p:Configuration=%_C% -p:TargetFramework=net461 -p:RuntimeIdentifier=linux-x86 -p:PublishDir=%_P%WixToolset.Sdk\broken\net461\ wix\wix.csproj || exit /b
+:: msbuild -t:Publish -Restore -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=linux-x86 -p:PublishDir=%_P%WixToolset.Sdk\broken\net472\ wix\wix.csproj || exit /b
 
 
 :: Test

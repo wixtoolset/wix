@@ -4,7 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net461;net472</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net472</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
     <Description>WiX Toolset Data</Description>
     <DebugType>embedded</DebugType>

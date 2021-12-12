@@ -3,6 +3,7 @@
     <!-- Build -->
     <ProjectReference Include="WixToolset.Data\WixToolset.Data.csproj" />
     <ProjectReference Include="WixToolset.Extensibility\WixToolset.Extensibility.csproj" />
+    <ProjectReference Include="test\WixToolsetTest.Data\WixToolsetTest.Data.csproj" />
 
     <!-- Pack -->
     <ProjectReference Include="WixToolset.Data\WixToolset.Data.csproj" Targets="Pack" />

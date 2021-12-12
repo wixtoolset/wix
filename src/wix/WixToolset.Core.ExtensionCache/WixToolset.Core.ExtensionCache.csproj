@@ -4,7 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net461;net472</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net472</TargetFrameworks>
     <Description>Extension Cache</Description>
     <Title>WiX Toolset Extension Cache</Title>
     <DebugType>embedded</DebugType>

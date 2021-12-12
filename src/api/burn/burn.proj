@@ -27,6 +27,7 @@
     <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=ARM64" />
 
     <ProjectReference Include="WixToolset.Mba.Core\WixToolset.Mba.Core.csproj" Properties="Platform=AnyCPU" />
+    <ProjectReference Include="test\WixToolsetTest.Mba.Core\WixToolsetTest.Mba.Core.csproj" Properties="Platform=AnyCPU" />
 
     <!-- Test -->
     <ProjectReference Include="test\BalUtilUnitTest\BalUtilUnitTest.vcxproj" Targets="Test" />

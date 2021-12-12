@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>WiX Toolset creates installation packages.</Description>
     <DebugType>embedded</DebugType>
@@ -20,7 +20,7 @@
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net461' and '$(OS)' != 'Windows_NT'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net472' and '$(OS)' != 'Windows_NT'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
   </ItemGroup>
 
