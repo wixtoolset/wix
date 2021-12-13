@@ -18,11 +18,11 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <None Include="$(BaseOutputPath)$(Configuration)\v143\x86\mbanative.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\v143\x86\mbanative.pdb" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\$(PlatformToolset)\x86\mbanative.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\$(PlatformToolset)\x86\mbanative.pdb" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition=" '$(NCrunch)'=='1' ">
-    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(SegmentName)\$(Configuration)\v143\x86\mbanative.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(SegmentName)\$(Configuration)\v143\x86\mbanative.pdb" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(SegmentName)\$(Configuration)\$(PlatformToolset)\x86\mbanative.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(SegmentName)\$(Configuration)\$(PlatformToolset)\x86\mbanative.pdb" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

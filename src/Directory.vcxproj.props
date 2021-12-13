@@ -8,7 +8,11 @@
     <PlatformFolder Condition=" '$(PlatformFolder)' == '' ">$(Platform)</PlatformFolder>
     <IntDir>$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformFolder)\</IntDir>
     <OutDir>$(OutputPath)$(PlatformFolder)\</OutDir>
-    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+
+  <!-- This is needed for v141 toolset, which doesn't understand `10.0` -->
+  <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'==''">
+    <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(CLRSupport)'!='true' ">
