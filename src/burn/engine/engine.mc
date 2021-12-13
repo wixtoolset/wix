@@ -991,6 +991,20 @@ Language=English
 Illegal state: Reboot requested within an MSI transaction, id: %1!ls!
 .
 
+MessageId=388
+Severity=Warning
+SymbolicName=MSG_APPLY_SKIPPING_NONVITAL_ROLLBACK_BOUNDARY_PACKAGE
+Language=English
+Skipping package inside non-vital rollback boundary, id: %1!ls!
+.
+
+MessageId=389
+Severity=Warning
+SymbolicName=MSG_APPLY_SKIPPING_REST_OF_NONVITAL_ROLLBACK_BOUNDARY
+Language=English
+Skipping the rest of non-vital rollback boundary, id: %1!ls!
+.
+
 MessageId=399
 Severity=Success
 SymbolicName=MSG_APPLY_COMPLETE

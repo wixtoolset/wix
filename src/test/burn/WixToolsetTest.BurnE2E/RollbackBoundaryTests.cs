@@ -22,7 +22,7 @@ namespace WixToolsetTest.BurnE2E
         ///     install package B
         ///     unregister since no non-permanent packages should be installed or cached.
         /// </summary>
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6309")]
+        [Fact]
         public void NonVitalRollbackBoundarySkipsToNextRollbackBoundary()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

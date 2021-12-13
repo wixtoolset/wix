@@ -1724,14 +1724,14 @@ extern "C" HRESULT PlanRollbackBoundaryBegin(
     hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
     ExitOnFailure(hr, "Failed to append rollback boundary begin action.");
 
-    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY;
+    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START;
     pExecuteAction->rollbackBoundary.pRollbackBoundary = pRollbackBoundary;
 
     // Add begin rollback boundary to rollback plan.
     hr = PlanAppendRollbackAction(pPlan, &pExecuteAction);
     ExitOnFailure(hr, "Failed to append rollback boundary begin action.");
 
-    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY;
+    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START;
     pExecuteAction->rollbackBoundary.pRollbackBoundary = pRollbackBoundary;
 
     hr = UserExperienceOnPlanRollbackBoundary(pUX, pRollbackBoundary->sczId, &pRollbackBoundary->fTransaction);
@@ -1785,6 +1785,18 @@ extern "C" HRESULT PlanRollbackBoundaryComplete(
 
     // Add checkpoints.
     hr = PlanExecuteCheckpoint(pPlan);
+
+    // Add complete rollback boundary to execute plan.
+    hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
+    ExitOnFailure(hr, "Failed to append rollback boundary complete action.");
+
+    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END;
+
+    // Add begin rollback boundary to rollback plan.
+    hr = PlanAppendRollbackAction(pPlan, &pExecuteAction);
+    ExitOnFailure(hr, "Failed to append rollback boundary complete action.");
+
+    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END;
 
 LExit:
     return hr;
@@ -2616,8 +2628,12 @@ static void ExecuteActionLog(
         LogStringLine(PlanDumpLevel, "%ls action[%u]: MSU_PACKAGE package id: %ls, action: %hs, log path: %ls", wzBase, iAction, pAction->msuPackage.pPackage->sczId, LoggingActionStateToString(pAction->msuPackage.action), pAction->msuPackage.sczLogPath);
         break;
 
-    case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: ROLLBACK_BOUNDARY id: %ls, vital: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no");
+    case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START:
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: ROLLBACK_BOUNDARY_START id: %ls, vital: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no");
+        break;
+
+    case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END:
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: ROLLBACK_BOUNDARY_END", wzBase, iAction);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_WAIT_CACHE_PACKAGE:
