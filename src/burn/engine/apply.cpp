@@ -191,7 +191,6 @@ static HRESULT DoExecuteAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_EXECUTE_CONTEXT* pContext,
-    __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
     __inout BURN_EXECUTE_ACTION_CHECKPOINT** ppCheckpoint,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -657,8 +656,7 @@ extern "C" HRESULT ApplyExecute(
     HRESULT hrRollback = S_OK;
     BURN_EXECUTE_ACTION_CHECKPOINT* pCheckpoint = NULL;
     BURN_EXECUTE_CONTEXT context = { };
-    BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
-    BOOL fSeekNextRollbackBoundary = FALSE;
+    BOOL fSeekRollbackBoundaryEnd = FALSE;
 
     context.pCache = pEngineState->plan.pCache;
     context.pUX = &pEngineState->userExperience;
@@ -680,21 +678,41 @@ extern "C" HRESULT ApplyExecute(
             continue;
         }
 
-        // If we are seeking the next rollback boundary, skip if this action wasn't it.
-        if (fSeekNextRollbackBoundary)
+        // If we are seeking the end of the rollback boundary, skip if this action wasn't it.
+        if (fSeekRollbackBoundaryEnd)
         {
-            if (BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY == pExecuteAction->type)
+            if (BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END != pExecuteAction->type)
             {
+                LPCWSTR wzId = NULL;
+                switch (pExecuteAction->type)
+                {
+                case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
+                    wzId = pExecuteAction->exePackage.pPackage->sczId;
+                    break;
+                case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
+                    wzId = pExecuteAction->msiPackage.pPackage->sczId;
+                    break;
+                case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
+                    wzId = pExecuteAction->mspTarget.pPackage->sczId;
+                    break;
+                case BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE:
+                    wzId = pExecuteAction->msuPackage.pPackage->sczId;
+                    break;
+                }
+
+                if (wzId)
+                {
+                    LogId(REPORT_WARNING, MSG_APPLY_SKIPPING_NONVITAL_ROLLBACK_BOUNDARY_PACKAGE, wzId);
+                }
+
                 continue;
             }
-            else
-            {
-                fSeekNextRollbackBoundary = FALSE;
-            }
+
+            fSeekRollbackBoundaryEnd = FALSE;
         }
 
         // Execute the action.
-        hr = DoExecuteAction(pEngineState, pExecuteAction, &context, &pRollbackBoundary, &pCheckpoint, pfSuspend, pRestart);
+        hr = DoExecuteAction(pEngineState, pExecuteAction, &context, &pCheckpoint, pfSuspend, pRestart);
 
         if (*pfSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart)
         {
@@ -737,19 +755,24 @@ extern "C" HRESULT ApplyExecute(
 
                 hrRollback = DoRollbackActions(pEngineState, &context, pCheckpoint->dwId, pRestart);
                 IgnoreRollbackError(hrRollback, "Failed rollback actions");
+
+                if (pCheckpoint->pActiveRollbackBoundary)
+                {
+                    if (pCheckpoint->pActiveRollbackBoundary->fVital)
+                    {
+                        // If the rollback boundary is vital, end execution here.
+                        break;
+                    }
+
+                    // Move forward to the end of this rollback boundary.
+                    fSeekRollbackBoundaryEnd = TRUE;
+
+                    LogId(REPORT_WARNING, MSG_APPLY_SKIPPING_REST_OF_NONVITAL_ROLLBACK_BOUNDARY, pCheckpoint->pActiveRollbackBoundary->sczId);
+                }
             }
 
-            // If the rollback boundary is vital, end execution here.
-            if (pRollbackBoundary && pRollbackBoundary->fVital)
-            {
-                break;
-            }
-
-            // Ignore failure inside of a non-vital rollback boundary.
+            // Ignore failure outside of a vital rollback boundary.
             hr = S_OK;
-
-            // Move forward to next rollback boundary.
-            fSeekNextRollbackBoundary = TRUE;
         }
     }
 
@@ -2207,7 +2230,6 @@ static HRESULT DoExecuteAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_EXECUTE_CONTEXT* pContext,
-    __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
     __inout BURN_EXECUTE_ACTION_CHECKPOINT** ppCheckpoint,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -2226,7 +2248,7 @@ static HRESULT DoExecuteAction(
 
     do
     {
-        fInsideMsiTransaction = *ppRollbackBoundary && (*ppRollbackBoundary)->fActiveTransaction;
+        fInsideMsiTransaction = *ppCheckpoint && (*ppCheckpoint)->pActiveRollbackBoundary && (*ppCheckpoint)->pActiveRollbackBoundary->fActiveTransaction;
 
         switch (pExecuteAction->type)
         {
@@ -2296,8 +2318,9 @@ static HRESULT DoExecuteAction(
 
             break;
 
-        case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
-            *ppRollbackBoundary = pExecuteAction->rollbackBoundary.pRollbackBoundary;
+        case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START: __fallthrough;
+        case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END:
+            *ppCheckpoint = NULL;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION:
@@ -2406,7 +2429,7 @@ static HRESULT DoRollbackActions(
                 IgnoreRollbackError(hr, "Failed to rollback dependency action.");
                 break;
 
-            case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
+            case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START:
                 ExitFunction1(hr = S_OK);
 
             case BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE:
