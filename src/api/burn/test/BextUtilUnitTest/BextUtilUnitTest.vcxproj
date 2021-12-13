@@ -31,7 +31,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\..\bextutil\inc;..\..\WixToolset.BootstrapperCore.Native\inc;..\..\..\..\libs\dutil\WixToolset.Dutil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>$(RootBuildFolder)libs\$(Configuration)\$(PlatformToolset)\$(PlatformTarget)\dutil.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>

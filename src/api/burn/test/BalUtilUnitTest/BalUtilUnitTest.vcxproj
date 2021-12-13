@@ -32,7 +32,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\..\balutil\inc;..\..\WixToolset.BootstrapperCore.Native\inc;..\..\..\..\libs\dutil\WixToolset.Dutil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;$(RootBuildFolder)libs\$(Configuration)\$(PlatformToolset)\$(PlatformTarget)\dutil.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
