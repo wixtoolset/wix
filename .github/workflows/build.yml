@@ -24,6 +24,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Confgure Visual Studio
+        shell: cmd
+        run: ./src/vs_config.cmd
+
       - name: Build wix4
         shell: cmd
         run: ./src/build_official.cmd
