@@ -28,7 +28,7 @@ jobs:
         shell: cmd
         run: ./src/build_official.cmd
         env:
-          RuntimeTestsEnabled: ${{ github.ref == 'refs/heads/master' }}
+          RuntimeTestsEnabled: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' }}
           SigningUser:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_USER || '' }}
           SigningSecret:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_SECRET || '' }}
 
