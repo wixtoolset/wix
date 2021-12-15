@@ -10,7 +10,10 @@ extern "C" {
 
 // constants
 
-const DWORD MB_RETRYTRYAGAIN = 0xF;
+const DWORD BURN_MB_RETRYTRYAGAIN = 0x10;
+const DWORD BURN_MB_MSI_FILES_IN_USE = 0x11;
+const DWORD BURN_MB_MSI_RM_FILES_IN_USE = 0x12;
+const DWORD BURN_MB_NETFX_FILES_IN_USE = 0x13;
 
 
 // structs
@@ -356,6 +359,7 @@ BAAPI UserExperienceOnExecuteFilesInUse(
     __in_z LPCWSTR wzPackageId,
     __in DWORD cFiles,
     __in_ecount_z_opt(cFiles) LPCWSTR* rgwzFiles,
+    __in BOOTSTRAPPER_FILES_IN_USE_TYPE source,
     __inout int* pnResult
     );
 BAAPI UserExperienceOnExecuteMsiMessage(

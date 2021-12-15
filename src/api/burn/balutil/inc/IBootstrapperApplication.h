@@ -488,27 +488,19 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout int* pResult
         ) = 0;
 
-    // OnExecuteFilesInUse - called when the engine encounters files in use while
-    //                       executing a package.
+    // OnExecuteFilesInUse - called when the engine receives a files in use message
+    //                       while executing a package.
     //
-    // Return:
-    //  IDOK instructs the engine to let the Restart Manager attempt to close the
-    //       applications to avoid a restart.
-    //
-    //  IDCANCEL instructs the engine to abort the execution and start rollback.
-    //
-    //  IDIGNORE instructs the engine to ignore the running applications. A restart will be
-    //           required.
-    //
-    //  IDRETRY instructs the engine to check if the applications are still running again.
-    //
-    //  IDNOACTION is equivalent to ignoring the running applications. A restart will be
-    //             required.
+    // Return value depends on the source:
+    //  BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI: https://docs.microsoft.com/en-us/windows/win32/msi/installvalidate-action
+    //  BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM: https://docs.microsoft.com/en-us/windows/win32/msi/using-restart-manager-with-an-external-ui-
+    //  BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX: https://docs.microsoft.com/en-us/dotnet/framework/deployment/how-to-get-progress-from-the-dotnet-installer
     STDMETHOD(OnExecuteFilesInUse)(
         __in_z LPCWSTR wzPackageId,
         __in DWORD cFiles,
         __in_ecount_z(cFiles) LPCWSTR* rgwzFiles,
         __in int nRecommendation,
+        __in BOOTSTRAPPER_FILES_IN_USE_TYPE source,
         __inout int* pResult
         ) = 0;
 

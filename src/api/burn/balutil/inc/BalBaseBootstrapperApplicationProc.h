@@ -438,7 +438,7 @@ static HRESULT BalBaseBAProcOnExecuteFilesInUse(
     __inout BA_ONEXECUTEFILESINUSE_RESULTS* pResults
     )
 {
-    return pBA->OnExecuteFilesInUse(pArgs->wzPackageId, pArgs->cFiles, pArgs->rgwzFiles, pArgs->nRecommendation, &pResults->nResult);
+    return pBA->OnExecuteFilesInUse(pArgs->wzPackageId, pArgs->cFiles, pArgs->rgwzFiles, pArgs->nRecommendation, pArgs->source, &pResults->nResult);
 }
 
 static HRESULT BalBaseBAProcOnExecutePackageComplete(

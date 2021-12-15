@@ -113,6 +113,7 @@ static INT SendErrorMessage(
     );
 static INT SendFilesInUseMessage(
     __in WIU_MSI_EXECUTE_CONTEXT* pContext,
+    __in UINT uiFlags,
     __in_opt MSIHANDLE hRecord,
     __in BOOL fRestartManagerRequest
     );
@@ -1161,7 +1162,7 @@ Trace(REPORT_STANDARD, "MSI install[%x]: %ls", pContext->dwCurrentProgressIndex,
 
     case INSTALLMESSAGE_FILESINUSE:
     case INSTALLMESSAGE_RMFILESINUSE:
-        nResult = SendFilesInUseMessage(pContext, hRecord, INSTALLMESSAGE_RMFILESINUSE == mt);
+        nResult = SendFilesInUseMessage(pContext, uiFlags, hRecord, INSTALLMESSAGE_RMFILESINUSE == mt);
         break;
 
 /*
@@ -1401,7 +1402,7 @@ static INT SendMsiMessage(
     InitializeMessageData(hRecord, &rgsczData, &cData);
 
     message.type = WIU_MSI_EXECUTE_MESSAGE_MSI_MESSAGE;
-    message.dwAllowedResults = uiFlags;
+    message.dwUIHint = uiFlags;
     message.cData = cData;
     message.rgwzData = (LPCWSTR*)rgsczData;
     message.msiMessage.mt = mt;
@@ -1445,7 +1446,7 @@ static INT SendErrorMessage(
     InitializeMessageData(hRecord, &rgsczData, &cData);
 
     message.type = WIU_MSI_EXECUTE_MESSAGE_ERROR;
-    message.dwAllowedResults = uiFlags;
+    message.dwUIHint = uiFlags;
     message.nResultRecommendation = nResult;
     message.cData = cData;
     message.rgwzData = (LPCWSTR*)rgsczData;
@@ -1459,8 +1460,9 @@ static INT SendErrorMessage(
 
 static INT SendFilesInUseMessage(
     __in WIU_MSI_EXECUTE_CONTEXT* pContext,
+    __in UINT uiFlags,
     __in_opt MSIHANDLE hRecord,
-    __in BOOL /*fRestartManagerRequest*/
+    __in BOOL fRestartManagerRequest
     )
 {
     INT nResult = IDNOACTION;
@@ -1470,8 +1472,8 @@ static INT SendFilesInUseMessage(
 
     InitializeMessageData(hRecord, &rgsczData, &cData);
 
-    message.type = WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE;
-    message.dwAllowedResults = WIU_MB_OKIGNORECANCELRETRY;
+    message.type = fRestartManagerRequest ? WIU_MSI_EXECUTE_MESSAGE_MSI_RM_FILES_IN_USE : WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE;
+    message.dwUIHint = uiFlags;
     message.cData = cData;
     message.rgwzData = (LPCWSTR*)rgsczData;
     message.msiFilesInUse.cFiles = message.cData;       // point the files in use information to the message record information.
@@ -1527,7 +1529,7 @@ static INT SendProgressUpdate(
 #endif
 
     message.type = WIU_MSI_EXECUTE_MESSAGE_PROGRESS;
-    message.dwAllowedResults = MB_OKCANCEL;
+    message.dwUIHint = MB_OKCANCEL;
     message.progress.dwPercentage = dwPercentage;
     nResult = pContext->pfnMessageHandler(&message, pContext->pvContext);
 

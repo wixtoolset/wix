@@ -42,7 +42,8 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_MESSAGE,
-    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE,
+    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_FILES_IN_USE,
+    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_NETFX_FILES_IN_USE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID,
     BURN_ELEVATION_MESSAGE_TYPE_PROGRESS_ROUTINE,
 } BURN_ELEVATION_MESSAGE_TYPE;
@@ -1618,7 +1619,7 @@ static HRESULT ProcessGenericExecuteMessages(
     LPWSTR* rgwzFiles = NULL;
     GENERIC_EXECUTE_MESSAGE message = { };
 
-    hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwAllowedResults);
+    hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwUIHint);
     ExitOnFailure(hr, "Failed to allowed results.");
     
     // Process the message.
@@ -1645,8 +1646,8 @@ static HRESULT ProcessGenericExecuteMessages(
         message.error.wzMessage = sczMessage;
         break;
 
-    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE:
-        message.type = GENERIC_EXECUTE_MESSAGE_FILES_IN_USE;
+    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_NETFX_FILES_IN_USE:
+        message.type = GENERIC_EXECUTE_MESSAGE_NETFX_FILES_IN_USE;
 
         // read message parameters
         hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &cFiles);
@@ -1701,6 +1702,7 @@ static HRESULT ProcessMsiPackageMessages(
     LPWSTR* rgwzMsiData = NULL;
     BURN_ELEVATION_MSI_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_MSI_MESSAGE_CONTEXT*>(pvContext);
     LPWSTR sczMessage = NULL;
+    BOOL fRestartManager = FALSE;
 
     // Read MSI extended message data.
     hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &cMsiData);
@@ -1721,7 +1723,7 @@ static HRESULT ProcessMsiPackageMessages(
         message.rgwzData = (LPCWSTR*)rgwzMsiData;
     }
 
-    hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwAllowedResults);
+    hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwUIHint);
     ExitOnFailure(hr, "Failed to read UI flags.");
 
     // Process the rest of the message.
@@ -1759,8 +1761,11 @@ static HRESULT ProcessMsiPackageMessages(
         message.msiMessage.wzMessage = sczMessage;
         break;
 
-    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE:
-        message.type = WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE;
+    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_FILES_IN_USE:
+        hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, (DWORD*)&fRestartManager);
+        ExitOnFailure(hr, "Failed to read fRestartManager.");
+
+        message.type = fRestartManager ? WIU_MSI_EXECUTE_MESSAGE_MSI_RM_FILES_IN_USE : WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE;
         message.msiFilesInUse.cFiles = cMsiData;
         message.msiFilesInUse.rgwzFiles = (LPCWSTR*)rgwzMsiData;
         break;
@@ -3006,7 +3011,7 @@ static int GenericExecuteMessageHandler(
     SIZE_T cbData = 0;
     DWORD dwMessage = 0;
 
-    hr = BuffWriteNumber(&pbData, &cbData, pMessage->dwAllowedResults);
+    hr = BuffWriteNumber(&pbData, &cbData, pMessage->dwUIHint);
     ExitOnFailure(hr, "Failed to write UI flags.");
 
     switch(pMessage->type)
@@ -3030,7 +3035,7 @@ static int GenericExecuteMessageHandler(
         dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR;
         break;
 
-    case GENERIC_EXECUTE_MESSAGE_FILES_IN_USE:
+    case GENERIC_EXECUTE_MESSAGE_NETFX_FILES_IN_USE:
         hr = BuffWriteNumber(&pbData, &cbData, pMessage->filesInUse.cFiles);
         ExitOnFailure(hr, "Failed to count of files in use to message buffer.");
 
@@ -3040,7 +3045,7 @@ static int GenericExecuteMessageHandler(
             ExitOnFailure(hr, "Failed to write file in use to message buffer.");
         }
 
-        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE;
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_NETFX_FILES_IN_USE;
         break;
     }
 
@@ -3065,6 +3070,7 @@ static int MsiExecuteMessageHandler(
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwMessage = 0;
+    BOOL fRestartManager = FALSE;
 
     // Always send any extra data via the struct first.
     hr = BuffWriteNumber(&pbData, &cbData, pMessage->cData);
@@ -3076,7 +3082,7 @@ static int MsiExecuteMessageHandler(
         ExitOnFailure(hr, "Failed to write MSI data to message buffer.");
     }
 
-    hr = BuffWriteNumber(&pbData, &cbData, pMessage->dwAllowedResults);
+    hr = BuffWriteNumber(&pbData, &cbData, pMessage->dwUIHint);
     ExitOnFailure(hr, "Failed to write UI flags.");
 
     switch (pMessage->type)
@@ -3114,11 +3120,15 @@ static int MsiExecuteMessageHandler(
         dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_MESSAGE;
         break;
 
+    case WIU_MSI_EXECUTE_MESSAGE_MSI_RM_FILES_IN_USE:
+        fRestartManager = TRUE;
+        __fallthrough;
     case WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE:
-        // NOTE: we do not serialize other message data here because all the "files in use" are in the data above.
+        hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fRestartManager);
+        ExitOnFailure(hr, "Failed to write fRestartManager to message buffer.");
 
         // set message id
-        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE;
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_FILES_IN_USE;
         break;
 
     default:

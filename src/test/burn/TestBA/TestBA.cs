@@ -399,7 +399,7 @@ namespace WixToolset.Test.BA
 
         protected override void OnExecuteFilesInUse(ExecuteFilesInUseEventArgs args)
         {
-            this.Log("OnExecuteFilesInUse() - package: {0}, retries remaining: {1}, data: {2}", args.PackageId, this.retryExecuteFilesInUse, String.Join(", ", args.Files.ToArray()));
+            this.Log("OnExecuteFilesInUse() - package: {0}, source: {1}, retries remaining: {2}, data: {3}", args.PackageId, args.Source, this.retryExecuteFilesInUse, String.Join(", ", args.Files.ToArray()));
 
             if (this.retryExecuteFilesInUse > 0)
             {

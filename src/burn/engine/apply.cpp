@@ -1931,8 +1931,8 @@ static HRESULT WINAPI AuthenticationRequired(
 
     APPLY_AUTHENTICATION_REQUIRED_DATA* authenticationData = reinterpret_cast<APPLY_AUTHENTICATION_REQUIRED_DATA*>(pData);
 
-    UserExperienceOnError(authenticationData->pUX, errorType, authenticationData->wzPackageOrContainerId, ERROR_ACCESS_DENIED, sczError, MB_RETRYTRYAGAIN, 0, NULL, &nResult); // ignore return value;
-    nResult = UserExperienceCheckExecuteResult(authenticationData->pUX, FALSE, MB_RETRYTRYAGAIN, nResult);
+    UserExperienceOnError(authenticationData->pUX, errorType, authenticationData->wzPackageOrContainerId, ERROR_ACCESS_DENIED, sczError, MB_RETRYCANCEL, 0, NULL, &nResult); // ignore return value;
+    nResult = UserExperienceCheckExecuteResult(authenticationData->pUX, FALSE, BURN_MB_RETRYTRYAGAIN, nResult);
     if (IDTRYAGAIN == nResult && authenticationData->pUX->hwndApply)
     {
         er = ::InternetErrorDlg(authenticationData->pUX->hwndApply, hUrl, ERROR_INTERNET_INCORRECT_PASSWORD, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA, NULL);
@@ -2495,10 +2495,10 @@ static HRESULT ExecuteExePackage(
     ExitOnRootFailure(hr, "BA aborted execute EXE package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-    message.dwAllowedResults = MB_OKCANCEL;
+    message.dwUIHint = MB_OKCANCEL;
     message.progress.dwPercentage = fRollback ? 100 : 0;
     nResult = GenericExecuteMessageHandler(&message, pContext);
-    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
+    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwUIHint, nResult);
     ExitOnRootFailure(hr, "BA aborted EXE progress.");
 
     fExecuted = TRUE;
@@ -2516,10 +2516,10 @@ static HRESULT ExecuteExePackage(
     }
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-    message.dwAllowedResults = MB_OKCANCEL;
+    message.dwUIHint = MB_OKCANCEL;
     message.progress.dwPercentage = fRollback ? 0 : 100;
     nResult = GenericExecuteMessageHandler(&message, pContext);
-    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
+    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwUIHint, nResult);
     ExitOnRootFailure(hr, "BA aborted EXE progress.");
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
@@ -2712,10 +2712,10 @@ static HRESULT ExecuteMsuPackage(
     ExitOnRootFailure(hr, "BA aborted execute MSU package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-    message.dwAllowedResults = MB_OKCANCEL;
+    message.dwUIHint = MB_OKCANCEL;
     message.progress.dwPercentage = fRollback ? 100 : 0;
     nResult = GenericExecuteMessageHandler(&message, pContext);
-    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
+    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwUIHint, nResult);
     ExitOnRootFailure(hr, "BA aborted MSU progress.");
 
     fExecuted = TRUE;
@@ -2733,10 +2733,10 @@ static HRESULT ExecuteMsuPackage(
     }
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-    message.dwAllowedResults = MB_OKCANCEL;
+    message.dwUIHint = MB_OKCANCEL;
     message.progress.dwPercentage = fRollback ? 0 : 100;
     nResult = GenericExecuteMessageHandler(&message, pContext);
-    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
+    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwUIHint, nResult);
     ExitOnRootFailure(hr, "BA aborted MSU progress.");
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
@@ -3047,6 +3047,7 @@ static int GenericExecuteMessageHandler(
     )
 {
     BURN_EXECUTE_CONTEXT* pContext = (BURN_EXECUTE_CONTEXT*)pvContext;
+    DWORD dwAllowedResults = pMessage->dwUIHint & MB_TYPEMASK;
     int nResult = IDNOACTION;
 
     switch (pMessage->type)
@@ -3059,15 +3060,16 @@ static int GenericExecuteMessageHandler(
         break;
 
     case GENERIC_EXECUTE_MESSAGE_ERROR:
-        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_EXE_PACKAGE, pContext->pExecutingPackage->sczId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwAllowedResults, 0, NULL, &nResult); // ignore return value.
+        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_EXE_PACKAGE, pContext->pExecutingPackage->sczId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, 0, NULL, &nResult); // ignore return value.
         break;
 
-    case GENERIC_EXECUTE_MESSAGE_FILES_IN_USE:
-        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->filesInUse.cFiles, pMessage->filesInUse.rgwzFiles, &nResult); // ignore return value.
+    case GENERIC_EXECUTE_MESSAGE_NETFX_FILES_IN_USE:
+        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->filesInUse.cFiles, pMessage->filesInUse.rgwzFiles, BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX, &nResult); // ignore return value.
+        dwAllowedResults = BURN_MB_NETFX_FILES_IN_USE;
         break;
     }
 
-    nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, pMessage->dwAllowedResults, nResult);
+    nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, dwAllowedResults, nResult);
     return nResult;
 }
 
@@ -3077,7 +3079,9 @@ static int MsiExecuteMessageHandler(
     )
 {
     BURN_EXECUTE_CONTEXT* pContext = (BURN_EXECUTE_CONTEXT*)pvContext;
+    DWORD dwAllowedResults = pMessage->dwUIHint & MB_TYPEMASK;
     int nResult = IDNOACTION;
+    BOOL fRestartManager = FALSE;
 
     switch (pMessage->type)
     {
@@ -3090,20 +3094,24 @@ static int MsiExecuteMessageHandler(
 
     case WIU_MSI_EXECUTE_MESSAGE_ERROR:
         nResult = pMessage->nResultRecommendation;
-        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_WINDOWS_INSTALLER, pContext->pExecutingPackage->sczId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwAllowedResults, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
+        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_WINDOWS_INSTALLER, pContext->pExecutingPackage->sczId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
         break;
 
     case WIU_MSI_EXECUTE_MESSAGE_MSI_MESSAGE:
         nResult = pMessage->nResultRecommendation;
-        UserExperienceOnExecuteMsiMessage(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiMessage.mt, pMessage->dwAllowedResults, pMessage->msiMessage.wzMessage, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
+        UserExperienceOnExecuteMsiMessage(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiMessage.mt, pMessage->dwUIHint, pMessage->msiMessage.wzMessage, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
         break;
 
+    case WIU_MSI_EXECUTE_MESSAGE_MSI_RM_FILES_IN_USE:
+        fRestartManager = TRUE;
+        __fallthrough;
     case WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE:
-        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiFilesInUse.cFiles, pMessage->msiFilesInUse.rgwzFiles, &nResult); // ignore return value.
+        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiFilesInUse.cFiles, pMessage->msiFilesInUse.rgwzFiles, fRestartManager ? BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM : BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI, &nResult); // ignore return value.
+        dwAllowedResults = fRestartManager ? BURN_MB_MSI_RM_FILES_IN_USE : BURN_MB_MSI_FILES_IN_USE;
         break;
     }
 
-    nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, pMessage->dwAllowedResults, nResult);
+    nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, dwAllowedResults, nResult);
     return nResult;
 }
 
