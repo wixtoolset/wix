@@ -1613,11 +1613,12 @@ namespace WixToolset.Mba.Core
     public class ExecuteFilesInUseEventArgs : ResultEventArgs
     {
         /// <summary />
-        public ExecuteFilesInUseEventArgs(string packageId, string[] files, Result recommendation, Result result)
+        public ExecuteFilesInUseEventArgs(string packageId, string[] files, Result recommendation, FilesInUseType source, Result result)
             : base(recommendation, result)
         {
             this.PackageId = packageId;
             this.Files = new ReadOnlyCollection<string>(files ?? new string[] { });
+            this.Source = source;
         }
 
         /// <summary>
@@ -1629,6 +1630,11 @@ namespace WixToolset.Mba.Core
         /// Gets the list of files in use.
         /// </summary>
         public IList<string> Files { get; private set; }
+
+        /// <summary>
+        /// Gets the source of the message.
+        /// </summary>
+        public FilesInUseType Source { get; private set; }
     }
 
     /// <summary>

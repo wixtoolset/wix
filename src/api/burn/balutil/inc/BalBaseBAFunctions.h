@@ -583,6 +583,7 @@ public: // IBootstrapperApplication
         __in DWORD /*cFiles*/,
         __in_ecount_z(cFiles) LPCWSTR* /*rgwzFiles*/,
         __in int /*nRecommendation*/,
+        __in BOOTSTRAPPER_FILES_IN_USE_TYPE /*source*/,
         __inout int* /*pResult*/
         )
     {

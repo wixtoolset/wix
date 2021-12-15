@@ -777,12 +777,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecuteFilesInUse"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="cFiles"></param>
-        /// <param name="rgwzFiles"></param>
-        /// <param name="nRecommendation"></param>
-        /// <param name="pResult"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecuteFilesInUse(
@@ -790,6 +784,7 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] int cFiles,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1, ArraySubType = UnmanagedType.LPWStr), In] string[] rgwzFiles,
             [MarshalAs(UnmanagedType.I4)] Result nRecommendation,
+            [MarshalAs(UnmanagedType.I4)] FilesInUseType source,
             [MarshalAs(UnmanagedType.I4)] ref Result pResult
             );
 
@@ -1444,6 +1439,25 @@ namespace WixToolset.Mba.Core
         /// </summary>
         Apply,
     };
+
+    /// <summary>
+    /// Indicates the source of the FilesInUse message.
+    /// </summary>
+    public enum FilesInUseType
+    {
+        /// <summary>
+        /// Generated from INSTALLMESSAGE_FILESINUSE.
+        /// </summary>
+        Msi,
+        /// <summary>
+        /// Generated from INSTALLMESSAGE_RMFILESINUSE.
+        /// </summary>
+        MsiRm,
+        /// <summary>
+        /// Generated from MMIO_CLOSE_APPS.
+        /// </summary>
+        Netfx,
+    }
 
     /// <summary>
     /// The calculated operation for the related bundle.

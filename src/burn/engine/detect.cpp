@@ -306,8 +306,8 @@ static HRESULT WINAPI AuthenticationRequired(
     hr = StrAllocFromError(&sczError, HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED), NULL);
     ExitOnFailure(hr, "Failed to allocation error string.");
 
-    UserExperienceOnError(pAuthenticationData->pUX, errorType, pAuthenticationData->wzPackageOrContainerId, ERROR_ACCESS_DENIED, sczError, MB_RETRYTRYAGAIN, 0, NULL, &nResult); // ignore return value.
-    nResult = UserExperienceCheckExecuteResult(pAuthenticationData->pUX, FALSE, MB_RETRYTRYAGAIN, nResult);
+    UserExperienceOnError(pAuthenticationData->pUX, errorType, pAuthenticationData->wzPackageOrContainerId, ERROR_ACCESS_DENIED, sczError, MB_RETRYCANCEL, 0, NULL, &nResult); // ignore return value.
+    nResult = UserExperienceCheckExecuteResult(pAuthenticationData->pUX, FALSE, BURN_MB_RETRYTRYAGAIN, nResult);
     if (IDTRYAGAIN == nResult && pAuthenticationData->pUX->hwndDetect)
     {
         er = ::InternetErrorDlg(pAuthenticationData->pUX->hwndDetect, hUrl, ERROR_INTERNET_INCORRECT_PASSWORD, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA, NULL);

@@ -161,7 +161,7 @@ static HRESULT OnEmbeddedErrorMessage(
 
     message.error.wzMessage = sczMessage;
 
-    hr = BuffReadNumber(pbData, cbData, &iData, &message.dwAllowedResults);
+    hr = BuffReadNumber(pbData, cbData, &iData, &message.dwUIHint);
     ExitOnFailure(hr, "Failed to read UI hint from buffer.");
 
     *pdwResult = (DWORD)pfnMessageHandler(&message, pvContext);
@@ -185,7 +185,7 @@ static HRESULT OnEmbeddedProgress(
     GENERIC_EXECUTE_MESSAGE message = { };
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-    message.dwAllowedResults = MB_OKCANCEL;
+    message.dwUIHint = MB_OKCANCEL;
 
     hr = BuffReadNumber(pbData, cbData, &iData, &message.progress.dwPercentage);
     ExitOnFailure(hr, "Failed to read progress from buffer.");

@@ -1494,6 +1494,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteFilesInUse(
     __in_z LPCWSTR wzPackageId,
     __in DWORD cFiles,
     __in_ecount_z_opt(cFiles) LPCWSTR* rgwzFiles,
+    __in BOOTSTRAPPER_FILES_IN_USE_TYPE source,
     __inout int* pnResult
     )
 {
@@ -1506,6 +1507,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteFilesInUse(
     args.cFiles = cFiles;
     args.rgwzFiles = rgwzFiles;
     args.nRecommendation = *pnResult;
+    args.source = source;
 
     results.cbSize = sizeof(results);
     results.nResult = *pnResult;
@@ -2492,13 +2494,12 @@ static int FilterResult(
     __in int nResult
     )
 {
-    DWORD dwFilteredAllowedResults = dwAllowedResults & MB_TYPEMASK;
     if (IDNOACTION == nResult || IDERROR == nResult) // do nothing and errors pass through.
     {
     }
     else
     {
-        switch (dwFilteredAllowedResults)
+        switch (dwAllowedResults)
         {
         case MB_OK:
             nResult = IDOK;
@@ -2606,7 +2607,28 @@ static int FilterResult(
             }
             break;
 
-        case WIU_MB_OKIGNORECANCELRETRY: // custom Windows Installer utility return code.
+        case BURN_MB_MSI_FILES_IN_USE:
+            // https://docs.microsoft.com/en-us/windows/win32/msi/installvalidate-action
+            if (IDRETRY == nResult || IDTRYAGAIN == nResult)
+            {
+                nResult = IDRETRY;
+            }
+            else if (IDCANCEL == nResult || IDABORT == nResult)
+            {
+                nResult = IDCANCEL;
+            }
+            else if (IDCONTINUE == nResult || IDIGNORE == nResult)
+            {
+                nResult = IDIGNORE;
+            }
+            else
+            {
+                nResult = IDNOACTION;
+            }
+            break;
+
+        case BURN_MB_MSI_RM_FILES_IN_USE:
+            // https://docs.microsoft.com/en-us/windows/win32/msi/using-restart-manager-with-an-external-ui-
             if (IDOK == nResult || IDYES == nResult)
             {
                 nResult = IDOK;
@@ -2615,11 +2637,15 @@ static int FilterResult(
             {
                 nResult = IDIGNORE;
             }
+            else if (IDNO == nResult)
+            {
+                nResult = IDNO;
+            }
             else if (IDCANCEL == nResult || IDABORT == nResult)
             {
                 nResult = IDCANCEL;
             }
-            else if (IDRETRY == nResult || IDTRYAGAIN == nResult || IDNO == nResult)
+            else if (IDRETRY == nResult || IDTRYAGAIN == nResult)
             {
                 nResult = IDRETRY;
             }
@@ -2629,10 +2655,30 @@ static int FilterResult(
             }
             break;
 
-        case MB_RETRYTRYAGAIN: // custom return code.
+        case BURN_MB_RETRYTRYAGAIN: // custom return code.
             if (IDRETRY != nResult && IDTRYAGAIN != nResult)
             {
                 nResult = IDNOACTION;
+            }
+            break;
+
+        case BURN_MB_NETFX_FILES_IN_USE:
+            // https://docs.microsoft.com/en-us/dotnet/framework/deployment/how-to-get-progress-from-the-dotnet-installer
+            if (IDOK == nResult || IDYES == nResult)
+            {
+                nResult = IDYES;
+            }
+            else if (IDRETRY == nResult || IDTRYAGAIN == nResult)
+            {
+                nResult = IDRETRY;
+            }
+            else if (IDCANCEL == nResult || IDABORT == nResult)
+            {
+                nResult = IDCANCEL;
+            }
+            else
+            {
+                nResult = IDNO;
             }
             break;
 

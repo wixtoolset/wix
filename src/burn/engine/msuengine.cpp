@@ -339,7 +339,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
     do
     {
         message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-        message.dwAllowedResults = MB_OKCANCEL;
+        message.dwUIHint = MB_OKCANCEL;
         message.progress.dwPercentage = 50;
         nResult = pfnGenericMessageHandler(&message, pvContext);
         hr = (IDOK == nResult || IDNOACTION == nResult) ? S_OK : IDCANCEL == nResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
