@@ -2607,78 +2607,10 @@ static int FilterResult(
             }
             break;
 
-        case BURN_MB_MSI_FILES_IN_USE:
-            // https://docs.microsoft.com/en-us/windows/win32/msi/installvalidate-action
-            if (IDRETRY == nResult || IDTRYAGAIN == nResult)
-            {
-                nResult = IDRETRY;
-            }
-            else if (IDCANCEL == nResult || IDABORT == nResult)
-            {
-                nResult = IDCANCEL;
-            }
-            else if (IDCONTINUE == nResult || IDIGNORE == nResult)
-            {
-                nResult = IDIGNORE;
-            }
-            else
-            {
-                nResult = IDNOACTION;
-            }
-            break;
-
-        case BURN_MB_MSI_RM_FILES_IN_USE:
-            // https://docs.microsoft.com/en-us/windows/win32/msi/using-restart-manager-with-an-external-ui-
-            if (IDOK == nResult || IDYES == nResult)
-            {
-                nResult = IDOK;
-            }
-            else if (IDCONTINUE == nResult || IDIGNORE == nResult)
-            {
-                nResult = IDIGNORE;
-            }
-            else if (IDNO == nResult)
-            {
-                nResult = IDNO;
-            }
-            else if (IDCANCEL == nResult || IDABORT == nResult)
-            {
-                nResult = IDCANCEL;
-            }
-            else if (IDRETRY == nResult || IDTRYAGAIN == nResult)
-            {
-                nResult = IDRETRY;
-            }
-            else
-            {
-                nResult = IDNOACTION;
-            }
-            break;
-
         case BURN_MB_RETRYTRYAGAIN: // custom return code.
             if (IDRETRY != nResult && IDTRYAGAIN != nResult)
             {
                 nResult = IDNOACTION;
-            }
-            break;
-
-        case BURN_MB_NETFX_FILES_IN_USE:
-            // https://docs.microsoft.com/en-us/dotnet/framework/deployment/how-to-get-progress-from-the-dotnet-installer
-            if (IDOK == nResult || IDYES == nResult)
-            {
-                nResult = IDYES;
-            }
-            else if (IDRETRY == nResult || IDTRYAGAIN == nResult)
-            {
-                nResult = IDRETRY;
-            }
-            else if (IDCANCEL == nResult || IDABORT == nResult)
-            {
-                nResult = IDCANCEL;
-            }
-            else
-            {
-                nResult = IDNO;
             }
             break;
 
