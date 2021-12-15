@@ -3049,6 +3049,7 @@ static int GenericExecuteMessageHandler(
     BURN_EXECUTE_CONTEXT* pContext = (BURN_EXECUTE_CONTEXT*)pvContext;
     DWORD dwAllowedResults = pMessage->dwUIHint & MB_TYPEMASK;
     int nResult = IDNOACTION;
+    BOOL fPassthrough = FALSE;
 
     switch (pMessage->type)
     {
@@ -3065,11 +3066,15 @@ static int GenericExecuteMessageHandler(
 
     case GENERIC_EXECUTE_MESSAGE_NETFX_FILES_IN_USE:
         UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->filesInUse.cFiles, pMessage->filesInUse.rgwzFiles, BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX, &nResult); // ignore return value.
-        dwAllowedResults = BURN_MB_NETFX_FILES_IN_USE;
+        fPassthrough = TRUE;
         break;
     }
 
-    nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, dwAllowedResults, nResult);
+    if (!fPassthrough)
+    {
+        nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, dwAllowedResults, nResult);
+    }
+
     return nResult;
 }
 
@@ -3082,6 +3087,7 @@ static int MsiExecuteMessageHandler(
     DWORD dwAllowedResults = pMessage->dwUIHint & MB_TYPEMASK;
     int nResult = IDNOACTION;
     BOOL fRestartManager = FALSE;
+    BOOL fPassthrough = FALSE;
 
     switch (pMessage->type)
     {
@@ -3107,11 +3113,15 @@ static int MsiExecuteMessageHandler(
         __fallthrough;
     case WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE:
         UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiFilesInUse.cFiles, pMessage->msiFilesInUse.rgwzFiles, fRestartManager ? BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM : BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI, &nResult); // ignore return value.
-        dwAllowedResults = fRestartManager ? BURN_MB_MSI_RM_FILES_IN_USE : BURN_MB_MSI_FILES_IN_USE;
+        fPassthrough = TRUE;
         break;
     }
 
-    nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, dwAllowedResults, nResult);
+    if (!fPassthrough)
+    {
+        nResult = UserExperienceCheckExecuteResult(pContext->pUX, pContext->fRollback, dwAllowedResults, nResult);
+    }
+
     return nResult;
 }
 

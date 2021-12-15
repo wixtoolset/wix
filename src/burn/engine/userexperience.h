@@ -11,9 +11,6 @@ extern "C" {
 // constants
 
 const DWORD BURN_MB_RETRYTRYAGAIN = 0x10;
-const DWORD BURN_MB_MSI_FILES_IN_USE = 0x11;
-const DWORD BURN_MB_MSI_RM_FILES_IN_USE = 0x12;
-const DWORD BURN_MB_NETFX_FILES_IN_USE = 0x13;
 
 
 // structs
