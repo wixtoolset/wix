@@ -6,14 +6,14 @@
 #define INITIAL_STRINGDICT_SIZE 4
 
 LPCWSTR vcsDependencyProviderQuery =
-    L"SELECT `Wix4DependencyProvider`.`Wix4DependencyProvider`, `Wix4DependencyProvider`.`Component_`, `Wix4DependencyProvider`.`ProviderKey`, `Wix4DependencyProvider`.`Attributes` "
+    L"SELECT `Wix4DependencyProvider`.`WixDependencyProvider`, `Wix4DependencyProvider`.`Component_`, `Wix4DependencyProvider`.`ProviderKey`, `Wix4DependencyProvider`.`Attributes` "
     L"FROM `Wix4DependencyProvider`";
 enum eDependencyProviderQuery { dpqId = 1, dpqComponent, dpqProviderKey, dpqAttributes };
 
 LPCWSTR vcsDependencyQuery =
-    L"SELECT `Wix4Dependency`.`Wix4Dependency`, `Wix4DependencyProvider`.`Component_`, `Wix4Dependency`.`ProviderKey`, `Wix4Dependency`.`MinVersion`, `Wix4Dependency`.`MaxVersion`, `Wix4Dependency`.`Attributes` "
+    L"SELECT `Wix4Dependency`.`WixDependency`, `Wix4DependencyProvider`.`Component_`, `Wix4Dependency`.`ProviderKey`, `Wix4Dependency`.`MinVersion`, `Wix4Dependency`.`MaxVersion`, `Wix4Dependency`.`Attributes` "
     L"FROM `Wix4DependencyProvider`, `Wix4Dependency`, `Wix4DependencyRef` "
-    L"WHERE `Wix4Dependency`.`Wix4Dependency` = `Wix4DependencyRef`.`Wix4Dependency_` AND `Wix4DependencyProvider`.`Wix4DependencyProvider` = `Wix4DependencyRef`.`Wix4DependencyProvider_`";
+    L"WHERE `Wix4Dependency`.`WixDependency` = `Wix4DependencyRef`.`WixDependency_` AND `Wix4DependencyProvider`.`WixDependencyProvider` = `Wix4DependencyRef`.`WixDependencyProvider_`";
 enum eDependencyComponentQuery { dqId = 1, dqComponent, dqProviderKey, dqMinVersion, dqMaxVersion, dqAttributes };
 
 static HRESULT EnsureRequiredDependencies(
@@ -159,7 +159,7 @@ static HRESULT EnsureRequiredDependencies(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, dqId, &sczId);
-        ExitOnFailure(hr, "Failed to get Wix4Dependency.Wix4Dependency.");
+        ExitOnFailure(hr, "Failed to get Wix4Dependency.WixDependency.");
 
         hr = WcaGetRecordString(hRec, dqComponent, &sczComponent);
         ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Component_.");
@@ -317,7 +317,7 @@ static HRESULT EnsureAbsentDependents(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, dpqId, &sczId);
-        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Wix4DependencyProvider.");
+        ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.WixDependencyProvider.");
 
         hr = WcaGetRecordString(hRec, dpqComponent, &sczComponent);
         ExitOnFailure(hr, "Failed to get Wix4DependencyProvider.Component.");
