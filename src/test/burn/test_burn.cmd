@@ -1,6 +1,7 @@
 @setlocal
 @pushd %~dp0
 
+@set _RESULT=0
 @set _C=Debug
 :parse_args
 @if /i "%1"=="release" set _C=Release
@@ -18,9 +19,11 @@ reg add HKLM\Software\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging 
 reg add HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
 
 dotnet test -c %_C% --no-build WixToolsetTest.BurnE2E
+set _RESULT=%ERRORLEVEL%
 
 7z a "..\..\..\build\logs\test_burn_%GITHUB_RUN_ID%.zip" "%TEMP%\*.log" "%TEMP%\..\*.log"
 
 :LExit
 @popd
+exit /b %_RESULT%
 @endlocal
