@@ -1932,6 +1932,14 @@ static void ResetPlannedPackageState(
             pSlipstreamMsp->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             pSlipstreamMsp->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
         }
+
+        for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
+        {
+            BURN_DETECTED_MSI* pDetectedMsi = &pPackage->Msi.rgDetectedRelatedMsis[i];
+
+            pDetectedMsi->fDefaultRemove = FALSE;
+            pDetectedMsi->fRemove = FALSE;
+        }
     }
     else if (BURN_PACKAGE_TYPE_MSP == pPackage->type && pPackage->Msp.rgTargetProducts)
     {

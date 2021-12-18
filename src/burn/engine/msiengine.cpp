@@ -16,6 +16,16 @@ static HRESULT ParseRelatedMsiFromXml(
     __in IXMLDOMNode* pixnRelatedMsi,
     __in BURN_RELATED_MSI* pRelatedMsi
     );
+static HRESULT AddRelatedMsi(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BURN_PACKAGE* pPackage,
+    __in LPCWSTR wzUpgradeCode,
+    __in LPCWSTR wzProductCode,
+    __in BOOL fPerMachine,
+    __in VERUTIL_VERSION* pVersion,
+    __in DWORD uLcid,
+    __in BOOTSTRAPPER_RELATED_OPERATION relatedMsiOperation
+    );
 static HRESULT EvaluateActionStateConditions(
     __in BURN_VARIABLES* pVariables,
     __in_z_opt LPCWSTR sczAddLocalCondition,
@@ -373,6 +383,8 @@ extern "C" void MsiEnginePackageUninitialize(
         MemFree(pPackage->Msi.rgRelatedMsis);
     }
 
+    MsiEngineResetDetectedRelatedMsis(pPackage);
+
     // free slipstream MSPs
     if (pPackage->Msi.rgsczSlipstreamMspPackageIds)
     {
@@ -396,6 +408,35 @@ extern "C" void MsiEnginePackageUninitialize(
 
     // clear struct
     memset(&pPackage->Msi, 0, sizeof(pPackage->Msi));
+}
+
+extern "C" void MsiEngineUninitializeDetectedMsi(
+    __in BURN_DETECTED_MSI* pDetectedMsi
+    )
+{
+    if (pDetectedMsi)
+    {
+        ReleaseStr(pDetectedMsi->sczUpgradeCode);
+        ReleaseStr(pDetectedMsi->sczProductCode);
+        VerFreeVersion(pDetectedMsi->pVersion);
+    }
+}
+
+extern "C" void MsiEngineResetDetectedRelatedMsis(
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    if (pPackage->Msi.rgDetectedRelatedMsis)
+    {
+        for (DWORD i = 0; i < pPackage->Msi.cDetectedRelatedMsis; ++i)
+        {
+            BURN_DETECTED_MSI* pDetectedMsi = &pPackage->Msi.rgDetectedRelatedMsis[i];
+
+            MsiEngineUninitializeDetectedMsi(pDetectedMsi);
+        }
+        ReleaseNullMem(pPackage->Msi.rgDetectedRelatedMsis);
+    }
+    pPackage->Msi.cDetectedRelatedMsis = 0;
 }
 
 extern "C" HRESULT MsiEngineDetectInitialize(
@@ -484,10 +525,8 @@ extern "C" HRESULT MsiEngineDetectPackage(
         // Report related MSI package to BA.
         if (BOOTSTRAPPER_RELATED_OPERATION_NONE != operation)
         {
-            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, pPackage->Msi.sczProductCode, LoggingPerMachineToString(pPackage->fPerMachine), pPackage->Msi.pInstalledVersion->sczVersion, pPackage->Msi.dwLanguage, LoggingRelatedOperationToString(operation));
-
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pPackage->Msi.pInstalledVersion, operation);
-            ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
+            hr = AddRelatedMsi(pUserExperience, pPackage, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pPackage->Msi.pInstalledVersion, pPackage->Msi.dwLanguage, operation);
+            ExitOnFailure(hr, "Failed to add detected related MSI package.");
         }
     }
     else if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr || HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) == hr) // package not present.
@@ -642,11 +681,8 @@ extern "C" HRESULT MsiEngineDetectPackage(
                 operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
             }
 
-            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, wzProductCode, LoggingPerMachineToString(fPerMachine), pVersion->sczVersion, uLcid, LoggingRelatedOperationToString(relatedMsiOperation));
-
-            // Pass to BA.
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pRelatedMsi->sczUpgradeCode, wzProductCode, fPerMachine, pVersion, relatedMsiOperation);
-            ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
+            hr = AddRelatedMsi(pUserExperience, pPackage, pRelatedMsi->sczUpgradeCode, wzProductCode, fPerMachine, pVersion, uLcid, relatedMsiOperation);
+            ExitOnFailure(hr, "Failed to add detected related MSI package.");
         }
     }
 
@@ -740,6 +776,18 @@ extern "C" HRESULT MsiEnginePlanInitializePackage(
             // Send plan MSI feature message to BA.
             hr = UserExperienceOnPlanMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, &pFeature->requested);
             ExitOnRootFailure(hr, "BA aborted plan MSI feature.");
+        }
+    }
+
+    if (pPackage->Msi.cDetectedRelatedMsis)
+    {
+        for (DWORD i = 0; i < pPackage->Msi.cDetectedRelatedMsis; ++i)
+        {
+            //TODO
+            //BURN_DETECTED_MSI* pDetectedMsi = pPackage->Msi.rgDetectedRelatedMsis + i;
+
+            //hr = UserExperienceOnPlanRemoveRelatedMsi(pUserExperience, pPackage->sczId, pDetectedMsi->fPerMachine, pDetectedMsi->sczUpgradeCode, pDetectedMsi->sczProductCode, pDetectedMsi->pVersion, &pDetectedMsi->fRemove);
+            //ExitOnRootFailure(hr, "BA aborted plan remove related MSI.");
         }
     }
 
@@ -917,6 +965,27 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
     BURN_EXECUTE_ACTION* pAction = NULL;
     BOOTSTRAPPER_FEATURE_ACTION* rgFeatureActions = NULL;
     BOOTSTRAPPER_FEATURE_ACTION* rgRollbackFeatureActions = NULL;
+
+    if (pPackage->Msi.cDetectedRelatedMsis)
+    {
+        for (DWORD i = 0; i < pPackage->Msi.cDetectedRelatedMsis; ++i)
+        {
+            BURN_DETECTED_MSI* pDetectedMsi = pPackage->Msi.rgDetectedRelatedMsis + i;
+
+            if (!pDetectedMsi->fRemove)
+            {
+                continue;
+            }
+
+            // No rollback actions because we can't.
+
+            hr = PlanAppendExecuteAction(pPlan, &pAction);
+            ExitOnFailure(hr, "Failed to append execute action.");
+
+            pAction->type = BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI;
+            pAction->uninstallMsi.pDetectedMsi = pDetectedMsi;
+        }
+    }
 
     if (pPackage->Msi.cFeatures)
     {
@@ -1238,6 +1307,72 @@ LExit:
     // Best effort to clear the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE, FALSE);
+
+    return hr;
+}
+
+extern "C" HRESULT MsiEngineExecuteUninstallMsi(
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* /*pVariables*/,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    WIU_MSI_EXECUTE_CONTEXT context = { };
+    WIU_RESTART restart = WIU_RESTART_NONE;
+    LPWSTR sczProperties = NULL;
+    LPWSTR sczObfuscatedProperties = NULL;
+    BURN_DETECTED_MSI* pDetectedMsi = pExecuteAction->uninstallMsi.pDetectedMsi;
+    BOOL fRollback = FALSE;
+    BOOTSTRAPPER_ACTION_STATE action = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+    BURN_MSI_PROPERTY actionMsiProperty = BURN_MSI_PROPERTY_UNINSTALL;
+    BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning = BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER;
+
+    // TODO: probably need to support most of the options of a normal MSI package
+
+    hr = WiuInitializeExternalUI(pfnMessageHandler, INSTALLUILEVEL_NONE, hwndParent, pvContext, fRollback, &context);
+    ExitOnFailure(hr, "Failed to initialize external UI handler.");
+
+    // TODO: this will ignore dependencies, which are not actually verified by the engine for this package
+    hr = MsiEngineConcatBurnProperties(action, actionMsiProperty, fileVersioning, TRUE, FALSE, &sczProperties);
+    ExitOnFailure(hr, "Failed to add action property to argument string.");
+
+    hr = MsiEngineConcatBurnProperties(action, actionMsiProperty, fileVersioning, TRUE, FALSE, &sczObfuscatedProperties);
+    ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
+
+    //
+    // Do the actual action.
+    //
+    hr = WiuConfigureProductEx(pDetectedMsi->sczProductCode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT, sczProperties, &restart);
+    if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr)
+    {
+        hr = S_OK;
+    }
+    ExitOnFailure(hr, "Failed to uninstall MSI.");
+
+LExit:
+    WiuUninitializeExternalUI(&context);
+
+    StrSecureZeroFreeString(sczProperties);
+    ReleaseStr(sczObfuscatedProperties);
+
+    switch (restart)
+    {
+        case WIU_RESTART_NONE:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+            break;
+
+        case WIU_RESTART_REQUIRED:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
+            break;
+
+        case WIU_RESTART_INITIATED:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
+            break;
+    }
 
     return hr;
 }
@@ -1644,6 +1779,48 @@ LExit:
     ReleaseObject(pixnNode);
     ReleaseStr(scz);
 
+    return hr;
+}
+
+static HRESULT AddRelatedMsi(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BURN_PACKAGE* pPackage,
+    __in LPCWSTR wzUpgradeCode,
+    __in LPCWSTR wzProductCode,
+    __in BOOL fPerMachine,
+    __in VERUTIL_VERSION* pVersion,
+    __in DWORD uLcid,
+    __in BOOTSTRAPPER_RELATED_OPERATION relatedMsiOperation
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_DETECTED_MSI* pDetectedMsi = NULL;
+
+    LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, wzProductCode, LoggingPerMachineToString(fPerMachine), pVersion->sczVersion, uLcid, LoggingRelatedOperationToString(relatedMsiOperation));
+
+    // Pass to BA.
+    hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, wzUpgradeCode, wzProductCode, fPerMachine, pVersion, relatedMsiOperation);
+    ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
+
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pPackage->Msi.rgDetectedRelatedMsis), pPackage->Msi.cDetectedRelatedMsis, 1, sizeof(BURN_DETECTED_MSI), 5);
+    ExitOnFailure(hr, "Failed to extend array for detected related MSIs.");
+
+    pDetectedMsi = pPackage->Msi.rgDetectedRelatedMsis + pPackage->Msi.cDetectedRelatedMsis;
+    pPackage->Msi.cDetectedRelatedMsis += 1;
+
+    pDetectedMsi->fPerMachine = fPerMachine;
+    pDetectedMsi->uLcid = uLcid;
+
+    hr = StrAllocString(&pDetectedMsi->sczUpgradeCode, wzUpgradeCode, 0);
+    ExitOnFailure(hr, "Failed to copy upgrade code.");
+
+    hr = StrAllocString(&pDetectedMsi->sczProductCode, wzProductCode, 0);
+    ExitOnFailure(hr, "Failed to copy product code.");
+
+    hr = VerCopyVersion(pVersion, &pDetectedMsi->pVersion);
+    ExitOnFailure(hr, "Failed to copy version.");
+
+LExit:
     return hr;
 }
 

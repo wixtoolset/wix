@@ -210,6 +210,14 @@ static HRESULT ExecuteExePackage(
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+static HRESULT ExecuteUninstallMsi(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __out BOOL* pfRetry,
+    __out BOOL* pfSuspend,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 static HRESULT ExecuteMsiPackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
@@ -2333,6 +2341,11 @@ static HRESULT DoExecuteAction(
             ExitOnFailure(hr, "Failed to execute commit MSI transaction action.");
             break;
 
+        case BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI:
+            hr = ExecuteUninstallMsi(pEngineState, pExecuteAction, pContext, &fRetry, pfSuspend, &restart);
+            ExitOnFailure(hr, "Failed to execute uninstall MSI.");
+            break;
+
         default:
             hr = E_UNEXPECTED;
             ExitOnFailure(hr, "Invalid execute action.");
@@ -2537,6 +2550,61 @@ LExit:
     {
         hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
+
+    return hr;
+}
+
+static HRESULT ExecuteUninstallMsi(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __out BOOL* /*pfRetry*/,
+    __out BOOL* /*pfSuspend*/,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    HRESULT hrExecute = S_OK;
+    //BOOL fBeginCalled = FALSE;
+    BURN_DETECTED_MSI* pDetectedMsi = pExecuteAction->uninstallMsi.pDetectedMsi;
+
+    // TODO: skip if parent package failed?
+    /*if (FAILED(pPackage->hrCacheResult))
+    {
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
+        ExitFunction1(hr = S_OK);
+    }*/
+
+    // TODO: How to report progress to the BA? Create a pseudo package?
+    //pContext->pExecutingPackage = pPackage;
+    //fBeginCalled = TRUE;
+
+    // Send package execute begin to BA.
+    //hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pPackage->sczId, !fRollback, pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.uiLevel, pExecuteAction->msiPackage.fDisableExternalUiHandler);
+    //ExitOnRootFailure(hr, "BA aborted execute MSI package begin.");
+
+    // execute package
+    if (pDetectedMsi->fPerMachine)
+    {
+        hrExecute = ElevationExecuteUninstallMsi(pEngineState->companionConnection.hPipe, pEngineState->userExperience.hwndApply, pExecuteAction, &pEngineState->variables, MsiExecuteMessageHandler, pContext, pRestart);
+        ExitOnFailure(hrExecute, "Failed to uninstall per-machine MSI.");
+    }
+    else
+    {
+        hrExecute = MsiEngineExecuteUninstallMsi(pEngineState->userExperience.hwndApply, pExecuteAction, &pEngineState->variables, MsiExecuteMessageHandler, pContext, pRestart);
+        ExitOnFailure(hrExecute, "Failed to uninstall per-user MSI.");
+    }
+
+    //pContext->cExecutedPackages += fRollback ? -1 : 1;
+
+    /*hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
+    ExitOnRootFailure(hr, "BA aborted MSI package execute progress.");*/
+
+LExit:
+    /*if (fBeginCalled)
+    {
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+    }*/
 
     return hr;
 }

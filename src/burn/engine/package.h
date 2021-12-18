@@ -162,6 +162,18 @@ typedef struct _BURN_RELATED_MSI
     DWORD cLanguages;
 } BURN_RELATED_MSI;
 
+typedef struct _BURN_DETECTED_MSI
+{
+    BOOL fPerMachine;
+    LPWSTR sczUpgradeCode;
+    LPWSTR sczProductCode;
+    VERUTIL_VERSION* pVersion;
+    DWORD uLcid;
+
+    BOOL fDefaultRemove;
+    BOOL fRemove;
+} BURN_DETECTED_MSI;
+
 typedef struct _BURN_CHAINED_PATCH
 {
     BURN_PACKAGE* pMspPackage;
@@ -300,6 +312,9 @@ typedef struct _BURN_PACKAGE
 
             BURN_RELATED_MSI* rgRelatedMsis;
             DWORD cRelatedMsis;
+
+            BURN_DETECTED_MSI* rgDetectedRelatedMsis;
+            DWORD cDetectedRelatedMsis;
 
             BURN_SLIPSTREAM_MSP* rgSlipstreamMsps;
             LPWSTR* rgsczSlipstreamMspPackageIds;

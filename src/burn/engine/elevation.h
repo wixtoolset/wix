@@ -89,6 +89,15 @@ HRESULT ElevationExecuteExePackage(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+HRESULT ElevationExecuteUninstallMsi(
+    __in HANDLE hPipe,
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 HRESULT ElevationExecuteMsiPackage(
     __in HANDLE hPipe,
     __in_opt HWND hwndParent,

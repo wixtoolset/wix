@@ -31,6 +31,7 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION,
     BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION,
     BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION,
+    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_UNINSTALL_MSI,
 
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN,
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE,
@@ -234,6 +235,14 @@ static HRESULT OnExecuteExePackage(
     __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
+    __in BURN_VARIABLES* pVariables,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    );
+static HRESULT OnExecuteUninstallMsi(
+    __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -950,6 +959,56 @@ extern "C" HRESULT ElevationMsiRollbackTransaction(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return hr;
+}
+extern "C" HRESULT ElevationExecuteUninstallMsi(
+    __in HANDLE hPipe,
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = { };
+    DWORD dwResult = 0;
+
+    // serialize message data
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->uninstallMsi.pDetectedMsi->sczUpgradeCode);
+    ExitOnFailure(hr, "Failed to write upgrade code to message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->uninstallMsi.pDetectedMsi->sczProductCode);
+    ExitOnFailure(hr, "Failed to write product code to message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->uninstallMsi.pDetectedMsi->pVersion->sczVersion);
+    ExitOnFailure(hr, "Failed to write version to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->uninstallMsi.pDetectedMsi->uLcid);
+    ExitOnFailure(hr, "Failed to write language id to message buffer.");
+
+    hr = BuffWritePointer(&pbData, &cbData, (DWORD_PTR)hwndParent);
+    ExitOnFailure(hr, "Failed to write parent hwnd to message buffer.");
+
+    hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
+    ExitOnFailure(hr, "Failed to write variables.");
+
+
+    // send message
+    context.pfnMessageHandler = pfnMessageHandler;
+    context.pvContext = pvContext;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_UNINSTALL_MSI, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_UNINSTALL_MSI message to per-machine process.");
+
+    hr = ProcessResult(dwResult, pRestart);
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1910,6 +1969,10 @@ static HRESULT ProcessElevatedChildMessage(
         hrResult = OnExecuteExePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, &pContext->pRegistration->relatedBundles, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
+    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_UNINSTALL_MSI:
+        hrResult = OnExecuteUninstallMsi(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        break;
+
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE:
         hrResult = OnExecuteMsiPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
@@ -2565,6 +2628,76 @@ LExit:
     return hr;
 }
 
+static HRESULT OnExecuteUninstallMsi(
+    __in HANDLE hPipe,
+    __in BURN_CACHE* /*pCache*/,
+    __in BURN_PACKAGES* /*pPackages*/,
+    __in BURN_VARIABLES* pVariables,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczVersion = NULL;
+    HWND hwndParent = NULL;
+    BURN_EXECUTE_ACTION executeAction = { };
+    BURN_DETECTED_MSI* pDetectedMsi = NULL;
+    BOOTSTRAPPER_APPLY_RESTART msiRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+
+    pDetectedMsi = (BURN_DETECTED_MSI*)MemAlloc(sizeof(BURN_DETECTED_MSI), TRUE);
+    ExitOnNull(pDetectedMsi, hr, E_OUTOFMEMORY, "Failed to allocate memory for detected msi.");
+
+    executeAction.type = BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI;
+    executeAction.uninstallMsi.pDetectedMsi = pDetectedMsi;
+
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &pDetectedMsi->sczUpgradeCode);
+    ExitOnFailure(hr, "Failed to read uninstall MSI upgrade code.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &pDetectedMsi->sczProductCode);
+    ExitOnFailure(hr, "Failed to read uninstall MSI product code.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczVersion);
+    ExitOnFailure(hr, "Failed to read uninstall MSI version.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pDetectedMsi->uLcid);
+    ExitOnFailure(hr, "Failed to read uninstall MSI language id.");
+
+    hr = BuffReadPointer(pbData, cbData, &iData, (DWORD_PTR*)&hwndParent);
+    ExitOnFailure(hr, "Failed to read parent hwnd.");
+
+    hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
+    ExitOnFailure(hr, "Failed to read variables.");
+
+    hr = VerParseVersion(sczVersion, 0, FALSE, &pDetectedMsi->pVersion);
+    ExitOnFailure(hr, "Failed to parse installed version from uninstall MSI.");
+
+    // Execute MSI package.
+    hr = MsiEngineExecuteUninstallMsi(hwndParent, &executeAction, pVariables, MsiExecuteMessageHandler, hPipe, &msiRestart);
+    ExitOnFailure(hr, "Failed to execute uninstall MSI.");
+
+LExit:
+    MsiEngineUninitializeDetectedMsi(pDetectedMsi);
+    ReleaseMem(pDetectedMsi);
+    ReleaseStr(sczVersion);
+    PlanUninitializeExecuteAction(&executeAction);
+
+    if (SUCCEEDED(hr))
+    {
+        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == msiRestart)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
+        }
+        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == msiRestart)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
+        }
+    }
+
+    return hr;
+}
+
 static HRESULT OnExecuteMsiPackage(
     __in HANDLE hPipe,
     __in BURN_CACHE* pCache,
@@ -3185,6 +3318,7 @@ static HRESULT OnLaunchApprovedExe(
     DWORD dwResult = 0;
 
     pLaunchApprovedExe = (BURN_LAUNCH_APPROVED_EXE*)MemAlloc(sizeof(BURN_LAUNCH_APPROVED_EXE), TRUE);
+    ExitOnNull(pLaunchApprovedExe, hr, E_OUTOFMEMORY, "Failed to allocate memory for approved exe.");
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &pLaunchApprovedExe->sczId);

@@ -80,9 +80,12 @@ extern "C" void DetectReset(
 
             ReleaseNullMem(pPackage->Msi.rgChainedPatches);
             pPackage->Msi.cChainedPatches = 0;
+
+            MsiEngineResetDetectedRelatedMsis(pPackage);
         }
         else if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
         {
+            // TODO: Memory leak - the individual elements have allocated memory
             ReleaseNullMem(pPackage->Msp.rgTargetProducts);
             pPackage->Msp.cTargetProductCodes = 0;
         }

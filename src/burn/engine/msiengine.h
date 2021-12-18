@@ -27,6 +27,12 @@ HRESULT MsiEngineParsePropertiesFromXml(
 void MsiEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     );
+void MsiEngineUninitializeDetectedMsi(
+    __in BURN_DETECTED_MSI* pDetectedMsi
+    );
+void MsiEngineResetDetectedRelatedMsis(
+    __in BURN_PACKAGE* pPackage
+    );
 HRESULT MsiEngineDetectInitialize(
     __in BURN_PACKAGES* pPackages
     );
@@ -66,6 +72,14 @@ HRESULT MsiEngineExecutePackage(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
+HRESULT MsiEngineExecuteUninstallMsi(
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
     __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart

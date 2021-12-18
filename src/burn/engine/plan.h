@@ -60,6 +60,7 @@ enum BURN_EXECUTE_ACTION_TYPE
     BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END,
     BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION,
     BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION,
+    BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI,
 };
 
 enum BURN_CLEAN_ACTION_TYPE
@@ -222,6 +223,10 @@ typedef struct _BURN_EXECUTE_ACTION
         {
             BURN_ROLLBACK_BOUNDARY* pRollbackBoundary;
         } msiTransaction;
+        struct
+        {
+            BURN_DETECTED_MSI* pDetectedMsi;
+        } uninstallMsi;
     };
 } BURN_EXECUTE_ACTION;
 
