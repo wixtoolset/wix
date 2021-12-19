@@ -27,31 +27,31 @@
   ==================================================================================================
   -->
   <PropertyGroup>
-    <InternalSignDependsOn Condition=" '$(OutputType)' == 'Module' ">
+    <_InternalSignDependsOn Condition=" '$(OutputType)' == 'Module' ">
       GetMsmsToSign;
       InternalSignMsm;
-    </InternalSignDependsOn>
-    <InternalSignDependsOn Condition=" '$(OutputType)' == 'Package' ">
+    </_InternalSignDependsOn>
+    <_InternalSignDependsOn Condition=" '$(OutputType)' == 'Package' ">
       GetCabsToSign;
       GetMsiToSign;
       InternalSignCabs;
       InscribeMsi;
       InternalSignMsi;
-    </InternalSignDependsOn>
-    <InternalSignDependsOn Condition=" '$(OutputType)' == 'Bundle' ">
+    </_InternalSignDependsOn>
+    <_InternalSignDependsOn Condition=" '$(OutputType)' == 'Bundle' ">
       GetContainersToSign;
       InternalSignContainers;
       InscribeBundleEngine;
       InternalSignBundleEngine;
       InscribeBundle;
       InternalSignBundle;
-    </InternalSignDependsOn>
+    </_InternalSignDependsOn>
 
     <SigningDependsOn>
-      WixBuild;
+      CoreCompile;
       CalculateSignTargetFiles;
       BeforeSigning;
-      $(InternalSignDependsOn);
+      $(_InternalSignDependsOn);
       AfterSigning
     </SigningDependsOn>
   </PropertyGroup>
