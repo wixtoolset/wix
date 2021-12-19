@@ -15,17 +15,15 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
     <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
-
-    <PackageReference Include="Microsoft.Build.Tasks.Core" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' ">
-    <PackageReference Include="Microsoft.Build.Tasks.Core" />
   </ItemGroup>
 </Project>

@@ -87,6 +87,10 @@
   ==================================================================================================
   -->
   <PropertyGroup>
+    <CoreCompileDependsOn>
+      $(CoreCompileDependsOn);
+      Harvest
+    </CoreCompileDependsOn>
     <HarvestDependsOn>
       ConvertReferences;
       ConvertBundleReferences;
@@ -136,10 +140,6 @@
       <HeatProject Include="@(_HeatProjectReference)" />
     </ItemGroup>
 
-    <Error
-      Text="The following files are deprecated and should be removed from your project(s): @(Compile->'%(Identity)', ', ')"
-      Condition=" '%(Compile.GenerateComponentGroups)' != '' " />
-
     <ItemGroup>
       <!-- Unconditionally generate Compile items so they are always linked in. -->
       <Compile Include="$(HarvestProjectsGeneratedFile)" />
@@ -167,10 +167,6 @@
       </_HeatProjectReference>
       <HeatProject Include="@(_HeatProjectReference)" />
     </ItemGroup>
-
-    <Error
-      Text="The following files are deprecated and should be removed from your project(s): @(Compile->'%(Identity)', ', ')"
-      Condition=" '%(Compile.GenerateComponentGroups)' != '' " />
 
     <ItemGroup>
       <!-- Unconditionally generate Compile items so they are always linked in. -->
@@ -254,7 +250,7 @@
   </PropertyGroup>
   <Target Name="HarvestProjects"
     DependsOnTargets="$(HarvestProjectsDependsOn)"
-    Inputs="@(_AllHeatProjects);%(_AllHeatProjects.Transforms);$(MSBuildAllProjects);$(ProjectPath)"
+    Inputs="@(_AllHeatProjects);%(_AllHeatProjects.Transforms);$(ProjectPath)"
     Outputs="@(_AllHeatProjects -> '%(HeatOutput)')"
     Condition=" $(EnableProjectHarvesting) and ('@(HeatProject)' != '' or '@(HarvestProject)' != '') ">
 
