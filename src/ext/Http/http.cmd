@@ -8,17 +8,14 @@
 
 @echo Http.wixext build %_C%
 
-:: Restore
-msbuild -t:Restore -p:Configuration=%_C% || exit /b
-
 :: Build
-msbuild -t:Build -p:Configuration=%_C% test\WixToolsetTest.Http\WixToolsetTest.Http.csproj || exit /b
+msbuild -Restore -p:Configuration=%_C% || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.Http || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% wixext\WixToolset.Http.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Http.wixext.csproj || exit /b
 
 @popd
 @endlocal

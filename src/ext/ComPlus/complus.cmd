@@ -1,22 +1,21 @@
 @setlocal
 @pushd %~dp0
-@set _C=Release
-@if /i "%1"=="debug" set _C=Debug
 
-:: Restore
-msbuild -p:Configuration=%_C% -t:Restore || exit /b
+@set _C=Debug
+:parse_args
+@if /i "%1"=="release" set _C=Release
+@if not "%1"=="" shift & goto parse_args
+
+@echo ComPlus.wixext build %_C%
 
 :: Build
-::msbuild -p:Configuration=%_C% -p:Platform=Win32 ca\complusca.vcxproj || exit /b
-::msbuild -p:Configuration=%_C% -p:Platform=x64 ca\complusca.vcxproj || exit /b
-
-msbuild -p:Configuration=%_C% test\WixToolsetTest.ComPlus\WixToolsetTest.ComPlus.csproj || exit /b
+msbuild -Restore -p:Configuration=%_C% || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.ComPlus || exit /b
 
 :: Pack
-msbuild -p:Configuration=%_C% -p:NoBuild=true -t:Pack wixext\WixToolset.ComPlus.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.ComPlus.wixext.csproj || exit /b
 
 @popd
 @endlocal

@@ -6,13 +6,10 @@
 @if /i "%1"=="release" set _C=Release
 @if not "%1"=="" shift & goto parse_args
 
-@echo Building ext\NetFx %_C%
-
-:: Restore
-msbuild -t:Restore -p:Configuration=%_C% || exit /b
+@echo NetFx.wixext build %_C%
 
 :: Build
-msbuild -t:Build -p:Configuration=%_C% test\WixToolsetTest.Netfx\WixToolsetTest.Netfx.csproj || exit /b
+msbuild -Restore -p:Configuration=%_C% || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.Netfx || exit /b

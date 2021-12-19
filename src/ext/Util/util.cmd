@@ -8,17 +8,14 @@
 
 @echo Building ext\Util %_C% using %_N%
 
-:: Restore
-msbuild -t:Restore -p:Configuration=%_C% || exit /b
-
 :: Build
-msbuild -t:Build -p:Configuration=%_C% test\WixToolsetTest.Util\WixToolsetTest.Util.csproj || exit /b
+msbuild -Restore -p:Configuration=%_C% || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.Util || exit /b
 
 :: Pack
-msbuild -p:Configuration=%_C% -p:NoBuild=true -t:Pack wixext\WixToolset.Util.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Util.wixext.csproj || exit /b
 
 @popd
 @endlocal

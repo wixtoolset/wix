@@ -7,21 +7,19 @@
     <RootNamespace>WixToolset.Iis</RootNamespace>
     <Description>WiX Toolset Iis Extension</Description>
     <Title>WiX Toolset Iis Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\iis.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Data"  PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility"  PrivateAssets="all" />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\iis.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\iis.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>

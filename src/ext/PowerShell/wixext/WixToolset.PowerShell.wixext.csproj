@@ -7,20 +7,19 @@
     <RootNamespace>WixToolset.PowerShell</RootNamespace>
     <Description>WiX Toolset PowerShell Extension</Description>
     <Title>WiX Toolset PowerShell Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\powershell.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\powershell.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\wixlib\powershell.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
   </ItemGroup>
 </Project>

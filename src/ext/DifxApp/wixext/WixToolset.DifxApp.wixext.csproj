@@ -7,17 +7,16 @@
     <RootNamespace>WixToolset.DifxApp</RootNamespace>
     <Description>WiX Toolset DIFxApp Extension</Description>
     <Title>WiX Toolset DIFxApp Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\difxapp.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\wixlib\difxapp.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\difxapp.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>

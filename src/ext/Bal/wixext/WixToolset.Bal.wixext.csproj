@@ -12,16 +12,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\bal.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Data" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\bal.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <ProjectReference Include="..\wixlib\bal.wixproj" ReferenceOutputAssembly="false" />
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>
