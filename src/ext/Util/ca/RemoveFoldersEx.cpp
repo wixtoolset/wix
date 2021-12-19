@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 LPCWSTR vcsRemoveFolderExQuery =
-    L"SELECT `Wix4RemoveFolderEx`, `Component_`, `Property`, `InstallMode`, `WixRemoveFolderEx`.`Condition`, `Component`.`Attributes`"
+    L"SELECT `Wix4RemoveFolderEx`, `Component_`, `Property`, `InstallMode`, `Wix4RemoveFolderEx`.`Condition`, `Component`.`Attributes`"
     L"FROM `Wix4RemoveFolderEx``,`Component` "
     L"WHERE `Wix4RemoveFolderEx`.`Component_`=`Component`.`Component`";
 enum eRemoveFolderExQuery { rfqId = 1, rfqComponent, rfqProperty, rfqMode, rfqCondition, rfqComponentAttributes };

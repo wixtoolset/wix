@@ -3,9 +3,10 @@
 #include "precomp.h"
 
 // structs
-LPCWSTR wzQUERY_SECUREOBJECTS = L"SELECT `Wix4SecureObject`.`Wix4SecureObject`, `Wix4SecureObject`.`Table`, `Wix4SecureObject`.`Domain`, `Wix4SecureObject`.`User`, `Wix4SecureObject`.`Attributes`, "
-                                L"`Wix4SecureObject`.`Permission`, `Wix4SecureObject`.`Component_`, `Component`.`Attributes` FROM `Wix4SecureObject`,`Component` WHERE "
-                                L"`Wix4SecureObject`.`Component_`=`Component`.`Component`";
+LPCWSTR wzQUERY_SECUREOBJECTS = L"SELECT `Wix4SecureObject`.`SecureObject`, `Wix4SecureObject`.`Table`, `Wix4SecureObject`.`Domain`, `Wix4SecureObject`.`User`, `Wix4SecureObject`.`Attributes`, "
+                                L"`Wix4SecureObject`.`Permission`, `Wix4SecureObject`.`Component_`, `Component`.`Attributes` "
+                                L"FROM `Wix4SecureObject`,`Component` "
+                                L"WHERE `Wix4SecureObject`.`Component_`=`Component`.`Component`";
 enum eQUERY_SECUREOBJECTS { QSO_SECUREOBJECT = 1, QSO_TABLE, QSO_DOMAIN, QSO_USER, QSO_ATTRIBUTES, QSO_PERMISSION, QSO_COMPONENT, QSO_COMPATTRIBUTES };
 
 LPCWSTR wzQUERY_REGISTRY = L"SELECT `Registry`.`Registry`, `Registry`.`Root`, `Registry`.`Key` FROM `Registry` WHERE `Registry`.`Registry`=?";

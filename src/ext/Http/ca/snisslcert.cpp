@@ -85,7 +85,7 @@ static void SetSniSslCertSetKey(
 
 
 LPCWSTR vcsWixHttpSniSslCertQuery =
-L"SELECT `Wix4HttpSniSslCert`.`Wix4HttpSniSslCert`, `Wix4HttpSniSslCert`.`Host`, `Wix4HttpSniSslCert`.`Port`, `Wix4HttpSniSslCert`.`Thumbprint`, `Wix4HttpSniSslCert`.`AppId`, `Wix4HttpSniSslCert`.`Store`, `Wix4HttpSniSslCert`.`HandleExisting`, `Wix4HttpSniSslCert`.`Component_` "
+L"SELECT `WixHttpSniSslCert`, `Host`, `Port`, `Thumbprint`, `AppId`, `Store`, `HandleExisting`, `Component_` "
 L"FROM `Wix4HttpSniSslCert`";
 enum eWixHttpSniSslCertQuery { hurqId = 1, hurqHost, hurqPort, hurqCertificateThumbprint, hurqAppId, hurqCertificateStore, hurqHandleExisting, hurqComponent };
 

@@ -30,7 +30,7 @@ enum eXmlPreserveDate
 };
 
 LPCWSTR vcsXmlConfigQuery =
-    L"SELECT `Wix4XmlConfig`.`Wix4XmlConfig`, `Wix4XmlConfig`.`File`, `Wix4XmlConfig`.`ElementId`, `Wix4XmlConfig`.`ElementPath`, `Wix4XmlConfig`.`VerifyPath`, `Wix4XmlConfig`.`Name`, "
+    L"SELECT `Wix4XmlConfig`.`XmlConfig`, `Wix4XmlConfig`.`File`, `Wix4XmlConfig`.`ElementId`, `Wix4XmlConfig`.`ElementPath`, `Wix4XmlConfig`.`VerifyPath`, `Wix4XmlConfig`.`Name`, "
     L"`Wix4XmlConfig`.`Value`, `Wix4XmlConfig`.`Flags`, `Wix4XmlConfig`.`Component_`, `Component`.`Attributes` "
     L"FROM `Wix4XmlConfig`,`Component` WHERE `Wix4XmlConfig`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
 enum eXmlConfigQuery { xfqXmlConfig = 1, xfqFile, xfqElementId, xfqElementPath, xfqVerifyPath, xfqName, xfqValue, xfqXmlFlags, xfqComponent, xfqCompAttributes  };

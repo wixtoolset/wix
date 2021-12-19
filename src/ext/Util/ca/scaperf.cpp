@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsPerfCounterDataQuery = L"SELECT `Wix4PerformanceCategory`, `Component_`, `Name`, `IniData`, `ConstantData` FROM `Wix4PerformanceCategory`";
+LPCWSTR vcsPerfCounterDataQuery = L"SELECT `PerformanceCategory`, `Component_`, `Name`, `IniData`, `ConstantData` FROM `Wix4PerformanceCategory`";
 enum ePerfCounterDataQuery { pcdqId = 1, pcdqComponent, pcdqName, pcdqIniData, pcdqConstantData };
 
 LPCWSTR vcsPerfMonQuery = L"SELECT `Component_`, `File`, `Name` FROM `Wix4Perfmon`";

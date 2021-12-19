@@ -18,7 +18,7 @@ enum eRmuResourceType
 };
 
 LPCWSTR vcsRestartResourceQuery =
-    L"SELECT `Wix4RestartResource`.`Wix4RestartResource`, `Wix4RestartResource`.`Component_`, `Wix4RestartResource`.`Resource`, `Wix4RestartResource`.`Attributes` "
+    L"SELECT `Wix4RestartResource`.`RestartResource`, `Wix4RestartResource`.`Component_`, `Wix4RestartResource`.`Resource`, `Wix4RestartResource`.`Attributes` "
     L"FROM `Wix4RestartResource`";
 enum eRestartResourceQuery { rrqRestartResource = 1, rrqComponent, rrqResource, rrqAttributes };
 
