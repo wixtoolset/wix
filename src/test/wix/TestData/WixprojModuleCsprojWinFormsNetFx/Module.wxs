@@ -1,0 +1,8 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id='CsprojWindowsFormsNetFxModule' Guid='00000001-0000-0000-0000-000000000000' Language='0' Version='0.0.1'>
+
+    <Component Guid='00000001-0000-0000-0000-000000000000' Directory='TARGETDIR'>
+      <File Source='CsprojWindowsFormsNetFx.exe' />
+    </Component>
+  </Module>
+</Wix>

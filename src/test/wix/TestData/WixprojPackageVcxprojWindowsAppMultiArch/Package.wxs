@@ -1,0 +1,23 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name='WixprojPackageVcxprojWindowsApp' Manufacturer='WiX Toolset' Version='0.0.1' UpgradeCode='00000000-0000-0000-0000-000000000000'>
+
+    <StandardDirectory Id='ProgramFilesFolder'>
+      <Directory Id='Application32Folder' Name='Test App (32-bit)' />
+    </StandardDirectory>
+
+    <StandardDirectory Id='ProgramFiles64Folder'>
+      <Directory Id='Application64Folder' Name='Test App (64-bit)' />
+    </StandardDirectory>
+
+    <Feature Id='Main'>
+      <Component Directory='Application32Folder'>
+        <File Source='..\VcxprojWindowsApp\Debug\VcxprojWindowsApp.exe' />
+      </Component>
+      <Component Directory='Application64Folder'>
+        <File Source='..\VcxprojWindowsApp\x64\Debug\VcxprojWindowsApp.exe' />
+      </Component>
+
+      <!-- <ComponentGroupRef Id='VcxprojDllComponentGroup' /> -->
+    </Feature>
+  </Package>
+</Wix>

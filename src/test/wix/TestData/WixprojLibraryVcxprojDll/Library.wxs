@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id='VcxprojDllComponentGroup' Directory='ApplicationFolder'>
+      <Component>
+        <File Source='VcxprojDll.dll' />
+      </Component>
+    </ComponentGroup>
+
+    <UIRef Id="WixUI_Minimal" />
+  </Fragment>
+</Wix>

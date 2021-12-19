@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net48;net5.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CsprojClassLibraryNetCore\CsprojClassLibraryNetCore.csproj" />
+  </ItemGroup>
+
+</Project>
