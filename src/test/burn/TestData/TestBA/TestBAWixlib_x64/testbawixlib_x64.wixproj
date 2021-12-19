@@ -13,6 +13,17 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj" />
+    <!-- An alternative to the above line is to explicitly reference projects with 
+         the required target framework. Since we want all target frameworks built,
+         the above line is shorter.
+    <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj">
+      <SetTargetFramework>TargetFramework=net35</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj">
+      <SetTargetFramework>TargetFramework=net5.0-windows</SetTargetFramework>
+    </ProjectReference>
+    -->
+
     <ProjectReference Include="..\..\..\TestExe\TestExe_x64.csproj" />
     <ProjectReference Include="..\..\..\WixToolset.WixBA\WixToolset.WixBA_x64.csproj" />
   </ItemGroup>

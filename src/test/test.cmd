@@ -10,7 +10,9 @@
 @if not "%RuntimeTestsEnabled%"=="true" echo Build integration tests %_C%
 @if "%RuntimeTestsEnabled%"=="true" set _T=test&echo Run integration tests %_C%
 
-@call burn\test_burn.cmd %_C% %_T%
+@call burn\test_burn.cmd %_C% %_T% || exit /b
+
+dotnet test wix -c %_C% --nologo -v m || exit /b
 
 @popd
 @endlocal

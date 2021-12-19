@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name='~WebApp' Manufacturer='WiX Toolset' Version='0.0.1' UpgradeCode='00000000-0000-0000-0000-000000000000'>
+
+    <StandardDirectory Id='ProgramFiles6432Folder'>
+      <Directory Id='ApplicationFolder' Name='~Web App'>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id='Main' Title='WebApp'>
+      <Component Directory='ApplicationFolder'>
+        <File Source='CsprojWebApplicationNetCore.exe' />
+        <File Source='web.config' />
+      </Component>
+    </Feature>
+
+    <UIRef Id="WixUI_Minimal" />
+  </Package>
+</Wix>
