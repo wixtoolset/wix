@@ -4,11 +4,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <DebugType>embedded</DebugType>
     <RootNamespace>WixToolset.Dependency</RootNamespace>
     <Description>WiX Toolset Dependency Extension</Description>
     <Title>WiX Toolset Dependency Extension</Title>
-    <IsTool>true</IsTool>
+    <DebugType>embedded</DebugType>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
@@ -16,12 +15,11 @@
     <EmbeddedResource Include="$(OutputPath)..\dependency.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\wixlib\dependency.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\dependency.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" PrivateAssets="All" />
-    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>

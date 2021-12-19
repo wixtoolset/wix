@@ -34,6 +34,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.mba.core" rd /s/q "%_NUGET_CACHE%\wixtoolset
 if exist "%_NUGET_CACHE%\wixtoolset.netfx.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.netfx.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.sdk" rd /s/q "%_NUGET_CACHE%\wixtoolset.sdk"
 if exist "%_NUGET_CACHE%\wixtoolset.util.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.util.wixext"
+if exist "%_NUGET_CACHE%\wixtoolset.ui.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.ui.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.wcautil" rd /s/q "%_NUGET_CACHE%\wixtoolset.wcautil"
 
 popd

@@ -15,11 +15,11 @@
     <EmbeddedResource Include="$(OutputPath)..\sql.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\wixlib\sql.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\sql.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>

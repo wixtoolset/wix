@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
 
   <ItemGroup>

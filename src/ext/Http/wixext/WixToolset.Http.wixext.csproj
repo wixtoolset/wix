@@ -7,21 +7,19 @@
     <RootNamespace>WixToolset.Http</RootNamespace>
     <Description>WiX Toolset Http Extension</Description>
     <Title>WiX Toolset Http Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\http.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Data" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\http.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\http.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>

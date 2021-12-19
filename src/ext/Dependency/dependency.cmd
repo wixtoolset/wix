@@ -8,11 +8,8 @@
 
 @echo Dependency.wixext build %_C%
 
-:: Restore
-msbuild -t:Restore -p:Configuration=%_C% || exit /b
-
 :: Build
-msbuild -t:Build -p:Configuration=%_C% test\WixToolsetTest.Dependency\WixToolsetTest.Dependency.csproj || exit /b
+msbuild -Restore -p:Configuration=%_C% || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.Dependency || exit /b

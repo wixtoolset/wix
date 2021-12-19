@@ -16,11 +16,10 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <ProjectReference Include="..\wixlib\ui.wixproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\wixlib\ui.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" />
-    <PackageReference Include="WixToolset.Extensibility" />
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>
