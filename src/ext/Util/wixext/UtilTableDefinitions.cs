@@ -11,7 +11,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.WixCloseApplication,
             new[]
             {
-                new ColumnDefinition("Wix4CloseApplication", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("CloseApplication", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Target", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Name of executable to ensure is closed.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Description", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Description string displayed to user when executable is in use.", modularizeType: ColumnModularizeType.Property, forceLocalizable: true),
                 new ColumnDefinition("Condition", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the closing.", modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
@@ -29,7 +29,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.WixRemoveFolderEx,
             new[]
             {
-                new ColumnDefinition("Wix4RemoveFolderEx", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the WixRemoveFolderEx row in the package.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("RemoveFolderEx", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the WixRemoveFolderEx row in the package.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, description: "Name of Property that contains the root of the directory tree to remove.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("InstallMode", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 1, maxValue: 3, description: "1 == Remove only when the associated component is being installed (msiInstallStateLocal or msiInstallStateSource), 2 == Remove only when the associated component is being removed (msiInstallStateAbsent), 3 = Remove in either of the above cases."),
@@ -43,7 +43,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.WixRemoveRegistryKeyEx,
             new[]
             {
-                new ColumnDefinition("Wix4RemoveRegistryKeyEx", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the Wix4RemoveRegistryKeyEx row in the package.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("RemoveRegistryKeyEx", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the Wix4RemoveRegistryKeyEx row in the package.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Root", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: -1, maxValue: 3, description: "The predefined root key for the registry value, one of rrkEnum."),
                 new ColumnDefinition("Key", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.RegPath, description: "The key for the registry value.", modularizeType: ColumnModularizeType.Property),
@@ -58,7 +58,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.WixRestartResource,
             new[]
             {
-                new ColumnDefinition("Wix4RestartResource", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized identifier.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("RestartResource", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized identifier.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Resource", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The resource to be registered with the Restart Manager.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "A 32-bit word that specifies the type of resource and flags used for processing."),
@@ -71,7 +71,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.FileShare,
             new[]
             {
-                new ColumnDefinition("Wix4FileShare", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized identifier", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("FileShare", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized identifier", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ShareName", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The actual share name used"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Description string displayed for the file share"),
@@ -85,8 +85,8 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.FileSharePermissions,
             new[]
             {
-                new ColumnDefinition("Wix4FileShare_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "FileShare", keyColumn: 1, description: "FileShare that these premissions are to be applied to.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Wix4User_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4User", description: "User that these premissions are to apply to.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("FileShare_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "FileShare", keyColumn: 1, description: "FileShare that these premissions are to be applied to.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4User", description: "User that these premissions are to apply to.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Permissions", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Permissions int, as in EXPLICIT_ACCESS.grfAccessPermissions in MSDN"),
             },
             symbolIdIsPrimaryKey: false
@@ -97,7 +97,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.Group,
             new[]
             {
-                new ColumnDefinition("Wix4Group", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Group", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Text, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Group name", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Domain", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Group domain", modularizeType: ColumnModularizeType.Property),
@@ -110,7 +110,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.WixInternetShortcut,
             new[]
             {
-                new ColumnDefinition("Wix4InternetShortcut", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("InternetShortcut", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Directory_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Directory", keyColumn: 1, description: "Foreign key referencing directory that the shortcut is created in", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Name used for shortcut.", modularizeType: ColumnModularizeType.Property),
@@ -127,7 +127,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.PerformanceCategory,
             new[]
             {
-                new ColumnDefinition("Wix4PerformanceCategory", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("PerformanceCategory", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Component used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 80, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Name of the performance counter category."),
                 new ColumnDefinition("IniData", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Data that goes into the performance counter .ini file."),
@@ -176,7 +176,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.SecureObjects,
             new[]
             {
-                new ColumnDefinition("Wix4SecureObject", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in Table", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("SecureObject", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token in Table", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Table", ColumnType.String, 32, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Table SecureObject should be securing"),
                 new ColumnDefinition("Domain", ColumnType.String, 255, primaryKey: true, nullable: true, ColumnCategory.Text, description: "Domain half of user account to secure", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("User", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, description: "User name half of user account to secure", modularizeType: ColumnModularizeType.Property),
@@ -211,7 +211,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.WixTouchFile,
             new[]
             {
-                new ColumnDefinition("Wix4TouchFile", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the Wix4TouchFile row in the package.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("TouchFile", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the Wix4TouchFile row in the package.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Path", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Formatted column that resolves to the path to touch.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 1, maxValue: 63, description: "1 == Touch only when the associated component is being installed, 2 == Touch only when the associated component is being repaired , 4 == Touch only when the associated component is being removed, 16 = path is in 64-bit location, 32 = touching the file is vital."),
@@ -224,7 +224,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.User,
             new[]
             {
-                new ColumnDefinition("Wix4User", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("User", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Text, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "User name", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Domain", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "User domain", modularizeType: ColumnModularizeType.Property),
@@ -239,8 +239,8 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.UserGroup,
             new[]
             {
-                new ColumnDefinition("Wix4User_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4User", keyColumn: 1, description: "User to be joined to a Group.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Wix4Group_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4Group", keyColumn: 1, description: "Group to join User to.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4User", keyColumn: 1, description: "User to be joined to a Group.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Group_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4Group", keyColumn: 1, description: "Group to join User to.", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: false
         );
@@ -250,7 +250,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.XmlFile,
             new[]
             {
-                new ColumnDefinition("Wix4XmlFile", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("XmlFile", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("File", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The .XML file in which to write the information", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("ElementPath", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The .XML file element to modify.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Name", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The .XML file node to set/add in the element.", modularizeType: ColumnModularizeType.Property),
@@ -267,7 +267,7 @@ namespace WixToolset.Util
             UtilSymbolDefinitions.XmlConfig,
             new[]
             {
-                new ColumnDefinition("Wix4XmlConfig", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("XmlConfig", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("File", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The .XML file in which to write the information", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("ElementId", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4XmlConfig", keyColumn: 1, description: "A foreign key reference to another Wix4XmlConfig row if no attributes are set and the row referenced is a create element row.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ElementPath", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The XPATH query for an element to modify or add children to. Must be null if ElementId is provided", modularizeType: ColumnModularizeType.Property),

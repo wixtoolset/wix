@@ -23,7 +23,7 @@ LPCWSTR vcsFileId =
 enum eFileId { fiFile = 1 };
 
 LPCWSTR vcsNgenQuery =
-    L"SELECT `Wix4NetFxNativeImage`.`File_`, `Wix4NetFxNativeImage`.`Wix4NetFxNativeImage`, `Wix4NetFxNativeImage`.`Priority`, `Wix4NetFxNativeImage`.`Attributes`, `Wix4NetFxNativeImage`.`File_Application`, `Wix4NetFxNativeImage`.`Directory_ApplicationBase`, `File`.`Component_` "
+    L"SELECT `Wix4NetFxNativeImage`.`File_`, `Wix4NetFxNativeImage`.`NetFxNativeImage`, `Wix4NetFxNativeImage`.`Priority`, `Wix4NetFxNativeImage`.`Attributes`, `Wix4NetFxNativeImage`.`File_Application`, `Wix4NetFxNativeImage`.`Directory_ApplicationBase`, `File`.`Component_` "
     L"FROM `Wix4NetFxNativeImage`, `File` WHERE `File`.`File`=`Wix4NetFxNativeImage`.`File_`";
 enum eNgenQuery { ngqFile = 1, ngqId, ngqPriority, ngqAttributes, ngqFileApp, ngqDirAppBase, ngqComponent };
 

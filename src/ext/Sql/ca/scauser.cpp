@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `User` WHERE `User`=?";
+LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `Wix4User` WHERE `User`=?";
 enum eUserQuery { vuqUser = 1, vuqComponent, vuqName, vuqDomain, vuqPassword };
 
 
@@ -41,33 +41,33 @@ HRESULT __stdcall ScaGetUser(
     if (S_OK == hr)
     {
         hr = WcaGetRecordString(hRec, vuqUser, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.User");
+        ExitOnFailure(hr, "Failed to get Wix4User.User");
         hr = ::StringCchCopyW(pscau->wzKey, countof(pscau->wzKey), pwzData);
         ExitOnFailure(hr, "Failed to copy key string to user object");
 
         hr = WcaGetRecordString(hRec, vuqComponent, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Component_");
+        ExitOnFailure(hr, "Failed to get Wix4User.Component_");
         hr = ::StringCchCopyW(pscau->wzComponent, countof(pscau->wzComponent), pwzData);
         ExitOnFailure(hr, "Failed to copy component string to user object");
 
         hr = WcaGetRecordFormattedString(hRec, vuqName, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Name");
+        ExitOnFailure(hr, "Failed to get Wix4User.Name");
         hr = ::StringCchCopyW(pscau->wzName, countof(pscau->wzName), pwzData);
         ExitOnFailure(hr, "Failed to copy name string to user object");
 
         hr = WcaGetRecordFormattedString(hRec, vuqDomain, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Domain");
+        ExitOnFailure(hr, "Failed to get Wix4User.Domain");
         hr = ::StringCchCopyW(pscau->wzDomain, countof(pscau->wzDomain), pwzData);
         ExitOnFailure(hr, "Failed to copy domain string to user object");
 
         hr = WcaGetRecordFormattedString(hRec, vuqPassword, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Password");
+        ExitOnFailure(hr, "Failed to get Wix4User.Password");
         hr = ::StringCchCopyW(pscau->wzPassword, countof(pscau->wzPassword), pwzData);
         ExitOnFailure(hr, "Failed to copy password string to user object");
     }
     else if (E_NOMOREITEMS == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate User.User='%ls'", wzUser);
+        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4User.User='%ls'", wzUser);
         hr = E_FAIL;
     }
     else

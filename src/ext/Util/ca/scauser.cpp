@@ -2,16 +2,16 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsUserQuery = L"SELECT `Wix4User`, `Component_`, `Name`, `Domain`, `Password` FROM `Wix4User` WHERE `Wix4User`=?";
+LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `Wix4User` WHERE `User`=?";
 enum eUserQuery { vuqUser = 1, vuqComponent, vuqName, vuqDomain, vuqPassword };
 
-LPCWSTR vcsGroupQuery = L"SELECT `Wix4Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Wix4Group`=?";
+LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Group`=?";
 enum eGroupQuery { vgqGroup = 1, vgqComponent, vgqName, vgqDomain };
 
-LPCWSTR vcsUserGroupQuery = L"SELECT `Wix4User_`, `Wix4Group_` FROM `Wix4UserGroup` WHERE `Wix4User_`=?";
+LPCWSTR vcsUserGroupQuery = L"SELECT `User_`, `Group_` FROM `Wix4UserGroup` WHERE `User_`=?";
 enum eUserGroupQuery { vugqUser = 1, vugqGroup };
 
-LPCWSTR vActionableQuery = L"SELECT `Wix4User`,`Component_`,`Name`,`Domain`,`Password`,`Attributes` FROM `Wix4User` WHERE `Component_` IS NOT NULL";
+LPCWSTR vActionableQuery = L"SELECT `User`,`Component_`,`Name`,`Domain`,`Password`,`Attributes` FROM `Wix4User` WHERE `Component_` IS NOT NULL";
 enum eActionableQuery { vaqUser = 1, vaqComponent, vaqName, vaqDomain, vaqPassword, vaqAttributes };
 
 
@@ -204,9 +204,9 @@ HRESULT __stdcall ScaGetGroup(
     if (S_OK == hr)
     {
         hr = WcaGetRecordString(hRec, vgqGroup, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4Group.Wix4Group.");
+        ExitOnFailure(hr, "Failed to get Wix4Group.Group.");
         hr = ::StringCchCopyW(pscag->wzKey, countof(pscag->wzKey), pwzData);
-        ExitOnFailure(hr, "Failed to copy Wix4Group.Wix4Group.");
+        ExitOnFailure(hr, "Failed to copy Wix4Group.Group.");
 
         hr = WcaGetRecordString(hRec, vgqComponent, &pwzData);
         ExitOnFailure(hr, "Failed to get Wix4Group.Component_");
@@ -225,7 +225,7 @@ HRESULT __stdcall ScaGetGroup(
     }
     else if (E_NOMOREITEMS == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4Group.Wix4Group='%ls'", wzGroup);
+        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4Group.Group='%ls'", wzGroup);
         hr = E_FAIL;
     }
     else

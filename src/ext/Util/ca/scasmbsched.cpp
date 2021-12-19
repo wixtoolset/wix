@@ -92,7 +92,7 @@ void ScaExUserPermsSmbFreeList(SCA_SMB_EX_USER_PERMS* pExUserPermsList)
 }
 
 // sql query constants
-LPCWSTR vcsSmbQuery = L"SELECT `Wix4FileShare`, `ShareName`, `Description`, `Directory_`, "
+LPCWSTR vcsSmbQuery = L"SELECT `FileShare`, `ShareName`, `Description`, `Directory_`, "
     L"`Component_`, `User_`, `Permissions` FROM `Wix4FileShare`";
 
 enum eSmbQuery {
@@ -154,7 +154,7 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
         ::ZeroMemory(pss, sizeof(*pss));
 
         hr = WcaGetRecordString(hRec, ssqFileShare, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4FileShare.Wix4FileShare");
+        ExitOnFailure(hr, "Failed to get Wix4FileShare.FileShare");
         hr = ::StringCchCopyW(pss->wzId, countof(pss->wzId), pwzData);
         ExitOnFailure(hr, "Failed to copy ID string to smb object");
 

@@ -36,7 +36,7 @@ enum eXmlSelectionLanguage
 };
 
 LPCWSTR vcsXmlFileQuery =
-    L"SELECT `Wix4XmlFile`.`Wix4XmlFile`, `Wix4XmlFile`.`File`, `Wix4XmlFile`.`ElementPath`, `Wix4XmlFile`.`Name`, `Wix4XmlFile`.`Value`, "
+    L"SELECT `Wix4XmlFile`.`XmlFile`, `Wix4XmlFile`.`File`, `Wix4XmlFile`.`ElementPath`, `Wix4XmlFile`.`Name`, `Wix4XmlFile`.`Value`, "
     L"`Wix4XmlFile`.`Flags`, `Wix4XmlFile`.`Component_`, `Component`.`Attributes` "
     L"FROM `Wix4XmlFile`,`Component` WHERE `Wix4XmlFile`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
 enum eXmlFileQuery { xfqXmlFile = 1, xfqFile, xfqXPath, xfqName, xfqValue, xfqXmlFlags, xfqComponent, xfqCompAttributes  };

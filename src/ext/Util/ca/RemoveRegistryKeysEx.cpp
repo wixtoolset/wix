@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 LPCWSTR vcsRemoveRegistryKeyExQuery =
-    L"SELECT `Wix4RemoveRegistryKeyEx`, `Component_`, `Root`, `Key`, `InstallMode`, `Condition` FROM `Wix4RemoveRegistryKeyEx`";
+    L"SELECT `RemoveRegistryKeyEx`, `Component_`, `Root`, `Key`, `InstallMode`, `Condition` FROM `Wix4RemoveRegistryKeyEx`";
 enum eRemoveRegistryKeyExQuery { rrxqId = 1, rrxqComponent, rrxqRoot, rrxqKey, rrxqMode, rrxqCondition };
 
 extern "C" UINT WINAPI WixRemoveRegistryKeysEx(

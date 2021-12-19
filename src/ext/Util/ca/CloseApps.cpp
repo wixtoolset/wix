@@ -5,7 +5,7 @@
 #define DEFAULT_PROCESS_EXIT_WAIT_TIME 5000
 
 // structs
-LPCWSTR wzQUERY_CLOSEAPPS = L"SELECT `Wix4CloseApplication`, `Target`, `Description`, `Condition`, `Attributes`, `Property`, `TerminateExitCode`, `Timeout` FROM `Wix4CloseApplication` ORDER BY `Sequence`";
+LPCWSTR wzQUERY_CLOSEAPPS = L"SELECT `CloseApplication`, `Target`, `Description`, `Condition`, `Attributes`, `Property`, `TerminateExitCode`, `Timeout` FROM `Wix4CloseApplication` ORDER BY `Sequence`";
 enum eQUERY_CLOSEAPPS { QCA_ID = 1, QCA_TARGET, QCA_DESCRIPTION, QCA_CONDITION, QCA_ATTRIBUTES, QCA_PROPERTY, QCA_TERMINATEEXITCODE, QCA_TIMEOUT };
 
 // CloseApplication.Attributes

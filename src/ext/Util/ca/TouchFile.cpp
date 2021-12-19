@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsTouchFileQuery = L"SELECT `Wix4TouchFile`, `Component_`, `Path`, `Attributes` FROM `Wix4TouchFile`";
+LPCWSTR vcsTouchFileQuery = L"SELECT `TouchFile`, `Component_`, `Path`, `Attributes` FROM `Wix4TouchFile`";
 enum TOUCH_FILE_QUERY { tfqId = 1, tfqComponent, tfqPath, tfqTouchFileAttributes };
 
 enum TOUCH_FILE_ATTRIBUTE

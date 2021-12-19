@@ -30,14 +30,14 @@ HTTPAPI_VERSION vcHttpVersion = HTTPAPI_VERSION_1;
 ULONG vcHttpFlags = HTTP_INITIALIZE_CONFIG;
 
 LPCWSTR vcsHttpUrlReservationQuery =
-    L"SELECT `Wix4HttpUrlReservation`.`Wix4HttpUrlReservation`, `Wix4HttpUrlReservation`.`HandleExisting`, `Wix4HttpUrlReservation`.`Sddl`, `Wix4HttpUrlReservation`.`Url`, `Wix4HttpUrlReservation`.`Component_` "
+    L"SELECT `WixHttpUrlReservation`, `HandleExisting`, `Sddl`, `Url`, `Component_` "
     L"FROM `Wix4HttpUrlReservation`";
 enum eHttpUrlReservationQuery { hurqId = 1, hurqHandleExisting, hurqSDDL, hurqUrl, hurqComponent };
 
 LPCWSTR vcsHttpUrlAceQuery =
-    L"SELECT `Wix4HttpUrlAce`.`SecurityPrincipal`, `Wix4HttpUrlAce`.`Rights` "
+    L"SELECT `SecurityPrincipal`, `Rights` "
     L"FROM `Wix4HttpUrlAce` "
-    L"WHERE `Wix4HttpUrlAce`.`Wix4HttpUrlReservation_`=?";
+    L"WHERE `WixHttpUrlReservation_`=?";
 enum eHttpUrlAceQuery { huaqSecurityPrincipal = 1, huaqRights };
 
 /******************************************************************
