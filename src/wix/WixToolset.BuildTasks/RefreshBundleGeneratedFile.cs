@@ -15,28 +15,17 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public class RefreshBundleGeneratedFile : Task
     {
-        private ITaskItem[] generatedFiles;
-        private ITaskItem[] projectReferencePaths;
-
         /// <summary>
         /// The list of files to generate.
         /// </summary>
         [Required]
-        public ITaskItem[] GeneratedFiles
-        {
-            get { return this.generatedFiles; }
-            set { this.generatedFiles = value; }
-        }
+        public ITaskItem[] GeneratedFiles { get; set; }
 
         /// <summary>
         /// All the project references in the project.
         /// </summary>
         [Required]
-        public ITaskItem[] ProjectReferencePaths
-        {
-            get { return this.projectReferencePaths; }
-            set { this.projectReferencePaths = value; }
-        }
+        public ITaskItem[] ProjectReferencePaths { get; set; }
 
         /// <summary>
         /// Gets a complete list of external cabs referenced by the given installer database file.
@@ -55,9 +44,9 @@ namespace WixToolset.BuildTasks
                     continue;
                 }
 
-                string projectPath = CreateProjectReferenceDefineConstants.GetProjectPath(this.ProjectReferencePaths, i);
+                string projectPath = item.GetMetadata("MSBuildSourceProjectFile");
                 string projectName = Path.GetFileNameWithoutExtension(projectPath);
-                string referenceName = ToolsCommon.GetIdentifierFromName(CreateProjectReferenceDefineConstants.GetReferenceName(item, projectName));
+                string referenceName = ToolsCommon.GetIdentifierFromName(ToolsCommon.GetMetadataOrDefault(item, "Name", projectName));
 
                 string[] pogs = item.GetMetadata("RefProjectOutputGroups").Split(';');
                 foreach (string pog in pogs)

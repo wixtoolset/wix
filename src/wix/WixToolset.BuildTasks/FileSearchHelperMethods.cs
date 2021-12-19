@@ -33,20 +33,21 @@ namespace WixToolset.BuildTasks
 
             if (directories == null)
             {
-                return string.Empty;
+                return String.Empty;
             }
 
-            string fileName = Path.GetFileName(defaultFullPath);
-            foreach (string currentPath in directories)
+            var fileName = Path.GetFileName(defaultFullPath);
+            foreach (var currentPath in directories)
             {
-                if (String.IsNullOrEmpty(currentPath) || String.IsNullOrEmpty(currentPath.Trim()))
+                if (String.IsNullOrWhiteSpace(currentPath))
                 {
                     continue;
                 }
 
-                if (File.Exists(Path.Combine(currentPath, fileName)))
+                var path = Path.Combine(currentPath, fileName);
+                if (File.Exists(path))
                 {
-                    return Path.Combine(currentPath, fileName);
+                    return path;
                 }
             }
 
