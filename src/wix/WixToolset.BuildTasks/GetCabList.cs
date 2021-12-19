@@ -14,27 +14,17 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public class GetCabList : Task
     {
-        private ITaskItem database;
-        private ITaskItem[] cabList;
-
         /// <summary>
         /// The list of database files to find cabs in
         /// </summary>
         [Required]
-        public ITaskItem Database
-        {
-            get { return this.database; }
-            set { this.database = value; }
-        }
+        public ITaskItem Database { get; set; }
 
         /// <summary>
         /// The total list of cabs in this database
         /// </summary>
         [Output]
-        public ITaskItem[] CabList
-        {
-            get { return this.cabList; }
-        }
+        public ITaskItem[] CabList { get; private set; }
 
         /// <summary>
         /// Gets a complete list of external cabs referenced by the given installer database file.
@@ -42,8 +32,8 @@ namespace WixToolset.BuildTasks
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            string databaseFile = this.database.ItemSpec;
-            Object []args = { };
+            string databaseFile = this.Database.ItemSpec;
+            object[] args = { };
             System.Collections.Generic.List<ITaskItem> cabNames = new System.Collections.Generic.List<ITaskItem>();
 
             // If the file doesn't exist, no cabs to return, so exit now
@@ -73,7 +63,7 @@ namespace WixToolset.BuildTasks
                 }
             }
 
-            this.cabList = cabNames.ToArray();
+            this.CabList = cabNames.ToArray();
 
             return true;
         }
