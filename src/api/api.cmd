@@ -11,12 +11,12 @@
 :: restore
 :: build
 :: pack
-msbuild -m -p:Configuration=%_C% api.proj || exit /b
+
+msbuild api_t.proj -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\api_build.binlog || exit /b
 
 :: test
-dotnet test -c %_C% --no-build burn\test\WixToolsetTest.Mba.Core\WixToolsetTest.Mba.Core.csproj || exit /b
-dotnet test -c %_C% --no-build wix\api_wix.sln || exit /b
-
+dotnet test burn\test\WixToolsetTest.Mba.Core\WixToolsetTest.Mba.Core.csproj -c %_C% --nologo --no-build || exit /b
+dotnet test wix\api_wix.sln -c %_C% --nologo --no-build || exit /b
 
 @popd
 @endlocal

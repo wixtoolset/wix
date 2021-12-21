@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.Build.Traversal/3.0.23">
+  <ItemGroup>
+    <ProjectReference Include="pack-wix\pack-wix.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Sdk\WixToolset.Sdk.csproj" Properties="NoBuild=true" Targets="Pack" />
+
+    <ProjectReference Include="WixToolset.Core.Native\WixToolset.Core.Native.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Core\WixToolset.Core.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Core.ExtensionCache\WixToolset.Core.ExtensionCache.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" Properties="NoBuild=true" Targets="Pack" />
+
+    <ProjectReference Include="WixToolset.Converters\WixToolset.Converters.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixToolset.Converters.Symbolizer\WixToolset.Converters.Symbolizer.csproj" Properties="NoBuild=true" Targets="Pack" />
+  </ItemGroup>
+</Project>

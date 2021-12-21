@@ -12,13 +12,7 @@
 
 nuget restore || exit /b
 
-msbuild -t:Test -p:Configuration=%_C%;Platform=x86 test\BurnUnitTest || exit /b
-
-msbuild -t:Build -p:Configuration=%_C%;Platform=x86 || exit /b
-msbuild -t:Build -p:Configuration=%_C%;Platform=x64 || exit /b
-msbuild -t:Build -p:Configuration=%_C%;Platform=arm64 || exit /b
-
-msbuild -t:PackNative -p:Configuration=%_C% stub\stub.vcxproj || exit /b
+msbuild burn_t.proj -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\burn_build.binlog || exit /b
 
 @popd
 @endlocal

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="test\BurnUnitTest\BurnUnitTest.vcxproj" Targets="Test" />
+
+    <ProjectReference Include="burn.sln" Properties="Platform=x86" />
+    <ProjectReference Include="burn.sln" Properties="Platform=x64" />
+    <ProjectReference Include="burn.sln" Properties="Platform=ARM64" />
+
+    <ProjectReference Include="stub\stub.vcxproj" Targets="PackNative" />
+  </ItemGroup>
+</Project>

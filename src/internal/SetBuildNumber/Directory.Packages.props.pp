@@ -50,11 +50,11 @@
     <PackageVersion Include="NuGet.Versioning" Version="5.6.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net472'" >
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3"/>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='netcoreapp3.1'">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
   </ItemGroup>
 

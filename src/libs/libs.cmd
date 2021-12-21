@@ -6,13 +6,9 @@
 @if /i "%1"=="release" set _C=Release
 @if not "%1"=="" shift & goto parse_args
 
-@echo Building libs %_C% using %_N%
+@echo Building libs %_C%
 
-:: libs
-
-nuget restore || exit /b
-
-msbuild -m -p:Configuration=%_C% libs.proj || exit /b
+msbuild -Restore libs_t.proj -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\libs_build.binlog || exit /b
 
 @popd
 @endlocal
