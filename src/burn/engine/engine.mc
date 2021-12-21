@@ -153,7 +153,7 @@ MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
 Language=English
-Error %1!hs!. Failed to parse condition %2!ls!. Unexpected symbol at position %3!hs!
+Error %1!ls!. Failed to parse condition %2!ls!.
 .
 
 MessageId=52
@@ -307,7 +307,7 @@ MessageId=152
 Severity=Error
 SymbolicName=MSG_FAILED_READ_RELATED_PACKAGE_LANGUAGE
 Language=English
-Detected related package: %2!ls!, but failed to read language: %3!hs!, error: 0x%1!x!
+Detected related package: %2!ls!, but failed to read language: %3!ls!, error: %1!ls!
 .
 
 MessageId=170
@@ -749,7 +749,7 @@ MessageId=337
 Severity=Error
 SymbolicName=MSG_CACHE_PREPARE_PACKAGE_FAILED
 Language=English
-Failed to prepare package: %2!ls!, error: 0x%1!ls!
+Failed to prepare package: %2!ls!, error: %1!ls!
 .
 
 MessageId=338
