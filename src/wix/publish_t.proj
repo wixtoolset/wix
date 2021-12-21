@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.Build.Traversal/3.0.23">
+  <ItemGroup>
+    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=netcoreapp3.1;PublishDir=$(BaseOutputPath)$(Configuration)\publish\wix\" Targets="Publish" />
+
+    <ProjectReference Include="WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x86;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\net472\x86\buildtasks\" Targets="Publish" />
+    <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x86;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\net472\x86\heat\" Targets="Publish" />
+    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x86;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\net472\x86\wix\" Targets="Publish" />
+
+    <ProjectReference Include="WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x64;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\net472\x64\buildtasks\" Targets="Publish" />
+    <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x64;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\net472\x64\heat\" Targets="Publish" />
+    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x64;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\net472\x64\wix\" Targets="Publish" />
+
+    <ProjectReference Include="WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" Properties="TargetFramework=netcoreapp3.1;UseAppHost=false;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\netcoreapp3.1\buildtasks\" Targets="Publish" />
+    <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=netcoreapp3.1;UseAppHost=false;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\netcoreapp3.1\heat\" Targets="Publish" />
+    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=netcoreapp3.1;UseAppHost=false;PublishDir=$(BaseIntermediateOutputPath)$(Configuration)\WixToolset.Sdk\separate\netcoreapp3.1\wix\" Targets="Publish" />
+  </ItemGroup>
+</Project>

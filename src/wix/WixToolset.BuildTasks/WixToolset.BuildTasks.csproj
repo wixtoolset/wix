@@ -17,15 +17,12 @@
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
     <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" />
-  </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net472' and '$(OS)' != 'Windows_NT'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' ">

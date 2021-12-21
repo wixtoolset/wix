@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="burn\burn_t.proj" Targets="Restore" BuildInParallel="false" />
+    <ProjectReference Include="wix\wix_t.proj" Targets="Restore" BuildInParallel="false" />
+
+    <ProjectReference Include="burn\burn_t.proj" />
+    <ProjectReference Include="wix\wix_t.proj" />
+  </ItemGroup>
+</Project>

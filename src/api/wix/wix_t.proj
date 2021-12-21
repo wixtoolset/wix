@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Build.Traversal/3.0.23">
+<Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
     <!-- Build -->
     <ProjectReference Include="WixToolset.Data\WixToolset.Data.csproj" />

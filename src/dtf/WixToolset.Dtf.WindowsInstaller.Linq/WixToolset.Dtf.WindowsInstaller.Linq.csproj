@@ -13,8 +13,4 @@
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

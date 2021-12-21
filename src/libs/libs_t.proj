@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="dutil\dutil_t.proj" />
+    <ProjectReference Include="wcautil\wcautil_t.proj" />
+  </ItemGroup>
+</Project>

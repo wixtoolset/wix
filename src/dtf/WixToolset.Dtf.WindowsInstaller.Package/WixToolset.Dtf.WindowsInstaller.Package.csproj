@@ -15,8 +15,4 @@
     <ProjectReference Include="..\WixToolset.Dtf.Compression\WixToolset.Dtf.Compression.csproj" />
     <ProjectReference Include="..\WixToolset.Dtf.Compression.Cab\WixToolset.Dtf.Compression.Cab.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

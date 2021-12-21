@@ -401,3 +401,6 @@ build/.tools/
 src/test/burn/TestData/CacheTests/BundleC/fivegb.file
 src/test/burn/TestData/Manual/BundleB/BAPayloads
 src/test/burn/TestData/Manual/BundleB/PackagePayloads
+
+# Allow standard response file
+!src/Directory.Build.rsp

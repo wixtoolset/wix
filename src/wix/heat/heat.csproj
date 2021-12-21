@@ -45,8 +45,4 @@
     <PackageReference Include="System.Diagnostics.PerformanceCounter" />
     <PackageReference Include="System.DirectoryServices" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='net472' and '$(OS)' != 'Windows_NT'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

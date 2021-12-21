@@ -58,7 +58,8 @@
       <Project>{6C57EF2C-979A-4106-A9E5-FE342810619A}</Project>
     </ProjectReference>
   </ItemGroup>
-  
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="build\WixBuildTools.TestSupport.Native.targets" />
+  <Target Name="Pack" DependsOnTargets="Build" />
 </Project>

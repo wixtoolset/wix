@@ -3,7 +3,7 @@
 
 md ..\build\artifacts
 
-msbuild -Restore -v:m internal\SetBuildNumber\SetBuildNumber.proj
+msbuild -Restore internal\SetBuildNumber\SetBuildNumber.proj -nologo
 
 @popd
 @endlocal

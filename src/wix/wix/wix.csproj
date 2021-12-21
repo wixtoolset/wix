@@ -20,10 +20,6 @@
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net472' and '$(OS)' != 'Windows_NT'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Converters\WixToolset.Converters.csproj" />
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />

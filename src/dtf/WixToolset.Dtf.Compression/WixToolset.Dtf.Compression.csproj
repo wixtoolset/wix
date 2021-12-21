@@ -13,8 +13,4 @@
   <ItemGroup>
     <None Include="Compression.cd" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
-  </ItemGroup>
 </Project>
