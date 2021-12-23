@@ -13,12 +13,6 @@ namespace WixToolset.VisualStudio
         /// <value>The default culture.</value>
         public override string DefaultCulture => "en-US";
 
-        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
-        {
-            symbolDefinition = VSSymbolDefinitions.ByName(name);
-            return symbolDefinition != null;
-        }
-
         public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
             return Intermediate.Load(typeof(VSExtensionData).Assembly, "WixToolset.VisualStudio.vs.wixlib", symbolDefinitions);

@@ -55,8 +55,9 @@ namespace WixToolset.Converters
         private static readonly XNamespace Wix3Namespace = "http://schemas.microsoft.com/wix/2006/wi";
         private static readonly XNamespace WixBalNamespace = "http://wixtoolset.org/schemas/v4/wxs/bal";
         private static readonly XNamespace WixDependencyNamespace = "http://wixtoolset.org/schemas/v4/wxs/dependency";
-        private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
         private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
+        private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
+        private static readonly XNamespace WixVSNamespace = "http://wixtoolset.org/schemas/v4/wxs/vs";
 
         private static readonly XName AdminExecuteSequenceElementName = WixNamespace + "AdminExecuteSequence";
         private static readonly XName AdminUISequenceSequenceElementName = WixNamespace + "AdminUISequence";
@@ -288,6 +289,8 @@ namespace WixToolset.Converters
 
         private int SourceVersion { get; set; }
 
+        public XElement XRoot { get; private set; }
+
         /// <summary>
         /// Convert a file.
         /// </summary>
@@ -333,6 +336,8 @@ namespace WixToolset.Converters
                 document.Declaration = null;
                 TrimLeadingText(document);
             }
+
+            this.XRoot = document.Root;
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
@@ -1269,14 +1274,14 @@ namespace WixToolset.Converters
                             xPackage.SetAttributeValue("Scope", "perUser");
                             break;
                         case "elevated":
-                        {
-                            var xAllUsers = xPackage.Elements(PropertyElementName).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
-                            if (xAllUsers?.Attribute("Value")?.Value == "1")
                             {
-                                xAllUsers?.Remove();
+                                var xAllUsers = xPackage.Elements(PropertyElementName).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
+                                if (xAllUsers?.Attribute("Value")?.Value == "1")
+                                {
+                                    xAllUsers?.Remove();
+                                }
                             }
-                        }
-                        break;
+                            break;
                     }
 
                     xInstallPrivileges?.Remove();
@@ -1309,6 +1314,9 @@ namespace WixToolset.Converters
         private void ConvertPropertyRefElement(XElement element)
         {
             var newElementName = String.Empty;
+            var newNamespace = WixUtilNamespace;
+            var newNamespaceName = "util";
+            var replace = true;
 
             var id = element.Attribute("Id");
             switch (id?.Value)
@@ -1377,13 +1385,69 @@ namespace WixToolset.Converters
                 case "WIX_NATIVE_MACHINE":
                     newElementName = "QueryNativeMachine";
                     break;
+                case "VS2017_ROOT_FOLDER":
+                case "VS2017DEVENV":
+                case "VS2017_EXTENSIONS_DIR":
+                case "VS2017_ITEMTEMPLATES_DIR":
+                case "VS2017_PROJECTTEMPLATES_DIR":
+                case "VS2017_SCHEMAS_DIR":
+                case "VS2017_IDE_DIR":
+                case "VS2017_BOOTSTRAPPER_PACKAGE_FOLDER":
+                case "VS2017_IDE_FSHARP_PROJECTSYSTEM_INSTALLED":
+                case "VS2017_IDE_VB_PROJECTSYSTEM_INSTALLED":
+                case "VS2017_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED":
+                case "VS2017_IDE_VSTS_TESTSYSTEM_INSTALLED":
+                case "VS2017_IDE_VC_PROJECTSYSTEM_INSTALLED":
+                case "VS2017_IDE_VWD_PROJECTSYSTEM_INSTALLED":
+                case "VS2017_IDE_MODELING_PROJECTSYSTEM_INSTALLED":
+                case "VS2019_ROOT_FOLDER":
+                case "VS2019DEVENV":
+                case "VS2019_EXTENSIONS_DIR":
+                case "VS2019_ITEMTEMPLATES_DIR":
+                case "VS2019_PROJECTTEMPLATES_DIR":
+                case "VS2019_SCHEMAS_DIR":
+                case "VS2019_IDE_DIR":
+                case "VS2019_BOOTSTRAPPER_PACKAGE_FOLDER":
+                case "VS2019_IDE_FSHARP_PROJECTSYSTEM_INSTALLED":
+                case "VS2019_IDE_VB_PROJECTSYSTEM_INSTALLED":
+                case "VS2019_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED":
+                case "VS2019_IDE_VSTS_TESTSYSTEM_INSTALLED":
+                case "VS2019_IDE_VC_PROJECTSYSTEM_INSTALLED":
+                case "VS2019_IDE_VWD_PROJECTSYSTEM_INSTALLED":
+                case "VS2019_IDE_MODELING_PROJECTSYSTEM_INSTALLED":
+                case "VS2022_ROOT_FOLDER":
+                case "VS2022DEVENV":
+                case "VS2022_EXTENSIONS_DIR":
+                case "VS2022_ITEMTEMPLATES_DIR":
+                case "VS2022_PROJECTTEMPLATES_DIR":
+                case "VS2022_SCHEMAS_DIR":
+                case "VS2022_IDE_DIR":
+                case "VS2022_BOOTSTRAPPER_PACKAGE_FOLDER":
+                case "VS2022_IDE_FSHARP_PROJECTSYSTEM_INSTALLED":
+                case "VS2022_IDE_VB_PROJECTSYSTEM_INSTALLED":
+                case "VS2022_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED":
+                case "VS2022_IDE_VSTS_TESTSYSTEM_INSTALLED":
+                case "VS2022_IDE_VC_PROJECTSYSTEM_INSTALLED":
+                case "VS2022_IDE_VWD_PROJECTSYSTEM_INSTALLED":
+                case "VS2022_IDE_MODELING_PROJECTSYSTEM_INSTALLED":
+                    newElementName = "FindVisualStudio";
+                    newNamespace = WixVSNamespace;
+                    newNamespaceName = "vs";
+                    replace = false;
+                    break;
             }
 
             if (!String.IsNullOrEmpty(newElementName)
-                && this.OnError(ConverterTestType.UtilReferencesReplaced, element, "Custom action and property reference {0} to WixUtilExtension have been replaced with strongly-typed elements.", id))
+                && this.OnError(ConverterTestType.ReferencesReplaced, element, "Custom action and property reference {0} have been replaced with strongly-typed elements.", id))
             {
-                element.AddAfterSelf(new XElement(WixUtilNamespace + newElementName));
-                element.Remove();
+                this.XRoot.SetAttributeValue(XNamespace.Xmlns + newNamespaceName, newNamespace.NamespaceName);
+
+                element.AddBeforeSelf(new XElement(newNamespace + newElementName));
+
+                if (replace)
+                {
+                    element.Remove();
+                }
             }
         }
 
@@ -1406,7 +1470,7 @@ namespace WixToolset.Converters
             }
 
             if (!String.IsNullOrEmpty(newElementName)
-                && this.OnError(ConverterTestType.UtilReferencesReplaced, element, "Custom action and property reference {0} to WixUtilExtension have been replaced with strongly-typed elements.", id))
+                && this.OnError(ConverterTestType.ReferencesReplaced, element, "Custom action and property reference {0} have been replaced with strongly-typed elements.", id))
             {
                 element.AddAfterSelf(new XElement(WixUtilNamespace + newElementName));
                 element.Remove();
@@ -2467,9 +2531,9 @@ namespace WixToolset.Converters
             DefiningStandardDirectoryDeprecated,
 
             /// <summary>
-            /// Naked custom action and property references replaced with WixUtilExtension elements.
+            /// Naked custom action and property references replaced with elements.
             /// </summary>
-            UtilReferencesReplaced,
+            ReferencesReplaced,
 
             /// <summary>
             /// Cache attribute value updated.
