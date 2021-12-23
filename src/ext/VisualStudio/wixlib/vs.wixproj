@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\vsca.vcxproj" Properties="Platform=x86"  ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\vsca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\vsca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

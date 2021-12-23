@@ -7,7 +7,6 @@
          <File Name="fake.vsix" Source="example.txt">
            <vs:VsixPackage PackageId="ExampleVsix" />
          </File>
-         
        </Component>
     </ComponentGroup>
   </Fragment>

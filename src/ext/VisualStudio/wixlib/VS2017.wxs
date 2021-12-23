@@ -2,11 +2,10 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?include ..\..\caDecor.wxi ?>
+
     <Fragment>
         <Property Id="VS2017_ROOT_FOLDER" Secure="yes" />
-
-        <!-- Currently supported only on x86 -->
-        <CustomActionRef Id="VSFindInstances" />
     </Fragment>
 
     <Fragment>
