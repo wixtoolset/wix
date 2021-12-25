@@ -42,7 +42,6 @@
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.6.0" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
-    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.14.114" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="4.7.0" />
 
