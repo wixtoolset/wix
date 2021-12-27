@@ -7,7 +7,6 @@
 
 const LPCWSTR REGISTRY_RUN_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 const LPCWSTR REGISTRY_RUN_ONCE_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce";
-const LPCWSTR REGISTRY_REBOOT_PENDING_FORMAT = L"%ls.RebootRequired";
 const LPCWSTR REGISTRY_BUNDLE_INSTALLED = L"Installed";
 const LPCWSTR REGISTRY_BUNDLE_DISPLAY_ICON = L"DisplayIcon";
 const LPCWSTR REGISTRY_BUNDLE_DISPLAY_VERSION = L"DisplayVersion";
@@ -108,9 +107,6 @@ static HRESULT UpdateBundleNameRegistration(
     __in BOOL fInProgressRegistration
     );
 static BOOL IsWuRebootPending();
-static BOOL IsBundleRebootPending(
-    __in BURN_REGISTRATION* pRegistration
-);
 static BOOL IsRegistryRebootPending();
 
 // function definitions
@@ -469,7 +465,7 @@ extern "C" HRESULT RegistrationSetVariables(
     hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->pVersion, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle version built-in variable.");
 
-    hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsBundleRebootPending(pRegistration) || IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
+    hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
 LExit:
@@ -520,14 +516,6 @@ extern "C" HRESULT RegistrationDetectResumeType(
     HRESULT hr = S_OK;
     HKEY hkRegistration = NULL;
     DWORD dwResume = 0;
-
-    if (IsBundleRebootPending(pRegistration))
-    {
-        LogId(REPORT_STANDARD, MSG_PENDING_REBOOT_DETECTED, pRegistration->sczRegistrationKey);
-
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING;
-        ExitFunction1(hr = S_OK);
-    }
 
     // open registration key
     hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
@@ -905,30 +893,7 @@ extern "C" HRESULT RegistrationSessionEnd(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczRebootRequiredKey = NULL;
-    HKEY hkRebootRequired = NULL;
     HKEY hkRegistration = NULL;
-
-    // If a restart is required for any reason, write a volatile registry key to track of
-    // of that fact until the reboot has taken place.
-    if (BOOTSTRAPPER_APPLY_RESTART_NONE != restart)
-    {
-        // We'll write the volatile registry key right next to the bundle ARP registry key
-        // because that's easy. This is all best effort since the worst case just means in
-        // the rare case the user launches the same install again before taking the restart
-        // the BA won't know a restart was still required.
-        hr = StrAllocFormatted(&sczRebootRequiredKey, REGISTRY_REBOOT_PENDING_FORMAT, pRegistration->sczRegistrationKey);
-        if (SUCCEEDED(hr))
-        {
-            hr = RegCreateEx(pRegistration->hkRoot, sczRebootRequiredKey, KEY_WRITE, TRUE, NULL, &hkRebootRequired, NULL);
-        }
-
-        if (FAILED(hr))
-        {
-            ExitTraceSource(DUTIL_SOURCE_DEFAULT, hr, "Failed to write volatile reboot required registry key.");
-            hr = S_OK;
-        }
-    }
 
     // If no resume mode, then remove the bundle registration.
     if (BURN_RESUME_MODE_NONE == resumeMode)
@@ -981,8 +946,6 @@ extern "C" HRESULT RegistrationSessionEnd(
 
 LExit:
     ReleaseRegKey(hkRegistration);
-    ReleaseRegKey(hkRebootRequired);
-    ReleaseStr(sczRebootRequiredKey);
 
     return hr;
 }
@@ -1320,7 +1283,6 @@ static HRESULT UpdateResumeMode(
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
-    HKEY hkRebootRequired = NULL;
     HKEY hkRun = NULL;
     LPWSTR sczRunOnceCommandLine = NULL;
     LPCWSTR sczResumeKey = REGISTRY_RUN_ONCE_KEY;
@@ -1399,7 +1361,6 @@ static HRESULT UpdateResumeMode(
 
 LExit:
     ReleaseStr(sczRunOnceCommandLine);
-    ReleaseRegKey(hkRebootRequired);
     ReleaseRegKey(hkRun);
 
     return hr;
@@ -1767,27 +1728,6 @@ static BOOL IsWuRebootPending()
     }
 
     return fRebootPending;
-}
-
-static BOOL IsBundleRebootPending(BURN_REGISTRATION* pRegistration)
-{
-    HRESULT hr = S_OK;
-    LPWSTR sczRebootRequiredKey = NULL;
-    HKEY hkRebootRequired = NULL;
-    BOOL fBundleRebootPending = FALSE;
-
-    // Check to see if a restart is pending for this bundle.
-    hr = StrAllocFormatted(&sczRebootRequiredKey, REGISTRY_REBOOT_PENDING_FORMAT, pRegistration->sczRegistrationKey);
-    ExitOnFailure(hr, "Failed to format pending restart registry key to read.");
-
-    hr = RegOpen(pRegistration->hkRoot, sczRebootRequiredKey, KEY_QUERY_VALUE, &hkRebootRequired);
-    fBundleRebootPending = SUCCEEDED(hr);
-
-LExit:
-    ReleaseStr(sczRebootRequiredKey);
-    ReleaseRegKey(hkRebootRequired);
-
-    return fBundleRebootPending;
 }
 
 static BOOL IsRegistryRebootPending()

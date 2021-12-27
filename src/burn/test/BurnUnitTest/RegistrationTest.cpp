@@ -369,7 +369,6 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to set registration variables.");
 
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, BURN_BUNDLE_INSTALLED));
-                Assert::Equal(1ll, VariableGetNumericHelper(&variables, BURN_REBOOT_PENDING));
                 Assert::Equal<String^>(gcnew String(L"foo"), VariableGetStringHelper(&variables, BURN_BUNDLE_TAG));
                 Assert::Equal<String^>(gcnew String(L"bar"), VariableGetStringHelper(&variables, BURN_BUNDLE_PROVIDER_KEY));
                 Assert::Equal<String^>(gcnew String(L"1.0.0.0"), VariableGetVersionHelper(&variables, BURN_BUNDLE_VERSION));
