@@ -387,7 +387,7 @@ extern "C" HRESULT ApplyRegister(
     ExitOnRootFailure(hr, "BA aborted register begin.");
 
     // If we have a resume mode that suggests the bundle is on the machine.
-    if (BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING < pEngineState->command.resumeType)
+    if (BOOTSTRAPPER_RESUME_TYPE_REBOOT <= pEngineState->command.resumeType)
     {
         // resume previous session
         if (pEngineState->registration.fPerMachine)
