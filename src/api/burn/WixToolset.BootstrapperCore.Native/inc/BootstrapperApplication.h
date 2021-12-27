@@ -23,7 +23,6 @@ enum BOOTSTRAPPER_RESUME_TYPE
     BOOTSTRAPPER_RESUME_TYPE_NONE,
     BOOTSTRAPPER_RESUME_TYPE_INVALID,        // resume information is present but invalid
     BOOTSTRAPPER_RESUME_TYPE_INTERRUPTED,    // relaunched after an unexpected interruption
-    BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING, // reboot has not taken place yet
     BOOTSTRAPPER_RESUME_TYPE_REBOOT,         // relaunched after reboot
     BOOTSTRAPPER_RESUME_TYPE_SUSPEND,        // relaunched after suspend
     BOOTSTRAPPER_RESUME_TYPE_ARP,            // launched from ARP

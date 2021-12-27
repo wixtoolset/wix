@@ -1394,11 +1394,6 @@ namespace WixToolset.Mba.Core
         Interrupted,
 
         /// <summary>
-        /// A reboot is pending.
-        /// </summary>
-        RebootPending,
-
-        /// <summary>
         /// The bundle was re-launched after a reboot.
         /// </summary>
         Reboot,

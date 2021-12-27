@@ -676,16 +676,6 @@ extern "C" HRESULT CoreApply(
 
     pEngineState->plan.fAffectedMachineState = pEngineState->plan.fCanAffectMachineState;
 
-    // Abort if could affect machine state and this bundle already requires a restart.
-    if (pEngineState->plan.fCanAffectMachineState && BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
-    {
-        restart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
-
-        hr = HRESULT_FROM_WIN32(ERROR_FAIL_NOACTION_REBOOT);
-        UserExperienceSendError(&pEngineState->userExperience, BOOTSTRAPPER_ERROR_TYPE_APPLY, NULL, hr, NULL, MB_ICONERROR | MB_OK, IDNOACTION); // ignore return value.
-        ExitFunction();
-    }
-
     hr = ApplyLock(FALSE, &hLock);
     ExitOnFailure(hr, "Another per-user setup is already executing.");
 
