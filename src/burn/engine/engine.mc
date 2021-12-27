@@ -1131,9 +1131,3 @@ Language=English
 Skipping MSI property '%1!ls!' because condition '%2!ls!' evaluates to %3!hs!.
 .
 
-MessageId=701
-Severity=Warning
-SymbolicName=MSG_PENDING_REBOOT_DETECTED
-Language=English
-A reboot is pending from a prior execution of this bundle: %1!ls!. Apply will be blocked. Continuing...
-.

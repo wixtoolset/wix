@@ -12,7 +12,7 @@
 
 nuget restore || exit /b
 
-msbuild -t:Test -p:Configuration=%_C% test\BurnUnitTest || exit /b
+msbuild -t:Test -p:Configuration=%_C%;Platform=x86 test\BurnUnitTest || exit /b
 
 msbuild -t:Build -p:Configuration=%_C%;Platform=x86 || exit /b
 msbuild -t:Build -p:Configuration=%_C%;Platform=x64 || exit /b
