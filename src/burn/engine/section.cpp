@@ -3,14 +3,6 @@
 #include "precomp.h"
 
 
-// constants
-
-// If these defaults ever change, be sure to update constants in burn\stub\StubSection.cpp as well.
-#define BURN_SECTION_NAME ".wixburn"
-#define BURN_SECTION_MAGIC 0x00f14300
-#define BURN_SECTION_VERSION 0x00000003
-#define MANIFEST_CABINET_TOKEN L"0"
-
 // structs
 typedef struct _BURN_SECTION_HEADER
 {
