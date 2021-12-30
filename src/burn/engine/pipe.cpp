@@ -710,6 +710,7 @@ static HRESULT ChildPipeConnected(
     }
 
     // All is well, tell the parent process.
+    // TODO: consider sending BURN_PROTOCOL_VERSION as a way to verify compatibility.
     hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&dwAck), sizeof(dwAck));
     ExitOnFailure(hr, "Failed to inform parent process that child is running.");
 

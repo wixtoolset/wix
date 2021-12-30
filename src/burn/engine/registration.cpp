@@ -671,6 +671,9 @@ extern "C" HRESULT RegistrationSessionBegin(
         hr = RegWriteStringFormatted(hkRegistration, BURN_REGISTRATION_REGISTRY_ENGINE_VERSION, L"%hs", szVerMajorMinorBuild);
         ExitOnFailure(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_ENGINE_VERSION);
 
+        hr = RegWriteNumber(hkRegistration, BURN_REGISTRATION_REGISTRY_ENGINE_PROTOCOL_VERSION, BURN_PROTOCOL_VERSION);
+        ExitOnFailure(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_ENGINE_PROTOCOL_VERSION);
+
         // DisplayIcon: [path to exe] and ",0" to refer to the first icon in the executable.
         hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_DISPLAY_ICON, L"%s,0", pRegistration->sczCacheExecutablePath);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_DISPLAY_ICON);

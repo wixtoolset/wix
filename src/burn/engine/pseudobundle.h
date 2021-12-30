@@ -7,8 +7,8 @@ extern "C" {
 #endif
 
 HRESULT PseudoBundleInitialize(
-    __in DWORD64 qwEngineVersion,
     __in BURN_PACKAGE* pPackage,
+    __in BOOL fSupportsBurnProtocol,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,

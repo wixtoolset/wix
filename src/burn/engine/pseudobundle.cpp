@@ -4,8 +4,8 @@
 
 
 extern "C" HRESULT PseudoBundleInitialize(
-    __in DWORD64 qwEngineVersion,
     __in BURN_PACKAGE* pPackage,
+    __in BOOL fSupportsBurnProtocol,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
@@ -84,6 +84,9 @@ extern "C" HRESULT PseudoBundleInitialize(
     pPackage->qwSize = qwSize;
     pPackage->fVital = fVital;
 
+    pPackage->Exe.protocol = fSupportsBurnProtocol ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;
+    pPackage->Exe.fSupportsAncestors = TRUE;
+
     hr = StrAllocString(&pPackage->sczId, wzId, 0);
     ExitOnFailure(hr, "Failed to copy key for pseudo bundle.");
 
@@ -130,12 +133,6 @@ extern "C" HRESULT PseudoBundleInitialize(
 
         pPackage->fUninstallable = TRUE;
     }
-
-    // Only support progress from engines that are compatible (aka: version greater than or equal to last protocol breaking change *and* versions that are older or the same as this engine).
-    pPackage->Exe.protocol = (FILEMAKEVERSION(3, 6, 2221, 0) <= qwEngineVersion && qwEngineVersion <= FILEMAKEVERSION(rmj, rmm, rup, rpr)) ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;
-    
-    // All versions of Burn past v3.9 RTM support suppressing ancestors.
-    pPackage->Exe.fSupportsAncestors = FILEMAKEVERSION(3, 9, 1006, 0) <= qwEngineVersion;
 
     if (pDependencyProvider)
     {
@@ -310,7 +307,7 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
     hr = StrAllocString(&pPackage->Exe.sczInstallArguments, wzInstallArguments, 0);
     ExitOnFailure(hr, "Failed to copy install arguments for update bundle package");
 
-    // Assume the update bundle has the same engine version as this one.
+    // Trust the BA to only use UPDATE_REPLACE_EMBEDDED when appropriate.
     pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_BURN;
     pPackage->Exe.fSupportsAncestors = TRUE;
 
