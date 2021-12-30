@@ -83,8 +83,7 @@ namespace WixToolset.Core.Burn.Bundles
         protected const UInt32 BURN_SECTION_MIN_SIZE = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0;
 
         protected const UInt32 BURN_SECTION_MAGIC = 0x00f14300;
-        protected const UInt32 BURN_SECTION_VERSION = 0x00000003;
-        protected const UInt32 BURN_SECTION_COMPATIBLE_VERSION = 0x00000002;
+        protected const UInt32 BURN_SECTION_VERSION = 0x00000002;
 
         protected string fileExe;
         protected UInt32 peOffset = UInt32.MaxValue;
@@ -191,7 +190,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             this.Version = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_VERSION);
-            if ((BURN_SECTION_VERSION != this.Version) && (BURN_SECTION_COMPATIBLE_VERSION != this.Version))
+            if (BURN_SECTION_VERSION != this.Version)
             {
                 this.Messaging.Write(BurnBackendErrors.IncompatibleWixBurnSection(this.fileExe, this.Version));
                 return false;
