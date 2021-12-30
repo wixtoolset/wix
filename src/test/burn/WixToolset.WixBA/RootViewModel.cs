@@ -27,6 +27,7 @@ namespace WixToolset.WixBA
         private bool canceled;
         private InstallationState installState;
         private DetectionState detectState;
+        private UpgradeDetectionState upgradeDetectState;
 
         /// <summary>
         /// Creates a new model of the root view.
@@ -115,6 +116,28 @@ namespace WixToolset.WixBA
 
                     // Notify all the properties derived from the state that the state changed.
                     base.OnPropertyChanged("DetectState");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets and sets the upgrade detect state of the view's model.
+        /// </summary>
+        public UpgradeDetectionState UpgradeDetectState
+        {
+            get
+            {
+                return this.upgradeDetectState;
+            }
+
+            set
+            {
+                if (this.upgradeDetectState != value)
+                {
+                    this.upgradeDetectState = value;
+
+                    // Notify all the properties derived from the state that the state changed.
+                    base.OnPropertyChanged("UpgradeDetectState");
                 }
             }
         }

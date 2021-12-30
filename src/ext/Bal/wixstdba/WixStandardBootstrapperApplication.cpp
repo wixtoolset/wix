@@ -246,12 +246,12 @@ public: // IBootstrapperApplication
         __in LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
         __in LPCWSTR wzVersion,
-        __in BOOTSTRAPPER_RELATED_OPERATION operation,
         __in BOOL fMissingFromCache,
         __inout BOOL* pfCancel
         )
     {
         BAL_INFO_PACKAGE* pPackage = NULL;
+        int nCompare = 0;
 
         if (!fMissingFromCache)
         {
@@ -261,14 +261,15 @@ public: // IBootstrapperApplication
             }
 
             // If we're not doing a prerequisite install, remember when our bundle would cause a downgrade.
-            if (!m_fPrereq && BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE == operation)
+            if (!m_fPrereq && BOOTSTRAPPER_RELATION_UPGRADE == relationType &&
+                SUCCEEDED(m_pEngine->CompareVersions(m_sczBundleVersion, wzVersion, &nCompare)) && 0 > nCompare)
             {
                 BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "A newer version (v%ls) of this product is installed.", wzVersion);
                 m_fDowngrading = TRUE;
             }
         }
 
-        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, operation, fMissingFromCache, pfCancel);
+        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
     }
 
 
@@ -2091,7 +2092,8 @@ public: //CBalBaseBootstrapperApplication
             }
         }
 
-        hr = S_OK;
+        hr = BalGetStringVariable(L"WixBundleVersion", &m_sczBundleVersion);
+        BalExitOnFailure(hr, "CWixStandardBootstrapperApplication initialization failed.");
 
     LExit:
         return hr;
@@ -4129,6 +4131,7 @@ public:
         m_plannedAction = BOOTSTRAPPER_ACTION_UNKNOWN;
 
         m_sczAfterForcedRestartPackage = NULL;
+        m_sczBundleVersion = NULL;
 
         m_pWixLoc = NULL;
         m_Bundle = { };
@@ -4367,6 +4370,7 @@ public:
         ReleaseStr(m_sczLanguage);
         ReleaseStr(m_sczLicenseFile);
         ReleaseStr(m_sczLicenseUrl);
+        ReleaseStr(m_sczBundleVersion);
         ReleaseStr(m_sczAfterForcedRestartPackage);
         ReleaseNullObject(m_pEngine);
 
@@ -4391,6 +4395,7 @@ private:
     BOOTSTRAPPER_ACTION m_plannedAction;
 
     LPWSTR m_sczAfterForcedRestartPackage;
+    LPWSTR m_sczBundleVersion;
 
     WIX_LOCALIZATION* m_pWixLoc;
     BAL_INFO_BUNDLE m_Bundle;

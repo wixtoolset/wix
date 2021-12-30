@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 12, 7, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 12, 30, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -1164,7 +1164,6 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
     __in VERUTIL_VERSION* pVersion,
-    __in BOOTSTRAPPER_RELATED_OPERATION operation,
     __in BOOL fMissingFromCache
     )
 {
@@ -1178,7 +1177,6 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
     args.wzVersion = pVersion->sczVersion;
-    args.operation = operation;
     args.fMissingFromCache = fMissingFromCache;
 
     results.cbSize = sizeof(results);

@@ -725,7 +725,6 @@ struct BA_ONDETECTRELATEDBUNDLE_ARGS
     LPCWSTR wzBundleTag;
     BOOL fPerMachine;
     LPCWSTR wzVersion;
-    BOOTSTRAPPER_RELATED_OPERATION operation;
     BOOL fMissingFromCache;
 };
 

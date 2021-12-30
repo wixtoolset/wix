@@ -286,7 +286,6 @@ BAAPI UserExperienceOnDetectRelatedBundle(
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
     __in VERUTIL_VERSION* pVersion,
-    __in BOOTSTRAPPER_RELATED_OPERATION operation,
     __in BOOL fMissingFromCache
     );
 BAAPI UserExperienceOnDetectRelatedMsiPackage(

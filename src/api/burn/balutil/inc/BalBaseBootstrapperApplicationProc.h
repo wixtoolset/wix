@@ -114,7 +114,7 @@ static HRESULT BalBaseBAProcOnDetectRelatedBundle(
     __inout BA_ONDETECTRELATEDBUNDLE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->operation, pArgs->fMissingFromCache, &pResults->fCancel);
+    return pBA->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fMissingFromCache, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectPackageBegin(

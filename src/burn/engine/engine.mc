@@ -223,7 +223,7 @@ MessageId=102
 Severity=Success
 SymbolicName=MSG_DETECTED_RELATED_BUNDLE
 Language=English
-Detected related bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, operation: %5!hs!, cached: %6!hs!
+Detected related bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, cached: %5!hs!
 .
 
 MessageId=103

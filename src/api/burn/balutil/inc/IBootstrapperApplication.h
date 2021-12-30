@@ -91,7 +91,6 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
         __in_z LPCWSTR wzVersion,
-        __in BOOTSTRAPPER_RELATED_OPERATION operation,
         __in BOOL fMissingFromCache,
         __inout BOOL* pfCancel
         ) = 0;

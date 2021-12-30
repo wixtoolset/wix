@@ -359,7 +359,7 @@ extern "C" HRESULT CoreDetect(
     ExitOnFailure(hr, "Failed to detect provider key bundle id.");
 
     // Report the related bundles.
-    hr = DetectReportRelatedBundles(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, pEngineState->command.action, &pEngineState->registration.fEligibleForCleanup);
+    hr = DetectReportRelatedBundles(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->registration.fEligibleForCleanup);
     ExitOnFailure(hr, "Failed to report detected related bundles.");
 
     // Do update detection.
