@@ -21,7 +21,7 @@ static HRESULT LoadRelatedBundleFromKey(
     __in HKEY hkBundleId,
     __in BOOL fPerMachine,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __inout BURN_RELATED_BUNDLE *pRelatedBundle
+    __in BURN_RELATED_BUNDLE *pRelatedBundle
     );
 
 
@@ -398,21 +398,34 @@ static HRESULT LoadRelatedBundleFromKey(
     __in HKEY hkBundleId,
     __in BOOL fPerMachine,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __inout BURN_RELATED_BUNDLE* pRelatedBundle
+    __in BURN_RELATED_BUNDLE* pRelatedBundle
     )
 {
     HRESULT hr = S_OK;
     DWORD64 qwEngineVersion = 0;
+    DWORD dwEngineProtocolVersion = 0;
+    BOOL fSupportsBurnProtocol = FALSE;
     LPWSTR sczBundleVersion = NULL;
     LPWSTR sczCachePath = NULL;
     BOOL fCached = FALSE;
     DWORD64 qwFileSize = 0;
     BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
 
-    hr = RegReadVersion(hkBundleId, BURN_REGISTRATION_REGISTRY_ENGINE_VERSION, &qwEngineVersion);
-    if (FAILED(hr))
+    // Only support progress from engines that are compatible.
+    hr = RegReadNumber(hkBundleId, BURN_REGISTRATION_REGISTRY_ENGINE_PROTOCOL_VERSION, &dwEngineProtocolVersion);
+    if (SUCCEEDED(hr))
     {
-        qwEngineVersion = 0;
+        fSupportsBurnProtocol = BURN_PROTOCOL_VERSION == dwEngineProtocolVersion;
+    }
+    else
+    {
+        // Rely on version checking (aka: version greater than or equal to last protocol breaking change *and* versions that are older or the same as this engine)
+        hr = RegReadVersion(hkBundleId, BURN_REGISTRATION_REGISTRY_ENGINE_VERSION, &qwEngineVersion);
+        if (SUCCEEDED(hr))
+        {
+            fSupportsBurnProtocol = (FILEMAKEVERSION(3, 6, 2221, 0) <= qwEngineVersion && qwEngineVersion <= FILEMAKEVERSION(rmj, rmm, rup, rpr));
+        }
+
         hr = S_OK;
     }
 
@@ -467,7 +480,7 @@ static HRESULT LoadRelatedBundleFromKey(
 
     pRelatedBundle->relationType = relationType;
 
-    hr = PseudoBundleInitialize(qwEngineVersion, &pRelatedBundle->package, fPerMachine, wzRelatedBundleId, pRelatedBundle->relationType,
+    hr = PseudoBundleInitialize(&pRelatedBundle->package, fSupportsBurnProtocol, fPerMachine, wzRelatedBundleId, pRelatedBundle->relationType,
                                 BOOTSTRAPPER_PACKAGE_STATE_PRESENT, fCached, sczCachePath, sczCachePath, NULL, qwFileSize, FALSE,
                                 L"-quiet", L"-repair -quiet", L"-uninstall -quiet",
                                 (dependencyProvider.sczKey && *dependencyProvider.sczKey) ? &dependencyProvider : NULL,

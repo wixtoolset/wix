@@ -1154,7 +1154,7 @@ namespace Bootstrapper
             pRelatedBundle->fPlannable = TRUE;
             pRelatedBundle->relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 
-            hr = PseudoBundleInitialize(0, &pRelatedBundle->package, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, TRUE, wzFilePath, wzFilePath, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
+            hr = PseudoBundleInitialize(&pRelatedBundle->package, TRUE, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, TRUE, wzFilePath, wzFilePath, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
             NativeAssert::Succeeded(hr, "Failed to initialize related bundle to represent bundle: %ls", wzId);
 
             ++pRelatedBundles->cRelatedBundles;

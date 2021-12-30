@@ -9,6 +9,8 @@
 #define BURN_SECTION_MAGIC 0x00f14300
 #define BURN_SECTION_VERSION 0x00000002
 
+// This needs to be incremented whenever a breaking change is made to the Burn protocol.
+#define BURN_PROTOCOL_VERSION 1
 
 #if defined(__cplusplus)
 extern "C" {
