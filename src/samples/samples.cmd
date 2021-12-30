@@ -12,7 +12,7 @@
 
 nuget restore || exit /b
 
-msbuild -t:Build -p:Configuration=%_C% -bl:..\..\samples_build.binlog || exit /b
+msbuild -t:Build -p:Configuration=%_C% -bl:..\..\build\logs\samples_build.binlog || exit /b
 
 @popd
 @endlocal
