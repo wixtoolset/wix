@@ -408,7 +408,7 @@ namespace WixToolset.Test.BA
             }
             else
             {
-                args.Result = Result.Abort;
+                args.Result = Result.Cancel;
             }
         }
 
