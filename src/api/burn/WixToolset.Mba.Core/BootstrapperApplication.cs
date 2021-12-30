@@ -1345,9 +1345,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectRelatedBundle(string wzProductCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, RelatedOperation operation, bool fMissingFromCache, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectRelatedBundle(string wzProductCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fMissingFromCache, ref bool fCancel)
         {
-            DetectRelatedBundleEventArgs args = new DetectRelatedBundleEventArgs(wzProductCode, relationType, wzBundleTag, fPerMachine, wzVersion, operation, fMissingFromCache, fCancel);
+            DetectRelatedBundleEventArgs args = new DetectRelatedBundleEventArgs(wzProductCode, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, fCancel);
             this.OnDetectRelatedBundle(args);
 
             fCancel = args.Cancel;

@@ -19,6 +19,18 @@ namespace WixToolset.WixBA
     {
         Absent,
         Present,
+    }
+
+    /// <summary>
+    /// The states of upgrade detection.
+    /// </summary>
+    public enum UpgradeDetectionState
+    {
+        // There are no Upgrade related bundles installed.
+        None,
+        // All Upgrade related bundles that are installed are older than or the same version as this bundle.
+        Older,
+        // At least one Upgrade related bundle is installed that is newer than this bundle.
         Newer,
     }
 
@@ -90,7 +102,7 @@ namespace WixToolset.WixBA
 
         void RootPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (("DetectState" == e.PropertyName) || ("InstallState" == e.PropertyName))
+            if (("DetectState" == e.PropertyName) || ("UpgradeDetectState" == e.PropertyName) || ("InstallState" == e.PropertyName))
             {
                 base.OnPropertyChanged("RepairEnabled");
                 base.OnPropertyChanged("InstallEnabled");
@@ -276,7 +288,9 @@ namespace WixToolset.WixBA
             {
                 if (this.installCommand == null)
                 {
-                    this.installCommand = new RelayCommand(param => WixBA.Plan(LaunchAction.Install), param => this.root.DetectState == DetectionState.Absent && this.root.InstallState == InstallationState.Waiting);
+                    this.installCommand = new RelayCommand(
+                        param => WixBA.Plan(LaunchAction.Install),
+                        param => this.root.DetectState == DetectionState.Absent && this.root.UpgradeDetectState != UpgradeDetectionState.Newer && this.root.InstallState == InstallationState.Waiting);
                 }
 
                 return this.installCommand;
@@ -399,9 +413,19 @@ namespace WixToolset.WixBA
 
         private void DetectedRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
         {
-            if (e.Operation == RelatedOperation.Downgrade)
+            if (e.RelationType == RelationType.Upgrade)
             {
-                this.Downgrade = true;
+                if (WixBA.Model.Engine.CompareVersions(this.Version, e.Version) > 0)
+                {
+                    if (this.root.UpgradeDetectState == UpgradeDetectionState.None)
+                    {
+                        this.root.UpgradeDetectState = UpgradeDetectionState.Older;
+                    }
+                }
+                else
+                {
+                    this.root.UpgradeDetectState = UpgradeDetectionState.Newer;
+                }
             }
 
             if (!WixBA.Model.BAManifest.Bundle.Packages.ContainsKey(e.ProductCode))
@@ -432,19 +456,10 @@ namespace WixToolset.WixBA
             }
             else if (Hresult.Succeeded(e.Status))
             {
-                if (this.Downgrade)
+                if (this.root.UpgradeDetectState == UpgradeDetectionState.Newer)
                 {
-                    this.root.DetectState = DetectionState.Newer;
-                    var relatedPackages = WixBA.Model.BAManifest.Bundle.Packages.Values.Where(p => p.Type == PackageType.UpgradeBundle);
-                    var installedVersion = relatedPackages.Any() ? new Version(relatedPackages.Max(p => p.Version)) : null;
-                    if (installedVersion != null && installedVersion < new Version(4, 1) && installedVersion.Build > 10)
-                    {
-                        this.DowngradeMessage = "You must uninstall WiX v" + installedVersion + " before you can install this.";
-                    }
-                    else
-                    {
-                        this.DowngradeMessage = "There is already a newer version of WiX installed on this machine.";
-                    }
+                    this.Downgrade = true;
+                    this.DowngradeMessage = "There is already a newer version of WiX installed on this machine.";
                 }
 
                 if (LaunchAction.Layout == WixBA.Model.Command.Action)

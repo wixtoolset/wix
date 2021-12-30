@@ -156,15 +156,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectRelatedBundle"/>.
         /// </summary>
-        /// <param name="wzBundleId"></param>
-        /// <param name="relationType"></param>
-        /// <param name="wzBundleTag"></param>
-        /// <param name="fPerMachine"></param>
-        /// <param name="wzVersion"></param>
-        /// <param name="operation"></param>
-        /// <param name="fMissingFromCache"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectRelatedBundle(
@@ -173,7 +164,6 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
-            [MarshalAs(UnmanagedType.U4)] RelatedOperation operation,
             [MarshalAs(UnmanagedType.Bool)] bool fMissingFromCache,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
@@ -289,11 +279,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanRelatedBundle"/>.
         /// </summary>
-        /// <param name="wzBundleId"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="pRequestedState"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanRelatedBundle(

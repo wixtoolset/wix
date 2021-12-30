@@ -172,7 +172,6 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR /*wzBundleTag*/,
         __in BOOL /*fPerMachine*/,
         __in LPCWSTR /*wzVersion*/,
-        __in BOOTSTRAPPER_RELATED_OPERATION /*operation*/,
         __in BOOL /*fMissingFromCache*/,
         __inout BOOL* pfCancel
         )

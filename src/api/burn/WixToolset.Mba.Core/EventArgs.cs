@@ -434,7 +434,7 @@ namespace WixToolset.Mba.Core
     public class DetectRelatedBundleEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, string version, RelatedOperation operation, bool missingFromCache, bool cancelRecommendation)
+        public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, string version, bool missingFromCache, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.ProductCode = productCode;
@@ -442,7 +442,6 @@ namespace WixToolset.Mba.Core
             this.BundleTag = bundleTag;
             this.PerMachine = perMachine;
             this.Version = version;
-            this.Operation = operation;
             this.MissingFromCache = missingFromCache;
         }
 
@@ -470,11 +469,6 @@ namespace WixToolset.Mba.Core
         /// Gets the version of the related bundle detected.
         /// </summary>
         public string Version { get; private set; }
-
-        /// <summary>
-        /// Gets the operation that will be taken on the detected bundle.
-        /// </summary>
-        public RelatedOperation Operation { get; private set; }
 
         /// <summary>
         /// Whether the related bundle is missing from the package cache.

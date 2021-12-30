@@ -154,68 +154,20 @@ extern "C" HRESULT DetectReportRelatedBundles(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_REGISTRATION* pRegistration,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOTSTRAPPER_ACTION action,
     __out BOOL* pfEligibleForCleanup
     )
 {
     HRESULT hr = S_OK;
-    int nCompareResult = 0;
     BOOTSTRAPPER_REQUEST_STATE uninstallRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
     *pfEligibleForCleanup = pRegistration->fInstalled || pRegistration->fCached;
 
     for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
     {
         const BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
-        BOOTSTRAPPER_RELATED_OPERATION operation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
 
-        switch (pRelatedBundle->relationType)
-        {
-        case BOOTSTRAPPER_RELATION_UPGRADE:
-            if (BOOTSTRAPPER_RELATION_UPGRADE != relationType && BOOTSTRAPPER_ACTION_UNINSTALL < action)
-            {
-                hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
-                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion->sczVersion, pRelatedBundle->pVersion->sczVersion);
+        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
 
-                if (nCompareResult < 0)
-                {
-                    operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
-                }
-                else
-                {
-                    operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
-                }
-            }
-            break;
-
-        case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;
-        case BOOTSTRAPPER_RELATION_ADDON:
-            if (BOOTSTRAPPER_ACTION_UNINSTALL == action)
-            {
-                operation = BOOTSTRAPPER_RELATED_OPERATION_REMOVE;
-            }
-            else if (BOOTSTRAPPER_ACTION_INSTALL == action || BOOTSTRAPPER_ACTION_MODIFY == action)
-            {
-                operation = BOOTSTRAPPER_RELATED_OPERATION_INSTALL;
-            }
-            else if (BOOTSTRAPPER_ACTION_REPAIR == action)
-            {
-                operation = BOOTSTRAPPER_RELATED_OPERATION_REPAIR;
-            }
-            break;
-
-        case BOOTSTRAPPER_RELATION_DETECT: __fallthrough;
-        case BOOTSTRAPPER_RELATION_DEPENDENT:
-            break;
-
-        default:
-            hr = E_FAIL;
-            ExitOnRootFailure(hr, "Unexpected relation type encountered: %d", pRelatedBundle->relationType);
-            break;
-        }
-
-        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingRelatedOperationToString(operation), LoggingBoolToString(pRelatedBundle->package.fCached));
-
-        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, operation, !pRelatedBundle->package.fCached);
+        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
         ExitOnRootFailure(hr, "BA aborted detect related bundle.");
 
         // For now, if any related bundles will be executed during uninstall by default then never automatically clean up the bundle.
