@@ -44,7 +44,6 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory(Skip = "Test demonstrates failure")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
