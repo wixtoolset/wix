@@ -15,6 +15,7 @@ namespace WixToolset.Converters
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
+#pragma warning disable 1591 // TODO: add documentation
     /// <summary>
     /// How to convert CustomTable elements.
     /// </summary>

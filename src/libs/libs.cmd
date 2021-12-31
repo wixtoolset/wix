@@ -8,7 +8,9 @@
 
 @echo Building libs %_C%
 
-msbuild -Restore libs_t.proj -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\libs_build.binlog || exit /b
+msbuild -Restore libs_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:..\..\build\logs\libs_build.binlog || exit /b
+
+msbuild dutil\test\DutilUnitTest -t:Test -p:Configuration=%_C% -nologo || exit /b
 
 @popd
 @endlocal

@@ -33,7 +33,6 @@
     <ProjectGuid>{1244E671-F108-4334-BA52-8A7517F26ECD}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>dutil</TargetName>
-    <MultiTargetLibrary>true</MultiTargetLibrary>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset native library foundation</Description>
     <PackageId>WixToolset.DUtil</PackageId>

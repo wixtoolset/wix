@@ -44,6 +44,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
+        [Theory(Skip = "https://github.com/wixtoolset/issues/issues/6407")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]

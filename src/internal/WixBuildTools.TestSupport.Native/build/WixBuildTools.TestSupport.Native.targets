@@ -10,10 +10,10 @@
   <!-- Include these references only when not referenced by the WixBuildTools.TestSupport.Native.vcxproj -->
   <ItemGroup Condition="'$(MSBuildProjectName)'!='$(MSBuildThisFileName)'">
     <Reference Include="WixBuildTools.TestSupport">
-      <HintPath>$(RootBuildFolder)internal\$(Configuration)\x86\WixBuildTools.TestSupport.dll</HintPath>
+      <HintPath>$(RootBuildFolder)internal\$(Configuration)\$(PlatformTarget)\WixBuildTools.TestSupport.dll</HintPath>
     </Reference>
     <Reference Include="WixBuildTools.TestSupport.Native">
-      <HintPath>$(RootBuildFolder)internal\$(Configuration)\x86\WixBuildTools.TestSupport.Native.dll</HintPath>
+      <HintPath>$(RootBuildFolder)internal\$(Configuration)\$(PlatformTarget)\WixBuildTools.TestSupport.Native.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -43,7 +43,7 @@
   </Target>
 
   <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x86" />
-  <Target Name="Test" DependsOnTargets="Build">
+  <Target Name="Test">
     <xunit Assemblies="$(TargetPath)" />
   </Target>
 </Project>
