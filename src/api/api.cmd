@@ -12,10 +12,12 @@
 :: build
 :: pack
 
-msbuild api_t.proj -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\api_build.binlog || exit /b
+msbuild api_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:..\..\build\logs\api_build.binlog || exit /b
 
 :: test
 dotnet test burn\test\WixToolsetTest.Mba.Core\WixToolsetTest.Mba.Core.csproj -c %_C% --nologo --no-build || exit /b
+msbuild burn\test\BalUtilUnitTest -t:Test -p:Configuration=%_C% -nologo || exit /b
+msbuild burn\test\BextUtilUnitTest -t:Test -p:Configuration=%_C% -nologo || exit /b
 dotnet test wix\api_wix.sln -c %_C% --nologo --no-build || exit /b
 
 @popd

@@ -12,7 +12,9 @@
 
 nuget restore || exit /b
 
-msbuild burn_t.proj -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\burn_build.binlog || exit /b
+msbuild burn_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:..\..\build\logs\burn_build.binlog || exit /b
+
+msbuild test\BurnUnitTest -t:Test -p:Configuration=%_C% -nologo || exit /b
 
 @popd
 @endlocal

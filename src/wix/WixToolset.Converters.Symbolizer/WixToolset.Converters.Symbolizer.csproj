@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <Reference Include="wix" HintPath="..\deps\wix.dll" />
-    <None Include="..\deps\wix.dll" Pack="true" PackagePath="lib\net472" />
+    <None Condition=" '$(Configuration)'=='Release' " Include="..\deps\wix.dll" Pack="true" PackagePath="lib\net472" />
     <None Include="..\deps\wix.dll" Pack="true" PackagePath="lib\netstandard2.0" />
   </ItemGroup>
 

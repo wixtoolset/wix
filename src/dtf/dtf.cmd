@@ -8,7 +8,7 @@
 
 @echo Building dtf %_C%
 
-msbuild -Restore -t:Pack dtf.sln -p:Configuration=%_C% -nologo -m -bl:..\..\build\logs\dtf_build.binlog|| exit /b
+msbuild -Restore -t:Pack dtf.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:..\..\build\logs\dtf_build.binlog || exit /b
 
 @popd
 @endlocal
