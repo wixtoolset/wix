@@ -12,7 +12,7 @@
 
 @call burn\test_burn.cmd %_C% %_T% || exit /b
 
-dotnet test wix -c %_C% --nologo -v m || exit /b
+dotnet test wix -c %_C% --nologo || exit /b
 
 @popd
 @endlocal
