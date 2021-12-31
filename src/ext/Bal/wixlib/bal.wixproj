@@ -31,11 +31,4 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
-
-  <!-- Workaround for bug in ProjectReferenceDefineConstants, they're not needed for this project anyway -->
-  <Target Name="ClearProjectReferenceDefineConstants" AfterTargets="CalculateDefineConstants">
-    <PropertyGroup>
-      <ProjectReferenceDefineConstants></ProjectReferenceDefineConstants>
-    </PropertyGroup>
-  </Target>
 </Project>
