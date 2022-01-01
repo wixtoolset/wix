@@ -68,7 +68,7 @@ namespace WixToolsetTest.Netfx
             var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "Binary", "CustomAction", "Wix4NetFxNativeImage");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4NetFxCA_X86\t[Binary data]",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
@@ -87,7 +87,7 @@ namespace WixToolsetTest.Netfx
             var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4NetFxNativeImage");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4NetFxCA_X64\t[Binary data]",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
@@ -106,7 +106,7 @@ namespace WixToolsetTest.Netfx
             var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4NetFxNativeImage");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4NetFxCA_A64\t[Binary data]",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",

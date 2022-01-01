@@ -16,7 +16,7 @@ namespace WixToolsetTest.VisualStudio
             var build = new Builder(folder, typeof(VSExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "CustomAction");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:SetVS2010Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2010_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:SetVS2012Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2012_VSIX_INSTALLER_PATH]\t",

@@ -40,7 +40,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
                     "ProgramFiles6432Folder:ProgramFilesFolder:.",
@@ -78,7 +78,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
                     "ProgramFiles6432Folder:ProgramFiles64Folder:.",
@@ -163,7 +163,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "dZsSsu81KcG46xXTwc4mTSZO5Zx4:INSTALLFOLDER:dupe",
                     "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
@@ -202,7 +202,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "BinFolder:ProgramFilesFolder:Example Corporation\\Test Product\\bin",
                     "ProgramFilesFolder:TARGETDIR:PFiles",
@@ -211,7 +211,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var directoryRows = data.Tables["Directory"].Rows;
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "d4EceYatXTyy8HXPt5B6DT9Rj.wE:ProgramFilesFolder:u7-b4gch|Example Corporation",
                     "dSJ1pgiASlW7kJTu0wqsGBklJsS0:d4EceYatXTyy8HXPt5B6DT9Rj.wE:vjj-gxay|Test Product",
@@ -250,7 +250,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "BinFolder\tProgramFilesFolder\tbin",
                     "ProgramFilesFolder\tTARGETDIR\tPFiles",
@@ -259,7 +259,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var directoryRows = data.Tables["Directory"].Rows;
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "BinFolder\tProgramFilesFolder\tbin",
                     "ProgramFilesFolder\tTARGETDIR\tPFiles",

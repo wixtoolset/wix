@@ -42,7 +42,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(2, mediaSymbols[0].LastSequence);
                 Assert.Equal(2, mediaSymbols[1].DiskId);
                 Assert.Equal(4, mediaSymbols[1].LastSequence);
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "a1.txt",
                     "a2.txt",

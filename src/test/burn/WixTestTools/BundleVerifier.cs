@@ -7,6 +7,7 @@ namespace WixTestTools
     using System.Linq;
     using System.Text;
     using Microsoft.Win32;
+    using WixBuildTools.TestSupport;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using Xunit;
@@ -93,7 +94,7 @@ namespace WixTestTools
             Assert.True(File.Exists(registration.CachePath));
 
             var expectedCachePath = this.GetExpectedCachedBundlePath();
-            Assert.Equal(expectedCachePath, registration.CachePath, StringComparer.OrdinalIgnoreCase);
+            WixAssert.StringEqual(expectedCachePath, registration.CachePath, true);
 
             return registration.CachePath;
         }

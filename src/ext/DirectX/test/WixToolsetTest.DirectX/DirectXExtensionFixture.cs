@@ -17,7 +17,7 @@ namespace WixToolsetTest.DirectX
             var build = new Builder(folder, typeof(DirectXExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "CustomAction");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:WixQueryDirectXCaps\t65\tDirectXCA\tWixQueryDirectXCaps\t",
             }, results);

@@ -100,7 +100,7 @@ namespace WixToolsetTest.CoreIntegration
                     "InstallUISequence",
                     "Property",
                 }).Where(x => !x.StartsWith("Property:") || x.StartsWith("Property:MsiHiddenProperties\t")).ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "ActionText:CustomAction2\tProgess2Text\t",
                     "AdminExecuteSequence:CostFinalize\t\t1000",

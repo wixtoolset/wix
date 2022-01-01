@@ -5,6 +5,7 @@ namespace WixToolsetTest.Mba.Core
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
+    using WixBuildTools.TestSupport;
     using WixToolset.Mba.Core;
     using Xunit;
 
@@ -45,7 +46,7 @@ namespace WixToolsetTest.Mba.Core
                         Assert.Equal(baFactory.BA.Command.Display, command.display);
 
                         var mbaCommand = baFactory.BA.Command.ParseCommandLine();
-                        Assert.Equal(mbaCommand.UnknownCommandLineArgs, new string[] { "this", "is a", "test" });
+                        WixAssert.CompareLineByLine(mbaCommand.UnknownCommandLineArgs, new string[] { "this", "is a", "test" });
                         Assert.Equal(mbaCommand.Variables, new KeyValuePair<string, string>[]
                         {
                             new KeyValuePair<string, string>("VariableA", "AVariable"),

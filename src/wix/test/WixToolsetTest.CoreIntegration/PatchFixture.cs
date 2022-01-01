@@ -43,14 +43,14 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
-                Assert.Equal(new[] { "#RTM.1", "RTM.1" }, names);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
 
                 var cab = Path.Combine(tempFolder, "foo.cab");
                 Query.ExtractStream(patchPath, "foo.cab", cab);
                 Assert.True(File.Exists(cab));
 
                 var files = Query.GetCabinetFiles(cab);
-                Assert.Equal(new[] { "a.txt", "b.txt" }, files.Select(f => f.Name).ToArray());
+                WixAssert.CompareLineByLine(new[] { "a.txt", "b.txt" }, files.Select(f => f.Name).ToArray());
             }
         }
 
@@ -75,7 +75,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
-                Assert.Equal(new[] { "#RTM.1", "RTM.1" }, names);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
 
                 var cab = Path.Combine(tempFolder, "foo.cab");
                 Query.ExtractStream(patchPath, "foo.cab", cab);

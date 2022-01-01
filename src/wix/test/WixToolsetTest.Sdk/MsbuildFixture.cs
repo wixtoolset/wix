@@ -29,8 +29,8 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -62,8 +62,8 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -96,8 +96,8 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -166,8 +166,8 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -318,8 +318,8 @@ namespace WixToolsetTest.Sdk
                 });
                 result.AssertSuccess();
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
             }
         }
 
@@ -409,7 +409,7 @@ namespace WixToolsetTest.Sdk
                     .Where(s => !allowedFiles.Contains(s))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Empty(remainingPaths);
+                WixAssert.StringCollectionEmpty(remainingPaths);
             }
         }
 

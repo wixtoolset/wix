@@ -5,6 +5,7 @@ namespace WixToolsetTest.Data
     using System;
     using System.IO;
     using System.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Symbols;
@@ -375,7 +376,7 @@ namespace WixToolsetTest.Data
                 var loc = loaded.Localizations.Single();
                 Assert.Equal(65001, loc.Codepage);
                 Assert.Empty(loc.Culture);
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "TestVar1/TestValue1/False",
                     "TestVar2/TestValue2/True",

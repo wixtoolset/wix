@@ -206,7 +206,7 @@ namespace WixToolsetTest.CoreIntegration
                 var error = messages.Single(m => m.Level == MessageLevel.Error);
                 var errorMessage = error.ToString();
                 var checkedPaths = errorMessage.Substring(errorMessage.IndexOf(':') + 1).Split(new[] { ',' }).Select(s => s.Trim()).ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "test.txt",
                     Path.Combine(folder, "does-not-exist", "test.txt"),
@@ -397,7 +397,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
 
-                Assert.Equal(new[]{
+                WixAssert.CompareLineByLine(new[]{
                     "test.wixipl"
                 }, builtFiles.Select(Path.GetFileName).ToArray());
             }
@@ -428,7 +428,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
 
-                Assert.Equal(new[]{
+                WixAssert.CompareLineByLine(new[]{
                     "test.wixlib"
                 }, builtFiles.Select(Path.GetFileName).ToArray());
             }
@@ -573,7 +573,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var msiAssemblyNameSymbols = section.Symbols.OfType<MsiAssemblyNameSymbol>();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "culture",
                     "fileVersion",
@@ -583,7 +583,7 @@ namespace WixToolsetTest.CoreIntegration
                     "version"
                 }, msiAssemblyNameSymbols.OrderBy(a => a.Name).Select(a => a.Name).ToArray());
 
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "neutral",
                     "3.11.11810.0",
@@ -630,7 +630,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var msiAssemblyNameSymbols = section.Symbols.OfType<MsiAssemblyNameSymbol>();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "culture",
                     "fileVersion",
@@ -639,7 +639,7 @@ namespace WixToolsetTest.CoreIntegration
                     "version"
                 }, msiAssemblyNameSymbols.OrderBy(a => a.Name).Select(a => a.Name).ToArray());
 
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "neutral",
                     "2.0.5805.0",
@@ -782,13 +782,13 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var progids = section.Symbols.OfType<ProgIdSymbol>().OrderBy(symbol => symbol.ProgId).ToList();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Foo.File.hol",
                     "Foo.File.hol.15"
                 }, progids.Select(p => p.ProgId).ToArray());
 
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Foo.File.hol.15",
                     null
@@ -823,20 +823,20 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("I1", substorage.Name);
 
                 var data = substorage.Data;
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "_SummaryInformation",
                     "Property",
                     "Upgrade"
                 }, data.Tables.Select(t => t.Name).ToArray());
 
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "INSTANCEPROPERTY\tI1",
                     "ProductName\tMsiPackage (Instance 1)",
                 }, JoinRows(data.Tables["Property"]));
 
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "{047730A5-30FE-4A62-A520-DA9381B8226A}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
                     "{047730A5-30FE-4A62-A520-DA9381B8226A}\t\t1.0.0.0\t1033\t1\t0\t0",

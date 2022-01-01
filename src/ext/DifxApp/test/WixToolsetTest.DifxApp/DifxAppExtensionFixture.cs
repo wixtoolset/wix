@@ -17,7 +17,7 @@ namespace WixToolsetTest.DifxApp
             var build = new Builder(folder, typeof(DifxAppExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "CustomAction");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:MsiCleanupOnSuccess\t1\tDIFxApp.dll\tCleanupOnSuccess\t",
                 "CustomAction:MsiInstallDrivers\t3073\tDIFxAppA.dll\tInstallDriverPackages\t",

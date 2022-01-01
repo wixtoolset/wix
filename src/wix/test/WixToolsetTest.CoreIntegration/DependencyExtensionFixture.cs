@@ -165,7 +165,7 @@ namespace WixToolsetTest.CoreIntegration
             var build = new Builder(folder, null, new[] { folder });
 
             var results = build.BuildAndQuery(Build, "Wix4DependencyProvider");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Wix4DependencyProvider:dep74OfIcniaqxA7EprRGBw4Oyy3r8\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
             }, results);
