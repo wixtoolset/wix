@@ -44,6 +44,8 @@
 
   <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x86" />
   <Target Name="Test">
-    <xunit Assemblies="$(TargetPath)" />
+    <!-- https://xunit.net/docs/running-tests-in-msbuild -->
+    <!-- https://github.com/xunit/xunit/issues/2188 -->
+    <xunit Assemblies="$(TargetPath)" Xml="$(CppCliTestResultsFile)" />
   </Target>
 </Project>

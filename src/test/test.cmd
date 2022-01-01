@@ -2,6 +2,7 @@
 @pushd %~dp0
 
 @set _C=Debug
+@set _L=%~dp0..\..\build\logs
 :parse_args
 @if /i "%1"=="release" set _C=Release
 @if /i "%1"=="test" set RuntimeTestsEnabled=true
@@ -12,7 +13,7 @@
 
 @call burn\test_burn.cmd %_C% %_T% || exit /b
 
-dotnet test wix -c %_C% --nologo || exit /b
+dotnet test wix -c %_C% --nologo -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.WixE2ETests.trx" || exit /b
 
 @popd
 @endlocal

@@ -15,9 +15,23 @@ environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   NUGET_XMLDOC_MODE: skip
   WixSkipVsDevCmd: 1
+  RuntimeTestsEnabled: true
+
+install:
+  - reg add HKLM\Software\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
+  - reg add HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
 
 build_script:
   - src\build_official.cmd
+
+after_build:
+  - 7z a "build\testresults.zip" @src\testresultfilelist.txt
+
+on_finish:
+  - ps: 7z a ('temp_logs_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') $env:TEMP\*.log $env:TEMP\..\*.log
+  - ps: 7z a ('build_logs_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') build\logs\ build\logs\TestResults\
+  - ps: Push-AppveyorArtifact temp_logs_*.zip
+  - ps: Push-AppveyorArtifact build_logs_*.zip
 
 test: off
 
@@ -46,7 +60,6 @@ for:
       - master
 
   environment:
-    RuntimeTestsEnabled: true
     SigningUser:
       secure: s+b2kuhi/AlE8ZYFsNVHFLfgJOwi0fIKMCOP+xL++8U=
     SigningSecret:
