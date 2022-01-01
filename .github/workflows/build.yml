@@ -44,6 +44,10 @@ jobs:
           name: artifacts
           path: build/artifacts/
 
+      - name: Create Zips
+        shell: cmd
+        run: ./src/create_zips.cmd
+
       - name: Save logs
         uses: actions/upload-artifact@v2
         if: always()

@@ -1,0 +1,16 @@
+build/logs/TestResults/api_wix.trx
+build/logs/TestResults/BalUtilUnitTest.xunit2.xml
+build/logs/TestResults/BextUtilUnitTest.xunit2.xml
+build/logs/TestResults/BurnUnitTest.xunit2.xml
+build/logs/TestResults/DutilUnitTest.xunit2.xml
+build/logs/TestResults/WixToolsetTest.BuildTasks.trx
+build/logs/TestResults/WixToolsetTest.BurnE2E.trx
+build/logs/TestResults/WixToolsetTest.Converters.trx
+build/logs/TestResults/WixToolsetTest.Converters.Symbolizer.trx
+build/logs/TestResults/WixToolsetTest.Core.Burn.trx
+build/logs/TestResults/WixToolsetTest.Core.Native.trx
+build/logs/TestResults/WixToolsetTest.CoreIntegration.trx
+build/logs/TestResults/WixToolsetTest.Heat.trx
+build/logs/TestResults/WixToolsetTest.Mba.Core.trx
+build/logs/TestResults/WixToolsetTest.Sdk.trx
+build/logs/TestResults/WixToolsetTest.WixE2ETests.trx

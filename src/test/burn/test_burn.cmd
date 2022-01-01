@@ -3,6 +3,7 @@
 
 @set _RESULT=0
 @set _C=Debug
+@set _L=%~dp0..\..\..\build\logs
 :parse_args
 @if /i "%1"=="release" set _C=Release
 @if /i "%1"=="test" set RuntimeTestsEnabled=true
@@ -10,20 +11,16 @@
 
 @echo Burn integration tests %_C%
 
-msbuild -t:Build -Restore -p:Configuration=%_C% -warnaserror -bl:..\..\..\build\logs\test_burn_build.binlog || exit /b
-msbuild -t:Build -Restore -p:Configuration=%_C% TestData\TestData.proj -bl:..\..\..\build\logs\test_burn_data_build.binlog || exit /b
+msbuild -t:Build -Restore -p:Configuration=%_C% -warnaserror -bl:%_L%\test_burn_build.binlog || exit /b
+msbuild -t:Build -Restore -p:Configuration=%_C% TestData\TestData.proj -bl:%_L%\test_burn_data_build.binlog || exit /b
 
 @if not "%RuntimeTestsEnabled%"=="true" goto :LExit
 
 reg add HKLM\Software\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
 reg add HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
 
-dotnet test -c %_C% --no-build WixToolsetTest.BurnE2E
-set _RESULT=%ERRORLEVEL%
-
-7z a "..\..\..\build\logs\test_burn_%GITHUB_RUN_ID%.zip" "%TEMP%\*.log" "%TEMP%\..\*.log"
+dotnet test -c %_C% --no-build WixToolsetTest.BurnE2E -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.BurnE2E.trx" || exit /b
 
 :LExit
 @popd
-exit /b %_RESULT%
 @endlocal
