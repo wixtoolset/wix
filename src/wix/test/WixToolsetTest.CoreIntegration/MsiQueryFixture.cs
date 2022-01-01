@@ -488,7 +488,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabaseByTable(msiPath, new[] { "Wix4Example" });
-                Assert.Empty(results["Wix4Example"]);
+                WixAssert.StringCollectionEmpty(results["Wix4Example"]);
             }
         }
 

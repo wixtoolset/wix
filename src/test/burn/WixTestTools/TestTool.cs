@@ -123,7 +123,7 @@ namespace WixTestTools
                     this.PrintErrors();
                 }
 
-                Assert.Empty(this.Errors);
+                WixAssert.StringCollectionEmpty(this.Errors);
             }
 
             return result;

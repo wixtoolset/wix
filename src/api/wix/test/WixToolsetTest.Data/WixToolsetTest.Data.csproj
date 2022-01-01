@@ -13,6 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- <PackageReference Include="WixBuildTools.TestSupport" /> -->
+    <ProjectReference Include="..\..\..\..\internal\WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />

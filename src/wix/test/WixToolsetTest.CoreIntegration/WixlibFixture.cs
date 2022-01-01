@@ -308,8 +308,8 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"other.txt", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var examples = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).ToArray();
-                Assert.Equal(new string[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
-                Assert.Equal(new[] { "Bar", "Value" }, examples.Select(t => t[0].AsString()).ToArray());
+                WixAssert.CompareLineByLine(new string[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
+                WixAssert.CompareLineByLine(new[] { "Bar", "Value" }, examples.Select(t => t[0].AsString()).ToArray());
             }
         }
     }

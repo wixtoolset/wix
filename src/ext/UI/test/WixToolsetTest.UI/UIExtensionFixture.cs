@@ -18,7 +18,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Property");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Property:WixUI_Mode\tAdvanced",
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
@@ -32,7 +32,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Property");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Property:WixUI_Mode\tFeatureTree",
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
@@ -46,7 +46,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Property");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Property:WixUI_Mode\tInstallDir",
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
@@ -60,7 +60,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Property");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Property:WixUI_Mode\tMinimal",
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
@@ -74,7 +74,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Property");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Property:WixUI_Mode\tMondo",
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
@@ -88,7 +88,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildInGerman, "Control");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "&Ja",
             }, results.Where(s => s.StartsWith("Control:ErrorDlg\tY")).Select(s => s.Split('\t')[9]).ToArray());

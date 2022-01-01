@@ -36,7 +36,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "CustomTable1" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "CustomTable1:Row1\ttest.txt",
                     "CustomTable1:Row2\ttest.txt",
@@ -71,7 +71,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "CustomTableLocalized" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "CustomTableLocalized:Row1\tThis is row one",
                     "CustomTableLocalized:Row2\tThis is row two",
@@ -105,7 +105,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "CustomTableWithFile" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "CustomTableWithFile:Row1\t[Binary data]",
                     "CustomTableWithFile:Row2\t[Binary data]",
@@ -151,7 +151,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "CustomTableWithFile" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "CustomTableWithFile:Row1\t[Binary data]",
                     "CustomTableWithFile:Row2\t[Binary data]",
@@ -185,7 +185,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "CustomTable2" });
-                Assert.Empty(results);
+                WixAssert.StringCollectionEmpty(results);
             }
         }
 

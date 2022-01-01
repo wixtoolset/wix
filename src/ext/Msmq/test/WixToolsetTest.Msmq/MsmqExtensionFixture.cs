@@ -17,7 +17,7 @@ namespace WixToolsetTest.Msmq
             var build = new Builder(folder, typeof(MsmqExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "MessageQueue");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "MessageQueue:TestMQ\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t\t\tMQLabel\t\tMQPath\t\t\t\t0",
             }, results);

@@ -17,7 +17,7 @@ namespace WixToolsetTest.Firewall
             var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "Wix4FirewallException", "CustomAction");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:Wix4ExecFirewallExceptionsInstall_X86\t3073\tWix4FWCA_X86\tExecFirewallExceptions\t",
                 "CustomAction:Wix4ExecFirewallExceptionsUninstall_X86\t3073\tWix4FWCA_X86\tExecFirewallExceptions\t",
@@ -36,7 +36,7 @@ namespace WixToolsetTest.Firewall
             var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildARM64, "Wix4FirewallException", "CustomAction");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:Wix4ExecFirewallExceptionsInstall_A64\t3073\tWix4FWCA_A64\tExecFirewallExceptions\t",
                 "CustomAction:Wix4ExecFirewallExceptionsUninstall_A64\t3073\tWix4FWCA_A64\tExecFirewallExceptions\t",

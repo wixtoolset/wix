@@ -59,7 +59,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var fileRows = data.Tables["File"].Rows;
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
                     "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
@@ -68,7 +68,7 @@ namespace WixToolsetTest.CoreIntegration
                 var cabPath = Path.Combine(intermediateFolder, "msm-test.cab");
                 Query.ExtractStream(msmPath, "MergeModule.CABinet", cabPath);
                 var files = Query.GetCabinetFiles(cabPath);
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
                     "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE",

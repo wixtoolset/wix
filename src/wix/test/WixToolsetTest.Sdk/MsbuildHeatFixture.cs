@@ -36,15 +36,15 @@ namespace WixToolsetTest.Sdk
                 var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem, true);
                 Assert.Single(heatCommandLines);
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
-                Assert.Equal(@"<Wix>" +
+                WixAssert.StringEqual(@"<Wix>" +
                     "<Fragment>" +
                     "<DirectoryRef Id='INSTALLFOLDER'>" +
                     "<Component Id='HeatFilePackage.wixproj' Guid='*'>" +
@@ -92,15 +92,15 @@ namespace WixToolsetTest.Sdk
                 var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem, true);
                 Assert.Equal(2, heatCommandLines.Count());
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
-                Assert.Equal("<Wix>" +
+                WixAssert.StringEqual("<Wix>" +
                     "<Fragment>" +
                     "<DirectoryRef Id='INSTALLFOLDER'>" +
                     "<Component Id='MyProgram.txt' Guid='*'>" +
@@ -120,7 +120,7 @@ namespace WixToolsetTest.Sdk
 
                 generatedContents = File.ReadAllText(generatedFilePath);
                 testXml = generatedContents.GetTestXml();
-                Assert.Equal("<Wix>" +
+                WixAssert.StringEqual("<Wix>" +
                     "<Fragment>" +
                     "<DirectoryRef Id='INSTALLFOLDER'>" +
                     "<Component Id='MyProgram.json' Guid='*'>" +
@@ -184,15 +184,15 @@ namespace WixToolsetTest.Sdk
                     Assert.DoesNotContain("-usetoolsversion", heatCommandLine);
                 }
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_ToolsVersion4Cs.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
-                Assert.Equal(@"<Wix>" +
+                WixAssert.StringEqual(@"<Wix>" +
                     "<Fragment>" +
                         "<DirectoryRef Id='ToolsVersion4Cs.Binaries'>" +
                             "<Component Id='ToolsVersion4Cs.Binaries.ToolsVersion4Cs.dll' Guid='*'>" +
@@ -253,7 +253,7 @@ namespace WixToolsetTest.Sdk
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(fs.BaseFolder, "ToolsVersion4Cs", "bin", "Release\\\\ToolsVersion4Cs.dll"), fileSymbol[FileSymbolFields.Source].AsPath()?.Path);
+                WixAssert.StringEqual(Path.Combine(fs.BaseFolder, "ToolsVersion4Cs", "bin", "Release\\\\ToolsVersion4Cs.dll"), fileSymbol[FileSymbolFields.Source].AsPath()?.Path);
             }
         }
 
@@ -301,15 +301,15 @@ namespace WixToolsetTest.Sdk
                     Assert.DoesNotContain("-usetoolsversion", heatCommandLine);
                 }
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Empty(warnings);
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_SdkStyleCs.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
-                Assert.Equal(@"<Wix>" +
+                WixAssert.StringEqual(@"<Wix>" +
                     "<Fragment>" +
                         "<DirectoryRef Id='SdkStyleCs.Binaries'>" +
                             "<Component Id='SdkStyleCs.Binaries.SdkStyleCs.dll' Guid='*'>" +
@@ -368,7 +368,7 @@ namespace WixToolsetTest.Sdk
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(fs.BaseFolder, "SdkStyleCs", "bin", "Release", "netstandard2.0\\\\SdkStyleCs.dll"), fileSymbol[FileSymbolFields.Source].AsPath()?.Path);
+                WixAssert.StringEqual(Path.Combine(fs.BaseFolder, "SdkStyleCs", "bin", "Release", "netstandard2.0\\\\SdkStyleCs.dll"), fileSymbol[FileSymbolFields.Source].AsPath()?.Path);
             }
         }
     }

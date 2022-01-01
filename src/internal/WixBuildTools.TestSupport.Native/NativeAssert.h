@@ -29,8 +29,7 @@ namespace TestSupport {
 
         static void NotStringEqual(LPCWSTR expected, LPCWSTR actual, BOOL ignoreCase)
         {
-            IEqualityComparer<String^>^ comparer = ignoreCase ? StringComparer::InvariantCultureIgnoreCase : StringComparer::InvariantCulture;
-            Assert::NotEqual(NativeAssert::LPWSTRToString(expected), NativeAssert::LPWSTRToString(actual), comparer);
+            WixAssert::NotStringEqual(NativeAssert::LPWSTRToString(expected), NativeAssert::LPWSTRToString(actual), ignoreCase);
         }
 
         // For some reason, naming these StringEqual methods "Equal" breaks Intellisense in files that call any overload of the Equal method.
@@ -41,8 +40,7 @@ namespace TestSupport {
 
         static void StringEqual(LPCWSTR expected, LPCWSTR actual, BOOL ignoreCase)
         {
-            IEqualityComparer<String^>^ comparer = ignoreCase ? StringComparer::InvariantCultureIgnoreCase : StringComparer::InvariantCulture;
-            Assert::Equal(NativeAssert::LPWSTRToString(expected), NativeAssert::LPWSTRToString(actual), comparer);
+            WixAssert::StringEqual(NativeAssert::LPWSTRToString(expected), NativeAssert::LPWSTRToString(actual), ignoreCase);
         }
 
         static void Succeeded(HRESULT hr, LPCSTR zFormat, LPCSTR zArg, ... array<LPCSTR>^ zArgs)

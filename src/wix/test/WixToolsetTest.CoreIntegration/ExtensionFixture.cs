@@ -21,7 +21,7 @@ namespace WixToolsetTest.CoreIntegration
             var build = new Builder(folder, typeof(ExampleExtensionFactory), new[] { Path.Combine(folder, "data") });
 
             var results = build.BuildAndQuery(Build, "Wix4Example");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Wix4Example:Foo\tBar"
             }, results);
