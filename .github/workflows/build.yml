@@ -47,6 +47,7 @@ jobs:
       - name: Create Zips
         shell: cmd
         run: ./src/create_zips.cmd
+        if: always()
 
       - name: Save logs
         uses: actions/upload-artifact@v2
