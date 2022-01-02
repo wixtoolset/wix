@@ -12,13 +12,17 @@ namespace WixBuildTools.TestSupport
     {
         public static void CompareLineByLine(string[] expectedLines, string[] actualLines)
         {
-            for (var i = 0; i < expectedLines.Length; ++i)
+            var lineNumber = 0;
+
+            for (; lineNumber < expectedLines.Length && lineNumber < actualLines.Length; ++lineNumber)
             {
-                Assert.True(actualLines.Length > i, $"{i}: expectedLines longer than actualLines");
-                WixAssert.StringEqual($"{i}: {expectedLines[i]}", $"{i}: {actualLines[i]}");
+                WixAssert.StringEqual($"{lineNumber}: {expectedLines[lineNumber]}", $"{lineNumber}: {actualLines[lineNumber]}");
             }
 
-            Assert.True(expectedLines.Length == actualLines.Length, $"actualLines ({actualLines.Length}) longer than expectedLines ({expectedLines.Length})");
+            var additionalExpectedLines = expectedLines.Length > lineNumber ? String.Join(Environment.NewLine, expectedLines.Skip(lineNumber).Select((s, i) => $"{lineNumber + i}: {s}")) : $"Missing {actualLines.Length - lineNumber} lines";
+            var additionalActualLines = actualLines.Length > lineNumber ? String.Join(Environment.NewLine, actualLines.Skip(lineNumber).Select((s, i) => $"{lineNumber + i}: {s}")) : $"Missing {expectedLines.Length - lineNumber} lines";
+
+            WixAssert.StringEqual(additionalExpectedLines, additionalActualLines);
         }
 
         public static void CompareXml(XContainer xExpected, XContainer xActual)
@@ -70,21 +74,21 @@ namespace WixBuildTools.TestSupport
             public static readonly StringObjectEqualityComparer InvariantCultureIgnoreCase = new StringObjectEqualityComparer(true);
             public static readonly StringObjectEqualityComparer InvariantCulture = new StringObjectEqualityComparer(false);
 
-            private readonly StringComparer _stringComparer;
+            private readonly StringComparer stringComparer;
 
             public StringObjectEqualityComparer(bool ignoreCase)
             {
-                this._stringComparer = ignoreCase ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture;
+                this.stringComparer = ignoreCase ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture;
             }
 
             public new bool Equals(object x, object y)
             {
-                return this._stringComparer.Equals((string)x,(string)y);
+                return this.stringComparer.Equals((string)x,(string)y);
             }
 
             public int GetHashCode(object obj)
             {
-                return this._stringComparer.GetHashCode((string)obj);
+                return this.stringComparer.GetHashCode((string)obj);
             }
         }
     }
