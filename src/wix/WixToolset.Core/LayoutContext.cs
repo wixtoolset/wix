@@ -27,11 +27,7 @@ namespace WixToolset.Core
 
         public string IntermediateFolder { get; set; }
 
-        public string ContentsFile { get; set; }
-
-        public string OutputsFile { get; set; }
-
-        public string BuiltOutputsFile { get; set; }
+        public string TrackingFile { get; set; }
 
         public bool ResetAcls { get; set; }
 

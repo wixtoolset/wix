@@ -112,16 +112,18 @@
   <PropertyGroup>
     <!-- Default pdb output path to the intermediate output directory -->
     <PdbOutputDir Condition=" '$(PdbOutputDir)'=='' ">$(TargetDir)</PdbOutputDir>
-    <PdbOutputDir Condition=" !HasTrailingSlash('$(PdbOutputDir)') ">$(PdbOutputDir)\</PdbOutputDir>
-
-    <!-- Example, C:\MyProjects\MyProject\bin\debug\ -->
-    <TargetPdbDir Condition=" '$(PdbOutputDir)'!='' ">$([System.IO.Path]::GetFullPath(`$([System.IO.Path]::Combine(`$(MSBuildProjectDirectory)`, `$(PdbOutputDir)`))`))</TargetPdbDir>
-
-    <!-- Example, MySetup.wixpdb" -->
+    <TargetPdbDir Condition=" '$(PdbOutputDir)'!='' ">$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(PdbOutputDir)))</TargetPdbDir>
     <TargetPdbFileName Condition=" '$(TargetPdbFileName)' == '' ">$(TargetName).wixpdb</TargetPdbFileName>
-
-    <!-- Example, C:\MyProjects\MyProject\bin\debug\MyPackage.wixpdb -->
     <TargetPdbPath Condition=" '$(TargetPdbPath)' == '' ">$(TargetPdbDir)$(TargetPdbFileName)</TargetPdbPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixBinDir)</WixExtDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BindTrackingFilePrefix Condition=" '$(BindTrackingFilePrefix)' == '' ">$(MSBuildProjectFile).BindTracking</BindTrackingFilePrefix>
+    <BindTrackingFileExtension Condition=" '$(BindTrackingFileExtension)' == '' ">.txt</BindTrackingFileExtension>
   </PropertyGroup>
 
   <!--
@@ -154,23 +156,13 @@
   <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
   <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
 
+  <UsingTask TaskName="ReadTracking" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ReadTracking" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="ReadTracking" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
   <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
   <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <PropertyGroup>
-    <BindContentsFile Condition=" '$(BindContentsFile)' == '' ">$(MSBuildProjectFile).BindContentsFileList.txt</BindContentsFile>
-    <BindOutputsFile Condition=" '$(BindOutputsFile)' == '' ">$(MSBuildProjectFile).BindOutputsFileList.txt</BindOutputsFile>
-    <BindBuiltOutputsFile Condition=" '$(BindBuiltOutputsFile)' == '' ">$(MSBuildProjectFile).BindBuiltOutputsFileList.txt</BindBuiltOutputsFile>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <CabinetCachePath Condition=" '$(CabinetCachePath)'=='' and '$(ReuseCabinetCache)'=='true' ">$(IntermediateOutputPath)cabcache\</CabinetCachePath>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixBinDir)</WixExtDir>
-  </PropertyGroup>
 
   <!--
   ***********************************************************************************************
@@ -552,6 +544,9 @@
     <PropertyGroup>
       <TargetPath>@(_CulturedTargetPath)</TargetPath>
       <TargetPdbPath>@(_CulturedTargetPdbPath)</TargetPdbPath>
+
+      <!-- Update bind tracking filename prefix so cultures appended to the filename will be separated by a "-" -->
+      <BindTrackingFilePrefix>$(BindTrackingFilePrefix)-</BindTrackingFilePrefix>
     </PropertyGroup>
   </Target>
 
@@ -615,18 +610,17 @@
       Inputs="@(Compile);
       @(Content);
       @(_WixLocalizationFile);
-      @(WixObject);
       @(_WixReferencedProjectOutputs);
       @(_ResolvedWixLibraryPaths);
       @(_ResolvedWixExtensionPaths);
       @(_BindInputs)"
-      Outputs="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile);@(_BindBuiltOutputs)"
+      Outputs="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension);@(_BindBuiltOutputs)"
       DependsOnTargets="$(CoreCompileDependsOn)" 
       Condition=" '@(Compile)' != '' ">
 
     <PropertyGroup>
-      <OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)))</OutputFile>
-      <PdbOutputFile>$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)</PdbOutputFile>
+      <CabinetCachePath Condition=" '$(CabinetCachePath)'=='' and '$(ReuseCabinetCache)'=='true' ">$(IntermediateOutputPath)cabcache\</CabinetCachePath>
+      <_WixBuildCabinetCachePath Condition=" '$(CabinetCachePath)'!='' ">$([MSBuild]::NormalizeDirectory($(CabinetCachePath), %(CultureGroup.OutputFolder)))</_WixBuildCabinetCachePath>
     </PropertyGroup>
 
     <WixBuild
@@ -641,9 +635,9 @@
 
         IntermediateDirectory="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)"
 
-        OutputFile="$(OutputFile)"
+        OutputFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)"
         OutputType="$(OutputType)"
-        PdbFile="$(PdbOutputFile)"
+        PdbFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"
         PdbType="$(WixPdbType)"
 
         AdditionalOptions="$(CompilerAdditionalOptions) $(LinkerAdditionalOptions)"
@@ -659,11 +653,9 @@
 
         BindInputPaths="@(LinkerBindInputPaths)"
         BindFiles="$(LinkerBindFiles)"
-        BindContentsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)"
-        BindOutputsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)"
-        BindBuiltOutputsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)"
+        BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)"
 
-        CabinetCachePath="$(CabinetCachePath)"
+        CabinetCachePath="$(_WixBuildCabinetCachePath)"
         CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
         DefaultCompressionLevel="$(DefaultCompressionLevel)"
 
@@ -754,16 +746,10 @@
   <Target
     Name="ReadPreviousBindInputsAndBuiltOutputs">
 
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)">
-      <Output TaskParameter="Lines" ItemName="_BindInputs" />
-    </ReadLinesFromFile>
-
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
-      <Output TaskParameter="Lines" ItemName="_BindBuiltOutputs" />
-    </ReadLinesFromFile>
-
-    <Message Importance="low" Text="Previous bind inputs: @(_BindInputs)" />
-    <Message Importance="low" Text="Previous bind outputs: @(_BindBuiltOutputs)" />
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+      <Output TaskParameter="Inputs" ItemName="_BindInputs" />
+      <Output TaskParameter="BuiltOutputs" ItemName="_BindBuiltOutputs" />
+    </ReadTracking>
   </Target>
 
   <!--
@@ -789,17 +775,13 @@
       Name="UpdateFileWritesWithBindInformation"
       AfterTargets="CoreCompile">
 
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)">
-      <Output TaskParameter="Lines" ItemName="FileWrites"/>
-    </ReadLinesFromFile>
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+      <Output TaskParameter="Outputs" ItemName="FileWrites" />
+    </ReadTracking>
 
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)') " />
-      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)') " />
-      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)') " />
+      <FileWrites Include="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)" Condition=" Exists('$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)') " />
     </ItemGroup>
-
-    <Message Importance="low" Text="Build files after link: @(FileWrites)" />
   </Target>
 
   <!--
@@ -862,10 +844,10 @@
 
     <!-- Don't add BuiltProjectOutputGroupKeyOutput - to avoid duplicates, we only want to get the updated list of TargetPaths from the TargetPath property below -->
 
-    <!-- Try to read the outputs from the bind outputs text file since that's the output list straight from compiler. -->
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
-      <Output TaskParameter="Lines" ItemName="_BuiltProjectOutputGroupOutputIntermediate"/>
-    </ReadLinesFromFile>
+    <!-- Try to read the outputs from the bind tracking text file since that's the output list straight from compiler. -->
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+      <Output TaskParameter="Outputs" ItemName="_BuiltProjectOutputGroupOutputIntermediate" />
+    </ReadTracking>
 
     <!-- If we didn't get anything from the bind outputs text file, default to the target path. -->
     <ItemGroup Condition=" '@(_BuiltProjectOutputGroupOutputIntermediate)'=='' ">
@@ -930,17 +912,17 @@
     <PropertyGroup>
       <CopyBuildOutputToOutputDirectory Condition="'$(CopyBuildOutputToOutputDirectory)'==''">true</CopyBuildOutputToOutputDirectory>
       <CopyOutputSymbolsToOutputDirectory Condition="'$(CopyOutputSymbolsToOutputDirectory)'==''">true</CopyOutputSymbolsToOutputDirectory>
-      <FullIntermediateOutputPath>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)))</FullIntermediateOutputPath>
+      <FullIntermediateOutputPath>$([MSBuild]::NormalizeDirectory($(IntermediateOutputPath)))</FullIntermediateOutputPath>
     </PropertyGroup>
 
-    <!-- Copy the bound files. -->
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
-      <Output TaskParameter="Lines" ItemName="_FullPathToCopy"/>
-    </ReadLinesFromFile>
+    <!-- Copy the bound output files. -->
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+      <Output TaskParameter="Outputs" ItemName="_FullPathToCopy" />
+    </ReadTracking>
 
     <ItemGroup>
-      <_FullPathToCopy Include="$(OutputFile)" Condition=" '@(_FullPathToCopy)'=='' " />
-      <_RelativePath Include="$([MSBuild]::MakeRelative($(FullIntermediateOutputPath), %(_FullPathToCopy.Identity)))" />
+      <_FullPathToCopy Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" Condition=" '@(_FullPathToCopy)'=='' " />
+      <_RelativePath Include="$([MSBuild]::MakeRelative($(FullIntermediateOutputPath), %(_FullPathToCopy.FullPath)))" />
     </ItemGroup>
 
     <Copy

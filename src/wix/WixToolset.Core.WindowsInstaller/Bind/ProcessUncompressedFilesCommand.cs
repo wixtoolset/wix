@@ -109,7 +109,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             // because if the source and destination of the transfer is the same, we
                             // don't want to clean the file because we'd be deleting the original
                             // (and that would be bad).
-                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.Final, facade.SourceLineNumber);
+                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.BuiltOutput, facade.SourceLineNumber);
                             tracked.Clean = !transfer.Redundant;
 
                             trackedFiles.Add(tracked);
