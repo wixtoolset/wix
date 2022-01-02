@@ -11,8 +11,8 @@
 
 @echo Burn integration tests %_C%
 
-msbuild -t:Build -Restore -p:Configuration=%_C% -warnaserror -bl:%_L%\test_burn_build.binlog || exit /b
-msbuild -t:Build -Restore -p:Configuration=%_C% TestData\TestData.proj -bl:%_L%\test_burn_data_build.binlog || exit /b
+msbuild -t:Build -Restore -p:Configuration=%_C% -warnaserror -m -bl:%_L%\test_burn_build.binlog || exit /b
+msbuild -t:Build -Restore TestData\TestData.proj -p:Configuration=%_C% -m -bl:%_L%\test_burn_data_build.binlog || exit /b
 
 @if not "%RuntimeTestsEnabled%"=="true" goto :LExit
 

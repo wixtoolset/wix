@@ -14,8 +14,12 @@ namespace TestExe
 
         static int Main(string[] args)
         {
-            Usage();
             tasks = TaskParser.ParseTasks(args);
+
+            if (tasks.Count == 0)
+            {
+                Usage();
+            }
 
             foreach (Task t in tasks)
             {
