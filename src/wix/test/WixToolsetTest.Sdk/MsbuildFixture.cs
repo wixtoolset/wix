@@ -44,7 +44,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory(Skip = "https://github.com/wixtoolset/issues/issues/6407")]
+        [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
@@ -71,9 +71,9 @@ namespace WixToolsetTest.Sdk
                     .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"bin\x86\Release\SimpleBundle.exe",
-                    @"bin\x86\Release\SimpleBundle.wixpdb",
                     @"bin\x86\Release\test.txt",
+                    @"bin\x86\Release\UncompressedBundle.exe",
+                    @"bin\x86\Release\UncompressedBundle.wixpdb",
                 }, paths);
             }
         }
