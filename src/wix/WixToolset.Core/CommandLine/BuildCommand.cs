@@ -52,11 +52,7 @@ namespace WixToolset.Core.CommandLine
 
         private CompressionLevel? DefaultCompressionLevel { get; set; }
 
-        private string ContentsFile { get; set; }
-
-        private string OutputsFile { get; set; }
-
-        private string BuiltOutputsFile { get; set; }
+        private string TrackingFile { get; set; }
 
         public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -78,11 +74,7 @@ namespace WixToolset.Core.CommandLine
 
             this.Platform = this.commandLine.Platform;
 
-            this.ContentsFile = this.commandLine.ContentsFile;
-
-            this.OutputsFile = this.commandLine.OutputsFile;
-
-            this.BuiltOutputsFile = this.commandLine.BuiltOutputsFile;
+            this.TrackingFile = this.commandLine.TrackingFile;
 
             this.DefaultCompressionLevel = this.commandLine.DefaultCompressionLevel;
 
@@ -371,9 +363,7 @@ namespace WixToolset.Core.CommandLine
                     context.TrackedFiles = bindResult.TrackedFiles;
                     context.FileTransfers = bindResult.FileTransfers;
                     context.IntermediateFolder = intermediateFolder;
-                    context.ContentsFile = this.ContentsFile;
-                    context.OutputsFile = this.OutputsFile;
-                    context.BuiltOutputsFile = this.BuiltOutputsFile;
+                    context.TrackingFile = this.TrackingFile;
                     context.ResetAcls = this.commandLine.ResetAcls;
                     context.CancellationToken = cancellationToken;
 
@@ -537,11 +527,7 @@ namespace WixToolset.Core.CommandLine
 
             public CompressionLevel? DefaultCompressionLevel { get; private set; }
 
-            public string ContentsFile { get; private set; }
-
-            public string OutputsFile { get; private set; }
-
-            public string BuiltOutputsFile { get; private set; }
+            public string TrackingFile { get; private set; }
 
             public List<string> Ices { get; } = new List<string>();
 
@@ -610,16 +596,8 @@ namespace WixToolset.Core.CommandLine
                             parser.GetNextArgumentOrError(arg, this.Cultures);
                             return true;
 
-                        case "contentsfile":
-                            this.ContentsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                            return true;
-
-                        case "outputsfile":
-                            this.OutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                            return true;
-
-                        case "builtoutputsfile":
-                            this.BuiltOutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                        case "trackingfile":
+                            this.TrackingFile = parser.GetNextArgumentAsFilePathOrError(arg);
                             return true;
 
                         case "d":

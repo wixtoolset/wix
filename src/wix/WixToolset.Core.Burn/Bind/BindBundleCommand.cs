@@ -483,7 +483,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);
-                trackedFiles.Add(this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final));
+                trackedFiles.Add(this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.BuiltOutput));
             }
 
 #if TODO // does this need to come back, or do they only need to be in TrackedFiles?
@@ -504,7 +504,7 @@ namespace WixToolset.Core.Burn
             }
             else
             {
-                var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
+                var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.BuiltOutput);
                 trackedFiles.Add(trackPdb);
 
                 wixout = WixOutput.Create(trackPdb.Path);

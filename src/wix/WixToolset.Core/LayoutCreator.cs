@@ -16,6 +16,8 @@ namespace WixToolset.Core
     /// </summary>
     internal class LayoutCreator : ILayoutCreator
     {
+        private const string TrackedLineTypePathSeparator = "\t";
+
         internal LayoutCreator(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -51,22 +53,9 @@ namespace WixToolset.Core
             }
             finally
             {
-                if (context.TrackedFiles != null)
+                if (context.TrackedFiles != null && !String.IsNullOrEmpty(context.TrackingFile))
                 {
-                    if (!String.IsNullOrEmpty(context.ContentsFile))
-                    {
-                        this.CreateContentsFile(context.ContentsFile, context.TrackedFiles);
-                    }
-
-                    if (!String.IsNullOrEmpty(context.OutputsFile))
-                    {
-                        this.CreateOutputsFile(context.OutputsFile, context.TrackedFiles);
-                    }
-
-                    if (!String.IsNullOrEmpty(context.BuiltOutputsFile))
-                    {
-                        this.CreateBuiltOutputsFile(context.BuiltOutputsFile, context.TrackedFiles);
-                    }
+                    this.CreateTrackingFile(context.TrackingFile, context.TrackedFiles);
                 }
             }
 
@@ -78,15 +67,15 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Writes the paths to the content files to a text file.
+        /// Writes the paths of the track files to a text file.
         /// </summary>
         /// <param name="path">Path to write file.</param>
-        /// <param name="trackedFiles">Collection of paths to content files that will be written to file.</param>
-        private void CreateContentsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
+        /// <param name="trackedFiles">Collection of files that were tracked.</param>
+        private void CreateTrackingFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
-            var uniqueInputFilePaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Input).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+            var uniqueTrackingLines = new SortedSet<string>(trackedFiles.Where(t => t.Type != TrackedFileType.Temporary).Select(TrackedFileLine), StringComparer.OrdinalIgnoreCase);
 
-            if (!uniqueInputFilePaths.Any())
+            if (!uniqueTrackingLines.Any())
             {
                 return;
             }
@@ -94,68 +83,11 @@ namespace WixToolset.Core
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
 
-            using (var contents = new StreamWriter(path, false))
+            using (var stream = new StreamWriter(path, false))
             {
-                foreach (var inputPath in uniqueInputFilePaths)
+                foreach (var trackingLine in uniqueTrackingLines)
                 {
-                    contents.WriteLine(inputPath);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Writes the paths to the output files to a text file.
-        /// </summary>
-        /// <param name="path">Path to write file.</param>
-        /// <param name="trackedFiles">Collection of files that were transferred to the output directory.</param>
-        private void CreateOutputsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
-        {
-            var uniqueOutputPaths = new SortedSet<string>(trackedFiles.Where(t => t.Clean).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
-
-            if (!uniqueOutputPaths.Any())
-            {
-                return;
-            }
-
-            var directory = Path.GetDirectoryName(path);
-            Directory.CreateDirectory(directory);
-
-            using (var outputs = new StreamWriter(path, false))
-            {
-                //// Don't list files where the source is the same as the destination since
-                //// that might be the only place the file exists. The outputs file is often
-                //// used to delete stuff and losing the original source would be bad.
-                //var uniqueOutputPaths = new SortedSet<string>(fileTransfers.Where(ft => !ft.Redundant).Select(ft => ft.Destination), StringComparer.OrdinalIgnoreCase);
-
-                foreach (var outputPath in uniqueOutputPaths)
-                {
-                    outputs.WriteLine(outputPath);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Writes the paths to the built output files to a text file.
-        /// </summary>
-        /// <param name="path">Path to write file.</param>
-        /// <param name="trackedFiles">Collection of files that were transferred to the output directory.</param>
-        private void CreateBuiltOutputsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
-        {
-            var uniqueBuiltPaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Final).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
-
-            if (!uniqueBuiltPaths.Any())
-            {
-                return;
-            }
-
-            var directory = Path.GetDirectoryName(path);
-            Directory.CreateDirectory(directory);
-
-            using (var outputs = new StreamWriter(path, false))
-            {
-                foreach (var builtPath in uniqueBuiltPaths)
-                {
-                    outputs.WriteLine(builtPath);
+                    stream.WriteLine(trackingLine);
                 }
             }
         }
@@ -218,6 +150,11 @@ namespace WixToolset.Core
                     uniqueFolders.Add(folder);
                 }
             }
+        }
+
+        private static string TrackedFileLine(ITrackedFile trackedFile)
+        {
+            return trackedFile.Type + TrackedLineTypePathSeparator + trackedFile.Path;
         }
     }
 }

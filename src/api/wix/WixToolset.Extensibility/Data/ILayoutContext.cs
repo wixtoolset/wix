@@ -32,24 +32,14 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<IFileTransfer> FileTransfers { get; set; }
 
         /// <summary>
-        /// File to capture list of content files.
-        /// </summary>
-        string ContentsFile { get; set; }
-
-        /// <summary>
-        /// File to capture list of output files.
-        /// </summary>
-        string OutputsFile { get; set; }
-
-        /// <summary>
         /// Intermediate folder.
         /// </summary>
         string IntermediateFolder { get; set; }
 
         /// <summary>
-        /// List of built output files.
+        /// File to capture list of content, built output and copied output files.
         /// </summary>
-        string BuiltOutputsFile { get; set; }
+        string TrackingFile { get; set; }
 
         /// <summary>
         /// Reset ACLs on file transfers.

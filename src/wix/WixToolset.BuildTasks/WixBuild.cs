@@ -52,11 +52,7 @@ namespace WixToolset.BuildTasks
 
         public bool BindFiles { get; set; }
 
-        public ITaskItem BindContentsFile { get; set; }
-
-        public ITaskItem BindOutputsFile { get; set; }
-
-        public ITaskItem BindBuiltOutputsFile { get; set; }
+        public ITaskItem BindTrackingFile { get; set; }
 
         public string CabinetCachePath { get; set; }
 
@@ -96,9 +92,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-usf ", this.UnreferencedSymbolsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
-            commandLineBuilder.AppendSwitchIfNotNull("-contentsfile ", this.BindContentsFile);
-            commandLineBuilder.AppendSwitchIfNotNull("-outputsfile ", this.BindOutputsFile);
-            commandLineBuilder.AppendSwitchIfNotNull("-builtoutputsfile ", this.BindBuiltOutputsFile);
+            commandLineBuilder.AppendSwitchIfNotNull("-trackingfile ", this.BindTrackingFile);
             commandLineBuilder.AppendSwitchIfNotNull("-defaultcompressionlevel ", this.DefaultCompressionLevel);
 
             base.BuildCommandLine(commandLineBuilder);

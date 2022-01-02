@@ -25,9 +25,15 @@ namespace WixToolset.Extensibility.Data
         Intermediate,
 
         /// <summary>
-        /// Final output (like a .msi, .cab or .wixpdb).
-        /// These are the whole point of the build process.
+        /// Output created by the build process itself (like a .msi, .cab or .wixpdb).
+        /// These files can be recreated in the final output location by building again.
         /// </summary>
-        Final,
+        BuiltOutput,
+
+        /// <summary>
+        /// Output copied by the build process (like external files in an .msi).
+        /// These files are not created by the build process but are copied to the final output location.
+        /// </summary>
+        CopiedOutput,
     }
 }
