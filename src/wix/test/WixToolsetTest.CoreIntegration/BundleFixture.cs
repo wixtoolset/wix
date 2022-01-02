@@ -292,6 +292,46 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildUncompressedBundle()
+        {
+            var folder = TestData.Get(@"TestData") + Path.DirectorySeparatorChar;
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder() + Path.DirectorySeparatorChar;
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var trackingFile = Path.Combine(intermediateFolder, "trackingFile.txt");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleUncompressed", "UncompressedBundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                    "-trackingFile", trackingFile
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(exePath));
+                Assert.True(File.Exists(Path.Combine(Path.GetDirectoryName(exePath), "test.txt")));
+
+                var trackedLines = File.ReadAllLines(trackingFile).Select(s => s.Replace(baseFolder, null, StringComparison.OrdinalIgnoreCase).Replace(folder, null, StringComparison.OrdinalIgnoreCase)).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BuiltOutput\tbin\\test.exe",
+                    "BuiltOutput\tbin\\test.wixpdb",
+                    "CopiedOutput\tbin\\test.txt",
+                    "Input\tSimpleBundle\\data\\fakeba.dll",
+                    "Input\tSimpleBundle\\data\\MsiPackage\\test.txt"
+                }, trackedLines);
+            }
+        }
+
+        [Fact]
         public void CantBuildWithDuplicateCacheIds()
         {
             var folder = TestData.Get(@"TestData");

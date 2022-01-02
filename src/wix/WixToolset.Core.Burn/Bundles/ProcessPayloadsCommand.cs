@@ -77,8 +77,12 @@ namespace WixToolset.Core.Burn.Bundles
                         // External payloads need to be transfered.
                         if (PackagingType.External == payload.Packaging)
                         {
-                            var transfer = this.BackendHelper.CreateFileTransfer(sourceFile.Path, Path.Combine(this.LayoutDirectory, payload.Name), false, payload.SourceLineNumbers);
+                            var outputPath = Path.Combine(this.LayoutDirectory, payload.Name);
+
+                            var transfer = this.BackendHelper.CreateFileTransfer(sourceFile.Path, outputPath, false, payload.SourceLineNumbers);
                             fileTransfers.Add(transfer);
+
+                            trackedFiles.Add(this.BackendHelper.TrackFile(outputPath, TrackedFileType.CopiedOutput, payload.SourceLineNumbers));
                         }
 
                         if (payload.ContentFile)

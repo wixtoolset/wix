@@ -104,8 +104,11 @@ namespace WixToolset.Core.Burn.Bundles
                     // Add detached containers to the list of file transfers.
                     if (ContainerType.Detached == container.Type)
                     {
-                        var transfer = this.BackendHelper.CreateFileTransfer(container.WorkingPath, Path.Combine(this.LayoutFolder, container.Name), true, container.SourceLineNumbers);
+                        var outputPath = Path.Combine(this.LayoutFolder, container.Name);
+                        var transfer = this.BackendHelper.CreateFileTransfer(container.WorkingPath, outputPath, true, container.SourceLineNumbers);
                         fileTransfers.Add(transfer);
+
+                        trackedFiles.Add(this.BackendHelper.TrackFile(outputPath, TrackedFileType.BuiltOutput, container.SourceLineNumbers));
                     }
                     else // update the attached container index.
                     {

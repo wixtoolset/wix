@@ -12,12 +12,4 @@
     <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>
-  <!-- Workaround wix.targets brokenness -->
-  <Target Name="CopyUncompressedFiles" AfterTargets="AfterBuild">
-    <ItemGroup>
-      <UncompressedFiles Include="$(IntermediateOutputPath)\BundleA.wxs" />
-      <UncompressedFiles Include="$(IntermediateOutputPath)\packages.cab" />
-    </ItemGroup>
-    <Copy SourceFiles="@(UncompressedFiles)" DestinationFolder="$(OutputPath)" />
-  </Target>
 </Project>
