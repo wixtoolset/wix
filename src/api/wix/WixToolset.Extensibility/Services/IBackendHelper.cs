@@ -12,7 +12,7 @@ namespace WixToolset.Extensibility.Services
     /// <summary>
     /// Interface provided to help backend extensions.
     /// </summary>
-    public interface IBackendHelper
+    public interface IBackendHelper : ILayoutServices
     {
         /// <summary>
         /// Creates a file facade from a <c>FileSymbol</c> and possible <c>AssemblySymbol</c>.
@@ -35,15 +35,6 @@ namespace WixToolset.Extensibility.Services
         /// <param name="fileSymbol"><c>FileSymbol</c> created from a Merge Module.</param>
         /// <returns>New <c>IFileFacade</c>.</returns>
         IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol);
-
-        /// <summary>
-        /// Creates a file transfer and marks it redundant if the source and destination are identical.
-        /// </summary>
-        /// <param name="source">Source for the file transfer.</param>
-        /// <param name="destination">Destination for the file transfer.</param>
-        /// <param name="move">Indicates whether to move or copy the source file.</param>
-        /// <param name="sourceLineNumbers">Optional source line numbers that requested the file transfer.</param>
-        IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null);
 
         /// <summary>
         /// Creates a MSI compatible GUID.
@@ -171,13 +162,5 @@ namespace WixToolset.Extensibility.Services
         /// Thus the returned array will always be of length 4.
         /// </remarks>
         string[] SplitMsiFileName(string value);
-
-        /// <summary>
-        /// Creates a tracked file.
-        /// </summary>
-        /// <param name="path">Destination path for the build output.</param>
-        /// <param name="type">Type of tracked file to create.</param>
-        /// <param name="sourceLineNumbers">Optional source line numbers that requested the tracked file.</param>
-        ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null);
     }
 }

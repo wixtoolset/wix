@@ -4,7 +4,6 @@ namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -12,16 +11,11 @@ namespace WixToolset.Core.ExtensibilityServices
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    internal class BackendHelper : IBackendHelper
+    internal class BackendHelper : LayoutServices, IBackendHelper
     {
-        private static readonly string[] ReservedFileNames = { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
-
-        public BackendHelper(IServiceProvider serviceProvider)
+        public BackendHelper(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            this.Messaging = serviceProvider.GetService<IMessaging>();
         }
-
-        private IMessaging Messaging { get; }
 
         public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly)
         {
@@ -36,22 +30,6 @@ namespace WixToolset.Core.ExtensibilityServices
         public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol)
         {
             return new FileFacade(true, fileSymbol);
-        }
-
-        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)
-        {
-            var sourceFullPath = this.GetValidatedFullPath(sourceLineNumbers, source);
-
-            var destinationFullPath = this.GetValidatedFullPath(sourceLineNumbers, destination);
-
-            return (String.IsNullOrEmpty(sourceFullPath) || String.IsNullOrEmpty(destinationFullPath)) ? null : new FileTransfer
-            {
-                Source = sourceFullPath,
-                Destination = destinationFullPath,
-                Move = move,
-                SourceLineNumbers = sourceLineNumbers,
-                Redundant = String.Equals(sourceFullPath, destinationFullPath, StringComparison.OrdinalIgnoreCase)
-            };
         }
 
         public string CreateGuid()
@@ -112,11 +90,6 @@ namespace WixToolset.Core.ExtensibilityServices
             return Common.GetNames(value);
         }
 
-        public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)
-        {
-            return new TrackedFile(path, type, sourceLineNumbers);
-        }
-
         public bool IsValidBinderVariable(string variable)
         {
             return Common.IsValidBinderVariable(variable);
@@ -140,37 +113,6 @@ namespace WixToolset.Core.ExtensibilityServices
         public bool IsValidShortFilename(string filename, bool allowWildcards)
         {
             return Common.IsValidShortFilename(filename, allowWildcards);
-        }
-
-        private string GetValidatedFullPath(SourceLineNumber sourceLineNumbers, string path)
-        {
-            try
-            {
-                var result = Path.GetFullPath(path);
-
-                var filename = Path.GetFileName(result);
-
-                foreach (var reservedName in ReservedFileNames)
-                {
-                    if (reservedName.Equals(filename, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.Messaging.Write(ErrorMessages.InvalidFileName(sourceLineNumbers, path));
-                        return null;
-                    }
-                }
-
-                return result;
-            }
-            catch (ArgumentException)
-            {
-                this.Messaging.Write(ErrorMessages.InvalidFileName(sourceLineNumbers, path));
-            }
-            catch (PathTooLongException)
-            {
-                this.Messaging.Write(ErrorMessages.PathTooLong(sourceLineNumbers, path));
-            }
-
-            return null;
         }
     }
 }
