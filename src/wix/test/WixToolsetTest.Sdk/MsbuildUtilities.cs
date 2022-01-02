@@ -30,6 +30,7 @@ namespace WixToolsetTest.Sdk
                 // Node reuse means that child msbuild processes can stay around after the build completes.
                 // Under that scenario, the root msbuild does not reliably close its streams which causes us to hang.
                 "-nr:false",
+                $"-bl:{Path.ChangeExtension(projectPath, ".binlog")}"
             };
 
             if (outOfProc.HasValue)

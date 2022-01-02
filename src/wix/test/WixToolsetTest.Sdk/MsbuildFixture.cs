@@ -397,6 +397,7 @@ namespace WixToolsetTest.Sdk
                 var allowedFiles = new HashSet<string>
                 {
                     "MsiPackage.wixproj",
+                    "MsiPackage.binlog",
                     "Package.en-us.wxl",
                     "Package.wxs",
                     "PackageComponents.wxs",
