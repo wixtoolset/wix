@@ -350,6 +350,9 @@ extern "C" void PackageUninitialize(
 
     switch (pPackage->type)
     {
+    case BURN_PACKAGE_TYPE_BUNDLE:
+        BundlePackageEnginePackageUninitialize(pPackage);
+        break;
     case BURN_PACKAGE_TYPE_EXE:
         ExeEnginePackageUninitialize(pPackage); // TODO: Modularization
         break;
@@ -439,22 +442,11 @@ extern "C" HRESULT PackageFindRelatedById(
     )
 {
     HRESULT hr = S_OK;
-    BURN_PACKAGE* pPackage = NULL;
+    BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
+    
+    hr = RelatedBundleFindById(pRelatedBundles, wzId, &pRelatedBundle);
+    *ppPackage = FAILED(hr) ? NULL : &pRelatedBundle->package;
 
-    for (DWORD i = 0; i < pRelatedBundles->cRelatedBundles; ++i)
-    {
-        pPackage = &pRelatedBundles->rgRelatedBundles[i].package;
-
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, wzId, -1))
-        {
-            *ppPackage = pPackage;
-            ExitFunction1(hr = S_OK);
-        }
-    }
-
-    hr = E_NOTFOUND;
-
-LExit:
     return hr;
 }
 

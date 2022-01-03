@@ -50,6 +50,7 @@ enum BURN_EXECUTE_ACTION_TYPE
     BURN_EXECUTE_ACTION_TYPE_CHECKPOINT,
     BURN_EXECUTE_ACTION_TYPE_WAIT_CACHE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE,
+    BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE,
     BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_MSP_TARGET,
@@ -160,12 +161,16 @@ typedef struct _BURN_EXECUTE_ACTION
         } uncachePackage;
         struct
         {
-            BURN_PACKAGE* pPackage;
-            BOOL fFireAndForget;
+            BURN_RELATED_BUNDLE* pRelatedBundle;
             BOOTSTRAPPER_ACTION_STATE action;
             LPWSTR sczIgnoreDependencies;
             LPWSTR sczAncestors;
             LPWSTR sczEngineWorkingDirectory;
+        } relatedBundle;
+        struct
+        {
+            BURN_PACKAGE* pPackage;
+            BOOTSTRAPPER_ACTION_STATE action;
         } exePackage;
         struct
         {
@@ -339,9 +344,7 @@ HRESULT PlanPackages(
     __in BURN_PACKAGES* pPackages,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT PlanRegistration(
     __in BURN_PLAN* pPlan,
@@ -356,18 +359,14 @@ HRESULT PlanPassThroughBundle(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT PlanUpdateBundle(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT PlanLayoutContainer(
     __in BURN_PLAN* pPlan,
@@ -379,7 +378,6 @@ HRESULT PlanLayoutPackage(
     );
 HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,

@@ -3,23 +3,6 @@
 #include "precomp.h"
 
 
-// internal function declarations
-
-static HRESULT HandleExitCode(
-    __in BURN_PACKAGE* pPackage,
-    __in DWORD dwExitCode,
-    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
-    );
-static HRESULT ParseCommandLineArgumentsFromXml(
-    __in IXMLDOMNode* pixnExePackage,
-    __in BURN_PACKAGE* pPackage
-    );
-static HRESULT ParseExitCodesFromXml(
-    __in IXMLDOMNode* pixnExePackage,
-    __in BURN_PACKAGE* pPackage
-    );
-
-
 // function definitions
 
 extern "C" HRESULT ExeEngineParsePackageFromXml(
@@ -82,10 +65,10 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
         ExitOnFailure(hr, "Failed to get @Protocol.");
     }
 
-    hr = ParseExitCodesFromXml(pixnExePackage, pPackage);
+    hr = ExeEngineParseExitCodesFromXml(pixnExePackage, &pPackage->Exe.rgExitCodes, &pPackage->Exe.cExitCodes);
     ExitOnFailure(hr, "Failed to parse exit codes.");
 
-    hr = ParseCommandLineArgumentsFromXml(pixnExePackage, pPackage);
+    hr = ExeEngineParseCommandLineArgumentsFromXml(pixnExePackage, &pPackage->Exe.rgCommandLineArguments, &pPackage->Exe.cCommandLineArguments);
     ExitOnFailure(hr, "Failed to parse command lines.");
 
 LExit:
@@ -104,8 +87,6 @@ extern "C" void ExeEnginePackageUninitialize(
     ReleaseStr(pPackage->Exe.sczInstallArguments);
     ReleaseStr(pPackage->Exe.sczRepairArguments);
     ReleaseStr(pPackage->Exe.sczUninstallArguments);
-    ReleaseStr(pPackage->Exe.sczIgnoreDependencies);
-    //ReleaseStr(pPackage->Exe.sczProgressSwitch);
     ReleaseMem(pPackage->Exe.rgExitCodes);
 
     // free command-line arguments
@@ -113,17 +94,23 @@ extern "C" void ExeEnginePackageUninitialize(
     {
         for (DWORD i = 0; i < pPackage->Exe.cCommandLineArguments; ++i)
         {
-            BURN_EXE_COMMAND_LINE_ARGUMENT* pCommandLineArgument = &pPackage->Exe.rgCommandLineArguments[i];
-            ReleaseStr(pCommandLineArgument->sczInstallArgument);
-            ReleaseStr(pCommandLineArgument->sczUninstallArgument);
-            ReleaseStr(pCommandLineArgument->sczRepairArgument);
-            ReleaseStr(pCommandLineArgument->sczCondition);
+            ExeEngineCommandLineArgumentUninitialize(pPackage->Exe.rgCommandLineArguments + i);
         }
         MemFree(pPackage->Exe.rgCommandLineArguments);
     }
 
     // clear struct
     memset(&pPackage->Exe, 0, sizeof(pPackage->Exe));
+}
+
+extern "C" void ExeEngineCommandLineArgumentUninitialize(
+    __in BURN_EXE_COMMAND_LINE_ARGUMENT* pCommandLineArgument
+    )
+{
+    ReleaseStr(pCommandLineArgument->sczInstallArgument);
+    ReleaseStr(pCommandLineArgument->sczUninstallArgument);
+    ReleaseStr(pCommandLineArgument->sczRepairArgument);
+    ReleaseStr(pCommandLineArgument->sczCondition);
 }
 
 extern "C" HRESULT ExeEngineDetectPackage(
@@ -264,7 +251,6 @@ LExit:
 // PlanAdd - adds the calculated execute and rollback actions for the package.
 //
 extern "C" HRESULT ExeEnginePlanAddPackage(
-    __in_opt DWORD *pdwInsertSequence,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -274,45 +260,18 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
     HRESULT hr = S_OK;
     BURN_EXECUTE_ACTION* pAction = NULL;
 
-    hr = DependencyPlanPackage(pdwInsertSequence, pPackage, pPlan);
+    hr = DependencyPlanPackage(NULL, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to plan package dependency actions.");
 
     // add execute action
     if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
     {
-        if (NULL != pdwInsertSequence)
-        {
-            hr = PlanInsertExecuteAction(*pdwInsertSequence, pPlan, &pAction);
-            ExitOnFailure(hr, "Failed to insert execute action.");
-        }
-        else
-        {
-            hr = PlanAppendExecuteAction(pPlan, &pAction);
-            ExitOnFailure(hr, "Failed to append execute action.");
-        }
+        hr = PlanAppendExecuteAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append execute action.");
 
         pAction->type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
         pAction->exePackage.pPackage = pPackage;
-        pAction->exePackage.fFireAndForget = (BOOTSTRAPPER_ACTION_UPDATE_REPLACE == pPlan->action);
         pAction->exePackage.action = pPackage->execute;
-
-        if (pPackage->Exe.sczIgnoreDependencies)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczIgnoreDependencies, pPackage->Exe.sczIgnoreDependencies, 0);
-            ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
-        }
-
-        if (pPackage->Exe.wzAncestors)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
-            ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
-        }
-
-        if (pPackage->Exe.wzEngineWorkingDirectory)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczEngineWorkingDirectory, pPackage->Exe.wzEngineWorkingDirectory, 0);
-            ExitOnFailure(hr, "Failed to allocate the custom working directory.");
-        }
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, NULL); // ignore errors.
     }
@@ -326,18 +285,6 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
         pAction->type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
         pAction->exePackage.pPackage = pPackage;
         pAction->exePackage.action = pPackage->rollback;
-
-        if (pPackage->Exe.sczIgnoreDependencies)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczIgnoreDependencies, pPackage->Exe.sczIgnoreDependencies, 0);
-            ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
-        }
-
-        if (pPackage->Exe.wzAncestors)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
-            ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
-        }
 
         LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, NULL); // ignore errors.
     }
@@ -452,13 +399,13 @@ extern "C" HRESULT ExeEngineExecutePackage(
         hr = VariableFormatString(pVariables, sczArguments, &sczArgumentsFormatted, NULL);
         ExitOnFailure(hr, "Failed to format argument string.");
 
-        hr = StrAllocFormattedSecure(&sczCommand, L"\"%ls\" %s", sczExecutablePath, sczArgumentsFormatted);
+        hr = StrAllocFormattedSecure(&sczCommand, L"\"%ls\" %ls", sczExecutablePath, sczArgumentsFormatted);
         ExitOnFailure(hr, "Failed to create executable command.");
 
         hr = VariableFormatStringObfuscated(pVariables, sczArguments, &sczArgumentsObfuscated, NULL);
         ExitOnFailure(hr, "Failed to format obfuscated argument string.");
 
-        hr = StrAllocFormatted(&sczCommandObfuscated, L"\"%ls\" %s", sczExecutablePath, sczArgumentsObfuscated);
+        hr = StrAllocFormatted(&sczCommandObfuscated, L"\"%ls\" %ls", sczExecutablePath, sczArgumentsObfuscated);
     }
     else
     {
@@ -469,47 +416,15 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
     ExitOnFailure(hr, "Failed to create obfuscated executable command.");
 
-    if (pPackage->Exe.fSupportsAncestors)
-    {
-        // Add the list of dependencies to ignore, if any, to the burn command line.
-        if (pExecuteAction->exePackage.sczIgnoreDependencies && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
-        {
-            hr = StrAllocFormattedSecure(&sczCommand, L"%ls -%ls=%ls", sczCommand, BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
-            ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
-
-            hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls -%ls=%ls", sczCommandObfuscated, BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
-            ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the obfuscated command line.");
-        }
-
-        // Add the list of ancestors, if any, to the burn command line.
-        if (pExecuteAction->exePackage.sczAncestors)
-        {
-            hr = StrAllocFormattedSecure(&sczCommand, L"%ls -%ls=%ls", sczCommand, BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->exePackage.sczAncestors);
-            ExitOnFailure(hr, "Failed to append the list of ancestors to the command line.");
-
-            hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls -%ls=%ls", sczCommandObfuscated, BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->exePackage.sczAncestors);
-            ExitOnFailure(hr, "Failed to append the list of ancestors to the obfuscated command line.");
-        }
-    }
-
-    if (BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
-    {
-        hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->exePackage.sczEngineWorkingDirectory, &sczCommand, &sczCommandObfuscated);
-        ExitOnFailure(hr, "Failed to append the custom working directory to the exepackage command line.");
-
-        hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczCommand, &sczCommandObfuscated);
-        ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
-    }
-
     // Log before we add the secret pipe name and client token for embedded processes.
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), sczExecutablePath, sczCommandObfuscated);
 
-    if (!pExecuteAction->exePackage.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
+    if (!pPackage->Exe.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
     {
         hr = EmbeddedRunBundle(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
-        ExitOnFailure(hr, "Failed to run bundle as embedded from path: %ls", sczExecutablePath);
+        ExitOnFailure(hr, "Failed to run exe with Burn protocol from path: %ls", sczExecutablePath);
     }
-    else if (!pExecuteAction->exePackage.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_NETFX4 == pPackage->Exe.protocol)
+    else if (!pPackage->Exe.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_NETFX4 == pPackage->Exe.protocol)
     {
         hr = NetFxRunChainer(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run netfx chainer: %ls", sczExecutablePath);
@@ -524,7 +439,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
             ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", sczExecutablePath);
         }
 
-        if (pExecuteAction->exePackage.fFireAndForget)
+        if (pPackage->Exe.fFireAndForget)
         {
             ::WaitForInputIdle(pi.hProcess, 5000);
             ExitFunction();
@@ -547,7 +462,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
         } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
     }
 
-    hr = HandleExitCode(pPackage, dwExitCode, pRestart);
+    hr = ExeEngineHandleExitCode(pPackage->Exe.rgExitCodes, pPackage->Exe.cExitCodes, dwExitCode, pRestart);
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:
@@ -595,12 +510,10 @@ LExit:
     return;
 }
 
-
-// internal helper functions
-
-static HRESULT ParseExitCodesFromXml(
-    __in IXMLDOMNode* pixnExePackage,
-    __in BURN_PACKAGE* pPackage
+extern "C" HRESULT ExeEngineParseExitCodesFromXml(
+    __in IXMLDOMNode* pixnPackage,
+    __inout BURN_EXE_EXIT_CODE** prgExitCodes,
+    __inout DWORD* pcExitCodes
     )
 {
     HRESULT hr = S_OK;
@@ -610,7 +523,7 @@ static HRESULT ParseExitCodesFromXml(
     LPWSTR scz = NULL;
 
     // select exit code nodes
-    hr = XmlSelectNodes(pixnExePackage, L"ExitCode", &pixnNodes);
+    hr = XmlSelectNodes(pixnPackage, L"ExitCode", &pixnNodes);
     ExitOnFailure(hr, "Failed to select exit code nodes.");
 
     // get exit code node count
@@ -620,15 +533,15 @@ static HRESULT ParseExitCodesFromXml(
     if (cNodes)
     {
         // allocate memory for exit codes
-        pPackage->Exe.rgExitCodes = (BURN_EXE_EXIT_CODE*) MemAlloc(sizeof(BURN_EXE_EXIT_CODE) * cNodes, TRUE);
-        ExitOnNull(pPackage->Exe.rgExitCodes, hr, E_OUTOFMEMORY, "Failed to allocate memory for exit code structs.");
+        *prgExitCodes = (BURN_EXE_EXIT_CODE*) MemAlloc(sizeof(BURN_EXE_EXIT_CODE) * cNodes, TRUE);
+        ExitOnNull(*prgExitCodes, hr, E_OUTOFMEMORY, "Failed to allocate memory for exit code structs.");
 
-        pPackage->Exe.cExitCodes = cNodes;
+        *pcExitCodes = cNodes;
 
         // parse package elements
         for (DWORD i = 0; i < cNodes; ++i)
         {
-            BURN_EXE_EXIT_CODE* pExitCode = &pPackage->Exe.rgExitCodes[i];
+            BURN_EXE_EXIT_CODE* pExitCode = *prgExitCodes + i;
 
             hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
             ExitOnFailure(hr, "Failed to get next node.");
@@ -666,9 +579,10 @@ LExit:
     return hr;
 }
 
-static HRESULT ParseCommandLineArgumentsFromXml(
-    __in IXMLDOMNode* pixnExePackage,
-    __in BURN_PACKAGE* pPackage
+extern "C" HRESULT ExeEngineParseCommandLineArgumentsFromXml(
+    __in IXMLDOMNode* pixnPackage,
+    __inout BURN_EXE_COMMAND_LINE_ARGUMENT** prgCommandLineArguments,
+    __inout DWORD* pcCommandLineArguments
     )
 {
     HRESULT hr = S_OK;
@@ -678,7 +592,7 @@ static HRESULT ParseCommandLineArgumentsFromXml(
     LPWSTR scz = NULL;
 
     // Select command-line argument nodes.
-    hr = XmlSelectNodes(pixnExePackage, L"CommandLine", &pixnNodes);
+    hr = XmlSelectNodes(pixnPackage, L"CommandLine", &pixnNodes);
     ExitOnFailure(hr, "Failed to select command-line argument nodes.");
 
     // Get command-line argument node count.
@@ -687,15 +601,15 @@ static HRESULT ParseCommandLineArgumentsFromXml(
 
     if (cNodes)
     {
-        pPackage->Exe.rgCommandLineArguments = (BURN_EXE_COMMAND_LINE_ARGUMENT*) MemAlloc(sizeof(BURN_EXE_COMMAND_LINE_ARGUMENT) * cNodes, TRUE);
-        ExitOnNull(pPackage->Exe.rgCommandLineArguments, hr, E_OUTOFMEMORY, "Failed to allocate memory for command-line argument structs.");
+        *prgCommandLineArguments = (BURN_EXE_COMMAND_LINE_ARGUMENT*) MemAlloc(sizeof(BURN_EXE_COMMAND_LINE_ARGUMENT) * cNodes, TRUE);
+        ExitOnNull(*prgCommandLineArguments, hr, E_OUTOFMEMORY, "Failed to allocate memory for command-line argument structs.");
 
-        pPackage->Exe.cCommandLineArguments = cNodes;
+        *pcCommandLineArguments = cNodes;
 
         // Parse command-line argument elements.
         for (DWORD i = 0; i < cNodes; ++i)
         {
-            BURN_EXE_COMMAND_LINE_ARGUMENT* pCommandLineArgument = &pPackage->Exe.rgCommandLineArguments[i];
+            BURN_EXE_COMMAND_LINE_ARGUMENT* pCommandLineArgument = *prgCommandLineArguments + i;
 
             hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
             ExitOnFailure(hr, "Failed to get next command-line argument node.");
@@ -731,8 +645,9 @@ LExit:
     return hr;
 }
 
-static HRESULT HandleExitCode(
-    __in BURN_PACKAGE* pPackage,
+extern "C" HRESULT ExeEngineHandleExitCode(
+    __in BURN_EXE_EXIT_CODE* rgCustomExitCodes,
+    __in DWORD cCustomExitCodes,
     __in DWORD dwExitCode,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
@@ -740,9 +655,9 @@ static HRESULT HandleExitCode(
     HRESULT hr = S_OK;
     BURN_EXE_EXIT_CODE_TYPE typeCode = BURN_EXE_EXIT_CODE_TYPE_NONE;
 
-    for (DWORD i = 0; i < pPackage->Exe.cExitCodes; ++i)
+    for (DWORD i = 0; i < cCustomExitCodes; ++i)
     {
-        BURN_EXE_EXIT_CODE* pExitCode = &pPackage->Exe.rgExitCodes[i];
+        BURN_EXE_EXIT_CODE* pExitCode = rgCustomExitCodes + i;
 
         // If this is a wildcard, use the last one we come across.
         if (pExitCode->fWildcard)

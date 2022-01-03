@@ -228,11 +228,11 @@ extern "C" HRESULT CoreInitializeConstants(
     {
         BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
 
-        if (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol) // TODO: Don't assume exePackages with burn protocol are bundles.
+        if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type)
         {
             // Pass along any ancestors and ourself to prevent infinite loops.
-            pPackage->Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
-            pPackage->Exe.wzEngineWorkingDirectory = pInternalCommand->sczEngineWorkingDirectory;
+            pPackage->Bundle.wzAncestors = pRegistration->sczBundlePackageAncestors;
+            pPackage->Bundle.wzEngineWorkingDirectory = pInternalCommand->sczEngineWorkingDirectory;
         }
     }
 
@@ -518,7 +518,7 @@ extern "C" HRESULT CorePlan(
         ExitOnFailure(hr, "Failed to plan the layout of the bundle.");
 
         // Plan the packages' layout.
-        hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
+        hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables);
         ExitOnFailure(hr, "Failed to plan packages.");
     }
     else if (BOOTSTRAPPER_ACTION_UPDATE_REPLACE == action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED == action)
@@ -527,7 +527,7 @@ extern "C" HRESULT CorePlan(
 
         pUpgradeBundlePackage = &pEngineState->update.package;
 
-        hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
+        hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables);
         ExitOnFailure(hr, "Failed to plan update.");
     }
     else
@@ -541,7 +541,7 @@ extern "C" HRESULT CorePlan(
 
             pForwardCompatibleBundlePackage = &pEngineState->plan.forwardCompatibleBundle;
 
-            hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
+            hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables);
             ExitOnFailure(hr, "Failed to plan passthrough.");
         }
         else // doing an action that modifies the machine state.
@@ -562,7 +562,7 @@ extern "C" HRESULT CorePlan(
                 hr = PlanRelatedBundlesBegin(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
                 ExitOnFailure(hr, "Failed to plan related bundles.");
 
-                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
+                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables);
                 ExitOnFailure(hr, "Failed to plan packages.");
 
                 // Schedule the update of related bundles last.

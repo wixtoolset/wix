@@ -98,6 +98,37 @@ extern "C" void RelatedBundlesUninitialize(
 }
 
 
+extern "C" HRESULT RelatedBundleFindById(
+    __in BURN_RELATED_BUNDLES* pRelatedBundles,
+    __in_z LPCWSTR wzId,
+    __out BURN_RELATED_BUNDLE** ppRelatedBundle
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
+    BURN_PACKAGE* pPackage = NULL;
+    
+    *ppRelatedBundle = NULL;
+
+    for (DWORD i = 0; i < pRelatedBundles->cRelatedBundles; ++i)
+    {
+        pRelatedBundle = pRelatedBundles->rgRelatedBundles + i;
+        pPackage = &pRelatedBundle->package;
+
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, wzId, -1))
+        {
+            *ppRelatedBundle = pRelatedBundle;
+            ExitFunction1(hr = S_OK);
+        }
+    }
+
+    hr = E_NOTFOUND;
+
+LExit:
+    return hr;
+}
+
+
 // internal helper functions
 
 static HRESULT LoadIfRelatedBundle(
@@ -410,6 +441,7 @@ static HRESULT LoadRelatedBundleFromKey(
     BOOL fCached = FALSE;
     DWORD64 qwFileSize = 0;
     BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
+    BURN_DEPENDENCY_PROVIDER* pBundleDependencyProvider = NULL;
 
     // Only support progress from engines that are compatible.
     hr = RegReadNumber(hkBundleId, BURN_REGISTRATION_REGISTRY_ENGINE_PROTOCOL_VERSION, &dwEngineProtocolVersion);
@@ -458,6 +490,11 @@ static HRESULT LoadRelatedBundleFromKey(
     if (E_FILENOTFOUND != hr)
     {
         ExitOnFailure(hr, "Failed to read provider key from registry for bundle: %ls", wzRelatedBundleId);
+    }
+
+    if (dependencyProvider.sczKey && *dependencyProvider.sczKey)
+    {
+        pBundleDependencyProvider = &dependencyProvider;
 
         dependencyProvider.fImported = TRUE;
 
@@ -480,11 +517,11 @@ static HRESULT LoadRelatedBundleFromKey(
 
     pRelatedBundle->relationType = relationType;
 
-    hr = PseudoBundleInitialize(&pRelatedBundle->package, fSupportsBurnProtocol, fPerMachine, wzRelatedBundleId, pRelatedBundle->relationType,
-                                BOOTSTRAPPER_PACKAGE_STATE_PRESENT, fCached, sczCachePath, sczCachePath, NULL, qwFileSize, FALSE,
-                                L"-quiet", L"-repair -quiet", L"-uninstall -quiet",
-                                (dependencyProvider.sczKey && *dependencyProvider.sczKey) ? &dependencyProvider : NULL,
-                                NULL, 0);
+    hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, fSupportsBurnProtocol, fPerMachine, wzRelatedBundleId,
+#ifdef DEBUG
+                                       pRelatedBundle->relationType,
+#endif
+                                       fCached, sczCachePath, qwFileSize, pBundleDependencyProvider);
     ExitOnFailure(hr, "Failed to initialize related bundle to represent bundle: %ls", wzRelatedBundleId);
 
 LExit:

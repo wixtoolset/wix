@@ -35,6 +35,7 @@ enum BURN_EXE_PROTOCOL_TYPE
 enum BURN_PACKAGE_TYPE
 {
     BURN_PACKAGE_TYPE_NONE,
+    BURN_PACKAGE_TYPE_BUNDLE,
     BURN_PACKAGE_TYPE_EXE,
     BURN_PACKAGE_TYPE_MSI,
     BURN_PACKAGE_TYPE_MSP,
@@ -263,20 +264,35 @@ typedef struct _BURN_PACKAGE
     {
         struct
         {
-            LPWSTR sczDetectCondition;
             LPWSTR sczInstallArguments;
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
+
             LPWSTR sczIgnoreDependencies;
             LPCWSTR wzAncestors; // points directly into engine state.
             LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 
             BOOL fPseudoBundle;
+            BOOL fRepairable;
+            BOOL fSupportsBurnProtocol;
 
+            BURN_EXE_EXIT_CODE* rgExitCodes;
+            DWORD cExitCodes;
+
+            BURN_EXE_COMMAND_LINE_ARGUMENT* rgCommandLineArguments;
+            DWORD cCommandLineArguments;
+        } Bundle;
+        struct
+        {
+            LPWSTR sczDetectCondition;
+            LPWSTR sczInstallArguments;
+            LPWSTR sczRepairArguments;
+            LPWSTR sczUninstallArguments;
+
+            BOOL fPseudoBundle;
+            BOOL fFireAndForget;
             BOOL fRepairable;
             BURN_EXE_PROTOCOL_TYPE protocol;
-
-            BOOL fSupportsAncestors;
 
             BURN_EXE_EXIT_CODE* rgExitCodes;
             DWORD cExitCodes;
