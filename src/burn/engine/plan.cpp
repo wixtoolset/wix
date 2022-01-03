@@ -36,16 +36,13 @@ static HRESULT PlanPackagesHelper(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     );
 static HRESULT InitializePackage(
     __in BURN_PLAN* pPlan,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_PACKAGE* pPackage,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_PACKAGE* pPackage
     );
 static HRESULT ProcessPackage(
     __in BOOL fBundlePerMachine,
@@ -54,7 +51,6 @@ static HRESULT ProcessPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
     );
 static HRESULT ProcessPackageRollbackBoundary(
@@ -266,10 +262,10 @@ extern "C" void PlanUninitializeExecuteAction(
 {
     switch (pExecuteAction->type)
     {
-    case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
-        ReleaseStr(pExecuteAction->exePackage.sczIgnoreDependencies);
-        ReleaseStr(pExecuteAction->exePackage.sczAncestors);
-        ReleaseStr(pExecuteAction->exePackage.sczEngineWorkingDirectory);
+    case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
+        ReleaseStr(pExecuteAction->relatedBundle.sczIgnoreDependencies);
+        ReleaseStr(pExecuteAction->relatedBundle.sczAncestors);
+        ReleaseStr(pExecuteAction->relatedBundle.sczEngineWorkingDirectory);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
@@ -500,14 +496,12 @@ extern "C" HRESULT PlanPackages(
     __in BURN_PACKAGES* pPackages,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     )
 {
     HRESULT hr = S_OK;
     
-    hr = PlanPackagesHelper(pPackages->rgPackages, pPackages->cPackages, pUX, pPlan, pLog, pVariables, display, relationType);
+    hr = PlanPackagesHelper(pPackages->rgPackages, pPackages->cPackages, pUX, pPlan, pLog, pVariables);
 
     return hr;
 }
@@ -712,15 +706,13 @@ extern "C" HRESULT PlanPassThroughBundle(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     )
 {
     HRESULT hr = S_OK;
 
     // Plan passthrough package.
-    hr = PlanPackagesHelper(pPackage, 1, pUX, pPlan, pLog, pVariables, display, relationType);
+    hr = PlanPackagesHelper(pPackage, 1, pUX, pPlan, pLog, pVariables);
     ExitOnFailure(hr, "Failed to process passthrough package.");
 
 LExit:
@@ -732,15 +724,17 @@ extern "C" HRESULT PlanUpdateBundle(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     )
 {
     HRESULT hr = S_OK;
 
+    Assert(!pPackage->fPerMachine);
+    Assert(BURN_PACKAGE_TYPE_EXE == pPackage->type);
+    pPackage->Exe.fFireAndForget = BOOTSTRAPPER_ACTION_UPDATE_REPLACE == pPlan->action;
+
     // Plan update package.
-    hr = PlanPackagesHelper(pPackage, 1, pUX, pPlan, pLog, pVariables, display, relationType);
+    hr = PlanPackagesHelper(pPackage, 1, pUX, pPlan, pLog, pVariables);
     ExitOnFailure(hr, "Failed to process update package.");
 
 LExit:
@@ -753,9 +747,7 @@ static HRESULT PlanPackagesHelper(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_VARIABLES* pVariables
     )
 {
     HRESULT hr = S_OK;
@@ -768,7 +760,7 @@ static HRESULT PlanPackagesHelper(
         DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
-        hr = InitializePackage(pPlan, pUX, pVariables, pPackage, relationType);
+        hr = InitializePackage(pPlan, pUX, pVariables, pPackage);
         ExitOnFailure(hr, "Failed to initialize package.");
     }
 
@@ -791,7 +783,7 @@ static HRESULT PlanPackagesHelper(
         DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
-        hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, &pRollbackBoundary);
+        hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, &pRollbackBoundary);
         ExitOnFailure(hr, "Failed to process package.");
     }
 
@@ -841,14 +833,24 @@ static HRESULT InitializePackage(
     __in BURN_PLAN* pPlan,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_PACKAGE* pPackage,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    __in BURN_PACKAGE* pPackage
     )
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition = BOOTSTRAPPER_PACKAGE_CONDITION_DEFAULT;
     BOOL fInstallCondition = FALSE;
     BOOL fBeginCalled = FALSE;
+    BOOTSTRAPPER_RELATION_TYPE relationType = pPlan->pCommand->relationType;
+
+    if (BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fPseudoBundle)
+    {
+        // Exe pseudo bundles are not configurable.
+        // The BA already requested this package to be executed
+        // * by the overall plan action for UpdateReplace
+        // * by enabling the forward compatible bundle for Passthrough
+        pPackage->defaultRequested = pPackage->requested = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
+        ExitFunction();
+    }
 
     if (pPackage->fCanAffectRegistration)
     {
@@ -896,7 +898,6 @@ static HRESULT ProcessPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
     )
 {
@@ -920,7 +921,7 @@ static HRESULT ProcessPackage(
         if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
         {
             // If the package is in a requested state, plan it.
-            hr = PlanExecutePackage(fBundlePerMachine, display, pUX, pPlan, pPackage, pLog, pVariables);
+            hr = PlanExecutePackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables);
             ExitOnFailure(hr, "Failed to plan execute package.");
         }
         else
@@ -1064,7 +1065,6 @@ LExit:
 
 extern "C" HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
@@ -1073,6 +1073,7 @@ extern "C" HRESULT PlanExecutePackage(
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_DISPLAY display = pPlan->pCommand->display;
     BOOL fRequestedCache = BOOTSTRAPPER_CACHE_TYPE_REMOVE < pPackage->cacheType && (BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested || ForceCache(pPlan, pPackage));
 
     hr = CalculateExecuteActions(pPackage, pPlan->pActiveRollbackBoundary);
@@ -1124,7 +1125,7 @@ extern "C" HRESULT PlanExecutePackage(
     switch (pPackage->type)
     {
     case BURN_PACKAGE_TYPE_EXE:
-        hr = ExeEnginePlanAddPackage(NULL, pPackage, pPlan, pLog, pVariables);
+        hr = ExeEnginePlanAddPackage(pPackage, pPlan, pLog, pVariables);
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
@@ -1288,8 +1289,8 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         }
 
         // Pass along any ancestors and ourself to prevent infinite loops.
-        pRelatedBundle->package.Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
-        pRelatedBundle->package.Exe.wzEngineWorkingDirectory = pPlan->pInternalCommand->sczEngineWorkingDirectory;
+        pRelatedBundle->package.Bundle.wzAncestors = pRegistration->sczBundlePackageAncestors;
+        pRelatedBundle->package.Bundle.wzEngineWorkingDirectory = pPlan->pInternalCommand->sczEngineWorkingDirectory;
 
         hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, pPlan->action, pRegistration->pVersion, pRelatedBundle->pVersion, &pRelatedBundle->package.requested);
         ExitOnFailure(hr, "Failed to get default request state for related bundle.");
@@ -1349,37 +1350,38 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
     for (DWORD i = 0; i < pPlan->cExecuteActions; ++i)
     {
-        if (BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE == pPlan->rgExecuteActions[i].type && BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].exePackage.action)
+        switch (pPlan->rgExecuteActions[i].type)
         {
-            fExecutingAnyPackage = TRUE;
-
-            BURN_PACKAGE* pPackage = pPlan->rgExecuteActions[i].packageProvider.pPackage;
-            if (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
+        case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
+            if (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].relatedBundle.action)
             {
-                if (0 < pPackage->cDependencyProviders)
+                fExecutingAnyPackage = TRUE;
+
+                BURN_PACKAGE* pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
+                if (pPackage->cDependencyProviders)
                 {
                     // Bundles only support a single provider key.
                     const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders;
                     DictAddKey(sdProviderKeys, pProvider->sczKey);
                 }
             }
-        }
-        else
-        {
-            switch (pPlan->rgExecuteActions[i].type)
-            {
-            case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-                fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].msiPackage.action);
-                break;
+            break;
 
-            case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-                fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].mspTarget.action);
-                break;
+        case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
+            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].exePackage.action);
+            break;
 
-            case BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE:
-                fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].msuPackage.action);
-                break;
-            }
+        case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
+            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].msiPackage.action);
+            break;
+
+        case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
+            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].mspTarget.action);
+            break;
+
+        case BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE:
+            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].msuPackage.action);
+            break;
         }
     }
 
@@ -1422,7 +1424,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
         if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
         {
             // Addon and patch bundles will be passed a list of dependencies to ignore for planning.
-            hr = StrAllocString(&pRelatedBundle->package.Exe.sczIgnoreDependencies, sczIgnoreDependencies, 0);
+            hr = StrAllocString(&pRelatedBundle->package.Bundle.sczIgnoreDependencies, sczIgnoreDependencies, 0);
             ExitOnFailure(hr, "Failed to copy the list of dependencies to ignore.");
 
             // Uninstall addons and patches early in the chain, before other packages are uninstalled.
@@ -1434,8 +1436,8 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
         if (BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
         {
-            hr = ExeEnginePlanCalculatePackage(&pRelatedBundle->package);
-            ExitOnFailure(hr, "Failed to calcuate plan for related bundle: %ls", pRelatedBundle->package.sczId);
+            hr = BundlePackageEnginePlanCalculatePackage(&pRelatedBundle->package);
+            ExitOnFailure(hr, "Failed to calculate plan for related bundle: %ls", pRelatedBundle->package.sczId);
 
             // Calculate package states based on reference count for addon and patch related bundles.
             if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
@@ -1450,7 +1452,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
                 }
             }
 
-            hr = ExeEnginePlanAddPackage(pdwInsertIndex, &pRelatedBundle->package, pPlan, pLog, pVariables);
+            hr = BundlePackageEnginePlanAddRelatedBundle(pdwInsertIndex, pRelatedBundle, pPlan, pLog, pVariables);
             ExitOnFailure(hr, "Failed to add to plan related bundle: %ls", pRelatedBundle->package.sczId);
 
             // Calculate package states based on reference count for addon and patch related bundles.
@@ -2603,8 +2605,12 @@ static void ExecuteActionLog(
         LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls, action: %hs", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey, LoggingDependencyActionToString(pAction->packageDependency.action));
         break;
 
+    case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: RELATED_BUNDLE package id: %ls, action: %hs, ignore dependencies: %ls", wzBase, iAction, pAction->relatedBundle.pRelatedBundle->package.sczId, LoggingActionStateToString(pAction->relatedBundle.action), pAction->relatedBundle.sczIgnoreDependencies);
+        break;
+
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: EXE_PACKAGE package id: %ls, action: %hs, ignore dependencies: %ls", wzBase, iAction, pAction->exePackage.pPackage->sczId, LoggingActionStateToString(pAction->exePackage.action), pAction->exePackage.sczIgnoreDependencies);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: EXE_PACKAGE package id: %ls, action: %hs", wzBase, iAction, pAction->exePackage.pPackage->sczId, LoggingActionStateToString(pAction->exePackage.action));
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:

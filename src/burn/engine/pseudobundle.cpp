@@ -3,36 +3,24 @@
 #include "precomp.h"
 
 
-extern "C" HRESULT PseudoBundleInitialize(
+extern "C" HRESULT PseudoBundleInitializeRelated(
     __in BURN_PACKAGE* pPackage,
     __in BOOL fSupportsBurnProtocol,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzId,
+#ifdef DEBUG
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOTSTRAPPER_PACKAGE_STATE state,
+#endif
     __in BOOL fCached,
     __in_z LPCWSTR wzFilePath,
-    __in_z LPCWSTR wzLocalSource,
-    __in_z_opt LPCWSTR wzDownloadSource,
     __in DWORD64 qwSize,
-    __in BOOL fVital,
-    __in_z_opt LPCWSTR wzInstallArguments,
-    __in_z_opt LPCWSTR wzRepairArguments,
-    __in_z_opt LPCWSTR wzUninstallArguments,
-    __in_opt BURN_DEPENDENCY_PROVIDER* pDependencyProvider,
-    __in_opt const BYTE* pbHash,
-    __in const DWORD cbHash
+    __in_opt BURN_DEPENDENCY_PROVIDER* pDependencyProvider
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczRelationTypeCommandLineSwitch = NULL;
     BURN_PAYLOAD* pPayload = NULL;
 
-    LPCWSTR wzRelationTypeCommandLine = CoreRelationTypeToCommandLineString(relationType);
-    if (wzRelationTypeCommandLine)
-    {
-        hr = StrAllocFormatted(&sczRelationTypeCommandLineSwitch, L" -%ls", wzRelationTypeCommandLine);
-    }
+    AssertSz(BOOTSTRAPPER_RELATION_UPDATE != relationType, "Update pseudo bundles must use PseudoBundleInitializeUpdateBundle instead.");
 
     // Initialize the single payload, and fill out all the necessary fields
     pPackage->payloads.rgItems = (BURN_PAYLOAD_GROUP_ITEM*)MemAlloc(sizeof(BURN_PAYLOAD_GROUP_ITEM), TRUE);
@@ -51,88 +39,27 @@ extern "C" HRESULT PseudoBundleInitialize(
     hr = StrAllocString(&pPayload->sczFilePath, wzFilePath, 0);
     ExitOnFailure(hr, "Failed to copy filename for pseudo bundle.");
 
-    hr = StrAllocString(&pPayload->sczSourcePath, wzLocalSource, 0);
+    hr = StrAllocString(&pPayload->sczSourcePath, wzFilePath, 0);
     ExitOnFailure(hr, "Failed to copy local source path for pseudo bundle.");
 
-    if (wzDownloadSource && *wzDownloadSource)
-    {
-        hr = StrAllocString(&pPayload->downloadSource.sczUrl, wzDownloadSource, 0);
-        ExitOnFailure(hr, "Failed to copy download source for pseudo bundle.");
-    }
-
-    if (pbHash)
-    {
-        pPayload->pbHash = static_cast<BYTE*>(MemAlloc(cbHash, FALSE));
-        ExitOnNull(pPayload->pbHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for pseudo bundle payload hash.");
-
-        pPayload->cbHash = cbHash;
-        memcpy_s(pPayload->pbHash, pPayload->cbHash, pbHash, cbHash);
-    }
-
-    if (BOOTSTRAPPER_RELATION_UPDATE == relationType)
-    {
-        pPayload->verification = BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE;
-    }
-
-    pPackage->Exe.fPseudoBundle = TRUE;
-
-    pPackage->type = BURN_PACKAGE_TYPE_EXE;
+    pPackage->type = BURN_PACKAGE_TYPE_BUNDLE;
     pPackage->fPerMachine = fPerMachine;
-    pPackage->currentState = state;
+    pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
     pPackage->fCached = fCached;
     pPackage->qwInstallSize = qwSize;
     pPackage->qwSize = qwSize;
-    pPackage->fVital = fVital;
+    pPackage->fVital = FALSE;
 
-    pPackage->Exe.protocol = fSupportsBurnProtocol ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;
-    pPackage->Exe.fSupportsAncestors = TRUE;
+    pPackage->fUninstallable = TRUE;
+    pPackage->Bundle.fPseudoBundle = TRUE;
+    pPackage->Bundle.fRepairable = TRUE;
+    pPackage->Bundle.fSupportsBurnProtocol = fSupportsBurnProtocol;
 
     hr = StrAllocString(&pPackage->sczId, wzId, 0);
     ExitOnFailure(hr, "Failed to copy key for pseudo bundle.");
 
     hr = StrAllocString(&pPackage->sczCacheId, wzId, 0);
     ExitOnFailure(hr, "Failed to copy cache id for pseudo bundle.");
-
-    // If we are a self updating bundle, we don't have to have Install arguments.
-    if (wzInstallArguments)
-    {
-        hr = StrAllocString(&pPackage->Exe.sczInstallArguments, wzInstallArguments, 0);
-        ExitOnFailure(hr, "Failed to copy install arguments for related bundle package");
-    }
-
-    if (sczRelationTypeCommandLineSwitch)
-    {
-        hr = StrAllocConcat(&pPackage->Exe.sczInstallArguments, sczRelationTypeCommandLineSwitch, 0);
-        ExitOnFailure(hr, "Failed to append relation type to install arguments for related bundle package");
-    }
-
-    if (wzRepairArguments)
-    {
-        hr = StrAllocString(&pPackage->Exe.sczRepairArguments, wzRepairArguments, 0);
-        ExitOnFailure(hr, "Failed to copy repair arguments for related bundle package");
-
-        if (sczRelationTypeCommandLineSwitch)
-        {
-            hr = StrAllocConcat(&pPackage->Exe.sczRepairArguments, sczRelationTypeCommandLineSwitch, 0);
-            ExitOnFailure(hr, "Failed to append relation type to repair arguments for related bundle package");
-        }
-
-        pPackage->Exe.fRepairable = TRUE;
-    }
-
-    if (wzUninstallArguments)
-    {
-        hr = StrAllocString(&pPackage->Exe.sczUninstallArguments, wzUninstallArguments, 0);
-        ExitOnFailure(hr, "Failed to copy uninstall arguments for related bundle package");
-
-        if (sczRelationTypeCommandLineSwitch)
-        {
-            hr = StrAllocConcat(&pPackage->Exe.sczUninstallArguments, sczRelationTypeCommandLineSwitch, 0);
-            ExitOnFailure(hr, "Failed to append relation type to uninstall arguments for related bundle package");
-        }
-
-        pPackage->fUninstallable = TRUE;
-    }
 
     if (pDependencyProvider)
     {
@@ -153,8 +80,6 @@ extern "C" HRESULT PseudoBundleInitialize(
     }
 
 LExit:
-    ReleaseStr(sczRelationTypeCommandLineSwitch);
-
     return hr;
 }
 
@@ -165,7 +90,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     __in BURN_PACKAGE* pPackage
     )
 {
-    Assert(BURN_PACKAGE_TYPE_EXE == pPackage->type);
+    Assert(BURN_PACKAGE_TYPE_BUNDLE == pPackage->type);
 
     HRESULT hr = S_OK;
     LPWSTR sczArguments = NULL;
@@ -180,15 +105,16 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
         pPassthroughPackage->payloads.rgItems[iPayload].pPayload = pPackage->payloads.rgItems[iPayload].pPayload;
     }
 
-    pPassthroughPackage->Exe.fPseudoBundle = TRUE;
-
     pPassthroughPackage->fPerMachine = FALSE; // passthrough bundles are always launched per-user.
-    pPassthroughPackage->type = pPackage->type;
+    pPassthroughPackage->type = BURN_PACKAGE_TYPE_EXE;
     pPassthroughPackage->currentState = pPackage->currentState;
     pPassthroughPackage->fCached = pPackage->fCached;
     pPassthroughPackage->qwInstallSize = pPackage->qwInstallSize;
     pPassthroughPackage->qwSize = pPackage->qwSize;
     pPassthroughPackage->fVital = pPackage->fVital;
+
+    pPassthroughPackage->Exe.fPseudoBundle = TRUE;
+    pPassthroughPackage->Exe.protocol = pPackage->Bundle.fSupportsBurnProtocol ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;
 
     hr = StrAllocString(&pPassthroughPackage->sczId, pPackage->sczId, 0);
     ExitOnFailure(hr, "Failed to copy key for passthrough pseudo bundle.");
@@ -196,42 +122,11 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     hr = StrAllocString(&pPassthroughPackage->sczCacheId, pPackage->sczCacheId, 0);
     ExitOnFailure(hr, "Failed to copy cache id for passthrough pseudo bundle.");
 
-    pPassthroughPackage->Exe.protocol = pPackage->Exe.protocol;
-
     hr = CoreCreatePassthroughBundleCommandLine(&sczArguments, pInternalCommand, pCommand);
     ExitOnFailure(hr, "Failed to create command-line arguments.");
 
     hr = StrAllocString(&pPassthroughPackage->Exe.sczInstallArguments, sczArguments, 0);
     ExitOnFailure(hr, "Failed to copy install arguments for passthrough bundle package");
-
-    hr = StrAllocString(&pPassthroughPackage->Exe.sczRepairArguments, sczArguments, 0);
-    ExitOnFailure(hr, "Failed to copy related arguments for passthrough bundle package");
-
-    pPassthroughPackage->Exe.fRepairable = TRUE;
-
-    hr = StrAllocString(&pPassthroughPackage->Exe.sczUninstallArguments, sczArguments, 0);
-    ExitOnFailure(hr, "Failed to copy uninstall arguments for passthrough bundle package");
-
-    pPassthroughPackage->fUninstallable = TRUE;
-
-    // TODO: consider bringing this back in the near future.
-    //if (pDependencyProvider)
-    //{
-    //    pPassthroughPackage->rgDependencyProviders = (BURN_DEPENDENCY_PROVIDER*)MemAlloc(sizeof(BURN_DEPENDENCY_PROVIDER), TRUE);
-    //    ExitOnNull(pPassthroughPackage->rgDependencyProviders, hr, E_OUTOFMEMORY, "Failed to allocate memory for dependency providers.");
-    //    pPassthroughPackage->cDependencyProviders = 1;
-
-    //    pPassthroughPackage->rgDependencyProviders[0].fImported = pDependencyProvider->fImported;
-
-    //    hr = StrAllocString(&pPassthroughPackage->rgDependencyProviders[0].sczKey, pDependencyProvider->sczKey, 0);
-    //    ExitOnFailure(hr, "Failed to copy key for pseudo bundle.");
-
-    //    hr = StrAllocString(&pPassthroughPackage->rgDependencyProviders[0].sczVersion, pDependencyProvider->sczVersion, 0);
-    //    ExitOnFailure(hr, "Failed to copy version for pseudo bundle.");
-
-    //    hr = StrAllocString(&pPassthroughPackage->rgDependencyProviders[0].sczDisplayName, pDependencyProvider->sczDisplayName, 0);
-    //    ExitOnFailure(hr, "Failed to copy display name for pseudo bundle.");
-    //}
 
 LExit:
     ReleaseStr(sczArguments);
@@ -290,13 +185,15 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
         memcpy_s(pPayload->pbHash, pPayload->cbHash, pbHash, cbHash);
     }
 
-    pPackage->Exe.fPseudoBundle = TRUE;
-
     pPackage->type = BURN_PACKAGE_TYPE_EXE;
     pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
     pPackage->qwInstallSize = qwSize;
     pPackage->qwSize = qwSize;
     pPackage->fVital = TRUE;
+
+    // Trust the BA to only use UPDATE_REPLACE_EMBEDDED when appropriate.
+    pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_BURN;
+    pPackage->Exe.fPseudoBundle = TRUE;
 
     hr = StrAllocString(&pPackage->sczId, wzId, 0);
     ExitOnFailure(hr, "Failed to copy id for update bundle.");
@@ -306,10 +203,6 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
 
     hr = StrAllocString(&pPackage->Exe.sczInstallArguments, wzInstallArguments, 0);
     ExitOnFailure(hr, "Failed to copy install arguments for update bundle package");
-
-    // Trust the BA to only use UPDATE_REPLACE_EMBEDDED when appropriate.
-    pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_BURN;
-    pPackage->Exe.fSupportsAncestors = TRUE;
 
 LExit:
     return hr;

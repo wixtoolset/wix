@@ -117,7 +117,7 @@ namespace Bootstrapper
             ValidateExecuteCommitMsiTransaction(pPlan, fRollback, dwIndex++, L"rbaOCA08D8ky7uBOK71_6FWz1K3TuQ");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
             Assert::Equal(dwIndex, pPlan->cExecuteActions);
 
             fRollback = TRUE;
@@ -155,7 +155,7 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
             Assert::Equal(dwIndex, pPlan->cRollbackActions);
 
             Assert::Equal(4ul, pPlan->cExecutePackagesTotal);
@@ -496,7 +496,7 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
             Assert::Equal(dwIndex, pPlan->cExecuteActions);
 
             fRollback = TRUE;
@@ -514,7 +514,7 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
             Assert::Equal(dwIndex, pPlan->cRollbackActions);
 
             Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
@@ -1154,7 +1154,11 @@ namespace Bootstrapper
             pRelatedBundle->fPlannable = TRUE;
             pRelatedBundle->relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 
-            hr = PseudoBundleInitialize(&pRelatedBundle->package, TRUE, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, TRUE, wzFilePath, wzFilePath, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
+            hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, TRUE, TRUE, wzId,
+#ifdef DEBUG
+                                               pRelatedBundle->relationType,
+#endif
+                                               TRUE, wzFilePath, 0, &dependencyProvider);
             NativeAssert::Succeeded(hr, "Failed to initialize related bundle to represent bundle: %ls", wzId);
 
             ++pRelatedBundles->cRelatedBundles;
@@ -1310,7 +1314,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
 
-        void ValidateExecuteExePackage(
+        void ValidateExecuteRelatedBundle(
             __in BURN_PLAN* pPlan,
             __in BOOL fRollback,
             __in DWORD dwIndex,
@@ -1320,10 +1324,25 @@ namespace Bootstrapper
             )
         {
             BURN_EXECUTE_ACTION* pAction = ValidateExecuteActionExists(pPlan, fRollback, dwIndex);
+            Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE, pAction->type);
+            NativeAssert::StringEqual(wzPackageId, pAction->relatedBundle.pRelatedBundle->package.sczId);
+            Assert::Equal<DWORD>(action, pAction->relatedBundle.action);
+            NativeAssert::StringEqual(wzIgnoreDependencies, pAction->relatedBundle.sczIgnoreDependencies);
+            Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
+        }
+
+        void ValidateExecuteExePackage(
+            __in BURN_PLAN* pPlan,
+            __in BOOL fRollback,
+            __in DWORD dwIndex,
+            __in LPCWSTR wzPackageId,
+            __in BOOTSTRAPPER_ACTION_STATE action
+            )
+        {
+            BURN_EXECUTE_ACTION* pAction = ValidateExecuteActionExists(pPlan, fRollback, dwIndex);
             Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE, pAction->type);
             NativeAssert::StringEqual(wzPackageId, pAction->exePackage.pPackage->sczId);
             Assert::Equal<DWORD>(action, pAction->exePackage.action);
-            NativeAssert::StringEqual(wzIgnoreDependencies, pAction->exePackage.sczIgnoreDependencies);
             Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
 

@@ -80,6 +80,15 @@ HRESULT ElevationProcessDependentRegistration(
     __in HANDLE hPipe,
     __in const BURN_DEPENDENT_REGISTRATION_ACTION* pAction
     );
+HRESULT ElevationExecuteRelatedBundle(
+    __in HANDLE hPipe,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 HRESULT ElevationExecuteExePackage(
     __in HANDLE hPipe,
     __in BURN_EXECUTE_ACTION* pExecuteAction,

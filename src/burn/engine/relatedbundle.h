@@ -14,6 +14,11 @@ HRESULT RelatedBundlesInitializeForScope(
 void RelatedBundlesUninitialize(
     __in BURN_RELATED_BUNDLES* pRelatedBundles
     );
+HRESULT RelatedBundleFindById(
+    __in BURN_RELATED_BUNDLES* pRelatedBundles,
+    __in_z LPCWSTR wzId,
+    __out BURN_RELATED_BUNDLE** ppRelatedBundle
+    );
 
 #if defined(__cplusplus)
 }

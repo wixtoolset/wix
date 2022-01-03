@@ -86,6 +86,7 @@
 #include "dependency.h"
 #include "core.h"
 #include "apply.h"
+#include "bundlepackageengine.h"
 #include "exeengine.h"
 #include "msiengine.h"
 #include "mspengine.h"

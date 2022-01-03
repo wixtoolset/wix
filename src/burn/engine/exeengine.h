@@ -16,6 +16,9 @@ HRESULT ExeEngineParsePackageFromXml(
 void ExeEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     );
+void ExeEngineCommandLineArgumentUninitialize(
+    __in BURN_EXE_COMMAND_LINE_ARGUMENT* pCommandLineArgument
+    );
 HRESULT ExeEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_VARIABLES* pVariables
@@ -24,7 +27,6 @@ HRESULT ExeEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage
     );
 HRESULT ExeEnginePlanAddPackage(
-    __in_opt DWORD *pdwInsertSequence,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -42,6 +44,22 @@ HRESULT ExeEngineExecutePackage(
 void ExeEngineUpdateInstallRegistrationState(
     __in BURN_EXECUTE_ACTION* pAction,
     __in HRESULT hrExecute
+    );
+HRESULT ExeEngineParseExitCodesFromXml(
+    __in IXMLDOMNode* pixnPackage,
+    __inout BURN_EXE_EXIT_CODE** prgExitCodes,
+    __inout DWORD* pcExitCodes
+    );
+HRESULT ExeEngineParseCommandLineArgumentsFromXml(
+    __in IXMLDOMNode* pixnPackage,
+    __inout BURN_EXE_COMMAND_LINE_ARGUMENT** prgCommandLineArguments,
+    __inout DWORD* pcCommandLineArguments
+    );
+HRESULT ExeEngineHandleExitCode(
+    __in BURN_EXE_EXIT_CODE* rgCustomExitCodes,
+    __in DWORD cCustomExitCodes,
+    __in DWORD dwExitCode,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 
 
