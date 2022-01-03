@@ -26,7 +26,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Confgure Visual Studio
+      - name: Configure Visual Studio
         shell: cmd
         run: ./src/vs_config.cmd
 
@@ -44,9 +44,13 @@ jobs:
           name: artifacts
           path: build/artifacts/
 
-      - name: Create Zips
+      - name: Validate Test Results
         shell: cmd
-        run: ./src/create_zips.cmd
+        run: 7z a build\testresults.zip @src\testresultfilelist.txt
+
+      - name: Zip temp logs
+        shell: cmd
+        run: 7z a "build\logs\test_burn_%GITHUB_RUN_ID%.zip" "%TEMP%\*.log" "%TEMP%\..\*.log"
         if: always()
 
       - name: Save logs
