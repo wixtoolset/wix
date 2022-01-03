@@ -16,4 +16,7 @@
     <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>
+  <Target Name="RemovePackageThatShouldBeMissing" AfterTargets="AfterBuild">
+    <Delete Files="$(OutputPath)MissingNonVital.msi" />
+  </Target>
 </Project>
