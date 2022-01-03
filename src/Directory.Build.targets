@@ -38,6 +38,13 @@
       <InformationalVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(GitSha)</InformationalVersion>
       <!-- We already included the $(GitSha) in the informational version so do not include it again.  -->
       <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+      <RepositoryUrl Condition=" '$(RepositoryUrl)'=='' and '$(GitRepositoryUrl)'!='' ">$(GitRepositoryUrl.Replace('.git',''))</RepositoryUrl>
+      <RepositoryType Condition=" '$(RepositoryType)'=='' ">git</RepositoryType>
+      <RepositoryCommit Condition=" '$(RepositoryCommit)'=='' ">$(GitSha)</RepositoryCommit>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(RepositoryUrl)'!='' ">$(RepositoryUrl)</ProjectUrl>
     </PropertyGroup>
 
     <Message Importance="$(GitInfoReportImportance)" Text="Properties from Git:
@@ -60,17 +67,14 @@
   <Target Name="__SetNuspecProperties" DependsOnTargets="__SetPropertiesFromGit"
           Condition=" Exists('$(MSBuildProjectName).nuspec') ">
     <PropertyGroup>
-      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(GitRepositoryUrl)'!='' ">$(GitRepositoryUrl.Replace('.git',''))</ProjectUrl>
-
       <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildProjectName).nuspec</NuspecFile>
       <PackageId Condition=" '$(PackageId)'=='' ">$(MSBuildProjectName)</PackageId>
       <Title Condition=" '$(Title)'=='' ">$(Description)</Title>
       <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$(OutputPath)</NuspecBasePath>
       <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Version=$(PackageVersion);Authors=$(Authors);Configuration=$(Configuration)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);RepositoryType=git;RepositoryCommit=$(GitSha);RepositoryUrl=$(GitRepositoryUrl)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);RepositoryType=$(RepositoryType);RepositoryCommit=$(RepositoryCommit);RepositoryUrl=$(RepositoryUrl)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);ProjectUrl=$(ProjectUrl);ProjectFolder=$(MSBuildProjectDirectory)</NuspecProperties>
-      <PublishRepositoryUrl>true</PublishRepositoryUrl>
       <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
