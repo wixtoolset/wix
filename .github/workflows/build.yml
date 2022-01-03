@@ -38,15 +38,15 @@ jobs:
           SigningUser:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_USER || '' }}
           SigningSecret:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_SECRET || '' }}
 
+      - name: Validate test results
+        shell: cmd
+        run: 7z a build\testresults.zip @src\testresultfilelist.txt
+
       - name: Save build
         uses: actions/upload-artifact@v2
         with:
           name: artifacts
           path: build/artifacts/
-
-      - name: Validate Test Results
-        shell: cmd
-        run: 7z a build\testresults.zip @src\testresultfilelist.txt
 
       - name: Zip temp logs
         shell: cmd
