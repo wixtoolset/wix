@@ -3,11 +3,14 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <authors>$authors$</authors>
-    <owners>$authors$</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <title>$title$</title>
     <description>$description$</description>
+    <authors>$authors$</authors>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
   </metadata>
 
   <files>
