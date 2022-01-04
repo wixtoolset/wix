@@ -9,13 +9,13 @@
 @echo Iis.wixext build %_C%
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% || exit /b
+msbuild -Restore -p:Configuration=%_C% -nologo || exit /b
 
 :: Test
-dotnet test -c %_C% --no-build test\WixToolsetTest.Iis || exit /b
+dotnet test test\WixToolsetTest.Iis -c %_C% --no-build --nologo || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Iis.wixext.csproj || exit /b
+dotnet pack wixext\WixToolset.Iis.wixext.csproj -c %_C% --no-build --nologo || exit /b
 
 @popd
 @endlocal
