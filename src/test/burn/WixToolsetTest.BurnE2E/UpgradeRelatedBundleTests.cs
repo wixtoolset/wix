@@ -32,5 +32,22 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv2InstallLogFilePath, @"OnDetectRelatedBundle\(\) - id: \{[0-9A-Za-z\-]{36}\}, missing from cache: True"));
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv2InstallLogFilePath, @"Detected related bundle: \{[0-9A-Za-z\-]{36}\}, type: Upgrade, scope: PerMachine, version: 1\.0\.0\.0, cached: No"));
         }
+
+        [Fact]
+        public void Bundle64UpgradesBundle32()
+        {
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var packageAv2 = this.CreatePackageInstaller("PackageAv2");
+            var bundleAv1 = this.CreateBundleInstaller("BundleAv1");
+            var bundleAv2x64 = this.CreateBundleInstaller("BundleAv2x64");
+
+            bundleAv1.Install();
+            bundleAv1.VerifyRegisteredAndInPackageCache();
+
+            bundleAv2x64.Install();
+            bundleAv2x64.VerifyRegisteredAndInPackageCache();
+
+            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
     }
 }
