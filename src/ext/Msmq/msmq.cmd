@@ -9,13 +9,13 @@
 @echo Msmq.wixext build %_C%
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% || exit /b
+msbuild -Restore -p:Configuration=%_C% -nologo || exit /b
 
 :: Test
-dotnet test -c %_C% --no-build test\WixToolsetTest.Msmq || exit /b
+dotnet test test\WixToolsetTest.Msmq -c %_C% --no-build --nologo || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Msmq.wixext.csproj || exit /b
+dotnet pack wixext\WixToolset.Msmq.wixext.csproj -c %_C% --no-build --nologo || exit /b
 
 @popd
 @endlocal
