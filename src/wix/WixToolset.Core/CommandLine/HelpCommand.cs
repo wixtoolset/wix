@@ -54,7 +54,7 @@ namespace WixToolset.Core.CommandLine
             }
 
             Console.WriteLine();
-            Console.WriteLine("Run 'wix [command] --help' for more information on a command.");
+            Console.WriteLine("Run 'wix [command] -h[elp]' for more information on a command.");
             Console.WriteLine();
             Console.WriteLine(this.Branding.ReplacePlaceholders("For more information see: [SupportUrl]"));
 
