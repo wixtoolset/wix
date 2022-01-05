@@ -18,6 +18,10 @@ namespace WixToolset.Data.WindowsInstaller
 
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
         private const string WixOutputStreamName = "wix-wid.xml";
+        private static readonly XmlReaderSettings ReaderSettings = new XmlReaderSettings
+        {
+            CheckCharacters = false
+        };
         private static readonly XmlWriterSettings WriterSettings = new XmlWriterSettings
         {
             CheckCharacters = false,
@@ -159,7 +163,7 @@ namespace WixToolset.Data.WindowsInstaller
         public static WindowsInstallerData Load(WixOutput wixOutput, TableDefinitionCollection tableDefinitions, bool suppressVersionCheck = false)
         {
             using (var stream = wixOutput.GetDataStream(WixOutputStreamName))
-            using (var reader = XmlReader.Create(stream, null, wixOutput.Uri.AbsoluteUri))
+            using (var reader = XmlReader.Create(stream, ReaderSettings, wixOutput.Uri.AbsoluteUri))
             {
                 try
                 {

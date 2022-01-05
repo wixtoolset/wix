@@ -2,9 +2,14 @@
 
 namespace WixToolsetTest.UI
 {
+    using System;
+    using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Data;
+    using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.UI;
     using Xunit;
 
@@ -64,6 +69,34 @@ namespace WixToolsetTest.UI
             {
                 "Property:WixUI_Mode\tMinimal",
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIMinimalAndReadPdb()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Minimal");
+            var bindFolder = TestData.Get(@"TestData\data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                Build(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-ext", Path.GetFullPath(new Uri(typeof(UIExtensionFactory).Assembly.CodeBase).LocalPath),
+                    "-bindpath", bindFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                var wid = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var propertyTable = wid.Tables["Property"];
+
+                var propertyRow = propertyTable.Rows.Single(r => r.GetPrimaryKey() == "WixUI_Mode");
+                WixAssert.StringEqual("Minimal", propertyRow.FieldAsString(1));
+            }
         }
 
         [Fact]
