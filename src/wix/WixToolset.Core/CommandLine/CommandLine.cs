@@ -56,7 +56,7 @@ namespace WixToolset.Core.CommandLine
             if (command.ShowLogo)
             {
                 var branding = this.ServiceProvider.GetService<IWixBranding>();
-                Console.WriteLine(branding.ReplacePlaceholders("[AssemblyProduct] [AssemblyDescription] version [FileVersion]"));
+                Console.WriteLine(branding.ReplacePlaceholders("[AssemblyProduct] [AssemblyDescription] version [ProductVersion]"));
                 Console.WriteLine(branding.ReplacePlaceholders("[AssemblyCopyright]"));
             }
 

@@ -22,7 +22,6 @@ namespace WixToolset.Core.CommandLine
                                                   , ThisAssembly.Git.BaseVersion.Patch
                                                   , ThisAssembly.Git.SemVer.DashLabel
                                                   , ThisAssembly.Git.Commit);
-
             return Task.FromResult(0);
         }
 

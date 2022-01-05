@@ -61,6 +61,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 original = original.Replace("[FileCopyright]", commonFileVersion.LegalCopyright);
                 original = original.Replace("[FileVersion]", commonFileVersion.FileVersion);
+                original = original.Replace("[ProductVersion]", commonFileVersion.ProductVersion);
             }
 
             var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -69,6 +70,7 @@ namespace WixToolset.Core.ExtensibilityServices
             original = original.Replace("[FileCopyright]", fileVersion.LegalCopyright);
             original = original.Replace("[FileProductName]", fileVersion.ProductName);
             original = original.Replace("[FileVersion]", fileVersion.FileVersion);
+            original = original.Replace("[ProductVersion]", fileVersion.ProductVersion);
 
             if (original.Contains("[FileVersionMajorMinor]"))
             {
