@@ -4,6 +4,11 @@
 
 // internal function declarations
 
+static __callback int __cdecl CompareRelatedBundles(
+    __in void* pvContext,
+    __in const void* pvLeft,
+    __in const void* pvRight
+    );
 static HRESULT LoadIfRelatedBundle(
     __in BOOL fPerMachine,
     __in HKEY hkUninstallKey,
@@ -128,8 +133,58 @@ LExit:
     return hr;
 }
 
+extern "C" void RelatedBundlesSort(
+    __in BURN_RELATED_BUNDLES* pRelatedBundles
+    )
+{
+    qsort_s(pRelatedBundles->rgRelatedBundles, pRelatedBundles->cRelatedBundles, sizeof(BURN_RELATED_BUNDLE), CompareRelatedBundles, NULL);
+}
+
 
 // internal helper functions
+
+static __callback int __cdecl CompareRelatedBundles(
+    __in void* /*pvContext*/,
+    __in const void* pvLeft,
+    __in const void* pvRight
+    )
+{
+    int ret = 0;
+    const BURN_RELATED_BUNDLE* pBundleLeft = static_cast<const BURN_RELATED_BUNDLE*>(pvLeft);
+    const BURN_RELATED_BUNDLE* pBundleRight = static_cast<const BURN_RELATED_BUNDLE*>(pvRight);
+
+    // Sort by relation type, then version, then bundle id.
+    if (pBundleLeft->relationType != pBundleRight->relationType)
+    {
+        // Upgrade bundles last, everything else according to the enum.
+        if (BOOTSTRAPPER_RELATION_UPGRADE == pBundleLeft->relationType)
+        {
+            ret = 1;
+        }
+        else if (BOOTSTRAPPER_RELATION_UPGRADE == pBundleRight->relationType)
+        {
+            ret = -1;
+        }
+        else if (pBundleLeft->relationType < pBundleRight->relationType)
+        {
+            ret = -1;
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    else
+    {
+        VerCompareParsedVersions(pBundleLeft->pVersion, pBundleRight->pVersion, &ret);
+        if (0 == ret)
+        {
+            ret = ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pBundleLeft->package.sczId, -1, pBundleRight->package.sczId, -1) - 2;
+        }
+    }
+
+    return ret;
+}
 
 static HRESULT LoadIfRelatedBundle(
     __in BOOL fPerMachine,

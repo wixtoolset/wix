@@ -6,7 +6,6 @@
     <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\BundleF_AddOnA\BundleF_AddOn.wxs" Link="BundleF_AddOn.wxs" />
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -17,5 +16,8 @@
     <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
     <PackageReference Include="WixToolset.Util.wixext" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="$(ForTestingUseOnlyWixextPath)" />
   </ItemGroup>
 </Project>

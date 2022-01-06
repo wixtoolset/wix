@@ -123,11 +123,7 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.1.0");
         }
 
-#if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
         [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
-#else
-        [Fact(Skip = "addon/patch related bundle")]
-#endif
         public void CanMinorUpgradeDependencyPackageFromPatchBundle()
         {
             var originalVersion = "1.0.0.0";
@@ -145,34 +141,39 @@ namespace WixToolsetTest.BurnE2E
             packageBv101.VerifyInstalled(false);
 
             bundleJ.Install();
-            bundleJ.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-            packageBv1.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+                packageBv1.VerifyInstalled(true);
+            }
 
             bundleJ_Patch.Install();
-            bundleJ_Patch.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ_Patch.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
-            packageBv1.VerifyInstalled(false);
-            packageBv101.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
+                packageBv1.VerifyInstalled(false);
+                packageBv101.VerifyInstalled(true);
+            }
 
             bundleJ.Uninstall();
-            bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
-            bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            packageA.VerifyInstalled(false);
-            packageBv1.VerifyInstalled(false);
-            packageBv101.VerifyInstalled(false);
+                packageA.VerifyInstalled(false);
+                packageBv1.VerifyInstalled(false);
+                packageBv101.VerifyInstalled(false);
+            }
         }
 
-#if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
         [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
-#else
-        [Fact(Skip = "addon/patch related bundle")]
-#endif
         public void CanMinorUpgradeDependencyPackageFromPatchBundleThenUninstallToRestoreBase()
         {
             var originalVersion = "1.0.0.0";
@@ -190,41 +191,49 @@ namespace WixToolsetTest.BurnE2E
             packageBv101.VerifyInstalled(false);
 
             bundleJ.Install();
-            bundleJ.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-            packageBv1.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+                packageBv1.VerifyInstalled(true);
+            }
 
             bundleJ_Patch.Install();
-            bundleJ_Patch.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ_Patch.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
-            packageBv1.VerifyInstalled(false);
-            packageBv101.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
+                packageBv1.VerifyInstalled(false);
+                packageBv101.VerifyInstalled(true);
+            }
 
             bundleJ_Patch.Uninstall();
-            bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-            packageBv1.VerifyInstalled(true);
-            packageBv101.VerifyInstalled(false);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+                packageBv1.VerifyInstalled(true);
+                packageBv101.VerifyInstalled(false);
+            }
 
             bundleJ.Uninstall();
-            bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            packageA.VerifyInstalled(false);
-            packageBv1.VerifyInstalled(false);
-            packageBv101.VerifyInstalled(false);
+                packageA.VerifyInstalled(false);
+                packageBv1.VerifyInstalled(false);
+                packageBv101.VerifyInstalled(false);
+            }
         }
 
-#if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
         [Fact]
-#else
-        [Fact(Skip = "addon/patch related bundle")]
-#endif
         public void CanUninstallBaseWithAddOnsWhenAllSharePackages()
         {
             var testRegistryValueExe = "ExeA";
@@ -239,33 +248,103 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
 
             bundleF.Install();
-            bundleF.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageB.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                packageB.VerifyInstalled(true);
+            }
 
             bundleF_AddOnA.Install();
-            bundleF_AddOnA.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF_AddOnA.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
-            packageB.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+                packageB.VerifyInstalled(true);
+            }
 
             bundleF_AddOnB.Install();
-            bundleF_AddOnB.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF_AddOnB.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
-            packageB.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+                packageB.VerifyInstalled(true);
+            }
 
             bundleF.Uninstall();
-            bundleF.VerifyUnregisteredAndRemovedFromPackageCache();
-            bundleF_AddOnA.VerifyUnregisteredAndRemovedFromPackageCache();
-            bundleF_AddOnB.VerifyUnregisteredAndRemovedFromPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleF_AddOnA.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleF_AddOnB.VerifyUnregisteredAndRemovedFromPackageCache();
+
+                packageA.VerifyInstalled(false);
+                bundleF.VerifyExeTestRegistryRootDeleted(testRegistryValueExe);
+                packageB.VerifyInstalled(false);
+            }
+        }
+
+        [Fact]
+        public void CanUpgradeBaseWithAddOns()
+        {
+            var testRegistryValueExe = "ExeA";
+
+            var packageA = this.CreatePackageInstaller("PackageAv1");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleF = this.CreateBundleInstaller("BundleF");
+            var bundleF_AddOnA = this.CreateBundleInstaller("BundleF_AddOnA");
+            var bundleF_AddOnB = this.CreateBundleInstaller("BundleF_AddOnB");
+            var bundleFv2 = this.CreateBundleInstaller("BundleFv2");
 
             packageA.VerifyInstalled(false);
-            bundleF.VerifyExeTestRegistryRootDeleted(testRegistryValueExe);
             packageB.VerifyInstalled(false);
+
+            bundleF.Install();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF.VerifyRegisteredAndInPackageCache();
+
+                packageA.VerifyInstalled(true);
+                packageB.VerifyInstalled(true);
+            }
+
+            bundleF_AddOnA.Install();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF_AddOnA.VerifyRegisteredAndInPackageCache();
+
+                packageA.VerifyInstalled(true);
+                bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+                packageB.VerifyInstalled(true);
+            }
+
+            bundleF_AddOnB.Install();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF_AddOnB.VerifyRegisteredAndInPackageCache();
+
+                packageA.VerifyInstalled(true);
+                bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+                packageB.VerifyInstalled(true);
+            }
+
+            bundleFv2.Install();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleFv2.VerifyRegisteredAndInPackageCache();
+                bundleF.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleF_AddOnA.VerifyRegisteredAndInPackageCache();
+                bundleF_AddOnB.VerifyRegisteredAndInPackageCache();
+
+                packageA.VerifyInstalled(true);
+                bundleF.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+                packageB.VerifyInstalled(true);
+            }
         }
 
         [Fact]
@@ -343,11 +422,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-#if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
         [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
-#else
-        [Fact(Skip = "addon/patch related bundle")]
-#endif
         public void CanUpgradePatchBundleWithAdditionalPatch()
         {
             var originalVersion = "1.0.0.0";
@@ -365,33 +440,45 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
 
             bundleF.Install();
-            bundleF.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-            packageB.VerifyInstalled(true);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+                packageB.VerifyInstalled(true);
+            }
 
             bundleF_PatchAv101.Install();
-            bundleF_PatchAv101.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF_PatchAv101.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
-            packageB.VerifyInstalled(false);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
+                packageB.VerifyInstalled(false);
+            }
 
             bundleF_PatchAv102.Install();
-            bundleF_PatchAv102.VerifyRegisteredAndInPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF_PatchAv102.VerifyRegisteredAndInPackageCache();
 
-            packageA.VerifyInstalled(true);
-            packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion2);
-            packageB.VerifyInstalled(false);
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion2);
+                packageB.VerifyInstalled(false);
+            }
 
             bundleF.Uninstall();
-            bundleF.VerifyUnregisteredAndRemovedFromPackageCache();
-            bundleF_PatchAv101.VerifyUnregisteredAndRemovedFromPackageCache();
-            bundleF_PatchAv102.VerifyUnregisteredAndRemovedFromPackageCache();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleF.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleF_PatchAv101.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleF_PatchAv102.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            packageA.VerifyInstalled(false);
-            packageB.VerifyInstalled(false);
+                packageA.VerifyInstalled(false);
+                packageB.VerifyInstalled(false);
+            }
         }
 
         [Fact]
