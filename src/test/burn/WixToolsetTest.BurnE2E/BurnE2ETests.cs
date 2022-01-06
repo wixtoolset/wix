@@ -15,6 +15,13 @@ namespace WixToolsetTest.BurnE2E
 
         private Stack<IDisposable> Installers { get; } = new Stack<IDisposable>();
 
+        protected bool SupportAddonAndPatchRelatedBundles =>
+#if SUPPORT_ADDON_AND_PATCH_RELATED_BUNDLES
+            true;
+#else
+            false;
+#endif
+
         protected BundleInstaller CreateBundleInstaller(string name)
         {
             var installer = new BundleInstaller(this.TestContext, name);

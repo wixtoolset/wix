@@ -585,6 +585,8 @@ extern "C" HRESULT RegistrationDetectRelatedBundles(
     hr = RelatedBundlesInitializeForScope(FALSE, pRegistration, &pRegistration->relatedBundles);
     ExitOnFailure(hr, "Failed to initialize per-user related bundles.");
 
+    RelatedBundlesSort(&pRegistration->relatedBundles);
+
 LExit:
     return hr;
 }
