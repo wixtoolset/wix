@@ -58,9 +58,9 @@ namespace DutilTests
             LPWSTR sczOutputPath = NULL;
             FILE_ENCODING feEncodingFound = FILE_ENCODING_UNSPECIFIED;
             BYTE *pbFile1 = NULL;
-            DWORD cbFile1 = 0;
+            size_t cbFile1 = 0;
             BYTE *pbFile2 = NULL;
-            DWORD cbFile2 = 0;
+            size_t cbFile2 = 0;
             size_t cbActualStringLength = 0;
 
             try
