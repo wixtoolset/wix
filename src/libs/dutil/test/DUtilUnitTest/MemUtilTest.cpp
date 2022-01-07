@@ -23,7 +23,7 @@ namespace DutilTests
         void MemUtilAppendTest()
         {
             HRESULT hr = S_OK;
-            size_t dwSize;
+            SIZE_T dwSize;
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
 
