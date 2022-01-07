@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
@@ -28,7 +27,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1244E671-F108-4334-BA52-8A7517F26ECD}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -36,13 +34,29 @@
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset native library foundation</Description>
     <PackageId>WixToolset.DUtil</PackageId>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
-
   <ItemGroup>
     <ClCompile Include="acl2util.cpp" />
     <ClCompile Include="aclutil.cpp" />
@@ -109,7 +123,6 @@
     <ClCompile Include="wuautil.cpp" />
     <ClCompile Include="xmlutil.cpp" />
   </ItemGroup>
-
   <ItemGroup>
     <ClInclude Include="inc\aclutil.h" />
     <ClInclude Include="inc\apputil.h" />
@@ -168,15 +181,12 @@
     <ClInclude Include="inc\xmlutil.h" />
     <ClInclude Include="precomp.h" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="xsd\thmutil.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

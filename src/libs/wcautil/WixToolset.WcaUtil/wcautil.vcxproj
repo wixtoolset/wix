@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
@@ -28,7 +27,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5B3714B6-3A76-463E-8595-D48DA276C512}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -37,17 +35,32 @@
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Custom Action native utility library</Description>
     <PackageId>WixToolset.WcaUtil</PackageId>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
-
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\..\dutil\WixToolset.DUtil\inc</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
-
   <ItemGroup>
     <ClCompile Include="exbinary.cpp" />
     <ClCompile Include="wcalog.cpp" />
@@ -60,7 +73,6 @@
     <ClCompile Include="wcawrap.cpp" />
     <ClCompile Include="qtexec.cpp" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(Platform)' == 'Win32'">
     <ClInclude Include="custommsierrors.h">
       <GenerateWixInclude>caerr.wxi</GenerateWixInclude>
@@ -76,11 +88,9 @@
     <ClInclude Include="inc\wcawow64.h" />
     <ClInclude Include="inc\wcawrapquery.h" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
