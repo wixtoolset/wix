@@ -8,5 +8,6 @@
     <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
     <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <DebugType Condition=" '$(DebugType)'=='' ">embedded</DebugType>
+    <RunAnalyzers>false</RunAnalyzers>
   </PropertyGroup>
 </Project>
