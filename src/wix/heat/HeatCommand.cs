@@ -28,6 +28,12 @@ namespace WixToolset.Harvesters
             this.ExtensionOptions.Add(harvestType);
         }
 
+        public bool ShowHelp { get; set; }
+
+        public bool ShowLogo { get; set; }
+
+        public bool StopParsing { get; private set; }
+
         private string ExtensionArgument { get; set; }
 
         private List<string> ExtensionOptions { get; } = new List<string>();
@@ -43,10 +49,6 @@ namespace WixToolset.Harvesters
         private string OutputFile { get; set; }
 
         private IServiceProvider ServiceProvider { get; }
-
-        public bool ShowLogo { get; private set; }
-
-        public bool StopParsing { get; private set; }
 
         public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {

@@ -10,7 +10,9 @@ namespace WixToolset.Core.CommandLine
 
     internal class VersionCommand : ICommandLineCommand
     {
-        public bool ShowLogo => true;
+        public bool ShowHelp { get; set; }
+
+        public bool ShowLogo { get; set; }
 
         public bool StopParsing => true;
 
@@ -25,6 +27,9 @@ namespace WixToolset.Core.CommandLine
             return Task.FromResult(0);
         }
 
-        public bool TryParseArgument(ICommandLineParser parseHelper, string argument) => true; // eat any arguments
+        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
+        {
+            return true; // eat any arguments
+        }
     }
 }

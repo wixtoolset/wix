@@ -4,6 +4,7 @@ namespace WixToolset.Core.CommandLine
 {
     using System;
     using System.Collections.Generic;
+    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -21,9 +22,15 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLine : ICommandLine
     {
-        public CommandLine(IServiceProvider serviceProvider) => this.ServiceProvider = serviceProvider;
+        public CommandLine(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+        }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         public ICommandLineCommand CreateCommand(string[] args)
         {
@@ -105,7 +112,8 @@ namespace WixToolset.Core.CommandLine
                 }
                 else if (parser.IsSwitch(arg))
                 {
-                    if (!command.TryParseArgument(parser, arg) && !TryParseCommandLineArgumentWithExtension(arg, parser, extensions))
+                    if (!command.TryParseArgument(parser, arg) && !TryParseCommandLineArgumentWithExtension(arg, parser, extensions) &&
+                        !this.TryParseStandardCommandLineSwitch(command, parser, arg))
                     {
                         parser.ReportErrorArgument(arg);
                     }
@@ -194,6 +202,81 @@ namespace WixToolset.Core.CommandLine
             }
 
             return false;
+        }
+
+        private bool TryParseStandardCommandLineSwitch(ICommandLineCommand command, ICommandLineParser parser, string arg)
+        {
+            var parameter = arg.Substring(1).ToLowerInvariant();
+
+            switch (parameter)
+            {
+                case "?":
+                case "h":
+                case "help":
+                    command.ShowHelp = true;
+                    return true;
+
+                case "nologo":
+                    command.ShowLogo = false;
+                    return true;
+
+                case "v":
+                case "verbose":
+                    this.Messaging.ShowVerboseMessages = true;
+                    return true;
+            }
+
+            if (parameter.StartsWith("sw"))
+            {
+                this.ParseSuppressWarning(parameter, "sw".Length, parser);
+                return true;
+            }
+            else if (parameter.StartsWith("suppresswarning"))
+            {
+                this.ParseSuppressWarning(parameter, "suppresswarning".Length, parser);
+                return true;
+            }
+            else if (parameter.StartsWith("wx"))
+            {
+                this.ParseWarningAsError(parameter, "wx".Length, parser);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ParseSuppressWarning(string parameter, int offset, ICommandLineParser parser)
+        {
+            var paramArg = parameter.Substring(offset);
+            if (paramArg.Length == 0)
+            {
+                this.Messaging.SuppressAllWarnings = true;
+            }
+            else if (Int32.TryParse(paramArg, out var suppressWarning) && suppressWarning > 0)
+            {
+                this.Messaging.SuppressWarningMessage(suppressWarning);
+            }
+            else
+            {
+                parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
+            }
+        }
+
+        private void ParseWarningAsError(string parameter, int offset, ICommandLineParser parser)
+        {
+            var paramArg = parameter.Substring(offset);
+            if (paramArg.Length == 0)
+            {
+                this.Messaging.WarningsAsError = true;
+            }
+            else if (Int32.TryParse(paramArg, out var elevateWarning) && elevateWarning > 0)
+            {
+                this.Messaging.ElevateWarningMessage(elevateWarning);
+            }
+            else
+            {
+                parser.ReportErrorArgument(parameter, ErrorMessages.IllegalWarningIdAsError(paramArg));
+            }
         }
     }
 }
