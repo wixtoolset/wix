@@ -15,9 +15,6 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public class GetLooseFileList : Task
     {
-        private ITaskItem database;
-        private ITaskItem[] looseFileList;
-
         internal const int MsidbFileAttributesNoncompressed = 8192;
         internal const int MsidbFileAttributesCompressed = 16384;
 
@@ -25,75 +22,13 @@ namespace WixToolset.BuildTasks
         /// The list of database files to find Loose Files in
         /// </summary>
         [Required]
-        public ITaskItem Database
-        {
-            get { return this.database; }
-            set { this.database = value; }
-        }
+        public ITaskItem Database { get; set; }
 
         /// <summary>
         /// The total list of Loose Files in this database
         /// </summary>
         [Output]
-        public ITaskItem[] LooseFileList
-        {
-            get { return this.looseFileList; }
-        }
-
-        /// <summary>
-        /// Takes the "defaultDir" column
-        /// </summary>
-        /// <returns>Returns the corresponding sourceDir.</returns>
-        public string SourceDirFromDefaultDir(string defaultDir)
-        {
-            string sourceDir;
-
-            string[] splitted = defaultDir.Split(':');
-
-            if (1 == splitted.Length)
-            {
-                sourceDir = splitted[0];
-            }
-            else
-            {
-                sourceDir = splitted[1];
-            }
-
-            splitted = sourceDir.Split('|');
-
-            if (1 == splitted.Length)
-            {
-                sourceDir = splitted[0];
-            }
-            else
-            {
-                sourceDir = splitted[1];
-            }
-
-            return sourceDir;
-        }
-
-        /// <summary>
-        /// Takes the "FileName" column
-        /// </summary>
-        /// <returns>Returns the corresponding source file name.</returns>
-        public string SourceFileFromFileName(string fileName)
-        {
-            string sourceFile;
-
-            string[] splitted = fileName.Split('|');
-
-            if (1 == splitted.Length)
-            {
-                sourceFile = splitted[0];
-            }
-            else
-            {
-                sourceFile = splitted[1];
-            }
-
-            return sourceFile;
-        }
+        public ITaskItem[] LooseFileList { get; private set; }
 
         /// <summary>
         /// Gets a complete list of external Loose Files referenced by the given installer database file.
@@ -101,15 +36,12 @@ namespace WixToolset.BuildTasks
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            string databaseFile = this.database.ItemSpec;
-            Object []emptyArgs = { };
-            System.Collections.Generic.List<ITaskItem> looseFileNames = new System.Collections.Generic.List<ITaskItem>();
-            Dictionary<string, string> ComponentFullDirectory = new Dictionary<string, string>();
-            Dictionary<string, string> DirectoryIdDefaultDir = new Dictionary<string, string>();
-            Dictionary<string, string> DirectoryIdParent = new Dictionary<string, string>();
-            Dictionary<string, string> DirectoryIdFullSource = new Dictionary<string, string>();
-            int i;
-            string databaseDir = Path.GetDirectoryName(databaseFile);
+            var databaseFile = this.Database.ItemSpec;
+            var looseFileNames = new List<ITaskItem>();
+            var ComponentFullDirectory = new Dictionary<string, string>();
+            var DirectoryIdDefaultDir = new Dictionary<string, string>();
+            var DirectoryIdParent = new Dictionary<string, string>();
+            var DirectoryIdFullSource = new Dictionary<string, string>();
 
             // If the file doesn't exist, no Loose Files to return, so exit now
             if (!File.Exists(databaseFile))
@@ -117,19 +49,17 @@ namespace WixToolset.BuildTasks
                 return true;
             }
 
-            using (Database database = new Database(databaseFile))
-            {
-                bool compressed = false;
-                if (2 == (database.SummaryInfo.WordCount & 2))
-                {
-                    compressed = true;
-                }
+            var databaseDir = Path.GetDirectoryName(databaseFile);
 
-                // If the media table doesn't exist, no Loose Files to return, so exit now
+            using (var database = new Database(databaseFile))
+            {
+                // If the File table doesn't exist, no Loose Files to return, so exit now
                 if (null == database.Tables["File"])
                 {
                     return true;
                 }
+
+                var compressed = 2 == (database.SummaryInfo.WordCount & 2);
 
                 // Only setup all these helpful indexes if the database is marked as uncompressed. If it's marked as compressed, files are stored at the root,
                 // so none of these indexes will be used
@@ -140,29 +70,28 @@ namespace WixToolset.BuildTasks
                         return true;
                     }
 
-                    System.Collections.IList directoryRecords = database.ExecuteQuery("SELECT `Directory`,`Directory_Parent`,`DefaultDir` FROM `Directory`", emptyArgs);
+                    var directoryRecords = database.ExecuteQuery("SELECT `Directory`,`Directory_Parent`,`DefaultDir` FROM `Directory`");
 
                     // First setup a simple index from DirectoryId to DefaultDir
-                    for (i = 0; i < directoryRecords.Count; i += 3)
+                    for (var i = 0; i < directoryRecords.Count; i += 3)
                     {
-                        string directoryId = (string)(directoryRecords[i]);
-                        string directoryParent = (string)(directoryRecords[i + 1]);
-                        string defaultDir = (string)(directoryRecords[i + 2]);
+                        var directoryId = (string)directoryRecords[i];
+                        var directoryParent = (string)directoryRecords[i + 1];
+                        var defaultDir = (string)directoryRecords[i + 2];
 
-                        string sourceDir = this.SourceDirFromDefaultDir(defaultDir);
+                        var sourceDir = this.SourceDirFromDefaultDir(defaultDir);
 
                         DirectoryIdDefaultDir[directoryId] = sourceDir;
                         DirectoryIdParent[directoryId] = directoryParent;
                     }
 
                     // Setup an index from directory Id to the full source path
-                    for (i = 0; i < directoryRecords.Count; i += 3)
+                    for (var i = 0; i < directoryRecords.Count; i += 3)
                     {
-                        string directoryId = (string)(directoryRecords[i]);
-                        string directoryParent = (string)(directoryRecords[i + 1]);
-                        string defaultDir = (string)(directoryRecords[i + 2]);
+                        var directoryId = (string)directoryRecords[i];
+                        var directoryParent = (string)directoryRecords[i + 1];
 
-                        string sourceDir = DirectoryIdDefaultDir[directoryId];
+                        var sourceDir = DirectoryIdDefaultDir[directoryId];
 
                         // The TARGETDIR case
                         if (String.IsNullOrEmpty(directoryParent))
@@ -171,7 +100,7 @@ namespace WixToolset.BuildTasks
                         }
                         else
                         {
-                            string tempDirectoryParent = directoryParent;
+                            var tempDirectoryParent = directoryParent;
 
                             while (!String.IsNullOrEmpty(tempDirectoryParent) && !String.IsNullOrEmpty(DirectoryIdParent[tempDirectoryParent]))
                             {
@@ -185,27 +114,27 @@ namespace WixToolset.BuildTasks
                     }
 
                     // Setup an index from component Id to full directory path
-                    System.Collections.IList componentRecords = database.ExecuteQuery("SELECT `Component`,`Directory_` FROM `Component`", emptyArgs);
+                    var componentRecords = database.ExecuteQuery("SELECT `Component`,`Directory_` FROM `Component`");
 
-                    for (i = 0; i < componentRecords.Count; i += 2)
+                    for (var i = 0; i < componentRecords.Count; i += 2)
                     {
-                        string componentId = (string)(componentRecords[i]);
-                        string componentDir = (string)(componentRecords[i + 1]);
+                        var componentId = (string)componentRecords[i];
+                        var componentDir = (string)componentRecords[i + 1];
 
                         ComponentFullDirectory[componentId] = DirectoryIdFullSource[componentDir];
                     }
                 }
 
-                System.Collections.IList fileRecords = database.ExecuteQuery("SELECT `Component_`,`FileName`,`Attributes` FROM `File`", emptyArgs);
+                var fileRecords = database.ExecuteQuery("SELECT `Component_`,`FileName`,`Attributes` FROM `File`");
 
-                for (i = 0; i < fileRecords.Count; i += 3)
+                for (var i = 0; i < fileRecords.Count; i += 3)
                 {
-                    string componentId = (string)(fileRecords[i]);
-                    string fileName = this.SourceFileFromFileName((string)(fileRecords[i + 1]));
-                    int attributes = (int)(fileRecords[i + 2]);
+                    var componentId = (string)fileRecords[i];
+                    var fileName = this.SourceFileFromFileName((string)fileRecords[i + 1]);
+                    var attributes = (int)fileRecords[i + 2];
 
                     // If the whole database is marked uncompressed, use the directory layout made above
-                    if ((!compressed && MsidbFileAttributesCompressed != (attributes & MsidbFileAttributesCompressed)))
+                    if (!compressed && MsidbFileAttributesCompressed != (attributes & MsidbFileAttributesCompressed))
                     {
                         looseFileNames.Add(new TaskItem(Path.GetFullPath(Path.Combine(ComponentFullDirectory[componentId], fileName))));
                     }
@@ -217,9 +146,37 @@ namespace WixToolset.BuildTasks
                 }
             }
 
-            this.looseFileList = looseFileNames.ToArray();
+            this.LooseFileList = looseFileNames.ToArray();
 
             return true;
+        }
+
+        /// <summary>
+        /// Takes the "defaultDir" column
+        /// </summary>
+        /// <returns>Returns the corresponding sourceDir.</returns>
+        public string SourceDirFromDefaultDir(string defaultDir)
+        {
+            var split = defaultDir.Split(':');
+
+            var sourceDir = (1 == split.Length) ? split[0] : split[1];
+
+            split = sourceDir.Split('|');
+
+            sourceDir = (1 == split.Length) ? split[0] : split[1];
+
+            return sourceDir;
+        }
+
+        /// <summary>
+        /// Takes the "FileName" column
+        /// </summary>
+        /// <returns>Returns the corresponding source file name.</returns>
+        private string SourceFileFromFileName(string fileName)
+        {
+            var split = fileName.Split('|');
+
+            return (1 == split.Length) ? split[0] : split[1];
         }
     }
 }

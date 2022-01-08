@@ -3,6 +3,7 @@
 namespace WixToolset.BuildTasks
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -32,9 +33,8 @@ namespace WixToolset.BuildTasks
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            string databaseFile = this.Database.ItemSpec;
-            object[] args = { };
-            System.Collections.Generic.List<ITaskItem> cabNames = new System.Collections.Generic.List<ITaskItem>();
+            var cabNames = new List<ITaskItem>();
+            var databaseFile = this.Database.ItemSpec;
 
             // If the file doesn't exist, no cabs to return, so exit now
             if (!File.Exists(databaseFile))
@@ -42,7 +42,7 @@ namespace WixToolset.BuildTasks
                 return true;
             }
 
-            using (Database database = new Database(databaseFile))
+            using (var database = new Database(databaseFile))
             {
                 // If the media table doesn't exist, no cabs to return, so exit now
                 if (null == database.Tables["Media"])
@@ -50,16 +50,16 @@ namespace WixToolset.BuildTasks
                     return true;
                 }
 
-                System.Collections.IList records = database.ExecuteQuery("SELECT `Cabinet` FROM `Media`", args);
+                var databaseDirectory = Path.GetDirectoryName(databaseFile);
 
-                foreach (string cabName in records)
+                foreach (string cabName in database.ExecuteQuery("SELECT `Cabinet` FROM `Media`"))
                 {
                     if (String.IsNullOrEmpty(cabName) || cabName.StartsWith("#", StringComparison.Ordinal))
                     {
                         continue;
                     }
 
-                    cabNames.Add(new TaskItem(Path.Combine(Path.GetDirectoryName(databaseFile), cabName)));
+                    cabNames.Add(new TaskItem(Path.Combine(databaseDirectory, cabName)));
                 }
             }
 
