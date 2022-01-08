@@ -8,8 +8,13 @@
   </PropertyGroup>
 
   <UsingTask TaskName="Insignia" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="GetCabList" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="GetLooseFileList" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="GetCabList" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="GetCabList" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="GetCabList" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="GetLooseFileList" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="GetLooseFileList" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="GetLooseFileList" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
 
   <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
