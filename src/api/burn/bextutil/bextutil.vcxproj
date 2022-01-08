@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
@@ -28,7 +27,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{06027492-1CB9-48BC-B31E-C1F9356ED07E}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -36,22 +34,36 @@
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Bundle Extension native utility library</Description>
     <PackageId>WixToolset.BextUtil</PackageId>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
-
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-
   <ImportGroup Label="Shared">
   </ImportGroup>
-
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>inc;..\WixToolset.BootstrapperCore.Native\inc</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
-
   <ItemGroup>
     <ClCompile Include="BextBundleExtensionEngine.cpp" />
     <ClCompile Include="bextutil.cpp" />
@@ -68,13 +80,10 @@
     <ClInclude Include="inc\IBundleExtensionEngine.h" />
     <ClInclude Include="precomp.h" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
-
     <PackageReference Include="WixToolset.DUtil" />
   </ItemGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
