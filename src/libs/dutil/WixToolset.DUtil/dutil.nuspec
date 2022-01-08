@@ -16,8 +16,8 @@
   <files>
     <file src="$projectFolder$\build\$id$.props" target="build\" />
     <file src="$projectFolder$\inc\*" target="build\native\include" />
-    <file src="..\..\v141\x64\dutil.lib" target="build\native\v14\x64" />
-    <file src="..\..\v141\x86\dutil.lib" target="build\native\v14\x86" />
-    <file src="..\..\v141\ARM64\dutil.lib" target="build\native\v14\ARM64" />
+    <file src="..\..\v143\x64\dutil.lib" target="build\native\v14\x64" />
+    <file src="..\..\v143\x86\dutil.lib" target="build\native\v14\x86" />
+    <file src="..\..\v143\ARM64\dutil.lib" target="build\native\v14\ARM64" />
   </files>
 </package>
