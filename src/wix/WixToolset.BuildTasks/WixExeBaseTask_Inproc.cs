@@ -10,7 +10,7 @@ namespace WixToolset.BuildTasks
     using WixToolset.Core.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
-    public partial class WixBuild
+    public abstract partial class WixExeBaseTask
     {
         protected override string TaskShortName => "WIX";
 
