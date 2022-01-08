@@ -30,11 +30,17 @@ namespace WixToolset.Core.CommandLine
             this.Platform = platform;
         }
 
+        public bool ShowHelp { get; set; }
+
+        public bool ShowLogo { get; set; }
+
+        public bool StopParsing { get; }
+
         private IServiceProvider ServiceProvider { get; }
 
-        public IMessaging Messaging { get; }
+        private IMessaging Messaging { get; }
 
-        public IExtensionManager ExtensionManager { get; }
+        private IExtensionManager ExtensionManager { get; }
 
         private IEnumerable<SourceFile> SourceFiles { get; }
 
@@ -44,11 +50,10 @@ namespace WixToolset.Core.CommandLine
 
         public IReadOnlyCollection<string> IncludeSearchPaths { get; }
 
-        public bool ShowLogo => throw new NotImplementedException();
-
-        public bool StopParsing => throw new NotImplementedException();
-
-        public bool TryParseArgument(ICommandLineParser parseHelper, string argument) => throw new NotImplementedException();
+        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<int> ExecuteAsync(CancellationToken _)
         {

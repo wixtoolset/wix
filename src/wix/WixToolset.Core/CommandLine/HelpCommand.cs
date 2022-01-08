@@ -25,7 +25,17 @@ namespace WixToolset.Core.CommandLine
             this.Branding = branding;
         }
 
-        public bool ShowLogo => true;
+        public bool ShowHelp
+        {
+            get => true;
+            set { }
+        }
+
+        public bool ShowLogo
+        {
+            get => true;
+            set { }
+        }
 
         public bool StopParsing => true;
 
@@ -61,6 +71,9 @@ namespace WixToolset.Core.CommandLine
             return Task.FromResult(-1);
         }
 
-        public bool TryParseArgument(ICommandLineParser parseHelper, string argument) => true; // eat any arguments
+        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
+        {
+            return true; // eat any arguments
+        }
     }
 }

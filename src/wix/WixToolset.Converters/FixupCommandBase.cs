@@ -23,11 +23,11 @@ namespace WixToolset.Converters
             this.SearchPatterns = new List<string>();
         }
 
-        public bool ShowLogo { get; private set; }
+        public bool ShowHelp { get; set; }
 
-        public bool StopParsing { get; private set; }
+        public bool ShowLogo { get; set; }
 
-        protected bool ShowHelp { get; set; }
+        public bool StopParsing { get; set; }
 
         protected CustomTableTarget CustomTableSetting { get; set; }
 

@@ -12,9 +12,14 @@ namespace WixToolset.Extensibility.Data
     public interface ICommandLineCommand
     {
         /// <summary>
+        /// Indicates the command-line should show help for the command.
+        /// </summary>
+        bool ShowHelp { get; set; }
+
+        /// <summary>
         /// Indicates the command-line should show the command-line logo.
         /// </summary>
-        bool ShowLogo { get; }
+        bool ShowLogo { get; set; }
 
         /// <summary>
         /// Indicates the command-line parsing can stop.

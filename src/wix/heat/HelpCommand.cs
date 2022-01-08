@@ -24,7 +24,13 @@ namespace WixToolset.Harvesters
 
         private IList<IHeatExtension> Extensions { get; }
 
-        public bool ShowLogo => false;
+        public bool ShowHelp { get; set; }
+
+        public bool ShowLogo
+        {
+            get => false;
+            set { }
+        }
 
         public bool StopParsing => true;
 
@@ -39,12 +45,15 @@ namespace WixToolset.Harvesters
             var wixcopAssembly = typeof(HelpCommand).Assembly;
             var fv = FileVersionInfo.GetVersionInfo(wixcopAssembly.Location);
 
-            Console.WriteLine("WiX Toolset Harvester version {0}", fv.FileVersion);
+            Console.WriteLine("WiX Toolset Harvester version {0}", fv.ProductVersion);
             Console.WriteLine("Copyright (C) .NET Foundation and contributors. All rights reserved.");
             Console.WriteLine();
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument) => true;
+        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        {
+            return true;
+        }
 
         private int DisplayHelp()
         {

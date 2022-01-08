@@ -30,11 +30,11 @@ namespace WixToolset.Core.ExtensionCache
 
         private IMessaging Messaging { get; }
 
-        public bool ShowLogo { get; private set; }
+        public bool ShowHelp { get; set; }
 
-        public bool StopParsing { get; private set; }
+        public bool ShowLogo { get; set; }
 
-        private bool ShowHelp { get; set; }
+        public bool StopParsing { get; set; }
 
         private bool Global { get; set; }
 
