@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
+    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Core.WindowsInstaller.Decompile;
     using WixToolset.Core.WindowsInstaller.Inscribe;
@@ -72,8 +73,9 @@ namespace WixToolset.Core.WindowsInstaller
 
         public bool Inscribe(IInscribeContext context)
         {
-            var command = new InscribeMsiPackageCommand(context);
-            return command.Execute();
+            //var command = new InscribeMsiPackageCommand(context);
+            //return command.Execute();
+            throw new NotImplementedException();
         }
 
         public Intermediate Unbind(IUnbindContext context)

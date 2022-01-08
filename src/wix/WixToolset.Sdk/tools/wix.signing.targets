@@ -11,6 +11,10 @@
   <UsingTask TaskName="GetCabList" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="GetLooseFileList" AssemblyFile="$(WixTasksPath)" />
 
+  <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
   <!-- Default Inscribe properties. -->
   <PropertyGroup>
     <InscribeNoLogo Condition=" '$(InscribeNoLogo)' == '' ">$(NoLogo)</InscribeNoLogo>
@@ -19,6 +23,10 @@
     <InscribeTreatWarningsAsErrors Condition=" '$(InscribeTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</InscribeTreatWarningsAsErrors>
     <InscribeTreatSpecificWarningsAsErrors Condition=" '$(InscribeTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</InscribeTreatSpecificWarningsAsErrors>
     <InscribeVerboseOutput Condition=" '$(InscribeVerboseOutput)' == '' ">$(VerboseOutput)</InscribeVerboseOutput>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SignOutputCabs Condition=" '$(SignOutputCabs)'=='' ">$(SignOutput)</SignOutputCabs>
   </PropertyGroup>
 
   <!--
@@ -58,7 +66,7 @@
   <Target
       Name="Signing"
       DependsOnTargets="$(SigningDependsOn)"
-      Inputs="$(TargetPath)"
+      Inputs="@(_WixBuildOutputFile)"
       Outputs="$(SignedFilePath)"
       Condition=" '$(SignOutput)' == 'true' ">
 
@@ -76,7 +84,7 @@
   <Target
       Name="CalculateSignTargetFiles">
     <ItemGroup>
-      <SignTargetPath Include="$(TargetPath)" />
+      <SignTargetPath Include="@(_WixBuildOutputFile)" />
     </ItemGroup>
   </Target>
 
@@ -98,7 +106,8 @@
   <Target
       Name="GetCabsToSign"
       Inputs="@(SignTargetPath)"
-      Outputs="$(SignedFilePath)">
+      Outputs="$(SignedFilePath)"
+      Condition=" '$(SignOutputCabs)' == 'true' ">
     <GetCabList Database="%(SignTargetPath.FullPath)">
       <Output TaskParameter="CabList" ItemName="SignCabs" />
       <Output TaskParameter="CabList" ItemName="FileWrites" />
@@ -174,18 +183,22 @@
       Outputs="$(SignedFilePath)"
       Condition=" '@(SignCabs)' != '' ">
 
-    <Insignia
+    <InscribeMsiWithCabinetSignatures
         DatabaseFile="%(SignTargetPath.FullPath)"
         OutputFile="%(SignTargetPath.FullPath)"
-        ToolPath="$(WixToolPath)"
+        IntermediateDirectory="%(SignTargetPath.RootDir)%(SignTargetPath.Directory)"
+
         NoLogo="$(InscribeNoLogo)"
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         SuppressAllWarnings="$(InscribeSuppressAllWarnings)"
         SuppressSpecificWarnings="$(InscribeSuppressSpecificWarnings)"
         TreatWarningsAsErrors="$(InscribeTreatWarningsAsErrors)"
         TreatSpecificWarningsAsErrors="$(InscribeTreatSpecificWarningsAsErrors)"
         VerboseOutput="$(InscribeVerboseOutput)"
-        AdditionalOptions="$(InscribeAdditionalOptions)" />
+        AdditionalOptions="$(InscribeAdditionalOptions)"
+
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        ToolExe="$(WixToolExe)"
+        ToolPath="$(WixToolDir)" />
   </Target>
 
   <!--
