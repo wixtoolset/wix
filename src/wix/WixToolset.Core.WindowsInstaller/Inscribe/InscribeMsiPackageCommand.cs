@@ -12,20 +12,25 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class InscribeMsiPackageCommand
     {
-        public InscribeMsiPackageCommand(IInscribeContext context)
+        public InscribeMsiPackageCommand(IServiceProvider serviceProvider, string inputPath, string intermediateFolder, string outputPath)
         {
-            this.Context = context;
-            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
-            this.WindowsInstallerBackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.WindowsInstallerBackendHelper = serviceProvider.GetService<IWindowsInstallerBackendHelper>();
             this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
+            this.InputPath = inputPath;
+            this.IntermediateFolder = intermediateFolder;
+            this.OutputPath = outputPath;
         }
 
-        private IInscribeContext Context { get; }
+        private string InputPath { get; }
+
+        private string IntermediateFolder { get; }
+
+        private string OutputPath { get; }
 
         private IMessaging Messaging { get; }
 
@@ -39,14 +44,22 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
             var foundUnsignedExternals = false;
             var shouldCommit = false;
 
-            var attributes = File.GetAttributes(this.Context.InputFilePath);
+            var databasePath = this.OutputPath;
+
+            if (!String.Equals(this.InputPath, this.OutputPath, StringComparison.OrdinalIgnoreCase))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
+                File.Copy(this.InputPath, this.OutputPath, true);
+            }
+
+            var attributes = File.GetAttributes(databasePath);
             if (FileAttributes.ReadOnly == (attributes & FileAttributes.ReadOnly))
             {
-                this.Messaging.Write(ErrorMessages.ReadOnlyOutputFile(this.Context.InputFilePath));
+                this.Messaging.Write(ErrorMessages.ReadOnlyOutputFile(databasePath));
                 return shouldCommit;
             }
 
-            using (var database = new Database(this.Context.InputFilePath, OpenDatabase.Transact))
+            using (var database = new Database(databasePath, OpenDatabase.Transact))
             {
                 // Just use the English codepage, because the tables we're importing only have binary streams / MSI identifiers / other non-localizable content
                 var codepage = 1252;
@@ -65,8 +78,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                     {
                         foreach (var digitalSignatureRecord in digitalSignatureView.Records)
                         {
-                            Row digitalSignatureRow = null;
-                            digitalSignatureRow = digitalSignatureTable.CreateRow(null);
+                            var digitalSignatureRow = digitalSignatureTable.CreateRow(null);
 
                             var table = digitalSignatureRecord.GetString(0);
                             var signObject = digitalSignatureRecord.GetString(1);
@@ -78,7 +90,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             if (false == digitalSignatureRecord.IsNull(3))
                             {
                                 // Export to a file, because the MSI API's require us to provide a file path on disk
-                                var hashPath = Path.Combine(this.Context.IntermediateFolder, "MsiDigitalSignature");
+                                var hashPath = Path.Combine(this.IntermediateFolder, "MsiDigitalSignature");
                                 var hashFileName = String.Concat(table, ".", signObject, ".bin");
 
                                 Directory.CreateDirectory(hashPath);
@@ -111,7 +123,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             var certificateId = digitalCertificateRecord.GetString(1); // get the identifier of the certificate
 
                             // Export to a file, because the MSI API's require us to provide a file path on disk
-                            var certPath = Path.Combine(this.Context.IntermediateFolder, "MsiDigitalCertificate");
+                            var certPath = Path.Combine(this.IntermediateFolder, "MsiDigitalCertificate");
                             Directory.CreateDirectory(certPath);
                             certPath = Path.Combine(certPath, String.Concat(certificateId, ".cer"));
 
@@ -147,7 +159,6 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                     foreach (var mediaRecord in mediaView.Records)
                     {
                         X509Certificate2 cert2 = null;
-                        Row digitalSignatureRow = null;
 
                         var cabName = mediaRecord.GetString(4); // get the name of the cab
                                                                 // If there is no cabinet or it's an internal cab, skip it.
@@ -157,7 +168,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                         }
 
                         var cabId = mediaRecord.GetString(1); // get the ID of the cab
-                        var cabPath = Path.Combine(Path.GetDirectoryName(this.Context.InputFilePath), cabName);
+                        var cabPath = Path.Combine(Path.GetDirectoryName(this.InputPath), cabName);
 
                         // If the cabs aren't there, throw an error but continue to catch the other errors
                         if (!File.Exists(cabPath))
@@ -207,7 +218,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             digitalCertificateRow[0] = certificateGeneratedId;
 
                             // Export to a file, because the MSI API's require us to provide a file path on disk
-                            var certPath = Path.Combine(this.Context.IntermediateFolder, "MsiDigitalCertificate");
+                            var certPath = Path.Combine(this.IntermediateFolder, "MsiDigitalCertificate");
                             Directory.CreateDirectory(certPath);
                             certPath = Path.Combine(certPath, String.Concat(cert2.Thumbprint, ".cer"));
                             File.Delete(certPath);
@@ -224,7 +235,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             certificates.Add(cert2.Thumbprint, certificateGeneratedId);
                         }
 
-                        digitalSignatureRow = digitalSignatureTable.CreateRow(null);
+                        var digitalSignatureRow = digitalSignatureTable.CreateRow(null);
 
                         digitalSignatureRow[0] = "Media";
                         digitalSignatureRow[1] = cabId;
@@ -234,7 +245,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
                 if (digitalCertificateTable.Rows.Count > 0)
                 {
-                    var command = new CreateIdtFileCommand(this.Messaging, digitalCertificateTable, codepage, this.Context.IntermediateFolder, true);
+                    var command = new CreateIdtFileCommand(this.Messaging, digitalCertificateTable, codepage, this.IntermediateFolder, true);
                     command.Execute();
 
                     database.Import(command.IdtPath);
@@ -243,7 +254,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
                 if (digitalSignatureTable.Rows.Count > 0)
                 {
-                    var command = new CreateIdtFileCommand(this.Messaging, digitalSignatureTable, codepage, this.Context.IntermediateFolder, true);
+                    var command = new CreateIdtFileCommand(this.Messaging, digitalSignatureTable, codepage, this.IntermediateFolder, true);
                     command.Execute();
 
                     database.Import(command.IdtPath);
@@ -257,7 +268,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                 // If we did find external cabs but not all of them were signed, give a warning
                 if (foundUnsignedExternals)
                 {
-                    this.Messaging.Write(WarningMessages.ExternalCabsAreNotSigned(this.Context.InputFilePath));
+                    this.Messaging.Write(WarningMessages.ExternalCabsAreNotSigned(this.InputPath));
                 }
 
                 if (shouldCommit)
