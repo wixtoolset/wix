@@ -9,7 +9,7 @@ namespace WixToolset.BuildTasks
     /// <summary>
     /// An MSBuild task to run the WiX compiler.
     /// </summary>
-    public sealed partial class WixBuild : ToolsetTask
+    public sealed partial class WixBuild : WixExeBaseTask
     {
         public string[] Cultures { get; set; }
 
@@ -71,8 +71,6 @@ namespace WixToolset.BuildTasks
         public string[] SuppressIces { get; set; }
 
         public string AdditionalCub { get; set; }
-
-        protected override string ToolName => "wix.exe";
 
         protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
