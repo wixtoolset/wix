@@ -71,8 +71,6 @@ namespace WixToolset.Core.WindowsInstaller
 
         public IDecompileResult Decompile(IDecompileContext context) => throw new NotImplementedException();
 
-        public bool Inscribe(IInscribeContext context) => throw new NotImplementedException();
-
         public Intermediate Unbind(IUnbindContext context)
         {
 #if TODO_PATCHING

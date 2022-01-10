@@ -40,7 +40,6 @@ namespace WixToolset.Core
             this.AddService<IBindContext>((provider, singletons) => new BindContext(provider));
             this.AddService<IDecompileContext>((provider, singletons) => new DecompileContext(provider));
             this.AddService<ILayoutContext>((provider, singletons) => new LayoutContext(provider));
-            this.AddService<IInscribeContext>((provider, singletons) => new InscribeContext(provider));
             this.AddService<IUnbindContext>((provider, singletons) => new UnbindContext(provider));
 
             this.AddService<IBindFileWithPath>((provider, singletons) => new BindFileWithPath());

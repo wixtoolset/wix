@@ -13,7 +13,5 @@ namespace WixToolset.Extensibility
         IDecompileResult Decompile(IDecompileContext context);
 
         Intermediate Unbind(IUnbindContext context);
-
-        bool Inscribe(IInscribeContext context);
     }
 }
