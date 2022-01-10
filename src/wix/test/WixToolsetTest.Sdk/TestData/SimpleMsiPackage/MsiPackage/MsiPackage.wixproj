@@ -43,4 +43,23 @@
   </ItemGroup>
 
   <Import Project="$(WixTargetsPath)" />
+
+  <Target Name="SignCabs">
+    <!-- It would be cool to actually sign, but signtool.exe is not always easy to find, so we'll
+         mock it up instead.
+    <Error Text="Could not find pfx at: $(TestCertificate)" Condition=" !Exists('$(TestCertificate)') " />
+    <Exec Command='signtool.exe sign /v /f $(TestCertificate) /p password %(SignCabs.FullPath)' />
+    -->
+    <Message Importance="high" Text="TEST: SignCabs: @(SignCabs)" />
+  </Target>
+
+  <Target Name="SignMsi">
+    <!-- It would be cool to actually sign, but signtool.exe is not always easy to find, so we'll
+         mock it up instead.
+    <Error Text="Could not find pfx at: $(TestCertificate)" Condition=" !Exists('$(TestCertificate)') " />
+    <Exec Command='signtool.exe sign /v /f $(TestCertificate) /p password "%(SignMsi.FullPath)" ' />
+    -->
+    <Message Importance="high" Text="TEST: SignMsi: @(SignMsi)" />
+  </Target>
+
 </Project>
