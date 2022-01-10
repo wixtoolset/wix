@@ -64,6 +64,10 @@ BundleEnumRelatedBundle - Queries the bundle installation metadata for installs 
 RETURNS:
     E_INVALIDARG
         An invalid parameter was passed to the function.
+    S_OK
+        Related bundle was found.
+    S_FALSE
+        Related bundle was not found.
 
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
@@ -82,6 +86,10 @@ NOTE: lpBundleIdBuff is a buffer to receive the bundle GUID. This buffer must be
 RETURNS:
     E_INVALIDARG
         An invalid parameter was passed to the function.
+    S_OK
+        Related bundle was found.
+    S_FALSE
+        Related bundle was not found.
 
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/

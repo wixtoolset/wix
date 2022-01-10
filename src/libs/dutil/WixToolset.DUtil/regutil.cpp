@@ -32,6 +32,9 @@ static PFN_REGDELETEVALUEW vpfnRegDeleteValueW = ::RegDeleteValueW;
 static HMODULE vhAdvApi32Dll = NULL;
 static BOOL vfRegInitialized = FALSE;
 
+static REGSAM TranslateKeyBitness(
+    __in REG_KEY_BITNESS kbKeyBitness
+);
 static HRESULT WriteStringToRegistry(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
@@ -121,6 +124,7 @@ DAPI_(HRESULT) RegCreateEx(
     __in HKEY hkRoot,
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __in BOOL fVolatile,
     __in_opt SECURITY_ATTRIBUTES* pSecurityAttributes,
     __out HKEY* phk,
@@ -131,7 +135,8 @@ DAPI_(HRESULT) RegCreateEx(
     DWORD er = ERROR_SUCCESS;
     DWORD dwDisposition;
 
-    er = vpfnRegCreateKeyExW(hkRoot, wzSubKey, 0, NULL, fVolatile ? REG_OPTION_VOLATILE : REG_OPTION_NON_VOLATILE, dwAccess, pSecurityAttributes, phk, &dwDisposition);
+    REGSAM samDesired = TranslateKeyBitness(kbKeyBitness);
+    er = vpfnRegCreateKeyExW(hkRoot, wzSubKey, 0, NULL, fVolatile ? REG_OPTION_VOLATILE : REG_OPTION_NON_VOLATILE, dwAccess | samDesired, pSecurityAttributes, phk, &dwDisposition);
     RegExitOnWin32Error(er, hr, "Failed to create registry key.");
 
     if (pfCreated)
@@ -149,12 +154,25 @@ DAPI_(HRESULT) RegOpen(
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
     __out HKEY* phk
-    )
+)
+{
+    return RegOpenEx(hkRoot, wzSubKey, dwAccess, REG_KEY_DEFAULT, phk);
+}
+
+
+DAPI_(HRESULT) RegOpenEx(
+    __in HKEY hkRoot,
+    __in_z LPCWSTR wzSubKey,
+    __in DWORD dwAccess,
+    __in REG_KEY_BITNESS kbKeyBitness,
+    __out HKEY* phk
+)
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
 
-    er = vpfnRegOpenKeyExW(hkRoot, wzSubKey, 0, dwAccess, phk);
+    REGSAM samDesired = TranslateKeyBitness(kbKeyBitness);
+    er = vpfnRegOpenKeyExW(hkRoot, wzSubKey, 0, dwAccess | samDesired, phk);
     if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
     {
         ExitFunction1(hr = E_FILENOTFOUND);
@@ -178,7 +196,6 @@ DAPI_(HRESULT) RegDelete(
     LPWSTR pszEnumeratedSubKey = NULL;
     LPWSTR pszRecursiveSubKey = NULL;
     HKEY hkKey = NULL;
-    REGSAM samDesired = 0;
 
     if (!vfRegInitialized && REG_KEY_DEFAULT != kbKeyBitness)
     {
@@ -186,22 +203,9 @@ DAPI_(HRESULT) RegDelete(
         RegExitOnFailure(hr, "RegInitialize must be called first in order to RegDelete() a key with non-default bit attributes!");
     }
 
-    switch (kbKeyBitness)
-    {
-    case REG_KEY_32BIT:
-        samDesired = KEY_WOW64_32KEY;
-        break;
-    case REG_KEY_64BIT:
-        samDesired = KEY_WOW64_64KEY;
-        break;
-    case REG_KEY_DEFAULT:
-        // Nothing to do
-        break;
-    }
-
     if (fDeleteTree)
     {
-        hr = RegOpen(hkRoot, wzSubKey, KEY_READ | samDesired, &hkKey);
+        hr = RegOpenEx(hkRoot, wzSubKey, KEY_READ, kbKeyBitness, &hkKey);
         if (E_FILENOTFOUND == hr)
         {
             ExitFunction1(hr = S_OK);
@@ -225,6 +229,7 @@ DAPI_(HRESULT) RegDelete(
 
     if (NULL != vpfnRegDeleteKeyExW)
     {
+        REGSAM samDesired = TranslateKeyBitness(kbKeyBitness);
         er = vpfnRegDeleteKeyExW(hkRoot, wzSubKey, samDesired, 0);
         if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
         {
@@ -249,7 +254,6 @@ LExit:
 
     return hr;
 }
-
 
 DAPI_(HRESULT) RegKeyEnum(
     __in HKEY hk,
@@ -889,14 +893,14 @@ DAPI_(HRESULT) RegKeyReadNumber(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
     __in_z_opt LPCWSTR wzName,
-    __in BOOL f64Bit,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __out DWORD* pdwValue
     )
 {
     HRESULT hr = S_OK;
     HKEY hkKey = NULL;
 
-    hr = RegOpen(hk, wzSubKey, KEY_READ | f64Bit ? KEY_WOW64_64KEY : 0, &hkKey);
+    hr = RegOpenEx(hk, wzSubKey, KEY_READ, kbKeyBitness, &hkKey);
     RegExitOnFailure(hr, "Failed to open key: %ls", wzSubKey);
 
     hr = RegReadNumber(hkKey, wzName, pdwValue);
@@ -917,14 +921,14 @@ DAPI_(BOOL) RegValueExists(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
     __in_z_opt LPCWSTR wzName,
-    __in BOOL f64Bit
+    __in REG_KEY_BITNESS kbKeyBitness
     )
 {
     HRESULT hr = S_OK;
     HKEY hkKey = NULL;
     DWORD dwType = 0;
 
-    hr = RegOpen(hk, wzSubKey, KEY_READ | f64Bit ? KEY_WOW64_64KEY : 0, &hkKey);
+    hr = RegOpenEx(hk, wzSubKey, KEY_READ, kbKeyBitness, &hkKey);
     RegExitOnFailure(hr, "Failed to open key: %ls", wzSubKey);
 
     hr = RegGetType(hkKey, wzName, &dwType);
@@ -934,6 +938,25 @@ LExit:
     ReleaseRegKey(hkKey);
 
     return SUCCEEDED(hr);
+}
+
+static REGSAM TranslateKeyBitness(
+    __in REG_KEY_BITNESS kbKeyBitness
+    )
+{
+    switch (kbKeyBitness)
+    {
+    case REG_KEY_32BIT:
+        return KEY_WOW64_32KEY;
+        break;
+    case REG_KEY_64BIT:
+        return KEY_WOW64_64KEY;
+        break;
+    case REG_KEY_DEFAULT:
+    default:
+        return 0;
+        break;
+    }
 }
 
 static HRESULT WriteStringToRegistry(

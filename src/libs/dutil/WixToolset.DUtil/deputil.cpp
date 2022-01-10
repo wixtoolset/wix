@@ -337,7 +337,7 @@ DAPI_(HRESULT) DepRegisterDependency(
     DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Create the dependency key (or open it if it already exists).
-    hr = RegCreateEx(hkHive, sczKey, KEY_WRITE, FALSE, NULL, &hkKey, &fCreated);
+    hr = RegCreateEx(hkHive, sczKey, KEY_WRITE, REG_KEY_DEFAULT, FALSE, NULL, &hkKey, &fCreated);
     DepExitOnFailure(hr, "Failed to create the dependency registry key \"%ls\".", sczKey);
 
     // Set the id if it was provided.
@@ -417,14 +417,14 @@ DAPI_(HRESULT) DepRegisterDependent(
     DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzDependencyProviderKey);
 
     // Create the dependency key (or open it if it already exists).
-    hr = RegCreateEx(hkHive, sczDependencyKey, KEY_WRITE, FALSE, NULL, &hkDependencyKey, &fCreated);
+    hr = RegCreateEx(hkHive, sczDependencyKey, KEY_WRITE, REG_KEY_DEFAULT, FALSE, NULL, &hkDependencyKey, &fCreated);
     DepExitOnFailure(hr, "Failed to create the dependency registry key \"%ls\".", sczDependencyKey);
 
     // Create the subkey to register the dependent.
     hr = StrAllocFormatted(&sczKey, L"%ls\\%ls", vsczRegistryDependents, wzProviderKey);
     DepExitOnFailure(hr, "Failed to allocate dependent subkey \"%ls\" under dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
 
-    hr = RegCreateEx(hkDependencyKey, sczKey, KEY_WRITE, FALSE, NULL, &hkKey, &fCreated);
+    hr = RegCreateEx(hkDependencyKey, sczKey, KEY_WRITE, REG_KEY_DEFAULT, FALSE, NULL, &hkKey, &fCreated);
     DepExitOnFailure(hr, "Failed to create the dependency subkey \"%ls\".", sczKey);
 
     // Set the minimum version if not NULL.

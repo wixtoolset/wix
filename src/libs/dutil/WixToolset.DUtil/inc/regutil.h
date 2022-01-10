@@ -147,6 +147,7 @@ HRESULT DAPI RegCreateEx(
     __in HKEY hkRoot,
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __in BOOL fVolatile,
     __in_opt SECURITY_ATTRIBUTES* pSecurityAttributes,
     __out HKEY* phk,
@@ -162,7 +163,19 @@ HRESULT DAPI RegOpen(
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
     __out HKEY* phk
-    );
+);
+
+/********************************************************************
+ RegOpenEx - opens a registry key.
+
+*********************************************************************/
+HRESULT DAPI RegOpenEx(
+    __in HKEY hkRoot,
+    __in_z LPCWSTR wzSubKey,
+    __in DWORD dwAccess,
+    __in REG_KEY_BITNESS kbKeyBitness,
+    __out HKEY* phk
+);
 
 /********************************************************************
  RegDelete - deletes a registry key (and optionally it's whole tree).
@@ -379,7 +392,7 @@ HRESULT DAPI RegKeyReadNumber(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
     __in_z_opt LPCWSTR wzName,
-    __in BOOL f64Bit,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __out DWORD* pdwValue
     );
 
@@ -392,7 +405,7 @@ BOOL DAPI RegValueExists(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
     __in_z_opt LPCWSTR wzName,
-    __in BOOL f64Bit
+    __in REG_KEY_BITNESS kbKeyBitness
     );
 
 #ifdef __cplusplus
