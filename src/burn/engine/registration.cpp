@@ -1742,38 +1742,38 @@ static BOOL IsRegistryRebootPending()
     HKEY hk = NULL;
     BOOL fRebootPending = FALSE;
 
-    hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\ServerManager", L"CurrentRebootAttempts", TRUE, &dwValue);
+    hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\ServerManager", L"CurrentRebootAttempts", REG_KEY_DEFAULT, &dwValue);
     fRebootPending = SUCCEEDED(hr) && 0 < dwValue;
 
     if (!fRebootPending)
     {
-        hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Updates", L"UpdateExeVolatile", TRUE, &dwValue);
+        hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Updates", L"UpdateExeVolatile", REG_KEY_DEFAULT, &dwValue);
         fRebootPending = SUCCEEDED(hr) && 0 < dwValue;
 
         if (!fRebootPending)
         {
-            fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending", NULL, TRUE);
+            fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending", NULL, REG_KEY_DEFAULT);
 
             if (!fRebootPending)
             {
-                fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootInProgress", NULL, TRUE);
+                fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootInProgress", NULL, REG_KEY_DEFAULT);
 
                 if (!fRebootPending)
                 {
-                    hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update", L"AUState", TRUE, &dwValue);
+                    hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update", L"AUState", REG_KEY_DEFAULT, &dwValue);
                     fRebootPending = SUCCEEDED(hr) && 8 == dwValue;
 
                     if (!fRebootPending)
                     {
-                        fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", L"PendingFileRenameOperations", TRUE);
+                        fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", L"PendingFileRenameOperations", REG_KEY_DEFAULT);
 
                         if (!fRebootPending)
                         {
-                            fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", L"PendingFileRenameOperations2", TRUE);
+                            fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", L"PendingFileRenameOperations2", REG_KEY_DEFAULT);
 
                             if (!fRebootPending)
                             {
-                                hr = RegOpen(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\FileRenameOperations", KEY_READ | KEY_WOW64_64KEY, &hk);
+                                hr = RegOpenEx(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\FileRenameOperations", KEY_READ, REG_KEY_DEFAULT, &hk);
                                 if (SUCCEEDED(hr))
                                 {
                                     DWORD cSubKeys = 0;
