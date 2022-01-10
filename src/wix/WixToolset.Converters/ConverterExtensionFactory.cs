@@ -4,7 +4,6 @@ namespace WixToolset.Converters
 {
     using System;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
 
     internal class ConverterExtensionFactory : IExtensionFactory
     {
