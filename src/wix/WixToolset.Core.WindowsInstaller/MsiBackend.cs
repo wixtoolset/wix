@@ -2,10 +2,8 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
-    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Core.WindowsInstaller.Decompile;
-    using WixToolset.Core.WindowsInstaller.Inscribe;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -69,13 +67,6 @@ namespace WixToolset.Core.WindowsInstaller
             }
 
             return result;
-        }
-
-        public bool Inscribe(IInscribeContext context)
-        {
-            //var command = new InscribeMsiPackageCommand(context);
-            //return command.Execute();
-            throw new NotImplementedException();
         }
 
         public Intermediate Unbind(IUnbindContext context)

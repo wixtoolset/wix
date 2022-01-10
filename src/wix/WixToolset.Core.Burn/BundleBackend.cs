@@ -45,11 +45,6 @@ namespace WixToolset.Core.Burn
             throw new NotImplementedException();
         }
 
-        public bool Inscribe(IInscribeContext context)
-        {
-            return false;
-        }
-
         public Intermediate Unbind(IUnbindContext context)
         {
             var uxExtractPath = Path.Combine(context.ExportBasePath, "UX");

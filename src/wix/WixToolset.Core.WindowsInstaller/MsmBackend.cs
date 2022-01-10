@@ -65,8 +65,6 @@ namespace WixToolset.Core.WindowsInstaller
             return result;
         }
 
-        public bool Inscribe(IInscribeContext context) => false;
-
         public Intermediate Unbind(IUnbindContext context)
         {
             var command = new UnbindMsiOrMsmCommand(context);

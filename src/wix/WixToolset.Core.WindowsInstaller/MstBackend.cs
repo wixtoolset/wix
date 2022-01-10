@@ -30,11 +30,6 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
-        public bool Inscribe(IInscribeContext context)
-        {
-            throw new NotImplementedException();
-        }
-
         public Intermediate Unbind(IUnbindContext context)
         {
             var command = new UnbindMsiOrMsmCommand(context);
