@@ -179,42 +179,8 @@
 
   <!-- Defaut Compiler properties. -->
   <PropertyGroup>
-    <CompilerNoLogo Condition=" '$(CompilerNoLogo)' == '' ">$(NoLogo)</CompilerNoLogo>
-    <CompilerSuppressAllWarnings Condition=" '$(CompilerSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</CompilerSuppressAllWarnings>
-    <CompilerSuppressSpecificWarnings Condition=" '$(CompilerSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</CompilerSuppressSpecificWarnings>
-    <CompilerTreatWarningsAsErrors Condition=" '$(CompilerTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</CompilerTreatWarningsAsErrors>
-    <CompilerTreatSpecificWarningsAsErrors Condition=" '$(CompilerTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</CompilerTreatSpecificWarningsAsErrors>
-    <CompilerVerboseOutput Condition=" '$(CompilerVerboseOutput)' == '' ">$(VerboseOutput)</CompilerVerboseOutput>
     <!-- TODO: This probably doesn't work any longer since Platform won't be defined until Microsoft.Common.targets is included -->
     <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and '$(Platform)' != 'AnyCPU' and '$(Platform)' != 'Any CPU' ">$(Platform)</InstallerPlatform>
-  </PropertyGroup>
-
-  <!-- Default Lib properties. -->
-  <PropertyGroup>
-    <LibNoLogo Condition=" '$(LibNoLogo)' == '' ">$(NoLogo)</LibNoLogo>
-    <LibBindFiles Condition=" '$(LibBindFiles)' == '' ">$(BindFiles)</LibBindFiles>
-    <LibPedantic Condition=" '$(LibPedantic)' == '' ">$(Pedantic)</LibPedantic>
-    <LibSuppressAllWarnings Condition=" '$(LibSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</LibSuppressAllWarnings>
-    <LibSuppressSpecificWarnings Condition=" '$(LibSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</LibSuppressSpecificWarnings>
-    <LibSuppressSchemaValidation Condition=" '$(LibSuppressSchemaValidation)' == '' ">$(SuppressSchemaValidation)</LibSuppressSchemaValidation>
-    <LibSuppressIntermediateFileVersionMatching Condition=" '$(LibSuppressIntermediateFileVersionMatching)' == '' ">$(SuppressIntermediateFileVersionMatching)</LibSuppressIntermediateFileVersionMatching>
-    <LibTreatWarningsAsErrors Condition=" '$(LibTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</LibTreatWarningsAsErrors>
-    <LibTreatSpecificWarningsAsErrors Condition=" '$(LibTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</LibTreatSpecificWarningsAsErrors>
-    <LibVerboseOutput Condition=" '$(LibVerboseOutput)' == '' ">$(VerboseOutput)</LibVerboseOutput>
-  </PropertyGroup>
-
-  <!-- Default Linker properties. -->
-  <PropertyGroup>
-    <LinkerNoLogo Condition=" '$(LinkerNoLogo)' == '' ">$(NoLogo)</LinkerNoLogo>
-    <LinkerBindFiles Condition=" '$(LinkerBindFiles)' == '' ">$(BindFiles)</LinkerBindFiles>
-    <LinkerPedantic Condition=" '$(LinkerPedantic)' == '' ">$(Pedantic)</LinkerPedantic>
-    <LinkerSuppressAllWarnings Condition=" '$(LinkerSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</LinkerSuppressAllWarnings>
-    <LinkerSuppressSpecificWarnings Condition=" '$(LinkerSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</LinkerSuppressSpecificWarnings>
-    <LinkerSuppressSchemaValidation Condition=" '$(LinkerSuppressSchemaValidation)' == '' ">$(SuppressSchemaValidation)</LinkerSuppressSchemaValidation>
-    <LinkerSuppressIntermediateFileVersionMatching Condition=" '$(LinkerSuppressIntermediateFileVersionMatching)' == '' ">$(SuppressIntermediateFileVersionMatching)</LinkerSuppressIntermediateFileVersionMatching>
-    <LinkerTreatWarningsAsErrors Condition=" '$(LinkerTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</LinkerTreatWarningsAsErrors>
-    <LinkerTreatSpecificWarningsAsErrors Condition=" '$(LinkerTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</LinkerTreatSpecificWarningsAsErrors>
-    <LinkerVerboseOutput Condition=" '$(LinkerVerboseOutput)' == '' ">$(VerboseOutput)</LinkerVerboseOutput>
   </PropertyGroup>
 
   <!-- If BindInputPaths (or LinkerBindInputPaths) was passed in via the command line, then convert it to an ItemGroup -->
@@ -648,11 +614,11 @@
         Pedantic="$(Pedantic)"
         ReferencePaths="$(ReferencePaths)"
 
-        SuppressSpecificWarnings="$(CompilerSuppressSpecificWarnings);$(LinkerSuppressSpecificWarnings)"
-        TreatSpecificWarningsAsErrors="$(CompilerTreatSpecificWarningsAsErrors)"
+        SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
+        TreatSpecificWarningsAsErrors="$(TreatSpecificWarningsAsErrors)"
 
         BindInputPaths="@(LinkerBindInputPaths)"
-        BindFiles="$(LinkerBindFiles)"
+        BindFiles="$(BindFiles)"
         BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)"
 
         CabinetCachePath="$(_WixBuildCabinetCachePath)"
@@ -667,15 +633,17 @@
         SuppressIces="$(SuppressIces)"
         AdditionalCub="$(AdditionalCub)"
 
+        SuppressAllWarnings="$(SuppressAllWarnings)"
+        TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+        VerboseOutput="$(VerboseOutput)"
+
         RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)" />
 
-    <!--
-    SuppressAllWarnings="$(CompilerSuppressAllWarnings);$(LinkerSuppressAllWarnings)"
-    TreatWarningsAsErrors="$(CompilerTreatWarningsAsErrors);$(LinkerTreatWarningsAsErrors)"
-    VerboseOutput="$(CompilerVerboseOutput);$(LinkerVerboseOutput)"
-    -->
+    <ItemGroup>
+      <_WixBuildOutputFile Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" />
+    </ItemGroup>
   </Target>
 
   <!--
