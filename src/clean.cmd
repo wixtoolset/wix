@@ -36,6 +36,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.sdk" rd /s/q "%_NUGET_CACHE%\wixtoolset.sdk"
 if exist "%_NUGET_CACHE%\wixtoolset.util.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.util.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.ui.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.ui.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.wcautil" rd /s/q "%_NUGET_CACHE%\wixtoolset.wcautil"
+if exist "%_NUGET_CACHE%\wix" rd /s/q "%_NUGET_CACHE%\wix"
 
 popd
 endlocal
