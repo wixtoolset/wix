@@ -15,7 +15,7 @@ namespace WixToolset.BuildTasks
 
     public partial class ToolsetTask
     {
-        protected sealed override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
+        protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
             if (this.RunAsSeparateProcess)
             {

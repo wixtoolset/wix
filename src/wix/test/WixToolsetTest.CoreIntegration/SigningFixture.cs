@@ -62,5 +62,117 @@ namespace WixToolsetTest.CoreIntegration
                 }, rows);
             }
         }
+
+        [Fact]
+        public void CanInscribeBundle()
+        {
+            var folder = TestData.Get(@"TestData", "SimpleBundle");
+            var signedFolder = TestData.Get(@"TestData", ".Data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var signedExe = Path.Combine(intermediateFolder, @"signed.exe");
+                var reattachedExe = Path.Combine(baseFolder, @"bin\final.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Bundle.wxs"),
+                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-bindpath", signedFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+{
+                    "burn",
+                    "detach",
+                    exePath,
+                    "-engine", signedExe
+                });
+
+                result.AssertSuccess();
+
+                // Swap in a pre-signed executable since signing during the unit test
+                // is a challenge. The exe isn't an exact match but that's okay for
+                // these testing purposes.
+                File.Copy(Path.Combine(signedFolder, "signed_bundle_engine.exe"), signedExe, true);
+
+                result = WixRunner.Execute(new[]
+{
+                    "burn",
+                    "reattach",
+                    exePath,
+                    "-engine", signedExe,
+                    "-o", reattachedExe
+                });
+
+                result.AssertSuccess();
+                Assert.True(File.Exists(reattachedExe));
+            }
+        }
+
+        [Fact]
+        public void CanInscribeUncompressedBundle()
+        {
+            var folder = TestData.Get(@"TestData", "BundleUncompressed");
+            var bindPath = TestData.Get(@"TestData", "SimpleBundle", "data");
+            var signedFolder = TestData.Get(@"TestData", ".Data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var signedExe = Path.Combine(intermediateFolder, @"signed.exe");
+                var reattachedExe = Path.Combine(baseFolder, @"bin\final.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "UncompressedBundle.wxs"),
+                    "-bindpath", bindPath,
+                    "-bindpath", signedFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+{
+                    "burn",
+                    "detach",
+                    exePath,
+                    "-engine", signedExe
+                });
+
+                result.AssertSuccess();
+
+                // Swap in a pre-signed executable since signing during the unit test
+                // is a challenge. The exe isn't an exact match but that's okay for
+                // these testing purposes.
+                File.Copy(Path.Combine(signedFolder, "signed_bundle_engine.exe"), signedExe, true);
+
+                result = WixRunner.Execute(new[]
+{
+                    "burn",
+                    "reattach",
+                    exePath,
+                    "-engine", signedExe,
+                    "-o", reattachedExe
+                });
+
+                Assert.True(File.Exists(reattachedExe));
+                Assert.Equal(-1000, result.ExitCode);
+            }
+        }
     }
 }

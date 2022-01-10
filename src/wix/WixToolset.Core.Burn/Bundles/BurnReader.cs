@@ -45,11 +45,6 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         public Stream Stream => this.binaryReader?.BaseStream;
 
-        internal static BurnReader Open(object inputFilePath)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Opens a Burn reader.
         /// </summary>
