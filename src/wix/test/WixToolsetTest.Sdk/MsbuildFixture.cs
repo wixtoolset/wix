@@ -26,11 +26,18 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "SimpleBundle.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { "-p:SignOutput=true" });
                 result.AssertSuccess();
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
                 WixAssert.StringCollectionEmpty(warnings);
+
+                var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(line => line.Trim()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"TEST: SignBundleEngine: obj\x86\Release\SimpleBundle.exe",
+                    @"TEST: SignBundle: obj\x86\Release\SimpleBundle.exe",
+                }, testMessages);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -59,11 +66,17 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "UncompressedBundle.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { "-p:SignOutput=true" });
                 result.AssertSuccess();
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
                 WixAssert.StringCollectionEmpty(warnings);
+
+                var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(line => line.Trim()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"TEST: SignBundleEngine: obj\x86\Release\UncompressedBundle.exe",
+                }, testMessages);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -119,21 +132,39 @@ namespace WixToolsetTest.Sdk
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
+            var baseFolder = String.Empty;
+
             using (var fs = new TestDataFolderFileSystem())
             {
                 fs.Initialize(sourceFolder);
-                var baseFolder = fs.BaseFolder;
+                baseFolder = fs.BaseFolder;
+
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { "-p:SignOutput=true" });
                 result.AssertSuccess();
 
                 var platformSwitches = result.Output.Where(line => line.Contains("-platform x86"));
                 Assert.Single(platformSwitches);
 
-                var warnings = result.Output.Where(line => line.Contains(": warning"));
-                Assert.Equal(4, warnings.Count());
+                var warnings = result.Output.Where(line => line.Contains(": warning")).Select(ExtractWarningFromMessage).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"WIX1118: The variable 'Variable' with value 'DifferentValue' was previously declared with value 'Value'.",
+                    @"WIX1102: The DefaultLanguage '1033' was used for file 'filcV1yrx0x8wJWj4qMzcH21jwkPko' which has no language or version. For unversioned files, specifying a value for DefaultLanguage is not neccessary and it will not be used when determining file versions. Remove the DefaultLanguage attribute to eliminate this warning.",
+                    @"WIX1122: The installer database '<basefolder>\obj\x86\Release\en-US\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build.",
+                    @"WIX1118: The variable 'Variable' with value 'DifferentValue' was previously declared with value 'Value'.",
+                    @"WIX1102: The DefaultLanguage '1033' was used for file 'filcV1yrx0x8wJWj4qMzcH21jwkPko' which has no language or version. For unversioned files, specifying a value for DefaultLanguage is not neccessary and it will not be used when determining file versions. Remove the DefaultLanguage attribute to eliminate this warning.",
+                    @"WIX1122: The installer database '<basefolder>\obj\x86\Release\en-US\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build."
+                }, warnings);
+
+                var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(ReplacePathsInMessage).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"TEST: SignCabs: <basefolder>\obj\x86\Release\en-US\cab1.cab",
+                    @"TEST: SignMsi: obj\x86\Release\en-US\MsiPackage.msi",
+                }, testMessages);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -145,6 +176,20 @@ namespace WixToolsetTest.Sdk
                     @"bin\x86\Release\en-US\MsiPackage.msi",
                     @"bin\x86\Release\en-US\MsiPackage.wixpdb",
                 }, paths);
+            }
+
+            string ExtractWarningFromMessage(string message)
+            {
+                const string prefix = ": warning ";
+
+                var start = message.IndexOf(prefix) + prefix.Length;
+                var end = message.LastIndexOf("[");
+                return ReplacePathsInMessage(message.Substring(start, end - start));
+            }
+
+            string ReplacePathsInMessage(string message)
+            {
+                return message.Replace(baseFolder, "<basefolder>").Trim();
             }
         }
 

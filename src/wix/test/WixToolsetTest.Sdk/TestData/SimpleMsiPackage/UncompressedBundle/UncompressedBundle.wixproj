@@ -39,4 +39,12 @@
   </ItemGroup>
 
   <Import Project="$(WixTargetsPath)" />
+
+  <Target Name="SignBundleEngine">
+    <Message Importance="high" Text="TEST: SignBundleEngine: @(SignBundleEngine)" />
+  </Target>
+
+  <Target Name="SignBundle">
+    <Message Importance="high" Text="TEST: SignBundle: @(SignBundle)" />
+  </Target>
 </Project>
