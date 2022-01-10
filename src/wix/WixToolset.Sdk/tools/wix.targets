@@ -961,7 +961,7 @@
   </Target>
 
   <Import Project="$(WixHarvestTargetsPath)" Condition=" '$(WixHarvestTargetsPath)' != '' and Exists('$(WixHarvestTargetsPath)')" />
-  <Import Project="$(WixSigningTargetsPath)" Condition=" '$(WixSigningTargetsPath)' != '' and Exists('$(WixSigningTargetsPath)')" />
+  <Import Project="$(WixSigningTargetsPath)"  />
 
   <!-- Extension point: Define CustomAfterWixTargets to a .targets file that you want to include after this file. -->
   <Import Project="$(CustomAfterWixTargets)" Condition=" '$(CustomAfterWixTargets)' != '' and Exists('$(CustomAfterWixTargets)')" />
