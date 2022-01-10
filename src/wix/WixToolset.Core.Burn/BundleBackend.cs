@@ -47,16 +47,7 @@ namespace WixToolset.Core.Burn
 
         public bool Inscribe(IInscribeContext context)
         {
-            if (String.IsNullOrEmpty(context.SignedEngineFile))
-            {
-                var command = new InscribeBundleCommand(context);
-                return command.Execute();
-            }
-            else
-            {
-                var command = new InscribeBundleEngineCommand(context);
-                return command.Execute();
-            }
+            return false;
         }
 
         public Intermediate Unbind(IUnbindContext context)

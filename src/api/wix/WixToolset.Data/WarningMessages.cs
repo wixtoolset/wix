@@ -279,7 +279,7 @@ namespace WixToolset.Data
 
         public static Message ExternalCabsAreNotSigned(string databaseFile)
         {
-            return Message(null, Ids.ExternalCabsAreNotSigned, "The installer database '{0}' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to run the insignia tool as part of your build.", databaseFile);
+            return Message(null, Ids.ExternalCabsAreNotSigned, "The installer database '{0}' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build.", databaseFile);
         }
 
         public static Message FailedToDeleteTempDir(string directory)

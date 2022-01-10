@@ -20,6 +20,14 @@
   <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
   <UsingTask TaskName="InscribeMsiWithCabinetSignatures" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
 
+  <UsingTask TaskName="DetachBundleEngineForSigning" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="DetachBundleEngineForSigning" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="DetachBundleEngineForSigning" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="ReattachSignedBundleEngine" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ReattachSignedBundleEngine" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="ReattachSignedBundleEngine" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
   <!-- Default Inscribe properties. -->
   <PropertyGroup>
     <InscribeNoLogo Condition=" '$(InscribeNoLogo)' == '' ">$(NoLogo)</InscribeNoLogo>
@@ -230,22 +238,26 @@
       Inputs="@(SignTargetPath)"
       Outputs="$(SignedFilePath)">
 
-    <Insignia
+    <DetachBundleEngineForSigning
         BundleFile="@(SignTargetPath)"
         OutputFile="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)"
-        ToolPath="$(WixToolPath)"
+        IntermediateDirectory="%(SignTargetPath.RootDir)%(SignTargetPath.Directory)"
+
         NoLogo="$(InscribeNoLogo)"
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         SuppressAllWarnings="$(InscribeSuppressAllWarnings)"
         SuppressSpecificWarnings="$(InscribeSuppressSpecificWarnings)"
         TreatWarningsAsErrors="$(InscribeTreatWarningsAsErrors)"
         TreatSpecificWarningsAsErrors="$(InscribeTreatSpecificWarningsAsErrors)"
         VerboseOutput="$(InscribeVerboseOutput)"
-        AdditionalOptions="$(InscribeAdditionalOptions)">
-      <Output TaskParameter="Output" ItemName="SignBundleEngine" />
-    </Insignia>
+        AdditionalOptions="$(InscribeAdditionalOptions)"
 
-    <!-- Explicitly add output to FileWrites to ensure they are included even when the target is up to date. -->
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        ToolExe="$(WixToolExe)"
+        ToolPath="$(WixToolDir)">
+      <Output TaskParameter="Output" ItemName="SignBundleEngine" />
+    </DetachBundleEngineForSigning>
+
+    <!-- Explicitly add output to FileWrites to ensure it is included even when the target is up to date. -->
     <ItemGroup>
       <FileWrites Include="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)" />
     </ItemGroup>
@@ -274,22 +286,26 @@
       Inputs="@(SignTargetPath)"
       Outputs="$(SignedFilePath)">
 
-    <Insignia
-        BundleFile="@(SignBundleEngine)"
-        OriginalBundleFile="@(SignTargetPath)"
+    <ReattachSignedBundleEngine
+        BundleFile="@(SignTargetPath)"
+        BundleEngineFile="@(SignBundleEngine)"
         OutputFile="@(SignTargetPath)"
-        ToolPath="$(WixToolPath)"
+        IntermediateDirectory="%(SignTargetPath.RootDir)%(SignTargetPath.Directory)"
+
         NoLogo="$(InscribeNoLogo)"
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         SuppressAllWarnings="$(InscribeSuppressAllWarnings)"
         SuppressSpecificWarnings="$(InscribeSuppressSpecificWarnings)"
         TreatWarningsAsErrors="$(InscribeTreatWarningsAsErrors)"
         TreatSpecificWarningsAsErrors="$(InscribeTreatSpecificWarningsAsErrors)"
         VerboseOutput="$(InscribeVerboseOutput)"
-        AdditionalOptions="$(InscribeAdditionalOptions)">
+        AdditionalOptions="$(InscribeAdditionalOptions)"
+
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        ToolExe="$(WixToolExe)"
+        ToolPath="$(WixToolDir)">
       <Output TaskParameter="Output" ItemName="SignBundle" />
       <Output TaskParameter="Output" ItemName="FileWrites" />
-    </Insignia>
+    </ReattachSignedBundleEngine>
   </Target>
 
   <!--

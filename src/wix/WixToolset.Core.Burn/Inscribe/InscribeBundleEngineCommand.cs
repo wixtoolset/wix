@@ -6,16 +6,19 @@ namespace WixToolset.Core.Burn.Inscribe
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.Native;
-    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class InscribeBundleEngineCommand
     {
-        public InscribeBundleEngineCommand(IInscribeContext context)
+        public InscribeBundleEngineCommand(IServiceProvider serviceProvider, string inputPath, string outputPath, string intermediateFolder)
         {
-            this.IntermediateFolder = context.IntermediateFolder;
-            this.InputFilePath = context.InputFilePath;
-            this.OutputFile = context.OutputFile;
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.IntermediateFolder = intermediateFolder;
+            this.InputFilePath = inputPath;
+            this.OutputFile = outputPath;
         }
+
+        private IMessaging Messaging { get; }
 
         private string IntermediateFolder { get; }
 
@@ -23,11 +26,11 @@ namespace WixToolset.Core.Burn.Inscribe
 
         private string OutputFile { get; }
 
-        public bool Execute()
+        public void Execute()
         {
             var tempFile = Path.Combine(this.IntermediateFolder, "bundle_engine_unsigned.exe");
 
-            using (var reader = BurnReader.Open(this.InputFilePath))
+            using (var reader = BurnReader.Open(this.Messaging, this.InputFilePath))
             using (var writer = File.Open(tempFile, FileMode.Create, FileAccess.Write, FileShare.Read | FileShare.Delete))
             {
                 reader.Stream.Seek(0, SeekOrigin.Begin);
@@ -56,8 +59,6 @@ namespace WixToolset.Core.Burn.Inscribe
             Directory.CreateDirectory(Path.GetDirectoryName(this.OutputFile));
 
             FileSystem.MoveFile(tempFile, this.OutputFile);
-
-            return true;
         }
     }
 }
