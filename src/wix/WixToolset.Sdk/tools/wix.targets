@@ -30,7 +30,7 @@
 
   <PropertyGroup>
     <WixHarvestTargetsPath Condition=" '$(WixHarvestTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.harvest.targets</WixHarvestTargetsPath>
-    <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.signing.targets</WixSigningTargetsPath>
+    <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(MSBuildThisFileDirectory)WixToolset.Signing.targets</WixSigningTargetsPath>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(EnableDefaultItems)' == 'true' ">
