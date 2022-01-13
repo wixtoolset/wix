@@ -16,6 +16,12 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
 
   <PropertyGroup>
+    <Configurations Condition=" '$(Configurations)' == '' ">Debug;Release</Configurations>
+    <Platforms Condition=" '$(Platforms)' == '' ">x86,x64,ARM64,AnyCPU</Platforms>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <ProjectTypeGuids>B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0</ProjectTypeGuids>
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
     <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>

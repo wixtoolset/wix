@@ -43,6 +43,10 @@
     <EmbeddedResource Include="**/*.wxl" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultEmbeddedResourceItems)' == 'true' " />
   </ItemGroup>
 
+  <ItemGroup>
+    <AvailableItemName Include="BindPath;WixLibrary;WixExtension" />
+  </ItemGroup>
+
   <!--
   ***********************************************************************************************
   ***********************************************************************************************
@@ -56,15 +60,18 @@
     <Language>wix</Language>
     <TargetRuntime>wix</TargetRuntime>
 
+    <!-- Ensure BaseOutputPath for Microsoft.Common.targets -->
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">bin\</BaseOutputPath>
+    <BaseOutputPath Condition="!HasTrailingSlash('$(BaseOutputPath)')">$(BaseOutputPath)\</BaseOutputPath>
+
     <!-- Use OutputName to set the AssemblyName for Microsoft.Common.targets -->
     <OutputName Condition=" '$(OutputName)'=='' ">$(MSBuildProjectName)</OutputName>
     <AssemblyName>$(OutputName)</AssemblyName>
 
     <!-- Default OutputType to a known WiX Toolset type.  -->
     <OutputType Condition=" '$(OutputType)' == '' ">Package</OutputType>
-    <AvailablePlatforms>x86,x64,ARM,ARM64,AnyCPU</AvailablePlatforms>
+    <AvailablePlatforms>x86,x64,ARM64,AnyCPU</AvailablePlatforms>
 
-    <!-- Default WixPdbType to a known WiX Toolset type.  -->
     <WixPdbType Condition=" '$(WixPdbType)' == '' ">full</WixPdbType>
   </PropertyGroup>
 
@@ -86,28 +93,21 @@
     <TargetExt Condition=" '$(OutputType)' == 'IntermediatePostLink' ">.wixipl</TargetExt>
   </PropertyGroup>
 
-<!-- 
-  <PropertyGroup>
-    <DefaultContentType Condition="$(DefaultContentType) == ''">Default</DefaultContentType>
-  </PropertyGroup>
--->
-
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 
-  <!-- This will override some targets that get defined in Microsoft.Common so this needs to be imported after -->
-  <Import Condition="Exists('$(DisableNetFrameworkResolutionTargets)') and '$(SkipImportDisableNetFrameworkResolutionTargets)' != 'true'" Project="$(DisableNetFrameworkResolutionTargets)" />
-  <!-- being Import that mimics the above line where DisableNetFrameworkResolutionTargets == Microsoft.NET.DisableStandardFrameworkResolution.targets -->
+  <!-- 
+  This will override some targets that get defined in Microsoft.Common just like Microsoft.NET.DisableStandardFrameworkResolution.targets
+  so this needs to be imported after
+  -->
   <Target Name="GetReferenceAssemblyPaths" />
   <Target Name="GetFrameworkPaths" />
-
   <PropertyGroup>
     <_TargetFrameworkDirectories />
     <FrameworkPathOverride />
     <TargetFrameworkDirectory />
-
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
-  <!-- end DisableNetFrameworkResolutionTargets == Microsoft.NET.DisableStandardFrameworkResolution.targets -->
+  <!-- end Microsoft.NET.DisableStandardFrameworkResolution.targets -->
 
   <PropertyGroup>
     <!-- We don't target any frameworks, so clear what the Microsoft.Common.targets set -->
@@ -182,9 +182,8 @@
     <WixExtension Include="$(WixExtension)"  Condition=" '$(WixExtension)' != '' " />
   </ItemGroup>
 
-  <!-- Defaut Compiler properties. -->
+  <!-- Default Compiler properties. -->
   <PropertyGroup>
-    <!-- TODO: This probably doesn't work any longer since Platform won't be defined until Microsoft.Common.targets is included -->
     <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and '$(Platform)' != 'AnyCPU' and '$(Platform)' != 'Any CPU' ">$(Platform)</InstallerPlatform>
   </PropertyGroup>
 
@@ -192,10 +191,6 @@
   <ItemGroup>
     <BindInputPaths Include="$(BindInputPaths)"  Condition=" '$(BindInputPaths)' != '' " />
     <LinkerBindInputPaths Include="$(LinkerBindInputPaths)"  Condition=" '$(LinkerBindInputPaths)' != '' " />
-  </ItemGroup>
-
-  <!-- Default Lit and Light "properties" -->
-  <ItemGroup>
     <LinkerBindInputPaths Condition=" '@(LinkerBindInputPaths)' == '' " Include="@(BindInputPaths)" />
   </ItemGroup>
 
