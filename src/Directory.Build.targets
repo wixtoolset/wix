@@ -34,6 +34,7 @@
       <AssemblyVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).0.0</AssemblyVersion>
       <FileVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)</FileVersion>
       <PackageVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)</PackageVersion>
+      <MajorMinorVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor)</MajorMinorVersion>
       <Version>$(PackageVersion)</Version>
       <InformationalVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(GitSha)</InformationalVersion>
       <!-- We already included the $(GitSha) in the informational version so do not include it again.  -->

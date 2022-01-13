@@ -23,4 +23,25 @@
     <Content Include="Sdk\Sdk.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Sdk\Sdk.targets" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <Target Name="PokeWixVersion"
+          AfterTargets="Publish">
+    <PropertyGroup>
+      <Namespaces>
+        <Namespace Prefix="msb" Uri="http://schemas.microsoft.com/developer/msbuild/2003" />
+      </Namespaces>
+    </PropertyGroup>
+
+    <XmlPoke
+      XmlInputPath="$(PublishDir)tools\wix.props"
+      Namespaces="$(Namespaces)"
+      Query="//msb:WixToolsetVersion"
+      Value="$(Version)" />
+
+    <XmlPoke
+      XmlInputPath="$(PublishDir)tools\wix.props"
+      Namespaces="$(Namespaces)"
+      Query="//msb:WixToolsetMajorMinorVersion"
+      Value="$(MajorMinorVersion)" />
+  </Target>
 </Project>
