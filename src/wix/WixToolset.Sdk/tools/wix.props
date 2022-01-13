@@ -8,6 +8,11 @@
     <WixToolsetMajorMinorVersion>$$WixToolsetMajorMinorVersion$$</WixToolsetMajorMinorVersion>
   </PropertyGroup>
 
+  <ImportGroup>
+    <Import Project="$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportBefore\*" Condition="'$(ImportUserLocationsByWildcardBeforeWixToolsetProps)' != 'false' and Exists('$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportBefore')" />
+    <Import Project="$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportBefore\*" Condition="'$(ImportByWildcardBeforeWixToolsetProps)' != 'false' and Exists('$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportBefore')" />
+  </ImportGroup>
+
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
 
   <PropertyGroup>
@@ -52,4 +57,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemDefinitionGroup>
+
+  <ImportGroup>
+    <Import Project="$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportAfter\*" Condition="'$(ImportUserLocationsByWildcardAfterWixToolsetProps)' != 'false' and Exists('$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportAfter')" />
+    <Import Project="$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportAfter\*" Condition="'$(ImportByWildcardAfterWixToolsetProps)' != 'false' and Exists('$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportAfter')" />
+  </ImportGroup>
 </Project>

@@ -8,6 +8,11 @@
 
   <Import Project="wix.props" Condition=" '$(WixPropsImported)' != 'true' " />
 
+  <ImportGroup>
+    <Import Project="$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportBefore\*" Condition="'$(ImportUserLocationsByWildcardBeforeWixToolsetTargets)' != 'false' and Exists('$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportBefore')" />
+    <Import Project="$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportBefore\*" Condition="'$(ImportByWildcardBeforeWixToolsetTargets)' != 'false' and Exists('$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportBefore')" />
+  </ImportGroup>
+
   <!--
   ***********************************************************************************************
   ***********************************************************************************************
@@ -939,4 +944,9 @@
     <DefaultItemExcludes Condition=" '$(BaseIntermediateOutputPath)' != '' ">$(DefaultItemExcludes);$(BaseIntermediateOutputPath)**</DefaultItemExcludes>
     <DefaultExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);**/.*/**</DefaultExcludesInProjectFolder>
   </PropertyGroup>
+
+  <ImportGroup>
+    <Import Project="$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportAfter\*" Condition="'$(ImportUserLocationsByWildcardAfterWixToolsetTargets)' != 'false' and Exists('$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportAfter')" />
+    <Import Project="$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportAfter\*" Condition="'$(ImportByWildcardAfterWixToolsetTargets)' != 'false' and Exists('$(MSBuildExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.targets\ImportAfter')" />
+  </ImportGroup>
 </Project>
