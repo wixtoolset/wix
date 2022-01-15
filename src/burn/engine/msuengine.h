@@ -18,6 +18,7 @@ void MsuEnginePackageUninitialize(
     );
 HRESULT MsuEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables
     );
 HRESULT MsuEnginePlanCalculatePackage(

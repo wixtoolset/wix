@@ -68,9 +68,18 @@ HRESULT DependencyDetectProviderKeyBundleId(
  DependencyDetect - Detects dependency information.
 
 *********************************************************************/
-HRESULT DependencyDetect(
+HRESULT DependencyDetectBundle(
     __in BURN_DEPENDENCIES* pDependencies,
-    __in BURN_PACKAGES* pPackages,
+    __in BURN_REGISTRATION* pRegistration
+    );
+
+HRESULT DependencyDetectChainPackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration
+    );
+
+HRESULT DependencyDetectRelatedBundle(
+    __in BURN_RELATED_BUNDLE* pRelatedBundle,
     __in BURN_REGISTRATION* pRegistration
     );
 

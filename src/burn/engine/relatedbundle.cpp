@@ -246,6 +246,9 @@ static HRESULT LoadIfRelatedBundle(
         hr = LoadRelatedBundleFromKey(sczRelatedBundleId, hkBundleId, fPerMachine, relationType, pRelatedBundle);
         ExitOnFailure(hr, "Failed to initialize package from related bundle id: %ls", sczRelatedBundleId);
 
+        hr = DependencyDetectRelatedBundle(pRelatedBundle, pRegistration);
+        ExitOnFailure(hr, "Failed to detect dependencies for related bundle.");
+
         ++pRelatedBundles->cRelatedBundles;
     }
 

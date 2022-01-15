@@ -53,6 +53,7 @@ extern "C" void MsuEnginePackageUninitialize(
 
 extern "C" HRESULT MsuEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables
     )
 {
@@ -73,6 +74,9 @@ extern "C" HRESULT MsuEngineDetectPackage(
     {
         pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
+
+    hr = DependencyDetectChainPackage(pPackage, pRegistration);
+    ExitOnFailure(hr, "Failed to detect dependencies for MSU package.");
 
 LExit:
     return hr;

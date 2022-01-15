@@ -41,6 +41,7 @@ HRESULT MspEngineAddMissingSlipstreamTarget(
     );
 HRESULT MspEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
 HRESULT MspEnginePlanInitializePackage(

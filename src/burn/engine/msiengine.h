@@ -32,6 +32,7 @@ HRESULT MsiEngineDetectInitialize(
     );
 HRESULT MsiEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
 HRESULT MsiEnginePlanInitializePackage(

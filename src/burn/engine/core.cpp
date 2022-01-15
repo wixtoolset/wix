@@ -342,21 +342,15 @@ extern "C" HRESULT CoreDetect(
     hr = SearchesExecute(&pEngineState->searches, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to execute searches.");
 
+    hr = DependencyDetectBundle(&pEngineState->dependencies, &pEngineState->registration);
+    ExitOnFailure(hr, "Failed to detect the dependencies.");
+
     // Load all of the related bundles.
     hr = RegistrationDetectRelatedBundles(&pEngineState->registration);
     ExitOnFailure(hr, "Failed to detect related bundles.");
 
-    hr = DependencyDetectProviderKeyBundleId(&pEngineState->registration);
-    if (SUCCEEDED(hr))
-    {
-        hr = DetectForwardCompatibleBundles(&pEngineState->userExperience, &pEngineState->registration);
-        ExitOnFailure(hr, "Failed to detect forward compatible bundle.");
-    }
-    else if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    ExitOnFailure(hr, "Failed to detect provider key bundle id.");
+    hr = DetectForwardCompatibleBundles(&pEngineState->userExperience, &pEngineState->registration);
+    ExitOnFailure(hr, "Failed to detect forward compatible bundle.");
 
     // Report the related bundles.
     hr = DetectReportRelatedBundles(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->registration.fEligibleForCleanup);
@@ -397,9 +391,6 @@ extern "C" HRESULT CoreDetect(
             pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
         }
     }
-
-    hr = DependencyDetect(&pEngineState->dependencies, &pEngineState->packages, &pEngineState->registration);
-    ExitOnFailure(hr, "Failed to detect the dependencies.");
 
     // Log the detected states.
     for (DWORD iPackage = 0; iPackage < pEngineState->packages.cPackages; ++iPackage)
@@ -2073,19 +2064,19 @@ static HRESULT DetectPackage(
     switch (pPackage->type)
     {
     case BURN_PACKAGE_TYPE_EXE:
-        hr = ExeEngineDetectPackage(pPackage, &pEngineState->variables);
+        hr = ExeEngineDetectPackage(pPackage, &pEngineState->registration, &pEngineState->variables);
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
-        hr = MsiEngineDetectPackage(pPackage, &pEngineState->userExperience);
+        hr = MsiEngineDetectPackage(pPackage, &pEngineState->registration, &pEngineState->userExperience);
         break;
 
     case BURN_PACKAGE_TYPE_MSP:
-        hr = MspEngineDetectPackage(pPackage, &pEngineState->userExperience);
+        hr = MspEngineDetectPackage(pPackage, &pEngineState->registration, &pEngineState->userExperience);
         break;
 
     case BURN_PACKAGE_TYPE_MSU:
-        hr = MsuEngineDetectPackage(pPackage, &pEngineState->variables);
+        hr = MsuEngineDetectPackage(pPackage, &pEngineState->registration, &pEngineState->variables);
         break;
 
     default:

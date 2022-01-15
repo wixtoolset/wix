@@ -21,6 +21,7 @@ void ExeEngineCommandLineArgumentUninitialize(
     );
 HRESULT ExeEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables
     );
 HRESULT ExeEnginePlanCalculatePackage(
