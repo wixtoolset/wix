@@ -98,6 +98,8 @@ extern "C" void DetectReset(
             pProvider->rgDependents = NULL;
             pProvider->cDependents = 0;
         }
+
+        PackageUninitializeCompatible(&pPackage->compatiblePackage);
     }
 
     for (DWORD iPatchInfo = 0; iPatchInfo < pPackages->cPatchInfo; ++iPatchInfo)

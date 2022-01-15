@@ -53,6 +53,13 @@ void LoggingOpenFailed();
 
 void LoggingIncrementPackageSequence();
 
+HRESULT LoggingSetCompatiblePackageVariable(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables,
+    __out_opt LPWSTR* psczLogPath
+    );
+
 HRESULT LoggingSetPackageVariable(
     __in BURN_PACKAGE* pPackage,
     __in_z_opt LPCWSTR wzSuffix,

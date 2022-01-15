@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 12, 30, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 1, 10, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -1015,6 +1015,36 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnDetectCompatibleMsiPackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in VERUTIL_VERSION* pCompatiblePackageVersion
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS args = { };
+    BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.wzCompatiblePackageId = wzCompatiblePackageId;
+    args.wzCompatiblePackageVersion = pCompatiblePackageVersion->sczVersion;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE, &args, &results);
+    ExitOnFailure(hr, "BA OnDetectCompatibleMsiPackage failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnDetectComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus,
@@ -1798,6 +1828,67 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in VERUTIL_VERSION* pCompatiblePackageVersion,
+    __inout BOOL* pfRequested
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS args = { };
+    BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.wzCompatiblePackageId = wzCompatiblePackageId;
+    args.wzCompatiblePackageVersion = pCompatiblePackageVersion->sczVersion;
+    args.fRecommendedRemove = *pfRequested;
+
+    results.cbSize = sizeof(results);
+    results.fRequestRemove = *pfRequested;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanCompatibleMsiPackageBegin failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    *pfRequested = results.fRequestRemove;
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in HRESULT hrStatus,
+    __in BOOL fRequested
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_ARGS args = { };
+    BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.wzCompatiblePackageId = wzCompatiblePackageId;
+    args.hrStatus = hrStatus;
+    args.fRequestedRemove = fRequested;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanCompatibleMsiPackageComplete failed.");
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnPlanMsiFeature(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
@@ -1927,6 +2018,31 @@ EXTERN_C BAAPI UserExperienceOnPlanMsiPackage(
     *pUiLevel = results.uiLevel;
     *pfDisableExternalUiHandler = results.fDisableExternalUiHandler;
     *pFileVersioning = results.fileVersioning;
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPlannedCompatiblePackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in BOOL fRemove
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANNEDCOMPATIBLEPACKAGE_ARGS args = { };
+    BA_ONPLANNEDCOMPATIBLEPACKAGE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.wzCompatiblePackageId = wzCompatiblePackageId;
+    args.fRemove = fRemove;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDCOMPATIBLEPACKAGE, &args, &results);
+    ExitOnFailure(hr, "BA OnPlannedCompatiblePackage failed.");
 
 LExit:
     return hr;

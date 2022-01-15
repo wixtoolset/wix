@@ -248,6 +248,12 @@ BAAPI UserExperienceOnDetectBegin(
     __in BOOL fInstalled,
     __in DWORD cPackages
     );
+BAAPI UserExperienceOnDetectCompatibleMsiPackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in VERUTIL_VERSION* pCompatiblePackageVersion
+    );
 BAAPI UserExperienceOnDetectComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus,
@@ -414,6 +420,20 @@ BAAPI UserExperienceOnPlanBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in DWORD cPackages
     );
+BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in VERUTIL_VERSION* pCompatiblePackageVersion,
+    __inout BOOL* pfRequested
+    );
+BAAPI UserExperienceOnPlanCompatibleMsiPackageComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in HRESULT hrStatus,
+    __in BOOL fRequested
+    );
 BAAPI UserExperienceOnPlanComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus
@@ -442,6 +462,12 @@ BAAPI UserExperienceOnPlanMsiPackage(
     __inout INSTALLUILEVEL* pUiLevel,
     __inout BOOL* pfDisableExternalUiHandler,
     __inout BOOTSTRAPPER_MSI_FILE_VERSIONING* pFileVersioning
+    );
+BAAPI UserExperienceOnPlannedCompatiblePackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzCompatiblePackageId,
+    __in BOOL fRemove
     );
 BAAPI UserExperienceOnPlannedPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,

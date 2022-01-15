@@ -191,6 +191,11 @@ void DependencyUnregisterBundle(
     __in const BURN_PACKAGES* pPackages
     );
 
+HRESULT DependencyDetectCompatibleEntry(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration
+    );
+
 #if defined(__cplusplus)
 }
 #endif

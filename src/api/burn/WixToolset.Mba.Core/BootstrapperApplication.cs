@@ -63,6 +63,9 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<DetectPackageBeginEventArgs> DetectPackageBegin;
+
+        /// <inheritdoc/>
+        public event EventHandler<DetectCompatibleMsiPackageEventArgs> DetectCompatibleMsiPackage;
         
         /// <inheritdoc/>
         public event EventHandler<DetectRelatedMsiPackageEventArgs> DetectRelatedMsiPackage;
@@ -92,6 +95,12 @@ namespace WixToolset.Mba.Core
         public event EventHandler<PlanPackageBeginEventArgs> PlanPackageBegin;
 
         /// <inheritdoc/>
+        public event EventHandler<PlanCompatibleMsiPackageBeginEventArgs> PlanCompatibleMsiPackageBegin;
+
+        /// <inheritdoc/>
+        public event EventHandler<PlanCompatibleMsiPackageCompleteEventArgs> PlanCompatibleMsiPackageComplete;
+
+        /// <inheritdoc/>
         public event EventHandler<PlanPatchTargetEventArgs> PlanPatchTarget;
 
         /// <inheritdoc/>
@@ -102,6 +111,9 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<PlanPackageCompleteEventArgs> PlanPackageComplete;
+
+        /// <inheritdoc/>
+        public event EventHandler<PlannedCompatiblePackageEventArgs> PlannedCompatiblePackage;
 
         /// <inheritdoc/>
         public event EventHandler<PlannedPackageEventArgs> PlannedPackage;
@@ -415,6 +427,19 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
+        /// Called by the engine, raises the <see cref="DetectCompatibleMsiPackage"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnDetectCompatibleMsiPackage(DetectCompatibleMsiPackageEventArgs args)
+        {
+            EventHandler<DetectCompatibleMsiPackageEventArgs> handler = this.DetectCompatibleMsiPackage;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
         /// Called by the engine, raises the <see cref="DetectRelatedMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
@@ -531,6 +556,32 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
+        /// Called by the engine, raises the <see cref="PlanCompatibleMsiPackageBegin"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlanCompatibleMsiPackageBegin(PlanCompatibleMsiPackageBeginEventArgs args)
+        {
+            EventHandler<PlanCompatibleMsiPackageBeginEventArgs> handler = this.PlanCompatibleMsiPackageBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlanCompatibleMsiPackageComplete"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlanCompatibleMsiPackageComplete(PlanCompatibleMsiPackageCompleteEventArgs args)
+        {
+            EventHandler<PlanCompatibleMsiPackageCompleteEventArgs> handler = this.PlanCompatibleMsiPackageComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
         /// Called by the engine, raises the <see cref="PlanPatchTarget"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
@@ -576,6 +627,19 @@ namespace WixToolset.Mba.Core
         protected virtual void OnPlanPackageComplete(PlanPackageCompleteEventArgs args)
         {
             EventHandler<PlanPackageCompleteEventArgs> handler = this.PlanPackageComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlannedCompatiblePackage"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlannedCompatiblePackage(PlannedCompatiblePackageEventArgs args)
+        {
+            EventHandler<PlannedCompatiblePackageEventArgs> handler = this.PlannedCompatiblePackage;
             if (null != handler)
             {
                 handler(this, args);
@@ -1363,6 +1427,15 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
+        int IBootstrapperApplication.OnDetectCompatibleMsiPackage(string wzPackageId, string wzCompatiblePackageId, string wzCompatiblePackageVersion, ref bool fCancel)
+        {
+            DetectCompatibleMsiPackageEventArgs args = new DetectCompatibleMsiPackageEventArgs(wzPackageId, wzCompatiblePackageId, wzCompatiblePackageVersion, fCancel);
+            this.OnDetectCompatibleMsiPackage(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
         int IBootstrapperApplication.OnDetectRelatedMsiPackage(string wzPackageId, string wzUpgradeCode, string wzProductCode, bool fPerMachine, string wzVersion, RelatedOperation operation, ref bool fCancel)
         {
             DetectRelatedMsiPackageEventArgs args = new DetectRelatedMsiPackageEventArgs(wzPackageId, wzUpgradeCode, wzProductCode, fPerMachine, wzVersion, operation, fCancel);
@@ -1445,6 +1518,24 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
+        int IBootstrapperApplication.OnPlanCompatibleMsiPackageBegin(string wzPackageId, string wzCompatiblePackageId, string wzCompatiblePackageVersion, bool recommendedRemove, ref bool pRequestedRemove, ref bool fCancel)
+        {
+            PlanCompatibleMsiPackageBeginEventArgs args = new PlanCompatibleMsiPackageBeginEventArgs(wzPackageId, wzCompatiblePackageId, wzCompatiblePackageVersion, recommendedRemove, pRequestedRemove, fCancel);
+            this.OnPlanCompatibleMsiPackageBegin(args);
+
+            pRequestedRemove = args.RequestRemove;
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlanCompatibleMsiPackageComplete(string wzPackageId, string wzCompatiblePackageId, int hrStatus, bool requestedRemove)
+        {
+            PlanCompatibleMsiPackageCompleteEventArgs args = new PlanCompatibleMsiPackageCompleteEventArgs(wzPackageId, wzCompatiblePackageId, hrStatus, requestedRemove);
+            this.OnPlanCompatibleMsiPackageComplete(args);
+
+            return args.HResult;
+        }
+
         int IBootstrapperApplication.OnPlanPatchTarget(string wzPackageId, string wzProductCode, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
         {
             PlanPatchTargetEventArgs args = new PlanPatchTargetEventArgs(wzPackageId, wzProductCode, recommendedState, pRequestedState, fCancel);
@@ -1482,6 +1573,14 @@ namespace WixToolset.Mba.Core
         {
             var args = new PlanPackageCompleteEventArgs(wzPackageId, hrStatus, requested);
             this.OnPlanPackageComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlannedCompatiblePackage(string wzPackageId, string wzCompatiblePackageId, bool remove)
+        {
+            var args = new PlannedCompatiblePackageEventArgs(wzPackageId, wzCompatiblePackageId, remove);
+            this.OnPlannedCompatiblePackage(args);
 
             return args.HResult;
         }

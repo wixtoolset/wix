@@ -262,6 +262,13 @@ Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version
 .
 
 MessageId=108
+Severity=Success
+SymbolicName=MSG_DETECTED_COMPATIBLE_PACKAGE_FROM_PROVIDER
+Language=English
+Detected compatible package: %1!ls!, provider: %2!ls!, installed: %3!ls!, version: %4!ls!, chained: %5!ls!
+.
+
+MessageId=109
 Severity=Warning
 SymbolicName=MSG_DETECT_RELATED_BUNDLE_NOT_CACHED
 Language=English
@@ -427,6 +434,13 @@ Severity=Success
 SymbolicName=MSG_PLAN_SKIPPED_RELATED_BUNDLE_SCHEDULED
 Language=English
 Plan skipped related bundle: %1!ls!, type: %2!hs!, because it was previously scheduled.
+.
+
+MessageId=215
+Severity=Success
+SymbolicName=MSG_PLANNED_ORPHAN_PACKAGE_FROM_PROVIDER
+Language=English
+Will remove orphan package: %1!ls!, installed: %2!ls!, chained: %3!ls!
 .
 
 MessageId=216
@@ -603,7 +617,6 @@ SymbolicName=MSG_FAILED_LAYOUT_CONTAINER
 Language=English
 Failed to layout container: %2!ls! to layout directory: %3!ls!, error: %1!ls!.
 .
-
 
 MessageId=317
 Severity=Error
@@ -927,7 +940,6 @@ Language=English
 Calculating whether to keep registration
 .
 
-
 MessageId=374
 Severity=Success
 SymbolicName=MSG_POST_APPLY_PACKAGE
@@ -1003,6 +1015,13 @@ Severity=Warning
 SymbolicName=MSG_APPLY_SKIPPING_REST_OF_NONVITAL_ROLLBACK_BOUNDARY
 Language=English
 Skipping the rest of non-vital rollback boundary, id: %1!ls!
+.
+
+MessageId=390
+Severity=Success
+SymbolicName=MSG_APPLYING_ORPHAN_COMPATIBLE_PACKAGE
+Language=English
+Applying %1!hs! compatible package: %2!ls!, parent package: %3!ls!, action: %4!hs!, arguments: '%5!ls!'
 .
 
 MessageId=399

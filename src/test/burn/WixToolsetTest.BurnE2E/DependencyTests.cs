@@ -123,6 +123,64 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.1.0");
         }
 
+        [Fact]
+        public void UninstallsOrphanCompatiblePackages()
+        {
+            var testRegistryValueExe = "ExeA";
+
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var packageAv2 = this.CreatePackageInstaller("PackageAv2");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleAv1 = this.CreateBundleInstaller("BundleAv1");
+            var bundleAv2 = this.CreateBundleInstaller("BundleAv2");
+            var bundleB = this.CreateBundleInstaller("BundleB");
+
+            packageAv1.VerifyInstalled(false);
+            packageAv2.VerifyInstalled(false);
+            packageB.VerifyInstalled(false);
+
+            bundleAv1.Install();
+            bundleAv1.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            bundleAv1.VerifyPackageIsCached("PackageA");
+            bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+
+            bundleB.Install();
+            bundleB.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            bundleAv1.VerifyPackageIsCached("PackageA");
+            bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
+            packageB.VerifyInstalled(true);
+
+            bundleAv2.Install();
+            bundleAv2.VerifyRegisteredAndInPackageCache();
+            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(false);
+            bundleAv1.VerifyPackageIsCached("PackageA", false);
+            packageAv2.VerifyInstalled(true);
+            bundleAv2.VerifyPackageIsCached("PackageA");
+            bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "2.0.0.0");
+
+            bundleAv2.Uninstall();
+            bundleAv2.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv2.VerifyInstalled(true);
+            bundleAv2.VerifyPackageIsCached("PackageA");
+            bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "2.0.0.0");
+            
+            // Verify https://github.com/wixtoolset/issues/issues/3190
+            bundleB.Uninstall();
+
+            packageAv1.VerifyInstalled(false);
+            packageAv2.VerifyInstalled(false);
+            bundleAv2.VerifyPackageIsCached("PackageA", false);
+            packageB.VerifyInstalled(false);
+            bundleAv1.VerifyExeTestRegistryRootDeleted(testRegistryValueExe);
+        }
+
         [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
         public void CanMinorUpgradeDependencyPackageFromPatchBundle()
         {

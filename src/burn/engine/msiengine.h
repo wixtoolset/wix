@@ -35,8 +35,12 @@ HRESULT MsiEngineDetectPackage(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
+HRESULT MsiEngineDetectCompatiblePackage(
+    __in BURN_PACKAGE* pPackage
+    );
 HRESULT MsiEnginePlanInitializePackage(
     __in BURN_PACKAGE* pPackage,
+    __in BOOTSTRAPPER_ACTION overallAction,
     __in BURN_VARIABLES* pVariables,
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
@@ -62,6 +66,16 @@ HRESULT MsiEngineRollbackTransaction(
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT MsiEngineExecutePackage(
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
+HRESULT MsiEngineUninstallCompatiblePackage(
     __in_opt HWND hwndParent,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_CACHE* pCache,

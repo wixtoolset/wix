@@ -288,6 +288,74 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void OrphanCompatiblePackageTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
+            DetectPackagesAsAbsent(pEngineState);
+            DetectCompatibleMsiPackage(pEngineState->packages.rgPackages, L"{C24F3903-38E7-4D44-8037-D9856B3C5046}", L"2.0.0.0");
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(0ull, pPlan->qwEstimatedSize);
+            Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 1;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", BURN_DEPENDENCY_ACTION_UNREGISTER);
+            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", BURN_DEPENDENCY_ACTION_UNREGISTER);
+            ValidateUninstallMsiCompatiblePackage(pPlan, fRollback, dwIndex++, L"PackageA", 0);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 1;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(1ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(1ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
+            ValidateCleanCompatibleAction(pPlan, dwIndex++, L"PackageA");
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", NULL);
+            ValidatePlannedProvider(pPlan, uIndex++, L"{64633047-D172-4BBB-B202-64337D15C952}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
+        }
+
+        [Fact]
         void RelatedBundleMissingFromCacheTest()
         {
             HRESULT hr = S_OK;
@@ -1026,6 +1094,36 @@ namespace Bootstrapper
             }
         }
 
+        void DetectCompatibleMsiPackage(BURN_PACKAGE* pPackage, LPCWSTR wzProductCode, LPCWSTR wzVersion)
+        {
+            HRESULT hr = S_OK;
+            Assert(BOOTSTRAPPER_PACKAGE_STATE_PRESENT > pPackage->currentState);
+            Assert(0 < pPackage->cDependencyProviders);
+            BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders;
+            BURN_COMPATIBLE_PACKAGE* pCompatiblePackage = &pPackage->compatiblePackage;
+            pCompatiblePackage->fDetected = TRUE;
+            pCompatiblePackage->fPlannable = TRUE;
+            pCompatiblePackage->type = BURN_PACKAGE_TYPE_MSI;
+
+            hr = StrAllocFormatted(&pCompatiblePackage->sczCacheId, L"%lsv%ls", wzProductCode, wzVersion);
+            NativeAssert::Succeeded(hr, "Failed to format cache id");
+
+            hr = StrAllocString(&pCompatiblePackage->Msi.sczVersion, wzVersion, 0);
+            NativeAssert::Succeeded(hr, "Failed to copy MSI version");
+
+            hr = VerParseVersion(wzVersion, 0, FALSE, &pCompatiblePackage->Msi.pVersion);
+            NativeAssert::Succeeded(hr, "Failed to parse MSI version");
+
+            hr = StrAllocString(&pCompatiblePackage->compatibleEntry.sczId, wzProductCode, 0);
+            NativeAssert::Succeeded(hr, "Failed to copy product code");
+
+            hr = StrAllocString(&pCompatiblePackage->compatibleEntry.sczVersion, wzVersion, 0);
+            NativeAssert::Succeeded(hr, "Failed to copy version");
+
+            hr = StrAllocString(&pCompatiblePackage->compatibleEntry.sczProviderKey, pProvider->sczKey, 0);
+            NativeAssert::Succeeded(hr, "Failed to copy provider key");
+        }
+
         void DetectPackageAsAbsent(BURN_PACKAGE* pPackage)
         {
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
@@ -1262,9 +1360,26 @@ namespace Bootstrapper
             __in LPCWSTR wzPackageId
             )
         {
-            Assert::InRange(dwIndex + 1ul, 1ul, pPlan->cCleanActions);
+            BURN_CLEAN_ACTION* pCleanAction = ValidateCleanActionExists(pPlan, dwIndex);
+            Assert::Equal<DWORD>(BURN_CLEAN_ACTION_TYPE_PACKAGE, pCleanAction->type);
+            Assert::NotEqual((DWORD_PTR)0, (DWORD_PTR)pCleanAction->pPackage);
+            NativeAssert::StringEqual(wzPackageId, pCleanAction->pPackage->sczId);
+        }
 
-            BURN_CLEAN_ACTION* pCleanAction = pPlan->rgCleanActions + dwIndex;
+        BURN_CLEAN_ACTION* ValidateCleanActionExists(BURN_PLAN* pPlan, DWORD dwIndex)
+        {
+            Assert::InRange(dwIndex + 1ul, 1ul, pPlan->cCleanActions);
+            return pPlan->rgCleanActions + dwIndex;
+        }
+
+        void ValidateCleanCompatibleAction(
+            __in BURN_PLAN* pPlan,
+            __in DWORD dwIndex,
+            __in LPCWSTR wzPackageId
+            )
+        {
+            BURN_CLEAN_ACTION* pCleanAction = ValidateCleanActionExists(pPlan, dwIndex);
+            Assert::Equal<DWORD>(BURN_CLEAN_ACTION_TYPE_COMPATIBLE_PACKAGE, pCleanAction->type);
             Assert::NotEqual((DWORD_PTR)0, (DWORD_PTR)pCleanAction->pPackage);
             NativeAssert::StringEqual(wzPackageId, pCleanAction->pPackage->sczId);
         }
@@ -1536,6 +1651,22 @@ namespace Bootstrapper
             DEPENDENCY* pProvider = pPlan->rgPlannedProviders + uIndex;
             NativeAssert::StringEqual(wzKey, pProvider->sczKey);
             NativeAssert::StringEqual(wzName, pProvider->sczName);
+        }
+
+        void ValidateUninstallMsiCompatiblePackage(
+            __in BURN_PLAN* pPlan,
+            __in BOOL fRollback,
+            __in DWORD dwIndex,
+            __in_z LPCWSTR wzPackageId,
+            __in DWORD dwLoggingAttributes
+            )
+        {
+            BURN_EXECUTE_ACTION* pAction = ValidateExecuteActionExists(pPlan, fRollback, dwIndex);
+            Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE, pAction->type);
+            NativeAssert::StringEqual(wzPackageId, pAction->uninstallMsiCompatiblePackage.pParentPackage->sczId);
+            NativeAssert::NotNull(pAction->msiPackage.sczLogPath);
+            Assert::Equal<DWORD>(dwLoggingAttributes, pAction->uninstallMsiCompatiblePackage.dwLoggingAttributes);
+            Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
     };
 }

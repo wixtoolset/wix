@@ -60,7 +60,7 @@ typedef struct _BURN_EXECUTE_CONTEXT
     BURN_USER_EXPERIENCE* pUX;
     BURN_APPLY_CONTEXT* pApplyContext;
     BOOL fRollback;
-    BURN_PACKAGE* pExecutingPackage;
+    LPCWSTR wzExecutingPackageId;
     DWORD cExecutedPackages;
     DWORD cExecutePackagesTotal;
 } BURN_EXECUTE_CONTEXT;
@@ -278,6 +278,19 @@ static void ResetTransactionRegistrationState(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BOOL fCommit
     );
+static HRESULT ExecuteUninstallMsiCompatiblePackage(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __out BOOL* pfRetry,
+    __out BOOL* pfSuspend,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
+static HRESULT CleanCompatiblePackage(
+    __in BURN_CACHE* pCache,
+    __in HANDLE hElevatedPipe,
+    __in BURN_PACKAGE* pPackage
+    );
 static HRESULT CleanPackage(
     __in BURN_CACHE* pCache,
     __in HANDLE hElevatedPipe,
@@ -300,7 +313,8 @@ static HRESULT ReportOverallProgressTicks(
 static HRESULT ExecutePackageComplete(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_PACKAGE* pPackage,
+    __in LPCWSTR wzPackageId,
+    __in BOOL fPackageVital,
     __in HRESULT hrOverall,
     __in HRESULT hrExecute,
     __in BOOL fRollback,
@@ -808,7 +822,20 @@ extern "C" void ApplyClean(
         BURN_CLEAN_ACTION* pCleanAction = pPlan->rgCleanActions + i;
         BURN_PACKAGE* pPackage = pCleanAction->pPackage;
 
-        hr = CleanPackage(pPlan->pCache, hPipe, pPackage);
+        switch (pCleanAction->type)
+        {
+        case BURN_CLEAN_ACTION_TYPE_COMPATIBLE_PACKAGE:
+            hr = CleanCompatiblePackage(pPlan->pCache, hPipe, pPackage);
+            break;
+
+        case BURN_CLEAN_ACTION_TYPE_PACKAGE:
+            hr = CleanPackage(pPlan->pCache, hPipe, pPackage);
+            break;
+
+        default:
+            AssertSz(FALSE, "Unknown clean action.");
+            break;
+        }
     }
 }
 
@@ -2350,6 +2377,11 @@ static HRESULT DoExecuteAction(
             ExitOnFailure(hr, "Failed to execute commit MSI transaction action.");
             break;
 
+        case BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE:
+            hr = ExecuteUninstallMsiCompatiblePackage(pEngineState, pExecuteAction, pContext, &fRetry, pfSuspend, &restart);
+            ExitOnFailure(hr, "Failed to execute uninstall MSI compatible package.");
+            break;
+
         default:
             hr = E_UNEXPECTED;
             ExitOnFailure(hr, "Invalid execute action.");
@@ -2509,7 +2541,7 @@ static HRESULT ExecuteRelatedBundle(
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pPackage;
+    pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
@@ -2550,7 +2582,7 @@ static HRESULT ExecuteRelatedBundle(
 LExit:
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2581,7 +2613,7 @@ static HRESULT ExecuteExePackage(
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pPackage;
+    pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
@@ -2629,7 +2661,7 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2659,7 +2691,7 @@ static HRESULT ExecuteMsiPackage(
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pPackage;
+    pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
@@ -2693,7 +2725,7 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2723,7 +2755,7 @@ static HRESULT ExecuteMspPackage(
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pPackage;
+    pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
@@ -2766,7 +2798,7 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2798,7 +2830,7 @@ static HRESULT ExecuteMsuPackage(
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pPackage;
+    pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
@@ -2846,7 +2878,7 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -3110,6 +3142,79 @@ static void ResetTransactionRegistrationState(
     }
 }
 
+static HRESULT ExecuteUninstallMsiCompatiblePackage(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __out BOOL* pfRetry,
+    __out BOOL* pfSuspend,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    HRESULT hrExecute = S_OK;
+    BOOL fRollback = FALSE;
+    BOOTSTRAPPER_ACTION_STATE action = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+    INSTALLUILEVEL uiLevel = INSTALLUILEVEL_NONE;
+    BOOL fDisableExternalUiHandler = FALSE;
+    BOOL fBeginCalled = FALSE;
+    BURN_PACKAGE* pParentPackage = pExecuteAction->uninstallMsiCompatiblePackage.pParentPackage;
+
+    Assert(pContext->fRollback == fRollback);
+    pContext->wzExecutingPackageId = pParentPackage->compatiblePackage.compatibleEntry.sczId;
+    fBeginCalled = TRUE;
+
+    // Send package execute begin to BA.
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pContext->wzExecutingPackageId, !fRollback, action, uiLevel, fDisableExternalUiHandler);
+    ExitOnRootFailure(hr, "BA aborted execute MSI compatible package begin.");
+
+    // execute package
+    if (pParentPackage->fPerMachine)
+    {
+        hrExecute = ElevationUninstallMsiCompatiblePackage(pEngineState->companionConnection.hPipe, pEngineState->userExperience.hwndApply, pExecuteAction, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
+        ExitOnFailure(hrExecute, "Failed to uninstall per-machine MSI compatible package.");
+    }
+    else
+    {
+        hrExecute = MsiEngineUninstallCompatiblePackage(pEngineState->userExperience.hwndApply, pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
+        ExitOnFailure(hrExecute, "Failed to uninstall per-user MSI compatible package.");
+    }
+
+    pContext->cExecutedPackages += fRollback ? -1 : 1;
+
+    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
+    ExitOnRootFailure(hr, "BA aborted MSI compatible package execute progress.");
+
+LExit:
+
+    if (fBeginCalled)
+    {
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pContext->wzExecutingPackageId, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+    }
+
+    return hr;
+}
+
+static HRESULT CleanCompatiblePackage(
+    __in BURN_CACHE* pCache,
+    __in HANDLE hElevatedPipe,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pPackage->fPerMachine)
+    {
+        hr = ElevationCleanCompatiblePackage(hElevatedPipe, pPackage);
+    }
+    else
+    {
+        hr = CacheRemovePackage(pCache, FALSE, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.sczCacheId);
+    }
+
+    return hr;
+}
+
 static HRESULT CleanPackage(
     __in BURN_CACHE* pCache,
     __in HANDLE hElevatedPipe,
@@ -3150,16 +3255,16 @@ static int GenericExecuteMessageHandler(
     case GENERIC_EXECUTE_MESSAGE_PROGRESS:
         {
             DWORD dwOverallProgress = pContext->cExecutePackagesTotal ? (pContext->cExecutedPackages * 100 + pMessage->progress.dwPercentage) / (pContext->cExecutePackagesTotal) : 0;
-            UserExperienceOnExecuteProgress(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->progress.dwPercentage, dwOverallProgress, &nResult); // ignore return value.
+            UserExperienceOnExecuteProgress(pContext->pUX, pContext->wzExecutingPackageId, pMessage->progress.dwPercentage, dwOverallProgress, &nResult); // ignore return value.
         }
         break;
 
     case GENERIC_EXECUTE_MESSAGE_ERROR:
-        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_EXE_PACKAGE, pContext->pExecutingPackage->sczId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, 0, NULL, &nResult); // ignore return value.
+        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_EXE_PACKAGE, pContext->wzExecutingPackageId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, 0, NULL, &nResult); // ignore return value.
         break;
 
     case GENERIC_EXECUTE_MESSAGE_NETFX_FILES_IN_USE:
-        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->filesInUse.cFiles, pMessage->filesInUse.rgwzFiles, BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX, &nResult); // ignore return value.
+        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->wzExecutingPackageId, pMessage->filesInUse.cFiles, pMessage->filesInUse.rgwzFiles, BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX, &nResult); // ignore return value.
         fPassthrough = TRUE;
         break;
     }
@@ -3188,25 +3293,25 @@ static int MsiExecuteMessageHandler(
     case WIU_MSI_EXECUTE_MESSAGE_PROGRESS:
         {
         DWORD dwOverallProgress = pContext->cExecutePackagesTotal ? (pContext->cExecutedPackages * 100 + pMessage->progress.dwPercentage) / (pContext->cExecutePackagesTotal) : 0;
-        UserExperienceOnExecuteProgress(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->progress.dwPercentage, dwOverallProgress, &nResult); // ignore return value.
+        UserExperienceOnExecuteProgress(pContext->pUX, pContext->wzExecutingPackageId, pMessage->progress.dwPercentage, dwOverallProgress, &nResult); // ignore return value.
         }
         break;
 
     case WIU_MSI_EXECUTE_MESSAGE_ERROR:
         nResult = pMessage->nResultRecommendation;
-        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_WINDOWS_INSTALLER, pContext->pExecutingPackage->sczId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
+        UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_WINDOWS_INSTALLER, pContext->wzExecutingPackageId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
         break;
 
     case WIU_MSI_EXECUTE_MESSAGE_MSI_MESSAGE:
         nResult = pMessage->nResultRecommendation;
-        UserExperienceOnExecuteMsiMessage(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiMessage.mt, pMessage->dwUIHint, pMessage->msiMessage.wzMessage, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
+        UserExperienceOnExecuteMsiMessage(pContext->pUX, pContext->wzExecutingPackageId, pMessage->msiMessage.mt, pMessage->dwUIHint, pMessage->msiMessage.wzMessage, pMessage->cData, pMessage->rgwzData, &nResult); // ignore return value.
         break;
 
     case WIU_MSI_EXECUTE_MESSAGE_MSI_RM_FILES_IN_USE:
         fRestartManager = TRUE;
         __fallthrough;
     case WIU_MSI_EXECUTE_MESSAGE_MSI_FILES_IN_USE:
-        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->pExecutingPackage->sczId, pMessage->msiFilesInUse.cFiles, pMessage->msiFilesInUse.rgwzFiles, fRestartManager ? BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM : BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI, &nResult); // ignore return value.
+        UserExperienceOnExecuteFilesInUse(pContext->pUX, pContext->wzExecutingPackageId, pMessage->msiFilesInUse.cFiles, pMessage->msiFilesInUse.rgwzFiles, fRestartManager ? BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM : BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI, &nResult); // ignore return value.
         fPassthrough = TRUE;
         break;
     }
@@ -3246,7 +3351,8 @@ static HRESULT ReportOverallProgressTicks(
 static HRESULT ExecutePackageComplete(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_PACKAGE* pPackage,
+    __in LPCWSTR wzPackageId,
+    __in BOOL fPackageVital,
     __in HRESULT hrOverall,
     __in HRESULT hrExecute,
     __in BOOL fRollback,
@@ -3256,10 +3362,10 @@ static HRESULT ExecutePackageComplete(
     )
 {
     HRESULT hr = FAILED(hrOverall) ? hrOverall : hrExecute; // if the overall function failed use that otherwise use the execution result.
-    BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION executePackageCompleteAction = FAILED(hrOverall) || SUCCEEDED(hrExecute) || pPackage->fVital ? BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_IGNORE;
+    BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION executePackageCompleteAction = FAILED(hrOverall) || SUCCEEDED(hrExecute) || fPackageVital ? BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_IGNORE;
 
     // Send package execute complete to BA.
-    UserExperienceOnExecutePackageComplete(pUX, pPackage->sczId, hr, *pRestart, &executePackageCompleteAction);
+    UserExperienceOnExecutePackageComplete(pUX, wzPackageId, hr, *pRestart, &executePackageCompleteAction);
     if (BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RESTART == executePackageCompleteAction)
     {
         *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
@@ -3271,23 +3377,23 @@ static HRESULT ExecutePackageComplete(
     if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart)
     {
         // Best effort to set the forced restart package variable.
-        VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, pPackage->sczId, TRUE, FALSE);
+        VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, wzPackageId, TRUE, FALSE);
     }
 
     // If we're retrying, leave a message in the log file and say everything is okay.
     if (*pfRetry)
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_RETRYING_PACKAGE, pPackage->sczId, hrExecute);
+        LogId(REPORT_STANDARD, MSG_APPLY_RETRYING_PACKAGE, wzPackageId, hrExecute);
         hr = S_OK;
     }
-    else if (SUCCEEDED(hrOverall) && FAILED(hrExecute) && BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_IGNORE == executePackageCompleteAction && !pPackage->fVital) // If we *only* failed to execute and the BA ignored this *not-vital* package, say everything is okay.
+    else if (SUCCEEDED(hrOverall) && FAILED(hrExecute) && BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_IGNORE == executePackageCompleteAction && !fPackageVital) // If we *only* failed to execute and the BA ignored this *not-vital* package, say everything is okay.
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_CONTINUING_NONVITAL_PACKAGE, pPackage->sczId, hrExecute);
+        LogId(REPORT_STANDARD, MSG_APPLY_CONTINUING_NONVITAL_PACKAGE, wzPackageId, hrExecute);
         hr = S_OK;
     }
     else
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_COMPLETED_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, hr, LoggingRestartToString(*pRestart));
+        LogId(REPORT_STANDARD, MSG_APPLY_COMPLETED_PACKAGE, LoggingRollbackOrExecute(fRollback), wzPackageId, hr, LoggingRestartToString(*pRestart));
     }
 
     return hr;

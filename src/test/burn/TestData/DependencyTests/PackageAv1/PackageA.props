@@ -3,7 +3,6 @@
   <PropertyGroup>
     <PackageName>PackageA</PackageName>
     <ProductComponentsRef>true</ProductComponentsRef>
-    <ProductCode>{6F171EC9-0774-4974-A8D1-493EF53CAB74}</ProductCode>
     <UpgradeCode>{45E933B7-B56A-44D5-8EEC-625EC199085E}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>

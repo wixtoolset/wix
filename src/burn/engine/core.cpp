@@ -389,6 +389,7 @@ extern "C" HRESULT CoreDetect(
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
             pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
             pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+            pPackage->compatiblePackage.fDetected = FALSE;
         }
     }
 
@@ -2240,7 +2241,7 @@ static void LogPackages(
             }
 
             LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingCacheTypeToString(pPackage->authoredCacheType), LoggingCacheTypeToString(pPackage->cacheType), LoggingBoolToString(pPackage->fPlannedCache), LoggingBoolToString(pPackage->fPlannedUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
-            
+
             if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
             {
                 if (pPackage->Msi.cFeatures)
@@ -2265,6 +2266,11 @@ static void LogPackages(
 
                         LogId(REPORT_STANDARD, MSG_PLANNED_SLIPSTREAMED_MSP_TARGET, pSlipstreamMsp->pMspPackage->sczId, LoggingActionStateToString(pSlipstreamMsp->execute), LoggingActionStateToString(pSlipstreamMsp->rollback));
                     }
+                }
+
+                if (pPackage->compatiblePackage.fRemove)
+                {
+                    LogId(REPORT_STANDARD, MSG_PLANNED_ORPHAN_PACKAGE_FROM_PROVIDER, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->Msi.sczProductCode);
                 }
             }
             else if (BURN_PACKAGE_TYPE_MSP == pPackage->type && pPackage->Msp.cTargetProductCodes)

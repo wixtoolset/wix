@@ -423,6 +423,10 @@ extern "C" void RegistrationUninitialize(
     ReleaseStr(pRegistration->sczBundlePackageAncestors);
     RelatedBundlesUninitialize(&pRegistration->relatedBundles);
 
+    if (pRegistration->rgDependents)
+    {
+        ReleaseDependencyArray(pRegistration->rgDependents, pRegistration->cDependents);
+    }
     // clear struct
     memset(pRegistration, 0, sizeof(BURN_REGISTRATION));
 }

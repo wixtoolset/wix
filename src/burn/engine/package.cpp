@@ -366,6 +366,31 @@ extern "C" void PackageUninitialize(
         MsuEnginePackageUninitialize(pPackage); // TODO: Modularization
         break;
     }
+
+    PackageUninitializeCompatible(&pPackage->compatiblePackage);
+}
+
+extern "C" void PackageUninitializeCompatible(
+    __in BURN_COMPATIBLE_PACKAGE* pCompatiblePackage
+    )
+{
+    ReleaseStr(pCompatiblePackage->compatibleEntry.sczId);
+    ReleaseStr(pCompatiblePackage->compatibleEntry.sczName);
+    ReleaseStr(pCompatiblePackage->compatibleEntry.sczProviderKey);
+    ReleaseStr(pCompatiblePackage->compatibleEntry.sczVersion);
+
+    ReleaseStr(pCompatiblePackage->sczCacheId);
+
+    switch (pCompatiblePackage->type)
+    {
+    case BURN_PACKAGE_TYPE_MSI:
+        ReleaseStr(pCompatiblePackage->Msi.sczVersion);
+        ReleaseVerutilVersion(pCompatiblePackage->Msi.pVersion);
+        break;
+    }
+
+    // clear struct
+    memset(pCompatiblePackage, 0, sizeof(BURN_COMPATIBLE_PACKAGE));
 }
 
 extern "C" void PackagesUninitialize(
