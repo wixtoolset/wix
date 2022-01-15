@@ -115,6 +115,7 @@ extern "C" void ExeEngineCommandLineArgumentUninitialize(
 
 extern "C" HRESULT ExeEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables
     )
 {
@@ -135,6 +136,9 @@ extern "C" HRESULT ExeEngineDetectPackage(
     {
         pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
+
+    hr = DependencyDetectChainPackage(pPackage, pRegistration);
+    ExitOnFailure(hr, "Failed to detect dependencies for EXE package.");
 
 LExit:
     return hr;

@@ -246,7 +246,7 @@ DAPI_(HRESULT) DepCheckDependents(
     __in HKEY hkHive,
     __in_z LPCWSTR wzProviderKey,
     __reserved int /*iAttributes*/,
-    __in C_STRINGDICT_HANDLE sdIgnoredDependents,
+    __in_opt C_STRINGDICT_HANDLE sdIgnoredDependents,
     __deref_inout_ecount_opt(*pcDependents) DEPENDENCY** prgDependents,
     __inout LPUINT pcDependents
     )
@@ -257,6 +257,7 @@ DAPI_(HRESULT) DepCheckDependents(
     HKEY hkDependentsKey = NULL;
     LPWSTR sczDependentKey = NULL;
     LPWSTR sczDependentName = NULL;
+    BOOL fIgnore = FALSE;
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
@@ -280,6 +281,8 @@ DAPI_(HRESULT) DepCheckDependents(
     // Now enumerate the dependent keys. If they are not defined in the ignored list, add them to the array.
     for (DWORD dwIndex = 0; ; ++dwIndex)
     {
+        fIgnore = FALSE;
+
         hr = RegKeyEnum(hkDependentsKey, dwIndex, &sczDependentKey);
         if (E_NOMOREITEMS != hr)
         {
@@ -292,12 +295,18 @@ DAPI_(HRESULT) DepCheckDependents(
         }
 
         // If the key isn't ignored, add it to the dependent array.
-        hr = DictKeyExists(sdIgnoredDependents, sczDependentKey);
-        if (E_NOTFOUND != hr)
+        if (sdIgnoredDependents)
         {
-            DepExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
+            hr = DictKeyExists(sdIgnoredDependents, sczDependentKey);
+            if (E_NOTFOUND != hr)
+            {
+                DepExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
+
+                fIgnore = TRUE;
+            }
         }
-        else
+
+        if (!fIgnore)
         {
             // Get the name of the dependent from the key.
             hr = GetDependencyNameFromKey(hkHive, sczDependentKey, &sczDependentName);

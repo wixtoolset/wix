@@ -250,6 +250,7 @@ LExit:
 
 extern "C" HRESULT MspEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience
     )
 {
@@ -327,6 +328,9 @@ extern "C" HRESULT MspEngineDetectPackage(
             ExitOnRootFailure(hr, "BA aborted detect patch target.");
         }
     }
+
+    hr = DependencyDetectChainPackage(pPackage, pRegistration);
+    ExitOnFailure(hr, "Failed to detect dependencies for MSP package.");
 
 LExit:
     ReleaseStr(sczState);

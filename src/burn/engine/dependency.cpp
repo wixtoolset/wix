@@ -12,7 +12,6 @@ const LPCWSTR vcszIgnoreDependenciesDelim = L";";
 
 static HRESULT DetectPackageDependents(
     __in BURN_PACKAGE* pPackage,
-    __in STRINGDICT_HANDLE sdIgnoredDependents,
     __in const BURN_REGISTRATION* pRegistration
     );
 
@@ -232,7 +231,8 @@ extern "C" HRESULT DependencyDetectProviderKeyBundleId(
     hr = DepGetProviderInformation(pRegistration->hkRoot, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleId, NULL, NULL);
     if (E_NOTFOUND == hr)
     {
-        ExitFunction();
+        ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleId);
+        ExitFunction1(hr = S_OK);
     }
     ExitOnFailure(hr, "Failed to get provider key bundle id.");
 
@@ -247,48 +247,24 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT DependencyDetect(
+extern "C" HRESULT DependencyDetectBundle(
     __in BURN_DEPENDENCIES* pDependencies,
-    __in BURN_PACKAGES* pPackages,
     __in BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
-    STRINGDICT_HANDLE sdIgnoredDependents = NULL;
-    BURN_PACKAGE* pPackage = NULL;
 
-    // Always leave this empty so that all dependents get detected. Plan will ignore dependents based on its own logic.
-    hr = DictCreateStringList(&sdIgnoredDependents, INITIAL_STRINGDICT_SIZE, DICT_FLAG_CASEINSENSITIVE);
-    ExitOnFailure(hr, "Failed to create the string dictionary.");
+    hr = DependencyDetectProviderKeyBundleId(pRegistration);
+    ExitOnFailure(hr, "Failed to detect provider key bundle id.");
 
-    hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, sdIgnoredDependents, &pRegistration->rgDependents, &pRegistration->cDependents);
+    hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed dependents check on bundle");
+        ExitOnFailure(hr, "Failed dependents check on bundle.");
     }
     else
     {
         hr = S_OK;
-    }
-
-    for (DWORD iPackage = 0; iPackage < pPackages->cPackages; ++iPackage)
-    {
-        pPackage = pPackages->rgPackages + iPackage;
-        hr = DetectPackageDependents(pPackage, sdIgnoredDependents, pRegistration);
-        ExitOnFailure(hr, "Failed to detect dependents for package '%ls'", pPackage->sczId);
-    }
-
-    for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
-    {
-        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
-        if (!pRelatedBundle->fPlannable)
-        {
-            continue;
-        }
-
-        pPackage = &pRelatedBundle->package;
-        hr = DetectPackageDependents(pPackage, sdIgnoredDependents, pRegistration);
-        ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
     }
 
     if (pDependencies->fSelfDependent || pDependencies->fActiveParent)
@@ -310,8 +286,38 @@ extern "C" HRESULT DependencyDetect(
     }
 
 LExit:
-    ReleaseDict(sdIgnoredDependents);
+    return hr;
+}
 
+extern "C" HRESULT DependencyDetectChainPackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = DetectPackageDependents(pPackage, pRegistration);
+    ExitOnFailure(hr, "Failed to detect dependents for package '%ls'", pPackage->sczId);
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT DependencyDetectRelatedBundle(
+    __in BURN_RELATED_BUNDLE* pRelatedBundle,
+    __in BURN_REGISTRATION* pRegistration
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_PACKAGE* pPackage = &pRelatedBundle->package;
+
+    if (pRelatedBundle->fPlannable)
+    {
+        hr = DetectPackageDependents(pPackage, pRegistration);
+        ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
+    }
+
+LExit:
     return hr;
 }
 
@@ -738,7 +744,6 @@ extern "C" void DependencyUnregisterBundle(
 
 static HRESULT DetectPackageDependents(
     __in BURN_PACKAGE* pPackage,
-    __in STRINGDICT_HANDLE sdIgnoredDependents,
     __in const BURN_REGISTRATION* pRegistration
     )
 {
@@ -759,7 +764,7 @@ static HRESULT DetectPackageDependents(
     {
         BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
 
-        hr = DepCheckDependents(hkHive, pProvider->sczKey, 0, sdIgnoredDependents, &pProvider->rgDependents, &pProvider->cDependents);
+        hr = DepCheckDependents(hkHive, pProvider->sczKey, 0, NULL, &pProvider->rgDependents, &pProvider->cDependents);
         if (E_FILENOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed dependents check on package provider: %ls", pProvider->sczKey);
