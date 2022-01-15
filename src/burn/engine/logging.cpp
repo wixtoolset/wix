@@ -227,6 +227,49 @@ extern "C" void LoggingIncrementPackageSequence()
     ++vdwPackageSequence;
 }
 
+extern "C" HRESULT LoggingSetCompatiblePackageVariable(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables,
+    __out_opt LPWSTR* psczLogPath
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczLogPathVariable = NULL;
+    LPWSTR sczLogPath = NULL;
+
+    // Make sure that no package log files are created when logging has been disabled via Log element.
+    if (BURN_LOGGING_STATE_DISABLED == pLog->state)
+    {
+        ExitFunction();
+    }
+
+    if (pPackage->sczLogPathVariable && *pPackage->sczLogPathVariable)
+    {
+        // Format a suitable log path variable from the original package.
+        hr = StrAllocFormatted(&sczLogPathVariable, L"%ls_Compatible", pPackage->sczLogPathVariable);
+        ExitOnFailure(hr, "Failed to format log path variable for compatible package.");
+
+        hr = StrAllocFormatted(&sczLogPath, L"%ls_%03u_%ls_%ls.%ls", pLog->sczPrefix, vdwPackageSequence, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pLog->sczExtension);
+        ExitOnFailure(hr, "Failed to allocate path for package log.");
+
+        hr = VariableSetString(pVariables, sczLogPathVariable, sczLogPath, FALSE, FALSE);
+        ExitOnFailure(hr, "Failed to set log path into variable.");
+
+        if (psczLogPath)
+        {
+            hr = StrAllocString(psczLogPath, sczLogPath, 0);
+            ExitOnFailure(hr, "Failed to copy package log path.");
+        }
+    }
+
+LExit:
+    ReleaseStr(sczLogPathVariable);
+    ReleaseStr(sczLogPath);
+
+    return hr;
+}
+
 extern "C" HRESULT LoggingSetPackageVariable(
     __in BURN_PACKAGE* pPackage,
     __in_z_opt LPCWSTR wzSuffix,

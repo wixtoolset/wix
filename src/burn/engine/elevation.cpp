@@ -32,6 +32,8 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION,
     BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION,
     BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION,
+    BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE,
+    BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE,
 
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN,
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE,
@@ -168,10 +170,15 @@ static HRESULT OnApplyInitialize(
     __in HANDLE hPipe,
     __in BURN_VARIABLES* pVariables,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_PACKAGES* pPackages,
     __in HANDLE* phLock,
     __in BOOL* pfDisabledWindowsUpdate,
     __in BYTE* pbData,
     __in SIZE_T cbData
+    );
+static HRESULT ElevatedProcessDetect(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_PACKAGES* pPackages
     );
 static HRESULT OnApplyUninitialize(
     __in HANDLE* phLock
@@ -271,6 +278,14 @@ static HRESULT OnExecuteMsuPackage(
     __in BYTE* pbData,
     __in SIZE_T cbData
     );
+static HRESULT OnUninstallMsiCompatiblePackage(
+    __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_VARIABLES* pVariables,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    );
 static HRESULT OnExecutePackageProviderAction(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
@@ -305,6 +320,12 @@ static int GenericExecuteMessageHandler(
 static int MsiExecuteMessageHandler(
     __in WIU_MSI_EXECUTE_MESSAGE* pMessage,
     __in_opt LPVOID pvContext
+    );
+static HRESULT OnCleanCompatiblePackage(
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
     );
 static HRESULT OnCleanPackage(
     __in BURN_CACHE* pCache,
@@ -1230,6 +1251,58 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT ElevationUninstallMsiCompatiblePackage(
+    __in HANDLE hPipe,
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = { };
+    DWORD dwResult = 0;
+
+    // serialize message data
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fRollback);
+    ExitOnFailure(hr, "Failed to write rollback flag to message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->uninstallMsiCompatiblePackage.pParentPackage->sczId);
+    ExitOnFailure(hr, "Failed to write package id to message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->uninstallMsiCompatiblePackage.pParentPackage->compatiblePackage.compatibleEntry.sczId);
+    ExitOnFailure(hr, "Failed to write compatible package id to message buffer.");
+
+    hr = BuffWritePointer(&pbData, &cbData, (DWORD_PTR)hwndParent);
+    ExitOnFailure(hr, "Failed to write parent hwnd to message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath);
+    ExitOnFailure(hr, "Failed to write package log to message buffer.");
+
+    hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
+    ExitOnFailure(hr, "Failed to write variables.");
+
+
+    // send message
+    context.pfnMessageHandler = pfnMessageHandler;
+    context.pvContext = pvContext;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE message to per-machine process.");
+
+    hr = ProcessResult(dwResult, pRestart);
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return hr;
+}
+
 extern "C" HRESULT ElevationExecutePackageProviderAction(
     __in HANDLE hPipe,
     __in BURN_EXECUTE_ACTION* pExecuteAction
@@ -1288,6 +1361,35 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
 
     // Ignore the restart since this action only results in registry writes.
     hr = ProcessResult(dwResult, &restart);
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return hr;
+}
+
+extern "C" HRESULT ElevationCleanCompatiblePackage(
+    __in HANDLE hPipe,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    DWORD dwResult = 0;
+
+    // serialize message data
+    hr = BuffWriteString(&pbData, &cbData, pPackage->sczId);
+    ExitOnFailure(hr, "Failed to write clean package id to message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pPackage->compatiblePackage.compatibleEntry.sczId);
+    ExitOnFailure(hr, "Failed to write compatible package id to message buffer.");
+
+    // send message
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE message to per-machine process.");
+
+    hr = (HRESULT)dwResult;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1940,7 +2042,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE:
-        hrResult = OnApplyInitialize(pContext->hPipe, pContext->pVariables, pContext->pRegistration, pContext->phLock, pContext->pfDisabledAutomaticUpdates, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnApplyInitialize(pContext->hPipe, pContext->pVariables, pContext->pRegistration, pContext->pPackages, pContext->phLock, pContext->pfDisabledAutomaticUpdates, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE:
@@ -2001,6 +2103,14 @@ static HRESULT ProcessElevatedChildMessage(
 
     case BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE:
         hrResult = OnLaunchApprovedExe(pContext->hPipe, pContext->pApprovedExes, pContext->pCache, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE:
+        hrResult = OnUninstallMsiCompatiblePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE:
+        hrResult = OnCleanCompatiblePackage(pContext->pCache, pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     default:
@@ -2082,6 +2192,7 @@ static HRESULT OnApplyInitialize(
     __in HANDLE hPipe,
     __in BURN_VARIABLES* pVariables,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_PACKAGES* pPackages,
     __in HANDLE* phLock,
     __in BOOL* pfDisabledWindowsUpdate,
     __in BYTE* pbData,
@@ -2113,11 +2224,9 @@ static HRESULT OnApplyInitialize(
     hr = ApplyLock(TRUE, phLock);
     ExitOnFailure(hr, "Failed to acquire lock due to setup in other session.");
 
-    // Reset and reload the related bundles.
-    RelatedBundlesUninitialize(&pRegistration->relatedBundles);
-
-    hr = RelatedBundlesInitializeForScope(TRUE, pRegistration, &pRegistration->relatedBundles);
-    ExitOnFailure(hr, "Failed to initialize per-machine related bundles.");
+    // Detect.
+    hr = ElevatedProcessDetect(pRegistration, pPackages);
+    ExitOnFailure(hr, "Failed to run detection in elevated process.");
 
     // Attempt to pause AU with best effort.
     if (BURN_AU_PAUSE_ACTION_IFELEVATED == dwAUAction || BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME == dwAUAction)
@@ -2184,6 +2293,39 @@ static HRESULT OnApplyInitialize(
 
 LExit:
     ReleaseStr(sczBundleName);
+    return hr;
+}
+
+static HRESULT ElevatedProcessDetect(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_PACKAGES* pPackages
+    )
+{
+    HRESULT hr = S_OK;
+
+    DetectReset(pRegistration, pPackages);
+
+    hr = RelatedBundlesInitializeForScope(TRUE, pRegistration, &pRegistration->relatedBundles);
+    ExitOnFailure(hr, "Failed to initialize per-machine related bundles.");
+
+    for (DWORD i = 0; i < pPackages->cPackages; ++i)
+    {
+        BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
+
+        hr = DependencyDetectCompatibleEntry(pPackage, pRegistration);
+        ExitOnFailure(hr, "Failed to detect per-machine compatible entry for package: %ls", pPackage->sczId);
+
+        switch (pPackage->type)
+        {
+        case BURN_PACKAGE_TYPE_MSI:
+            hr = MsiEngineDetectCompatiblePackage(pPackage);
+            ExitOnFailure(hr, "Failed to detect per-machine compatible package for package: %ls", pPackage->sczId);
+
+            break;
+        }
+    }
+
+LExit:
     return hr;
 }
 
@@ -2659,6 +2801,11 @@ static HRESULT OnExecuteExePackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.exePackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    if (BURN_PACKAGE_TYPE_EXE != executeAction.exePackage.pPackage->type)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an EXE package: %ls", sczPackage);
+    }
+
     // Execute EXE package.
     hr = ExeEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &exeRestart);
     ExitOnFailure(hr, "Failed to execute EXE package.");
@@ -2760,6 +2907,11 @@ static HRESULT OnExecuteMsiPackage(
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
 
+    if (BURN_PACKAGE_TYPE_MSI != executeAction.msiPackage.pPackage->type)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an MSI package: %ls", sczPackage);
+    }
+
     // Execute MSI package.
     hr = MsiEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);
     ExitOnFailure(hr, "Failed to execute MSI package.");
@@ -2859,6 +3011,11 @@ static HRESULT OnExecuteMspPackage(
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
     ExitOnFailure(hr, "Failed to read rollback flag.");
 
+    if (BURN_PACKAGE_TYPE_MSP != executeAction.mspTarget.pPackage->type)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an MSP package: %ls", sczPackage);
+    }
+
     // Execute MSP package.
     hr = MspEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &restart);
     ExitOnFailure(hr, "Failed to execute MSP package.");
@@ -2920,6 +3077,11 @@ static HRESULT OnExecuteMsuPackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.msuPackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    if (BURN_PACKAGE_TYPE_MSU != executeAction.msuPackage.pPackage->type)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an MSU package: %ls", sczPackage);
+    }
+
     // execute MSU package
     hr = MsuEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), static_cast<BOOL>(dwStopWusaService), GenericExecuteMessageHandler, hPipe, &restart);
     ExitOnFailure(hr, "Failed to execute MSU package.");
@@ -2935,6 +3097,88 @@ LExit:
             hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
         }
         else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
+        }
+    }
+
+    return hr;
+}
+
+static HRESULT OnUninstallMsiCompatiblePackage(
+    __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_VARIABLES* pVariables,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczPackageId = NULL;
+    LPWSTR sczCompatiblePackageId = NULL;
+    HWND hwndParent = NULL;
+    BOOL fRollback = 0;
+    BURN_EXECUTE_ACTION executeAction = { };
+    BURN_PACKAGE* pPackage = NULL;
+    BURN_COMPATIBLE_PACKAGE* pCompatiblePackage = NULL;
+    BOOTSTRAPPER_APPLY_RESTART msiRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+
+    executeAction.type = BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE;
+
+    // Deserialize message data.
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
+    ExitOnFailure(hr, "Failed to read rollback flag.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczPackageId);
+    ExitOnFailure(hr, "Failed to read MSI package id.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczCompatiblePackageId);
+    ExitOnFailure(hr, "Failed to read MSI compatible package id.");
+
+    hr = BuffReadPointer(pbData, cbData, &iData, (DWORD_PTR*)&hwndParent);
+    ExitOnFailure(hr, "Failed to read parent hwnd.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &executeAction.uninstallMsiCompatiblePackage.sczLogPath);
+    ExitOnFailure(hr, "Failed to read package log.");
+
+    hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
+    ExitOnFailure(hr, "Failed to read variables.");
+
+    hr = PackageFindById(pPackages, sczPackageId, &pPackage);
+    ExitOnFailure(hr, "Failed to find package: %ls", sczPackageId);
+
+    executeAction.uninstallMsiCompatiblePackage.pParentPackage = pPackage;
+    pCompatiblePackage = &pPackage->compatiblePackage;
+
+    if (!pCompatiblePackage->fDetected || BURN_PACKAGE_TYPE_MSI != pCompatiblePackage->type || !pCompatiblePackage->compatibleEntry.sczId)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package '%ls' has no compatible MSI package", sczPackageId);
+    }
+
+    if (!sczCompatiblePackageId || !*sczCompatiblePackageId ||
+        CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pCompatiblePackage->compatibleEntry.sczId, -1, sczCompatiblePackageId, -1))
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package '%ls' has no compatible package with id: %ls", sczPackageId, sczCompatiblePackageId);
+    }
+
+    // Uninstall MSI compatible package.
+    hr = MsiEngineUninstallCompatiblePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);
+    ExitOnFailure(hr, "Failed to execute MSI package.");
+
+LExit:
+    ReleaseStr(sczPackageId);
+    ReleaseStr(sczCompatiblePackageId);
+    PlanUninitializeExecuteAction(&executeAction);
+
+    if (SUCCEEDED(hr))
+    {
+        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == msiRestart)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
+        }
+        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == msiRestart)
         {
             hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
         }
@@ -3256,6 +3500,53 @@ LExit:
     ReleaseBuffer(pbData);
 
     return nResult;
+}
+
+static HRESULT OnCleanCompatiblePackage(
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczPackageId = NULL;
+    LPWSTR sczCompatiblePackageId = NULL;
+    BURN_PACKAGE* pPackage = NULL;
+    BURN_COMPATIBLE_PACKAGE* pCompatiblePackage = NULL;
+
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &sczPackageId);
+    ExitOnFailure(hr, "Failed to read package id.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczCompatiblePackageId);
+    ExitOnFailure(hr, "Failed to read compatible package id.");
+
+    hr = PackageFindById(pPackages, sczPackageId, &pPackage);
+    ExitOnFailure(hr, "Failed to find package: %ls", sczPackageId);
+
+    pCompatiblePackage = &pPackage->compatiblePackage;
+
+    if (!pCompatiblePackage->fDetected || !pCompatiblePackage->compatibleEntry.sczId || !pCompatiblePackage->sczCacheId || !*pCompatiblePackage->sczCacheId)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package '%ls' has no compatible package to clean.", sczPackageId);
+    }
+
+    if (!sczCompatiblePackageId || !*sczCompatiblePackageId ||
+        CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pCompatiblePackage->compatibleEntry.sczId, -1, sczCompatiblePackageId, -1))
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package '%ls' has no compatible package with id: %ls", sczPackageId, sczCompatiblePackageId);
+    }
+
+    // Remove the package from the cache.
+    hr = CacheRemovePackage(pCache, TRUE, pCompatiblePackage->compatibleEntry.sczId, pCompatiblePackage->sczCacheId);
+    ExitOnFailure(hr, "Failed to remove from cache compatible package: %ls", pCompatiblePackage->compatibleEntry.sczId);
+
+LExit:
+    ReleaseStr(sczPackageId);
+    ReleaseStr(sczCompatiblePackageId);
+    return hr;
 }
 
 static HRESULT OnCleanPackage(

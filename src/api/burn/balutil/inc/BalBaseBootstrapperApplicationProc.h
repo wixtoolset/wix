@@ -126,6 +126,15 @@ static HRESULT BalBaseBAProcOnDetectPackageBegin(
     return pBA->OnDetectPackageBegin(pArgs->wzPackageId, &pResults->fCancel);
 }
 
+static HRESULT BalBaseBAProcOnDetectCompatiblePackage(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS* pArgs,
+    __inout BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS* pResults
+    )
+{
+    return pBA->OnDetectCompatibleMsiPackage(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->wzCompatiblePackageVersion, &pResults->fCancel);
+}
+
 static HRESULT BalBaseBAProcOnDetectRelatedMsiPackage(
     __in IBootstrapperApplication* pBA,
     __in BA_ONDETECTRELATEDMSIPACKAGE_ARGS* pArgs,
@@ -189,6 +198,24 @@ static HRESULT BalBaseBAProcOnPlanPackageBegin(
     return pBA->OnPlanPackageBegin(pArgs->wzPackageId, pArgs->state, pArgs->fCached, pArgs->installCondition, pArgs->recommendedState, pArgs->recommendedCacheType, &pResults->requestedState, &pResults->requestedCacheType, &pResults->fCancel);
 }
 
+static HRESULT BalBaseBAProcOnPlanCompatibleMsiPackageBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS* pArgs,
+    __inout BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS* pResults
+    )
+{
+    return pBA->OnPlanCompatibleMsiPackageBegin(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->wzCompatiblePackageVersion, pArgs->fRecommendedRemove, &pResults->fRequestRemove, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnPlanCompatibleMsiPackageComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_ARGS* pArgs,
+    __inout BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnPlanCompatibleMsiPackageComplete(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->hrStatus, pArgs->fRequestedRemove);
+}
+
 static HRESULT BalBaseBAProcOnPlanPatchTarget(
     __in IBootstrapperApplication* pBA,
     __in BA_ONPLANPATCHTARGET_ARGS* pArgs,
@@ -214,6 +241,15 @@ static HRESULT BalBaseBAProcOnPlanPackageComplete(
     )
 {
     return pBA->OnPlanPackageComplete(pArgs->wzPackageId, pArgs->hrStatus, pArgs->requested);
+}
+
+static HRESULT BalBaseBAProcOnPlannedCompatiblePackage(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANNEDCOMPATIBLEPACKAGE_ARGS* pArgs,
+    __inout BA_ONPLANNEDCOMPATIBLEPACKAGE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnPlannedCompatiblePackage(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->fRemove);
 }
 
 static HRESULT BalBaseBAProcOnPlannedPackage(
@@ -927,6 +963,18 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSETUPDATECOMPLETE:
             hr = BalBaseBAProcOnSetUpdateComplete(pBA, reinterpret_cast<BA_ONSETUPDATECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONSETUPDATECOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE:
+            hr = BalBaseBAProcOnDetectCompatiblePackage(pBA, reinterpret_cast<BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN:
+            hr = BalBaseBAProcOnPlanCompatibleMsiPackageBegin(pBA, reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE:
+            hr = BalBaseBAProcOnPlanCompatibleMsiPackageComplete(pBA, reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDCOMPATIBLEPACKAGE:
+            hr = BalBaseBAProcOnPlannedCompatiblePackage(pBA, reinterpret_cast<BA_ONPLANNEDCOMPATIBLEPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANNEDCOMPATIBLEPACKAGE_RESULTS*>(pvResults));
             break;
         }
     }

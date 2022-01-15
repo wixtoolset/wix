@@ -101,6 +101,14 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
+    // OnDetectCompatibleMsiPackage - called when the engine detects that a package is not installed but a newer package using the same provider key is.
+    STDMETHOD(OnDetectCompatibleMsiPackage)(
+        __in_z LPCWSTR wzPackageId,
+        __in_z LPCWSTR wzCompatiblePackageId,
+        __in_z LPCWSTR wzCompatiblePackageVersion,
+        __inout BOOL* pfCancel
+        ) = 0;
+
     // OnDetectRelatedMsiPackage - called when the engine begins detects a related package.
     STDMETHOD(OnDetectRelatedMsiPackage)(
         __in_z LPCWSTR wzPackageId,
@@ -181,6 +189,25 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
+    // OnPlanCompatibleMsiPackageBegin - called when the engine plans a newer, compatible package using the same provider key.
+    STDMETHOD(OnPlanCompatibleMsiPackageBegin)(
+        __in_z LPCWSTR wzPackageId,
+        __in_z LPCWSTR wzCompatiblePackageId,
+        __in_z LPCWSTR wzCompatiblePackageVersion,
+        __in BOOL fRecommendedRemove,
+        __inout BOOL* pfRequestRemove,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    // OnPlanCompatibleMsiPackageComplete - called after the engine plans the package.
+    //
+    STDMETHOD(OnPlanCompatibleMsiPackageComplete)(
+        __in_z LPCWSTR wzPackageId,
+        __in_z LPCWSTR wzCompatiblePackageId,
+        __in HRESULT hrStatus,
+        __in BOOL fRequestedRemove
+        ) = 0;
+
     // OnPlanPatchTarget - called when the engine is about to plan a target
     //                     of an MSP package.
     STDMETHOD(OnPlanPatchTarget)(
@@ -221,6 +248,13 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z LPCWSTR wzPackageId,
         __in HRESULT hrStatus,
         __in BOOTSTRAPPER_REQUEST_STATE requested
+        ) = 0;
+
+    // OnPlannedCompatiblePackage - called after the engine has completed planning a compatible package.
+    STDMETHOD(OnPlannedCompatiblePackage)(
+        __in_z LPCWSTR wzPackageId,
+        __in_z LPCWSTR wzCompatiblePackageId,
+        __in BOOL fRemove
         ) = 0;
 
     // OnPlannedPackage - called after the engine has completed planning a package.

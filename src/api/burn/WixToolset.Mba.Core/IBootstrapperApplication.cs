@@ -182,16 +182,20 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.DetectCompatibleMsiPackage"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnDetectCompatibleMsiPackage(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageVersion,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectRelatedMsiPackage"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzUpgradeCode"></param>
-        /// <param name="wzProductCode"></param>
-        /// <param name="fPerMachine"></param>
-        /// <param name="wzVersion"></param>
-        /// <param name="operation"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectRelatedMsiPackage(
@@ -318,6 +322,32 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlanCompatibleMsiPackageBegin"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanCompatibleMsiPackageBegin(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageVersion,
+            [MarshalAs(UnmanagedType.Bool)] bool fRecommendedRemove,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fRequestRemove,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlanCompatibleMsiPackageComplete"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanCompatibleMsiPackageComplete(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
+            int hrStatus,
+            [MarshalAs(UnmanagedType.Bool)] bool fRequestedRemove
+            );
+
+        /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanPatchTarget"/>.
         /// </summary>
         /// <param name="wzPackageId"></param>
@@ -385,6 +415,17 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             int hrStatus,
             [MarshalAs(UnmanagedType.U4)] RequestState requested
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlannedCompatiblePackage"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlannedCompatiblePackage(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
+            [MarshalAs(UnmanagedType.Bool)] bool fRemove
             );
 
         /// <summary>

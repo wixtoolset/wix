@@ -496,6 +496,37 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectCompatibleMsiPackage"/>
+    /// </summary>
+    [Serializable]
+    public class DetectCompatibleMsiPackageEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public DetectCompatibleMsiPackageEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.PackageId = packageId;
+            this.CompatiblePackageId = compatiblePackageId;
+            this.CompatiblePackageVersion = compatiblePackageVersion;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package that was not detected.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the identity of the compatible package that was detected.
+        /// </summary>
+        public string CompatiblePackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the version of the compatible package that was detected.
+        /// </summary>
+        public string CompatiblePackageVersion { get; private set; }
+    }
+
+    /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectRelatedMsiPackage"/>
     /// </summary>
     [Serializable]
@@ -776,6 +807,80 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanCompatibleMsiPackageBegin"/>
+    /// </summary>
+    [Serializable]
+    public class PlanCompatibleMsiPackageBeginEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public PlanCompatibleMsiPackageBeginEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, bool recommendedRemove, bool requestRemove, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.PackageId = packageId;
+            this.CompatiblePackageId = compatiblePackageId;
+            this.CompatiblePackageVersion = compatiblePackageVersion;
+            this.RecommendedRemove = recommendedRemove;
+            this.RequestRemove = requestRemove;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package that was not detected.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the identity of the compatible package detected.
+        /// </summary>
+        public string CompatiblePackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the version of the compatible package detected.
+        /// </summary>
+        public string CompatiblePackageVersion { get; private set; }
+
+        /// <summary>
+        /// Gets the recommended state to use for the compatible package for planning.
+        /// </summary>
+        public bool RecommendedRemove { get; private set; }
+
+        /// <summary>
+        /// Gets or sets whether to uninstall the compatible package.
+        /// </summary>
+        public bool RequestRemove { get; set; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanCompatibleMsiPackageComplete"/>
+    /// </summary>
+    [Serializable]
+    public class PlanCompatibleMsiPackageCompleteEventArgs : StatusEventArgs
+    {
+        /// <summary />
+        public PlanCompatibleMsiPackageCompleteEventArgs(string packageId, string compatiblePackageId, int hrStatus, bool requestedRemove)
+            : base(hrStatus)
+        {
+            this.PackageId = packageId;
+            this.CompatiblePackageId = compatiblePackageId;
+            this.RequestedRemove = requestedRemove;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package planned for.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the identity of the compatible package detected.
+        /// </summary>
+        public string CompatiblePackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the requested state of the package.
+        /// </summary>
+        public bool RequestedRemove { get; private set; }
+    }
+
+    /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanRollbackBoundary"/>
     /// </summary>
     [Serializable]
@@ -978,6 +1083,36 @@ namespace WixToolset.Mba.Core
         /// Gets the requested state for the package.
         /// </summary>
         public RequestState Requested { get; private set; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlannedCompatiblePackage"/>
+    /// </summary>
+    [Serializable]
+    public class PlannedCompatiblePackageEventArgs : HResultEventArgs
+    {
+        /// <summary />
+        public PlannedCompatiblePackageEventArgs(string packageId, string compatiblePackageId, bool remove)
+        {
+            this.PackageId = packageId;
+            this.CompatiblePackageId = compatiblePackageId;
+            this.Remove = remove;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package planned for.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the identity of the compatible package detected.
+        /// </summary>
+        public string CompatiblePackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the planned state of the package.
+        /// </summary>
+        public bool Remove { get; private set; }
     }
 
     /// <summary>

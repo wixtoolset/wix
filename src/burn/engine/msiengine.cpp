@@ -506,6 +506,9 @@ extern "C" HRESULT MsiEngineDetectPackage(
     {
         BURN_RELATED_MSI* pRelatedMsi = &pPackage->Msi.rgRelatedMsis[i];
 
+        ReleaseVerutilVersion(pVersion);
+        pVersion = NULL;
+
         for (DWORD iProduct = 0; ; ++iProduct)
         {
             // get product
@@ -708,6 +711,46 @@ extern "C" HRESULT MsiEngineDetectPackage(
     hr = DependencyDetectChainPackage(pPackage, pRegistration);
     ExitOnFailure(hr, "Failed to detect dependencies for MSI package.");
 
+    if (BOOTSTRAPPER_PACKAGE_STATE_PRESENT > pPackage->currentState)
+    {
+        hr = MsiEngineDetectCompatiblePackage(pPackage);
+        ExitOnFailure(hr, "Failed to detect compatible package for MSI package.");
+
+        if (BURN_PACKAGE_TYPE_MSI == pPackage->compatiblePackage.type)
+        {
+            LPCWSTR wzCompatibleProductCode = pPackage->compatiblePackage.compatibleEntry.sczId;
+            LPCWSTR wzCompatibleInstalledVersion = pPackage->compatiblePackage.Msi.sczVersion;
+
+            ReleaseVerutilVersion(pVersion);
+            pVersion = NULL;
+
+            hr = VerParseVersion(wzCompatibleInstalledVersion, 0, FALSE, &pVersion);
+            ExitOnFailure(hr, "Failed to parse dependency version: '%ls' for ProductCode: %ls", wzCompatibleInstalledVersion, wzCompatibleProductCode);
+
+            if (pVersion->fInvalid)
+            {
+                LogId(REPORT_WARNING, MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION, wzCompatibleProductCode, wzCompatibleInstalledVersion);
+            }
+
+            pPackage->compatiblePackage.Msi.pVersion = pVersion;
+            pVersion = NULL;
+
+            // compare versions
+            hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pPackage->compatiblePackage.Msi.pVersion, &nCompareResult);
+            ExitOnFailure(hr, "Failed to compare version '%ls' to dependency version: '%ls'", pPackage->Msi.pVersion->sczVersion, wzCompatibleInstalledVersion);
+
+            if (nCompareResult < 0)
+            {
+                pPackage->compatiblePackage.fPlannable = TRUE;
+
+                LogId(REPORT_STANDARD, MSG_DETECTED_COMPATIBLE_PACKAGE_FROM_PROVIDER, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczProviderKey, wzCompatibleProductCode, wzCompatibleInstalledVersion, pPackage->Msi.sczProductCode);
+
+                hr = UserExperienceOnDetectCompatibleMsiPackage(pUserExperience, pPackage->sczId, wzCompatibleProductCode, pPackage->compatiblePackage.Msi.pVersion);
+                ExitOnRootFailure(hr, "BA aborted detect compatible MSI package.");
+            }
+        }
+    }
+
 LExit:
     ReleaseStr(sczInstalledLanguage);
     ReleaseStr(sczInstalledVersion);
@@ -716,8 +759,49 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT MsiEngineDetectCompatiblePackage(
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczVersion = NULL;
+    LPWSTR sczCacheId = NULL;
+    LPCWSTR wzCompatibleProductCode = pPackage->compatiblePackage.compatibleEntry.sczId;
+
+    if (!pPackage->compatiblePackage.fDetected)
+    {
+        ExitFunction();
+    }
+
+    hr = WiuGetProductInfoEx(wzCompatibleProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczVersion);
+    if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr || HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    ExitOnFailure(hr, "Failed to get product information for compatible ProductCode: %ls", wzCompatibleProductCode);
+
+    // Assume the package used the default cache ID generation from the binder.
+    hr = StrAllocFormatted(&sczCacheId, L"%lsv%ls", wzCompatibleProductCode, sczVersion);
+    ExitOnFailure(hr, "Failed to format cache ID for compatible package.");
+
+    pPackage->compatiblePackage.sczCacheId = sczCacheId;
+    sczCacheId = NULL;
+
+    pPackage->compatiblePackage.Msi.sczVersion = sczVersion;
+    sczVersion = NULL;
+
+    pPackage->compatiblePackage.type = BURN_PACKAGE_TYPE_MSI;
+
+LExit:
+    ReleaseStr(sczVersion);
+    ReleaseStr(sczCacheId);
+
+    return hr;
+}
+
 extern "C" HRESULT MsiEnginePlanInitializePackage(
     __in BURN_PACKAGE* pPackage,
+    __in BOOTSTRAPPER_ACTION overallAction,
     __in BURN_VARIABLES* pVariables,
     __in BURN_USER_EXPERIENCE* pUserExperience
     )
@@ -745,6 +829,18 @@ extern "C" HRESULT MsiEnginePlanInitializePackage(
             hr = UserExperienceOnPlanMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, &pFeature->requested);
             ExitOnRootFailure(hr, "BA aborted plan MSI feature.");
         }
+    }
+
+    if (pPackage->compatiblePackage.fPlannable)
+    {
+        Assert(BURN_PACKAGE_TYPE_MSI == pPackage->compatiblePackage.type);
+
+        pPackage->compatiblePackage.fDefaultRequested = BOOTSTRAPPER_ACTION_UNINSTALL == overallAction;
+        pPackage->compatiblePackage.fRequested = pPackage->compatiblePackage.fDefaultRequested;
+
+        hr = UserExperienceOnPlanCompatibleMsiPackageBegin(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.Msi.pVersion, &pPackage->compatiblePackage.fRequested);
+        UserExperienceOnPlanCompatibleMsiPackageComplete(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, hr, pPackage->compatiblePackage.fRequested);
+        ExitOnRootFailure(hr, "BA aborted plan compatible MSI package begin.");
     }
 
 LExit:
@@ -988,6 +1084,17 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
         pAction->msiPackage.dwLoggingAttributes = pLog->dwAttributes;
+    }
+    else if (pPackage->compatiblePackage.fRemove)
+    {
+        hr = PlanAppendExecuteAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append execute action.");
+
+        pAction->type = BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE;
+        pAction->uninstallMsiCompatiblePackage.pParentPackage = pPackage;
+        pAction->uninstallMsiCompatiblePackage.dwLoggingAttributes = pLog->dwAttributes;
+
+        LoggingSetCompatiblePackageVariable(pPackage, pLog, pVariables, &pAction->uninstallMsiCompatiblePackage.sczLogPath); // ignore errors.
     }
 
 LExit:
@@ -1242,6 +1349,80 @@ LExit:
     // Best effort to clear the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE, FALSE);
+
+    return hr;
+}
+
+extern "C" HRESULT MsiEngineUninstallCompatiblePackage(
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* /*pCache*/,
+    __in BURN_VARIABLES* /*pVariables*/,
+    __in BOOL fRollback,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    WIU_MSI_EXECUTE_CONTEXT context = { };
+    WIU_RESTART restart = WIU_RESTART_NONE;
+    LPWSTR sczProperties = NULL;
+    BOOTSTRAPPER_ACTION_STATE action = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+    BURN_MSI_PROPERTY burnMsiProperty = BURN_MSI_PROPERTY_NONE;
+    BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning = BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER;
+    BURN_PACKAGE* pParentPackage = pExecuteAction->uninstallMsiCompatiblePackage.pParentPackage;
+    BURN_COMPATIBLE_PROVIDER_ENTRY* pCompatibleEntry = &pExecuteAction->uninstallMsiCompatiblePackage.pParentPackage->compatiblePackage.compatibleEntry;
+
+    // Default to "verbose" logging and set extra debug mode only if explicitly required.
+    DWORD dwLogMode = WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE;
+
+    if (pExecuteAction->uninstallMsiCompatiblePackage.dwLoggingAttributes & BURN_LOGGING_ATTRIBUTE_EXTRADEBUG)
+    {
+        dwLogMode |= INSTALLLOGMODE_EXTRADEBUG;
+    }
+
+    hr = WiuInitializeExternalUI(pfnMessageHandler, INSTALLUILEVEL_NONE, hwndParent, pvContext, fRollback, &context);
+    ExitOnFailure(hr, "Failed to initialize external UI handler.");
+
+    if (pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath && *pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath)
+    {
+        hr = WiuEnableLog(dwLogMode, pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath, INSTALLLOGATTRIBUTES_APPEND);
+        ExitOnFailure(hr, "Failed to enable logging for compatible package: %ls to: %ls", pCompatibleEntry->sczId, pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath);
+    }
+
+    hr = MsiEngineConcatBurnProperties(action, burnMsiProperty, fileVersioning, TRUE, FALSE, &sczProperties);
+    ExitOnFailure(hr, "Failed to add action property to argument string.");
+
+    LogId(REPORT_STANDARD, MSG_APPLYING_ORPHAN_COMPATIBLE_PACKAGE, LoggingRollbackOrExecute(fRollback), pCompatibleEntry->sczId, pParentPackage->sczId, LoggingActionStateToString(action), sczProperties ? sczProperties : L"");
+
+    hr = WiuConfigureProductEx(pCompatibleEntry->sczId, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT, sczProperties, &restart);
+    if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr)
+    {
+        LogId(REPORT_STANDARD, MSG_ATTEMPTED_UNINSTALL_ABSENT_PACKAGE, pCompatibleEntry->sczId);
+        hr = S_OK;
+    }
+    ExitOnFailure(hr, "Failed to uninstall compatible MSI package.");
+
+LExit:
+    WiuUninitializeExternalUI(&context);
+
+    StrSecureZeroFreeString(sczProperties);
+
+    switch (restart)
+    {
+    case WIU_RESTART_NONE:
+        *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+        break;
+
+    case WIU_RESTART_REQUIRED:
+        *pRestart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
+        break;
+
+    case WIU_RESTART_INITIATED:
+        *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
+        break;
+    }
 
     return hr;
 }

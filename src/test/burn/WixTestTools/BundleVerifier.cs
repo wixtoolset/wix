@@ -124,14 +124,14 @@ namespace WixTestTools
             }
         }
 
-        public void VerifyPackageIsCached(string packageId)
+        public void VerifyPackageIsCached(string packageId, bool cached = true)
         {
             using var wixOutput = WixOutput.Read(this.BundlePdb);
             var intermediate = Intermediate.Load(wixOutput);
             var section = intermediate.Sections.Single();
             var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
             var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == YesNoDefaultType.Yes);
-            Assert.True(Directory.Exists(cachePath));
+            Assert.Equal(cached, Directory.Exists(cachePath));
         }
 
         public void VerifyExeTestRegistryRootDeleted(string name, bool x64 = false)

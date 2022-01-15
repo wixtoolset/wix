@@ -127,6 +127,16 @@ HRESULT ElevationExecuteMsuPackage(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+HRESULT ElevationUninstallMsiCompatiblePackage(
+    __in HANDLE hPipe,
+    __in_opt HWND hwndParent,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 HRESULT ElevationExecutePackageProviderAction(
     __in HANDLE hPipe,
     __in BURN_EXECUTE_ACTION* pExecuteAction
@@ -135,12 +145,9 @@ HRESULT ElevationExecutePackageDependencyAction(
     __in HANDLE hPipe,
     __in BURN_EXECUTE_ACTION* pExecuteAction
     );
-HRESULT ElevationLaunchElevatedChild(
+HRESULT ElevationCleanCompatiblePackage(
     __in HANDLE hPipe,
-    __in BURN_PACKAGE* pPackage,
-    __in LPCWSTR wzPipeName,
-    __in LPCWSTR wzPipeToken,
-    __out DWORD* pdwChildPid
+    __in BURN_PACKAGE* pPackage
     );
 HRESULT ElevationCleanPackage(
     __in HANDLE hPipe,

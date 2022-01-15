@@ -54,6 +54,10 @@ static HRESULT AddPackageDependencyActions(
     __in const BURN_DEPENDENCY_ACTION dependencyRollbackAction
     );
 
+static LPCWSTR GetPackageProviderId(
+    __in const BURN_PACKAGE* pPackage
+    );
+
 static HRESULT RegisterPackageProvider(
     __in const BURN_PACKAGE* pPackage
     );
@@ -299,6 +303,9 @@ extern "C" HRESULT DependencyDetectChainPackage(
     hr = DetectPackageDependents(pPackage, pRegistration);
     ExitOnFailure(hr, "Failed to detect dependents for package '%ls'", pPackage->sczId);
 
+    hr = DependencyDetectCompatibleEntry(pPackage, pRegistration);
+    ExitOnFailure(hr, "Failed to detect compatible package for package '%ls'", pPackage->sczId);
+
 LExit:
     return hr;
 }
@@ -396,6 +403,8 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     STRINGDICT_HANDLE sdIgnoredDependents = NULL;
     BURN_DEPENDENCY_ACTION dependencyExecuteAction = BURN_DEPENDENCY_ACTION_NONE;
     BURN_DEPENDENCY_ACTION dependencyRollbackAction = BURN_DEPENDENCY_ACTION_NONE;
+    BOOL fDependentBlocksUninstall = FALSE;
+    BOOL fAttemptingUninstall = BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute || pPackage->compatiblePackage.fRemove;
 
     pPackage->dependencyExecute = BURN_DEPENDENCY_ACTION_NONE;
     pPackage->dependencyRollback = BURN_DEPENDENCY_ACTION_NONE;
@@ -415,7 +424,7 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     }
 
     // If we're uninstalling the package, check if any dependents are registered.
-    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
+    if (fAttemptingUninstall)
     {
         // Build up a list of dependents to ignore, including the current bundle.
         hr = GetIgnoredDependents(pPackage, pPlan, &sdIgnoredDependents);
@@ -444,9 +453,9 @@ extern "C" HRESULT DependencyPlanPackageBegin(
                     {
                         hr = S_OK;
 
-                        if (!pPackage->fDependencyManagerWasHere)
+                        if (!fDependentBlocksUninstall)
                         {
-                            pPackage->fDependencyManagerWasHere = TRUE;
+                            fDependentBlocksUninstall = TRUE;
 
                             LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_HASDEPENDENTS, pPackage->sczId);
                         }
@@ -459,14 +468,20 @@ extern "C" HRESULT DependencyPlanPackageBegin(
         }
     }
 
+    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
+    {
+        pPackage->fDependencyManagerWasHere = fDependentBlocksUninstall;
+    }
+
     // Calculate the dependency actions before the package itself is planned.
     CalculateDependencyActionStates(pPackage, pPlan->action, &dependencyExecuteAction, &dependencyRollbackAction);
 
     // If dependents were found, change the action to not uninstall the package.
-    if (pPackage->fDependencyManagerWasHere)
+    if (fDependentBlocksUninstall)
     {
         pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
+        pPackage->compatiblePackage.fRemove = FALSE;
     }
     else
     {
@@ -494,7 +509,7 @@ extern "C" HRESULT DependencyPlanPackageBegin(
         }
 
         // If the package will be removed, add its providers to the growing list in the plan.
-        if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
+        if (fAttemptingUninstall)
         {
             for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
             {
@@ -737,6 +752,73 @@ extern "C" void DependencyUnregisterBundle(
         const BURN_PACKAGE* pPackage = &pRegistration->relatedBundles.rgRelatedBundles[i].package;
         UnregisterPackageDependency(pPackage->fPerMachine, pPackage, wzDependentProviderKey);
     }
+}
+
+extern "C" HRESULT DependencyDetectCompatibleEntry(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczId = NULL;
+    LPWSTR sczName = NULL;
+    LPWSTR sczVersion = NULL;
+    LPCWSTR wzPackageProviderId = GetPackageProviderId(pPackage);
+    HKEY hkHive = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+    switch (pPackage->type)
+    {
+    case BURN_PACKAGE_TYPE_MSI:
+        // Only MSI packages can handle compatible entries.
+        break;
+    default:
+        ExitFunction();
+    }
+
+    for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+
+        hr = DepGetProviderInformation(hkHive, pProvider->sczKey, &sczId, &sczName, &sczVersion);
+        if (E_NOTFOUND == hr)
+        {
+            hr = S_OK;
+            continue;
+        }
+        ExitOnFailure(hr, "Failed to get provider information for compatible package: %ls", pProvider->sczKey);
+
+        // Make sure the compatible package is not the package itself.
+        if (!wzPackageProviderId)
+        {
+            if (!sczId)
+            {
+                continue;
+            }
+        }
+        else if (sczId && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzPackageProviderId, -1, sczId, -1))
+        {
+            continue;
+        }
+
+        pPackage->compatiblePackage.fDetected = TRUE;
+
+        hr = StrAllocString(&pPackage->compatiblePackage.compatibleEntry.sczProviderKey, pProvider->sczKey, 0);
+        ExitOnFailure(hr, "Failed to copy provider key for compatible entry.");
+
+        pPackage->compatiblePackage.compatibleEntry.sczId = sczId;
+        sczId = NULL;
+
+        pPackage->compatiblePackage.compatibleEntry.sczName = sczName;
+        sczName = NULL;
+
+        pPackage->compatiblePackage.compatibleEntry.sczVersion = sczVersion;
+        sczVersion = NULL;
+
+        break;
+    }
+
+LExit:
+    return hr;
 }
 
 // internal functions
@@ -1170,24 +1252,35 @@ LExit:
     return hr;
 }
 
+static LPCWSTR GetPackageProviderId(
+    __in const BURN_PACKAGE* pPackage
+    )
+{
+    LPCWSTR wzId = NULL;
+
+    switch (pPackage->type)
+    {
+    case BURN_PACKAGE_TYPE_MSI:
+        wzId = pPackage->Msi.sczProductCode;
+        break;
+    case BURN_PACKAGE_TYPE_MSP:
+        wzId = pPackage->Msp.sczPatchCode;
+        break;
+    }
+
+    return wzId;
+}
+
 static HRESULT RegisterPackageProvider(
     __in const BURN_PACKAGE* pPackage
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR wzId = NULL;
-    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
 
     if (pPackage->rgDependencyProviders)
     {
-        if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
-        {
-            wzId = pPackage->Msi.sczProductCode;
-        }
-        else if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
-        {
-            wzId = pPackage->Msp.sczPatchCode;
-        }
+        HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+        LPCWSTR wzId = GetPackageProviderId(pPackage);
 
         for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
         {

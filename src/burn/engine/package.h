@@ -147,6 +147,14 @@ typedef struct _BURN_MSIFEATURE
     BOOTSTRAPPER_FEATURE_ACTION rollback;          // only valid during Plan.
 } BURN_MSIFEATURE;
 
+typedef struct _BURN_COMPATIBLE_PROVIDER_ENTRY
+{
+    LPWSTR sczProviderKey;
+    LPWSTR sczId;
+    LPWSTR sczName;
+    LPWSTR sczVersion;
+} BURN_COMPATIBLE_PROVIDER_ENTRY;
+
 typedef struct _BURN_RELATED_MSI
 {
     LPWSTR sczUpgradeCode;
@@ -206,6 +214,27 @@ typedef struct _BURN_PATCH_TARGETCODE
     BURN_PATCH_TARGETCODE_TYPE type;
 } BURN_PATCH_TARGETCODE;
 
+typedef struct _BURN_COMPATIBLE_PACKAGE
+{
+    BOOL fDetected;
+    BOOL fPlannable;
+    BOOL fDefaultRequested;
+    BOOL fRequested;
+    BOOL fRemove;
+    LPWSTR sczCacheId;
+    BURN_COMPATIBLE_PROVIDER_ENTRY compatibleEntry;
+
+    BURN_PACKAGE_TYPE type;
+    union
+    {
+        struct
+        {
+            LPWSTR sczVersion;
+            VERUTIL_VERSION* pVersion;
+        } Msi;
+    };
+} BURN_COMPATIBLE_PACKAGE;
+
 typedef struct _BURN_PACKAGE
 {
     LPWSTR sczId;
@@ -258,6 +287,8 @@ typedef struct _BURN_PACKAGE
 
     BURN_DEPENDENCY_PROVIDER* rgDependencyProviders;
     DWORD cDependencyProviders;
+
+    BURN_COMPATIBLE_PACKAGE compatiblePackage;
 
     BURN_PACKAGE_TYPE type;
     union
@@ -370,6 +401,9 @@ HRESULT PackagesParseFromXml(
     );
 void PackageUninitialize(
     __in BURN_PACKAGE* pPackage
+    );
+void PackageUninitializeCompatible(
+    __in BURN_COMPATIBLE_PACKAGE* pCompatiblePackage
     );
 void PackagesUninitialize(
     __in BURN_PACKAGES* pPackages

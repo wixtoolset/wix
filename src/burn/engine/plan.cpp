@@ -96,6 +96,10 @@ static HRESULT AppendRollbackCacheAction(
     __in BURN_PLAN* pPlan,
     __out BURN_CACHE_ACTION** ppCacheAction
     );
+static HRESULT AppendCleanAction(
+    __in BURN_PLAN* pPlan,
+    __out BURN_CLEAN_ACTION** ppCleanAction
+    );
 static HRESULT ProcessPayloadGroup(
     __in BURN_PLAN* pPlan,
     __in BURN_PAYLOAD_GROUP* pPayloadGroup
@@ -285,6 +289,10 @@ extern "C" void PlanUninitializeExecuteAction(
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
         ReleaseStr(pExecuteAction->packageDependency.sczBundleProviderKey);
+        break;
+
+    case BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE:
+        ReleaseStr(pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath);
         break;
     }
 }
@@ -823,6 +831,11 @@ static HRESULT PlanPackagesHelper(
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
         UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, pPackage->fPlannedCache, pPackage->fPlannedUncache);
+
+        if (pPackage->compatiblePackage.fPlannable)
+        {
+            UserExperienceOnPlannedCompatiblePackage(pUX, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.fRemove);
+        }
     }
 
 LExit:
@@ -878,7 +891,7 @@ static HRESULT InitializePackage(
 
     if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
     {
-        hr = MsiEnginePlanInitializePackage(pPackage, pVariables, pUX);
+        hr = MsiEnginePlanInitializePackage(pPackage, pPlan->action, pVariables, pUX);
         ExitOnFailure(hr, "Failed to initialize plan package: %ls", pPackage->sczId);
     }
 
@@ -918,7 +931,7 @@ static HRESULT ProcessPackage(
     }
     else
     {
-        if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
+        if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested || pPackage->compatiblePackage.fRequested)
         {
             // If the package is in a requested state, plan it.
             hr = PlanExecutePackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables);
@@ -1151,7 +1164,7 @@ extern "C" HRESULT PlanExecutePackage(
     ExitOnFailure(hr, "Failed to complete plan dependency actions for package: %ls", pPackage->sczId);
 
     // If we are going to take any action on this package, add progress for it.
-    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute || BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback)
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute || BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback || pPackage->compatiblePackage.fRemove)
     {
         LoggingIncrementPackageSequence();
 
@@ -1560,12 +1573,10 @@ extern "C" HRESULT PlanCleanPackage(
 
     if (fPlanCleanPackage)
     {
-        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pPlan->rgCleanActions), pPlan->cCleanActions + 1, sizeof(BURN_CLEAN_ACTION), 5);
-        ExitOnFailure(hr, "Failed to grow plan's array of clean actions.");
+        hr = AppendCleanAction(pPlan, &pCleanAction);
+        ExitOnFailure(hr, "Failed to append clean action to plan.");
 
-        pCleanAction = pPlan->rgCleanActions + pPlan->cCleanActions;
-        ++pPlan->cCleanActions;
-
+        pCleanAction->type = BURN_CLEAN_ACTION_TYPE_PACKAGE;
         pCleanAction->pPackage = pPackage;
 
         pPackage->fPlannedUncache = TRUE;
@@ -1574,6 +1585,15 @@ extern "C" HRESULT PlanCleanPackage(
         {
             pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
         }
+    }
+
+    if (pPackage->compatiblePackage.fRemove)
+    {
+        hr = AppendCleanAction(pPlan, &pCleanAction);
+        ExitOnFailure(hr, "Failed to append clean action to plan.");
+
+        pCleanAction->type = BURN_CLEAN_ACTION_TYPE_COMPATIBLE_PACKAGE;
+        pCleanAction->pPackage = pPackage;
     }
 
 LExit:
@@ -2229,6 +2249,24 @@ LExit:
     return hr;
 }
 
+static HRESULT AppendCleanAction(
+    __in BURN_PLAN* pPlan,
+    __out BURN_CLEAN_ACTION** ppCleanAction
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pPlan->rgCleanActions), pPlan->cCleanActions, 1, sizeof(BURN_CLEAN_ACTION), 5);
+    ExitOnFailure(hr, "Failed to grow plan's array of clean actions.");
+
+
+    *ppCleanAction = pPlan->rgCleanActions + pPlan->cCleanActions;
+    ++pPlan->cCleanActions;
+
+LExit:
+    return hr;
+}
+
 static HRESULT ProcessPayloadGroup(
     __in BURN_PLAN* pPlan,
     __in BURN_PAYLOAD_GROUP* pPayloadGroup
@@ -2505,6 +2543,8 @@ static HRESULT CalculateExecuteActions(
         ExitOnFailure(hr, "Invalid package type.");
     }
 
+    pPackage->compatiblePackage.fRemove = pPackage->compatiblePackage.fPlannable && pPackage->compatiblePackage.fRequested;
+
 LExit:
     return hr;
 }
@@ -2622,6 +2662,10 @@ static void ExecuteActionLog(
         }
         break;
 
+    case BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE:
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: UNINSTALL_MSI_COMPATIBLE_PACKAGE package id: %ls, compatible package id: %ls, cache id: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->uninstallMsiCompatiblePackage.pParentPackage->sczId, pAction->uninstallMsiCompatiblePackage.pParentPackage->compatiblePackage.compatibleEntry.sczId, pAction->uninstallMsiCompatiblePackage.pParentPackage->compatiblePackage.sczCacheId, pAction->uninstallMsiCompatiblePackage.sczLogPath, pAction->uninstallMsiCompatiblePackage.dwLoggingAttributes);
+        break;
+
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %hs, file versioning: %hs, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, LoggingBoolToString(pAction->mspTarget.fPerMachineTarget), LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, LoggingBoolToString(pAction->mspTarget.fDisableExternalUiHandler), LoggingMsiFileVersioningToString(pAction->mspTarget.fileVersioning), pAction->mspTarget.sczLogPath);
         for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
@@ -2669,6 +2713,27 @@ static void ExecuteActionLog(
     }
 }
 
+static void CleanActionLog(
+    __in DWORD iAction,
+    __in BURN_CLEAN_ACTION* pAction
+    )
+{
+    switch (pAction->type)
+    {
+    case BURN_CLEAN_ACTION_TYPE_COMPATIBLE_PACKAGE:
+        LogStringLine(PlanDumpLevel, "   Clean action[%u]: CLEAN_COMPATIBLE_PACKAGE package id: %ls", iAction, pAction->pPackage->sczId);
+        break;
+
+    case BURN_CLEAN_ACTION_TYPE_PACKAGE:
+        LogStringLine(PlanDumpLevel, "   Clean action[%u]: CLEAN_PACKAGE package id: %ls", iAction, pAction->pPackage->sczId);
+        break;
+
+    default:
+        AssertSz(FALSE, "Unknown clean action type.");
+        break;
+    }
+}
+
 extern "C" void PlanDump(
     __in BURN_PLAN* pPlan
     )
@@ -2709,7 +2774,7 @@ extern "C" void PlanDump(
 
     for (DWORD i = 0; i < pPlan->cCleanActions; ++i)
     {
-        LogStringLine(PlanDumpLevel, "   Clean action[%u]: CLEAN_PACKAGE package id: %ls", i, pPlan->rgCleanActions[i].pPackage->sczId);
+        CleanActionLog(i, pPlan->rgCleanActions + i);
     }
 
     for (DWORD i = 0; i < pPlan->cPlannedProviders; ++i)
