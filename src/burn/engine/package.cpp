@@ -235,6 +235,23 @@ extern "C" HRESULT PackagesParseFromXml(
             // ignore other package types for now
         }
 
+        if (!pPackage->fPermanent)
+        {
+            BOOL fUninstallable = TRUE;
+
+            switch (pPackage->type)
+            {
+            case BURN_PACKAGE_TYPE_EXE:
+                fUninstallable = pPackage->Exe.fUninstallable;
+                break;
+            }
+
+            if (!fUninstallable)
+            {
+                ExitWithRootFailure(hr, E_INVALIDDATA, "Non-permanent packages must be uninstallable.");
+            }
+        }
+
         // parse payload references
         hr = ParsePayloadRefsFromXml(pPackage, pPayloads, pixnNode);
         ExitOnFailure(hr, "Failed to parse payload references.");

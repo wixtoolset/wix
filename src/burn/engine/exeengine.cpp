@@ -11,36 +11,43 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fFoundXml = FALSE;
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
     LPWSTR scz = NULL;
 
     // @DetectCondition
     hr = XmlGetAttributeEx(pixnExePackage, L"DetectCondition", &pPackage->Exe.sczDetectCondition);
-    ExitOnFailure(hr, "Failed to get @DetectCondition.");
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DetectCondition.");
 
     // @InstallArguments
     hr = XmlGetAttributeEx(pixnExePackage, L"InstallArguments", &pPackage->Exe.sczInstallArguments);
-    ExitOnFailure(hr, "Failed to get @InstallArguments.");
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallArguments.");
 
     // @UninstallArguments
     hr = XmlGetAttributeEx(pixnExePackage, L"UninstallArguments", &pPackage->Exe.sczUninstallArguments);
-    ExitOnFailure(hr, "Failed to get @UninstallArguments.");
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UninstallArguments.");
 
     // @RepairArguments
     hr = XmlGetAttributeEx(pixnExePackage, L"RepairArguments", &pPackage->Exe.sczRepairArguments);
-    ExitOnFailure(hr, "Failed to get @RepairArguments.");
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RepairArguments.");
 
     // @Repairable
     hr = XmlGetYesNoAttribute(pixnExePackage, L"Repairable", &pPackage->Exe.fRepairable);
-    if (E_NOTFOUND != hr)
-    {
-        ExitOnFailure(hr, "Failed to get @Repairable.");
-    }
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Repairable.");
+
+    // @Uninstallable
+    pPackage->Exe.fUninstallable = TRUE; // TODO: https://github.com/wixtoolset/issues/issues/6459
+    /*
+    hr = XmlGetYesNoAttribute(pixnNode, L"Uninstallable", &pPackage->Exe.fUninstallable);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Uninstallable.");
+    */
 
     // @Protocol
     hr = XmlGetAttributeEx(pixnExePackage, L"Protocol", &scz);
-    if (SUCCEEDED(hr))
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Protocol.");
+
+    if (fFoundXml)
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"burn", -1))
         {
@@ -59,10 +66,6 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
             hr = E_UNEXPECTED;
             ExitOnFailure(hr, "Invalid protocol type: %ls", scz);
         }
-    }
-    else if (E_NOTFOUND != hr)
-    {
-        ExitOnFailure(hr, "Failed to get @Protocol.");
     }
 
     hr = ExeEngineParseExitCodesFromXml(pixnExePackage, &pPackage->Exe.rgExitCodes, &pPackage->Exe.cExitCodes);
@@ -172,7 +175,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
             execute = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
-            execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+            execute = pPackage->Exe.fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
         default:
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -552,11 +555,11 @@ extern "C" HRESULT ExeEngineParseExitCodesFromXml(
 
             // @Type
             hr = XmlGetAttributeNumber(pixnNode, L"Type", (DWORD*)&pExitCode->type);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             // @Code
             hr = XmlGetAttributeEx(pixnNode, L"Code", &scz);
-            ExitOnFailure(hr, "Failed to get @Code.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Code.");
 
             if (L'*' == scz[0])
             {
@@ -614,25 +617,26 @@ extern "C" HRESULT ExeEngineParseCommandLineArgumentsFromXml(
         for (DWORD i = 0; i < cNodes; ++i)
         {
             BURN_EXE_COMMAND_LINE_ARGUMENT* pCommandLineArgument = *prgCommandLineArguments + i;
+            BOOL fFoundXml = FALSE;
 
             hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
             ExitOnFailure(hr, "Failed to get next command-line argument node.");
 
             // @InstallArgument
             hr = XmlGetAttributeEx(pixnNode, L"InstallArgument", &pCommandLineArgument->sczInstallArgument);
-            ExitOnFailure(hr, "Failed to get @InstallArgument.");
+            ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallArgument.");
 
             // @UninstallArgument
             hr = XmlGetAttributeEx(pixnNode, L"UninstallArgument", &pCommandLineArgument->sczUninstallArgument);
-            ExitOnFailure(hr, "Failed to get @UninstallArgument.");
+            ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UninstallArgument.");
 
             // @RepairArgument
             hr = XmlGetAttributeEx(pixnNode, L"RepairArgument", &pCommandLineArgument->sczRepairArgument);
-            ExitOnFailure(hr, "Failed to get @RepairArgument.");
+            ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RepairArgument.");
 
             // @Condition
             hr = XmlGetAttributeEx(pixnNode, L"Condition", &pCommandLineArgument->sczCondition);
-            ExitOnFailure(hr, "Failed to get @Condition.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Condition.");
 
             // Prepare next iteration.
             ReleaseNullObject(pixnNode);
