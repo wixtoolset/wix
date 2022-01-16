@@ -161,7 +161,6 @@ extern "C" HRESULT PackagesParseFromXml(
         // @Permanent
         hr = XmlGetYesNoAttribute(pixnNode, L"Permanent", &pPackage->fPermanent);
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Permanent.");
-        pPackage->fCanAffectRegistration = !pPackage->fPermanent;
 
         // @Vital
         hr = XmlGetYesNoAttribute(pixnNode, L"Vital", &pPackage->fVital);
@@ -244,6 +243,9 @@ extern "C" HRESULT PackagesParseFromXml(
             case BURN_PACKAGE_TYPE_EXE:
                 fUninstallable = pPackage->Exe.fUninstallable;
                 break;
+            case BURN_PACKAGE_TYPE_MSU:
+                fUninstallable = pPackage->Msu.fUninstallable;
+                break;
             }
 
             if (!fUninstallable)
@@ -251,6 +253,8 @@ extern "C" HRESULT PackagesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDDATA, "Non-permanent packages must be uninstallable.");
             }
         }
+
+        pPackage->fCanAffectRegistration = !pPackage->fPermanent;
 
         // parse payload references
         hr = ParsePayloadRefsFromXml(pPackage, pPayloads, pixnNode);
