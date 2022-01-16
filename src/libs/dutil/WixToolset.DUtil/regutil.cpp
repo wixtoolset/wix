@@ -32,9 +32,6 @@ static PFN_REGDELETEVALUEW vpfnRegDeleteValueW = ::RegDeleteValueW;
 static HMODULE vhAdvApi32Dll = NULL;
 static BOOL vfRegInitialized = FALSE;
 
-static REGSAM TranslateKeyBitness(
-    __in REG_KEY_BITNESS kbKeyBitness
-);
 static HRESULT WriteStringToRegistry(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
@@ -135,7 +132,7 @@ DAPI_(HRESULT) RegCreateEx(
     DWORD er = ERROR_SUCCESS;
     DWORD dwDisposition;
 
-    REGSAM samDesired = TranslateKeyBitness(kbKeyBitness);
+    REGSAM samDesired = RegTranslateKeyBitness(kbKeyBitness);
     er = vpfnRegCreateKeyExW(hkRoot, wzSubKey, 0, NULL, fVolatile ? REG_OPTION_VOLATILE : REG_OPTION_NON_VOLATILE, dwAccess | samDesired, pSecurityAttributes, phk, &dwDisposition);
     RegExitOnWin32Error(er, hr, "Failed to create registry key.");
 
@@ -171,7 +168,7 @@ DAPI_(HRESULT) RegOpenEx(
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
 
-    REGSAM samDesired = TranslateKeyBitness(kbKeyBitness);
+    REGSAM samDesired = RegTranslateKeyBitness(kbKeyBitness);
     er = vpfnRegOpenKeyExW(hkRoot, wzSubKey, 0, dwAccess | samDesired, phk);
     if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
     {
@@ -229,7 +226,7 @@ DAPI_(HRESULT) RegDelete(
 
     if (NULL != vpfnRegDeleteKeyExW)
     {
-        REGSAM samDesired = TranslateKeyBitness(kbKeyBitness);
+        REGSAM samDesired = RegTranslateKeyBitness(kbKeyBitness);
         er = vpfnRegDeleteKeyExW(hkRoot, wzSubKey, samDesired, 0);
         if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
         {
@@ -912,11 +909,6 @@ LExit:
     return hr;
 }
 
-/********************************************************************
-RegValueExists - determines whether a named value exists in a 
-specified subkey.
-
-*********************************************************************/
 DAPI_(BOOL) RegValueExists(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
@@ -940,7 +932,7 @@ LExit:
     return SUCCEEDED(hr);
 }
 
-static REGSAM TranslateKeyBitness(
+DAPI_(REGSAM) RegTranslateKeyBitness(
     __in REG_KEY_BITNESS kbKeyBitness
     )
 {
@@ -948,14 +940,11 @@ static REGSAM TranslateKeyBitness(
     {
     case REG_KEY_32BIT:
         return KEY_WOW64_32KEY;
-        break;
     case REG_KEY_64BIT:
         return KEY_WOW64_64KEY;
-        break;
     case REG_KEY_DEFAULT:
     default:
         return 0;
-        break;
     }
 }
 

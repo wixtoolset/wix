@@ -63,13 +63,6 @@ static HRESULT CopyStringToBuffer(
     __in_z_opt LPWSTR wzBuffer,
     __inout SIZE_T* pcchBuffer
     );
-static HRESULT DoBundleEnumRelatedBundle(
-    __in HKEY hkRoot,
-    __in REG_KEY_BITNESS kbKeyBitness,
-    __in_z LPCWSTR wzUpgradeCode,
-    __inout PDWORD pdwStartIndex,
-    __deref_out_z LPWSTR* psczBundleId
-    );
 
 
 DAPI_(HRESULT) BundleGetBundleInfo(
@@ -156,11 +149,21 @@ LExit:
 DAPI_(HRESULT) BundleEnumRelatedBundle(
     __in_z LPCWSTR wzUpgradeCode,
     __in BUNDLE_INSTALL_CONTEXT context,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
     __deref_out_z LPWSTR* psczBundleId
     )
 {
     HRESULT hr = S_OK;
+    BOOL fUpgradeCodeFound = FALSE;
+    HKEY hkUninstall = NULL;
+    HKEY hkBundle = NULL;
+    LPWSTR sczUninstallSubKey = NULL;
+    LPWSTR sczUninstallSubKeyPath = NULL;
+    LPWSTR sczValue = NULL;
+    DWORD dwType = 0;
+    LPWSTR* rgsczBundleUpgradeCodes = NULL;
+    DWORD cBundleUpgradeCodes = 0;
     HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == context ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
 
     if (!wzUpgradeCode || !pdwStartIndex)
@@ -168,27 +171,105 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
         ButilExitOnFailure(hr = E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    hr = DoBundleEnumRelatedBundle(hkRoot, REG_KEY_DEFAULT, wzUpgradeCode, pdwStartIndex, psczBundleId);
-    ButilExitOnFailure(hr, "Failed to enumerate default-bitness bundles.");
-    if (S_FALSE == hr)
+    hr = RegOpenEx(hkRoot, BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, kbKeyBitness, &hkUninstall);
+    ButilExitOnFailure(hr, "Failed to open bundle uninstall key path.");
+
+    for (DWORD dwIndex = *pdwStartIndex; !fUpgradeCodeFound; dwIndex++)
     {
-#if defined(_WIN64)
-        hr = DoBundleEnumRelatedBundle(hkRoot, REG_KEY_32BIT, wzUpgradeCode, pdwStartIndex, psczBundleId);
-        ButilExitOnFailure(hr, "Failed to enumerate 32-bit bundles.");
-#else
-        hr = DoBundleEnumRelatedBundle(hkRoot, REG_KEY_64BIT, wzUpgradeCode, pdwStartIndex, psczBundleId);
-        ButilExitOnFailure(hr, "Failed to enumerate 64-bit bundles.");
-#endif
+        hr = RegKeyEnum(hkUninstall, dwIndex, &sczUninstallSubKey);
+        ButilExitOnFailure(hr, "Failed to enumerate bundle uninstall key path.");
+
+        hr = StrAllocFormatted(&sczUninstallSubKeyPath, L"%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, sczUninstallSubKey);
+        ButilExitOnFailure(hr, "Failed to allocate bundle uninstall key path.");
+
+        hr = RegOpenEx(hkRoot, sczUninstallSubKeyPath, KEY_READ, kbKeyBitness, &hkBundle);
+        ButilExitOnFailure(hr, "Failed to open uninstall key path.");
+
+        // If it's a bundle, it should have a BundleUpgradeCode value of type REG_SZ (old) or REG_MULTI_SZ
+        hr = RegGetType(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &dwType);
+        if (FAILED(hr))
+        {
+            ReleaseRegKey(hkBundle);
+            ReleaseNullStr(sczUninstallSubKey);
+            ReleaseNullStr(sczUninstallSubKeyPath);
+            // Not a bundle
+            continue;
+        }
+
+        switch (dwType)
+        {
+        case REG_SZ:
+            hr = RegReadString(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &sczValue);
+            ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode string property.");
+
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, sczValue, -1, wzUpgradeCode, -1))
+            {
+                *pdwStartIndex = dwIndex;
+                fUpgradeCodeFound = TRUE;
+                break;
+            }
+
+            ReleaseNullStr(sczValue);
+
+            break;
+        case REG_MULTI_SZ:
+            hr = RegReadStringArray(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczBundleUpgradeCodes, &cBundleUpgradeCodes);
+            ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode multi-string property.");
+
+            for (DWORD i = 0; i < cBundleUpgradeCodes; i++)
+            {
+                LPWSTR wzBundleUpgradeCode = rgsczBundleUpgradeCodes[i];
+                if (wzBundleUpgradeCode && *wzBundleUpgradeCode)
+                {
+                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzBundleUpgradeCode, -1, wzUpgradeCode, -1))
+                    {
+                        *pdwStartIndex = dwIndex;
+                        fUpgradeCodeFound = TRUE;
+                        break;
+                    }
+                }
+            }
+            ReleaseNullStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
+
+            break;
+
+        default:
+            ButilExitWithRootFailure(hr, E_NOTIMPL, "BundleUpgradeCode of type 0x%x not implemented.", dwType);
+        }
+
+        if (fUpgradeCodeFound)
+        {
+            if (psczBundleId)
+            {
+                *psczBundleId = sczUninstallSubKey;
+                sczUninstallSubKey = NULL;
+            }
+
+            break;
+        }
+
+        // Cleanup before next iteration
+        ReleaseRegKey(hkBundle);
+        ReleaseNullStr(sczUninstallSubKey);
+        ReleaseNullStr(sczUninstallSubKeyPath);
     }
 
 LExit:
-    return hr;
+    ReleaseStr(sczValue);
+    ReleaseStr(sczUninstallSubKey);
+    ReleaseStr(sczUninstallSubKeyPath);
+    ReleaseRegKey(hkBundle);
+    ReleaseRegKey(hkUninstall);
+    ReleaseStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
+
+    return FAILED(hr) ? hr : fUpgradeCodeFound ? S_OK : S_FALSE;
 }
 
 
 DAPI_(HRESULT) BundleEnumRelatedBundleFixed(
     __in_z LPCWSTR wzUpgradeCode,
     __in BUNDLE_INSTALL_CONTEXT context,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
     __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleId
     )
@@ -197,7 +278,7 @@ DAPI_(HRESULT) BundleEnumRelatedBundleFixed(
     LPWSTR sczValue = NULL;
     size_t cchValue = 0;
 
-    hr = BundleEnumRelatedBundle(wzUpgradeCode, context, pdwStartIndex, &sczValue);
+    hr = BundleEnumRelatedBundle(wzUpgradeCode, context, kbKeyBitness, pdwStartIndex, &sczValue);
     if (S_OK == hr && wzBundleId)
     {
         hr = ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchValue);
@@ -395,117 +476,4 @@ static HRESULT CopyStringToBuffer(
     }
 
     return hr;
-}
-
-static HRESULT DoBundleEnumRelatedBundle(
-    __in HKEY hkRoot,
-    __in REG_KEY_BITNESS kbKeyBitness,
-    __in_z LPCWSTR wzUpgradeCode,
-    __inout PDWORD pdwStartIndex,
-    __deref_out_z LPWSTR* psczBundleId
-)
-{
-    HRESULT hr = S_OK;
-    BOOL fUpgradeCodeFound = FALSE;
-    HKEY hkUninstall = NULL;
-    HKEY hkBundle = NULL;
-    LPWSTR sczUninstallSubKey = NULL;
-    LPWSTR sczUninstallSubKeyPath = NULL;
-    LPWSTR sczValue = NULL;
-    DWORD dwType = 0;
-    LPWSTR* rgsczBundleUpgradeCodes = NULL;
-    DWORD cBundleUpgradeCodes = 0;
-
-    hr = RegOpenEx(hkRoot, BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, kbKeyBitness, &hkUninstall);
-    ButilExitOnFailure(hr, "Failed to open bundle uninstall key path.");
-
-    for (DWORD dwIndex = *pdwStartIndex; !fUpgradeCodeFound; dwIndex++)
-    {
-        hr = RegKeyEnum(hkUninstall, dwIndex, &sczUninstallSubKey);
-        ButilExitOnFailure(hr, "Failed to enumerate bundle uninstall key path.");
-
-        hr = StrAllocFormatted(&sczUninstallSubKeyPath, L"%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, sczUninstallSubKey);
-        ButilExitOnFailure(hr, "Failed to allocate bundle uninstall key path.");
-
-        hr = RegOpenEx(hkRoot, sczUninstallSubKeyPath, KEY_READ, kbKeyBitness, &hkBundle);
-        ButilExitOnFailure(hr, "Failed to open uninstall key path.");
-
-        // If it's a bundle, it should have a BundleUpgradeCode value of type REG_SZ (old) or REG_MULTI_SZ
-        hr = RegGetType(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &dwType);
-        if (FAILED(hr))
-        {
-            ReleaseRegKey(hkBundle);
-            ReleaseNullStr(sczUninstallSubKey);
-            ReleaseNullStr(sczUninstallSubKeyPath);
-            // Not a bundle
-            continue;
-        }
-
-        switch (dwType)
-        {
-        case REG_SZ:
-            hr = RegReadString(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &sczValue);
-            ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode string property.");
-
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, sczValue, -1, wzUpgradeCode, -1))
-            {
-                *pdwStartIndex = dwIndex;
-                fUpgradeCodeFound = TRUE;
-                break;
-            }
-
-            ReleaseNullStr(sczValue);
-
-            break;
-        case REG_MULTI_SZ:
-            hr = RegReadStringArray(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczBundleUpgradeCodes, &cBundleUpgradeCodes);
-            ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode multi-string property.");
-
-            for (DWORD i = 0; i < cBundleUpgradeCodes; i++)
-            {
-                LPWSTR wzBundleUpgradeCode = rgsczBundleUpgradeCodes[i];
-                if (wzBundleUpgradeCode && *wzBundleUpgradeCode)
-                {
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzBundleUpgradeCode, -1, wzUpgradeCode, -1))
-                    {
-                        *pdwStartIndex = dwIndex;
-                        fUpgradeCodeFound = TRUE;
-                        break;
-                    }
-                }
-            }
-            ReleaseNullStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
-
-            break;
-
-        default:
-            ButilExitWithRootFailure(hr, E_NOTIMPL, "BundleUpgradeCode of type 0x%x not implemented.", dwType);
-        }
-
-        if (fUpgradeCodeFound)
-        {
-            if (psczBundleId)
-            {
-                *psczBundleId = sczUninstallSubKey;
-                sczUninstallSubKey = NULL;
-            }
-
-            break;
-        }
-
-        // Cleanup before next iteration
-        ReleaseRegKey(hkBundle);
-        ReleaseNullStr(sczUninstallSubKey);
-        ReleaseNullStr(sczUninstallSubKeyPath);
-    }
-
-LExit:
-    ReleaseStr(sczValue);
-    ReleaseStr(sczUninstallSubKey);
-    ReleaseStr(sczUninstallSubKeyPath);
-    ReleaseRegKey(hkBundle);
-    ReleaseRegKey(hkUninstall);
-    ReleaseStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
-
-    return FAILED(hr) ? hr : fUpgradeCodeFound ? S_OK : S_FALSE;
 }

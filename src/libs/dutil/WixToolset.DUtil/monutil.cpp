@@ -1677,18 +1677,7 @@ static REGSAM GetRegKeyBitness(
     __in MON_REQUEST *pRequest
     )
 {
-    if (REG_KEY_32BIT == pRequest->regkey.kbKeyBitness)
-    {
-        return KEY_WOW64_32KEY;
-    }
-    else if (REG_KEY_64BIT == pRequest->regkey.kbKeyBitness)
-    {
-        return KEY_WOW64_64KEY;
-    }
-    else
-    {
-        return 0;
-    }
+    return RegTranslateKeyBitness(pRequest->regkey.kbKeyBitness);
 }
 
 static HRESULT DuplicateRemoveMessage(

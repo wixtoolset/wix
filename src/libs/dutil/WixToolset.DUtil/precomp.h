@@ -48,7 +48,6 @@
 #include "apputil.h"
 #include "atomutil.h"
 #include "buffutil.h"
-#include "butil.h"
 #include "cabcutil.h"
 #include "cabutil.h"
 #include "conutil.h"
@@ -76,6 +75,7 @@
 #include "polcutil.h"
 #include "procutil.h"
 #include "regutil.h"
+#include "butil.h"  // NOTE: Butil must come after Regutil.
 #include "resrutil.h"
 #include "reswutil.h"
 #include "rmutil.h"

@@ -2361,7 +2361,7 @@ static HRESULT Get64bitFolderFromRegistry(
     AssertSz(CSIDL_PROGRAM_FILES == nFolder || CSIDL_PROGRAM_FILES_COMMON == nFolder, "Unknown folder CSIDL.");
     LPCWSTR wzFolderValue = CSIDL_PROGRAM_FILES_COMMON == nFolder ? L"CommonFilesDir" : L"ProgramFilesDir";
 
-    hr = RegOpen(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", KEY_READ | KEY_WOW64_64KEY, &hkFolders);
+    hr = RegOpenEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", KEY_READ, REG_KEY_64BIT, &hkFolders);
     ExitOnFailure(hr, "Failed to open Windows folder key.");
 
     hr = RegReadString(hkFolders, wzFolderValue, psczPath);

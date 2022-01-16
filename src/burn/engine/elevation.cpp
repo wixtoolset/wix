@@ -3299,7 +3299,6 @@ static HRESULT OnLaunchApprovedExe(
     SIZE_T iData = 0;
     BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = NULL;
     BURN_APPROVED_EXE* pApprovedExe = NULL;
-    REGSAM samDesired = KEY_QUERY_VALUE;
     HKEY hKey = NULL;
     DWORD dwProcessId = 0;
     BYTE* pbSendData = NULL;
@@ -3323,12 +3322,7 @@ static HRESULT OnLaunchApprovedExe(
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_APPROVED_EXE_SEARCH, pApprovedExe->sczKey, pApprovedExe->sczValueName ? pApprovedExe->sczValueName : L"", pApprovedExe->fWin64 ? L"yes" : L"no");
 
-    if (pApprovedExe->fWin64)
-    {
-        samDesired |= KEY_WOW64_64KEY;
-    }
-
-    hr = RegOpen(HKEY_LOCAL_MACHINE, pApprovedExe->sczKey, samDesired, &hKey);
+    hr = RegOpenEx(HKEY_LOCAL_MACHINE, pApprovedExe->sczKey, KEY_QUERY_VALUE, pApprovedExe->fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
     ExitOnFailure(hr, "Failed to open the registry key for the approved exe path.");
 
     hr = RegReadString(hKey, pApprovedExe->sczValueName, &pLaunchApprovedExe->sczExecutablePath);

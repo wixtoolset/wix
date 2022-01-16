@@ -11,13 +11,13 @@ static __callback int __cdecl CompareRelatedBundles(
 );
 static HRESULT InitializeForScopeAndBitness(
     __in BOOL fPerMachine,
-    __in BOOL fWow6432,
+    __in REG_KEY_BITNESS regBitness,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_RELATED_BUNDLES* pRelatedBundles
     );
 static HRESULT LoadIfRelatedBundle(
     __in BOOL fPerMachine,
-    __in BOOL fWow6432,
+    __in REG_KEY_BITNESS regBitness,
     __in HKEY hkUninstallKey,
     __in_z LPCWSTR sczRelatedBundleId,
     __in BURN_REGISTRATION* pRegistration,
@@ -47,13 +47,11 @@ extern "C" HRESULT RelatedBundlesInitializeForScope(
 {
     HRESULT hr = S_OK;
 
-    hr = InitializeForScopeAndBitness(fPerMachine, /*fWow6432*/FALSE, pRegistration, pRelatedBundles);
-    ExitOnFailure(hr, "Failed to open platform-native uninstall registry key.");
-
-#if defined(_WIN64)
-    hr = InitializeForScopeAndBitness(fPerMachine, /*fWow6432*/TRUE, pRegistration, pRelatedBundles);
+    hr = InitializeForScopeAndBitness(fPerMachine, REG_KEY_32BIT, pRegistration, pRelatedBundles);
     ExitOnFailure(hr, "Failed to open 32-bit uninstall registry key.");
-#endif
+
+    hr = InitializeForScopeAndBitness(fPerMachine, REG_KEY_64BIT, pRegistration, pRelatedBundles);
+    ExitOnFailure(hr, "Failed to open 64-bit uninstall registry key.");
 
 LExit:
     return hr;
@@ -170,7 +168,7 @@ static __callback int __cdecl CompareRelatedBundles(
 
 static HRESULT InitializeForScopeAndBitness(
     __in BOOL fPerMachine,
-    __in BOOL fWow6432,
+    __in REG_KEY_BITNESS regBitness,
     __in BURN_REGISTRATION * pRegistration,
     __in BURN_RELATED_BUNDLES * pRelatedBundles
 )
@@ -180,7 +178,7 @@ static HRESULT InitializeForScopeAndBitness(
     HKEY hkUninstallKey = NULL;
     LPWSTR sczRelatedBundleId = NULL;
 
-    hr = RegOpen(hkRoot, BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ | (fWow6432 ? KEY_WOW64_32KEY : 0), &hkUninstallKey);
+    hr = RegOpenEx(hkRoot, BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, regBitness, &hkUninstallKey);
     if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
     {
         ExitFunction1(hr = S_OK);
@@ -202,7 +200,7 @@ static HRESULT InitializeForScopeAndBitness(
         {
             // Ignore failures here since we'll often find products that aren't actually
             // related bundles (or even bundles at all).
-            HRESULT hrRelatedBundle = LoadIfRelatedBundle(fPerMachine, fWow6432, hkUninstallKey, sczRelatedBundleId, pRegistration, pRelatedBundles);
+            HRESULT hrRelatedBundle = LoadIfRelatedBundle(fPerMachine, regBitness, hkUninstallKey, sczRelatedBundleId, pRegistration, pRelatedBundles);
             UNREFERENCED_PARAMETER(hrRelatedBundle);
         }
     }
@@ -216,7 +214,7 @@ LExit:
 
 static HRESULT LoadIfRelatedBundle(
     __in BOOL fPerMachine,
-    __in BOOL fWow6432,
+    __in REG_KEY_BITNESS regBitness,
     __in HKEY hkUninstallKey,
     __in_z LPCWSTR sczRelatedBundleId,
     __in BURN_REGISTRATION* pRegistration,
@@ -227,7 +225,7 @@ static HRESULT LoadIfRelatedBundle(
     HKEY hkBundleId = NULL;
     BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_NONE;
 
-    hr = RegOpen(hkUninstallKey, sczRelatedBundleId, KEY_READ | (fWow6432 ? KEY_WOW64_32KEY : 0), &hkBundleId);
+    hr = RegOpenEx(hkUninstallKey, sczRelatedBundleId, KEY_READ, regBitness, &hkBundleId);
     ExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", sczRelatedBundleId);
 
     hr = DetermineRelationType(hkBundleId, pRegistration, &relationType);
