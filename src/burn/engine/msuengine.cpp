@@ -39,6 +39,17 @@ extern "C" HRESULT MsuEngineParsePackageFromXml(
     hr = XmlGetAttributeEx(pixnMsuPackage, L"DetectCondition", &pPackage->Msu.sczDetectCondition);
     ExitOnFailure(hr, "Failed to get @DetectCondition.");
 
+    // We can only uninstall MSU packages if they have a KB and we are on Win7 or newer.
+    if (pPackage->Msu.sczKB && *pPackage->Msu.sczKB && ::IsWindows7OrGreater())
+    {
+        pPackage->Msu.fUninstallable = TRUE;
+    }
+    else
+    {
+        pPackage->fPermanent = TRUE;
+        pPackage->Msu.fUninstallable = FALSE;
+    }
+
 LExit:
     return hr;
 }
@@ -92,10 +103,6 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
     HRESULT hr = S_OK;
     BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-    BOOL fAllowUninstall = FALSE;
-
-    // We can only uninstall MSU packages if they have a KB and we are on Win7 or newer.
-    fAllowUninstall = pPackage->Msu.sczKB && *pPackage->Msu.sczKB && ::IsWindows7OrGreater();
 
     // execute action
     switch (pPackage->currentState)
@@ -110,11 +117,11 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
 
         case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-            execute = fAllowUninstall && !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+            execute = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
 
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
-            execute = fAllowUninstall ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+            execute = pPackage->Msu.fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
 
         default:
@@ -166,7 +173,7 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
             {
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-                rollback = fAllowUninstall ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+                rollback = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
 
             default:
