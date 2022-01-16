@@ -115,6 +115,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     pPassthroughPackage->fPermanent = TRUE;
 
     pPassthroughPackage->Exe.fPseudoBundle = TRUE;
+    pPassthroughPackage->Exe.fUninstallable = FALSE;
     pPassthroughPackage->Exe.protocol = pPackage->Bundle.fSupportsBurnProtocol ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;
 
     hr = StrAllocString(&pPassthroughPackage->sczId, pPackage->sczId, 0);

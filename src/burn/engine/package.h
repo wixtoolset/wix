@@ -323,6 +323,7 @@ typedef struct _BURN_PACKAGE
             BOOL fPseudoBundle;
             BOOL fFireAndForget;
             BOOL fRepairable;
+            BOOL fUninstallable;
             BURN_EXE_PROTOCOL_TYPE protocol;
 
             BURN_EXE_EXIT_CODE* rgExitCodes;
