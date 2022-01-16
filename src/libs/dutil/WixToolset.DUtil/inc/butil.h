@@ -60,7 +60,9 @@ HRESULT DAPI BundleGetBundleInfoFixed(
     );
 
 /********************************************************************
-BundleEnumRelatedBundle - Queries the bundle installation metadata for installs with the given upgrade code
+BundleEnumRelatedBundle - Queries the bundle installation metadata for installs with the given upgrade code.
+Enumerate 32-bit and 64-bit in two passes.
+
 RETURNS:
     E_INVALIDARG
         An invalid parameter was passed to the function.
@@ -74,12 +76,14 @@ RETURNS:
 HRESULT DAPI BundleEnumRelatedBundle(
     __in_z LPCWSTR wzUpgradeCode,
     __in BUNDLE_INSTALL_CONTEXT context,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
     __deref_out_z LPWSTR* psczBundleId
     );
 
 /********************************************************************
 BundleEnumRelatedBundleFixed - Queries the bundle installation metadata for installs with the given upgrade code
+Enumerate 32-bit and 64-bit in two passes.
 
 NOTE: lpBundleIdBuff is a buffer to receive the bundle GUID. This buffer must be 39 characters long.
         The first 38 characters are for the GUID, and the last character is for the terminating null character.
@@ -96,6 +100,7 @@ RETURNS:
 HRESULT DAPI BundleEnumRelatedBundleFixed(
     __in_z LPCWSTR wzUpgradeCode,
     __in BUNDLE_INSTALL_CONTEXT context,
+    __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
     __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleId
     );

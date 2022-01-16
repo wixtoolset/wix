@@ -49,5 +49,22 @@ namespace WixToolsetTest.BurnE2E
 
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
         }
+
+        [Fact]
+        public void Bundle32UpgradesBundle64()
+        {
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var packageAv2 = this.CreatePackageInstaller("PackageAv2");
+            var bundleAv1x64 = this.CreateBundleInstaller("BundleAv1x64");
+            var bundleAv2 = this.CreateBundleInstaller("BundleAv2");
+
+            bundleAv1x64.Install();
+            bundleAv1x64.VerifyRegisteredAndInPackageCache();
+
+            bundleAv2.Install();
+            bundleAv2.VerifyRegisteredAndInPackageCache();
+             
+            bundleAv1x64.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
     }
 }

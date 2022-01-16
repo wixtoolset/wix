@@ -408,6 +408,15 @@ BOOL DAPI RegValueExists(
     __in REG_KEY_BITNESS kbKeyBitness
     );
 
+/********************************************************************
+RegTranslateKeyBitness - Converts from REG_KEY_BITNESS values to
+REGSAM-compatible values.
+
+*********************************************************************/
+REGSAM DAPI RegTranslateKeyBitness(
+    __in REG_KEY_BITNESS kbKeyBitness
+    );
+
 #ifdef __cplusplus
 }
 #endif

@@ -645,7 +645,7 @@ namespace Bootstrapper
                 NativeAssert::Succeeded(hr, "Failed to allocate buffer for related bundle id.");
 
                 // Verify we can find ourself via the UpgradeCode
-                hr = BundleEnumRelatedBundleFixed(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, &dwRelatedBundleIndex, sczRelatedBundleId);
+                hr = BundleEnumRelatedBundleFixed(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, REG_KEY_DEFAULT, &dwRelatedBundleIndex, sczRelatedBundleId);
                 TestThrowOnFailure(hr, L"Failed to enumerate related bundle.");
 
                 NativeAssert::StringEqual(TEST_BUNDLE_ID, sczRelatedBundleId);

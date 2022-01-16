@@ -836,19 +836,13 @@ static HRESULT RegistrySearchExists(
     HKEY hKey = NULL;
     DWORD dwType = 0;
     BOOL fExists = FALSE;
-    REGSAM samDesired = KEY_QUERY_VALUE;
-
-    if (pSearch->RegistrySearch.fWin64)
-    {
-        samDesired = samDesired | KEY_WOW64_64KEY;
-    }
 
     // format key string
     hr = VariableFormatString(pVariables, pSearch->RegistrySearch.sczKey, &sczKey, NULL);
     ExitOnFailure(hr, "Failed to format key string.");
 
     // open key
-    hr = RegOpen(pSearch->RegistrySearch.hRoot, sczKey, samDesired, &hKey);
+    hr = RegOpenEx(pSearch->RegistrySearch.hRoot, sczKey, KEY_QUERY_VALUE, pSearch->RegistrySearch.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
     if (SUCCEEDED(hr))
     {
         fExists = TRUE;
@@ -922,12 +916,6 @@ static HRESULT RegistrySearchValue(
     LPBYTE pData = NULL;
     DWORD cch = 0;
     BURN_VARIANT value = { };
-    REGSAM samDesired = KEY_QUERY_VALUE;
-
-    if (pSearch->RegistrySearch.fWin64)
-    {
-        samDesired = samDesired | KEY_WOW64_64KEY;
-    }
 
     // format key string
     hr = VariableFormatString(pVariables, pSearch->RegistrySearch.sczKey, &sczKey, NULL);
@@ -941,7 +929,7 @@ static HRESULT RegistrySearchValue(
     }
 
     // open key
-    hr = RegOpen(pSearch->RegistrySearch.hRoot, sczKey, samDesired, &hKey);
+    hr = RegOpenEx(pSearch->RegistrySearch.hRoot, sczKey, KEY_QUERY_VALUE, pSearch->RegistrySearch.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
     if (E_FILENOTFOUND == hr)
     {
         // What if there is a hidden variable in sczKey?
