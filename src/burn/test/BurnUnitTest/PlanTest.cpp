@@ -1207,7 +1207,7 @@ namespace Bootstrapper
             for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
             {
                 BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
-                if (pPackage->fUninstallable)
+                if (!pPackage->fPermanent)
                 {
                     DetectPackageAsAbsent(pPackage);
                 }

@@ -110,7 +110,7 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
 
         case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-            execute = fAllowUninstall && pPackage->fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+            execute = fAllowUninstall && !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
 
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:

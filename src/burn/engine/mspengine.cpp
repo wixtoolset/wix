@@ -397,7 +397,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
 
             case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-                execute = pPackage->fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+                execute = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
 
             case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
@@ -458,7 +458,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
                 {
                 case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
                 case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-                    rollback = pPackage->fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+                    rollback = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
                     break;
 
                 default:
