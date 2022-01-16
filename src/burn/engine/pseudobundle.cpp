@@ -51,7 +51,6 @@ extern "C" HRESULT PseudoBundleInitializeRelated(
     pPackage->fVital = FALSE;
 
     pPackage->fPermanent = FALSE;
-    pPackage->Bundle.fPseudoBundle = TRUE;
     pPackage->Bundle.fRepairable = TRUE;
     pPackage->Bundle.fSupportsBurnProtocol = fSupportsBurnProtocol;
 
@@ -114,7 +113,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     pPassthroughPackage->fVital = pPackage->fVital;
     pPassthroughPackage->fPermanent = TRUE;
 
-    pPassthroughPackage->Exe.fPseudoBundle = TRUE;
+    pPassthroughPackage->Exe.fPseudoPackage = TRUE;
     pPassthroughPackage->Exe.fUninstallable = FALSE;
     pPassthroughPackage->Exe.protocol = pPackage->Bundle.fSupportsBurnProtocol ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;
 
@@ -195,7 +194,7 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
 
     // Trust the BA to only use UPDATE_REPLACE_EMBEDDED when appropriate.
     pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_BURN;
-    pPackage->Exe.fPseudoBundle = TRUE;
+    pPackage->Exe.fPseudoPackage = TRUE;
 
     hr = StrAllocString(&pPackage->sczId, wzId, 0);
     ExitOnFailure(hr, "Failed to copy id for update bundle.");

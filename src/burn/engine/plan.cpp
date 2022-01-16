@@ -9,6 +9,10 @@
 
 // internal function definitions
 
+static void PlannedExecutePackage(
+    __in BURN_PLAN* pPlan,
+    __in BURN_PACKAGE* pPackage
+    );
 static void UninitializeRegistrationAction(
     __in BURN_DEPENDENT_REGISTRATION_ACTION* pAction
     );
@@ -855,13 +859,13 @@ static HRESULT InitializePackage(
     BOOL fBeginCalled = FALSE;
     BOOTSTRAPPER_RELATION_TYPE relationType = pPlan->pCommand->relationType;
 
-    if (BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fPseudoBundle)
+    if (BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fPseudoPackage)
     {
-        // Exe pseudo bundles are not configurable.
+        // Exe pseudo packages are not configurable.
         // The BA already requested this package to be executed
         // * by the overall plan action for UpdateReplace
         // * by enabling the forward compatible bundle for Passthrough
-        pPackage->defaultRequested = pPackage->requested = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
+        pPackage->defaultRequested = pPackage->requested = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
         ExitFunction();
     }
 
@@ -1164,18 +1168,15 @@ extern "C" HRESULT PlanExecutePackage(
     ExitOnFailure(hr, "Failed to complete plan dependency actions for package: %ls", pPackage->sczId);
 
     // If we are going to take any action on this package, add progress for it.
-    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute || BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback || pPackage->compatiblePackage.fRemove)
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute || BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback)
     {
-        LoggingIncrementPackageSequence();
+        PlannedExecutePackage(pPlan, pPackage);
+    }
 
-        ++pPlan->cExecutePackagesTotal;
-        ++pPlan->cOverallProgressTicksTotal;
-
-        // If package is per-machine and is being executed, flag the plan to be per-machine as well.
-        if (pPackage->fPerMachine)
-        {
-            pPlan->fPerMachine = TRUE;
-        }
+    // If we are going to take any action on the compatible package, add progress for it.
+    if (pPackage->compatiblePackage.fRemove)
+    {
+        PlannedExecutePackage(pPlan, pPackage);
     }
 
 LExit:
@@ -1219,7 +1220,7 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
         }
         else if (BOOTSTRAPPER_ACTION_INSTALL == action || BOOTSTRAPPER_ACTION_MODIFY == action)
         {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
         }
         else if (BOOTSTRAPPER_ACTION_REPAIR == action)
         {
@@ -1478,16 +1479,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             // If we are going to take any action on this package, add progress for it.
             if (BOOTSTRAPPER_ACTION_STATE_NONE != pRelatedBundle->package.execute || BOOTSTRAPPER_ACTION_STATE_NONE != pRelatedBundle->package.rollback)
             {
-                LoggingIncrementPackageSequence();
-
-                ++pPlan->cExecutePackagesTotal;
-                ++pPlan->cOverallProgressTicksTotal;
-            }
-
-            // If package is per-machine and is being executed, flag the plan to be per-machine as well.
-            if (pRelatedBundle->package.fPerMachine)
-            {
-                pPlan->fPerMachine = TRUE;
+                PlannedExecutePackage(pPlan, &pRelatedBundle->package);
             }
         }
         else if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
@@ -1846,6 +1838,24 @@ LExit:
 
 
 // internal function definitions
+
+
+static void PlannedExecutePackage(
+    __in BURN_PLAN* pPlan,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    LoggingIncrementPackageSequence();
+
+    ++pPlan->cExecutePackagesTotal;
+    ++pPlan->cOverallProgressTicksTotal;
+
+    // If package is per-machine and is being executed, flag the plan to be per-machine as well.
+    if (pPackage->fPerMachine)
+    {
+        pPlan->fPerMachine = TRUE;
+    }
+}
 
 static void UninitializeRegistrationAction(
     __in BURN_DEPENDENT_REGISTRATION_ACTION* pAction

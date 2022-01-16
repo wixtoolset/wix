@@ -404,6 +404,11 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
                 execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
                 break;
 
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT:
+                execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+                fWillUninstallAll = FALSE;
+                break;
+
             default:
                 execute = BOOTSTRAPPER_ACTION_STATE_NONE;
                 fWillUninstallAll = FALSE;
@@ -415,9 +420,14 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             switch (pTargetProduct->requested)
             {
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
                 fWillUninstallAll = FALSE;
+                break;
+
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
+                execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
                 break;
 
             default:
@@ -427,9 +437,25 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             break;
 
         default:
-            if (pTargetProduct->fInstalled)
+            switch (pTargetProduct->requested)
             {
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
+                execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+                break;
+
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT:
+                execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
                 fWillUninstallAll = FALSE;
+                break;
+
+            default:
+                execute = BOOTSTRAPPER_ACTION_STATE_NONE;
+
+                if (pTargetProduct->fInstalled)
+                {
+                    fWillUninstallAll = FALSE;
+                }
+                break;
             }
             break;
         }
@@ -457,6 +483,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
                 switch (pTargetProduct->requested)
                 {
                 case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+                case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
                 case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                     rollback = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
                     break;

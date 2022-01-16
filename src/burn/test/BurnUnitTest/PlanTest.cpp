@@ -13,6 +13,11 @@ static LPCWSTR wzMsiTransactionManifestFileName = L"MsiTransaction_BundleAv1_man
 static LPCWSTR wzSingleMsiManifestFileName = L"BasicFunctionality_BundleA_manifest.xml";
 static LPCWSTR wzSlipstreamManifestFileName = L"Slipstream_BundleA_manifest.xml";
 
+static BOOL vfUsePackageRequestState = FALSE;
+static BOOTSTRAPPER_REQUEST_STATE vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+static BOOL vfUseRelatedBundleRequestState = FALSE;
+static BOOTSTRAPPER_REQUEST_STATE vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+
 namespace Microsoft
 {
 namespace Tools
@@ -511,6 +516,158 @@ namespace Bootstrapper
 
             Assert::Equal(1ul, pEngineState->packages.cPackages);
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
+        }
+
+        [Fact]
+        void SingleMsiForceAbsentTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPackagesAsAbsent(pEngineState);
+            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+
+            vfUsePackageRequestState = TRUE;
+            vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT;
+            vfUseRelatedBundleRequestState = TRUE;
+            vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT;
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(0ull, pPlan->qwEstimatedSize);
+            Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 1;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", BURN_DEPENDENCY_ACTION_UNREGISTER);
+            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", BURN_DEPENDENCY_ACTION_UNREGISTER);
+            ValidateExecuteMsiPackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, BURN_MSI_PROPERTY_UNINSTALL, INSTALLUILEVEL_NONE, FALSE, BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER, 0);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 1;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(2ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", NULL);
+            ValidatePlannedProvider(pPlan, uIndex++, L"{64633047-D172-4BBB-B202-64337D15C952}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
+        }
+
+        [Fact]
+        void SingleMsiForcePresentTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
+            DetectPackagesAsPresentAndCached(pEngineState);
+            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+
+            vfUsePackageRequestState = TRUE;
+            vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
+            vfUseRelatedBundleRequestState = TRUE;
+            vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_MODIFY);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_MODIFY, pPlan->action);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(35694ull, pPlan->qwEstimatedSize);
+            Assert::Equal(175674ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", BURN_DEPENDENCY_ACTION_REGISTER);
+            ValidateExecuteMsiPackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_INSTALL, BURN_MSI_PROPERTY_INSTALL, INSTALLUILEVEL_NONE, FALSE, BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER, 0);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", BURN_DEPENDENCY_ACTION_REGISTER);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(3ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
         [Fact]
@@ -1015,6 +1172,9 @@ namespace Bootstrapper
             HRESULT hr = S_OK;
             LPWSTR sczFilePath = NULL;
 
+            vfUsePackageRequestState = FALSE;
+            vfUseRelatedBundleRequestState = FALSE;
+
             ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
 
             hr = CacheInitialize(&pEngineState->cache, &pEngineState->internalCommand);
@@ -1046,6 +1206,7 @@ namespace Bootstrapper
             hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables, &pEngineState->internalCommand);
             NativeAssert::Succeeded(hr, "Failed to initialize cache sources.");
 
+            pEngineState->userExperience.hUXModule = reinterpret_cast<HMODULE>(1);
             pEngineState->userExperience.pfnBAProc = PlanTestBAProc;
         }
 
@@ -1676,11 +1837,29 @@ namespace Bootstrapper
 }
 
 static HRESULT WINAPI PlanTestBAProc(
-    __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
+    __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
     __in const LPVOID /*pvArgs*/,
-    __inout LPVOID /*pvResults*/,
+    __inout LPVOID pvResults,
     __in_opt LPVOID /*pvContext*/
     )
 {
+    switch (message)
+    {
+    case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGEBEGIN:
+        if (vfUsePackageRequestState)
+        {
+            BA_ONPLANPACKAGEBEGIN_RESULTS* pResults = reinterpret_cast<BA_ONPLANPACKAGEBEGIN_RESULTS*>(pvResults);
+            pResults->requestedState = vPackageRequestState;
+        }
+        break;
+    case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLE:
+        if (vfUseRelatedBundleRequestState)
+        {
+            BA_ONPLANRELATEDBUNDLE_RESULTS* pResults = reinterpret_cast<BA_ONPLANRELATEDBUNDLE_RESULTS*>(pvResults);
+            pResults->requestedState = vRelatedBundleRequestState;
+        }
+        break;
+    }
+
     return S_OK;
 }

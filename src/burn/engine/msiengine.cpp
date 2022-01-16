@@ -920,6 +920,10 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         {
             execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
         }
+        else if (BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT == pPackage->requested)
+        {
+            execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+        }
         else
         {
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -931,8 +935,13 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+            break;
+
+        case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
+            execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
             break;
 
         default:
@@ -958,6 +967,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT:
                 rollback = fRollbackFeatureActionDelta ? BOOTSTRAPPER_ACTION_STATE_MODIFY : BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
@@ -972,11 +982,12 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             break;
 
         case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
-        case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
+        case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
             // If the package is not permanent and we requested to put the package on the machine then
             // remove the package during rollback.
             if (!pPackage->fPermanent &&
                 (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested ||
+                 BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT == pPackage->requested ||
                  BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested))
             {
                 rollback = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
@@ -1040,6 +1051,18 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
     hr = DependencyPlanPackage(NULL, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to plan package dependency actions.");
 
+    if (pPackage->compatiblePackage.fRemove)
+    {
+        hr = PlanAppendExecuteAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append execute action.");
+
+        pAction->type = BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE;
+        pAction->uninstallMsiCompatiblePackage.pParentPackage = pPackage;
+        pAction->uninstallMsiCompatiblePackage.dwLoggingAttributes = pLog->dwAttributes;
+
+        LoggingSetCompatiblePackageVariable(pPackage, pLog, pVariables, &pAction->uninstallMsiCompatiblePackage.sczLogPath); // ignore errors.
+    }
+
     // add rollback action
     if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback)
     {
@@ -1084,17 +1107,6 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
         pAction->msiPackage.dwLoggingAttributes = pLog->dwAttributes;
-    }
-    else if (pPackage->compatiblePackage.fRemove)
-    {
-        hr = PlanAppendExecuteAction(pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to append execute action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE;
-        pAction->uninstallMsiCompatiblePackage.pParentPackage = pPackage;
-        pAction->uninstallMsiCompatiblePackage.dwLoggingAttributes = pLog->dwAttributes;
-
-        LoggingSetCompatiblePackageVariable(pPackage, pLog, pVariables, &pAction->uninstallMsiCompatiblePackage.sczLogPath); // ignore errors.
     }
 
 LExit:
