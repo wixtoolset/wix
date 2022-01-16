@@ -50,7 +50,7 @@ extern "C" HRESULT PseudoBundleInitializeRelated(
     pPackage->qwSize = qwSize;
     pPackage->fVital = FALSE;
 
-    pPackage->fUninstallable = TRUE;
+    pPackage->fPermanent = FALSE;
     pPackage->Bundle.fPseudoBundle = TRUE;
     pPackage->Bundle.fRepairable = TRUE;
     pPackage->Bundle.fSupportsBurnProtocol = fSupportsBurnProtocol;
@@ -112,6 +112,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     pPassthroughPackage->qwInstallSize = pPackage->qwInstallSize;
     pPassthroughPackage->qwSize = pPackage->qwSize;
     pPassthroughPackage->fVital = pPackage->fVital;
+    pPassthroughPackage->fPermanent = TRUE;
 
     pPassthroughPackage->Exe.fPseudoBundle = TRUE;
     pPassthroughPackage->Exe.protocol = pPackage->Bundle.fSupportsBurnProtocol ? BURN_EXE_PROTOCOL_TYPE_BURN : BURN_EXE_PROTOCOL_TYPE_NONE;

@@ -912,7 +912,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             }
         }
         else if ((BOOTSTRAPPER_REQUEST_STATE_ABSENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested) &&
-                 pPackage->fUninstallable) // removing a package that can be removed.
+                 !pPackage->fPermanent) // removing a package that should be removed.
         {
             execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
         }
@@ -973,9 +973,9 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
 
         case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
-            // If the package is uninstallable and we requested to put the package on the machine then
+            // If the package is not permanent and we requested to put the package on the machine then
             // remove the package during rollback.
-            if (pPackage->fUninstallable &&
+            if (!pPackage->fPermanent &&
                 (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested ||
                  BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested))
             {

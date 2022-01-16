@@ -244,7 +244,7 @@ typedef struct _BURN_PACKAGE
 
     LPWSTR sczInstallCondition;
     BOOL fPerMachine;
-    BOOL fUninstallable;
+    BOOL fPermanent;
     BOOL fVital;
     BOOL fCanAffectRegistration;
 
