@@ -165,7 +165,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT:
-            execute = pPackage->Exe.fPseudoBundle ? BOOTSTRAPPER_ACTION_STATE_INSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = pPackage->Exe.fRepairable ? BOOTSTRAPPER_ACTION_STATE_REPAIR : BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -177,6 +177,9 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
             execute = pPackage->Exe.fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
+        case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT:
+            execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+            break;
         default:
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
@@ -187,8 +190,12 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+            break;
+        case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
+            execute = pPackage->Exe.fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
         default:
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -210,6 +217,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
             switch (pPackage->requested)
             {
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
@@ -227,6 +235,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
             switch (pPackage->requested)
             {
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 rollback = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;

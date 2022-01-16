@@ -303,7 +303,6 @@ typedef struct _BURN_PACKAGE
             LPCWSTR wzAncestors; // points directly into engine state.
             LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 
-            BOOL fPseudoBundle;
             BOOL fRepairable;
             BOOL fSupportsBurnProtocol;
 
@@ -320,7 +319,7 @@ typedef struct _BURN_PACKAGE
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
 
-            BOOL fPseudoBundle;
+            BOOL fPseudoPackage;
             BOOL fFireAndForget;
             BOOL fRepairable;
             BOOL fUninstallable;

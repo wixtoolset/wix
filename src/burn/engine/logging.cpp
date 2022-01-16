@@ -779,6 +779,8 @@ extern "C" LPCSTR LoggingRequestStateToString(
         return "Cache";
     case BOOTSTRAPPER_REQUEST_STATE_PRESENT:
         return "Present";
+    case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT:
+        return "ForcePresent";
     case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
         return "Repair";
     default:

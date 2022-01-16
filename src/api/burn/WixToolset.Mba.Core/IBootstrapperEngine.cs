@@ -490,6 +490,11 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
+        ForcePresent,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Repair,
     }
 
