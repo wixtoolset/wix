@@ -274,7 +274,7 @@ namespace WixToolset.Converters
 
         private CustomTableTarget CustomTableSetting { get; }
 
-        private int Errors { get; set; }
+        private int Messages { get; set; }
 
         private HashSet<ConverterTestType> ErrorsAsWarnings { get; set; }
 
@@ -296,8 +296,8 @@ namespace WixToolset.Converters
         /// Convert a file.
         /// </summary>
         /// <param name="sourceFile">The file to convert.</param>
-        /// <param name="saveConvertedFile">Option to save the converted errors that are found.</param>
-        /// <returns>The number of errors found.</returns>
+        /// <param name="saveConvertedFile">Option to save the converted Messages that are found.</param>
+        /// <returns>The number of Messages found.</returns>
         public int ConvertFile(string sourceFile, bool saveConvertedFile)
         {
             var document = this.OpenSourceFile(sourceFile);
@@ -309,30 +309,30 @@ namespace WixToolset.Converters
 
             this.ConvertDocument(document);
 
-            // Fix errors if requested and necessary.
-            if (saveConvertedFile && 0 < this.Errors)
+            // Fix Messages if requested and necessary.
+            if (saveConvertedFile && 0 < this.Messages)
             {
                 this.SaveDocument(document);
             }
 
-            return this.Errors;
+            return this.Messages;
         }
 
         /// <summary>
         /// Convert a document.
         /// </summary>
         /// <param name="document">The document to convert.</param>
-        /// <returns>The number of errors found.</returns>
+        /// <returns>The number of Messages found.</returns>
         public int ConvertDocument(XDocument document)
         {
             // Reset the instance info.
-            this.Errors = 0;
+            this.Messages = 0;
             this.SourceVersion = 0;
             this.Operation = ConvertOperation.Convert;
 
             // Remove the declaration.
             if (null != document.Declaration
-                && this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
+                && this.OnInformation(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
             {
                 document.Declaration = null;
                 TrimLeadingText(document);
@@ -344,15 +344,15 @@ namespace WixToolset.Converters
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
 
-            return this.Errors;
+            return this.Messages;
         }
 
         /// <summary>
         /// Format a file.
         /// </summary>
         /// <param name="sourceFile">The file to format.</param>
-        /// <param name="saveConvertedFile">Option to save the format errors that are found.</param>
-        /// <returns>The number of errors found.</returns>
+        /// <param name="saveConvertedFile">Option to save the format Messages that are found.</param>
+        /// <returns>The number of Messages found.</returns>
         public int FormatFile(string sourceFile, bool saveConvertedFile)
         {
             var document = this.OpenSourceFile(sourceFile);
@@ -364,30 +364,30 @@ namespace WixToolset.Converters
 
             this.FormatDocument(document);
 
-            // Fix errors if requested and necessary.
-            if (saveConvertedFile && 0 < this.Errors)
+            // Fix Messages if requested and necessary.
+            if (saveConvertedFile && 0 < this.Messages)
             {
                 this.SaveDocument(document);
             }
 
-            return this.Errors;
+            return this.Messages;
         }
 
         /// <summary>
         /// Format a document.
         /// </summary>
         /// <param name="document">The document to format.</param>
-        /// <returns>The number of errors found.</returns>
+        /// <returns>The number of Messages found.</returns>
         public int FormatDocument(XDocument document)
         {
             // Reset the instance info.
-            this.Errors = 0;
+            this.Messages = 0;
             this.SourceVersion = 0;
             this.Operation = ConvertOperation.Format;
 
             // Remove the declaration.
             if (null != document.Declaration
-                && this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
+                && this.OnInformation(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
             {
                 document.Declaration = null;
                 TrimLeadingText(document);
@@ -397,7 +397,7 @@ namespace WixToolset.Converters
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
 
-            return this.Errors;
+            return this.Messages;
         }
 
         private XDocument OpenSourceFile(string sourceFile)
@@ -516,7 +516,7 @@ namespace WixToolset.Converters
             {
                 var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
 
-                if (this.OnError(testType, node, message))
+                if (this.OnInformation(testType, node, message))
                 {
                     WixConverter.FixupWhitespace(this.IndentationAmount, level, whitespace);
                 }
@@ -529,7 +529,7 @@ namespace WixToolset.Converters
             {
                 var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
 
-                if (this.OnError(testType, node, message))
+                if (this.OnInformation(testType, node, message))
                 {
                     whitespace.Remove();
                 }
@@ -558,7 +558,7 @@ namespace WixToolset.Converters
 
                     if (WixConverter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
                     {
-                        if (this.OnError(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
+                        if (this.OnInformation(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
                         {
                             deprecatedToUpdatedNamespaces.Add(declaration.Value, ns);
                         }
@@ -592,7 +592,7 @@ namespace WixToolset.Converters
         {
             var xUseUILanguages = element.Attribute(BalUseUILanguagesName);
             if (xUseUILanguages != null &&
-                this.OnError(ConverterTestType.BalUseUILanguagesDeprecated, element, "bal:UseUILanguages is deprecated, 'true' is now the standard behavior."))
+                this.OnInformation(ConverterTestType.BalUseUILanguagesDeprecated, element, "bal:UseUILanguages is deprecated, 'true' is now the standard behavior."))
             {
                 xUseUILanguages.Remove();
             }
@@ -664,7 +664,7 @@ namespace WixToolset.Converters
 
             bool CreateBADllElement(XObject node, out XElement xCreatedBADll)
             {
-                var create = this.OnError(ConverterTestType.BootstrapperApplicationDll, node, "The bootstrapper application dll is now specified in the BootstrapperApplicationDll element.");
+                var create = this.OnInformation(ConverterTestType.BootstrapperApplicationDll, node, "The bootstrapper application dll is now specified in the BootstrapperApplicationDll element.");
                 xCreatedBADll = create ? new XElement(BootstrapperApplicationDllElementName) : null;
                 return create;
             }
@@ -674,7 +674,7 @@ namespace WixToolset.Converters
         {
             var xUseUILanguages = element.Attribute(BalUseUILanguagesName);
             if (xUseUILanguages != null &&
-                this.OnError(ConverterTestType.BalUseUILanguagesDeprecated, element, "bal:UseUILanguages is deprecated, 'true' is now the standard behavior."))
+                this.OnInformation(ConverterTestType.BalUseUILanguagesDeprecated, element, "bal:UseUILanguages is deprecated, 'true' is now the standard behavior."))
             {
                 xUseUILanguages.Remove();
             }
@@ -776,7 +776,7 @@ namespace WixToolset.Converters
 
         private void ConvertCatalogElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The element will be removed."))
+            if (this.OnInformation(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The element will be removed."))
             {
                 element.Remove();
             }
@@ -812,7 +812,7 @@ namespace WixToolset.Converters
             var bootstrapperApplicationData = element.Attribute("BootstrapperApplicationData");
             if (bootstrapperApplicationData?.Value == "no")
             {
-                if (this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
+                if (this.OnInformation(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
                 {
                     bootstrapperApplicationData.Remove();
                 }
@@ -853,14 +853,14 @@ namespace WixToolset.Converters
                     switch (this.CustomTableSetting)
                     {
                         case CustomTableTarget.Bundle:
-                            if (this.OnError(ConverterTestType.CustomTableRef, element, "CustomTable elements that don't contain the table definition are now BundleCustomDataRef for Bundles."))
+                            if (this.OnInformation(ConverterTestType.CustomTableRef, element, "CustomTable elements that don't contain the table definition are now BundleCustomDataRef for Bundles."))
                             {
                                 element.Name = WixConverter.BundleCustomDataRefElementName;
                                 this.ConvertCustomTableElementToBundle(element);
                             }
                             break;
                         case CustomTableTarget.Msi:
-                            if (this.OnError(ConverterTestType.CustomTableRef, element, "CustomTable elements that don't contain the table definition are now CustomTableRef for MSI."))
+                            if (this.OnInformation(ConverterTestType.CustomTableRef, element, "CustomTable elements that don't contain the table definition are now CustomTableRef for MSI."))
                             {
                                 element.Name = WixConverter.CustomTableRefElementName;
                             }
@@ -920,7 +920,7 @@ namespace WixToolset.Converters
                 var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
                 if (!String.IsNullOrEmpty(action) &&
                     TryGetInnerText(xCondition, out var text) &&
-                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
+                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
                 {
                     element.Add(new XAttribute(action + "Condition", text));
                     remove.Add(xCondition);
@@ -938,7 +938,7 @@ namespace WixToolset.Converters
             var guid = element.Attribute("Guid");
             if (guid != null && guid.Value == "*")
             {
-                if (this.OnError(ConverterTestType.AutoGuidUnnecessary, element, "Using '*' for the Component Guid attribute is unnecessary. Remove the attribute to remove the redundancy."))
+                if (this.OnInformation(ConverterTestType.AutoGuidUnnecessary, element, "Using '*' for the Component Guid attribute is unnecessary. Remove the attribute to remove the redundancy."))
                 {
                     guid.Remove();
                 }
@@ -948,7 +948,7 @@ namespace WixToolset.Converters
             if (xCondition != null)
             {
                 if (TryGetInnerText(xCondition, out var text) &&
-                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
+                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
                 {
                     element.Add(new XAttribute("Condition", text));
                     xCondition.Remove();
@@ -966,7 +966,7 @@ namespace WixToolset.Converters
                 if (null != attribute)
                 {
                     var shortName = attribute.Value;
-                    if (this.OnError(ConverterTestType.AssignDirectoryNameFromShortName, element, "The directory ShortName attribute is being renamed to Name since Name wasn't specified for value '{0}'", shortName))
+                    if (this.OnInformation(ConverterTestType.AssignDirectoryNameFromShortName, element, "The directory ShortName attribute is being renamed to Name since Name wasn't specified for value '{0}'", shortName))
                     {
                         element.Add(new XAttribute("Name", shortName));
                         attribute.Remove();
@@ -977,7 +977,7 @@ namespace WixToolset.Converters
             var id = element.Attribute("Id")?.Value;
 
             if (id == "TARGETDIR" &&
-                this.OnError(ConverterTestType.TargetDirDeprecated, element, "The TARGETDIR directory should not longer be explicitly defined. Remove the Directory element with Id attribute 'TARGETDIR'."))
+                this.OnInformation(ConverterTestType.TargetDirDeprecated, element, "The TARGETDIR directory should not longer be explicitly defined. Remove the Directory element with Id attribute 'TARGETDIR'."))
             {
                 var parentElement = element.Parent;
 
@@ -1002,7 +1002,7 @@ namespace WixToolset.Converters
             }
             else if (id != null &&
                      WindowsInstallerStandard.IsStandardDirectory(id) &&
-                     this.OnError(ConverterTestType.DefiningStandardDirectoryDeprecated, element, "Standard directories such as '{0}' should no longer be defined using the Directory element. Use the StandardDirectory element instead.", id))
+                     this.OnInformation(ConverterTestType.DefiningStandardDirectoryDeprecated, element, "Standard directories such as '{0}' should no longer be defined using the Directory element. Use the StandardDirectory element instead.", id))
             {
                 element.Name = StandardDirectoryElementName;
 
@@ -1017,7 +1017,7 @@ namespace WixToolset.Converters
         {
             var xAbsent = element.Attribute("Absent");
             if (xAbsent != null &&
-                this.OnError(ConverterTestType.FeatureAbsentAttributeReplaced, element, "The Feature element's Absent attribute has been replaced with the AllowAbsent attribute. Use the 'AllowAbsent' attribute instead."))
+                this.OnInformation(ConverterTestType.FeatureAbsentAttributeReplaced, element, "The Feature element's Absent attribute has been replaced with the AllowAbsent attribute. Use the 'AllowAbsent' attribute instead."))
             {
                 if (xAbsent.Value == "disallow")
                 {
@@ -1030,12 +1030,12 @@ namespace WixToolset.Converters
             if (xAllowAdvertise != null)
             {
                 if ((xAllowAdvertise.Value == "system" || xAllowAdvertise.Value == "allow") &&
-                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value is deprecated. Set the value to 'yes' instead.", xAllowAdvertise.Value))
+                    this.OnInformation(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value is deprecated. Set the value to 'yes' instead.", xAllowAdvertise.Value))
                 {
                     xAllowAdvertise.Value = "yes";
                 }
                 else if (xAllowAdvertise.Value == "disallow" &&
-                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value is deprecated. Remove the value instead.", xAllowAdvertise.Value))
+                    this.OnInformation(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value is deprecated. Remove the value instead.", xAllowAdvertise.Value))
                 {
                     xAllowAdvertise.Remove();
                 }
@@ -1047,7 +1047,7 @@ namespace WixToolset.Converters
                 var level = xCondition.Attribute("Level")?.Value;
                 if (!String.IsNullOrEmpty(level) &&
                     TryGetInnerText(xCondition, out var text) &&
-                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Level' element instead.", xCondition.Name.LocalName))
+                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Level' element instead.", xCondition.Name.LocalName))
                 {
                     xCondition.AddAfterSelf(new XElement(LevelElementName,
                         new XAttribute("Value", level),
@@ -1073,7 +1073,7 @@ namespace WixToolset.Converters
                 {
                     var name = Path.GetFileName(attribute.Value);
 
-                    if (this.OnError(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the v3 default", name))
+                    if (this.OnInformation(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the v3 default", name))
                     {
                         IEnumerable<XAttribute> attributes = element.Attributes().ToList();
                         element.RemoveAttributes();
@@ -1094,7 +1094,7 @@ namespace WixToolset.Converters
 
                 if (!String.IsNullOrEmpty(message) &&
                     TryGetInnerText(xCondition, out var text) &&
-                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
+                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
                 {
                     xCondition.AddAfterSelf(new XElement(LaunchElementName,
                         new XAttribute("Condition", text),
@@ -1128,7 +1128,7 @@ namespace WixToolset.Converters
                 var attribute = element.Attribute(attributeName);
 
                 if (attribute != null &&
-                    this.OnError(ConverterTestType.RenameExePackageCommandToArguments, element, "The {0} element {1} attribute has been renamed {2}.", element.Name.LocalName, attribute.Name.LocalName, newName))
+                    this.OnInformation(ConverterTestType.RenameExePackageCommandToArguments, element, "The {0} element {1} attribute has been renamed {2}.", element.Name.LocalName, attribute.Name.LocalName, newName))
                 {
                     element.Add(new XAttribute(newName, attribute.Value));
                     attribute.Remove();
@@ -1142,7 +1142,7 @@ namespace WixToolset.Converters
             if (xCondition != null)
             {
                 if (TryGetInnerText(xCondition, out var text) &&
-                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
+                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
                 {
                     element.Add(new XAttribute("Condition", text));
                     xCondition.Remove();
@@ -1155,7 +1155,7 @@ namespace WixToolset.Converters
         private void ConvertModuleElement(XElement element)
         {
             if (element.Attribute("Guid") == null // skip already-converted Module elements
-                && this.OnError(ConverterTestType.ModuleAndPackageRenamed, element, "The Module and Package elements have been renamed and reorganized for simplicity."))
+                && this.OnInformation(ConverterTestType.ModuleAndPackageRenamed, element, "The Module and Package elements have been renamed and reorganized for simplicity."))
             {
                 var xModule = element;
 
@@ -1167,7 +1167,7 @@ namespace WixToolset.Converters
                     var xInstallerVersion = xSummaryInformation.Attribute("InstallerVersion");
                     if (this.SourceVersion < 4 && xInstallerVersion == null)
                     {
-                        this.OnError(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Module element.");
+                        this.OnInformation(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Module element.");
                     }
 
                     RemoveAttribute(xSummaryInformation, "AdminImage");
@@ -1200,7 +1200,7 @@ namespace WixToolset.Converters
             var id = element.Attribute("Id");
             if (id != null && id.Value == "*")
             {
-                if (this.OnError(ConverterTestType.AutoGuidUnnecessary, element, "Using '*' for the Product Id attribute is unnecessary. Remove the attribute to remove the redundancy."))
+                if (this.OnInformation(ConverterTestType.AutoGuidUnnecessary, element, "Using '*' for the Product Id attribute is unnecessary. Remove the attribute to remove the redundancy."))
                 {
                     id.Remove();
                 }
@@ -1213,7 +1213,7 @@ namespace WixToolset.Converters
 
                 if (!String.IsNullOrEmpty(message) &&
                     TryGetInnerText(xCondition, out var text) &&
-                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
+                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
                 {
                     xCondition.AddAfterSelf(new XElement(LaunchElementName,
                         new XAttribute("Condition", text),
@@ -1230,7 +1230,7 @@ namespace WixToolset.Converters
                 xMediaTemplate.Remove();
             }
 
-            if (this.OnError(ConverterTestType.ProductAndPackageRenamed, element, "The Product and Package elements have been renamed and reorganized for simplicity."))
+            if (this.OnInformation(ConverterTestType.ProductAndPackageRenamed, element, "The Product and Package elements have been renamed and reorganized for simplicity."))
             {
                 var xPackage = element;
                 xPackage.Name = PackageElementName;
@@ -1243,7 +1243,7 @@ namespace WixToolset.Converters
                     var xInstallerVersion = xSummaryInformation.Attribute("InstallerVersion");
                     if (this.SourceVersion < 4 && xInstallerVersion == null)
                     {
-                        this.OnError(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Package element.");
+                        this.OnInformation(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Package element.");
                     }
 
                     if (xSummaryInformation.Attribute("Compressed") == null)
@@ -1471,7 +1471,7 @@ namespace WixToolset.Converters
             }
 
             if (!String.IsNullOrEmpty(newElementName)
-                && this.OnError(ConverterTestType.ReferencesReplaced, element, "Custom action and property reference {0} have been replaced with strongly-typed elements.", id))
+                && this.OnInformation(ConverterTestType.ReferencesReplaced, element, "Custom action and property reference {0} have been replaced with strongly-typed elements.", id))
             {
                 element.AddAfterSelf(new XElement(WixUtilNamespace + newElementName));
                 element.Remove();
@@ -1484,7 +1484,7 @@ namespace WixToolset.Converters
 
             var xCondition = element.Attribute("Condition");
             if (xCondition?.Value == "1" &&
-                this.OnError(ConverterTestType.PublishConditionOneUnnecessary, element, "Adding Condition='1' on {0} elements is no longer necessary. Remove the Condition attribute.", xCondition.Name.LocalName))
+                this.OnInformation(ConverterTestType.PublishConditionOneUnnecessary, element, "Adding Condition='1' on {0} elements is no longer necessary. Remove the Condition attribute.", xCondition.Name.LocalName))
             {
                 xCondition.Remove();
             }
@@ -1497,7 +1497,7 @@ namespace WixToolset.Converters
             var xAction = element.Attribute("Action");
 
             if (xAction != null
-                && this.OnError(ConverterTestType.RegistryKeyActionObsolete, element, "The RegistryKey element's Action attribute is obsolete. Action='create' will be converted to ForceCreateOnInstall='yes'. Action='createAndRemoveOnUninstall' will be converted to ForceCreateOnInstall='yes' and ForceDeleteOnUninstall='yes'."))
+                && this.OnInformation(ConverterTestType.RegistryKeyActionObsolete, element, "The RegistryKey element's Action attribute is obsolete. Action='create' will be converted to ForceCreateOnInstall='yes'. Action='createAndRemoveOnUninstall' will be converted to ForceCreateOnInstall='yes' and ForceDeleteOnUninstall='yes'."))
             {
                 switch (xAction?.Value)
                 {
@@ -1519,7 +1519,7 @@ namespace WixToolset.Converters
             var xParent = element.Parent;
 
             if (xParent.Name == ExePackageElementName &&
-                this.OnError(ConverterTestType.RemotePayloadRenamed, element, "The RemotePayload element has been renamed. Use the 'ExePackagePayload' instead."))
+                this.OnInformation(ConverterTestType.RemotePayloadRenamed, element, "The RemotePayload element has been renamed. Use the 'ExePackagePayload' instead."))
             {
                 element.Name = ExePackagePayloadElementName;
             }
@@ -1531,7 +1531,7 @@ namespace WixToolset.Converters
 
             var xName = xParent.Attribute("Name");
             if (xName != null &&
-                this.OnError(ConverterTestType.NameAttributeMovedToRemotePayload, xParent, "The Name attribute must be specified on the child XxxPackagePayload element when using a remote payload."))
+                this.OnInformation(ConverterTestType.NameAttributeMovedToRemotePayload, xParent, "The Name attribute must be specified on the child XxxPackagePayload element when using a remote payload."))
             {
                 element.SetAttributeValue("Name", xName.Value);
                 xName.Remove();
@@ -1539,7 +1539,7 @@ namespace WixToolset.Converters
 
             var xDownloadUrl = xParent.Attribute("DownloadUrl");
             if (xDownloadUrl != null &&
-                this.OnError(ConverterTestType.DownloadUrlAttributeMovedToRemotePayload, xParent, "The DownloadUrl attribute must be specified on the child XxxPackagePayload element when using a remote payload."))
+                this.OnInformation(ConverterTestType.DownloadUrlAttributeMovedToRemotePayload, xParent, "The DownloadUrl attribute must be specified on the child XxxPackagePayload element when using a remote payload."))
             {
                 element.SetAttributeValue("DownloadUrl", xDownloadUrl.Value);
                 xDownloadUrl.Remove();
@@ -1547,12 +1547,12 @@ namespace WixToolset.Converters
 
             var xCompressed = xParent.Attribute("Compressed");
             if (xCompressed != null &&
-                this.OnError(ConverterTestType.CompressedAttributeUnnecessaryForRemotePayload, xParent, "The Compressed attribute should not be specified when using a remote payload."))
+                this.OnInformation(ConverterTestType.CompressedAttributeUnnecessaryForRemotePayload, xParent, "The Compressed attribute should not be specified when using a remote payload."))
             {
                 xCompressed.Remove();
             }
 
-            this.OnError(ConverterTestType.BurnHashAlgorithmChanged, element, "The hash algorithm for bundles changed from SHA1 to SHA512.");
+            this.OnInformation(ConverterTestType.BurnHashAlgorithmChanged, element, "The hash algorithm for bundles changed from SHA1 to SHA512.");
 
             this.RemoveAttributeIfPresent(element, "CertificatePublicKey", ConverterTestType.BundleSignatureValidationObsolete, "The {0} element contains obsolete '{1}' attribute. Signature validation is no longer supported. The attribute will be removed.");
             this.RemoveAttributeIfPresent(element, "CertificateThumbprint", ConverterTestType.BundleSignatureValidationObsolete, "The {0} element contains obsolete '{1}' attribute. Signature validation is no longer supported. The attribute will be removed.");
@@ -1591,7 +1591,7 @@ namespace WixToolset.Converters
             }
 
             if (element.Parent.Name == ComponentElementName &&
-                this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Provides element has been integrated into the WiX v4 namespace. Add the 'Check' attribute from the WixDependency.wixext to match v3 runtime behavior."))
+                this.OnInformation(ConverterTestType.IntegratedDependencyNamespace, element, "The Provides element has been integrated into the WiX v4 namespace. Add the 'Check' attribute from the WixDependency.wixext to match v3 runtime behavior."))
             {
                 element.Add(new XAttribute(DependencyCheckAttributeName, "yes"));
             }
@@ -1599,14 +1599,14 @@ namespace WixToolset.Converters
 
         private void ConvertRequiresElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Requires element has been integrated into the WiX v4 namespace. Remove the namespace."))
+            if (this.OnInformation(ConverterTestType.IntegratedDependencyNamespace, element, "The Requires element has been integrated into the WiX v4 namespace. Remove the namespace."))
             {
                 element.Name = RequiresElementName;
             }
 
             if (element.Parent.Name == ProvidesElementName &&
                 element.Parent.Parent?.Name == ComponentElementName &&
-                this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Requires element has been integrated into the WiX v4 namespace. Add the 'Enforce' attribute from the WixDependency.wixext to match v3 runtime behavior."))
+                this.OnInformation(ConverterTestType.IntegratedDependencyNamespace, element, "The Requires element has been integrated into the WiX v4 namespace. Add the 'Enforce' attribute from the WixDependency.wixext to match v3 runtime behavior."))
             {
                 element.Add(new XAttribute(DependencyEnforceAttributeName, "yes"));
             }
@@ -1614,14 +1614,14 @@ namespace WixToolset.Converters
 
         private void ConvertRequiresRefElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The RequiresRef element has been integrated into the WiX v4 namespace. Remove the namespace."))
+            if (this.OnInformation(ConverterTestType.IntegratedDependencyNamespace, element, "The RequiresRef element has been integrated into the WiX v4 namespace. Remove the namespace."))
             {
                 element.Name = RequiresRefElementName;
             }
 
             if (element.Parent.Name == ProvidesElementName &&
                 element.Parent.Parent?.Name == ComponentElementName &&
-                this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The RequiresRef element has been integrated into the WiX v4 namespace. Add the 'Enforce' attribute from the WixDependency.wixext to match v3 runtime behavior."))
+                this.OnInformation(ConverterTestType.IntegratedDependencyNamespace, element, "The RequiresRef element has been integrated into the WiX v4 namespace. Add the 'Enforce' attribute from the WixDependency.wixext to match v3 runtime behavior."))
             {
                 element.Add(new XAttribute(DependencyEnforceAttributeName, "yes"));
             }
@@ -1632,7 +1632,7 @@ namespace WixToolset.Converters
             var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
 
             if (null != suppressSignatureValidation
-                && this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The chain package element contains obsolete '{0}' attribute. Signature validation is no longer supported. The attribute will be removed.", suppressSignatureValidation.Name))
+                && this.OnInformation(ConverterTestType.BundleSignatureValidationObsolete, element, "The chain package element contains obsolete '{0}' attribute. Signature validation is no longer supported. The attribute will be removed.", suppressSignatureValidation.Name))
             {
                 suppressSignatureValidation.Remove();
             }
@@ -1640,7 +1640,7 @@ namespace WixToolset.Converters
 
         private void ConvertTagElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.TagElementRenamed, element, "The Tag element has been renamed. Use the 'SoftwareTag' element instead."))
+            if (this.OnInformation(ConverterTestType.TagElementRenamed, element, "The Tag element has been renamed. Use the 'SoftwareTag' element instead."))
             {
                 element.Name = SoftwareTagElementName;
             }
@@ -1652,7 +1652,7 @@ namespace WixToolset.Converters
 
         private void ConvertTagRefElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.TagRefElementRenamed, element, "The TagRef element has been renamed. Use the 'SoftwareTagRef' element instead."))
+            if (this.OnInformation(ConverterTestType.TagRefElementRenamed, element, "The TagRef element has been renamed. Use the 'SoftwareTagRef' element instead."))
             {
                 element.Name = SoftwareTagRefElementName;
             }
@@ -1685,7 +1685,7 @@ namespace WixToolset.Converters
         private void ConvertCustomActionElement(XElement xCustomAction)
         {
             var xBinaryKey = xCustomAction.Attribute("BinaryKey");
-            if (xBinaryKey != null && this.OnError(ConverterTestType.CustomActionKeysAreNowRefs, xCustomAction, "The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef."))
+            if (xBinaryKey != null && this.OnInformation(ConverterTestType.CustomActionKeysAreNowRefs, xCustomAction, "The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef."))
             {
                 xCustomAction.SetAttributeValue("BinaryRef", xBinaryKey.Value);
                 xBinaryKey.Remove();
@@ -1693,7 +1693,7 @@ namespace WixToolset.Converters
             }
 
             var xFileKey = xCustomAction.Attribute("FileKey");
-            if (xFileKey != null && this.OnError(ConverterTestType.CustomActionKeysAreNowRefs, xCustomAction, "The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef."))
+            if (xFileKey != null && this.OnInformation(ConverterTestType.CustomActionKeysAreNowRefs, xCustomAction, "The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef."))
             {
                 xCustomAction.SetAttributeValue("FileRef", xFileKey.Value);
                 xFileKey.Remove();
@@ -1701,7 +1701,7 @@ namespace WixToolset.Converters
 
             if (xBinaryKey?.Value == "WixCA" || xBinaryKey?.Value == "UtilCA")
             {
-                if (this.OnError(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA custom action DLL Binary table id has been renamed. Use the id 'Wix4UtilCA_X86' instead."))
+                if (this.OnInformation(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA custom action DLL Binary table id has been renamed. Use the id 'Wix4UtilCA_X86' instead."))
                 {
                     xBinaryKey.Value = "Wix4UtilCA_X86";
                 }
@@ -1709,7 +1709,7 @@ namespace WixToolset.Converters
 
             if (xBinaryKey?.Value == "WixCA_x64" || xBinaryKey?.Value == "UtilCA_x64")
             {
-                if (this.OnError(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA_x64 custom action DLL Binary table id has been renamed. Use the id 'Wix4UtilCA_X64' instead."))
+                if (this.OnInformation(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA_x64 custom action DLL Binary table id has been renamed. Use the id 'Wix4UtilCA_X64' instead."))
                 {
                     xBinaryKey.Value = "Wix4UtilCA_X64";
                 }
@@ -1719,7 +1719,7 @@ namespace WixToolset.Converters
 
             if (xDllEntry?.Value == "CAQuietExec" || xDllEntry?.Value == "CAQuietExec64")
             {
-                if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The CAQuietExec and CAQuietExec64 custom action ids have been renamed. Use the ids 'WixQuietExec' and 'WixQuietExec64' instead."))
+                if (this.OnInformation(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The CAQuietExec and CAQuietExec64 custom action ids have been renamed. Use the ids 'WixQuietExec' and 'WixQuietExec64' instead."))
                 {
                     xDllEntry.Value = xDllEntry.Value.Replace("CAQuietExec", "WixQuietExec");
                 }
@@ -1729,7 +1729,7 @@ namespace WixToolset.Converters
 
             if (xProperty?.Value == "QtExecCmdLine" || xProperty?.Value == "QtExec64CmdLine")
             {
-                if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The QtExecCmdLine and QtExec64CmdLine property ids have been renamed. Use the ids 'WixQuietExecCmdLine' and 'WixQuietExec64CmdLine' instead."))
+                if (this.OnInformation(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The QtExecCmdLine and QtExec64CmdLine property ids have been renamed. Use the ids 'WixQuietExecCmdLine' and 'WixQuietExec64CmdLine' instead."))
                 {
                     xProperty.Value = xProperty.Value.Replace("QtExec", "WixQuietExec");
                 }
@@ -1739,7 +1739,7 @@ namespace WixToolset.Converters
 
             if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText))
             {
-                if (this.OnError(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptSourceFile' attribute to reference it.", xCustomAction.Name.LocalName))
+                if (this.OnInformation(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptSourceFile' attribute to reference it.", xCustomAction.Name.LocalName))
                 {
                     var scriptFolder = Path.GetDirectoryName(this.SourceFile) ?? String.Empty;
                     var id = xCustomAction.Attribute("Id")?.Value ?? Guid.NewGuid().ToString("N");
@@ -1763,13 +1763,13 @@ namespace WixToolset.Converters
                 if (xType == null)
                 {
                     if (WasImplicitlyStringTyped(xValue?.Value) &&
-                        this.OnError(ConverterTestType.AssignVariableTypeFormatted, xVariable, "The \"string\" variable type now denotes a literal string. Use \"formatted\" to keep the previous behavior."))
+                        this.OnInformation(ConverterTestType.AssignVariableTypeFormatted, xVariable, "The \"string\" variable type now denotes a literal string. Use \"formatted\" to keep the previous behavior."))
                     {
                         xVariable.Add(new XAttribute("Type", "formatted"));
                     }
                 }
                 else if (xType.Value == "string" &&
-                        this.OnError(ConverterTestType.AssignVariableTypeFormatted, xVariable, "The \"string\" variable type now denotes a literal string. Use \"formatted\" to keep the previous behavior."))
+                        this.OnInformation(ConverterTestType.AssignVariableTypeFormatted, xVariable, "The \"string\" variable type now denotes a literal string. Use \"formatted\" to keep the previous behavior."))
                 {
                     xType.Value = "formatted";
                 }
@@ -1782,7 +1782,7 @@ namespace WixToolset.Converters
 
             if (xId.Value == "QtExecCmdTimeout")
             {
-                this.OnError(ConverterTestType.QtExecCmdTimeoutAmbiguous, xProperty, "QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.");
+                this.OnInformation(ConverterTestType.QtExecCmdTimeoutAmbiguous, xProperty, "QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.");
             }
 
             this.ConvertInnerTextToAttribute(xProperty, "Value");
@@ -1797,7 +1797,7 @@ namespace WixToolset.Converters
                 var inheritable = element.Parent.Name == CreateFolderElementName;
                 if (!inheritable)
                 {
-                    if (this.OnError(ConverterTestType.AssignPermissionExInheritable, element, "The PermissionEx Inheritable attribute is being set to 'no' to ensure it remains the same as the v3 default."))
+                    if (this.OnInformation(ConverterTestType.AssignPermissionExInheritable, element, "The PermissionEx Inheritable attribute is being set to 'no' to ensure it remains the same as the v3 default."))
                     {
                         element.Add(new XAttribute("Inheritable", "no"));
                     }
@@ -1828,7 +1828,7 @@ namespace WixToolset.Converters
         /// <returns>The converted element.</returns>
         private void ConvertElementWithoutNamespace(XElement element)
         {
-            if (this.OnError(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
+            if (this.OnInformation(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
             {
                 element.Name = WixNamespace.GetName(element.Name.LocalName);
 
@@ -1844,7 +1844,7 @@ namespace WixToolset.Converters
         private void ConvertInnerTextToAttribute(XElement element, string attributeName)
         {
             if (TryGetInnerText(element, out var text) &&
-                this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
+                this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
             {
                 element.Add(new XAttribute(attributeName, text));
                 RemoveChildren(element);
@@ -1854,7 +1854,7 @@ namespace WixToolset.Converters
         void RemoveAttributeIfPresent(XElement element, string attributeName, ConverterTestType type, string format)
         {
             var xAttribute = element.Attribute(attributeName);
-            if (null != xAttribute && this.OnError(type, element, format, element.Name.LocalName, xAttribute.Name))
+            if (null != xAttribute && this.OnInformation(type, element, format, element.Name.LocalName, xAttribute.Name))
             {
                 xAttribute.Remove();
             }
@@ -1863,7 +1863,7 @@ namespace WixToolset.Converters
         private void RenameWin64ToBitness(XElement element)
         {
             var win64 = element.Attribute("Win64");
-            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The {0} element's Win64 attribute has been renamed. Use the Bitness attribute instead.", element.Name.LocalName))
+            if (win64 != null && this.OnInformation(ConverterTestType.Win64AttributeRenamed, element, "The {0} element's Win64 attribute has been renamed. Use the Bitness attribute instead.", element.Name.LocalName))
             {
                 var value = this.UpdateWin64ValueToBitnessValue(win64);
                 element.Add(new XAttribute("Bitness", value));
@@ -1891,7 +1891,7 @@ namespace WixToolset.Converters
             }
 
             if (!String.IsNullOrEmpty(replacement) &&
-                this.OnError(ConverterTestType.BundlePackageCacheAttributeValueObsolete, element, "The chain package element 'Cache' attribute contains obsolete '{0}' value. The value should be '{1}' instead.", cacheValue, replacement))
+                this.OnInformation(ConverterTestType.BundlePackageCacheAttributeValueObsolete, element, "The chain package element 'Cache' attribute contains obsolete '{0}' value. The value should be '{1}' instead.", cacheValue, replacement))
             {
                 cacheAttribute.SetValue(replacement);
             }
@@ -2042,7 +2042,7 @@ namespace WixToolset.Converters
             foreach (var declaration in declarations)
             {
                 if (namespaces.Contains(declaration.Value) &&
-                    this.OnError(ConverterTestType.RemoveUnusedNamespaces, declaration, "The namespace '{0}' is not used. Remove unused namespaces.", declaration.Value))
+                    this.OnInformation(ConverterTestType.RemoveUnusedNamespaces, declaration, "The namespace '{0}' is not used. Remove unused namespaces.", declaration.Value))
                 {
                     declaration.Remove();
                 }
@@ -2067,14 +2067,55 @@ namespace WixToolset.Converters
                 return false;
             }
 
-            // Increase the error count.
-            this.Errors++;
+            // Increase the message count.
+            this.Messages++;
 
             var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wix.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
             var warning = this.ErrorsAsWarnings.Contains(converterTestType);
-            var display = String.Format(CultureInfo.CurrentCulture, message, args);
+            
+            var msg = new Message(
+                    sourceLine,
+                    warning ? MessageLevel.Warning : MessageLevel.Error,
+                    (int)converterTestType,
+                    "{0} ({1})",
+                    String.Format(CultureInfo.CurrentCulture, message, args),
+                    converterTestType.ToString());
 
-            var msg = new Message(sourceLine, warning ? MessageLevel.Warning : MessageLevel.Error, (int)converterTestType, "{0} ({1})", display, converterTestType.ToString());
+            this.Messaging.Write(msg);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Output an information message to the console.
+        /// </summary>
+        /// <param name="converterTestType">The type of converter test.</param>
+        /// <param name="node">The node that caused the error.</param>
+        /// <param name="message">Detailed error message.</param>
+        /// <param name="args">Additional formatted string arguments.</param>
+        /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
+        private bool OnInformation(ConverterTestType converterTestType, XObject node, string message, params object[] args)
+        {
+            // Ignore the error if explicitly ignored or outside the range of the current operation.
+            if (this.IgnoreErrors.Contains(converterTestType) ||
+                (this.Operation == ConvertOperation.Convert && converterTestType < ConverterTestType.EndIgnoreInConvert) ||
+                (this.Operation == ConvertOperation.Format && converterTestType > ConverterTestType.BeginIgnoreInFormat))
+            {
+                return false;
+            }
+
+            // Increase the message count.
+            this.Messages++;
+
+            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wix.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
+
+            var msg = new Message(
+                    sourceLine,
+                    MessageLevel.Information,
+                    (int)converterTestType,
+                    "[Converted] {0} ({1})",
+                    String.Format(CultureInfo.CurrentCulture, message, args),
+                    converterTestType.ToString());
 
             this.Messaging.Write(msg);
 
