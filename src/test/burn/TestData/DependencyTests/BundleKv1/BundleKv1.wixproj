@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <Import Project="BundleK.props" />
   <ItemGroup>
-    <ProjectReference Include="..\PackageF\PackageF.wixproj" />
+    <ProjectReference Include="..\PackageFv1\PackageFv1.wixproj" />
     <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
   </ItemGroup>
   <ItemGroup>

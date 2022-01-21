@@ -4,7 +4,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
     <PackageGroup Id="BundlePackages">
-      <MsiPackage Id="PackageF" SourceFile="$(var.PackageF.TargetPath)" />
+      <MsiPackage Id="PackageF" SourceFile="$(var.PackageFv1.TargetPath)" />
     </PackageGroup>
   </Fragment>
 </Wix>
