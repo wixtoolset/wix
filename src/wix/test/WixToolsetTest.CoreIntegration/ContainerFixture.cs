@@ -9,6 +9,9 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using Xunit;
 
     public class ContainerFixture
@@ -115,7 +118,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
-                this.BuildMsis(folder, intermediateFolder, binFolder);
+                var pdbPaths = this.BuildMsis(folder, intermediateFolder, binFolder);
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -138,7 +141,6 @@ namespace WixToolsetTest.CoreIntegration
                 var ignoreAttributes = new Dictionary<string, List<string>>
                 {
                     { "MsiPackage", new List<string> { "CacheId", "InstallSize", "Size", "ProductCode" } },
-                    { "Provides", new List<string> { "Key" } },
                 };
                 var msiPackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage")
                                             .Cast<XmlElement>()
@@ -148,7 +150,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "<MsiPackage Id='FirstX86.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX86.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX86.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{12E4699F-E774-4D05-8A01-5BDD41BBA127}'>" +
                       "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
-                      "<Provides Key='*' Version='1.0.0.0' DisplayName='MsiPackage' />" +
+                     $"<Provides Key='{GetProductCodeFromMsiPdb(pdbPaths[0])}' Version='1.0.0.0' DisplayName='MsiPackage' />" +
                       "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
                       "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
                       "<PayloadRef Id='FirstX86.msi' />" +
@@ -156,7 +158,7 @@ namespace WixToolsetTest.CoreIntegration
                     "</MsiPackage>",
                     "<MsiPackage Id='FirstX64.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX64.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX64.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{12E4699F-E774-4D05-8A01-5BDD41BBA127}'>" +
                       "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
-                      "<Provides Key='*' Version='1.0.0.0' DisplayName='MsiPackage' />" +
+                     $"<Provides Key='{GetProductCodeFromMsiPdb(pdbPaths[1])}' Version='1.0.0.0' DisplayName='MsiPackage' />" +
                       "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
                       "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
                       "<PayloadRef Id='FirstX64.msi' />" +
@@ -372,8 +374,9 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        private void BuildMsis(string folder, string intermediateFolder, string binFolder, bool buildToSubfolder = false)
+        private string[] BuildMsis(string folder, string intermediateFolder, string binFolder, bool buildToSubfolder = false)
         {
+            var x86OutputPath = Path.Combine(binFolder, buildToSubfolder ? "FirstX86" : ".", "FirstX86.msi");
             var result = WixRunner.Execute(new[]
             {
                 "build",
@@ -382,11 +385,12 @@ namespace WixToolsetTest.CoreIntegration
                 Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
                 "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                 "-intermediateFolder", intermediateFolder,
-                "-o", Path.Combine(binFolder, buildToSubfolder ? "FirstX86" : ".", "FirstX86.msi"),
+                "-o", x86OutputPath,
             });
 
             result.AssertSuccess();
 
+            var x64OutputPath = Path.Combine(binFolder, buildToSubfolder ? "FirstX64" : ".", "FirstX64.msi");
             result = WixRunner.Execute(new[]
             {
                 "build",
@@ -395,10 +399,22 @@ namespace WixToolsetTest.CoreIntegration
                 Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
                 "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                 "-intermediateFolder", intermediateFolder,
-                "-o", Path.Combine(binFolder, buildToSubfolder ? "FirstX64" : ".", "FirstX64.msi"),
+                "-o", x64OutputPath,
             });
 
             result.AssertSuccess();
+
+            return new[]
+            {
+                Path.ChangeExtension(x86OutputPath, ".wixpdb"),
+                Path.ChangeExtension(x64OutputPath, ".wixpdb"),
+            };
+        }
+
+        private static string GetProductCodeFromMsiPdb(string pdbPath)
+        {
+            var wiData = WindowsInstallerData.Load(pdbPath, suppressVersionCheck: false);
+            return wiData.Tables["Property"].Rows.Cast<PropertyRow>().Single(r => r.Property == "ProductCode").Value;
         }
     }
 }

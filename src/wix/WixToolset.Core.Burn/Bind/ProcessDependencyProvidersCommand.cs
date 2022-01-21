@@ -22,8 +22,6 @@ namespace WixToolset.Core.Burn.Bind
 
         public string BundleProviderKey { get; private set; }
 
-        public Dictionary<string, WixDependencyProviderSymbol> DependencySymbolsByKey { get; private set; }
-
         private IMessaging Messaging { get; }
 
         private IntermediateSection Section { get; }
@@ -88,7 +86,7 @@ namespace WixToolset.Core.Burn.Bind
                 }
             }
 
-            this.DependencySymbolsByKey = this.GetDependencySymbolsByKey(dependencySymbols);
+            var dependencySymbolsByPackageId = this.GetDependencySymbolsByPackageId(dependencySymbols);
 
             // Generate providers for MSI and MSP packages that still do not have providers.
             foreach (var facade in this.Facades.Values)
@@ -104,24 +102,23 @@ namespace WixToolset.Core.Burn.Bind
                     key = mspPackage.PatchCode;
                 }
 
-                if (!String.IsNullOrEmpty(key) && !this.DependencySymbolsByKey.ContainsKey(key))
+                if (!String.IsNullOrEmpty(key) && !dependencySymbolsByPackageId.Contains(facade.PackageId))
                 {
-                    var dependency = this.Section.AddSymbol(new WixDependencyProviderSymbol(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.Id)
+                    this.Section.AddSymbol(new WixDependencyProviderSymbol(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.Id)
                     {
                         ParentRef = facade.PackageId,
                         ProviderKey = key,
                         Version = facade.PackageSymbol.Version,
                         DisplayName = facade.PackageSymbol.DisplayName
                     });
-
-                    this.DependencySymbolsByKey.Add(dependency.ProviderKey, dependency);
                 }
             }
         }
 
-        private Dictionary<string, WixDependencyProviderSymbol> GetDependencySymbolsByKey(IEnumerable<WixDependencyProviderSymbol> dependencySymbols)
+        private HashSet<string> GetDependencySymbolsByPackageId(IEnumerable<WixDependencyProviderSymbol> dependencySymbols)
         {
             var dependencySymbolsByKey = new Dictionary<string, WixDependencyProviderSymbol>();
+            var dependencySymbolsByPackageId = new HashSet<string>();
 
             foreach (var dependency in dependencySymbols)
             {
@@ -139,9 +136,11 @@ namespace WixToolset.Core.Burn.Bind
                 {
                     dependencySymbolsByKey.Add(dependency.ProviderKey, dependency);
                 }
+
+                dependencySymbolsByPackageId.Add(dependency.ParentRef);
             }
 
-            return dependencySymbolsByKey;
+            return dependencySymbolsByPackageId;
         }
     }
 }
