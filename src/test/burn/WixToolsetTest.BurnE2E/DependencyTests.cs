@@ -189,14 +189,14 @@ namespace WixToolsetTest.BurnE2E
             var testRegistryValue = "PackageA";
 
             var packageA = this.CreatePackageInstaller("PackageAv1");
-            var packageBv1 = this.CreatePackageInstaller("PackageBv1");
-            var packageBv101 = this.CreatePackageInstaller("PackageBv1_0_1");
+            var packageEv1 = this.CreatePackageInstaller("PackageEv1");
+            var packageEv101 = this.CreatePackageInstaller("PackageEv1_0_1");
             var bundleJ = this.CreateBundleInstaller("BundleJ");
             var bundleJ_Patch = this.CreateBundleInstaller("BundleJ_Patch");
 
             packageA.VerifyInstalled(false);
-            packageBv1.VerifyInstalled(false);
-            packageBv101.VerifyInstalled(false);
+            packageEv1.VerifyInstalledWithVersion(false);
+            packageEv101.VerifyInstalledWithVersion(false);
 
             bundleJ.Install();
             if (this.SupportAddonAndPatchRelatedBundles)
@@ -205,7 +205,7 @@ namespace WixToolsetTest.BurnE2E
 
                 packageA.VerifyInstalled(true);
                 packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-                packageBv1.VerifyInstalled(true);
+                packageEv1.VerifyInstalledWithVersion(true);
             }
 
             bundleJ_Patch.Install();
@@ -215,8 +215,8 @@ namespace WixToolsetTest.BurnE2E
 
                 packageA.VerifyInstalled(true);
                 packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
-                packageBv1.VerifyInstalled(false);
-                packageBv101.VerifyInstalled(true);
+                packageEv1.VerifyInstalledWithVersion(false);
+                packageEv101.VerifyInstalledWithVersion(true);
             }
 
             bundleJ.Uninstall();
@@ -226,8 +226,8 @@ namespace WixToolsetTest.BurnE2E
                 bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
 
                 packageA.VerifyInstalled(false);
-                packageBv1.VerifyInstalled(false);
-                packageBv101.VerifyInstalled(false);
+                packageEv1.VerifyInstalledWithVersion(false);
+                packageEv101.VerifyInstalledWithVersion(false);
             }
         }
 
@@ -239,14 +239,14 @@ namespace WixToolsetTest.BurnE2E
             var testRegistryValue = "PackageA";
 
             var packageA = this.CreatePackageInstaller("PackageAv1");
-            var packageBv1 = this.CreatePackageInstaller("PackageBv1");
-            var packageBv101 = this.CreatePackageInstaller("PackageBv1_0_1");
+            var packageEv1 = this.CreatePackageInstaller("PackageEv1");
+            var packageEv101 = this.CreatePackageInstaller("PackageEv1_0_1");
             var bundleJ = this.CreateBundleInstaller("BundleJ");
             var bundleJ_Patch = this.CreateBundleInstaller("BundleJ_Patch");
 
             packageA.VerifyInstalled(false);
-            packageBv1.VerifyInstalled(false);
-            packageBv101.VerifyInstalled(false);
+            packageEv1.VerifyInstalledWithVersion(false);
+            packageEv101.VerifyInstalledWithVersion(false);
 
             bundleJ.Install();
             if (this.SupportAddonAndPatchRelatedBundles)
@@ -255,7 +255,7 @@ namespace WixToolsetTest.BurnE2E
 
                 packageA.VerifyInstalled(true);
                 packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-                packageBv1.VerifyInstalled(true);
+                packageEv1.VerifyInstalledWithVersion(true);
             }
 
             bundleJ_Patch.Install();
@@ -265,8 +265,8 @@ namespace WixToolsetTest.BurnE2E
 
                 packageA.VerifyInstalled(true);
                 packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
-                packageBv1.VerifyInstalled(false);
-                packageBv101.VerifyInstalled(true);
+                packageEv1.VerifyInstalledWithVersion(false);
+                packageEv101.VerifyInstalledWithVersion(true);
             }
 
             bundleJ_Patch.Uninstall();
@@ -276,8 +276,8 @@ namespace WixToolsetTest.BurnE2E
 
                 packageA.VerifyInstalled(true);
                 packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
-                packageBv1.VerifyInstalled(true);
-                packageBv101.VerifyInstalled(false);
+                packageEv1.VerifyInstalledWithVersion(true);
+                packageEv101.VerifyInstalledWithVersion(false);
             }
 
             bundleJ.Uninstall();
@@ -286,8 +286,8 @@ namespace WixToolsetTest.BurnE2E
                 bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
 
                 packageA.VerifyInstalled(false);
-                packageBv1.VerifyInstalled(false);
-                packageBv101.VerifyInstalled(false);
+                packageEv1.VerifyInstalledWithVersion(false);
+                packageEv101.VerifyInstalledWithVersion(false);
             }
         }
 
@@ -490,7 +490,7 @@ namespace WixToolsetTest.BurnE2E
 
             var packageA = this.CreatePackageInstaller("PackageAv1");
             var packageB = this.CreatePackageInstaller("PackageBv1");
-            var bundleF = this.CreateBundleInstaller("BundleJ");
+            var bundleF = this.CreateBundleInstaller("BundleF");
             var bundleF_PatchAv101 = this.CreateBundleInstaller("BundleF_PatchAv1_0_1");
             var bundleF_PatchAv102 = this.CreateBundleInstaller("BundleF_PatchAv1_0_2");
 

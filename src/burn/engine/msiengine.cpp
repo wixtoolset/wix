@@ -774,7 +774,7 @@ extern "C" HRESULT MsiEngineDetectCompatiblePackage(
     }
 
     hr = WiuGetProductInfoEx(wzCompatibleProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczVersion);
-    if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr || HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) == hr)
+    if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr || HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) == hr || E_INVALIDARG == hr)
     {
         ExitFunction1(hr = S_OK);
     }
