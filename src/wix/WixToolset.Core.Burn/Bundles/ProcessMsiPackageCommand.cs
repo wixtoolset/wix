@@ -488,9 +488,15 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void ImportDependencyProviders(Database db, WixBundleMsiPackageSymbol msiPackage)
         {
-            if (db.TableExists("Wix4DependencyProvider"))
+            this.ImportDependencyProvidersFromTable(db, msiPackage, "WixDependencyProvider");
+            this.ImportDependencyProvidersFromTable(db, msiPackage, "Wix4DependencyProvider");
+        }
+
+        private void ImportDependencyProvidersFromTable(Database db, WixBundleMsiPackageSymbol msiPackage, string tableName)
+        {
+            if (db.TableExists(tableName))
             {
-                using (var view = db.OpenExecuteView("SELECT `WixDependencyProvider`, `ProviderKey`, `Version`, `DisplayName`, `Attributes` FROM `Wix4DependencyProvider`"))
+                using (var view = db.OpenExecuteView($"SELECT `WixDependencyProvider`, `ProviderKey`, `Version`, `DisplayName`, `Attributes` FROM `{tableName}`"))
                 {
                     foreach (var record in view.Records)
                     {
