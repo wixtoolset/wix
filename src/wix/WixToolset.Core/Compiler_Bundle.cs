@@ -2509,7 +2509,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    extensionAttributes.Add(attrib);
                 }
             }
 
