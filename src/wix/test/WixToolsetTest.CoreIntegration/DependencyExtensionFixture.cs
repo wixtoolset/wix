@@ -107,7 +107,6 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<Provides Key='UsingProvides' Version='1.0.0.0' DisplayName='MsiPackage' Imported='yes' />",
-                    "<Provides Key='{A81D50F9-B696-4F3D-ABE0-E64D61590E5F}' Version='1.0.0.0' DisplayName='MsiPackage' />",
                 }, provides);
             }
         }
