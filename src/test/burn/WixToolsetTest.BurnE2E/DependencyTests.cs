@@ -15,29 +15,29 @@ namespace WixToolsetTest.BurnE2E
         [Fact]
         public void CanKeepSameExactPackageAfterUpgradingBundle()
         {
-            var packageF = this.CreatePackageInstaller("PackageF");
+            var packageFv1 = this.CreatePackageInstaller("PackageFv1");
             var bundleKv1 = this.CreateBundleInstaller("BundleKv1");
             var bundleKv2 = this.CreateBundleInstaller("BundleKv2");
 
-            packageF.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(false);
 
             bundleKv1.Install();
             bundleKv1.VerifyRegisteredAndInPackageCache();
 
-            packageF.VerifyInstalled(true);
+            packageFv1.VerifyInstalled(true);
 
             bundleKv2.Install();
             bundleKv2.VerifyRegisteredAndInPackageCache();
             bundleKv1.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            packageF.VerifyInstalled(true);
+            packageFv1.VerifyInstalled(true);
 
             bundleKv2.VerifyPackageIsCached("PackageF");
 
             bundleKv2.Uninstall();
             bundleKv2.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            packageF.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(false);
         }
 
         [Fact (Skip = "https://github.com/wixtoolset/issues/issues/6401")]
@@ -539,6 +539,152 @@ namespace WixToolsetTest.BurnE2E
             }
         }
 
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3421")]
+        public void DoesntLoseDependenciesOnFailedMajorUpgradeBundleFromMajorUpdateMsi()
+        {
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var packageC = this.CreatePackageInstaller("PackageC");
+            var packageFv1 = this.CreatePackageInstaller("PackageFv1");
+            var packageFv2 = this.CreatePackageInstaller("PackageFv2");
+            var packageGv1 = this.CreatePackageInstaller("PackageGv1");
+            var packageGv2 = this.CreatePackageInstaller("PackageGv2");
+            var bundleM = this.CreateBundleInstaller("BundleM");
+            var bundleNv1 = this.CreateBundleInstaller("BundleNv1");
+            var bundleNv2 = this.CreateBundleInstaller("BundleNv2");
+            var testBAController = this.CreateTestBAController();
+
+            packageAv1.VerifyInstalled(false);
+            packageC.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(false);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(false);
+            packageGv2.VerifyInstalled(false);
+
+            bundleM.Install();
+            bundleM.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            packageFv1.VerifyInstalled(true);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(false);
+            packageGv2.VerifyInstalled(false);
+
+            bundleNv1.Install();
+            bundleNv1.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            packageFv1.VerifyInstalled(true);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(true);
+            packageGv2.VerifyInstalled(false);
+
+            // Make PackageC fail.
+            testBAController.SetPackageCancelExecuteAtProgress("PackageC", 10);
+
+            bundleNv2.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleNv2.VerifyUnregisteredAndRemovedFromPackageCache();
+            bundleNv1.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            packageC.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(true);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(true);
+            packageGv2.VerifyInstalled(false);
+
+            bundleM.Uninstall();
+            bundleM.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(true);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(true);
+            packageGv2.VerifyInstalled(false);
+
+            bundleNv1.Uninstall();
+            bundleNv1.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(false);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(false);
+            packageGv2.VerifyInstalled(false);
+        }
+
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6510")]
+        public void DoesntLoseDependenciesOnFailedMajorUpgradeBundleFromMinorUpdateMsi()
+        {
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var packageC = this.CreatePackageInstaller("PackageC");
+            var packageFv1 = this.CreatePackageInstaller("PackageFv1");
+            var packageFv101 = this.CreatePackageInstaller("PackageFv1_0_1");
+            var packageGv1 = this.CreatePackageInstaller("PackageGv1");
+            var packageGv101 = this.CreatePackageInstaller("PackageGv1_0_1");
+            var bundleM = this.CreateBundleInstaller("BundleM");
+            var bundleNv1 = this.CreateBundleInstaller("BundleNv1");
+            var bundleNv101 = this.CreateBundleInstaller("BundleNv1_0_1");
+            var testBAController = this.CreateTestBAController();
+
+            packageAv1.VerifyInstalled(false);
+            packageC.VerifyInstalled(false);
+            packageFv1.VerifyInstalledWithVersion(false);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(false);
+            packageGv101.VerifyInstalledWithVersion(false);
+
+            bundleM.Install();
+            bundleM.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            packageFv1.VerifyInstalledWithVersion(true);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(false);
+            packageGv101.VerifyInstalledWithVersion(false);
+
+            bundleNv1.Install();
+            bundleNv1.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            packageFv1.VerifyInstalledWithVersion(true);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(true);
+            packageGv101.VerifyInstalledWithVersion(false);
+
+            // Make PackageC fail.
+            testBAController.SetPackageCancelExecuteAtProgress("PackageC", 10);
+
+            // Verify https://github.com/wixtoolset/issues/issues/6510 - Dependency provider removed on rollback even though package is not rolled back
+            bundleNv101.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleNv101.VerifyUnregisteredAndRemovedFromPackageCache();
+            bundleNv1.VerifyRegisteredAndInPackageCache();
+
+            // The expected values will change after implementing https://github.com/wixtoolset/issues/issues/6535 and https://github.com/wixtoolset/issues/issues/3421
+            packageAv1.VerifyInstalled(true);
+            packageC.VerifyInstalled(false);
+            packageFv1.VerifyInstalledWithVersion(false);
+            packageFv101.VerifyInstalledWithVersion(true);
+            packageGv1.VerifyInstalledWithVersion(false);
+            packageGv101.VerifyInstalledWithVersion(true);
+
+            bundleM.Uninstall();
+            bundleM.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(false);
+            packageFv1.VerifyInstalledWithVersion(false);
+            packageFv101.VerifyInstalledWithVersion(true);
+            packageGv1.VerifyInstalledWithVersion(false);
+            packageGv101.VerifyInstalledWithVersion(true);
+
+            bundleNv1.Uninstall();
+            bundleNv1.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(false);
+            packageFv1.VerifyInstalledWithVersion(false);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(false);
+            packageGv101.VerifyInstalledWithVersion(false);
+        }
+
         [Fact]
         public void DoesntRegisterDependencyOnPackageNotSelectedForInstall()
         {
@@ -709,6 +855,49 @@ namespace WixToolsetTest.BurnE2E
 
             packageA.VerifyInstalled(false);
             bundleA.VerifyExeTestRegistryRootDeleted(testRegistryValueExe);
+        }
+
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3850")]
+        public void RemovesDependencyProviderFromUpgradedPackageDuringUninstall()
+        {
+            var packageC = this.CreatePackageInstaller("PackageC");
+            var packageFv1 = this.CreatePackageInstaller("PackageFv1");
+            var packageFv2 = this.CreatePackageInstaller("PackageFv2");
+            var packageGv1 = this.CreatePackageInstaller("PackageGv1");
+            var packageGv2 = this.CreatePackageInstaller("PackageGv2");
+            var bundleNv1 = this.CreateBundleInstaller("BundleNv1");
+            var bundleNv2 = this.CreateBundleInstaller("BundleNv2");
+
+            packageC.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(false);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(false);
+            packageGv2.VerifyInstalled(false);
+
+            bundleNv1.Install();
+            bundleNv1.VerifyRegisteredAndInPackageCache();
+
+            packageC.VerifyInstalled(false);
+            packageFv1.VerifyInstalled(true);
+            packageFv2.VerifyInstalled(false);
+            packageGv1.VerifyInstalled(true);
+            packageGv2.VerifyInstalled(false);
+
+            // Verify https://github.com/wixtoolset/issues/issues/3850 - Dependency provider not removed on uninstall from upgrade
+            bundleNv2.Install();
+            bundleNv2.VerifyRegisteredAndInPackageCache();
+            bundleNv1.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageC.VerifyInstalled(true);
+            packageFv1.VerifyInstalled(false);
+            packageFv2.VerifyInstalled(true);
+            packageGv1.VerifyInstalled(false);
+            packageGv2.VerifyInstalled(true);
+
+            bundleNv1.VerifyPackageIsCached("PackageF", false);
+            bundleNv1.VerifyPackageIsCached("PackageG", false);
+            bundleNv1.VerifyPackageProviderRemoved("PackageF");
+            bundleNv1.VerifyPackageProviderRemoved("PackageG");
         }
 
         [Fact]

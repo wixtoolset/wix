@@ -14,6 +14,7 @@ namespace WixTestTools
 
     public partial class BundleInstaller
     {
+        public const string DependencyRegistryRoot = "Software\\Classes\\Installer\\Dependencies";
         public const string FULL_BURN_POLICY_REGISTRY_PATH = "SOFTWARE\\WOW6432Node\\Policies\\WiX\\Burn";
         public const string PACKAGE_CACHE_FOLDER_NAME = "Package Cache";
 
@@ -132,6 +133,22 @@ namespace WixTestTools
             var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
             var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == YesNoDefaultType.Yes);
             Assert.Equal(cached, Directory.Exists(cachePath));
+        }
+
+        public void VerifyPackageProviderRemoved(string packageId)
+        {
+            using var wixOutput = WixOutput.Read(this.BundlePdb);
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
+            var providerSymbol = section.Symbols.OfType<WixDependencyProviderSymbol>().Single(p => p.ParentRef == packageId);
+            var registryRoot = packageSymbol.PerMachine == YesNoDefaultType.Yes ? Registry.LocalMachine : Registry.CurrentUser;
+            var subkeyPath = Path.Combine(DependencyRegistryRoot, providerSymbol.ProviderKey);
+            using var registryKey = registryRoot.OpenSubKey(subkeyPath);
+            if (registryKey != null)
+            {
+                WixAssert.StringEqual(null, subkeyPath);
+            }
         }
 
         public void VerifyExeTestRegistryRootDeleted(string name, bool x64 = false)

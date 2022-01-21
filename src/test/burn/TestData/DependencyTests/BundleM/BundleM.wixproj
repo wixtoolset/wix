@@ -1,15 +1,20 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Project Sdk="WixToolset.Sdk">
-  <Import Project="..\BundleKv1\BundleK.props" />
   <PropertyGroup>
-    <Version>2.0.0.0</Version>
+    <OutputType>Bundle</OutputType>
+    <UpgradeCode>{D106D5F7-CA25-4AC4-8EE9-A9CF8C2C7941}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PackageAv1\PackageAv1.wixproj" />
     <ProjectReference Include="..\PackageFv1\PackageFv1.wixproj" />
     <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
+    <PackageReference Include="WixToolset.Util.wixext" />
   </ItemGroup>
 </Project>
