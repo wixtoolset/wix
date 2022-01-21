@@ -12,7 +12,10 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="~$(var.TestGroupName) - $(var.PackageName)" Language="1033" Version="$(var.Version)" Manufacturer="WixToolset" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" ProductCode="$(var.ProductCode)">
+    <!-- Temporary workaround for https://github.com/wixtoolset/issues/issues/6705
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." IgnoreLanguage="yes" />
     <?ifndef CabPrefix?>
     <MediaTemplate EmbedCab="yes" />
     <?else?>

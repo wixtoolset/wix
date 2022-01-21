@@ -538,9 +538,9 @@ namespace WixToolset.Core.Burn.Bundles
                         }
                         writer.WriteAttributeString("OnlyDetect", related.OnlyDetect ? "yes" : "no");
 
-                        var relatedLanguages = related.Languages.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        var relatedLanguages = related.Languages?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                        if (0 < relatedLanguages.Length)
+                        if (null != relatedLanguages && 0 < relatedLanguages.Length)
                         {
                             writer.WriteAttributeString("LangInclusive", related.LangInclusive ? "yes" : "no");
                             foreach (string language in relatedLanguages)
