@@ -9,10 +9,6 @@
     <SignOutput>false</SignOutput>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

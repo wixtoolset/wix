@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" />
-    <ProjectReference Include="..\..\..\internal\WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj" />
+    <PackageReference Include="WixBuildTools.TestSupport" />
   </ItemGroup>
 
   <ItemGroup>

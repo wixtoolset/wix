@@ -9,7 +9,7 @@
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <SignOutput>false</SignOutput>
   </PropertyGroup>
 
