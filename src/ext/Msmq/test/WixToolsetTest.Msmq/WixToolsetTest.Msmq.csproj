@@ -8,10 +8,6 @@
     <SignOutput>false</SignOutput>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="TestData\UsingMessageQueue\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingMessageQueue\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />

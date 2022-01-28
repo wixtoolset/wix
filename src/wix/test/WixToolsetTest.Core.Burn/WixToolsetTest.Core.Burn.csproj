@@ -9,17 +9,12 @@
     <SignOutput>false</SignOutput>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- <PackageReference Include="WixBuildTools.TestSupport" /> -->
-    <ProjectReference Include="..\..\..\internal\WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj" />
+    <PackageReference Include="WixBuildTools.TestSupport" />
   </ItemGroup>
 
   <ItemGroup>

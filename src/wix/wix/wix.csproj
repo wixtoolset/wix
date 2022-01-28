@@ -16,10 +16,6 @@
     <NuspecBasePath>$(OutputPath)publish\wix\</NuspecBasePath>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Converters\WixToolset.Converters.csproj" />
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
