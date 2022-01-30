@@ -11,6 +11,7 @@ namespace WixToolset.UI
         protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(UIExtensionData),
+            typeof(UICompiler),
         };
     }
 }

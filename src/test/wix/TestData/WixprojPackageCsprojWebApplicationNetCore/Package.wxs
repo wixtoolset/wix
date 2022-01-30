@@ -12,7 +12,5 @@
         <File Source='web.config' />
       </Component>
     </Feature>
-
-    <UIRef Id="WixUI_Minimal" />
   </Package>
 </Wix>

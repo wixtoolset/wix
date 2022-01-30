@@ -57,6 +57,7 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixBalNamespace = "http://wixtoolset.org/schemas/v4/wxs/bal";
         private static readonly XNamespace WixDependencyNamespace = "http://wixtoolset.org/schemas/v4/wxs/dependency";
         private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
+        private static readonly XNamespace WixUiNamespace = "http://wixtoolset.org/schemas/v4/wxs/ui";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
         private static readonly XNamespace WixVSNamespace = "http://wixtoolset.org/schemas/v4/wxs/vs";
 
@@ -142,6 +143,7 @@ namespace WixToolset.Converters
         private static readonly XName UtilXmlConfigElementName = WixUtilNamespace + "XmlConfig";
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName CustomActionRefElementName = WixNamespace + "CustomActionRef";
+        private static readonly XName UIRefElementName = WixNamespace + "UIRef";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
         private static readonly XName Wix4ElementName = WixNamespace + "Wix";
         private static readonly XName Wix3ElementName = Wix3Namespace + "Wix";
@@ -259,6 +261,7 @@ namespace WixToolset.Converters
                 { WixConverter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
                 { WixConverter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
                 { WixConverter.VerbElementName, this.ConvertVerbElement },
+                { WixConverter.UIRefElementName, this.ConvertUIRefElement },
             };
 
             this.Messaging = messaging;
@@ -1275,14 +1278,14 @@ namespace WixToolset.Converters
                             xPackage.SetAttributeValue("Scope", "perUser");
                             break;
                         case "elevated":
+                        {
+                            var xAllUsers = xPackage.Elements(PropertyElementName).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
+                            if (xAllUsers?.Attribute("Value")?.Value == "1")
                             {
-                                var xAllUsers = xPackage.Elements(PropertyElementName).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
-                                if (xAllUsers?.Attribute("Value")?.Value == "1")
-                                {
-                                    xAllUsers?.Remove();
-                                }
+                                xAllUsers?.Remove();
                             }
-                            break;
+                        }
+                        break;
                     }
 
                     xInstallPrivileges?.Remove();
@@ -1439,7 +1442,7 @@ namespace WixToolset.Converters
             }
 
             if (!String.IsNullOrEmpty(newElementName)
-                && this.OnError(ConverterTestType.ReferencesReplaced, element, "Custom action and property reference {0} have been replaced with strongly-typed elements.", id))
+                && this.OnError(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
             {
                 this.XRoot.SetAttributeValue(XNamespace.Xmlns + newNamespaceName, newNamespace.NamespaceName);
 
@@ -1449,6 +1452,21 @@ namespace WixToolset.Converters
                 {
                     element.Remove();
                 }
+            }
+        }
+
+        private void ConvertUIRefElement(XElement element)
+        {
+            var id = element.Attribute("Id")?.Value;
+
+            if (id?.StartsWith("WixUI_") == true
+                && this.OnError(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
+            {
+                this.XRoot.SetAttributeValue(XNamespace.Xmlns + "ui", WixUiNamespace.NamespaceName);
+
+                element.AddBeforeSelf(new XElement(WixUiNamespace + "WixUI", new XAttribute("Id", id)));
+
+                element.Remove();
             }
         }
 
@@ -1471,7 +1489,7 @@ namespace WixToolset.Converters
             }
 
             if (!String.IsNullOrEmpty(newElementName)
-                && this.OnError(ConverterTestType.ReferencesReplaced, element, "Custom action and property reference {0} have been replaced with strongly-typed elements.", id))
+                && this.OnError(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
             {
                 element.AddAfterSelf(new XElement(WixUtilNamespace + newElementName));
                 element.Remove();
@@ -2532,7 +2550,7 @@ namespace WixToolset.Converters
             DefiningStandardDirectoryDeprecated,
 
             /// <summary>
-            /// Naked custom action and property references replaced with elements.
+            /// Naked UI, custom action, and property references replaced with elements.
             /// </summary>
             ReferencesReplaced,
 

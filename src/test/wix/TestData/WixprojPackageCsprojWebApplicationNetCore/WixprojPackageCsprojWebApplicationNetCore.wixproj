@@ -11,7 +11,6 @@
   <ItemGroup>
     <!-- SkipPublish="true" BindPath="$(MSBuildProjectDirectory)\does\not\exist" BindName="Xxx" Publish="true" -->
     <ProjectReference Include="..\CsprojWebApplicationNetCore\CsprojWebApplicationNetCore.csproj" Publish="true" />
-    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.0-preview.0" />
   </ItemGroup>
 
   <!-- <Import Sdk="WixToolset.Sdk" Project='D:\src\wix4\build\wix\Debug\netcoreapp3.1\Sdk\Sdk.targets' /> -->

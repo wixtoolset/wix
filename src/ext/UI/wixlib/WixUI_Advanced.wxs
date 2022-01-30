@@ -53,7 +53,6 @@ Todo:
             <TextStyle Id="WixUI_Font_Emphasized" FaceName="!(loc.Advanced_Font_FaceName)" Size="!(loc.Advanced_Font_Emphasized_Size)" Bold="yes" />
 
             <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
-            <Property Id="WixUI_Mode" Value="Advanced" />
 
             <DialogRef Id="BrowseDlg" />
             <DialogRef Id="DiskCostDlg" />

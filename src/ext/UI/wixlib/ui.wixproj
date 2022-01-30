@@ -27,7 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=ARM64" />
   </ItemGroup>
 
   <ItemGroup>
