@@ -33,7 +33,7 @@
     <ProjectGuid>{76542B28-0FFD-47D3-AD6A-D0F20FA875AC}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <TargetName>directxca</TargetName>
+    <TargetName>dxca</TargetName>
     <ProjectModuleDefinitionFile>directx.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset DirectX CustomAction</Description>
   </PropertyGroup>

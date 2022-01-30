@@ -56,6 +56,7 @@ namespace WixToolset.Converters
         private static readonly XNamespace Wix3Namespace = "http://schemas.microsoft.com/wix/2006/wi";
         private static readonly XNamespace WixBalNamespace = "http://wixtoolset.org/schemas/v4/wxs/bal";
         private static readonly XNamespace WixDependencyNamespace = "http://wixtoolset.org/schemas/v4/wxs/dependency";
+        private static readonly XNamespace WixDirectXNamespace = "http://wixtoolset.org/schemas/v4/wxs/directx";
         private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
         private static readonly XNamespace WixUiNamespace = "http://wixtoolset.org/schemas/v4/wxs/ui";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
@@ -94,6 +95,7 @@ namespace WixToolset.Converters
         private static readonly XName FileElementName = WixNamespace + "File";
         private static readonly XName FragmentElementName = WixNamespace + "Fragment";
         private static readonly XName FirewallRemoteAddressElementName = WixFirewallNamespace + "RemoteAddress";
+        private static readonly XName GetCapabilitiesElementName = WixFirewallNamespace + "GetCapabilities";
         private static readonly XName LaunchElementName = WixNamespace + "Launch";
         private static readonly XName LevelElementName = WixNamespace + "Level";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
@@ -455,11 +457,11 @@ namespace WixToolset.Converters
                     {
                         text.Value = text.Value.Trim();
                     }
-                    else if (node.NextNode is XCData cdata)
+                    else if (node.NextNode is XCData)
                     {
                         this.EnsurePrecedingWhitespaceRemoved(text, node, ConverterTestType.WhitespacePrecedingNodeWrong);
                     }
-                    else if (node.NextNode is XElement element)
+                    else if (node.NextNode is XElement)
                     {
                         this.EnsurePrecedingWhitespaceCorrect(text, node, level, ConverterTestType.WhitespacePrecedingNodeWrong);
                     }
@@ -503,7 +505,7 @@ namespace WixToolset.Converters
         {
             newValue = this.DeprecatedPrefixRegex.Replace(value, "!");
 
-            if (object.ReferenceEquals(newValue, value))
+            if (Object.ReferenceEquals(newValue, value))
             {
                 return false;
             }
@@ -1438,6 +1440,12 @@ namespace WixToolset.Converters
                     newNamespace = WixVSNamespace;
                     newNamespaceName = "vs";
                     replace = false;
+                    break;
+                case "WIX_DIRECTX_PIXELSHADERVERSION":
+                case "WIX_DIRECTX_VERTEXSHADERVERSION":
+                    newElementName = "GetCapabilities";
+                    newNamespace = WixDirectXNamespace;
+                    newNamespaceName = "directx";
                     break;
             }
 
