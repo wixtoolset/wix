@@ -7,8 +7,6 @@ namespace WixToolsetTest.UI
     using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Data;
-    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.UI;
     using Xunit;
@@ -22,11 +20,48 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Property");
-            WixAssert.CompareLineByLine(new[]
-            {
-                "Property:WixUI_Mode\tAdvanced",
-            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerMachineFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerUserFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerMachineFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerUserFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\t"));
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIAdvancedX64()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Advanced");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(BuildX64, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerMachineFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerUserFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerMachineFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerUserFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIPrintEula\t65\tWixUiCa_X64\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIValidatePath\t65\tWixUiCa_X64\t"));
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIAdvancedARM64()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Advanced");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(BuildARM64, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerMachineFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerUserFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerMachineFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerUserFolder\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIPrintEula\t65\tWixUiCa_A64\t"));
+            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIValidatePath\t65\tWixUiCa_A64\t"));
         }
 
         [Fact]
@@ -36,11 +71,10 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Property");
-            WixAssert.CompareLineByLine(new[]
-            {
-                "Property:WixUI_Mode\tFeatureTree",
-            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
+            Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
+            Assert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
         }
 
         [Fact]
@@ -50,11 +84,8 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Property");
-            WixAssert.CompareLineByLine(new[]
-            {
-                "Property:WixUI_Mode\tInstallDir",
-            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
         }
 
         [Fact]
@@ -64,11 +95,8 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Property");
-            WixAssert.CompareLineByLine(new[]
-            {
-                "Property:WixUI_Mode\tMinimal",
-            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeEulaDlg\t"));
         }
 
         [Fact]
@@ -92,10 +120,8 @@ namespace WixToolsetTest.UI
                 });
 
                 var wid = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
-                var propertyTable = wid.Tables["Property"];
-
-                var propertyRow = propertyTable.Rows.Single(r => r.GetPrimaryKey() == "WixUI_Mode");
-                WixAssert.StringEqual("Minimal", propertyRow.FieldAsString(1));
+                var dialogTable = wid.Tables["Dialog"];
+                var dialogRow = dialogTable.Rows.Single(r => r.GetPrimaryKey() == "WelcomeEulaDlg");
             }
         }
 
@@ -106,11 +132,10 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Property");
-            WixAssert.CompareLineByLine(new[]
-            {
-                "Property:WixUI_Mode\tMondo",
-            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
+            Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
+            Assert.Single(results, result => result.StartsWith("Dialog:SetupTypeDlg\t"));
         }
 
         [Fact]
@@ -130,6 +155,18 @@ namespace WixToolsetTest.UI
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args)
+                                  .AssertSuccess();
+        }
+
+        private static void BuildX64(string[] args)
+        {
+            var result = WixRunner.Execute(args.Concat(new[] { "-arch", "x64" }).ToArray())
+                                  .AssertSuccess();
+        }
+
+        private static void BuildARM64(string[] args)
+        {
+            var result = WixRunner.Execute(args.Concat(new[] { "-arch", "arm64" }).ToArray())
                                   .AssertSuccess();
         }
 

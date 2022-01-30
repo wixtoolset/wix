@@ -16,7 +16,5 @@
 
       <MergeRef Id='WinFormsModule' />
     </Feature>
-
-    <UIRef Id="WixUI_Minimal" />
   </Package>
 </Wix>
