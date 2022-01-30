@@ -27,7 +27,7 @@ BOOL DAPI IsLogInitialized();
 BOOL DAPI IsLogOpen();
 
 void DAPI LogInitialize(
-    __in HMODULE hModule
+    __in_opt HMODULE hModule
     );
 
 HRESULT DAPI LogOpen(

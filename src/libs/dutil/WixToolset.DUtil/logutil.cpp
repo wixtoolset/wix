@@ -87,7 +87,7 @@ extern "C" BOOL DAPI IsLogOpen()
 
 ********************************************************************/
 extern "C" void DAPI LogInitialize(
-    __in HMODULE hModule
+    __in_opt HMODULE hModule
     )
 {
     AssertSz(INVALID_HANDLE_VALUE == LogUtil_hLog && !LogUtil_sczLogPath, "LogInitialize() or LogOpen() - already called.");
