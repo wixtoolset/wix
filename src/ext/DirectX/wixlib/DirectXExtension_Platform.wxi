@@ -1,0 +1,23 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?include ..\..\caDecor.wxi ?>
+
+    <!-- DirectX Custom Action DLL Definitions -->
+    <Fragment>
+        <Binary Id="$(var.Prefix)DXCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))dxca.dll" />
+    </Fragment>
+
+    <Fragment>
+        <CustomAction Id="$(var.Prefix)QueryDirectXCaps$(var.Suffix)" DllEntry="WixQueryDirectXCaps" Return="ignore" BinaryRef="$(var.Prefix)DXCA$(var.Suffix)" />
+        
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryDirectXCaps$(var.Suffix)" Before="LaunchConditions" Overridable="yes" />
+        </InstallUISequence>
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryDirectXCaps$(var.Suffix)" Before="LaunchConditions" Overridable="yes" />
+        </InstallExecuteSequence>
+    </Fragment>
+</Include>

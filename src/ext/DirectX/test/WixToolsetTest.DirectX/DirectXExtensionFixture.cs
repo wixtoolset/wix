@@ -16,10 +16,11 @@ namespace WixToolsetTest.DirectX
             var folder = TestData.Get(@"TestData\UsingPixelShaderVersion");
             var build = new Builder(folder, typeof(DirectXExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "CustomAction");
+            var results = build.BuildAndQuery(Build, "CustomAction", "Binary");
             WixAssert.CompareLineByLine(new[]
             {
-                "CustomAction:WixQueryDirectXCaps\t65\tDirectXCA\tWixQueryDirectXCaps\t",
+                "Binary:Wix4DXCA_X86\t[Binary data]",
+                "CustomAction:Wix4QueryDirectXCaps_X86\t65\tWix4DXCA_X86\tWixQueryDirectXCaps\t",
             }, results);
         }
 

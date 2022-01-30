@@ -11,6 +11,7 @@ namespace WixToolset.DirectX
         protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(DirectXExtensionData),
+            typeof(DirectXCompiler),
         };
     }
 }
