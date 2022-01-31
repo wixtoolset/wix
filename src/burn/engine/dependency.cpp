@@ -77,6 +77,9 @@ static void UnregisterPackageDependency(
     __in const BURN_PACKAGE* pPackage,
     __in_z LPCWSTR wzDependentProviderKey
     );
+static void UnregisterOrphanPackageProviders(
+    __in const BURN_PACKAGE* pPackage
+    );
 
 
 // functions
@@ -734,15 +737,19 @@ extern "C" void DependencyUnregisterBundle(
     HRESULT hr = S_OK;
     LPCWSTR wzDependentProviderKey = pRegistration->sczId;
 
-    // Remove the bundle provider key.
-    hr = DepUnregisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey);
-    if (SUCCEEDED(hr))
+    // If we own the bundle dependency then remove it.
+    if (!pRegistration->fDetectedForeignProviderKeyBundleId)
     {
-        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED, pRegistration->sczProviderKey);
-    }
-    else if (FAILED(hr) && E_FILENOTFOUND != hr)
-    {
-        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED_FAILED, pRegistration->sczProviderKey, hr);
+        // Remove the bundle provider key.
+        hr = DepUnregisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey);
+        if (SUCCEEDED(hr))
+        {
+            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED, pRegistration->sczProviderKey);
+        }
+        else if (FAILED(hr) && E_FILENOTFOUND != hr)
+        {
+            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED_FAILED, pRegistration->sczProviderKey, hr);
+        }
     }
 
     // Best effort to make sure this bundle is not registered as a dependent for anything.
@@ -756,6 +763,13 @@ extern "C" void DependencyUnregisterBundle(
     {
         const BURN_PACKAGE* pPackage = &pRegistration->relatedBundles.rgRelatedBundles[i].package;
         UnregisterPackageDependency(pPackage->fPerMachine, pPackage, wzDependentProviderKey);
+    }
+
+    // Best effort to make sure package providers are removed if unused.
+    for (DWORD i = 0; i < pPackages->cPackages; ++i)
+    {
+        const BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
+        UnregisterOrphanPackageProviders(pPackage);
     }
 }
 
@@ -1429,5 +1443,36 @@ static void UnregisterPackageDependency(
                 LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_DEPENDENCY_FAILED, wzDependentProviderKey, pProvider->sczKey, pPackage->sczId, hr);
             }
         }
+    }
+}
+
+static void UnregisterOrphanPackageProviders(
+    __in const BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    DEPENDENCY* rgDependents = NULL;
+    UINT cDependents = 0;
+    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+    for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+    {
+        const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+
+        // Skip providers not owned by the bundle.
+        if (pProvider->fImported)
+        {
+            continue;
+        }
+
+        hr = DepCheckDependents(hkRoot, pProvider->sczKey, 0, NULL, &rgDependents, &cDependents);
+        if (SUCCEEDED(hr) && !cDependents)
+        {
+            UnregisterPackageProvider(pProvider, pPackage->sczId, hkRoot);
+        }
+
+        ReleaseDependencyArray(rgDependents, cDependents);
+        rgDependents = NULL;
+        cDependents = 0;
     }
 }
