@@ -39,6 +39,7 @@ extern "C" void DetectReset(
 {
     RelatedBundlesUninitialize(&pRegistration->relatedBundles);
     ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleId);
+    pRegistration->fDetectedForeignProviderKeyBundleId = FALSE;
     pRegistration->fSelfRegisteredAsDependent = FALSE;
     pRegistration->fParentRegisteredAsDependent = FALSE;
     pRegistration->fForwardCompatibleBundleExists = FALSE;
@@ -118,8 +119,7 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
     HRESULT hr = S_OK;
     int nCompareResult = 0;
 
-    if (pRegistration->sczDetectedProviderKeyBundleId &&
-        CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRegistration->sczId, -1))
+    if (pRegistration->fDetectedForeignProviderKeyBundleId)
     {
         for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
         {

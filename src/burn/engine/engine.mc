@@ -275,6 +275,13 @@ Language=English
 Detected related bundle missing from cache: %1!ls!, cache path: %2!ls!
 .
 
+MessageId=110
+Severity=Success
+SymbolicName=MSG_DETECTED_FOREIGN_BUNDLE_PROVIDER_REGISTRATION
+Language=English
+Detected bundle provider key: %1!ls! that is registered to a different bundle: %2!ls!
+.
+
 MessageId=120
 Severity=Warning
 SymbolicName=MSG_DETECT_PACKAGE_NOT_FULLY_CACHED

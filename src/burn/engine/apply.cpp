@@ -432,12 +432,12 @@ extern "C" HRESULT ApplyRegister(
         // begin new session
         if (pEngineState->registration.fPerMachine)
         {
-            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize, registrationType);
+            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleId, pEngineState->plan.qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session in per-machine process.");
         }
         else
         {
-            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize, registrationType);
+            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session.");
         }
     }
@@ -521,12 +521,12 @@ extern "C" HRESULT ApplyUnregister(
 
     if (pEngineState->registration.fPerMachine)
     {
-        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction, registrationType);
+        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->registration.fDetectedForeignProviderKeyBundleId, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-machine process.");
     }
     else
     {
-        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->cache, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction, registrationType);
+        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->cache, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-user process.");
     }
 
@@ -2914,8 +2914,9 @@ static HRESULT ExecuteDependencyAction(
     )
 {
     HRESULT hr = S_OK;
+    BURN_PACKAGE* pPackage = pAction->packageDependency.pPackage;
 
-    if (pAction->packageDependency.pPackage->fPerMachine)
+    if (pPackage->fPerMachine)
     {
         hr = ElevationExecutePackageDependencyAction(pEngineState->companionConnection.hPipe, pAction);
         ExitOnFailure(hr, "Failed to register the dependency on per-machine package.");
@@ -2926,20 +2927,20 @@ static HRESULT ExecuteDependencyAction(
         ExitOnFailure(hr, "Failed to register the dependency on per-user package.");
     }
 
-    if (pAction->packageDependency.pPackage->fCanAffectRegistration)
+    if (pPackage->fCanAffectRegistration)
     {
         if (BURN_DEPENDENCY_ACTION_REGISTER == pAction->packageDependency.action)
         {
-            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pAction->packageDependency.pPackage->cacheRegistrationState)
+            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->cacheRegistrationState)
             {
-                pAction->packageDependency.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+                pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
             }
 
-            if (BURN_PACKAGE_TYPE_MSP == pAction->packageDependency.pPackage->type)
+            if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
             {
-                for (DWORD i = 0; i < pAction->packageDependency.pPackage->Msp.cTargetProductCodes; ++i)
+                for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
                 {
-                    BURN_MSPTARGETPRODUCT* pTargetProduct = pAction->packageDependency.pPackage->Msp.rgTargetProducts + i;
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
 
                     if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pTargetProduct->registrationState)
                     {
@@ -2947,23 +2948,23 @@ static HRESULT ExecuteDependencyAction(
                     }
                 }
             }
-            else if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pAction->packageDependency.pPackage->installRegistrationState)
+            else if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->installRegistrationState)
             {
-                pAction->packageDependency.pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+                pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
             }
         }
         else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pAction->packageDependency.action)
         {
-            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pAction->packageDependency.pPackage->cacheRegistrationState)
+            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState)
             {
-                pAction->packageDependency.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
             }
 
-            if (BURN_PACKAGE_TYPE_MSP == pAction->packageDependency.pPackage->type)
+            if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
             {
-                for (DWORD i = 0; i < pAction->packageDependency.pPackage->Msp.cTargetProductCodes; ++i)
+                for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
                 {
-                    BURN_MSPTARGETPRODUCT* pTargetProduct = pAction->packageDependency.pPackage->Msp.rgTargetProducts + i;
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
 
                     if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pTargetProduct->registrationState)
                     {
@@ -2971,9 +2972,9 @@ static HRESULT ExecuteDependencyAction(
                     }
                 }
             }
-            else if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pAction->packageDependency.pPackage->installRegistrationState)
+            else if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState)
             {
-                pAction->packageDependency.pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
             }
         }
     }

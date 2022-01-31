@@ -246,6 +246,11 @@ extern "C" HRESULT DependencyDetectProviderKeyBundleId(
         hr = StrAllocString(&pRegistration->sczDetectedProviderKeyBundleId, pRegistration->sczProviderKey, 0);
         ExitOnFailure(hr, "Failed to initialize provider key bundle id.");
     }
+    else if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pRegistration->sczDetectedProviderKeyBundleId, -1))
+    {
+        pRegistration->fDetectedForeignProviderKeyBundleId = TRUE;
+        LogId(REPORT_STANDARD, MSG_DETECTED_FOREIGN_BUNDLE_PROVIDER_REGISTRATION, pRegistration->sczProviderKey, pRegistration->sczDetectedProviderKeyBundleId);
+    }
 
 LExit:
     return hr;

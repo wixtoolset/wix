@@ -541,25 +541,14 @@ extern "C" HRESULT PlanRegistration(
         pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
     }
 
-    // Always write registration since things may have changed or it just needs to be "fixed up".
-    pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
-
-    // Always update our estimated size registration when installing/modify/repair since things
-    // may have been added or removed or it just needs to be "fixed up".
-    pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_UPDATE_SIZE;
-
     if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
     {
-        // If our provider key was detected and it points to our current bundle then we can
-        // unregister the bundle dependency.
-        if (pRegistration->sczDetectedProviderKeyBundleId &&
-            CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pRegistration->sczDetectedProviderKeyBundleId, -1))
+        // If our provider key was not owned by a different bundle,
+        // then plan to write our provider key registration to "fix it" if broken
+        // in case the bundle isn't successfully uninstalled.
+        if (!pRegistration->fDetectedForeignProviderKeyBundleId)
         {
-            pPlan->dependencyRegistrationAction = BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER;
-        }
-        else // log that another bundle already owned our registration, hopefully this only happens when a newer version
-        {    // of a bundle installed and is in the process of upgrading us.
-            LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_PROVIDER_KEY_REMOVAL, pRegistration->sczProviderKey, pRegistration->sczDetectedProviderKeyBundleId);
+            pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY;
         }
 
         // Create the dictionary of dependents that should be ignored.
@@ -651,7 +640,7 @@ extern "C" HRESULT PlanRegistration(
 
         // Always plan to write our provider key registration when installing/modify/repair to "fix it"
         // if broken.
-        pPlan->dependencyRegistrationAction = BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER;
+        pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY;
 
         // Create the dictionary of bundle dependents.
         hr = DictCreateStringList(&sdBundleDependents, 5, DICT_FLAG_CASEINSENSITIVE);
