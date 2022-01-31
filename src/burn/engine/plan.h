@@ -213,7 +213,6 @@ typedef struct _BURN_EXECUTE_ACTION
         {
             BURN_PACKAGE* pPackage;
             LPWSTR sczBundleProviderKey;
-            BURN_DEPENDENCY_ACTION action;
         } packageDependency;
         struct
         {
