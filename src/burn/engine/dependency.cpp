@@ -445,47 +445,44 @@ extern "C" HRESULT DependencyPlanPackageBegin(
         ExitFunction1(hr = S_OK);
     }
 
-    // If we're uninstalling the package, check if any dependents are registered.
-    if (fAttemptingUninstall)
+    // Check if any dependents are registered which would prevent the package from being uninstalled.
+    // Build up a list of dependents to ignore, including the current bundle.
+    hr = GetIgnoredDependents(pPackage, pPlan, &sdIgnoredDependents);
+    ExitOnFailure(hr, "Failed to build the list of ignored dependents.");
+
+    // Skip the dependency check if "ALL" was authored for IGNOREDEPENDENCIES.
+    hr = DictKeyExists(sdIgnoredDependents, L"ALL");
+    if (E_NOTFOUND != hr)
     {
-        // Build up a list of dependents to ignore, including the current bundle.
-        hr = GetIgnoredDependents(pPackage, pPlan, &sdIgnoredDependents);
-        ExitOnFailure(hr, "Failed to build the list of ignored dependents.");
+        ExitOnFailure(hr, "Failed to check if \"ALL\" was set in IGNOREDEPENDENCIES.");
+    }
+    else
+    {
+        hr = S_OK;
 
-        // Skip the dependency check if "ALL" was authored for IGNOREDEPENDENCIES.
-        hr = DictKeyExists(sdIgnoredDependents, L"ALL");
-        if (E_NOTFOUND != hr)
+        for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
         {
-            ExitOnFailure(hr, "Failed to check if \"ALL\" was set in IGNOREDEPENDENCIES.");
-        }
-        else
-        {
-            hr = S_OK;
+            const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders + i;
 
-            for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+            for (DWORD j = 0; j < pProvider->cDependents; ++j)
             {
-                const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders + i;
+                const DEPENDENCY* pDependency = pProvider->rgDependents + j;
 
-                for (DWORD j = 0; j < pProvider->cDependents; ++j)
+                hr = DictKeyExists(sdIgnoredDependents, pDependency->sczKey);
+                if (E_NOTFOUND == hr)
                 {
-                    const DEPENDENCY* pDependency = pProvider->rgDependents + j;
+                    hr = S_OK;
 
-                    hr = DictKeyExists(sdIgnoredDependents, pDependency->sczKey);
-                    if (E_NOTFOUND == hr)
+                    if (!fDependentBlocksUninstall)
                     {
-                        hr = S_OK;
+                        fDependentBlocksUninstall = TRUE;
 
-                        if (!fDependentBlocksUninstall)
-                        {
-                            fDependentBlocksUninstall = TRUE;
-
-                            LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_HASDEPENDENTS, pPackage->sczId);
-                        }
-
-                        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_DEPENDENT, pDependency->sczKey, LoggingStringOrUnknownIfNull(pDependency->sczName));
+                        LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_HASDEPENDENTS, pPackage->sczId);
                     }
-                    ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
+
+                    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_DEPENDENT, pDependency->sczKey, LoggingStringOrUnknownIfNull(pDependency->sczName));
                 }
+                ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
             }
         }
     }
@@ -499,7 +496,7 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     CalculateDependencyActionStates(pPackage, &dependencyExecuteAction, &dependencyRollbackAction);
 
     // If dependents were found, change the action to not uninstall the package.
-    if (fDependentBlocksUninstall)
+    if (fAttemptingUninstall && fDependentBlocksUninstall)
     {
         pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -509,6 +506,12 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     }
     else
     {
+        // Trust the forward compatible nature of providers - don't uninstall the package during rollback if there were dependents.
+        if (fDependentBlocksUninstall && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->rollback)
+        {
+            pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
+        }
+
         // Only plan providers when the package is current (not obsolete).
         if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE != pPackage->currentState)
         {
