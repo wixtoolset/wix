@@ -193,8 +193,10 @@ typedef struct _BURN_DEPENDENCY_PROVIDER
     LPWSTR sczDisplayName;
     BOOL fImported;
 
-    DEPENDENCY* rgDependents; // only valid after Detect.
-    UINT cDependents;         // only valid after Detect.
+    BOOL fExists;                              // only valid after Detect.
+    BOOL fBundleRegisteredAsDependent;         // only valid after Detect.
+    DEPENDENCY* rgDependents;                  // only valid after Detect.
+    UINT cDependents;                          // only valid after Detect.
 
     BURN_DEPENDENCY_ACTION dependentExecute;   // only valid during Plan.
     BURN_DEPENDENCY_ACTION dependentRollback;  // only valid during Plan.
@@ -264,7 +266,6 @@ typedef struct _BURN_PACKAGE
 
     BOOTSTRAPPER_PACKAGE_STATE currentState;    // only valid after Detect.
     BOOL fCached;                               // only valid after Detect.
-    BOOL fPackageProviderExists;                // only valid after Detect.
     BOOTSTRAPPER_CACHE_TYPE cacheType;          // only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;// only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;       // only valid during Plan.

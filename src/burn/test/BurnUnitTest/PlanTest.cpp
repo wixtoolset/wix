@@ -305,7 +305,7 @@ namespace Bootstrapper
 
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectPackagesAsAbsent(pEngineState);
-            DetectCompatibleMsiPackage(pEngineState->packages.rgPackages, L"{C24F3903-38E7-4D44-8037-D9856B3C5046}", L"2.0.0.0");
+            DetectCompatibleMsiPackage(pEngineState, pEngineState->packages.rgPackages, L"{C24F3903-38E7-4D44-8037-D9856B3C5046}", L"2.0.0.0");
 
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
             NativeAssert::Succeeded(hr, "CorePlan failed");
@@ -491,7 +491,6 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
             Assert::Equal(dwIndex, pPlan->cExecuteActions);
 
@@ -500,8 +499,6 @@ namespace Bootstrapper
             dwExecuteCheckpointId = 2;
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
             ValidateExecuteUncachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
-            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", unregisterActions1, 1);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
@@ -561,8 +558,6 @@ namespace Bootstrapper
             dwIndex = 0;
             DWORD dwExecuteCheckpointId = 1;
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
-            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", unregisterActions1, 1);
-            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", unregisterActions1, 1);
             ValidateExecuteMsiPackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, BURN_MSI_PROPERTY_UNINSTALL, INSTALLUILEVEL_NONE, FALSE, BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER, 0);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -613,10 +608,10 @@ namespace Bootstrapper
             vfUseRelatedBundleRequestState = TRUE;
             vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_MODIFY);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
-            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_MODIFY, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
 
@@ -1258,7 +1253,7 @@ namespace Bootstrapper
             }
         }
 
-        void DetectCompatibleMsiPackage(BURN_PACKAGE* pPackage, LPCWSTR wzProductCode, LPCWSTR wzVersion)
+        void DetectCompatibleMsiPackage(BURN_ENGINE_STATE* pEngineState, BURN_PACKAGE* pPackage, LPCWSTR wzProductCode, LPCWSTR wzVersion)
         {
             HRESULT hr = S_OK;
             Assert(BOOTSTRAPPER_PACKAGE_STATE_PRESENT > pPackage->currentState);
@@ -1286,6 +1281,8 @@ namespace Bootstrapper
 
             hr = StrAllocString(&pCompatiblePackage->compatibleEntry.sczProviderKey, pProvider->sczKey, 0);
             NativeAssert::Succeeded(hr, "Failed to copy provider key");
+
+            DetectPackageDependent(pPackage, pEngineState->registration.sczId);
         }
 
         void DetectPackageAsAbsent(BURN_PACKAGE* pPackage)
@@ -1319,6 +1316,9 @@ namespace Bootstrapper
 
                 hr = DepDependencyArrayAlloc(&pProvider->rgDependents, &pProvider->cDependents, wzId, NULL);
                 NativeAssert::Succeeded(hr, "Failed to add package dependent");
+
+                pProvider->fExists = TRUE;
+                pProvider->fBundleRegisteredAsDependent = TRUE;
             }
         }
 

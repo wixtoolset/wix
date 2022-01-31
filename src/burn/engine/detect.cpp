@@ -57,7 +57,6 @@ extern "C" void DetectReset(
         BURN_PACKAGE* pPackage = pPackages->rgPackages + iPackage;
 
         pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
-        pPackage->fPackageProviderExists = FALSE;
         pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
         pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
@@ -91,6 +90,9 @@ extern "C" void DetectReset(
         for (DWORD iProvider = 0; iProvider < pPackage->cDependencyProviders; ++iProvider)
         {
             BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders + iProvider;
+
+            pProvider->fExists = FALSE;
+            pProvider->fBundleRegisteredAsDependent = FALSE;
 
             if (pProvider->rgDependents)
             {

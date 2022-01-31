@@ -67,7 +67,6 @@ static HRESULT ProcessPackageRollbackBoundary(
     );
 static HRESULT GetActionDefaultRequestState(
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOL fPermanent,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
     __out BOOTSTRAPPER_REQUEST_STATE* pRequestState
     );
@@ -318,7 +317,6 @@ LExit:
 extern "C" HRESULT PlanDefaultPackageRequestState(
     __in BURN_PACKAGE_TYPE packageType,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
-    __in BOOL fPermanent,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
@@ -333,6 +331,20 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
     {
         *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
     }
+    else if (BOOTSTRAPPER_ACTION_CACHE == action)
+    {
+        switch (currentState)
+        {
+        case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
+            break;
+
+        default:
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
+            break;
+        }
+    }
     else if (BOOTSTRAPPER_RELATION_PATCH == relationType && BURN_PACKAGE_TYPE_MSP == packageType)
     {
         // For patch related bundles, only install a patch if currently absent during install, modify, or repair.
@@ -345,33 +357,30 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
         }
     }
-    else if (BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == currentState && BOOTSTRAPPER_ACTION_UNINSTALL != action)
-    {
-        // Superseded means the package is on the machine but not active, so only uninstall operations are allowed.
-        // All other operations do nothing.
-        *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-    }
-    else if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE == currentState && !(BOOTSTRAPPER_ACTION_UNINSTALL == action && BURN_PACKAGE_TYPE_MSP == packageType))
-    {
-        // Obsolete means the package is not on the machine and should not be installed, *except* patches can be obsolete
-        // and present so allow them to be removed during uninstall. Everyone else, gets nothing.
-        *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-    }
     else // pick the best option for the action state and install condition.
     {
-        hr = GetActionDefaultRequestState(action, fPermanent, currentState, &defaultRequestState);
+        hr = GetActionDefaultRequestState(action, currentState, &defaultRequestState);
         ExitOnFailure(hr, "Failed to get default request state for action.");
 
-        // If we're doing an install, use the install condition
-        // to determine whether to use the default request state or make the package absent.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL != action && BOOTSTRAPPER_PACKAGE_CONDITION_FALSE == installCondition)
+        if (BOOTSTRAPPER_ACTION_UNINSTALL != action)
         {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+            // If we're not doing an uninstall, use the install condition
+            // to determine whether to use the default request state or make the package absent.
+            if (BOOTSTRAPPER_PACKAGE_CONDITION_FALSE == installCondition)
+            {
+                defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+            }
+            // Obsolete means the package is not on the machine and should not be installed,
+            // *except* patches can be obsolete and present.
+            // Superseded means the package is on the machine but not active, so only uninstall operations are allowed.
+            // All other operations do nothing.
+            else if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE == currentState || BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == currentState)
+            {
+                defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT <= defaultRequestState ? BOOTSTRAPPER_REQUEST_STATE_NONE : defaultRequestState;
+            }
         }
-        else // just set the package to the default request state.
-        {
-            *pRequestState = defaultRequestState;
-        }
+
+        *pRequestState = defaultRequestState;
     }
 
 LExit:
@@ -873,7 +882,7 @@ static HRESULT InitializePackage(
     }
 
     // Remember the default requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
-    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, pPackage->fPermanent, pPlan->action, installCondition, relationType, &pPackage->defaultRequested);
+    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, pPlan->action, installCondition, relationType, &pPackage->defaultRequested);
     ExitOnFailure(hr, "Failed to set default package state.");
 
     pPackage->requested = pPackage->defaultRequested;
@@ -1993,7 +2002,6 @@ static void ResetPlannedRollbackBoundaryState(
 
 static HRESULT GetActionDefaultRequestState(
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOL fPermanent,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
     __out BOOTSTRAPPER_REQUEST_STATE* pRequestState
     )
@@ -2002,22 +2010,7 @@ static HRESULT GetActionDefaultRequestState(
 
     switch (action)
     {
-    case BOOTSTRAPPER_ACTION_CACHE:
-        switch (currentState)
-        {
-        case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
-            break;
-
-        default:
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
-            break;
-        }
-        break;
-
-    case BOOTSTRAPPER_ACTION_INSTALL: __fallthrough;
-    case BOOTSTRAPPER_ACTION_UPDATE_REPLACE: __fallthrough;
-    case BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED:
+    case BOOTSTRAPPER_ACTION_INSTALL:
         *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
         break;
 
@@ -2026,7 +2019,7 @@ static HRESULT GetActionDefaultRequestState(
         break;
 
     case BOOTSTRAPPER_ACTION_UNINSTALL:
-        *pRequestState = fPermanent ? BOOTSTRAPPER_REQUEST_STATE_NONE : BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+        *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
         break;
 
     case BOOTSTRAPPER_ACTION_MODIFY:
@@ -2052,7 +2045,7 @@ static HRESULT GetActionDefaultRequestState(
     }
 
 LExit:
-        return hr;
+    return hr;
 }
 
 static HRESULT AddRegistrationAction(

@@ -611,7 +611,7 @@ namespace WixToolsetTest.BurnE2E
             packageGv2.VerifyInstalled(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6510")]
+        [Fact]
         public void DoesntLoseDependenciesOnFailedMajorUpgradeBundleFromMinorUpdateMsi()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
