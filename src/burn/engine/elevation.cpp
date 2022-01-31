@@ -1346,7 +1346,8 @@ LExit:
 
 extern "C" HRESULT ElevationExecutePackageDependencyAction(
     __in HANDLE hPipe,
-    __in BURN_EXECUTE_ACTION* pExecuteAction
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BOOL fRollback
     )
 {
     HRESULT hr = S_OK;
@@ -1359,11 +1360,20 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->packageDependency.pPackage->sczId);
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fRollback);
+    ExitOnFailure(hr, "Failed to write rollback flag to message buffer.");
+
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->packageDependency.sczBundleProviderKey);
     ExitOnFailure(hr, "Failed to write bundle dependency key to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, pExecuteAction->packageDependency.action);
-    ExitOnFailure(hr, "Failed to write action to message buffer.");
+    // Dependent actions.
+    for (DWORD i = 0; i < pExecuteAction->packageProvider.pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = pExecuteAction->packageProvider.pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->dependentRollback : &pProvider->dependentExecute;
+        hr = BuffWriteNumber(&pbData, &cbData, (DWORD)*pAction);
+        ExitOnFailure(hr, "Failed to write dependent action to message buffer.");
+    }
 
     // Send the message.
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY, pbData, cbData, NULL, NULL, &dwResult);
@@ -3260,6 +3270,7 @@ static HRESULT OnExecutePackageDependencyAction(
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
+    BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY;
@@ -3267,12 +3278,6 @@ static HRESULT OnExecutePackageDependencyAction(
     // Deserialize the message data.
     hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
     ExitOnFailure(hr, "Failed to read package id from message buffer.");
-
-    hr = BuffReadString(pbData, cbData, &iData, &executeAction.packageDependency.sczBundleProviderKey);
-    ExitOnFailure(hr, "Failed to read bundle dependency key from message buffer.");
-
-    hr = BuffReadNumber(pbData, cbData, &iData, reinterpret_cast<DWORD*>(&executeAction.packageDependency.action));
-    ExitOnFailure(hr, "Failed to read action.");
 
     // Find the package again.
     hr = PackageFindById(pPackages, sczPackage, &executeAction.packageDependency.pPackage);
@@ -3282,8 +3287,23 @@ static HRESULT OnExecutePackageDependencyAction(
     }
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
+    ExitOnFailure(hr, "Failed to read rollback flag.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &executeAction.packageDependency.sczBundleProviderKey);
+    ExitOnFailure(hr, "Failed to read bundle dependency key from message buffer.");
+
+    // Read dependent actions.
+    for (DWORD i = 0; i < executeAction.packageProvider.pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = executeAction.packageProvider.pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->dependentRollback : &pProvider->dependentExecute;
+        hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)pAction);
+        ExitOnFailure(hr, "Failed to read dependent action.");
+    }
+
     // Execute the package dependency action.
-    hr = DependencyExecutePackageDependencyAction(TRUE, &executeAction);
+    hr = DependencyExecutePackageDependencyAction(TRUE, &executeAction, fRollback);
     ExitOnFailure(hr, "Failed to execute package dependency action.");
 
 LExit:

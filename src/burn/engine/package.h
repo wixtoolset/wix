@@ -45,8 +45,8 @@ enum BURN_PACKAGE_TYPE
 enum BURN_DEPENDENCY_ACTION
 {
     BURN_DEPENDENCY_ACTION_NONE,
-    BURN_DEPENDENCY_ACTION_REGISTER,
     BURN_DEPENDENCY_ACTION_UNREGISTER,
+    BURN_DEPENDENCY_ACTION_REGISTER,
 };
 
 enum BURN_PATCH_TARGETCODE_TYPE
@@ -196,6 +196,8 @@ typedef struct _BURN_DEPENDENCY_PROVIDER
     DEPENDENCY* rgDependents; // only valid after Detect.
     UINT cDependents;         // only valid after Detect.
 
+    BURN_DEPENDENCY_ACTION dependentExecute;   // only valid during Plan.
+    BURN_DEPENDENCY_ACTION dependentRollback;  // only valid during Plan.
     BURN_DEPENDENCY_ACTION providerExecute;    // only valid during Plan.
     BURN_DEPENDENCY_ACTION providerRollback;   // only valid during Plan.
 } BURN_DEPENDENCY_PROVIDER;

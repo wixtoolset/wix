@@ -1973,6 +1973,8 @@ static void ResetPlannedPackageState(
     {
         BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
 
+        pProvider->dependentExecute = BURN_DEPENDENCY_ACTION_NONE;
+        pProvider->dependentRollback = BURN_DEPENDENCY_ACTION_NONE;
         pProvider->providerExecute = BURN_DEPENDENCY_ACTION_NONE;
         pProvider->providerRollback = BURN_DEPENDENCY_ACTION_NONE;
     }
@@ -2654,7 +2656,12 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls, action: %hs", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey, LoggingDependencyActionToString(pAction->packageDependency.action));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey);
+        for (DWORD j = 0; j < pAction->packageProvider.pPackage->cDependencyProviders; ++j)
+        {
+            const BURN_DEPENDENCY_PROVIDER* pProvider = pAction->packageProvider.pPackage->rgDependencyProviders + j;
+            LogStringLine(PlanDumpLevel, "      Provider[%u]: key: %ls, action: %hs", j, pProvider->sczKey, LoggingDependencyActionToString(fRollback ? pProvider->dependentRollback : pProvider->dependentExecute));
+        }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:

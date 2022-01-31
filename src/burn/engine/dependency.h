@@ -161,7 +161,8 @@ HRESULT DependencyExecutePackageProviderAction(
 *********************************************************************/
 HRESULT DependencyExecutePackageDependencyAction(
     __in BOOL fPerMachine,
-    __in const BURN_EXECUTE_ACTION* pAction
+    __in const BURN_EXECUTE_ACTION* pAction,
+    __in BOOL fRollback
     );
 
 /********************************************************************

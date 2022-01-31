@@ -258,7 +258,8 @@ static HRESULT ExecutePackageProviderAction(
 static HRESULT ExecuteDependencyAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pAction,
-    __in BURN_EXECUTE_CONTEXT* pContext
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fRollback
     );
 static HRESULT ExecuteMsiBeginTransaction(
     __in BURN_ENGINE_STATE* pEngineState,
@@ -2357,7 +2358,7 @@ static HRESULT DoExecuteAction(
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
-            hr = ExecuteDependencyAction(pEngineState, pExecuteAction, pContext);
+            hr = ExecuteDependencyAction(pEngineState, pExecuteAction, pContext, FALSE);
             ExitOnFailure(hr, "Failed to execute dependency action.");
             break;
 
@@ -2480,7 +2481,7 @@ static HRESULT DoRollbackActions(
                 break;
 
             case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
-                hr = ExecuteDependencyAction(pEngineState, pRollbackAction, pContext);
+                hr = ExecuteDependencyAction(pEngineState, pRollbackAction, pContext, TRUE);
                 IgnoreRollbackError(hr, "Failed to rollback dependency action.");
                 break;
 
@@ -2915,26 +2916,31 @@ LExit:
 static HRESULT ExecuteDependencyAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pAction,
-    __in BURN_EXECUTE_CONTEXT* /*pContext*/
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fRollback
     )
 {
     HRESULT hr = S_OK;
     BURN_PACKAGE* pPackage = pAction->packageDependency.pPackage;
 
+    Assert(pContext->fRollback == fRollback);
+    UNREFERENCED_PARAMETER(pContext);
+
     if (pPackage->fPerMachine)
     {
-        hr = ElevationExecutePackageDependencyAction(pEngineState->companionConnection.hPipe, pAction);
+        hr = ElevationExecutePackageDependencyAction(pEngineState->companionConnection.hPipe, pAction, fRollback);
         ExitOnFailure(hr, "Failed to register the dependency on per-machine package.");
     }
     else
     {
-        hr = DependencyExecutePackageDependencyAction(FALSE, pAction);
+        hr = DependencyExecutePackageDependencyAction(FALSE, pAction, fRollback);
         ExitOnFailure(hr, "Failed to register the dependency on per-user package.");
     }
 
     if (pPackage->fCanAffectRegistration)
     {
-        if (BURN_DEPENDENCY_ACTION_REGISTER == pAction->packageDependency.action)
+        BURN_DEPENDENCY_ACTION dependencyAction = fRollback ? pPackage->dependencyRollback : pPackage->dependencyExecute;
+        if (BURN_DEPENDENCY_ACTION_REGISTER == dependencyAction)
         {
             if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->cacheRegistrationState)
             {
@@ -2958,7 +2964,7 @@ static HRESULT ExecuteDependencyAction(
                 pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
             }
         }
-        else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pAction->packageDependency.action)
+        else if (BURN_DEPENDENCY_ACTION_UNREGISTER == dependencyAction)
         {
             if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState)
             {
