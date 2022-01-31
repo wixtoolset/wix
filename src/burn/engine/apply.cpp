@@ -252,7 +252,8 @@ static HRESULT ExecuteMsuPackage(
 static HRESULT ExecutePackageProviderAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pAction,
-    __in BURN_EXECUTE_CONTEXT* pContext
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fRollback
     );
 static HRESULT ExecuteDependencyAction(
     __in BURN_ENGINE_STATE* pEngineState,
@@ -2351,7 +2352,7 @@ static HRESULT DoExecuteAction(
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER:
-            hr = ExecutePackageProviderAction(pEngineState, pExecuteAction, pContext);
+            hr = ExecutePackageProviderAction(pEngineState, pExecuteAction, pContext, FALSE);
             ExitOnFailure(hr, "Failed to execute package provider registration action.");
             break;
 
@@ -2474,7 +2475,7 @@ static HRESULT DoRollbackActions(
                 break;
 
             case BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER:
-                hr = ExecutePackageProviderAction(pEngineState, pRollbackAction, pContext);
+                hr = ExecutePackageProviderAction(pEngineState, pRollbackAction, pContext, TRUE);
                 IgnoreRollbackError(hr, "Failed to rollback package provider action.");
                 break;
 
@@ -2887,19 +2888,23 @@ LExit:
 static HRESULT ExecutePackageProviderAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pAction,
-    __in BURN_EXECUTE_CONTEXT* /*pContext*/
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fRollback
     )
 {
     HRESULT hr = S_OK;
 
+    Assert(pContext->fRollback == fRollback);
+    UNREFERENCED_PARAMETER(pContext);
+
     if (pAction->packageProvider.pPackage->fPerMachine)
     {
-        hr = ElevationExecutePackageProviderAction(pEngineState->companionConnection.hPipe, pAction);
+        hr = ElevationExecutePackageProviderAction(pEngineState->companionConnection.hPipe, pAction, fRollback);
         ExitOnFailure(hr, "Failed to register the package provider on per-machine package.");
     }
     else
     {
-        hr = DependencyExecutePackageProviderAction(pAction);
+        hr = DependencyExecutePackageProviderAction(pAction, fRollback);
         ExitOnFailure(hr, "Failed to register the package provider on per-user package.");
     }
 

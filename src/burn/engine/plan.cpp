@@ -1922,8 +1922,8 @@ static void ResetPlannedPackageState(
     pPackage->fPlannedUncache = FALSE;
     pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-    pPackage->providerExecute = BURN_DEPENDENCY_ACTION_NONE;
-    pPackage->providerRollback = BURN_DEPENDENCY_ACTION_NONE;
+    pPackage->fProviderExecute = FALSE;
+    pPackage->fProviderRollback = FALSE;
     pPackage->dependencyExecute = BURN_DEPENDENCY_ACTION_NONE;
     pPackage->dependencyRollback = BURN_DEPENDENCY_ACTION_NONE;
     pPackage->fDependencyManagerWasHere = FALSE;
@@ -1967,6 +1967,14 @@ static void ResetPlannedPackageState(
             pTargetProduct->executeSkip = BURN_PATCH_SKIP_STATE_NONE;
             pTargetProduct->rollbackSkip = BURN_PATCH_SKIP_STATE_NONE;
         }
+    }
+
+    for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+
+        pProvider->providerExecute = BURN_DEPENDENCY_ACTION_NONE;
+        pProvider->providerRollback = BURN_DEPENDENCY_ACTION_NONE;
     }
 
     ResetPlannedPayloadGroupState(&pPackage->payloads);
@@ -2637,7 +2645,12 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_PROVIDER package id: %ls, action: %hs", wzBase, iAction, pAction->packageProvider.pPackage->sczId, LoggingDependencyActionToString(pAction->packageProvider.action));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_PROVIDER package id: %ls", wzBase, iAction, pAction->packageProvider.pPackage->sczId);
+        for (DWORD j = 0; j < pAction->packageProvider.pPackage->cDependencyProviders; ++j)
+        {
+            const BURN_DEPENDENCY_PROVIDER* pProvider = pAction->packageProvider.pPackage->rgDependencyProviders + j;
+            LogStringLine(PlanDumpLevel, "      Provider[%u]: key: %ls, action: %hs", j, pProvider->sczKey, LoggingDependencyActionToString(fRollback ? pProvider->providerRollback : pProvider->providerExecute));
+        }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
