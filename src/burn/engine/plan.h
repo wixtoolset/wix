@@ -208,7 +208,6 @@ typedef struct _BURN_EXECUTE_ACTION
         struct
         {
             BURN_PACKAGE* pPackage;
-            BURN_DEPENDENCY_ACTION action;
         } packageProvider;
         struct
         {

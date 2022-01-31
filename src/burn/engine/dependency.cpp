@@ -59,11 +59,17 @@ static LPCWSTR GetPackageProviderId(
     );
 
 static HRESULT RegisterPackageProvider(
-    __in const BURN_PACKAGE* pPackage
+    __in const BURN_DEPENDENCY_PROVIDER* pProvider,
+    __in LPCWSTR wzPackageId,
+    __in LPCWSTR wzPackageProviderId,
+    __in HKEY hkRoot,
+    __in BOOL fVital
     );
 
 static void UnregisterPackageProvider(
-    __in const BURN_PACKAGE* pPackage
+    __in const BURN_DEPENDENCY_PROVIDER* pProvider,
+    __in LPCWSTR wzPackageId,
+    __in HKEY hkRoot
     );
 
 static HRESULT RegisterPackageDependency(
@@ -489,6 +495,8 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     {
         pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
+
+        // Assume the compatible package has the same exact providers.
         pPackage->compatiblePackage.fRemove = FALSE;
     }
     else
@@ -511,8 +519,22 @@ extern "C" HRESULT DependencyPlanPackageBegin(
 
             if (!fAllImportedProviders)
             {
-                pPackage->providerExecute = dependencyExecuteAction;
-                pPackage->providerRollback = dependencyRollbackAction;
+                for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+                {
+                    BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+                    pProvider->providerExecute = dependencyExecuteAction;
+                    pProvider->providerRollback = dependencyRollbackAction;
+                }
+
+                if (BURN_DEPENDENCY_ACTION_NONE != dependencyExecuteAction)
+                {
+                    pPackage->fProviderExecute = TRUE;
+                }
+
+                if (BURN_DEPENDENCY_ACTION_NONE != dependencyRollbackAction)
+                {
+                    pPackage->fProviderRollback = TRUE;
+                }
             }
         }
 
@@ -556,14 +578,13 @@ extern "C" HRESULT DependencyPlanPackage(
     }
 
     // Add the provider rollback plan.
-    if (BURN_DEPENDENCY_ACTION_NONE != pPackage->providerRollback)
+    if (pPackage->fProviderRollback)
     {
         hr = PlanAppendRollbackAction(pPlan, &pAction);
         ExitOnFailure(hr, "Failed to append provider rollback action.");
 
         pAction->type = BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER;
         pAction->packageProvider.pPackage = const_cast<BURN_PACKAGE*>(pPackage);
-        pAction->packageProvider.action = pPackage->providerRollback;
 
         // Put a checkpoint before the execute action so that rollback happens
         // if execute fails.
@@ -573,7 +594,7 @@ extern "C" HRESULT DependencyPlanPackage(
 
     // Add the provider execute plan. This comes after rollback so if something goes wrong
     // rollback will try to clean up after us.
-    if (BURN_DEPENDENCY_ACTION_NONE != pPackage->providerExecute)
+    if (pPackage->fProviderExecute)
     {
         if (NULL != pdwInsertSequence)
         {
@@ -592,7 +613,6 @@ extern "C" HRESULT DependencyPlanPackage(
 
         pAction->type = BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER;
         pAction->packageProvider.pPackage = const_cast<BURN_PACKAGE*>(pPackage);
-        pAction->packageProvider.action = pPackage->providerExecute;
     }
 
 LExit:
@@ -627,26 +647,39 @@ LExit:
 }
 
 extern "C" HRESULT DependencyExecutePackageProviderAction(
-    __in const BURN_EXECUTE_ACTION* pAction
+    __in const BURN_EXECUTE_ACTION* pAction,
+    __in BOOL fRollback
     )
 {
     AssertSz(BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER == pAction->type, "Execute action type not supported by this function.");
 
     HRESULT hr = S_OK;
     const BURN_PACKAGE* pPackage = pAction->packageProvider.pPackage;
+    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    LPCWSTR wzId = GetPackageProviderId(pPackage);
 
-    // Register or unregister the package provider(s).
-    if (BURN_DEPENDENCY_ACTION_REGISTER == pAction->packageProvider.action)
+    for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
     {
-        hr = RegisterPackageProvider(pPackage);
-        ExitOnFailure(hr, "Failed to register the package providers.");
-    }
-    else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pAction->packageProvider.action)
-    {
-        UnregisterPackageProvider(pPackage);
+        const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_ACTION action = fRollback ? pProvider->providerRollback : pProvider->providerExecute;
+        HRESULT hrProvider = S_OK;
+
+        // Register or unregister the package provider.
+        switch (action)
+        {
+        case BURN_DEPENDENCY_ACTION_REGISTER:
+            hrProvider = RegisterPackageProvider(pProvider, pPackage->sczId, wzId, hkRoot, pPackage->fVital);
+            if (SUCCEEDED(hr) && FAILED(hrProvider))
+            {
+                hr = hrProvider;
+            }
+            break;
+        case BURN_DEPENDENCY_ACTION_UNREGISTER:
+            UnregisterPackageProvider(pProvider, pPackage->sczId, hkRoot);
+            break;
+        }
     }
 
-LExit:
     if (!pPackage->fVital)
     {
         hr = S_OK;
@@ -1175,7 +1208,7 @@ static void CalculateDependencyActionStates(
         case BOOTSTRAPPER_ACTION_STATE_INSTALL: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
-        case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE: __fallthrough;
+        case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
             *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
             break;
         }
@@ -1188,7 +1221,7 @@ static void CalculateDependencyActionStates(
         switch (pPackage->currentState)
         {
         case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
-        case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
+        case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
             *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
             break;
         }
@@ -1291,32 +1324,25 @@ static LPCWSTR GetPackageProviderId(
 }
 
 static HRESULT RegisterPackageProvider(
-    __in const BURN_PACKAGE* pPackage
+    __in const BURN_DEPENDENCY_PROVIDER* pProvider,
+    __in LPCWSTR wzPackageId,
+    __in LPCWSTR wzPackageProviderId,
+    __in HKEY hkRoot,
+    __in BOOL fVital
     )
 {
     HRESULT hr = S_OK;
 
-    if (pPackage->rgDependencyProviders)
+    if (!pProvider->fImported)
     {
-        HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-        LPCWSTR wzId = GetPackageProviderId(pPackage);
+        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_REGISTER, pProvider->sczKey, pProvider->sczVersion, wzPackageId);
 
-        for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
-        {
-            const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-
-            if (!pProvider->fImported)
-            {
-                LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_REGISTER, pProvider->sczKey, pProvider->sczVersion, pPackage->sczId);
-
-                hr = DepRegisterDependency(hkRoot, pProvider->sczKey, pProvider->sczVersion, pProvider->sczDisplayName, wzId, 0);
-                ExitOnFailure(hr, "Failed to register the package dependency provider: %ls", pProvider->sczKey);
-            }
-        }
+        hr = DepRegisterDependency(hkRoot, pProvider->sczKey, pProvider->sczVersion, pProvider->sczDisplayName, wzPackageProviderId, 0);
+        ExitOnFailure(hr, "Failed to register the package dependency provider: %ls", pProvider->sczKey);
     }
 
 LExit:
-    if (!pPackage->fVital)
+    if (!fVital)
     {
         hr = S_OK;
     }
@@ -1325,36 +1351,28 @@ LExit:
 }
 
 /********************************************************************
- UnregisterPackageProvider - Removes each dependency provider
-  for the package (if not imported from the package itself).
+ UnregisterPackageProvider - Removes the dependency provider.
 
  Note: Does not check for existing dependents before removing the key.
 *********************************************************************/
 static void UnregisterPackageProvider(
-    __in const BURN_PACKAGE* pPackage
+    __in const BURN_DEPENDENCY_PROVIDER* pProvider,
+    __in LPCWSTR wzPackageId,
+    __in HKEY hkRoot
     )
 {
     HRESULT hr = S_OK;
-    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
 
-    if (pPackage->rgDependencyProviders)
+    if (!pProvider->fImported)
     {
-        for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+        hr = DepUnregisterDependency(hkRoot, pProvider->sczKey);
+        if (SUCCEEDED(hr))
         {
-            const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-
-            if (!pProvider->fImported)
-            {
-                hr = DepUnregisterDependency(hkRoot, pProvider->sczKey);
-                if (SUCCEEDED(hr))
-                {
-                    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED, pProvider->sczKey, pPackage->sczId);
-                }
-                else if (FAILED(hr) && E_FILENOTFOUND != hr)
-                {
-                    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_FAILED, pProvider->sczKey, pPackage->sczId, hr);
-                }
-            }
+            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED, pProvider->sczKey, wzPackageId);
+        }
+        else if (FAILED(hr) && E_FILENOTFOUND != hr)
+        {
+            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_FAILED, pProvider->sczKey, wzPackageId, hr);
         }
     }
 }

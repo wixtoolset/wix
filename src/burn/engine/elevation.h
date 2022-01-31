@@ -139,7 +139,8 @@ HRESULT ElevationUninstallMsiCompatiblePackage(
     );
 HRESULT ElevationExecutePackageProviderAction(
     __in HANDLE hPipe,
-    __in BURN_EXECUTE_ACTION* pExecuteAction
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BOOL fRollback
     );
 HRESULT ElevationExecutePackageDependencyAction(
     __in HANDLE hPipe,

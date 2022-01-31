@@ -1305,7 +1305,8 @@ LExit:
 
 extern "C" HRESULT ElevationExecutePackageProviderAction(
     __in HANDLE hPipe,
-    __in BURN_EXECUTE_ACTION* pExecuteAction
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BOOL fRollback
     )
 {
     HRESULT hr = S_OK;
@@ -1318,8 +1319,17 @@ extern "C" HRESULT ElevationExecutePackageProviderAction(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->packageProvider.pPackage->sczId);
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, pExecuteAction->packageProvider.action);
-    ExitOnFailure(hr, "Failed to write action to message buffer.");
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fRollback);
+    ExitOnFailure(hr, "Failed to write rollback flag to message buffer.");
+
+    // Provider actions.
+    for (DWORD i = 0; i < pExecuteAction->packageProvider.pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = pExecuteAction->packageProvider.pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->providerRollback : &pProvider->providerExecute;
+        hr = BuffWriteNumber(&pbData, &cbData, (DWORD)*pAction);
+        ExitOnFailure(hr, "Failed to write provider action to message buffer.");
+    }
 
     // Send the message.
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER, pbData, cbData, NULL, NULL, &dwResult);
@@ -2840,7 +2850,7 @@ static HRESULT OnExecuteMsiPackage(
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
     HWND hwndParent = NULL;
-    BOOL fRollback = 0;
+    BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
     BOOTSTRAPPER_APPLY_RESTART msiRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
@@ -2946,7 +2956,7 @@ static HRESULT OnExecuteMspPackage(
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
     HWND hwndParent = NULL;
-    BOOL fRollback = 0;
+    BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
     BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
@@ -3117,7 +3127,7 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     LPWSTR sczPackageId = NULL;
     LPWSTR sczCompatiblePackageId = NULL;
     HWND hwndParent = NULL;
-    BOOL fRollback = 0;
+    BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
     BURN_PACKAGE* pPackage = NULL;
     BURN_COMPATIBLE_PACKAGE* pCompatiblePackage = NULL;
@@ -3195,6 +3205,7 @@ static HRESULT OnExecutePackageProviderAction(
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
+    BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER;
@@ -3202,9 +3213,6 @@ static HRESULT OnExecutePackageProviderAction(
     // Deserialize the message data.
     hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
     ExitOnFailure(hr, "Failed to read package id from message buffer.");
-
-    hr = BuffReadNumber(pbData, cbData, &iData, reinterpret_cast<DWORD*>(&executeAction.packageProvider.action));
-    ExitOnFailure(hr, "Failed to read action.");
 
     // Find the package again.
     hr = PackageFindById(pPackages, sczPackage, &executeAction.packageProvider.pPackage);
@@ -3214,8 +3222,25 @@ static HRESULT OnExecutePackageProviderAction(
     }
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
+    ExitOnFailure(hr, "Failed to read rollback flag.");
+
+    // Read provider actions.
+    for (DWORD i = 0; i < executeAction.packageProvider.pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = executeAction.packageProvider.pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->providerRollback : &pProvider->providerExecute;
+        hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)pAction);
+        ExitOnFailure(hr, "Failed to read provider action.");
+    }
+
+    if (!executeAction.packageProvider.pPackage->fPerMachine)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "ExecutePackageProviderAction called for per-user package.");
+    }
+
     // Execute the package provider action.
-    hr = DependencyExecutePackageProviderAction(&executeAction);
+    hr = DependencyExecutePackageProviderAction(&executeAction, fRollback);
     ExitOnFailure(hr, "Failed to execute package provider action.");
 
 LExit:

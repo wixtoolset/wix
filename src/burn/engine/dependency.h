@@ -150,7 +150,8 @@ HRESULT DependencyPlanPackageComplete(
 
 *********************************************************************/
 HRESULT DependencyExecutePackageProviderAction(
-    __in const BURN_EXECUTE_ACTION* pAction
+    __in const BURN_EXECUTE_ACTION* pAction,
+    __in BOOL fRollback
     );
 
 /********************************************************************

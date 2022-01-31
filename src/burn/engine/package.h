@@ -195,6 +195,9 @@ typedef struct _BURN_DEPENDENCY_PROVIDER
 
     DEPENDENCY* rgDependents; // only valid after Detect.
     UINT cDependents;         // only valid after Detect.
+
+    BURN_DEPENDENCY_ACTION providerExecute;    // only valid during Plan.
+    BURN_DEPENDENCY_ACTION providerRollback;   // only valid during Plan.
 } BURN_DEPENDENCY_PROVIDER;
 
 typedef struct _BURN_ROLLBACK_BOUNDARY
@@ -267,8 +270,8 @@ typedef struct _BURN_PACKAGE
     BOOL fPlannedUncache;                       // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE execute;          // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE rollback;         // only valid during Plan.
-    BURN_DEPENDENCY_ACTION providerExecute;     // only valid during Plan.
-    BURN_DEPENDENCY_ACTION providerRollback;    // only valid during Plan.
+    BOOL fProviderExecute;                      // only valid during Plan.
+    BOOL fProviderRollback;                     // only valid during Plan.
     BURN_DEPENDENCY_ACTION dependencyExecute;   // only valid during Plan.
     BURN_DEPENDENCY_ACTION dependencyRollback;  // only valid during Plan.
     BOOL fDependencyManagerWasHere;             // only valid during Plan.
