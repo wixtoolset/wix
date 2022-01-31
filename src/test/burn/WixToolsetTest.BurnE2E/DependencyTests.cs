@@ -857,7 +857,7 @@ namespace WixToolsetTest.BurnE2E
             bundleA.VerifyExeTestRegistryRootDeleted(testRegistryValueExe);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3850")]
+        [Fact]
         public void RemovesDependencyProviderFromUpgradedPackageDuringUninstall()
         {
             var packageC = this.CreatePackageInstaller("PackageC");

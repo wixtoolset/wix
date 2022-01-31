@@ -338,6 +338,10 @@ static HRESULT EnsureAbsentDependents(
 
         // Check the registry to see if the provider has any dependents registered.
         hr = DepCheckDependents(hkHive, sczProviderKey, iAttributes, sdIgnoredDependents, &rgDependents, &cDependents);
+        if (E_FILENOTFOUND == hr)
+        {
+            hr = S_OK;
+        }
         ExitOnFailure(hr, "Failed dependents check for %ls.", sczId);
     }
 

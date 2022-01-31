@@ -900,12 +900,8 @@ extern "C" HRESULT RegistrationSessionEnd(
     {
         AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE == registrationType, "Registration type must be NONE if resume mode is NONE");
 
-        // If we own the bundle dependency then remove it.
-        if (!pRegistration->fDetectedForeignProviderKeyBundleId)
-        {
-            // Remove the bundle dependency key.
-            DependencyUnregisterBundle(pRegistration, pPackages);
-        }
+        // Remove the bundle dependencies.
+        DependencyUnregisterBundle(pRegistration, pPackages);
 
         // Delete update registration key.
         if (pRegistration->update.fRegisterUpdate)
