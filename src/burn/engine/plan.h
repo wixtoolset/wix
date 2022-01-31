@@ -317,7 +317,6 @@ HRESULT PlanSetVariables(
 HRESULT PlanDefaultPackageRequestState(
     __in BURN_PACKAGE_TYPE packageType,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
-    __in BOOL fPermanent,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,

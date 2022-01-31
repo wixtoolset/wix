@@ -41,7 +41,6 @@ static BOOL GetProviderExists(
 
 static void CalculateDependencyActionStates(
     __in const BURN_PACKAGE* pPackage,
-    __in const BOOTSTRAPPER_ACTION action,
     __out BURN_DEPENDENCY_ACTION* pDependencyExecuteAction,
     __out BURN_DEPENDENCY_ACTION* pDependencyRollbackAction
     );
@@ -497,7 +496,7 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     }
 
     // Calculate the dependency actions before the package itself is planned.
-    CalculateDependencyActionStates(pPackage, pPlan->action, &dependencyExecuteAction, &dependencyRollbackAction);
+    CalculateDependencyActionStates(pPackage, &dependencyExecuteAction, &dependencyRollbackAction);
 
     // If dependents were found, change the action to not uninstall the package.
     if (fDependentBlocksUninstall)
@@ -510,37 +509,54 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     }
     else
     {
-        // Use the calculated dependency actions as the provider actions if there
-        // are any non-imported providers that need to be registered and the package
-        // is current (not obsolete).
+        // Only plan providers when the package is current (not obsolete).
         if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE != pPackage->currentState)
         {
-            BOOL fAllImportedProviders = TRUE; // assume all providers were imported.
             for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
             {
-                const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-                if (!pProvider->fImported)
-                {
-                    fAllImportedProviders = FALSE;
-                    break;
-                }
-            }
+                BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
 
-            if (!fAllImportedProviders)
-            {
-                for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+                // Only need to handle providers that were authored directly in the bundle.
+                if (pProvider->fImported)
                 {
-                    BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-                    pProvider->providerExecute = dependencyExecuteAction;
-                    pProvider->providerRollback = dependencyRollbackAction;
+                    continue;
                 }
 
-                if (BURN_DEPENDENCY_ACTION_NONE != dependencyExecuteAction)
+                pProvider->providerExecute = dependencyExecuteAction;
+                pProvider->providerRollback = dependencyRollbackAction;
+
+                // Don't overwrite providers that we don't own.
+                if (pPackage->compatiblePackage.fDetected)
+                {
+                    if (BURN_DEPENDENCY_ACTION_REGISTER == pProvider->providerExecute)
+                    {
+                        pProvider->providerExecute = BURN_DEPENDENCY_ACTION_NONE;
+                        pProvider->providerRollback = BURN_DEPENDENCY_ACTION_NONE;
+                    }
+
+                    if (BURN_DEPENDENCY_ACTION_REGISTER == pProvider->providerRollback)
+                    {
+                        pProvider->providerRollback = BURN_DEPENDENCY_ACTION_NONE;
+                    }
+                }
+
+                if (BURN_DEPENDENCY_ACTION_UNREGISTER == pProvider->providerExecute && !pProvider->fExists)
+                {
+                    pProvider->providerExecute = BURN_DEPENDENCY_ACTION_NONE;
+                }
+
+                if (BURN_DEPENDENCY_ACTION_UNREGISTER == pProvider->providerRollback && pProvider->fExists ||
+                    BURN_DEPENDENCY_ACTION_REGISTER == pProvider->providerRollback && !pProvider->fExists)
+                {
+                    pProvider->providerRollback = BURN_DEPENDENCY_ACTION_NONE;
+                }
+
+                if (BURN_DEPENDENCY_ACTION_NONE != pProvider->providerExecute)
                 {
                     pPackage->fProviderExecute = TRUE;
                 }
 
-                if (BURN_DEPENDENCY_ACTION_NONE != dependencyRollbackAction)
+                if (BURN_DEPENDENCY_ACTION_NONE != pProvider->providerRollback)
                 {
                     pPackage->fProviderRollback = TRUE;
                 }
@@ -566,6 +582,23 @@ extern "C" HRESULT DependencyPlanPackageBegin(
 
         pProvider->dependentExecute = dependencyExecuteAction;
         pProvider->dependentRollback = dependencyRollbackAction;
+
+        if (BURN_DEPENDENCY_ACTION_REGISTER == pProvider->dependentRollback &&
+            BURN_DEPENDENCY_ACTION_UNREGISTER  == pProvider->providerExecute && BURN_DEPENDENCY_ACTION_REGISTER != pProvider->providerRollback)
+        {
+            pProvider->dependentRollback = BURN_DEPENDENCY_ACTION_NONE;
+        }
+
+        if (BURN_DEPENDENCY_ACTION_UNREGISTER == pProvider->dependentExecute && !pProvider->fBundleRegisteredAsDependent)
+        {
+            pProvider->dependentExecute = BURN_DEPENDENCY_ACTION_NONE;
+        }
+
+        if (BURN_DEPENDENCY_ACTION_UNREGISTER == pProvider->dependentRollback && pProvider->fBundleRegisteredAsDependent ||
+            BURN_DEPENDENCY_ACTION_REGISTER == pProvider->dependentRollback && !pProvider->fBundleRegisteredAsDependent)
+        {
+            pProvider->dependentRollback = BURN_DEPENDENCY_ACTION_NONE;
+        }
 
         // The highest aggregate action state found will be returned.
         if (pPackage->dependencyExecute < pProvider->dependentExecute)
@@ -655,16 +688,8 @@ extern "C" HRESULT DependencyPlanPackageComplete(
     // installed and all that good stuff.
     if (BURN_DEPENDENCY_ACTION_REGISTER == pPackage->dependencyExecute)
     {
-        // Recalculate the dependency actions in case other operations may have changed
-        // the package execution state.
-        CalculateDependencyActionStates(pPackage, pPlan->action, &pPackage->dependencyExecute, &pPackage->dependencyRollback);
-
-        // If the dependency execution action is *still* to register, add the dependency actions to the plan.
-        if (BURN_DEPENDENCY_ACTION_REGISTER == pPackage->dependencyExecute)
-        {
-            hr = AddPackageDependencyActions(NULL, pPackage, pPlan, pPackage->dependencyExecute, pPackage->dependencyRollback);
-            ExitOnFailure(hr, "Failed to plan the dependency actions for package: %ls", pPackage->sczId);
-        }
+        hr = AddPackageDependencyActions(NULL, pPackage, pPlan, pPackage->dependencyExecute, pPackage->dependencyRollback);
+        ExitOnFailure(hr, "Failed to plan the dependency actions for package: %ls", pPackage->sczId);
     }
 
 LExit:
@@ -863,15 +888,6 @@ extern "C" HRESULT DependencyDetectCompatibleEntry(
     LPCWSTR wzPackageProviderId = GetPackageProviderId(pPackage);
     HKEY hkHive = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
 
-    switch (pPackage->type)
-    {
-    case BURN_PACKAGE_TYPE_MSI:
-        // Only MSI packages can handle compatible entries.
-        break;
-    default:
-        ExitFunction();
-    }
-
     for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
     {
         BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
@@ -944,44 +960,28 @@ static HRESULT DetectPackageDependents(
         BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
 
         hr = DepCheckDependents(hkHive, pProvider->sczKey, 0, NULL, &pProvider->rgDependents, &pProvider->cDependents);
-        if (E_FILENOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed dependents check on package provider: %ls", pProvider->sczKey);
-
-            if (!pPackage->fPackageProviderExists && (0 < pProvider->cDependents || GetProviderExists(hkHive, pProvider->sczKey)))
-            {
-                pPackage->fPackageProviderExists = TRUE;
-            }
-
-            if (fCanIgnorePresence && !fBundleRegisteredAsDependent)
-            {
-                for (DWORD iDependent = 0; iDependent < pProvider->cDependents; ++iDependent)
-                {
-                    DEPENDENCY* pDependent = pProvider->rgDependents + iDependent;
-
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pDependent->sczKey, -1))
-                    {
-                        fBundleRegisteredAsDependent = TRUE;
-                        break;
-                    }
-                }
-            }
-        }
-        else
+        if (E_FILENOTFOUND == hr)
         {
             hr = S_OK;
+        }
+        ExitOnFailure(hr, "Failed dependents check on package provider: %ls", pProvider->sczKey);
 
-            if (!pPackage->fPackageProviderExists && GetProviderExists(hkHive, pProvider->sczKey))
+        if (0 < pProvider->cDependents || GetProviderExists(hkHive, pProvider->sczKey))
+        {
+            pProvider->fExists = TRUE;
+        }
+
+        for (DWORD iDependent = 0; iDependent < pProvider->cDependents; ++iDependent)
+        {
+            DEPENDENCY* pDependent = pProvider->rgDependents + iDependent;
+
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pDependent->sczKey, -1))
             {
-                pPackage->fPackageProviderExists = TRUE;
+                pProvider->fBundleRegisteredAsDependent = TRUE;
+                fBundleRegisteredAsDependent = TRUE;
+                break;
             }
         }
-    }
-
-    // Older bundles may not have written the id so try the default.
-    if (!pPackage->fPackageProviderExists && BURN_PACKAGE_TYPE_MSI == pPackage->type && pPackage->Msi.sczProductCode && GetProviderExists(hkHive, pPackage->Msi.sczProductCode))
-    {
-        pPackage->fPackageProviderExists = TRUE;
     }
 
     if (fCanIgnorePresence && !fBundleRegisteredAsDependent)
@@ -1190,95 +1190,54 @@ static BOOL GetProviderExists(
 *********************************************************************/
 static void CalculateDependencyActionStates(
     __in const BURN_PACKAGE* pPackage,
-    __in const BOOTSTRAPPER_ACTION action,
     __out BURN_DEPENDENCY_ACTION* pDependencyExecuteAction,
     __out BURN_DEPENDENCY_ACTION* pDependencyRollbackAction
     )
 {
-    switch (action)
+    switch (pPackage->execute)
     {
-    case BOOTSTRAPPER_ACTION_UNINSTALL:
-        // Always remove the dependency when uninstalling a bundle even if the package is absent.
-        *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
-        break;
-    case BOOTSTRAPPER_ACTION_INSTALL: __fallthrough;
-    case BOOTSTRAPPER_ACTION_CACHE:
-        // Always remove the dependency during rollback when installing a bundle.
-        *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
-        __fallthrough;
-    case BOOTSTRAPPER_ACTION_MODIFY: __fallthrough;
-    case BOOTSTRAPPER_ACTION_REPAIR:
-        switch (pPackage->execute)
+    case BOOTSTRAPPER_ACTION_STATE_NONE:
+        switch (pPackage->requested)
         {
-        case BOOTSTRAPPER_ACTION_STATE_NONE:
-            switch (pPackage->requested)
+        case BOOTSTRAPPER_REQUEST_STATE_ABSENT:
+            // Unregister if the package is not requested but already not installed.
+            *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
+            break;
+        case BOOTSTRAPPER_REQUEST_STATE_NONE:
+            // Register if a newer, compatible package is already installed.
+            switch (pPackage->currentState)
             {
-            case BOOTSTRAPPER_REQUEST_STATE_NONE:
-                // Register if a newer, compatible package is already installed.
-                switch (pPackage->currentState)
-                {
-                case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE:
-                    if (!pPackage->fPackageProviderExists)
-                    {
-                        break;
-                    }
-                    __fallthrough;
-                case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
-                    *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
-                    break;
-                }
-                break;
-            case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
-            case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-                // Register if the package is requested but already installed.
-                switch (pPackage->currentState)
-                {
-                case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE:
-                    if (!pPackage->fPackageProviderExists)
-                    {
-                        break;
-                    }
-                    __fallthrough;
-                case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
-                case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
-                    *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
-                    break;
-                }
+            case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
+            case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
+                *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
                 break;
             }
             break;
-        case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-            *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
-            break;
-        case BOOTSTRAPPER_ACTION_STATE_INSTALL: __fallthrough;
-        case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
-        case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
-        case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
+        case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
+            // Register if the package is requested but already installed.
             *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
             break;
         }
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
+        *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_INSTALL: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
+        *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
         break;
     }
 
     switch (*pDependencyExecuteAction)
     {
     case BURN_DEPENDENCY_ACTION_REGISTER:
-        switch (pPackage->currentState)
-        {
-        case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
-        case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
-            *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
-            break;
-        }
+        *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
         break;
     case BURN_DEPENDENCY_ACTION_UNREGISTER:
-        switch (pPackage->currentState)
-        {
-        case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
-        case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
-            *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_REGISTER;
-            break;
-        }
+        *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_REGISTER;
         break;
     }
 }
@@ -1376,13 +1335,10 @@ static HRESULT RegisterPackageProvider(
 {
     HRESULT hr = S_OK;
 
-    if (!pProvider->fImported)
-    {
-        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_REGISTER, pProvider->sczKey, pProvider->sczVersion, wzPackageId);
+    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_REGISTER, pProvider->sczKey, pProvider->sczVersion, wzPackageId);
 
-        hr = DepRegisterDependency(hkRoot, pProvider->sczKey, pProvider->sczVersion, pProvider->sczDisplayName, wzPackageProviderId, 0);
-        ExitOnFailure(hr, "Failed to register the package dependency provider: %ls", pProvider->sczKey);
-    }
+    hr = DepRegisterDependency(hkRoot, pProvider->sczKey, pProvider->sczVersion, pProvider->sczDisplayName, wzPackageProviderId, 0);
+    ExitOnFailure(hr, "Failed to register the package dependency provider: %ls", pProvider->sczKey);
 
 LExit:
     if (!fVital)
@@ -1406,17 +1362,14 @@ static void UnregisterPackageProvider(
 {
     HRESULT hr = S_OK;
 
-    if (!pProvider->fImported)
+    hr = DepUnregisterDependency(hkRoot, pProvider->sczKey);
+    if (SUCCEEDED(hr))
     {
-        hr = DepUnregisterDependency(hkRoot, pProvider->sczKey);
-        if (SUCCEEDED(hr))
-        {
-            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED, pProvider->sczKey, wzPackageId);
-        }
-        else if (FAILED(hr) && E_FILENOTFOUND != hr)
-        {
-            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_FAILED, pProvider->sczKey, wzPackageId, hr);
-        }
+        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED, pProvider->sczKey, wzPackageId);
+    }
+    else if (FAILED(hr) && E_FILENOTFOUND != hr)
+    {
+        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_FAILED, pProvider->sczKey, wzPackageId, hr);
     }
 }
 
