@@ -7,11 +7,6 @@ extern "C" {
 #endif
 
 
-enum BURN_MODE;
-enum BURN_DEPENDENCY_REGISTRATION_ACTION;
-struct _BURN_LOGGING;
-typedef _BURN_LOGGING BURN_LOGGING;
-
 // constants
 
 const LPCWSTR BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
@@ -152,6 +147,7 @@ typedef struct _BURN_REGISTRATION
     BOOL fForwardCompatibleBundleExists; // Only valid after detect.
     BOOL fEligibleForCleanup;            // Only valid after detect.
 
+    BOOL fDetectedForeignProviderKeyBundleId;
     LPWSTR sczDetectedProviderKeyBundleId;
     LPWSTR sczBundlePackageAncestors;
 } BURN_REGISTRATION;
@@ -187,7 +183,6 @@ HRESULT RegistrationSessionBegin(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOptions,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
@@ -203,7 +198,6 @@ HRESULT RegistrationSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT RegistrationSaveState(

@@ -8,10 +8,12 @@ extern "C" {
 
 // forward declare
 
+enum BURN_MODE;
 typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT BOOTSTRAPPER_ENGINE_CONTEXT;
 typedef struct _BURN_CACHE BURN_CACHE;
 typedef struct _BURN_DEPENDENCIES BURN_DEPENDENCIES;
 typedef struct _BURN_ENGINE_COMMAND BURN_ENGINE_COMMAND;
+typedef struct  _BURN_LOGGING BURN_LOGGING;
 
 // structs
 

@@ -525,7 +525,7 @@ extern "C" HRESULT ElevationSessionBegin(
     __in BOOL fDisableResume,
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOperations,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
+    __in BOOL fDetectedForeignProviderKeyBundleId,
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
@@ -548,7 +548,7 @@ extern "C" HRESULT ElevationSessionBegin(
     hr = BuffWriteNumber(&pbData, &cbData, dwRegistrationOperations);
     ExitOnFailure(hr, "Failed to write registration operations to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)dependencyRegistrationAction);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleId);
     ExitOnFailure(hr, "Failed to write dependency registration action to message buffer.");
 
     hr = BuffWriteNumber64(&pbData, &cbData, qwEstimatedSize);
@@ -622,7 +622,7 @@ extern "C" HRESULT ElevationSessionEnd(
     __in HANDLE hPipe,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
+    __in BOOL fDetectedForeignProviderKeyBundleId,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
@@ -638,7 +638,7 @@ extern "C" HRESULT ElevationSessionEnd(
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)restart);
     ExitOnFailure(hr, "Failed to write restart enum to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)dependencyRegistrationAction);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleId);
     ExitOnFailure(hr, "Failed to write dependency registration action to message buffer.");
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)registrationType);
@@ -2359,7 +2359,6 @@ static HRESULT OnSessionBegin(
     SIZE_T iData = 0;
     LPWSTR sczEngineWorkingPath = NULL;
     DWORD dwRegistrationOperations = 0;
-    DWORD dwDependencyRegistrationAction = 0;
     DWORD64 qwEstimatedSize = 0;
     DWORD dwRegistrationType = 0;
 
@@ -2376,7 +2375,7 @@ static HRESULT OnSessionBegin(
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationOperations);
     ExitOnFailure(hr, "Failed to read registration operations.");
 
-    hr = BuffReadNumber(pbData, cbData, &iData, &dwDependencyRegistrationAction);
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleId);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     hr = BuffReadNumber64(pbData, cbData, &iData, &qwEstimatedSize);
@@ -2389,7 +2388,7 @@ static HRESULT OnSessionBegin(
     ExitOnFailure(hr, "Failed to read variables.");
 
     // Begin session in per-machine process.
-    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pCache, pVariables, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
+    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pCache, pVariables, dwRegistrationOperations, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to begin registration session.");
 
 LExit:
@@ -2443,7 +2442,6 @@ static HRESULT OnSessionEnd(
     SIZE_T iData = 0;
     DWORD dwResumeMode = 0;
     DWORD dwRestart = 0;
-    DWORD dwDependencyRegistrationAction = 0;
     DWORD dwRegistrationType = 0;
 
     // Deserialize message data.
@@ -2453,14 +2451,14 @@ static HRESULT OnSessionEnd(
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRestart);
     ExitOnFailure(hr, "Failed to read restart enum.");
 
-    hr = BuffReadNumber(pbData, cbData, &iData, &dwDependencyRegistrationAction);
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleId);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationType);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     // suspend session in per-machine process
-    hr = RegistrationSessionEnd(pRegistration, pCache, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
+    hr = RegistrationSessionEnd(pRegistration, pCache, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to suspend registration session.");
 
 LExit:
