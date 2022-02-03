@@ -16,8 +16,6 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
 
   <PropertyGroup>
-    <Configurations Condition=" '$(Configurations)' == '' ">Debug;Release</Configurations>
-    <Platforms Condition=" '$(Platforms)' == '' ">x86,x64,ARM64,AnyCPU</Platforms>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
   </PropertyGroup>
 
