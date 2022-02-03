@@ -584,7 +584,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionElement(node, child);
                 }
             }
-
         }
 
         /// <summary>
