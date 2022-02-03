@@ -1,0 +1,20 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <UI Id="CustomDialog">
+            <Dialog Id="SomeDialog" Width="100" Height="100">
+                <!-- Correct would be Type="Hyperlink", notice the lowercase 'l'. -->
+                <Control Id="WebLink" Type="HyperLink" Width="70" Height="12" X="10" Y="10" Transparent="yes" NoPrefix="yes" Text="Some text that would be a hyperlink." />
+            </Dialog>
+
+            <InstallUISequence>
+                <Show Dialog="SomeDialog" Before="FirstDialog" Overridable="yes" Condition="NOT Installed" />
+            </InstallUISequence>
+        </UI>
+
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

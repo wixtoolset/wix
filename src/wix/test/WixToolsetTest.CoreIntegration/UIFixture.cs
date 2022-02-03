@@ -65,5 +65,36 @@ namespace WixToolsetTest.CoreIntegration
                 }, results);
             }
         }
+
+        [Fact]
+        public void CanErrorWithInvalidControlType()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "UI", "DialogWithInvalidControlType.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath,
+                });
+
+                var errors = result.Messages.Where(m => m.Level == MessageLevel.Error).ToList();
+                Assert.Equal(new[]
+                {
+                    21,
+                    52
+                }, errors.Select(e => e.Id).ToArray());
+             }
+        }
     }
 }
