@@ -1186,9 +1186,11 @@ namespace WixToolset.Core
                 specialAttributes = VolumeControlAttributes;
                 break;
             default:
-                specialAttributes = null;
-                notTabbable = true;
-                break;
+                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, typeAttribute.Name.LocalName, controlType,
+                    "Billboard", "Bitmap", "CheckBox", "ComboBox", "DirectoryCombo", "DirectoryList", "Edit", "GroupBox",
+                    "Hyperlink", "Icon", "Line", "ListBox", "ListView", "MaskedEdit", "PathEdit", "ProgressBar", "PushButton",
+                    "RadioButtonGroup", "ScrollableText", "SelectionTree", "Text", "VolumeCostList", "VolumeSelectCombo"));
+                return;
             }
 
             foreach (var attrib in node.Attributes())

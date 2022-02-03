@@ -749,49 +749,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalAttributeInMergeModule, "The {0}/@{1} attribute cannot be specified in a merge module.", elementName, attributeName);
         }
 
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1)
+        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, params string[] legalValues)
         {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}'.", elementName, attributeName, value, legalValue1);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', or '{4}'.", elementName, attributeName, value, legalValue1, legalValue2);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', or '{5}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3, string legalValue4)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', '{5}', or '{6}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3, legalValue4);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3, string legalValue4, string legalValue5)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', '{5}', '{6}', or '{7}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3, legalValue4, legalValue5);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3, string legalValue4, string legalValue5, string legalValue6)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', '{5}', '{6}', '{7}', or '{8}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3, legalValue4, legalValue5, legalValue6);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3, string legalValue4, string legalValue5, string legalValue6, string legalValue7)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', or '{9}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3, legalValue4, legalValue5, legalValue6, legalValue7);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3, string legalValue4, string legalValue5, string legalValue6, string legalValue7, string legalValue8)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', or '{10}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3, legalValue4, legalValue5, legalValue6, legalValue7, legalValue8);
-        }
-
-        public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string legalValue1, string legalValue2, string legalValue3, string legalValue4, string legalValue5, string legalValue6, string legalValue7, string legalValue8, string legalValue9, string legalValue10, string legalValue11, string legalValue12, string legalValue13, string legalValue14, string legalValue15, string legalValue16, string legalValue17, string legalValue18, string legalValue19, string legalValue20, string legalValue21, string legalValue22, string legalValue23, string legalValue24, string legalValue25, string legalValue26)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}', '{16}', '{17}', '{18}', '{19}', '{20}', '{21}', '{22}', '{23}', '{24}', '{25}', '{26}', '{27}', or '{28}'.", elementName, attributeName, value, legalValue1, legalValue2, legalValue3, legalValue4, legalValue5, legalValue6, legalValue7, legalValue8, legalValue9, legalValue10, legalValue11, legalValue12, legalValue13, legalValue14, legalValue15, legalValue16, legalValue17, legalValue18, legalValue19, legalValue20, legalValue21, legalValue22, legalValue23, legalValue24, legalValue25, legalValue26);
+            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}'.", elementName, attributeName, value, String.Join(",", legalValues));
         }
 
         public static Message IllegalAttributeValueWhenNested(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attrivuteValue, string parentElementName)
