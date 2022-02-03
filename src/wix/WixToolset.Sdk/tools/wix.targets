@@ -70,7 +70,6 @@
 
     <!-- Default OutputType to a known WiX Toolset type.  -->
     <OutputType Condition=" '$(OutputType)' == '' ">Package</OutputType>
-    <AvailablePlatforms>x86,x64,ARM64,AnyCPU</AvailablePlatforms>
 
     <WixPdbType Condition=" '$(WixPdbType)' == '' ">full</WixPdbType>
   </PropertyGroup>
@@ -377,12 +376,7 @@
     DependsOnTargets="$(ResolveWixLibraryReferencesDependsOn)">
 
     <PropertyGroup>
-      <WixLibrarySearchPaths Condition=" '$(WixLibrarySearchPaths)' == '' ">
-        $(ReferencePaths);
-        {HintPathFromItem};
-        {RawFileName};
-        $(WixExtDir)
-      </WixLibrarySearchPaths>
+      <WixLibrarySearchPaths Condition=" '$(WixLibrarySearchPaths)' == '' ">$(ReferencePaths);{HintPathFromItem};{RawFileName};$(WixExtDir)</WixLibrarySearchPaths>
     </PropertyGroup>
 
     <ResolveWixReferences
@@ -428,14 +422,9 @@
     DependsOnTargets="$(ResolveWixExtensionReferencesDependsOn)"
     Condition=" '@(WixExtension)' != ''">
 
-    <CreateProperty Condition=" '$(WixExtensionSearchPaths)' == '' " Value="
-      $(ReferencePaths);
-      {HintPathFromItem};
-      {RawFileName};
-      $(WixExtDir)
-      ">
-      <Output TaskParameter="Value" PropertyName="WixExtensionSearchPaths" />
-    </CreateProperty>
+    <PropertyGroup>
+      <WixExtensionSearchPaths Condition=" '$(WixExtensionSearchPaths)' == '' ">$(ReferencePaths);{HintPathFromItem};{RawFileName};$(WixExtDir)</WixExtensionSearchPaths>
+    </PropertyGroup>
 
     <ResolveWixReferences
       WixReferences="@(WixExtension)"
