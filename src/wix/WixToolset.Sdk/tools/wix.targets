@@ -555,6 +555,7 @@
   <PropertyGroup>
     <CoreCompileDependsOn>
       AssignTargetPaths;
+      CreateManifestResourceNames;
       ReadPreviousBindInputsAndBuiltOutputs;
       _CreateProjectDefineConstants;
       $(CoreCompileDependsOn)
