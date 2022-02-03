@@ -156,11 +156,11 @@ namespace WixToolset.Core
                 }
 
                 // Display an error message for Components that were not referenced by a Feature.
-                foreach (var symbolWithSection in resolve.ReferencedSymbolWithSections.Where(s => s.Symbol.Definition.Type == SymbolDefinitionType.Component))
+                foreach (var component in sections.SelectMany(s => s.Symbols.Where(y => y.Definition.Type == SymbolDefinitionType.Component)))
                 {
-                    if (!referencedComponents.Contains(symbolWithSection.Name))
+                    if (!referencedComponents.Contains(component.Id.Id))
                     {
-                        this.Messaging.Write(ErrorMessages.OrphanedComponent(symbolWithSection.Symbol.SourceLineNumbers, symbolWithSection.Symbol.Id.Id));
+                        this.Messaging.Write(ErrorMessages.OrphanedComponent(component.SourceLineNumbers, component.Id.Id));
                     }
                 }
 
@@ -451,8 +451,7 @@ namespace WixToolset.Core
                                     });
 
                                     // index the component for finding orphaned records
-                                    var symbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
-                                    referencedComponents.Add(symbolName);
+                                    referencedComponents.Add(wixComplexReferenceRow.Child);
 
                                     break;
 
@@ -521,8 +520,7 @@ namespace WixToolset.Core
                                     }
 
                                     // index the component for finding orphaned records
-                                    var componentSymbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
-                                    referencedComponents.Add(componentSymbolName);
+                                    referencedComponents.Add(wixComplexReferenceRow.Child);
 
                                     break;
 
