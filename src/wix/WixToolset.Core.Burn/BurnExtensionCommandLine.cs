@@ -4,12 +4,13 @@ namespace WixToolset.Core.Burn
 {
     using System;
     using System.Collections.Generic;
+    using WixToolset.Core.Burn.CommandLine;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
-    /// Parses the "msi" command-line command. See <c>WindowsInstallerCommand</c>
+    /// Parses the "burn" command-line command. See <c>BurnCommand</c>
     /// for the bulk of the command-line processing.
     /// </summary>
     internal class BurnExtensionCommandLine : BaseExtensionCommandLine
