@@ -4,6 +4,7 @@ namespace WixToolset.Core.WindowsInstaller
 {
     using System;
     using System.Collections.Generic;
+    using WixToolset.Core.WindowsInstaller.CommandLine;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
