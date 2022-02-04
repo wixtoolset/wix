@@ -4,6 +4,7 @@ namespace WixToolset.Core.Native.Msi
 {
     using System;
     using System.Diagnostics;
+    using System.Runtime.InteropServices;
     using System.Text;
 
     /// <summary>
@@ -15,7 +16,7 @@ namespace WixToolset.Core.Native.Msi
     /// one message box icon type, one default button, and one installation message type.</param>
     /// <param name="message">Specifies the message text.</param>
     /// <returns>-1 for an error, 0 if no action was taken, 1 if OK, 3 to abort.</returns>
-    public delegate int InstallUIHandler(IntPtr context, uint messageType, string message);
+    public delegate int InstallUIHandler(IntPtr context, uint messageType, [MarshalAs(UnmanagedType.LPWStr)] string message);
 
     /// <summary>
     /// Represents the Windows Installer, provides wrappers to

@@ -166,7 +166,7 @@ namespace WixToolset.Core.Native
                         {
                             var action = record.GetString(1);
 
-                            if (!this.SuppressedIces.Contains(action) && this.Ices.Contains(action))
+                            if (!this.SuppressedIces.Contains(action) && (this.Ices.Count == 0 || this.Ices.Contains(action)))
                             {
                                 actions.Add(action);
                             }
@@ -281,11 +281,18 @@ namespace WixToolset.Core.Native
 
             // If we're getting messges during the validation session, log them.
             // Otherwise, ignore the messages.
-            if (!this.ValidationSessionInProgress)
+            if (this.ValidationSessionInProgress)
             {
-                var parsedMessage = ParseValidationMessage(message, this.CurrentIce);
+                try
+                {
+                    var parsedMessage = ParseValidationMessage(message, this.CurrentIce);
 
-                continueValidation = this.Callback.ValidationMessage(parsedMessage);
+                    continueValidation = this.Callback.ValidationMessage(parsedMessage);
+                }
+                catch
+                {
+                    return - 1;
+                }
             }
 
             return continueValidation ? 1 : 3;
