@@ -68,7 +68,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         patchGroup.Add(facade);
                     }
-                    else if (!facade.FromModule)
+                    else
                     {
                         facade.Sequence = ++lastSequence;
                     }

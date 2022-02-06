@@ -249,7 +249,7 @@ namespace WixToolset.Core
                         this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
                         {
                             PropertyId = SummaryInformationType.Keywords,
-                            Value = "Installer"
+                            Value = "MergeModule, MSI, database"
                         });
                     }
 
@@ -264,6 +264,24 @@ namespace WixToolset.Core
                     {
                         PropertyId = SummaryInformationType.PackageCode,
                         Value = moduleId
+                    });
+
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Title,
+                        Value = "Merge Module"
+                    });
+
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.WordCount,
+                        Value = "0"
+                    });
+
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Comments,
+                        Value = String.Format(CultureInfo.InvariantCulture, "This merge module contains the logic and data required to install {0}.", this.activeName)
                     });
 
                     this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, this.activeLanguage);

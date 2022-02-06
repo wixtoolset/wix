@@ -834,9 +834,10 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test fails in new repo")]
+        [Fact]
         public void CanMergeModule()
         {
+            var msmFolder = TestData.Get(@"TestData\SimpleModule");
             var folder = TestData.Get(@"TestData\SimpleMerge");
 
             using (var fs = new DisposableFileSystem())
@@ -845,12 +846,24 @@ namespace WixToolsetTest.CoreIntegration
                 var msiPath = Path.Combine(intermediateFolder, @"bin\test.msi");
                 var cabPath = Path.Combine(intermediateFolder, @"bin\cab1.cab");
 
+                var msmResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(msmFolder, "Module.wxs"),
+                    "-loc", Path.Combine(msmFolder, "Module.en-us.wxl"),
+                    "-bindpath", Path.Combine(msmFolder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "test", "test.msm")
+                });
+
+                msmResult.AssertSuccess();
+
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, ".data"),
+                    "-bindpath", Path.Combine(intermediateFolder, "bin", "test"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath
                 });
@@ -870,13 +883,15 @@ namespace WixToolsetTest.CoreIntegration
                 var results = Query.QueryDatabase(msiPath, new[] { "File" });
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "File:filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent.243FB739_4D05_472F_9CFB_EF6B1017B6DE\ttest.txt\t17\t\t\t512\t0"
+                    "File:File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tfile1.txt\t17\t\t\t512\t1",
+                    "File:File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent2.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tfile2.txt\t17\t\t\t512\t2",
                 }, results);
 
                 var files = Query.GetCabinetFiles(cabPath);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                    "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
+                    "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
                 }, files.Select(f => f.Name).ToArray());
             }
         }
