@@ -91,17 +91,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         var uniqueModuleFileIdentifiers = new Dictionary<string, IFileFacade>(StringComparer.OrdinalIgnoreCase);
 
-                        using (var view = db.OpenExecuteView("SELECT `File`, `Directory_` FROM `File`, `Component` WHERE `Component_`=`Component`"))
+                        using (var view = db.OpenExecuteView("SELECT `File`, `Component_`, `FileName`, `Directory_` FROM `File`, `Component` WHERE `Component_`=`Component`"))
                         {
                             // add each file row from the merge module into the file row collection (check for errors along the way)
                             foreach (var record in view.Records)
                             {
+                                var splitFilename = this.BackendHelper.SplitMsiFileName(record[3]);
+
                                 // NOTE: this is very tricky - the merge module file rows are not added to the
                                 // file table because they should not be created via idt import.  Instead, these
                                 // rows are created by merging in the actual modules.
                                 var fileSymbol = new FileSymbol(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Section, record[1]));
                                 fileSymbol.Attributes = wixMergeRow.FileAttributes;
-                                fileSymbol.DirectoryRef = record[2];
+                                fileSymbol.ComponentRef = record[2];
+                                fileSymbol.Name = splitFilename[1] ?? splitFilename[0];
+                                fileSymbol.ShortName = splitFilename[1] is null ? null : splitFilename[0];
+                                fileSymbol.DirectoryRef = record[4];
                                 fileSymbol.DiskId = wixMergeRow.DiskId;
                                 fileSymbol.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
 

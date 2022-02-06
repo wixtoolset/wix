@@ -182,6 +182,18 @@ namespace WixToolset.Core
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "1", false, false, false, false);
                 }
 
+                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                {
+                    PropertyId = SummaryInformationType.Title,
+                    Value = "Installation Database"
+                });
+
+                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                {
+                    PropertyId = SummaryInformationType.Comments,
+                    Value = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName)
+                });
+
                 this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, productLanguage);
 
                 this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
@@ -448,18 +460,6 @@ namespace WixToolset.Core
                 msiVersion = 500;
                 this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));
             }
-
-            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-            {
-                PropertyId = SummaryInformationType.Comments,
-                Value = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName)
-            });
-
-            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-            {
-                PropertyId = SummaryInformationType.Title,
-                Value = "Installation Database"
-            });
 
             this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
             {

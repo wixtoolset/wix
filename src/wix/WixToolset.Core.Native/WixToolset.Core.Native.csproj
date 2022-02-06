@@ -24,16 +24,11 @@
     <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=x64" />
   </ItemGroup>
 
-  <!-- Copy the x86 binaries for unittests (especially CI) but use x64 binaries when in NCrunch -->
-  <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <None Include="..\wixnative\Win32\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(NCrunch)'=='1' ">
-    <None Include="$(NCrunchOriginalProjectDir)..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(NCrunchOriginalProjectDir)..\..\..\build\$(SegmentName)\$(Configuration)\x86\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(NCrunchOriginalProjectDir)..\..\..\build\$(SegmentName)\$(Configuration)\x86\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
+  <!-- Copy the x64 binaries for unittests since we've standardized on VS2022 (which is 64-bit only) -->
+  <ItemGroup>
+    <None Include="..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

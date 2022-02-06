@@ -4,13 +4,13 @@
 
         <Directory Id="MergeRedirectFolder">
             <Component Id="ModuleComponent1" Guid="A04E61B2-3ED4-4803-B2EB-4B773576FA45">
-                <File Id="File1" Source="test.txt" />
+                <File Id="File1" Name="file1.txt" Source="test.txt" />
             </Component>
         </Directory>
 
         <Directory Id="NotTheMergeRedirectFolder">
             <Component Id="ModuleComponent2" Guid="EADB3047-BD32-417B-AABF-B8D9CCDC22DA">
-                <File Id="File2" Source="test.txt" />
+                <File Id="File2" Name="file2.txt" Source="test.txt" />
             </Component>
         </Directory>
     </Module>
