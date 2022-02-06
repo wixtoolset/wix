@@ -1552,12 +1552,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private Row CreateRow(IntermediateSymbol symbol, string tableDefinitionName) =>
-            this.CreateRow(symbol, this.TableDefinitions[tableDefinitionName]);
+        private Row CreateRow(IntermediateSymbol symbol, string tableDefinitionName)
+        {
+            return this.CreateRow(symbol, this.TableDefinitions[tableDefinitionName]);
+        }
 
-        private Row CreateRow(IntermediateSymbol symbol, TableDefinition tableDefinition) =>
-            this.BackendHelper.CreateRow(this.Section, symbol, this.Data, tableDefinition);
-
+        private Row CreateRow(IntermediateSymbol symbol, TableDefinition tableDefinition)
+        {
+            return this.BackendHelper.CreateRow(this.Section, symbol, this.Data, tableDefinition);
+        }
 
         private string CreateShortName(string longName, bool keepExtension, params string[] args)
         {

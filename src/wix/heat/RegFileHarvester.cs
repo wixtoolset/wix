@@ -141,19 +141,19 @@ namespace WixToolset.Harvesters
         {
             string name = null;
             string value = null;
-            Wix.RegistryValue.TypeType type;
-            Wix.RegistryKey registryKey = new Wix.RegistryKey();
+            var registryKey = new Wix.RegistryKey
+            {
+                Root = root,
+                Key = line
+            };
 
-            registryKey.Root = root;
-            registryKey.Key = line;
-
-            while (this.GetValue(sr, ref name, ref value, out type))
+            while (this.GetValue(sr, ref name, ref value, out var type))
             {
                 Wix.RegistryValue registryValue = new Wix.RegistryValue();
                 ArrayList charArray;
 
                 // Don't specifiy name for default attribute
-                if (!string.IsNullOrEmpty(name))
+                if (!String.IsNullOrEmpty(name))
                 {
                     registryValue.Name = name;
                 }
@@ -163,7 +163,7 @@ namespace WixToolset.Harvesters
                 switch (type)
                 {
                     case Wix.RegistryValue.TypeType.binary:
-                        registryValue.Value = value.Replace(",", string.Empty).ToUpper();
+                        registryValue.Value = value.Replace(",", String.Empty).ToUpper();
                         break;
 
                     case Wix.RegistryValue.TypeType.integer:
@@ -172,7 +172,7 @@ namespace WixToolset.Harvesters
 
                     case Wix.RegistryValue.TypeType.expandable:
                         charArray = this.ConvertCharList(value);
-                        value = string.Empty;
+                        value = String.Empty;
 
                         // create the string, remove the terminating null
                         for (int i = 0; i < charArray.Count; i++)
@@ -188,7 +188,7 @@ namespace WixToolset.Harvesters
 
                     case Wix.RegistryValue.TypeType.multiString:
                         charArray = this.ConvertCharList(value);
-                        value = string.Empty;
+                        value = String.Empty;
 
                         // Convert the character array to a string so we can simply split it at the nulls, ignore the final null null.
                         for (int i = 0; i < (charArray.Count - 2); i++)
@@ -399,7 +399,7 @@ namespace WixToolset.Harvesters
         /// <returns>Array of characters.</returns>
         private ArrayList ConvertCharList(string charList)
         {
-            if (string.IsNullOrEmpty(charList))
+            if (String.IsNullOrEmpty(charList))
             {
                 return new ArrayList();
             }
