@@ -287,7 +287,7 @@ namespace WixToolset.Core.Burn.Bundles
                         attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect) == WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect ? WixBundleRelatedPackageAttributes.OnlyDetect : 0;
                         attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive ? WixBundleRelatedPackageAttributes.MinInclusive : 0;
                         attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive ? WixBundleRelatedPackageAttributes.MaxInclusive : 0;
-                        attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive ? WixBundleRelatedPackageAttributes.LangInclusive : 0;
+                        attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive ? 0 : WixBundleRelatedPackageAttributes.LangInclusive;
 
                         this.Section.AddSymbol(new WixBundleRelatedPackageSymbol(this.Facade.PackageSymbol.SourceLineNumbers)
                         {

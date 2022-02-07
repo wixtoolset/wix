@@ -151,16 +151,16 @@ namespace WixToolsetTest.CoreIntegration
                     "<MsiPackage Id='FirstX86.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX86.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX86.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{12E4699F-E774-4D05-8A01-5BDD41BBA127}'>" +
                       "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
                      $"<Provides Key='{GetProductCodeFromMsiPdb(pdbPaths[0])}' Version='1.0.0.0' DisplayName='MsiPackage' />" +
-                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
-                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
+                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
+                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
                       "<PayloadRef Id='FirstX86.msi' />" +
                       "<PayloadRef Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' />" +
                     "</MsiPackage>",
                     "<MsiPackage Id='FirstX64.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX64.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX64.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{12E4699F-E774-4D05-8A01-5BDD41BBA127}'>" +
                       "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
                      $"<Provides Key='{GetProductCodeFromMsiPdb(pdbPaths[1])}' Version='1.0.0.0' DisplayName='MsiPackage' />" +
-                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
-                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='no'><Language Id='1033' /></RelatedPackage>" +
+                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
+                      "<RelatedPackage Id='{12E4699F-E774-4D05-8A01-5BDD41BBA127}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
                       "<PayloadRef Id='FirstX64.msi' />" +
                       "<PayloadRef Id='fC0n41rZK8oW3JK8LzHu6AT3CjdQ' />" +
                     "</MsiPackage>",
