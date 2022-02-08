@@ -44,10 +44,12 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.Install();
             bundleAv1.VerifyRegisteredAndInPackageCache();
 
-            bundleAv2x64.Install();
+            var bundleAv2x64InstallLogFilePath = bundleAv2x64.Install();
             bundleAv2x64.VerifyRegisteredAndInPackageCache();
 
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+            
+            Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv2x64InstallLogFilePath, @"Detected related package: \{[0-9A-Za-z\-]{36}\}, scope: PerMachine, version: 1.0.0.0, language: 1033 operation: MajorUpgrade"));
         }
 
         [Fact]

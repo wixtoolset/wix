@@ -1077,6 +1077,7 @@ namespace WixToolsetTest.BurnE2E
 
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleHv2InstallLogFilePath, @"Skipping cross-scope dependency registration on package: PackageA, bundle scope: PerUser, package scope: PerMachine"));
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleHv2InstallLogFilePath, @"Detected related bundle: \{[0-9A-Za-z\-]{36}\}, type: Upgrade, scope: PerUser, version: 1\.0\.0\.0, cached: Yes"));
+            Assert.True(LogVerifier.MessageInLogFileRegex(bundleHv2InstallLogFilePath, @"Detected related package: \{[0-9A-Za-z\-]{36}\}, scope: PerUser, version: 1.0.0.0, language: 0 operation: MajorUpgrade"));
 
             bundleHv2.Uninstall();
             bundleHv2.VerifyUnregisteredAndRemovedFromPackageCache();
