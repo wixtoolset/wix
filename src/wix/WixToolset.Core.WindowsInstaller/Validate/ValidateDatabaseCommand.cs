@@ -117,20 +117,20 @@ namespace WixToolset.Core.WindowsInstaller.Validate
         }
 
         /// <summary>
-        /// Validation blocked by other installation operation for <see cref="IWindowsInstallerValidatorCallback"/>.
-        /// </summary>
-        public void ValidationBlocked()
-        {
-            this.Messaging.Write(VerboseMessages.ValidationSerialized());
-        }
-
-        /// <summary>
         /// Validation message implementation for <see cref="IWindowsInstallerValidatorCallback"/>.
         /// </summary>
         public bool ValidationMessage(ValidationMessage message)
         {
             this.LogValidationMessage(message);
             return true;
+        }
+
+        /// <summary>
+        /// Normal message encountered while preparing for ICE validation for <see cref="IWindowsInstallerValidatorCallback"/>.
+        /// </summary>
+        public void WriteMessage(Message message)
+        {
+            this.Messaging.Write(message);
         }
 
         /// <summary>
