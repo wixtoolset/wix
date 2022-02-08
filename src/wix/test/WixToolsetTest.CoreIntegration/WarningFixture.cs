@@ -56,7 +56,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal((int)WarningMessages.Ids.PathCanonicalized, result.ExitCode);
 
                 var message = Assert.Single(result.Messages);
-                Assert.Equal(MessageLevel.Warning, message.Level); // TODO: is this right?
+                Assert.Equal(MessageLevel.Error, message.Level);
             }
         }
     }
