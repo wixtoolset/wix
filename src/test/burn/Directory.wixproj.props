@@ -7,6 +7,7 @@
     <DefaultCompressionLevel>None</DefaultCompressionLevel>
     <CompilerAdditionalOptions>-wx</CompilerAdditionalOptions>
     <SuppressSpecificWarnings>1154;$(SuppressSpecificWarnings)</SuppressSpecificWarnings>
+    <SuppressValidation>true</SuppressValidation>
     <ForTestingUseOnlyWixextPath>$(BaseOutputPath)$(Configuration)\netstandard2.0\ForTestingUseOnly.wixext.dll</ForTestingUseOnlyWixextPath>
   </PropertyGroup>
 </Project>

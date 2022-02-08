@@ -1,0 +1,32 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="ValidationPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <MajorUpgrade DowngradeErrorMessage="Downgrade message" />
+
+    <Property Id="MyProperty" Value="1" />
+    <Launch Condition="Myproperty" Message="Invalid cased Property Id below causes ICE46" />
+
+    <CustomAction Id="CausesICE12Error" Directory="INSTALLFOLDER" Value="Test" />
+
+    <Feature Id="ProductFeature" Title="Product Feature">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <InstallExecuteSequence>
+      <Custom Action="CausesICE12Error" Before="AppSearch" />
+    </InstallExecuteSequence>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="test.txt" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

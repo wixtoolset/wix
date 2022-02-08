@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name='WixprojPackageVcxprojWindowsApp' Manufacturer='WiX Toolset' Version='0.0.1' UpgradeCode='00000000-0000-0000-0000-000000000000'>
+  <Package Name='WixprojPackageVcxprojWindowsApp' Manufacturer='WiX Toolset' Version='0.0.1' UpgradeCode='41a2c17e-1976-465b-bcde-eae03516ca68'>
 
     <StandardDirectory Id='ProgramFilesFolder'>
       <Directory Id='Application32Folder' Name='Test App (32-bit)' />

@@ -62,14 +62,14 @@ namespace WixToolset.Core.Native
 
         private static void EnsureDirectoryWithoutFile(string path)
         {
-            File.Delete(path);
-
             var directory = Path.GetDirectoryName(path);
 
             if (!String.IsNullOrEmpty(directory))
             {
                 Directory.CreateDirectory(directory);
             }
+
+            File.Delete(path);
         }
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

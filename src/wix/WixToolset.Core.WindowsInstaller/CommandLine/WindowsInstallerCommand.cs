@@ -48,6 +48,10 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                     case "inscribe":
                         this.Subcommand = new InscribeSubcommand(this.ServiceProvider);
                         return true;
+
+                    case "validate":
+                        this.Subcommand = new ValidateSubcommand(this.ServiceProvider);
+                        return true;
                 }
 
                 return false;
@@ -68,6 +72,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             Console.WriteLine("Commands:");
             Console.WriteLine();
             Console.WriteLine("  inscribe          Updates MSI database with cabinet signature information.");
+            Console.WriteLine("  validate          Validates MSI database using standard or custom ICEs.");
         }
     }
 }

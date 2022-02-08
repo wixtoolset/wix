@@ -349,14 +349,11 @@ namespace WixToolset.Core.CommandLine
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
                     context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
                     context.FileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
-                    context.Ices = this.commandLine.Ices;
                     context.IntermediateFolder = intermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
                     context.OutputPath = this.OutputFile;
                     context.PdbType = this.PdbType;
                     context.PdbPath = this.PdbType == PdbType.None ? null : this.PdbFile ?? Path.ChangeExtension(this.OutputFile, ".wixpdb");
-                    context.SuppressIces = this.commandLine.SuppressIces;
-                    context.SuppressValidation = this.commandLine.SuppressValidation;
                     context.CancellationToken = cancellationToken;
 
                     var binder = this.ServiceProvider.GetService<IBinder>();
@@ -540,12 +537,6 @@ namespace WixToolset.Core.CommandLine
 
             public string TrackingFile { get; private set; }
 
-            public List<string> Ices { get; } = new List<string>();
-
-            public List<string> SuppressIces { get; } = new List<string>();
-
-            public bool SuppressValidation { get; set; }
-
             public bool ResetAcls { get; set; }
 
             public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
@@ -627,13 +618,6 @@ namespace WixToolset.Core.CommandLine
                             parser.GetNextArgumentOrError(arg, this.IncludeSearchPaths);
                             return true;
 
-                        case "ice":
-                        {
-                            var value = parser.GetNextArgumentOrError(arg);
-                            this.Ices.Add(value);
-                            return true;
-                        }
-
                         case "intermediatefolder":
                             this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(arg);
                             return true;
@@ -669,17 +653,6 @@ namespace WixToolset.Core.CommandLine
                                 }
                                 return false;
                             }
-
-                        case "sice":
-                        {
-                            var value = parser.GetNextArgumentOrError(arg);
-                            this.SuppressIces.Add(value);
-                            return true;
-                        }
-
-                        case "sval":
-                            this.SuppressValidation = true;
-                            return true;
 
                         case "resetacls":
                             this.ResetAcls = true;

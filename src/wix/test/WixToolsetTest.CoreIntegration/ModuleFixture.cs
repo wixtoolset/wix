@@ -15,7 +15,7 @@ namespace WixToolsetTest.CoreIntegration
     public class ModuleFixture
     {
         [Fact]
-        public void CanBuildSimpleModule()
+        public void CanBuildAndValidateSimpleModule()
         {
             var folder = TestData.Get(@"TestData\SimpleModule");
 
@@ -73,6 +73,30 @@ namespace WixToolsetTest.CoreIntegration
                     "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
                     "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
                 }, files.Select(f => Path.Combine(f.Path, f.Name)).ToArray());
+
+                var rows = Query.QueryDatabase(msmPath, new[] { "_SummaryInformation" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "_SummaryInformation:Title\tMerge Module",
+                    "_SummaryInformation:Subject\tMergeModule1",
+                    "_SummaryInformation:Author\tExample Company",
+                    "_SummaryInformation:Keywords\tMergeModule, MSI, database",
+                    "_SummaryInformation:Comments\tThis merge module contains the logic and data required to install MergeModule1.",
+                    "_SummaryInformation:Template\tIntel;1033",
+                    "_SummaryInformation:CodePage\t1252",
+                    "_SummaryInformation:PageCount\t200",
+                    "_SummaryInformation:WordCount\t0",
+                    "_SummaryInformation:CharacterCount\t0",
+                    "_SummaryInformation:Security\t2",
+                }, rows);
+
+                var validationResult = WixRunner.Execute(new[]
+                {
+                    "msi", "validate",
+                    "-intermediateFolder", intermediateFolder,
+                    msmPath
+                });
+                validationResult.AssertSuccess();
             }
         }
 
@@ -107,6 +131,73 @@ namespace WixToolsetTest.CoreIntegration
                     "CustomAction:Test\t11265\tFakeCA.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tTestEntry\t",
                     "Property:MsiHiddenProperties\tTest"
                 }, rows);
+            }
+        }
+
+        [Fact]
+        public void CanMergeModule()
+        {
+            var msmFolder = TestData.Get(@"TestData\SimpleModule");
+            var folder = TestData.Get(@"TestData\SimpleMerge");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var msiPath = Path.Combine(intermediateFolder, @"bin\test.msi");
+                var cabPath = Path.Combine(intermediateFolder, @"bin\cab1.cab");
+
+                var msmResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(msmFolder, "Module.wxs"),
+                    "-loc", Path.Combine(msmFolder, "Module.en-us.wxl"),
+                    "-bindpath", Path.Combine(msmFolder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "test", "test.msm")
+                });
+
+                msmResult.AssertSuccess();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(intermediateFolder, "bin", "test"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var validationResult = WixRunner.Execute(new[]
+                {
+                    "msi", "validate",
+                    "-intermediateFolder", intermediateFolder,
+                    msiPath
+                });
+                validationResult.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+                Assert.Empty(section.Symbols.OfType<FileSymbol>());
+
+                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                Assert.Empty(data.Tables["File"].Rows);
+
+                var results = Query.QueryDatabase(msiPath, new[] { "File" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "File:File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tfile1.txt\t17\t\t\t512\t1",
+                    "File:File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent2.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tfile2.txt\t17\t\t\t512\t2",
+                }, results);
+
+                var files = Query.GetCabinetFiles(cabPath);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
+                    "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                }, files.Select(f => f.Name).ToArray());
             }
         }
     }

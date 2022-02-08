@@ -21,11 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, string cubeFile) : this(context, backendExtension, null, cubeFile)
-        {
-        }
-
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, IEnumerable<SubStorage> subStorages, string cubeFile)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, IEnumerable<SubStorage> subStorages = null)
         {
             this.ServiceProvider = context.ServiceProvider;
 
@@ -52,11 +48,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.SuppressLayout = context.SuppressLayout;
 
             this.SubStorages = subStorages;
-
-            this.SuppressValidation = context.SuppressValidation;
-            this.Ices = context.Ices;
-            this.SuppressedIces = context.SuppressIces;
-            this.CubeFiles = String.IsNullOrEmpty(cubeFile) ? null : new[] { cubeFile };
 
             this.BackendExtensions = backendExtension;
         }
@@ -108,12 +99,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private string IntermediateFolder { get; }
 
         private bool SuppressValidation { get; }
-
-        private IEnumerable<string> Ices { get; }
-
-        private IEnumerable<string> SuppressedIces { get; }
-
-        private IEnumerable<string> CubeFiles { get; }
 
         public IBindResult Execute()
         {
@@ -500,20 +485,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 var command = new MergeModulesCommand(this.Messaging, fileFacades, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
                 command.Execute();
-            }
-
-            if (this.Messaging.EncounteredError)
-            {
-                return null;
-            }
-
-            // Validate the output if there are CUBe files and we're not explicitly suppressing validation.
-            if (this.CubeFiles != null && !this.SuppressValidation)
-            {
-                var command = new ValidateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.IntermediateFolder, data, this.OutputPath, this.CubeFiles, this.Ices, this.SuppressedIces);
-                command.Execute();
-
-                trackedFiles.AddRange(command.TrackedFiles);
             }
 
             if (this.Messaging.EncounteredError)

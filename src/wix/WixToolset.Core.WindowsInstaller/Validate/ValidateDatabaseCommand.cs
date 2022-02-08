@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Bind
+namespace WixToolset.Core.WindowsInstaller.Validate
 {
     using System;
     using System.Collections.Generic;
@@ -18,18 +18,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // Set of ICEs that have equivalent-or-better checks in WiX.
         private static readonly string[] WellKnownSuppressedIces = new[] { "ICE08", "ICE33", "ICE47", "ICE66" };
 
-        public ValidateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, WindowsInstallerData data, string outputPath, IEnumerable<string> cubeFiles, IEnumerable<string> ices, IEnumerable<string> suppressedIces)
+        public ValidateDatabaseCommand(IMessaging messaging, string intermediateFolder, string databasePath, WindowsInstallerData data, IEnumerable<string> cubeFiles, IEnumerable<string> ices, IEnumerable<string> suppressedIces)
         {
             this.Messaging = messaging;
-            this.BackendHelper = backendHelper;
             this.Data = data;
-            this.OutputPath = outputPath;
+            this.DatabasePath = databasePath;
             this.CubeFiles = cubeFiles;
             this.Ices = ices;
             this.SuppressedIces = suppressedIces == null ? WellKnownSuppressedIces : suppressedIces.Union(WellKnownSuppressedIces);
 
             this.IntermediateFolder = intermediateFolder;
-            this.OutputSourceLineNumber = new SourceLineNumber(outputPath);
+            this.OutputSourceLineNumber = new SourceLineNumber(databasePath);
         }
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
@@ -41,11 +40,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IMessaging Messaging { get; }
 
-        private IBackendHelper BackendHelper { get; }
-
         private WindowsInstallerData Data { get; }
 
-        private string OutputPath { get; }
+        private string DatabasePath { get; }
 
         private IEnumerable<string> CubeFiles { get; }
 
@@ -64,34 +61,34 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var trackedFiles = new List<ITrackedFile>();
             var stopwatch = Stopwatch.StartNew();
 
             this.Messaging.Write(VerboseMessages.ValidatingDatabase());
 
-            // Ensure the temporary files can be created the working folder.
-            var workingFolder = Path.Combine(this.IntermediateFolder, "_validate");
-            Directory.CreateDirectory(workingFolder);
-
             // Copy the database to a temporary location so it can be manipulated.
             // Ensure it is not read-only.
-            var workingDatabasePath = Path.Combine(workingFolder, Path.GetFileName(this.OutputPath));
-            FileSystem.CopyFile(this.OutputPath, workingDatabasePath, allowHardlink: false);
+            var workingDatabaseFilename = String.Concat(Path.GetFileNameWithoutExtension(this.DatabasePath), "_validate", Path.GetExtension(this.DatabasePath));
+            var workingDatabasePath = Path.Combine(this.IntermediateFolder, workingDatabaseFilename);
+            try
+            {
+                FileSystem.CopyFile(this.DatabasePath, workingDatabasePath, allowHardlink: false);
 
-            var trackWorkingDatabase = this.BackendHelper.TrackFile(workingDatabasePath, TrackedFileType.Temporary);
-            trackedFiles.Add(trackWorkingDatabase);
+                var attributes = File.GetAttributes(workingDatabasePath);
+                File.SetAttributes(workingDatabasePath, attributes & ~FileAttributes.ReadOnly);
 
-            var attributes = File.GetAttributes(workingDatabasePath);
-            File.SetAttributes(workingDatabasePath, attributes & ~FileAttributes.ReadOnly);
-
-            var validator = new WindowsInstallerValidator(this, workingDatabasePath, this.CubeFiles, this.Ices, this.SuppressedIces);
-            validator.Execute();
+                var validator = new WindowsInstallerValidator(this, workingDatabasePath, this.CubeFiles, this.Ices, this.SuppressedIces);
+                validator.Execute();
+            }
+            finally
+            {
+                if (File.Exists(workingDatabasePath))
+                {
+                    File.Delete(workingDatabasePath);
+                }
+            }
 
             stopwatch.Stop();
             this.Messaging.Write(VerboseMessages.ValidatedDatabase(stopwatch.ElapsedMilliseconds));
-
-
-            this.TrackedFiles = trackedFiles;
         }
 
         private void LogValidationMessage(ValidationMessage message)
