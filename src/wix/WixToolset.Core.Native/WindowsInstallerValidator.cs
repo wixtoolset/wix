@@ -65,7 +65,7 @@ namespace WixToolset.Core.Native
                 {
                     if (!mutex.WaitOne(0))
                     {
-                        this.Callback.ValidationBlocked();
+                        this.Callback.WriteMessage(VerboseMessages.ValidationSerialized());
                         mutex.WaitOne();
                     }
                 }
@@ -124,7 +124,8 @@ namespace WixToolset.Core.Native
 
                         if (!findCubeFile.Found)
                         {
-                            throw new WixException(ErrorMessages.CubeFileNotFound(findCubeFile.Path));
+                            this.Callback.WriteMessage(ErrorMessages.CubeFileNotFound(findCubeFile.Path));
+                            continue;
                         }
 
                         try
@@ -145,10 +146,12 @@ namespace WixToolset.Core.Native
                         {
                             if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
                             {
-                                throw new WixException(ErrorMessages.CubeFileNotFound(findCubeFile.Path));
+                                this.Callback.WriteMessage(ErrorMessages.CubeFileNotFound(findCubeFile.Path));
                             }
-
-                            throw;
+                            else
+                            {
+                                this.Callback.WriteMessage(ErrorMessages.UnexpectedException($"Unexpected exception while merging CUB: {findCubeFile.Path}, detail: {e.Message}", e.GetType().ToString(), e.StackTrace));
+                            }
                         }
                     }
 
@@ -212,7 +215,7 @@ namespace WixToolset.Core.Native
                             {
                                 if (!this.Callback.EncounteredError)
                                 {
-                                    throw e;
+                                    this.Callback.WriteMessage(ErrorMessages.UnexpectedException($"Unexpected exception while executing ICE: {action}, detail: {e.Message}", e.GetType().ToString(), e.StackTrace));
                                 }
                             }
 
@@ -236,29 +239,29 @@ namespace WixToolset.Core.Native
                         // this would be the temporary copy and there would be no final output becasue
                         // this error occured; and during standalone validation they should know the path
                         // passed in.
-                        throw new WixException(ErrorMessages.ValidationFailedToOpenDatabase());
+                        this.Callback.WriteMessage(ErrorMessages.ValidationFailedToOpenDatabase());
                     }
                     else if (0x64D == e.NativeErrorCode)
                     {
-                        throw new WixException(ErrorMessages.ValidationFailedDueToLowMsiEngine());
+                        this.Callback.WriteMessage(ErrorMessages.ValidationFailedDueToLowMsiEngine());
                     }
                     else if (0x654 == e.NativeErrorCode)
                     {
-                        throw new WixException(ErrorMessages.ValidationFailedDueToInvalidPackage());
+                        this.Callback.WriteMessage(ErrorMessages.ValidationFailedDueToInvalidPackage());
                     }
                     else if (0x658 == e.NativeErrorCode)
                     {
-                        throw new WixException(ErrorMessages.ValidationFailedDueToMultilanguageMergeModule());
+                        this.Callback.WriteMessage(ErrorMessages.ValidationFailedDueToMultilanguageMergeModule());
                     }
                     else if (0x659 == e.NativeErrorCode)
                     {
-                        throw new WixException(WarningMessages.ValidationFailedDueToSystemPolicy());
+                        this.Callback.WriteMessage(WarningMessages.ValidationFailedDueToSystemPolicy());
                     }
                     else
                     {
                         var msg = String.IsNullOrEmpty(this.CurrentIce) ? e.Message : $"Action - '{this.CurrentIce}' {e.Message}";
 
-                        throw new WixException(ErrorMessages.Win32Exception(e.NativeErrorCode, msg));
+                        this.Callback.WriteMessage(ErrorMessages.Win32Exception(e.NativeErrorCode, msg));
                     }
                 }
             }
@@ -294,9 +297,15 @@ namespace WixToolset.Core.Native
 
                     continueValidation = this.Callback.ValidationMessage(parsedMessage);
                 }
-                catch
+                catch (WixException e)
                 {
-                    return - 1;
+                    this.Callback.WriteMessage(e.Error);
+                    return -1;
+                }
+                catch (Exception e)
+                {
+                    this.Callback.WriteMessage(ErrorMessages.UnexpectedException($"Unexpected exception while executing action: {this.CurrentIce}, detail: {e.Message}", e.GetType().ToString(), e.StackTrace));
+                    return -1;
                 }
             }
 

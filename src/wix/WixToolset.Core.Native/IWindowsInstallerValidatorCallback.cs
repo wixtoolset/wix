@@ -2,6 +2,8 @@
 
 namespace WixToolset.Core.Native
 {
+    using WixToolset.Data;
+
     /// <summary>
     /// Callbacks during validation.
     /// </summary>
@@ -13,15 +15,16 @@ namespace WixToolset.Core.Native
         bool EncounteredError { get; }
 
         /// <summary>
-        /// Validation blocked by another Windows Installer operation.
-        /// </summary>
-        void ValidationBlocked();
-
-        /// <summary>
         /// Validation message from an ICE.
         /// </summary>
         /// <param name="message">The validation message.</param>
         /// <returns>True if validation should continue; otherwise cancel the validation.</returns>
         bool ValidationMessage(ValidationMessage message);
+
+        /// <summary>
+        /// Normal message encountered while preparing for ICE validation.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
+        void WriteMessage(Message message);
     }
 }
