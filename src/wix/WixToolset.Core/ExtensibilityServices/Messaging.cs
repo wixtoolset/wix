@@ -23,11 +23,20 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public bool WarningsAsError { get; set; }
 
-        public void ElevateWarningMessage(int warningNumber) => this.warningsAsErrors.Add(warningNumber);
+        public void ElevateWarningMessage(int warningNumber)
+        {
+            this.warningsAsErrors.Add(warningNumber);
+        }
 
-        public void SetListener(IMessageListener listener) => this.listener = listener;
+        public void SetListener(IMessageListener listener)
+        {
+            this.listener = listener;
+        }
 
-        public void SuppressWarningMessage(int warningNumber) => this.suppressedWarnings.Add(warningNumber);
+        public void SuppressWarningMessage(int warningNumber)
+        {
+            this.suppressedWarnings.Add(warningNumber);
+        }
 
         public void Write(Message message)
         {
@@ -87,6 +96,8 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else if (this.WarningsAsError || this.warningsAsErrors.Contains(message.Id))
                 {
+                    message.ElevateToError();
+
                     level = MessageLevel.Error;
                 }
             }

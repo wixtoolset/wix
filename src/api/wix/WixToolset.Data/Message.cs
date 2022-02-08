@@ -82,6 +82,14 @@ namespace WixToolset.Data
         /// <value>The arguments for the format string.</value>
         public object[] MessageArgs { get; }
 
+        /// <summary>
+        /// Changes the message into an error message.
+        /// </summary>
+        public void ElevateToError()
+        {
+            this.Level = MessageLevel.Error;
+        }
+
         public override string ToString()
         {
             if (this.ResourceManager == null)
