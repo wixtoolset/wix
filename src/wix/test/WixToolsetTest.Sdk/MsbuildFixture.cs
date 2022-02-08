@@ -332,7 +332,6 @@ namespace WixToolsetTest.Sdk
             {
                 fs.Initialize(sourceFolder);
                 var baseFolder = fs.BaseFolder;
-                var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, suppressValidation: false);
@@ -367,7 +366,6 @@ namespace WixToolsetTest.Sdk
             {
                 fs.Initialize(sourceFolder);
                 var baseFolder = fs.BaseFolder;
-                var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
