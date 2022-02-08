@@ -7,6 +7,7 @@
   <PropertyGroup>
     <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
     <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+    <DefineConstants Condition=" '$(Configuration)'=='Debug' ">$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
   <Target Name="__SetAssemblyInfoFromGit" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="GetAssemblyVersion" />
