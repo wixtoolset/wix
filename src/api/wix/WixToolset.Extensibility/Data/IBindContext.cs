@@ -53,11 +53,6 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<IFileSystemExtension> FileSystemExtensions { get; set; }
 
         /// <summary>
-        /// Set of ICEs to execute.
-        /// </summary>
-        IReadOnlyCollection<string> Ices { get; set; }
-
-        /// <summary>
         /// Intermedaite folder.
         /// </summary>
         string IntermediateFolder { get; set; }
@@ -96,16 +91,6 @@ namespace WixToolset.Extensibility.Data
         /// LCID from resolve.
         /// </summary>
         int? ResolvedLcid { get; set; }
-
-        /// <summary>
-        /// Set of ICEs to skip.
-        /// </summary>
-        IReadOnlyCollection<string> SuppressIces { get; set; }
-
-        /// <summary>
-        /// Skip all ICEs.
-        /// </summary>
-        bool SuppressValidation { get; set; }
 
         /// <summary>
         /// Skip creation of output.

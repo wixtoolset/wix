@@ -64,13 +64,8 @@ namespace WixToolset.BuildTasks
         public ITaskItem UnreferencedSymbolsFile { get; set; }
 
         public ITaskItem WixProjectFile { get; set; }
+
         public string[] WixVariables { get; set; }
-
-        public bool SuppressValidation { get; set; }
-
-        public string[] SuppressIces { get; set; }
-
-        public string AdditionalCub { get; set; }
 
         protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
@@ -85,8 +80,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
             commandLineBuilder.AppendArrayIfNotNull("-I ", this.IncludeSearchPaths);
             commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);
-            commandLineBuilder.AppendIfTrue("-sval", this.SuppressValidation);
-            commandLineBuilder.AppendArrayIfNotNull("-sice ", this.SuppressIces);
             commandLineBuilder.AppendSwitchIfNotNull("-usf ", this.UnreferencedSymbolsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);

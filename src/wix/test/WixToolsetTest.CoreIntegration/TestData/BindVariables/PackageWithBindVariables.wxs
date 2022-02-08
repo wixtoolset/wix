@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="PacakgeWithBindVariables" Version="!(bind.fileversion.TestBinaryFile)" Manufacturer="Example Corporation" UpgradeCode="00000000-0000-0000-0000-000000000000">
+  <Package Name="PacakgeWithBindVariables" Version="!(bind.fileversion.TestBinaryFile)" Manufacturer="Example Corporation" UpgradeCode="41a2c17e-1976-465b-bcde-eae03516ca68">
 
     <Property Id="TestPackageManufacturer" Value="!(bind.Property.Manufacturer)" />
     <Property Id="TestPackageName" Value="!(bind.Property.ProductName)" />

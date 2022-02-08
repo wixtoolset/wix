@@ -26,7 +26,7 @@ namespace WixToolset.Core.WindowsInstaller
             IBindResult result = null;
             try
             {
-                var command = new BindDatabaseCommand(context, backendExtensions, "mergemod.cub");
+                var command = new BindDatabaseCommand(context, backendExtensions);
                 result = command.Execute();
 
                 foreach (var extension in backendExtensions)

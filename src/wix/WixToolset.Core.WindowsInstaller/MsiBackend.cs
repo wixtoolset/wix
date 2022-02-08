@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller
             var dispose = true;
             try
             {
-                var command = new BindDatabaseCommand(context, backendExtensions, "darice.cub");
+                var command = new BindDatabaseCommand(context, backendExtensions);
                 result = command.Execute();
 
                 foreach (var extension in backendExtensions)

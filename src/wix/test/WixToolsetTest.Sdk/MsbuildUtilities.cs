@@ -20,12 +20,13 @@ namespace WixToolsetTest.Sdk
         public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath), "..", "publish", "WixToolset.Sdk");
         public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
 
-        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal")
+        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal", bool suppressValidation = true)
         {
             var allArgs = new List<string>
             {
                 $"-verbosity:{verbosityLevel}",
                 $"-p:Configuration={configuration}",
+                $"-p:SuppressValidation={suppressValidation}",
                 GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildUtilities.WixPropsPath),
                 // Node reuse means that child msbuild processes can stay around after the build completes.
                 // Under that scenario, the root msbuild does not reliably close its streams which causes us to hang.

@@ -36,8 +36,6 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<IFileSystemExtension> FileSystemExtensions { get; set; }
 
-        public IReadOnlyCollection<string> Ices { get; set; }
-
         public string IntermediateFolder { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }
@@ -53,10 +51,6 @@ namespace WixToolset.Core
         public int? ResolvedSummaryInformationCodepage { get; set; }
 
         public int? ResolvedLcid { get; set; }
-
-        public IReadOnlyCollection<string> SuppressIces { get; set; }
-
-        public bool SuppressValidation { get; set; }
 
         public bool SuppressLayout { get; set; }
 

@@ -52,7 +52,7 @@ namespace WixToolset.Core.WindowsInstaller
             IBindResult result = null;
             try
             {
-                var command = new BindDatabaseCommand(context, backendExtensions, subStorages, null);
+                var command = new BindDatabaseCommand(context, backendExtensions, subStorages);
                 result = command.Execute();
 
                 foreach (var extension in backendExtensions)

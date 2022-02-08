@@ -168,6 +168,10 @@
   <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
   <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
 
+  <UsingTask TaskName="WindowsInstallerValidation" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WindowsInstallerValidation" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="WindowsInstallerValidation" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
   <!--
   ***********************************************************************************************
   ***********************************************************************************************
@@ -553,6 +557,10 @@
     ================================================================================================
     -->
   <PropertyGroup>
+    <CompileDependsOn>
+      $(CompileDependsOn);
+      WindowsInstallerValidation
+    </CompileDependsOn>
     <CoreCompileDependsOn>
       AssignTargetPaths;
       CreateManifestResourceNames;
@@ -604,9 +612,6 @@
         Pedantic="$(Pedantic)"
         ReferencePaths="$(ReferencePaths)"
 
-        SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
-        TreatSpecificWarningsAsErrors="$(TreatSpecificWarningsAsErrors)"
-
         BindInputPaths="@(LinkerBindInputPaths)"
         BindFiles="$(BindFiles)"
         BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)"
@@ -619,12 +624,10 @@
         WixProjectFile="$(ProjectPath)"
         WixVariables="$(WixVariables)"
 
-        SuppressValidation="$(SuppressValidation)"
-        SuppressIces="$(SuppressIces)"
-        AdditionalCub="$(AdditionalCub)"
-
         SuppressAllWarnings="$(SuppressAllWarnings)"
+        SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
         TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+        TreatSpecificWarningsAsErrors="$(TreatSpecificWarningsAsErrors)"
         VerboseOutput="$(VerboseOutput)"
 
         RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
@@ -634,6 +637,28 @@
     <ItemGroup>
       <_WixBuildOutputFile Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" />
     </ItemGroup>
+  </Target>
+
+  <Target
+      Name="WindowsInstallerValidation"
+      DependsOnTargets="CoreCompile" 
+      Condition=" ('$(OutputType)' == 'Package' or '$(OutputType)' == 'Module') and '$(SuppressValidation)'!='true' ">
+      <WindowsInstallerValidation
+          DatabaseFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)"
+          WixpdbFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"
+          IntermediateDirectory="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)"
+          Ices="$(Ices)"
+          SuppressIces="$(SuppressIces)"
+          CubeFiles="$(AdditionalCub)"
+
+          AdditionalOptions="$(ValidationAdditionalOptions)"
+
+          NoLogo="true"
+          SuppressAllWarnings="$(SuppressAllWarnings)"
+          SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
+          TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+          TreatSpecificWarningsAsErrors="$(TreatSpecificWarningsAsErrors)"
+          VerboseOutput="$(VerboseOutput)" />
   </Target>
 
   <!--
