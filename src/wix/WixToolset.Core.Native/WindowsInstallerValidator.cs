@@ -18,6 +18,8 @@ namespace WixToolset.Core.Native
     {
         private const string CubesFolder = "cubes";
 
+        private readonly InstallUIHandler validationUIHandlerDelegate;
+
         /// <summary>
         /// Creates a new Windows Installer validator.
         /// </summary>
@@ -33,6 +35,9 @@ namespace WixToolset.Core.Native
             this.CubeFiles = cubeFiles;
             this.Ices = new SortedSet<string>(ices);
             this.SuppressedIces = new SortedSet<string>(suppressedIces);
+
+            // Hold a reference to our callback beyond when the external UI handler is reset.
+            this.validationUIHandlerDelegate = new InstallUIHandler(this.ValidationUIHandler);
         }
 
         private IWindowsInstallerValidatorCallback Callback { get; }
@@ -175,7 +180,7 @@ namespace WixToolset.Core.Native
 
                     // Disable the internal UI handler and set an external UI handler.
                     previousUILevel = Installer.SetInternalUI((int)InstallUILevels.None, ref previousHwnd);
-                    previousUIHandler = Installer.SetExternalUI(this.ValidationUIHandler, (int)InstallLogModes.Error | (int)InstallLogModes.Warning | (int)InstallLogModes.User, IntPtr.Zero);
+                    previousUIHandler = Installer.SetExternalUI(this.validationUIHandlerDelegate, (int)InstallLogModes.Error | (int)InstallLogModes.Warning | (int)InstallLogModes.User, IntPtr.Zero);
 
                     // Create a session for running the ICEs.
                     this.ValidationSessionInProgress = true;
