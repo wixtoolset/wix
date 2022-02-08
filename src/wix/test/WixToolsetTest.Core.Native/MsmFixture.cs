@@ -7,7 +7,7 @@ namespace WixToolsetTest.CoreNative
 
     public class MsmFixture
     {
-        [Fact(Skip = "Test fails in new repo")]
+        [Fact]
         public void CanCreateMsmInterface()
         {
             var merge = MsmInterop.GetMsmMerge();
