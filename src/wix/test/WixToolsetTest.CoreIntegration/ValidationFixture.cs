@@ -10,7 +10,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class ValidationFixture
     {
-        [Fact]
+        [Fact(Skip = "Flaky")]
         public void CanValidateMsiWithIceIssues()
         {
             var folder = TestData.Get(@"TestData");
@@ -50,7 +50,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Flaky")]
         public void CanValidateMsiSuppressIceError()
         {
             var folder = TestData.Get(@"TestData");
@@ -90,7 +90,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Flaky")]
         public void CanValidateMsiWithWarningsAsErrors()
         {
             var folder = TestData.Get(@"TestData");
