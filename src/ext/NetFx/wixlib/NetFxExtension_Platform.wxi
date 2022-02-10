@@ -2,8 +2,7 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-
-  <?include caDecor.wxi ?>
+  <?include ..\..\caDecor.wxi ?>
 
   <Fragment>
     <CustomAction Id="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" DllEntry="SchedNetFx" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />

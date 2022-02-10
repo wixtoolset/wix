@@ -2,8 +2,8 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caDecor.wxi ?>
-    <?include caerr.wxi ?>
+    <?include ..\..\caDecor.wxi ?>
+    <?include ..\..\caerr.wxi ?>
 
     <Fragment>
         <UI Id="ConfigureUsersErrorText">
