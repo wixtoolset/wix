@@ -6,6 +6,8 @@ namespace WixToolsetTest.Sdk
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
     using WixBuildTools.TestSupport;
     using Xunit;
 
@@ -328,6 +330,10 @@ namespace WixToolsetTest.Sdk
         {
             var sourceFolder = TestData.Get(@"TestData\MsiPackageWithIceError\MsiPackage");
 
+            var testLogsFolder = TestData.GetUnitTestLogsFolder();
+            File.Delete(Path.Combine(testLogsFolder, buildSystem + ".binlog"));
+            File.Delete(Path.Combine(testLogsFolder, buildSystem + ".msi"));
+
             using (var fs = new TestDataFolderFileSystem())
             {
                 fs.Initialize(sourceFolder);
@@ -335,7 +341,9 @@ namespace WixToolsetTest.Sdk
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, suppressValidation: false);
-                Assert.Equal(1, result.ExitCode);
+
+                File.Copy(Path.ChangeExtension(projectPath, ".binlog"), Path.Combine(testLogsFolder, buildSystem + ".binlog"));
+                File.Copy(Path.Combine(baseFolder, "obj", "x86", "Release", "en-US", "MsiPackage.msi"), Path.Combine(testLogsFolder, buildSystem + ".msi"));
 
                 var iceIssues = result.Output.Where(line => line.Contains(": error") || line.Contains(": warning"))
                                              .Select(line => line.Replace(baseFolder, "<baseFolder>")
