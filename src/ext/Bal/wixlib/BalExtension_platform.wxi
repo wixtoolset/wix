@@ -2,7 +2,8 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caDecor.wxi ?>
+    <?include ..\..\caDecor.wxi ?>
+
     <Fragment>
         <BootstrapperApplication Id="WixDotNetCoreBootstrapperApplicationHost$(var.Suffix)">
             <BootstrapperApplicationDll Id="WixDotNetCoreBootstrapperApplicationHost" SourceFile="!(bindpath.$(var.platform))\dnchost.dll" />
@@ -10,6 +11,7 @@
             <PayloadGroupRef Id="WixDotNetCoreBootstrapperApplicationHostManagedPayloads" />
         </BootstrapperApplication>
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixDotNetCoreBootstrapperApplicationHost.Standard$(var.Suffix)">
             <PayloadGroupRef Id="DncPreqStandardPayloads" />
@@ -22,30 +24,35 @@
             <BootstrapperApplicationDll Id="WixStandardBootstrapperApplication" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication.RtfLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaRtfLicensePayloads" />
         </BootstrapperApplication>
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication$(var.Suffix)" />
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication.RtfLargeLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaRtfLargeLicensePayloads" />
         </BootstrapperApplication>
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication$(var.Suffix)" />
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaHyperlinkLicensePayloads" />
         </BootstrapperApplication>
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication$(var.Suffix)" />
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkLargeLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaHyperlinkLargeLicensePayloads" />
         </BootstrapperApplication>
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication$(var.Suffix)" />
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkSidebarLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaHyperlinkSidebarLicensePayloads" />

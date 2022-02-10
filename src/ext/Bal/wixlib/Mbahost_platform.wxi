@@ -2,7 +2,8 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caDecor.wxi ?>
+    <?include ..\..\caDecor.wxi ?>
+
     <Fragment>
         <BootstrapperApplication Id="WixManagedBootstrapperApplicationHost$(var.Suffix)">
             <BootstrapperApplicationDll Id="WixManagedBootstrapperApplicationHost" SourceFile="!(bindpath.$(var.platform))\mbahost.dll" />
@@ -10,6 +11,7 @@
             <PayloadGroupRef Id="WixManagedBootstrapperApplicationHostManagedPayloads" />
         </BootstrapperApplication>
     </Fragment>
+
     <Fragment>
         <BootstrapperApplication Id="WixManagedBootstrapperApplicationHost.Standard$(var.Suffix)">
             <PayloadGroupRef Id="MbaPreqStandardPayloads" />

@@ -2,7 +2,7 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caDecor.wxi ?>
+    <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
         <CustomAction Id="$(var.Prefix)FailWhenDeferred$(var.Suffix)" DllEntry="WixFailWhenDeferred" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />

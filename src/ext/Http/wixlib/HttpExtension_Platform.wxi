@@ -2,7 +2,7 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caDecor.wxi ?>
+    <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
         <UIRef Id="WixHttpErrors" />
