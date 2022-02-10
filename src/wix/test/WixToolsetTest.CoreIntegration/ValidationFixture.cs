@@ -172,6 +172,10 @@ namespace WixToolsetTest.CoreIntegration
         {
             var folder = TestData.Get(@"TestData");
 
+            var testLogsFolder = TestData.GetUnitTestLogsFolder();
+            File.Delete(Path.Combine(testLogsFolder, "build.txt"));
+            File.Delete(Path.Combine(testLogsFolder, "validate.txt"));
+
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
@@ -187,6 +191,8 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath,
                 });
 
+                File.WriteAllLines(Path.Combine(testLogsFolder, "build.txt"), result.Messages.Select(m => m.ToString()));
+
                 result.AssertSuccess();
 
                 var validationResult = WixRunner.Execute(new[]
@@ -195,6 +201,8 @@ namespace WixToolsetTest.CoreIntegration
                     "-intermediateFolder", intermediateFolder,
                     msiPath
                 });
+
+                File.WriteAllLines(Path.Combine(testLogsFolder, "validate.txt"), validationResult.Messages.Select(m => m.ToString()));
 
                 Assert.Equal(1, validationResult.ExitCode);
 
@@ -212,6 +220,10 @@ namespace WixToolsetTest.CoreIntegration
         {
             var folder = TestData.Get(@"TestData");
 
+            var testLogsFolder = TestData.GetUnitTestLogsFolder();
+            File.Delete(Path.Combine(testLogsFolder, "build.txt"));
+            File.Delete(Path.Combine(testLogsFolder, "validate.txt"));
+
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
@@ -227,6 +239,8 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath,
                 });
 
+                File.WriteAllLines(Path.Combine(testLogsFolder, "build.txt"), result.Messages.Select(m => m.ToString()));
+
                 result.AssertSuccess();
 
                 var validationResult = WixRunner.Execute(warningsAsErrors: false, new[]
@@ -236,6 +250,8 @@ namespace WixToolsetTest.CoreIntegration
                     "-sice", "ICE12",
                     msiPath
                 });
+
+                File.WriteAllLines(Path.Combine(testLogsFolder, "validate.txt"), validationResult.Messages.Select(m => m.ToString()));
 
                 validationResult.AssertSuccess();
 
