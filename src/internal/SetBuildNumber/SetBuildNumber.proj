@@ -27,7 +27,7 @@
   <Target Name="SetAppVeyorBuildNumber"
           Condition=" '$(APPVEYOR)'=='True' ">
     <PropertyGroup>
-      <AppVeyorBuildNumber>$(InformationalVersion)</AppVeyorBuildNumber>
+      <AppVeyorBuildNumber>$(InformationalVersion)-$(APPVEYOR_BUILD_ID)</AppVeyorBuildNumber>
       <AppVeyorBuildNumber Condition=" '$(APPVEYOR_PULL_REQUEST_NUMBER)'!='' ">PR#$(APPVEYOR_PULL_REQUEST_NUMBER)-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
       <AppVeyorBuildNumber Condition=" '$(RuntimeTestsEnabled)'!='' ">TEST-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
     </PropertyGroup>
