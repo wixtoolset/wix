@@ -355,7 +355,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
+        [Theory(Skip = "Flaky")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
