@@ -2089,6 +2089,16 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
+    void OnPlanRestoreRelatedBundleFallback(
+        __in BA_ONPLANRESTORERELATEDBUNDLE_ARGS* pArgs,
+        __inout BA_ONPLANRESTORERELATEDBUNDLE_RESULTS* pResults
+        )
+    {
+        BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRESTORERELATEDBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RESTORE_RELATED_BUNDLE, m_hModule, pArgs->wzBundleId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
+    }
+
 
 public: //CBalBaseBootstrapperApplication
     virtual STDMETHODIMP Initialize(

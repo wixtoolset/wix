@@ -13,6 +13,33 @@ namespace WixToolsetTest.BurnE2E
         public UpgradeRelatedBundleTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [Fact]
+        public void ReinstallsOlderBundleAfterFailure()
+        {
+            var packageAv2 = this.CreatePackageInstaller("PackageAv2");
+            var packageAv3 = this.CreatePackageInstaller("PackageAv3");
+            var bundleAv2 = this.CreateBundleInstaller("BundleAv2");
+            var bundleAv3 = this.CreateBundleInstaller("BundleAv3");
+
+            packageAv2.VerifyInstalled(false);
+            packageAv3.VerifyInstalled(false);
+
+            bundleAv2.Install();
+            bundleAv2.VerifyRegisteredAndInPackageCache();
+
+            packageAv2.VerifyInstalled(true);
+            packageAv3.VerifyInstalled(false);
+
+            // Verify https://github.com/wixtoolset/issues/issues/3421
+            var bundleAv3InstallLogFilePath = bundleAv3.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
+            bundleAv3.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv3InstallLogFilePath, @"Applied execute package: PackageA, result: 0x0, restart: None"));
+
+            packageAv2.VerifyInstalled(true);
+            packageAv3.VerifyInstalled(false);
+        }
+
+        [Fact]
         public void ReportsRelatedBundleMissingFromCache()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");

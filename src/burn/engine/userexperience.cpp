@@ -2176,6 +2176,36 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnPlanRestoreRelatedBundle(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzBundleId,
+    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANRESTORERELATEDBUNDLE_ARGS args = { };
+    BA_ONPLANRESTORERELATEDBUNDLE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzBundleId = wzBundleId;
+    args.recommendedState = *pRequestedState;
+
+    results.cbSize = sizeof(results);
+    results.requestedState = *pRequestedState;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRESTORERELATEDBUNDLE, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanRestoreRelatedBundle failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    *pRequestedState = results.requestedState;
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnPlanRollbackBoundary(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzRollbackBoundaryId,

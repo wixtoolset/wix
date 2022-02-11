@@ -61,6 +61,10 @@ typedef struct _BURN_RELATED_BUNDLE
     BOOL fPlannable;
 
     BURN_PACKAGE package;
+
+    BOOTSTRAPPER_REQUEST_STATE defaultRequestedRestore;
+    BOOTSTRAPPER_REQUEST_STATE requestedRestore;
+    BOOTSTRAPPER_ACTION_STATE restore;
 } BURN_RELATED_BUNDLE;
 
 typedef struct _BURN_RELATED_BUNDLES

@@ -51,7 +51,7 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-            execute = pPackage->Bundle.fRepairable ? BOOTSTRAPPER_ACTION_STATE_REPAIR : BOOTSTRAPPER_ACTION_STATE_NONE;
+            execute = BOOTSTRAPPER_ACTION_STATE_REPAIR;
             break;
         case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_CACHE:

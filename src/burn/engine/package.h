@@ -309,7 +309,6 @@ typedef struct _BURN_PACKAGE
             LPCWSTR wzAncestors; // points directly into engine state.
             LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 
-            BOOL fRepairable;
             BOOL fSupportsBurnProtocol;
 
             BURN_EXE_EXIT_CODE* rgExitCodes;

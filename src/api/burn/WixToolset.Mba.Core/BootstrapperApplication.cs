@@ -271,6 +271,9 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public event EventHandler<SetUpdateCompleteEventArgs> SetUpdateComplete;
 
+        /// <inheritdoc/>
+        public event EventHandler<PlanRestoreRelatedBundleEventArgs> PlanRestoreRelatedBundle;
+
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
@@ -1321,6 +1324,19 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlanRestoreRelatedBundle"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlanRestoreRelatedBundle(PlanRestoreRelatedBundleEventArgs args)
+        {
+            EventHandler<PlanRestoreRelatedBundleEventArgs> handler = this.PlanRestoreRelatedBundle;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
 
         int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
@@ -2039,6 +2055,16 @@ namespace WixToolset.Mba.Core
             SetUpdateCompleteEventArgs args = new SetUpdateCompleteEventArgs(hrStatus, wzPreviousPackageId, wzNewPackageId);
             this.OnSetUpdateComplete(args);
 
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlanRestoreRelatedBundle(string wzBundleId, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        {
+            PlanRestoreRelatedBundleEventArgs args = new PlanRestoreRelatedBundleEventArgs(wzBundleId, recommendedState, pRequestedState, fCancel);
+            this.OnPlanRestoreRelatedBundle(args);
+
+            pRequestedState = args.State;
+            fCancel = args.Cancel;
             return args.HResult;
         }
 

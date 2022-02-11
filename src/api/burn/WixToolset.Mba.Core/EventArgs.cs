@@ -2402,4 +2402,35 @@ namespace WixToolset.Mba.Core
         /// </summary>
         public string NewPackageId { get; private set; }
     }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanRestoreRelatedBundle"/>
+    /// </summary>
+    [Serializable]
+    public class PlanRestoreRelatedBundleEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public PlanRestoreRelatedBundleEventArgs(string bundleId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.BundleId = bundleId;
+            this.RecommendedState = recommendedState;
+            this.State = state;
+        }
+
+        /// <summary>
+        /// Gets the identity of the bundle to plan for.
+        /// </summary>
+        public string BundleId { get; private set; }
+
+        /// <summary>
+        /// Gets the recommended requested state for the bundle.
+        /// </summary>
+        public RequestState RecommendedState { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the requested state for the bundle.
+        /// </summary>
+        public RequestState State { get; set; }
+    }
 }

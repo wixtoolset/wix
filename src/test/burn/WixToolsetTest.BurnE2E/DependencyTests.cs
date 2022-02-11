@@ -539,7 +539,7 @@ namespace WixToolsetTest.BurnE2E
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3421")]
+        [Fact]
         public void DoesntLoseDependenciesOnFailedMajorUpgradeBundleFromMajorUpdateMsiFifo()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -611,7 +611,7 @@ namespace WixToolsetTest.BurnE2E
             packageGv2.VerifyInstalled(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3421")]
+        [Fact]
         public void DoesntLoseDependenciesOnFailedMajorUpgradeBundleFromMajorUpdateMsiLifo()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");

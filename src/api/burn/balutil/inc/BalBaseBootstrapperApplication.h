@@ -1047,6 +1047,17 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnPlanRestoreRelatedBundle(
+        __in_z LPCWSTR /*wzBundleId*/,
+        __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
+        __inout BOOTSTRAPPER_REQUEST_STATE* /*pRequestedState*/,
+        __inout BOOL* pfCancel
+        )
+    {
+        *pfCancel |= CheckCanceled();
+        return S_OK;
+    }
+
 public: //CBalBaseBootstrapperApplication
     virtual STDMETHODIMP Initialize(
         __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs

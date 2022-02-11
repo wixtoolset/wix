@@ -103,6 +103,10 @@ static HRESULT AppendCleanAction(
     __in BURN_PLAN* pPlan,
     __out BURN_CLEAN_ACTION** ppCleanAction
     );
+static HRESULT AppendRestoreRelatedBundleAction(
+    __in BURN_PLAN* pPlan,
+    __out BURN_EXECUTE_ACTION** ppExecuteAction
+    );
 static HRESULT ProcessPayloadGroup(
     __in BURN_PLAN* pPlan,
     __in BURN_PAYLOAD_GROUP* pPayloadGroup
@@ -194,6 +198,15 @@ extern "C" void PlanReset(
             PlanUninitializeExecuteAction(&pPlan->rgRollbackActions[i]);
         }
         MemFree(pPlan->rgRollbackActions);
+    }
+
+    if (pPlan->rgRestoreRelatedBundleActions)
+    {
+        for (DWORD i = 0; i < pPlan->cRestoreRelatedBundleActions; ++i)
+        {
+            PlanUninitializeExecuteAction(&pPlan->rgRestoreRelatedBundleActions[i]);
+        }
+        MemFree(pPlan->rgRestoreRelatedBundleActions);
     }
 
     if (pPlan->rgCleanActions)
@@ -1276,6 +1289,9 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
             continue;
         }
 
+        pRelatedBundle->defaultRequestedRestore = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        pRelatedBundle->requestedRestore = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_NONE;
         pRelatedBundle->package.defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
         pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
 
@@ -1312,12 +1328,6 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         hr = UserExperienceOnPlanRelatedBundle(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->package.requested);
         ExitOnRootFailure(hr, "BA aborted plan related bundle.");
 
-        // Log when the BA changed the bundle state so the engine doesn't get blamed for planning the wrong thing.
-        if (pRelatedBundle->package.requested != pRelatedBundle->package.defaultRequested)
-        {
-            LogId(REPORT_STANDARD, MSG_PLANNED_BUNDLE_UX_CHANGED_REQUEST, pRelatedBundle->package.sczId, LoggingRequestStateToString(pRelatedBundle->package.requested), LoggingRequestStateToString(pRelatedBundle->package.defaultRequested));
-        }
-
         // If uninstalling and the dependent related bundle may be executed, ignore its provider key to allow for downgrades with ref-counting.
         if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
         {
@@ -1340,6 +1350,7 @@ LExit:
 }
 
 extern "C" HRESULT PlanRelatedBundlesComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -1359,16 +1370,19 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
     ExitOnFailure(hr, "Failed to create dictionary for planned packages.");
 
     BOOL fExecutingAnyPackage = FALSE;
+    BOOL fInstallingAnyPackage = FALSE;
 
     for (DWORD i = 0; i < pPlan->cExecuteActions; ++i)
     {
+        BOOTSTRAPPER_ACTION_STATE packageAction = BOOTSTRAPPER_ACTION_STATE_NONE;
+
         switch (pPlan->rgExecuteActions[i].type)
         {
         case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
-            if (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].relatedBundle.action)
-            {
-                fExecutingAnyPackage = TRUE;
+            packageAction = pPlan->rgExecuteActions[i].relatedBundle.action;
 
+            if (BOOTSTRAPPER_ACTION_STATE_NONE != packageAction)
+            {
                 BURN_PACKAGE* pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
                 if (pPackage->cDependencyProviders)
                 {
@@ -1380,21 +1394,24 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
-            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].exePackage.action);
+            packageAction = pPlan->rgExecuteActions[i].exePackage.action;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].msiPackage.action);
+            packageAction = pPlan->rgExecuteActions[i].msiPackage.action;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].mspTarget.action);
+            packageAction = pPlan->rgExecuteActions[i].mspTarget.action;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE:
-            fExecutingAnyPackage |= (BOOTSTRAPPER_ACTION_STATE_NONE != pPlan->rgExecuteActions[i].msuPackage.action);
+            packageAction = pPlan->rgExecuteActions[i].msuPackage.action;
             break;
         }
+
+        fExecutingAnyPackage |= BOOTSTRAPPER_ACTION_STATE_NONE != packageAction;
+        fInstallingAnyPackage |= BOOTSTRAPPER_ACTION_STATE_INSTALL == packageAction || BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE == packageAction;
     }
 
     for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
@@ -1491,6 +1508,62 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
             hr = DependencyPlanPackageComplete(&pRelatedBundle->package, pPlan);
             ExitOnFailure(hr, "Failed to complete plan dependency actions for related bundle package: %ls", pRelatedBundle->package.sczId);
+        }
+
+        if (fInstallingAnyPackage && BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->relationType)
+        {
+            BURN_EXECUTE_ACTION* pAction = NULL;
+
+            pRelatedBundle->defaultRequestedRestore = pRelatedBundle->requestedRestore = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
+
+            hr = UserExperienceOnPlanRestoreRelatedBundle(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->requestedRestore);
+            ExitOnRootFailure(hr, "BA aborted plan restore related bundle.");
+
+            switch (pRelatedBundle->requestedRestore)
+            {
+            case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
+                pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_REPAIR;
+                break;
+            case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
+            case BOOTSTRAPPER_REQUEST_STATE_CACHE: __fallthrough;
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
+                pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+                break;
+            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT:
+                pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+                break;
+            default:
+                pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_NONE;
+                break;
+            }
+
+            if (BOOTSTRAPPER_ACTION_STATE_NONE != pRelatedBundle->restore)
+            {
+                hr = AppendRestoreRelatedBundleAction(pPlan, &pAction);
+                ExitOnFailure(hr, "Failed to append restore related bundle action to plan.");
+
+                pAction->type = BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE;
+                pAction->relatedBundle.pRelatedBundle = pRelatedBundle;
+                pAction->relatedBundle.action = pRelatedBundle->restore;
+
+                if (pRelatedBundle->package.Bundle.sczIgnoreDependencies)
+                {
+                    hr = StrAllocString(&pAction->relatedBundle.sczIgnoreDependencies, pRelatedBundle->package.Bundle.sczIgnoreDependencies, 0);
+                    ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+                }
+
+                if (pRelatedBundle->package.Bundle.wzAncestors)
+                {
+                    hr = StrAllocString(&pAction->relatedBundle.sczAncestors, pRelatedBundle->package.Bundle.wzAncestors, 0);
+                    ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+                }
+
+                if (pRelatedBundle->package.Bundle.wzEngineWorkingDirectory)
+                {
+                    hr = StrAllocString(&pAction->relatedBundle.sczEngineWorkingDirectory, pRelatedBundle->package.Bundle.wzEngineWorkingDirectory, 0);
+                    ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+                }
+            }
         }
     }
 
@@ -2269,6 +2342,23 @@ LExit:
     return hr;
 }
 
+static HRESULT AppendRestoreRelatedBundleAction(
+    __in BURN_PLAN* pPlan,
+    __out BURN_EXECUTE_ACTION** ppExecuteAction
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pPlan->rgRestoreRelatedBundleActions), pPlan->cRestoreRelatedBundleActions, 1, sizeof(BURN_EXECUTE_ACTION), 5);
+    ExitOnFailure(hr, "Failed to grow plan's array of restore related bundle actions.");
+
+    *ppExecuteAction = pPlan->rgRestoreRelatedBundleActions + pPlan->cRestoreRelatedBundleActions;
+    ++pPlan->cRestoreRelatedBundleActions;
+
+LExit:
+    return hr;
+}
+
 static HRESULT ProcessPayloadGroup(
     __in BURN_PLAN* pPlan,
     __in BURN_PAYLOAD_GROUP* pPayloadGroup
@@ -2725,6 +2815,28 @@ static void ExecuteActionLog(
     }
 }
 
+static void RestoreRelatedBundleActionLog(
+    __in DWORD iAction,
+    __in BURN_EXECUTE_ACTION* pAction
+    )
+{
+    switch (pAction->type)
+    {
+    case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
+        LogStringLine(PlanDumpLevel, "Restore action[%u]: RELATED_BUNDLE package id: %ls, action: %hs, ignore dependencies: %ls", iAction, pAction->relatedBundle.pRelatedBundle->package.sczId, LoggingActionStateToString(pAction->relatedBundle.action), pAction->relatedBundle.sczIgnoreDependencies);
+        break;
+
+    default:
+        AssertSz(FALSE, "Unknown execute action type.");
+        break;
+    }
+
+    if (pAction->fDeleted)
+    {
+        LogStringLine(PlanDumpLevel, "      (deleted action)");
+    }
+}
+
 static void CleanActionLog(
     __in DWORD iAction,
     __in BURN_CLEAN_ACTION* pAction
@@ -2782,6 +2894,11 @@ extern "C" void PlanDump(
     for (DWORD i = 0; i < pPlan->cRollbackActions; ++i)
     {
         ExecuteActionLog(i, pPlan->rgRollbackActions + i, TRUE);
+    }
+
+    for (DWORD i = 0; i < pPlan->cRestoreRelatedBundleActions; ++i)
+    {
+        RestoreRelatedBundleActionLog(i, pPlan->rgRestoreRelatedBundleActions + i);
     }
 
     for (DWORD i = 0; i < pPlan->cCleanActions; ++i)

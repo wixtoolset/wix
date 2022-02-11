@@ -280,6 +280,9 @@ typedef struct _BURN_PLAN
     BURN_EXECUTE_ACTION* rgRollbackActions;
     DWORD cRollbackActions;
 
+    BURN_EXECUTE_ACTION* rgRestoreRelatedBundleActions;
+    DWORD cRestoreRelatedBundleActions;
+
     BURN_CLEAN_ACTION* rgCleanActions;
     DWORD cCleanActions;
 
@@ -394,6 +397,7 @@ HRESULT PlanRelatedBundlesBegin(
     __in BURN_PLAN* pPlan
     );
 HRESULT PlanRelatedBundlesComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,

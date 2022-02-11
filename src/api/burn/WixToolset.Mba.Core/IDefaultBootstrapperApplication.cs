@@ -334,6 +334,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
 
         /// <summary>
+        /// Fired when the engine has begun planning an upgrade related bundle for restoring in case of failure.
+        /// </summary>
+        event EventHandler<PlanRestoreRelatedBundleEventArgs> PlanRestoreRelatedBundle;
+
+        /// <summary>
         /// Fired when the engine is planning a rollback boundary.
         /// </summary>
         event EventHandler<PlanRollbackBoundaryEventArgs> PlanRollbackBoundary;

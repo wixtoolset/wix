@@ -720,6 +720,15 @@ static HRESULT BalBaseBAProcOnSetUpdateComplete(
     return pBA->OnSetUpdateComplete(pArgs->hrStatus, pArgs->wzPreviousPackageId, pArgs->wzNewPackageId);
 }
 
+static HRESULT BalBaseBAProcOnPlanRestoreRelatedBundle(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANRESTORERELATEDBUNDLE_ARGS* pArgs,
+    __inout BA_ONPLANRESTORERELATEDBUNDLE_RESULTS* pResults
+    )
+{
+    return pBA->OnPlanRestoreRelatedBundle(pArgs->wzBundleId, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -975,6 +984,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDCOMPATIBLEPACKAGE:
             hr = BalBaseBAProcOnPlannedCompatiblePackage(pBA, reinterpret_cast<BA_ONPLANNEDCOMPATIBLEPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANNEDCOMPATIBLEPACKAGE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRESTORERELATEDBUNDLE:
+            hr = BalBaseBAProcOnPlanRestoreRelatedBundle(pBA, reinterpret_cast<BA_ONPLANRESTORERELATEDBUNDLE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANRESTORERELATEDBUNDLE_RESULTS*>(pvResults));
             break;
         }
     }

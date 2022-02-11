@@ -691,4 +691,12 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z_opt LPCWSTR wzPreviousPackageId,
         __in_z_opt LPCWSTR wzNewPackageId
         ) = 0;
+
+    // OnPlanRestoreRelatedBundle - called when the engine begins planning an upgrade related bundle for restoring in case of failure.
+    STDMETHOD(OnPlanRestoreRelatedBundle)(
+        __in_z LPCWSTR wzBundleId,
+        __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
+        __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
+        __inout BOOL* pfCancel
+        ) = 0;
 };
