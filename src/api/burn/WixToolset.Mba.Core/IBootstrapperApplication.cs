@@ -1136,6 +1136,18 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzPreviousPackageId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzNewPackageId
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlanRestoreRelatedBundle"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanRestoreRelatedBundle(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
+            [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
     }
 
     /// <summary>

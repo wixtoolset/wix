@@ -85,3 +85,10 @@ Language=English
 WIXSTDBA: Planned rollback boundary: %1!ls!, wixstdba requested transaction: %2!hs!, bafunctions requested transaction: %3!hs!
 .
 
+MessageId=9
+Severity=Success
+SymbolicName=MSG_WIXSTDBA_PLANNED_RESTORE_RELATED_BUNDLE
+Language=English
+WIXSTDBA: Planned restore related bundle: %1!ls!, wixstdba requested: %2!hs!, bafunctions requested: %3!hs!
+.
+

@@ -170,6 +170,10 @@ namespace Bootstrapper
             Assert::Equal(7ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
@@ -277,6 +281,9 @@ namespace Bootstrapper
             Assert::Equal(3ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
             ValidateCleanAction(pPlan, dwIndex++, L"PackageC");
             ValidateCleanAction(pPlan, dwIndex++, L"PackageB");
             ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
@@ -348,6 +355,9 @@ namespace Bootstrapper
 
             Assert::Equal(1ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(1ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
@@ -438,6 +448,9 @@ namespace Bootstrapper
             Assert::Equal(2ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
@@ -506,6 +519,9 @@ namespace Bootstrapper
 
             Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(1ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
@@ -577,6 +593,9 @@ namespace Bootstrapper
 
             Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(2ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
@@ -656,6 +675,10 @@ namespace Bootstrapper
 
             Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(3ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
@@ -744,6 +767,10 @@ namespace Bootstrapper
             Assert::Equal(3ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
@@ -803,6 +830,9 @@ namespace Bootstrapper
 
             Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(0ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
@@ -879,6 +909,9 @@ namespace Bootstrapper
             Assert::Equal(1ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
             ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
@@ -944,6 +977,9 @@ namespace Bootstrapper
 
             Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(0ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
@@ -1057,6 +1093,9 @@ namespace Bootstrapper
             Assert::Equal(5ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
@@ -1145,6 +1184,9 @@ namespace Bootstrapper
 
             Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
             Assert::Equal(2ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
 
             dwIndex = 0;
             ValidateCleanAction(pPlan, dwIndex++, L"PatchA");
@@ -1827,6 +1869,28 @@ namespace Bootstrapper
             DEPENDENCY* pProvider = pPlan->rgPlannedProviders + uIndex;
             NativeAssert::StringEqual(wzKey, pProvider->sczKey);
             NativeAssert::StringEqual(wzName, pProvider->sczName);
+        }
+
+        void ValidateRestoreRelatedBundle(
+            __in BURN_PLAN* pPlan,
+            __in DWORD dwIndex,
+            __in LPCWSTR wzPackageId,
+            __in BOOTSTRAPPER_ACTION_STATE action,
+            __in LPCWSTR wzIgnoreDependencies
+            )
+        {
+            BURN_EXECUTE_ACTION* pAction = ValidateRestoreRelatedBundleActionExists(pPlan, dwIndex);
+            Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE, pAction->type);
+            NativeAssert::StringEqual(wzPackageId, pAction->relatedBundle.pRelatedBundle->package.sczId);
+            Assert::Equal<DWORD>(action, pAction->relatedBundle.action);
+            NativeAssert::StringEqual(wzIgnoreDependencies, pAction->relatedBundle.sczIgnoreDependencies);
+            Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
+        }
+
+        BURN_EXECUTE_ACTION* ValidateRestoreRelatedBundleActionExists(BURN_PLAN* pPlan, DWORD dwIndex)
+        {
+            Assert::InRange(dwIndex + 1ul, 1ul, pPlan->cRestoreRelatedBundleActions);
+            return pPlan->rgRestoreRelatedBundleActions + dwIndex;
         }
 
         void ValidateUninstallMsiCompatiblePackage(

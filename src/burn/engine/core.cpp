@@ -558,7 +558,7 @@ extern "C" HRESULT CorePlan(
                 ExitOnFailure(hr, "Failed to plan packages.");
 
                 // Schedule the update of related bundles last.
-                hr = PlanRelatedBundlesComplete(&pEngineState->registration, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, dwExecuteActionEarlyIndex);
+                hr = PlanRelatedBundlesComplete(&pEngineState->userExperience, &pEngineState->registration, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, dwExecuteActionEarlyIndex);
                 ExitOnFailure(hr, "Failed to schedule related bundles.");
             }
         }
@@ -2309,7 +2309,7 @@ static void LogRelatedBundles(
 
             if (pRelatedBundle->fPlannable)
             {
-                LogId(REPORT_STANDARD, MSG_PLANNED_RELATED_BUNDLE, pPackage->sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingDependencyActionToString(pPackage->dependencyExecute));
+                LogId(REPORT_STANDARD, MSG_PLANNED_RELATED_BUNDLE, pPackage->sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingRequestStateToString(pRelatedBundle->defaultRequestedRestore), LoggingRequestStateToString(pRelatedBundle->requestedRestore), LoggingActionStateToString(pRelatedBundle->restore), LoggingDependencyActionToString(pPackage->dependencyExecute));
             }
         }
     }

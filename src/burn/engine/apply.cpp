@@ -210,6 +210,11 @@ static HRESULT ExecuteRelatedBundle(
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+static HRESULT DoRestoreRelatedBundleActions(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 static HRESULT ExecuteExePackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
@@ -788,6 +793,9 @@ extern "C" HRESULT ApplyExecute(
                 {
                     if (pCheckpoint->pActiveRollbackBoundary->fVital)
                     {
+                        hrRollback = DoRestoreRelatedBundleActions(pEngineState, &context, pRestart);
+                        IgnoreRollbackError(hrRollback, "Failed rollback actions");
+
                         // If the rollback boundary is vital, end execution here.
                         break;
                     }
@@ -2587,6 +2595,48 @@ LExit:
         hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
+    return hr;
+}
+
+static HRESULT DoRestoreRelatedBundleActions(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fRetryIgnored = FALSE;
+    BOOL fSuspendIgnored = FALSE;
+
+    // execute restore related bundle actions
+    for (DWORD i = 0; i < pEngineState->plan.cRestoreRelatedBundleActions; ++i)
+    {
+        BURN_EXECUTE_ACTION* pRestoreRelatedBundleAction = &pEngineState->plan.rgRestoreRelatedBundleActions[i];
+        if (pRestoreRelatedBundleAction->fDeleted)
+        {
+            continue;
+        }
+
+        BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+        switch (pRestoreRelatedBundleAction->type)
+        {
+        case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
+            hr = ExecuteRelatedBundle(pEngineState, pRestoreRelatedBundleAction, pContext, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
+            IgnoreRollbackError(hr, "Failed to restore related bundle package.");
+            break;
+
+        default:
+            hr = E_UNEXPECTED;
+            ExitOnFailure(hr, "Invalid restore related bundle action: %d.", pRestoreRelatedBundleAction->type);
+        }
+
+        if (*pRestart < restart)
+        {
+            *pRestart = restart;
+        }
+    }
+
+LExit:
     return hr;
 }
 

@@ -51,7 +51,6 @@ extern "C" HRESULT PseudoBundleInitializeRelated(
     pPackage->fVital = FALSE;
 
     pPackage->fPermanent = FALSE;
-    pPackage->Bundle.fRepairable = TRUE;
     pPackage->Bundle.fSupportsBurnProtocol = fSupportsBurnProtocol;
 
     hr = StrAllocString(&pPackage->sczId, wzId, 0);
