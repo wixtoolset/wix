@@ -107,7 +107,7 @@ namespace WixToolset.Core.Burn.Bind
                     this.Section.AddSymbol(new WixDependencyProviderSymbol(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.Id)
                     {
                         ParentRef = facade.PackageId,
-                        ProviderKey = key,
+                        ProviderKey = $"{key}_v{facade.PackageSymbol.Version}",
                         Version = facade.PackageSymbol.Version,
                         DisplayName = facade.PackageSymbol.DisplayName
                     });

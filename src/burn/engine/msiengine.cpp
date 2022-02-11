@@ -443,7 +443,6 @@ extern "C" HRESULT MsiEngineDetectPackage(
     LPWSTR sczInstalledVersion = NULL;
     LPWSTR sczInstalledLanguage = NULL;
     INSTALLSTATE installState = INSTALLSTATE_UNKNOWN;
-    BOOTSTRAPPER_RELATED_OPERATION operation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
     BOOTSTRAPPER_RELATED_OPERATION relatedMsiOperation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
     WCHAR wzProductCode[MAX_GUID_CHARS + 1] = { };
     VERUTIL_VERSION* pVersion = NULL;
@@ -455,39 +454,39 @@ extern "C" HRESULT MsiEngineDetectPackage(
     hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
     if (SUCCEEDED(hr))
     {
-        hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pPackage->Msi.pInstalledVersion);
+        hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pVersion);
         ExitOnFailure(hr, "Failed to parse installed version: '%ls' for ProductCode: %ls", sczInstalledVersion, pPackage->Msi.sczProductCode);
 
-        if (pPackage->Msi.pInstalledVersion->fInvalid)
+        if (pVersion->fInvalid)
         {
             LogId(REPORT_WARNING, MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION, pPackage->Msi.sczProductCode, sczInstalledVersion);
         }
 
         // compare versions
-        hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pPackage->Msi.pInstalledVersion, &nCompareResult);
-        ExitOnFailure(hr, "Failed to compare version '%ls' to installed version: '%ls'", pPackage->Msi.pVersion->sczVersion, pPackage->Msi.pInstalledVersion->sczVersion);
+        hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pVersion, &nCompareResult);
+        ExitOnFailure(hr, "Failed to compare version '%ls' to installed version: '%ls'", pPackage->Msi.pVersion->sczVersion, pVersion->sczVersion);
 
         if (nCompareResult < 0)
         {
-            operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
+            pPackage->Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED;
+        }
+        else if (nCompareResult > 0)
+        {
+            pPackage->Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_MINOR_UPDATE;
+            pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
         }
         else
         {
-            if (nCompareResult > 0)
-            {
-                operation = BOOTSTRAPPER_RELATED_OPERATION_MINOR_UPDATE;
-            }
-
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
         }
 
         // Report related MSI package to BA.
-        if (BOOTSTRAPPER_RELATED_OPERATION_NONE != operation)
+        if (BOOTSTRAPPER_RELATED_OPERATION_NONE != pPackage->Msi.operation)
         {
-            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, pPackage->Msi.sczProductCode, LoggingPerMachineToString(pPackage->fPerMachine), pPackage->Msi.pInstalledVersion->sczVersion, pPackage->Msi.dwLanguage, LoggingRelatedOperationToString(operation));
+            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, pPackage->Msi.sczProductCode, LoggingPerMachineToString(pPackage->fPerMachine), pVersion->sczVersion, pPackage->Msi.dwLanguage, LoggingRelatedOperationToString(pPackage->Msi.operation));
 
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pPackage->Msi.pInstalledVersion, operation);
+            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pVersion, pPackage->Msi.operation);
             ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
         }
     }
@@ -623,7 +622,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
             {
                 // If we've already detected a major upgrade that trumps any guesses that the detect is a downgrade
                 // or even something else.
-                if (BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE == operation)
+                if (BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE == pPackage->Msi.operation)
                 {
                     relatedMsiOperation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
                 }
@@ -632,7 +631,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
                          pPackage->Msi.sczUpgradeCode && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pPackage->Msi.sczUpgradeCode, -1, pRelatedMsi->sczUpgradeCode, -1))
                 {
                     relatedMsiOperation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
-                    operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
+                    pPackage->Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
                     pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE;
                 }
                 else // we're already on the machine so the detect-only *must* be for detection purposes only.
@@ -643,7 +642,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
             else
             {
                 relatedMsiOperation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
-                operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
+                pPackage->Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
             }
 
             LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, wzProductCode, LoggingPerMachineToString(fPerMachine), pVersion->sczVersion, uLcid, LoggingRelatedOperationToString(relatedMsiOperation));
@@ -858,9 +857,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     Trace(REPORT_STANDARD, "Planning MSI package 0x%p", pPackage);
 
     HRESULT hr = S_OK;
-    VERUTIL_VERSION* pVersion = pPackage->Msi.pVersion;
-    VERUTIL_VERSION* pInstalledVersion = pPackage->Msi.pInstalledVersion;
-    int nCompareResult = 0;
     BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOL fFeatureActionDelta = FALSE;
@@ -892,17 +888,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
         if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
         {
-            hr = VerCompareParsedVersions(pVersion, pInstalledVersion, &nCompareResult);
-            ExitOnFailure(hr, "Failed to compare '%ls' to '%ls' for planning.", pVersion->sczVersion, pInstalledVersion->sczVersion);
-
-            // Take a look at the version and determine if this is a potential
-            // minor upgrade (same ProductCode newer ProductVersion), otherwise,
-            // there is a newer version so no work necessary.
-            if (nCompareResult > 0)
-            {
-                execute = BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE;
-            }
-            else if (BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
+            if (BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
             {
                 execute = BOOTSTRAPPER_ACTION_STATE_REPAIR;
             }
@@ -937,7 +923,14 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-            execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+            if (BOOTSTRAPPER_RELATED_OPERATION_MINOR_UPDATE == pPackage->Msi.operation)
+            {
+                execute = BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE;
+            }
+            else
+            {
+                execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+            }
             break;
 
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:

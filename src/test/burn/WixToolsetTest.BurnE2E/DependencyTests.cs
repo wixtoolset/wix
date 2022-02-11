@@ -730,22 +730,21 @@ namespace WixToolsetTest.BurnE2E
             bundleNv101.VerifyUnregisteredAndRemovedFromPackageCache();
             bundleNv1.VerifyRegisteredAndInPackageCache();
 
-            // The expected values will change after implementing https://github.com/wixtoolset/issues/issues/6535 and https://github.com/wixtoolset/issues/issues/3421
             packageAv1.VerifyInstalled(true);
             packageC.VerifyInstalled(false);
-            packageFv1.VerifyInstalledWithVersion(false);
-            packageFv101.VerifyInstalledWithVersion(true);
-            packageGv1.VerifyInstalledWithVersion(false);
-            packageGv101.VerifyInstalledWithVersion(true);
+            packageFv1.VerifyInstalledWithVersion(true);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(true);
+            packageGv101.VerifyInstalledWithVersion(false);
 
             bundleM.Uninstall();
             bundleM.VerifyUnregisteredAndRemovedFromPackageCache();
 
             packageAv1.VerifyInstalled(false);
-            packageFv1.VerifyInstalledWithVersion(false);
-            packageFv101.VerifyInstalledWithVersion(true);
-            packageGv1.VerifyInstalledWithVersion(false);
-            packageGv101.VerifyInstalledWithVersion(true);
+            packageFv1.VerifyInstalledWithVersion(true);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(true);
+            packageGv101.VerifyInstalledWithVersion(false);
 
             bundleNv1.Uninstall();
             bundleNv1.VerifyUnregisteredAndRemovedFromPackageCache();
@@ -804,20 +803,19 @@ namespace WixToolsetTest.BurnE2E
             bundleNv101.VerifyUnregisteredAndRemovedFromPackageCache();
             bundleNv1.VerifyRegisteredAndInPackageCache();
 
-            // The expected values will change after implementing https://github.com/wixtoolset/issues/issues/6535 and https://github.com/wixtoolset/issues/issues/3421
             packageAv1.VerifyInstalled(true);
             packageC.VerifyInstalled(false);
-            packageFv1.VerifyInstalledWithVersion(false);
-            packageFv101.VerifyInstalledWithVersion(true);
-            packageGv1.VerifyInstalledWithVersion(false);
-            packageGv101.VerifyInstalledWithVersion(true);
+            packageFv1.VerifyInstalledWithVersion(true);
+            packageFv101.VerifyInstalledWithVersion(false);
+            packageGv1.VerifyInstalledWithVersion(true);
+            packageGv101.VerifyInstalledWithVersion(false);
 
             bundleNv1.Uninstall();
             bundleNv1.VerifyUnregisteredAndRemovedFromPackageCache();
 
             packageAv1.VerifyInstalled(true);
-            packageFv1.VerifyInstalledWithVersion(false);
-            packageFv101.VerifyInstalledWithVersion(true);
+            packageFv1.VerifyInstalledWithVersion(true);
+            packageFv101.VerifyInstalledWithVersion(false);
             packageGv1.VerifyInstalledWithVersion(false);
             packageGv101.VerifyInstalledWithVersion(false);
 

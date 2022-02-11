@@ -341,8 +341,9 @@ typedef struct _BURN_PACKAGE
             LPWSTR sczProductCode;
             DWORD dwLanguage;
             VERUTIL_VERSION* pVersion;
-            VERUTIL_VERSION* pInstalledVersion;
             LPWSTR sczUpgradeCode;
+
+            BOOTSTRAPPER_RELATED_OPERATION operation;
 
             BURN_MSIPROPERTY* rgProperties;
             DWORD cProperties;

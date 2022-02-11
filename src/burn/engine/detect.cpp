@@ -64,6 +64,8 @@ extern "C" void DetectReset(
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {
+            pPackage->Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
+
             for (DWORD iFeature = 0; iFeature < pPackage->Msi.cFeatures; ++iFeature)
             {
                 BURN_MSIFEATURE* pFeature = pPackage->Msi.rgFeatures + iFeature;
