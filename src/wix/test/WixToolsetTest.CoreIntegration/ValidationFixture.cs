@@ -12,6 +12,15 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
+    // When these tests are run repeatedly, they will expose an issue
+    // in the Windows Installer where ICE validations will occasionally
+    // fail to send all error/warning messages. The inconsistency
+    // obviously wreaks havoc on the tests.
+    //
+    // These tests are still interesting (and complex) enough to keep
+    // around for manual testing. Uncomment or define the following
+    // line to do so.
+#if DISABLE_VALIDATION_TESTS_DUE_TO_WINDOWS_INSTALLER_INCONSISTENCIES
     public class ValidationFixture
     {
         [Fact]
@@ -303,4 +312,5 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
     }
+#endif
 }
