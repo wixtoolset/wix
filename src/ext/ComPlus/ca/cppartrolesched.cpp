@@ -12,7 +12,7 @@ enum ePartitionRoleQuery { prqPartitionRole = 1, prqPartition, prqComponent, prq
 LPCWSTR vcsUserInPartitionRoleQuery =
     L"SELECT `UserInPartitionRole`, `PartitionRole_`, `ComPlusUserInPartitionRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusUserInPartitionRole`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsGroupInPartitionRoleQuery =
-    L"SELECT `GroupInPartitionRole`, `PartitionRole_`, `ComPlusGroupInPartitionRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInPartitionRole`, `Group` WHERE `Group_` = `Group`";
+    L"SELECT `GroupInPartitionRole`, `PartitionRole_`, `ComPlusGroupInPartitionRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInPartitionRole`, `Wix4Group` WHERE `Group_` = `Group`";
 enum eTrusteeInPartitionRoleQuery { tiprqUserInPartitionRole = 1, tiprqPartitionRole, tiprqComponent, tiprqDomain, tiprqName };
 
 

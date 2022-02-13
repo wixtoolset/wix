@@ -12,7 +12,7 @@ enum eApplicationRoleQuery { arqApplicationRole = 1, arqApplication, arqComponen
 LPCWSTR vcsUserInApplicationRoleQuery =
     L"SELECT `UserInApplicationRole`, `ApplicationRole_`, `ComPlusUserInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusUserInApplicationRole`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsGroupInApplicationRoleQuery =
-    L"SELECT `GroupInApplicationRole`, `ApplicationRole_`, `ComPlusGroupInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInApplicationRole`, `Group` WHERE `Group_` = `Group`";
+    L"SELECT `GroupInApplicationRole`, `ApplicationRole_`, `ComPlusGroupInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInApplicationRole`, `Wix4Group` WHERE `Group_` = `Group`";
 enum eTrusteeInApplicationRoleQuery { tiarqUserInApplicationRole = 1, tiarqApplicationRole, tiarqComponent, tiarqDomain, tiarqName };
 
 LPCWSTR vcsApplicationRolePropertyQuery =
