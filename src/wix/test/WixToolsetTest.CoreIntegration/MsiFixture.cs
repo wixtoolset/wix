@@ -848,9 +848,18 @@ namespace WixToolsetTest.CoreIntegration
 
         [Fact(Skip = "Test demonstrates failure")]
         public void FailsBuildAtLinkTimeForMissingEnsureTable()
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
         {
-            var folder = TestData.Get(@"TestData");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+            throw new System.NotImplementedException();
+        }
+#else
+        {
+        var folder = TestData.Get(@"TestData");
+#if NET461 || NET472 || NET48
+            var extensionPath = (new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase)).LocalPath;
+#else // NETCOREAPP3_1 || NET5_0
+            var extensionPath = typeof(ExampleExtensionFactory).Assembly.Location;
+#endif
 
             using (var fs = new DisposableFileSystem())
             {
@@ -879,14 +888,15 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.False(File.Exists(msiPath));
             }
         }
+#endif
 
         private static string[] JoinRows(Table table)
         {
             return table.Rows.Select(r => JoinFields(r.Fields)).ToArray();
 
-            string JoinFields(Field[] fields)
+            static string JoinFields(Field[] fields)
             {
-                return String.Join('\t', fields.Select(f => f.ToString()));
+                return String.Join("\t", fields.Select(f => f.ToString()));
             }
         }
     }

@@ -19,9 +19,16 @@ namespace WixToolset.Core.Native
             var found = File.Exists(path);
             if (!found)
             {
+                // CodeBase is obsoleted in net5.0 and deprecated in netcoreapp3.1.
+                // In addition, AppContext.GetData is only defined in net470 and
+                // higher, so it does no good to attempt a fallback procedure here.
+
+#if NET471_OR_GREATER || NET48_OR_GREATER
+
                 // Fallback to the Assembly.CodeBase to handle "shadow copy" scenarios (like unit tests) but
                 // only check codebase if it is different from the Assembly.Location path.
-                var codebase = Path.Combine(Path.GetDirectoryName(new Uri(assembly.CodeBase).LocalPath), relativePath);
+
+                var codebase = Path.Combine(Path.GetDirectoryName((new Uri(assembly.CodeBase)).LocalPath), relativePath);
 
                 if (!codebase.Equals(path, StringComparison.OrdinalIgnoreCase))
                 {
@@ -48,6 +55,7 @@ namespace WixToolset.Core.Native
                         }
                     }
                 }
+#endif
             }
 
             return new FindAssemblyRelativeFileResult

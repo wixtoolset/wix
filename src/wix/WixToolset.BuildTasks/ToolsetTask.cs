@@ -9,7 +9,30 @@ namespace WixToolset.BuildTasks
 
     public abstract partial class ToolsetTask : ToolTask
     {
-        private static readonly string ThisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
+        private static string _thisDllPath = null;
+
+        private static string ThisDllPath
+        {
+            get
+            {
+                if (_thisDllPath == null)
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
+                {
+                    throw new System.NotImplementedException();
+                }
+#else
+                {
+#if NET461 || NET472 || NET48
+                    _thisDllPath = (new Uri(typeof(ToolsetTask).Assembly.CodeBase)).LocalPath;
+#else // NETCOREAPP3_1 || NET5_0
+                    _thisDllPath = typeof(ToolsetTask).Assembly.Location;
+#endif
+                }
+
+                return _thisDllPath;
+            }
+        }
+#endif
 
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.

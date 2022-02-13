@@ -121,7 +121,8 @@ namespace WixToolsetTest.CoreIntegration
                     "CompanyFolder\tProgramFilesFolder\tExample Corporation",
                     "ProgramFilesFolder\tTARGETDIR\tPFiles",
                     "TARGETDIR\t\tSourceDir"
-                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => String.Join('\t', d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => String.Join("\t", d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
+                // xxxxx I'm not sure what symptoms the above error causes, but it should be a syntax error xxxxx
 
                 var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var directoryRows = data.Tables["Directory"].Rows;
@@ -131,7 +132,8 @@ namespace WixToolsetTest.CoreIntegration
                     "CompanyFolder\tProgramFilesFolder\tu7-b4gch|Example Corporation",
                     "ProgramFilesFolder\tTARGETDIR\tPFiles",
                     "TARGETDIR\t\tSourceDir"
-                }, directoryRows.Select(r => String.Join('\t', r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
+                }, directoryRows.Select(r => String.Join("\t", r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
+                // xxxxx I'm not sure what symptoms the above error causes, but it should be a syntax error xxxxx
             }
         }
 
@@ -255,7 +257,8 @@ namespace WixToolsetTest.CoreIntegration
                     "BinFolder\tProgramFilesFolder\tbin",
                     "ProgramFilesFolder\tTARGETDIR\tPFiles",
                     "TARGETDIR\t\tSourceDir"
-                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => String.Join('\t', d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => String.Join("\t", d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
+                // xxxxx I'm not sure what symptoms the above error causes, but it should be a syntax error xxxxx
 
                 var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var directoryRows = data.Tables["Directory"].Rows;
@@ -264,7 +267,8 @@ namespace WixToolsetTest.CoreIntegration
                     "BinFolder\tProgramFilesFolder\tbin",
                     "ProgramFilesFolder\tTARGETDIR\tPFiles",
                     "TARGETDIR\t\tSourceDir"
-                }, directoryRows.Select(r => String.Join('\t', r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
+                }, directoryRows.Select(r => String.Join("\t", r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
+                // xxxxx I'm not sure what symptoms the above error causes, but it should be a syntax error xxxxx
             }
         }
     }

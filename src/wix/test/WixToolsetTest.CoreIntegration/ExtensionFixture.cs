@@ -29,9 +29,18 @@ namespace WixToolsetTest.CoreIntegration
 
         [Fact]
         public void CanBuildWithExampleExtension()
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
+        {
+            throw new System.NotImplementedException();
+        }
+#else
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+#if NET461 || NET472 || NET48
+            var extensionPath = (new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase)).LocalPath;
+#else // NETCOREAPP3_1 || NET5_0
+            var extensionPath = typeof(ExampleExtensionFactory).Assembly.Location;
+#endif
 
             using (var fs = new DisposableFileSystem())
             {
@@ -67,12 +76,22 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("Bar", example[0].AsString());
             }
         }
+#endif
 
         [Fact]
         public void CanParseCommandLineWithExtension()
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
+        {
+            throw new System.NotImplementedException();
+        }
+#else
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+#if NET461 || NET472 || NET48
+            var extensionPath = (new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase)).LocalPath;
+#else // NETCOREAPP3_1 || NET5_0
+            var extensionPath = typeof(ExampleExtensionFactory).Assembly.Location;
+#endif
 
             using (var fs = new DisposableFileSystem())
             {
@@ -101,6 +120,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("test", property.Value);
             }
         }
+#endif
 
         [Fact]
         public void CannotBuildWithMissingExtension()

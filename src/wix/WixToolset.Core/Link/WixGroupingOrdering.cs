@@ -431,6 +431,7 @@ namespace WixToolset.Core.Link
                 }
             }
 
+#if !NETCOREAPP2_0_OR_GREATER && !NET5_0_OR_GREATER
             public bool TryGetValue(TKey key, out TItem item)
             {
                 // KeyedCollection doesn't implement the TryGetValue() method, but it's
@@ -453,6 +454,7 @@ namespace WixToolset.Core.Link
                 item = default(TItem);
                 return false;
             }
+#endif
 
 #if DEBUG
             // This just makes debugging easier...

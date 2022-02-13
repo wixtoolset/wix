@@ -186,8 +186,17 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB)
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
         {
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+            throw new System.NotImplementedException();
+        }
+#else
+        {
+#if NET461 || NET472 || NET48
+            var extensionPath = (new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase)).LocalPath;
+#else // NETCOREAPP3_1 || NET5_0
+            var extensionPath = typeof(ExampleExtensionFactory).Assembly.Location;
+#endif
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
             var result = WixRunner.Execute(new[]
@@ -207,6 +216,7 @@ namespace WixToolsetTest.CoreIntegration
 
             return Path.ChangeExtension(outputPath, ".wixpdb");
         }
+#endif
 
         private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, bool hasNoFiles = false)
         {

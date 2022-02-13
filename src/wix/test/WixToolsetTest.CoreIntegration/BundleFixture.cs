@@ -195,8 +195,17 @@ namespace WixToolsetTest.CoreIntegration
 
         [Fact]
         public void CanBuildSimpleBundleUsingExtensionBA()
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
         {
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+            throw new System.NotImplementedException();
+        }
+#else
+        {
+#if NET461 || NET472 || NET48
+            var extensionPath = (new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase)).LocalPath;
+#else // NETCOREAPP3_1 || NET5_0
+            var extensionPath = typeof(ExampleExtensionFactory).Assembly.Location;
+#endif
             var folder = TestData.Get(@"TestData\SimpleBundle");
 
             using (var fs = new DisposableFileSystem())
@@ -221,6 +230,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
             }
         }
+#endif
 
         [Fact]
         public void CanBuildSingleExeBundle()

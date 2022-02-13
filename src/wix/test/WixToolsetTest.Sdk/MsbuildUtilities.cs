@@ -17,8 +17,48 @@ namespace WixToolsetTest.Sdk
 
     public static class MsbuildUtilities
     {
-        public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Sdk");
-        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
+        private static string _wixMsbuildPath = null;
+        public static string WixMsbuildPath
+        {
+            get
+            {
+                if (_wixMsbuildPath == null)
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
+                {
+                    throw new System.NotImplementedException();
+                }
+#else
+                {
+#if NET461 || NET472 || NET48
+                    _wixMsbuildPath = Path.Combine(Path.GetDirectoryName((new Uri(typeof(MsbuildUtilities).Assembly.CodeBase)).LocalPath), "..", "publish", "WixToolset.Sdk");
+#else // NETCOREAPP3_1 || NET5_0
+                    _wixMsbuildPath = Path.Combine(Path.GetDirectoryName(typeof(MsbuildUtilities).Assembly.Location), "..", "publish", "WixToolset.Sdk");
+#endif
+                }
+#endif
+
+                return _wixMsbuildPath;
+            }
+        }
+
+        private static string _wixPropsPath = null;
+
+        public static string WixPropsPath
+        {
+            get
+            {
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
+                {
+                    throw new System.NotImplementedException();
+                }
+#else
+                {
+                    _wixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
+                }
+#endif
+                return _wixPropsPath;
+            }
+        }
 
         public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal", bool suppressValidation = true)
         {

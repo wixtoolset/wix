@@ -33,11 +33,23 @@ namespace WixToolset.Core.ExtensibilityServices
             var factories = types.Select(this.CreateExtensionFactory).ToList();
 
             if (!factories.Any())
+#if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
             {
-                var path = Path.GetFullPath(new Uri(extensionAssembly.CodeBase).LocalPath);
-                throw new WixException(ErrorMessages.InvalidExtension(path, "The extension does not implement IExtensionFactory. All extensions must have at least one implementation of IExtensionFactory."));
+                // xxxxx This should be a build error but then, of course, it won't build
+                // xxxxx #error Unknown target framework
+                throw new System.NotImplementedException();
             }
-
+#else
+            {
+#if NET461 || NET472 || NET48
+                var path = (new Uri(extensionAssembly.CodeBase)).LocalPath;
+                throw new WixException(ErrorMessages.InvalidExtension(path, "The extension does not implement IExtensionFactory. All extensions must have at least one implementation of IExtensionFactory."));
+#else // NETCOREAPP3_1 || NET5_0
+                var path = extensionAssembly.Location;
+                throw new WixException(ErrorMessages.InvalidExtension(path, "The extension does not implement IExtensionFactory. All extensions must have at least one implementation of IExtensionFactory."));
+#endif
+            }
+#endif
             this.extensionFactories.AddRange(factories);
         }
 
@@ -155,7 +167,17 @@ namespace WixToolset.Core.ExtensibilityServices
                 yield return path;
             }
 
-            path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath), ExtensionsFolderName);
+#if (NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
+            // xxxxx This should really be a build error but then, the change would be hard to submit as a pull request.
+            // xxxxx #error Unknown target framework
+            throw new System.NotImplementedException();
+#else
+#if NET461 || NET472 || NET48
+            path = Path.Combine(Path.GetDirectoryName((new Uri(System.Reflection.Assembly.GetCallingAssembly().CodeBase)).LocalPath), ExtensionsFolderName);
+#else // NETCOREAPP3_1 || NET5_0
+            path = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location), ExtensionsFolderName);
+#endif
+#endif
             if (Directory.Exists(path))
             {
                 yield return path;
