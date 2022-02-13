@@ -7,7 +7,7 @@ namespace WixToolset.Msmq
     public static class MsmqTableDefinitions
     {
         public static readonly TableDefinition MessageQueue = new TableDefinition(
-            "MessageQueue",
+            "Wix4MessageQueue",
             MsmqSymbolDefinitions.MessageQueue,
             new[]
             {
@@ -27,7 +27,7 @@ namespace WixToolset.Msmq
         );
 
         public static readonly TableDefinition MessageQueueUserPermission = new TableDefinition(
-            "MessageQueueUserPermission",
+            "Wix4MessageQueueUserPermission",
             MsmqSymbolDefinitions.MessageQueueUserPermission,
             new[]
             {
@@ -41,7 +41,7 @@ namespace WixToolset.Msmq
         );
 
         public static readonly TableDefinition MessageQueueGroupPermission = new TableDefinition(
-            "MessageQueueGroupPermission",
+            "Wix4MessageQueueGroupPermission",
             MsmqSymbolDefinitions.MessageQueueGroupPermission,
             new[]
             {

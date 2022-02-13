@@ -6,11 +6,11 @@
 // sql queries
 
 LPCWSTR vcsSubscriptionQuery =
-    L"SELECT `Subscription`, `ComPlusComponent_`, `Component_`, `Id`, `Name`, `EventCLSID`, `PublisherID` FROM `ComPlusSubscription`";
+    L"SELECT `Subscription`, `ComPlusComponent_`, `Component_`, `Id`, `Name`, `EventCLSID`, `PublisherID` FROM `Wix4ComPlusSubscription`";
 enum eSubscriptionQuery { sqSubscription = 1, sqComPlusComponent, sqComponent, sqID, sqName, sqEventCLSID, sqPublisherID };
 
 LPCWSTR vcsSubscriptionPropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusSubscriptionProperty` WHERE `Subscription_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusSubscriptionProperty` WHERE `Subscription_` = ?";
 
 
 // property definitions

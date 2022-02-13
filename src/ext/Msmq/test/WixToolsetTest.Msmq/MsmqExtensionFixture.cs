@@ -16,17 +16,25 @@ namespace WixToolsetTest.Msmq
             var folder = TestData.Get(@"TestData\UsingMessageQueue");
             var build = new Builder(folder, typeof(MsmqExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "MessageQueue");
+            var results = build.BuildAndQuery(Build, "Wix4MessageQueue", "CustomAction");
             WixAssert.CompareLineByLine(new[]
             {
-                "MessageQueue:TestMQ\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t\t\tMQLabel\t\tMQPath\t\t\t\t0",
+                "CustomAction:Wix4MessageQueuingExecuteInstall_A64\t3073\tWix4MsmqCA_A64\tMessageQueuingExecuteInstall\t",
+                "CustomAction:Wix4MessageQueuingExecuteUninstall_A64\t3073\tWix4MsmqCA_A64\tMessageQueuingExecuteUninstall\t",
+                "CustomAction:Wix4MessageQueuingInstall_A64\t1\tWix4MsmqCA_A64\tMessageQueuingInstall\t",
+                "CustomAction:Wix4MessageQueuingRollbackInstall_A64\t3329\tWix4MsmqCA_A64\tMessageQueuingRollbackInstall\t",
+                "CustomAction:Wix4MessageQueuingRollbackUninstall_A64\t3329\tWix4MsmqCA_A64\tMessageQueuingRollbackUninstall\t",
+                "CustomAction:Wix4MessageQueuingUninstall_A64\t1\tWix4MsmqCA_A64\tMessageQueuingUninstall\t",
+                "Wix4MessageQueue:TestMQ\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t\t\tMQLabel\t\tMQPath\t\t\t\t0",
             }, results);
         }
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            args = args.Concat(new[] { "-arch", "arm64" }).ToArray();
+
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
         }
     }
 }

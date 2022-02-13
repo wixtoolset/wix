@@ -14,36 +14,36 @@ LPCWSTR vcsModuleQuery =
 enum eModuleQuery { mqModule = 1 };
 
 LPCWSTR vcsAssemblyQuery =
-    L"SELECT `Assembly`, `Component_`, `Application_`, `AssemblyName`, `DllPath`, `TlbPath`, `PSDllPath`, `Attributes` FROM `ComPlusAssembly`";
+    L"SELECT `Assembly`, `Component_`, `Application_`, `AssemblyName`, `DllPath`, `TlbPath`, `PSDllPath`, `Attributes` FROM `Wix4ComPlusAssembly`";
 enum eAssemblyQuery { aqAssembly = 1, aqComponent, aqApplication, aqAssemblyName, aqDllPath, aqTlbPath, aqPSDllPath, aqAttributes };
 
 LPCWSTR vcsComponentQuery =
-    L"SELECT `ComPlusComponent`, `CLSID` FROM `ComPlusComponent` WHERE `Assembly_` = ?";
+    L"SELECT `ComPlusComponent`, `CLSID` FROM `Wix4ComPlusComponent` WHERE `Assembly_` = ?";
 enum eComponentQuery { cqComponent = 1, cqCLSID };
 
 LPCWSTR vcsComponentPropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusComponentProperty` WHERE `ComPlusComponent_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusComponentProperty` WHERE `ComPlusComponent_` = ?";
 
 LPCWSTR vcsInterfaceQuery =
-    L"SELECT `Interface`, `IID` FROM `ComPlusInterface` WHERE `ComPlusComponent_` = ?";
+    L"SELECT `Interface`, `IID` FROM `Wix4ComPlusInterface` WHERE `ComPlusComponent_` = ?";
 enum eInterfaceQuery { iqInterface = 1, iqIID };
 
 LPCWSTR vcsInterfacePropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusInterfaceProperty` WHERE `Interface_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusInterfaceProperty` WHERE `Interface_` = ?";
 
 LPCWSTR vcsMethodQuery =
-    L"SELECT `Method`, `Index`, `Name` FROM `ComPlusMethod` WHERE `Interface_` = ?";
+    L"SELECT `Method`, `Index`, `Name` FROM `Wix4ComPlusMethod` WHERE `Interface_` = ?";
 enum eMethodQuery { mqMethod = 1, mqIndex, mqName };
 
 LPCWSTR vcsMethodPropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusMethodProperty` WHERE `Method_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusMethodProperty` WHERE `Method_` = ?";
 
 LPCWSTR vcsRoleForComponentQuery =
-    L"SELECT `RoleForComponent`, `ApplicationRole_`, `Component_` FROM `ComPlusRoleForComponent` WHERE `ComPlusComponent_` = ?";
+    L"SELECT `RoleForComponent`, `ApplicationRole_`, `Component_` FROM `Wix4ComPlusRoleForComponent` WHERE `ComPlusComponent_` = ?";
 LPCWSTR vcsRoleForInterfaceQuery =
-    L"SELECT `RoleForInterface`, `ApplicationRole_`, `Component_` FROM `ComPlusRoleForInterface` WHERE `Interface_` = ?";
+    L"SELECT `RoleForInterface`, `ApplicationRole_`, `Component_` FROM `Wix4ComPlusRoleForInterface` WHERE `Interface_` = ?";
 LPCWSTR vcsRoleForMethodQuery =
-    L"SELECT `RoleForMethod`, `ApplicationRole_`, `Component_` FROM `ComPlusRoleForMethod` WHERE `Method_` = ?";
+    L"SELECT `RoleForMethod`, `ApplicationRole_`, `Component_` FROM `Wix4ComPlusRoleForMethod` WHERE `Method_` = ?";
 
 enum eRoleAssignmentQuery { raqKey = 1, raqApplicationRole, raqComponent };
 
@@ -52,7 +52,7 @@ LPCWSTR vcsModuleComponentsQuery =
 LPCWSTR vcsModuleDependencyQuery =
     L"SELECT `ModuleID`, `RequiredID` FROM `ModuleDependency`";
 LPCWSTR vcsAssemblyDependencyQuery =
-    L"SELECT `Assembly_`, `RequiredAssembly_` FROM `ComPlusAssemblyDependency`";
+    L"SELECT `Assembly_`, `RequiredAssembly_` FROM `Wix4ComPlusAssemblyDependency`";
 
 enum eKeyPairQuery { kpqFirstKey = 1, kpqSecondKey };
 

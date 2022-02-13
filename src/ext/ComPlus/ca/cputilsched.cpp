@@ -13,7 +13,7 @@ LPCWSTR vcsComponentAttributesQuery =
     L"SELECT `Attributes` FROM `Component` WHERE `Component` = ?";
 enum eComponentAttributesQuery { caqAttributes = 1 };
 
-LPCWSTR vcsUserQuery = L"SELECT `Domain`, `Name` FROM `User` WHERE `User` = ?";
+LPCWSTR vcsUserQuery = L"SELECT `Domain`, `Name` FROM `Wix4User` WHERE `User` = ?";
 enum eUserQuery { uqDomain = 1, uqName };
 
 enum ePropertyQuery { pqName = 1, pqValue };

@@ -6,14 +6,14 @@
 // sql queries
 
 LPCWSTR vcsPartitionQuery =
-    L"SELECT `Partition`, `Component_`, `Id`, `Name` FROM `ComPlusPartition`";
+    L"SELECT `Partition`, `Component_`, `Id`, `Name` FROM `Wix4ComPlusPartition`";
 enum ePartitionQuery { pqPartition = 1, pqComponent, pqID, pqName };
 
 LPCWSTR vcsPartitionPropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusPartitionProperty` WHERE `Partition_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusPartitionProperty` WHERE `Partition_` = ?";
 
 LPCWSTR vcsPartitionUserQuery =
-    L"SELECT `PartitionUser`, `Partition_`, `ComPlusPartitionUser`.`Component_`, `Domain`, `Name` FROM `ComPlusPartitionUser`, `User` WHERE `User_` = `User`";
+    L"SELECT `PartitionUser`, `Partition_`, `ComPlusPartitionUser`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusPartitionUser`, `Wix4User` WHERE `User_` = `User`";
 enum ePartitionUserQuery { puqPartitionUser = 1, puqPartition, puqComponent, puqDomain, puqName };
 
 

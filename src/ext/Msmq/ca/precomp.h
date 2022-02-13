@@ -17,7 +17,6 @@
 #include "CustomMsiErrors.h"
 
 #include "mqcost.h"
-#include "mqutilsched.h"
 #include "mqqueuesched.h"
 #include "mqutilexec.h"
 #include "mqqueueexec.h"

@@ -8,6 +8,7 @@ namespace WixToolset.ComPlus
     using WixToolset.ComPlus.Symbols;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// The compiler for the WiX Toolset COM+ Extension.
@@ -40,7 +41,6 @@ namespace WixToolset.ComPlus
             {
                 case "Component":
                     var componentId = context["ComponentId"];
-                    var directoryId = context["DirectoryId"];
                     var win64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
@@ -2148,17 +2148,8 @@ namespace WixToolset.ComPlus
 
         private void AddReferenceToConfigureComPlus(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, bool win64)
         {
-            if (win64)
-            {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
-            }
-            else
-            {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
-            }
-
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4ConfigureComPlusInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4ConfigureComPlusUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
         }
     }
 }
