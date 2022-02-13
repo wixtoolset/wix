@@ -10,9 +10,9 @@ LPCWSTR vcsMessageQueueQuery =
 enum eMessageQueueQuery { mqqMessageQueue = 1, mqqComponent,  mqqBasePriority, mqqJournalQuota, mqqLabel, mqqMulticastAddress, mqqPathName, mqqPrivLevel, mqqQuota, mqqServiceTypeGuid, mqqAttributes };
 
 LPCWSTR vcsMessageQueueUserPermissionQuery =
-    L"SELECT `MessageQueueUserPermission`, `MessageQueue_`, `MessageQueueUserPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueUserPermission`, `User` WHERE `User_` = `User`";
+    L"SELECT `MessageQueueUserPermission`, `MessageQueue_`, `MessageQueueUserPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueUserPermission`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsMessageQueueGroupPermissionQuery =
-    L"SELECT `MessageQueueGroupPermission`, `MessageQueue_`, `MessageQueueGroupPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueGroupPermission`, `Group` WHERE `Group_` = `Group`";
+    L"SELECT `MessageQueueGroupPermission`, `MessageQueue_`, `MessageQueueGroupPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueGroupPermission`, `Wix4Group` WHERE `Group_` = `Group`";
 enum eMessageQueuePermissionQuery { mqpqMessageQueuePermission = 1, mqpqMessageQueue, mqpqComponent, mqpqDomain, mqpqName, mqpqPermissions };
 
 
