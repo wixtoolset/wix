@@ -6,11 +6,11 @@
 // sql queries
 
 LPCWSTR vcsApplicationQuery =
-    L"SELECT `Application`, `Component_`, `Partition_`, `Id`, `Name` FROM `ComPlusApplication`";
+    L"SELECT `Application`, `Component_`, `Partition_`, `Id`, `Name` FROM `Wix4ComPlusApplication`";
 enum eApplicationQuery { aqApplication = 1, aqComponent, aqPartition, aqID, aqName };
 
 LPCWSTR vcsApplicationPropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusApplicationProperty` WHERE `Application_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusApplicationProperty` WHERE `Application_` = ?";
 
 
 // property definitions

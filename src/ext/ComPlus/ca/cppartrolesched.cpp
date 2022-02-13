@@ -6,13 +6,13 @@
 // sql queries
 
 LPCWSTR vcsPartitionRoleQuery =
-    L"SELECT `PartitionRole`, `Partition_`, `Component_`, `Name` FROM `ComPlusPartitionRole`";
+    L"SELECT `PartitionRole`, `Partition_`, `Component_`, `Name` FROM `Wix4ComPlusPartitionRole`";
 enum ePartitionRoleQuery { prqPartitionRole = 1, prqPartition, prqComponent, prqName };
 
 LPCWSTR vcsUserInPartitionRoleQuery =
-    L"SELECT `UserInPartitionRole`, `PartitionRole_`, `ComPlusUserInPartitionRole`.`Component_`, `Domain`, `Name` FROM `ComPlusUserInPartitionRole`, `User` WHERE `User_` = `User`";
+    L"SELECT `UserInPartitionRole`, `PartitionRole_`, `ComPlusUserInPartitionRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusUserInPartitionRole`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsGroupInPartitionRoleQuery =
-    L"SELECT `GroupInPartitionRole`, `PartitionRole_`, `ComPlusGroupInPartitionRole`.`Component_`, `Domain`, `Name` FROM `ComPlusGroupInPartitionRole`, `Group` WHERE `Group_` = `Group`";
+    L"SELECT `GroupInPartitionRole`, `PartitionRole_`, `ComPlusGroupInPartitionRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInPartitionRole`, `Group` WHERE `Group_` = `Group`";
 enum eTrusteeInPartitionRoleQuery { tiprqUserInPartitionRole = 1, tiprqPartitionRole, tiprqComponent, tiprqDomain, tiprqName };
 
 

@@ -7,6 +7,7 @@ namespace WixToolset.Msmq
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Msmq.Symbols;
 
     /// <summary>
@@ -71,7 +72,6 @@ namespace WixToolset.Msmq
             {
                 case "Component":
                     var componentId = context["ComponentId"];
-                    var directoryId = context["DirectoryId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -249,8 +249,8 @@ namespace WixToolset.Msmq
                 symbol.Quota = quota;
             }
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MessageQueuingInstall");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MessageQueuingUninstall");
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4MessageQueuingInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4MessageQueuingUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
         }
 
         ///	<summary>

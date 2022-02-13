@@ -7,7 +7,7 @@ namespace WixToolset.ComPlus
     public static class ComPlusTableDefinitions
     {
         public static readonly TableDefinition ComPlusPartition = new TableDefinition(
-            "ComPlusPartition",
+            "Wix4ComPlusPartition",
             ComPlusSymbolDefinitions.ComPlusPartition,
             new[]
             {
@@ -20,7 +20,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusPartitionProperty = new TableDefinition(
-            "ComPlusPartitionProperty",
+            "Wix4ComPlusPartitionProperty",
             ComPlusSymbolDefinitions.ComPlusPartitionProperty,
             new[]
             {
@@ -32,7 +32,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusPartitionRole = new TableDefinition(
-            "ComPlusPartitionRole",
+            "Wix4ComPlusPartitionRole",
             ComPlusSymbolDefinitions.ComPlusPartitionRole,
             new[]
             {
@@ -45,7 +45,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusUserInPartitionRole = new TableDefinition(
-            "ComPlusUserInPartitionRole",
+            "Wix4ComPlusUserInPartitionRole",
             ComPlusSymbolDefinitions.ComPlusUserInPartitionRole,
             new[]
             {
@@ -58,7 +58,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusGroupInPartitionRole = new TableDefinition(
-            "ComPlusGroupInPartitionRole",
+            "Wix4ComPlusGroupInPartitionRole",
             ComPlusSymbolDefinitions.ComPlusGroupInPartitionRole,
             new[]
             {
@@ -71,7 +71,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusPartitionUser = new TableDefinition(
-            "ComPlusPartitionUser",
+            "Wix4ComPlusPartitionUser",
             ComPlusSymbolDefinitions.ComPlusPartitionUser,
             new[]
             {
@@ -84,7 +84,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusApplication = new TableDefinition(
-            "ComPlusApplication",
+            "Wix4ComPlusApplication",
             ComPlusSymbolDefinitions.ComPlusApplication,
             new[]
             {
@@ -98,7 +98,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusApplicationProperty = new TableDefinition(
-            "ComPlusApplicationProperty",
+            "Wix4ComPlusApplicationProperty",
             ComPlusSymbolDefinitions.ComPlusApplicationProperty,
             new[]
             {
@@ -110,7 +110,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusApplicationRole = new TableDefinition(
-            "ComPlusApplicationRole",
+            "Wix4ComPlusApplicationRole",
             ComPlusSymbolDefinitions.ComPlusApplicationRole,
             new[]
             {
@@ -123,7 +123,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusApplicationRoleProperty = new TableDefinition(
-            "ComPlusApplicationRoleProperty",
+            "Wix4ComPlusApplicationRoleProperty",
             ComPlusSymbolDefinitions.ComPlusApplicationRoleProperty,
             new[]
             {
@@ -135,7 +135,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusUserInApplicationRole = new TableDefinition(
-            "ComPlusUserInApplicationRole",
+            "Wix4ComPlusUserInApplicationRole",
             ComPlusSymbolDefinitions.ComPlusUserInApplicationRole,
             new[]
             {
@@ -148,7 +148,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusGroupInApplicationRole = new TableDefinition(
-            "ComPlusGroupInApplicationRole",
+            "Wix4ComPlusGroupInApplicationRole",
             ComPlusSymbolDefinitions.ComPlusGroupInApplicationRole,
             new[]
             {
@@ -161,7 +161,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusAssembly = new TableDefinition(
-            "ComPlusAssembly",
+            "Wix4ComPlusAssembly",
             ComPlusSymbolDefinitions.ComPlusAssembly,
             new[]
             {
@@ -178,7 +178,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusAssemblyDependency = new TableDefinition(
-            "ComPlusAssemblyDependency",
+            "Wix4ComPlusAssemblyDependency",
             ComPlusSymbolDefinitions.ComPlusAssemblyDependency,
             new[]
             {
@@ -189,7 +189,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusComponent = new TableDefinition(
-            "ComPlusComponent",
+            "Wix4ComPlusComponent",
             ComPlusSymbolDefinitions.ComPlusComponent,
             new[]
             {
@@ -201,7 +201,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusComponentProperty = new TableDefinition(
-            "ComPlusComponentProperty",
+            "Wix4ComPlusComponentProperty",
             ComPlusSymbolDefinitions.ComPlusComponentProperty,
             new[]
             {
@@ -213,7 +213,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusRoleForComponent = new TableDefinition(
-            "ComPlusRoleForComponent",
+            "Wix4ComPlusRoleForComponent",
             ComPlusSymbolDefinitions.ComPlusRoleForComponent,
             new[]
             {
@@ -226,7 +226,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusInterface = new TableDefinition(
-            "ComPlusInterface",
+            "Wix4ComPlusInterface",
             ComPlusSymbolDefinitions.ComPlusInterface,
             new[]
             {
@@ -238,7 +238,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusInterfaceProperty = new TableDefinition(
-            "ComPlusInterfaceProperty",
+            "Wix4ComPlusInterfaceProperty",
             ComPlusSymbolDefinitions.ComPlusInterfaceProperty,
             new[]
             {
@@ -250,7 +250,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusRoleForInterface = new TableDefinition(
-            "ComPlusRoleForInterface",
+            "Wix4ComPlusRoleForInterface",
             ComPlusSymbolDefinitions.ComPlusRoleForInterface,
             new[]
             {
@@ -263,7 +263,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusMethod = new TableDefinition(
-            "ComPlusMethod",
+            "Wix4ComPlusMethod",
             ComPlusSymbolDefinitions.ComPlusMethod,
             new[]
             {
@@ -276,7 +276,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusMethodProperty = new TableDefinition(
-            "ComPlusMethodProperty",
+            "Wix4ComPlusMethodProperty",
             ComPlusSymbolDefinitions.ComPlusMethodProperty,
             new[]
             {
@@ -288,7 +288,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusRoleForMethod = new TableDefinition(
-            "ComPlusRoleForMethod",
+            "Wix4ComPlusRoleForMethod",
             ComPlusSymbolDefinitions.ComPlusRoleForMethod,
             new[]
             {
@@ -301,7 +301,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusSubscription = new TableDefinition(
-            "ComPlusSubscription",
+            "Wix4ComPlusSubscription",
             ComPlusSymbolDefinitions.ComPlusSubscription,
             new[]
             {
@@ -317,7 +317,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusSubscriptionProperty = new TableDefinition(
-            "ComPlusSubscriptionProperty",
+            "Wix4ComPlusSubscriptionProperty",
             ComPlusSymbolDefinitions.ComPlusSubscriptionProperty,
             new[]
             {

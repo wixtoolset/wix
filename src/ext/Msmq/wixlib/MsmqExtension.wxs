@@ -2,28 +2,13 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <?include ..\..\caerr.wxi ?>
+    <?include ..\..\caDecor.wxi ?>
+    <?include ..\..\caerr.wxi ?>
 
-  <Fragment>
-    <UI>
-      <ProgressText Action="MessageQueuingExecuteInstall" Template="!(loc.MessageQueuingExecuteInstallTemplate)" Message="!(loc.MessageQueuingExecuteInstall)" />
-      <ProgressText Action="MessageQueuingExecuteUninstall" Template="!(loc.MessageQueuingExecuteUninstallTemplate)" Message="!(loc.MessageQueuingExecuteUninstall)" />
-    </UI>
-
-    <CustomAction Id="MessageQueuingInstall" DllEntry="MessageQueuingInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="MsmqCA" />
-    <CustomAction Id="MessageQueuingUninstall" DllEntry="MessageQueuingUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="MsmqCA" />
-    <CustomAction Id="MessageQueuingExecuteInstall" DllEntry="MessageQueuingExecuteInstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
-    <CustomAction Id="MessageQueuingRollbackInstall" DllEntry="MessageQueuingRollbackInstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
-    <CustomAction Id="MessageQueuingExecuteUninstall" DllEntry="MessageQueuingExecuteUninstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
-    <CustomAction Id="MessageQueuingRollbackUninstall" DllEntry="MessageQueuingRollbackUninstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
-
-    <InstallExecuteSequence>
-      <Custom Action="MessageQueuingUninstall" After="DeleteServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-      <Custom Action="MessageQueuingInstall" Before="InstallServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-    </InstallExecuteSequence>
-  </Fragment>
-
-  <Fragment>
-    <Binary Id="MsmqCA" SourceFile="msmqca.dll" />
-  </Fragment>
+    <Fragment>
+      <UI Id="MsmqUI">
+        <ProgressText Action="$(var.Prefix)MessageQueuingExecuteInstall$(var.Suffix)" Template="!(loc.MessageQueuingExecuteInstallTemplate)" Message="!(loc.MessageQueuingExecuteInstall)" />
+        <ProgressText Action="$(var.Prefix)MessageQueuingExecuteUninstall$(var.Suffix)" Template="!(loc.MessageQueuingExecuteUninstallTemplate)" Message="!(loc.MessageQueuingExecuteUninstall)" />
+      </UI>
+    </Fragment>
 </Wix>

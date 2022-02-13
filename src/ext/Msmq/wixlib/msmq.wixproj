@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\msmqca.vcxproj" ReferenceOutputAssembly="false" />
+    <BindInputPaths Include="$(OutputPath)x86" BindName='x86' />
+    <BindInputPaths Include="$(OutputPath)x64" BindName='x64' />
+    <BindInputPaths Include="$(OutputPath)arm64" BindName='arm64' />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ca\msmqca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\msmqca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\msmqca.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
 
   <ItemGroup>

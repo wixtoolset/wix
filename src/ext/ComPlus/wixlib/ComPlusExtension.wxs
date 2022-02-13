@@ -1,6 +1,8 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
+
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include ..\..\caDecor.wxi ?>
   <?include ..\..\caerr.wxi ?>
 
   <Fragment>
@@ -31,105 +33,27 @@
       <Error Id="$(var.msierrComPlusSubscriptionNameConflict)" Message="!(loc.msierrComPlusSubscriptionNameConflict)" />
       <Error Id="$(var.msierrComPlusFailedLookupNames)" Message="!(loc.msierrComPlusFailedLookupNames)" />
 
-      <ProgressText Action="ComPlusInstallExecute" Message="!(loc.ComPlusInstallExecute)" />
-      <ProgressText Action="ComPlusUninstallExecute" Message="!(loc.ComPlusUninstallExecute)" />
+      <ProgressText Action="$(var.Prefix)ComPlusInstallExecute$(var.Suffix)" Message="!(loc.ComPlusInstallExecute)" />
+      <ProgressText Action="$(var.Prefix)ComPlusUninstallExecute$(var.Suffix)" Message="!(loc.ComPlusUninstallExecute)" />
 
-      <ProgressText Action="CreateComPlusPartitions" Template="!(loc.CreateComPlusPartitionsTemplate)" Message="!(loc.CreateComPlusPartitions)" />
-      <ProgressText Action="RemoveComPlusPartitions" Template="!(loc.RemoveComPlusPartitionsTemplate)" Message="!(loc.RemoveComPlusPartitions)" />
-      <ProgressText Action="AddUsersToComPlusPartitionRoles" Template="!(loc.AddUsersToComPlusPartitionRolesTemplate)" Message="!(loc.AddUsersToComPlusPartitionRoles)" />
-      <ProgressText Action="RemoveUsersFromComPlusPartRoles" Template="!(loc.RemoveUsersFromComPlusPartitionRolesTemplate)" Message="!(loc.RemoveUsersFromComPlusPartitionRoles)" />
-      <ProgressText Action="AddComPlusPartitionUsers" Template="!(loc.AddComPlusPartitionUsersTemplate)" Message="!(loc.AddComPlusPartitionUsers)" />
-      <ProgressText Action="RemoveComPlusPartitionUsers" Template="!(loc.RemoveComPlusPartitionUsersTemplate)" Message="!(loc.RemoveComPlusPartitionUsers)" />
-      <ProgressText Action="CreateComPlusApplications" Template="!(loc.CreateComPlusApplicationsTemplate)" Message="!(loc.CreateComPlusApplications)" />
-      <ProgressText Action="RemoveComPlusApplications" Template="!(loc.RemoveComPlusApplicationsTemplate)" Message="!(loc.RemoveComPlusApplications)" />
-      <ProgressText Action="CreateComPlusApplicationRoles" Template="!(loc.CreateComPlusApplicationRolesTemplate)" Message="!(loc.CreateComPlusApplicationRoles)" />
-      <ProgressText Action="RemoveComPlusApplicationRoles" Template="!(loc.RemoveComPlusApplicationRolesTemplate)" Message="!(loc.RemoveComPlusApplicationRoles)" />
-      <ProgressText Action="AddUsersToComPlusApplicationRoles" Template="!(loc.AddUsersToComPlusApplicationRolesTemplate)" Message="!(loc.AddUsersToComPlusApplicationRoles)" />
-      <ProgressText Action="RemoveUsersFromComPlusAppRoles" Template="!(loc.RemoveUsersFromComPlusApplicationRolesTemplate)" Message="!(loc.RemoveUsersFromComPlusApplicationRoles)" />
-      <ProgressText Action="RegisterComPlusAssemblies" Template="!(loc.RegisterComPlusAssembliesTemplate)" Message="!(loc.RegisterComPlusAssemblies)" />
-      <ProgressText Action="UnregisterComPlusAssemblies" Template="!(loc.UnregisterComPlusAssembliesTemplate)" Message="!(loc.UnregisterComPlusAssemblies)" />
-      <ProgressText Action="AddComPlusRoleAssignments" Template="!(loc.AddComPlusRoleAssignmentsTemplate)" Message="!(loc.AddComPlusRoleAssignments)" />
-      <ProgressText Action="RemoveComPlusRoleAssignments" Template="!(loc.RemoveComPlusRoleAssignmentsTemplate)" Message="!(loc.RemoveComPlusRoleAssignments)" />
-      <ProgressText Action="CreateSubscrComPlusComponents" Template="!(loc.CreateSubscriptionsComPlusComponentsTemplate)" Message="!(loc.CreateSubscriptionsComPlusComponents)" />
-      <ProgressText Action="RemoveSubscrComPlusComponents" Template="!(loc.RemoveSubscriptionsComPlusComponentsTemplate)" Message="!(loc.RemoveSubscriptionsComPlusComponents)" />
+      <ProgressText Action="$(var.Prefix)CreateComPlusPartitions$(var.Suffix)" Template="!(loc.CreateComPlusPartitionsTemplate)" Message="!(loc.CreateComPlusPartitions)" />
+      <ProgressText Action="$(var.Prefix)RemoveComPlusPartitions$(var.Suffix)" Template="!(loc.RemoveComPlusPartitionsTemplate)" Message="!(loc.RemoveComPlusPartitions)" />
+      <ProgressText Action="$(var.Prefix)AddUsersToComPlusPartitionRoles$(var.Suffix)" Template="!(loc.AddUsersToComPlusPartitionRolesTemplate)" Message="!(loc.AddUsersToComPlusPartitionRoles)" />
+      <ProgressText Action="$(var.Prefix)RemoveUsersFromComPlusPartRoles$(var.Suffix)" Template="!(loc.RemoveUsersFromComPlusPartitionRolesTemplate)" Message="!(loc.RemoveUsersFromComPlusPartitionRoles)" />
+      <ProgressText Action="$(var.Prefix)AddComPlusPartitionUsers$(var.Suffix)" Template="!(loc.AddComPlusPartitionUsersTemplate)" Message="!(loc.AddComPlusPartitionUsers)" />
+      <ProgressText Action="$(var.Prefix)RemoveComPlusPartitionUsers$(var.Suffix)" Template="!(loc.RemoveComPlusPartitionUsersTemplate)" Message="!(loc.RemoveComPlusPartitionUsers)" />
+      <ProgressText Action="$(var.Prefix)CreateComPlusApplications$(var.Suffix)" Template="!(loc.CreateComPlusApplicationsTemplate)" Message="!(loc.CreateComPlusApplications)" />
+      <ProgressText Action="$(var.Prefix)RemoveComPlusApplications$(var.Suffix)" Template="!(loc.RemoveComPlusApplicationsTemplate)" Message="!(loc.RemoveComPlusApplications)" />
+      <ProgressText Action="$(var.Prefix)CreateComPlusApplicationRoles$(var.Suffix)" Template="!(loc.CreateComPlusApplicationRolesTemplate)" Message="!(loc.CreateComPlusApplicationRoles)" />
+      <ProgressText Action="$(var.Prefix)RemoveComPlusApplicationRoles$(var.Suffix)" Template="!(loc.RemoveComPlusApplicationRolesTemplate)" Message="!(loc.RemoveComPlusApplicationRoles)" />
+      <ProgressText Action="$(var.Prefix)AddUsersToComPlusApplicationRoles$(var.Suffix)" Template="!(loc.AddUsersToComPlusApplicationRolesTemplate)" Message="!(loc.AddUsersToComPlusApplicationRoles)" />
+      <ProgressText Action="$(var.Prefix)RemoveUsersFromComPlusAppRoles$(var.Suffix)" Template="!(loc.RemoveUsersFromComPlusApplicationRolesTemplate)" Message="!(loc.RemoveUsersFromComPlusApplicationRoles)" />
+      <ProgressText Action="$(var.Prefix)RegisterComPlusAssemblies$(var.Suffix)" Template="!(loc.RegisterComPlusAssembliesTemplate)" Message="!(loc.RegisterComPlusAssemblies)" />
+      <ProgressText Action="$(var.Prefix)UnregisterComPlusAssemblies$(var.Suffix)" Template="!(loc.UnregisterComPlusAssembliesTemplate)" Message="!(loc.UnregisterComPlusAssemblies)" />
+      <ProgressText Action="$(var.Prefix)AddComPlusRoleAssignments$(var.Suffix)" Template="!(loc.AddComPlusRoleAssignmentsTemplate)" Message="!(loc.AddComPlusRoleAssignments)" />
+      <ProgressText Action="$(var.Prefix)RemoveComPlusRoleAssignments$(var.Suffix)" Template="!(loc.RemoveComPlusRoleAssignmentsTemplate)" Message="!(loc.RemoveComPlusRoleAssignments)" />
+      <ProgressText Action="$(var.Prefix)CreateSubscrComPlusComponents$(var.Suffix)" Template="!(loc.CreateSubscriptionsComPlusComponentsTemplate)" Message="!(loc.CreateSubscriptionsComPlusComponents)" />
+      <ProgressText Action="$(var.Prefix)RemoveSubscrComPlusComponents$(var.Suffix)" Template="!(loc.RemoveSubscriptionsComPlusComponentsTemplate)" Message="!(loc.RemoveSubscriptionsComPlusComponents)" />
     </UI>
-  </Fragment>
-
-  <Fragment>
-    <UIRef Id="ComPlusUI" />
-
-    <CustomAction Id="ConfigureComPlusInstall" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ConfigureComPlusUninstall" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusInstallPrepare" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusRollbackInstallPrepare" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusInstallExecute" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusInstallExecuteCommit" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusRollbackInstallExecute" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusInstallCommit" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusUninstallPrepare" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusRollbackUninstallPrepare" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusUninstallExecute" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusRollbackUninstallExecute" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-    <CustomAction Id="ComPlusUninstallCommit" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x86" />
-
-    <Property Id="ComPlusInstallPrepare" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackInstallPrepare" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusInstallExecute" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusInstallExecuteCommit" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackInstallExecute" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusInstallCommit" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusUninstallPrepare" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackUninstallPrepare" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusUninstallExecute" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackUninstallExecute" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusUninstallCommit" Hidden="yes" SuppressModularization="yes" />
-
-    <InstallExecuteSequence>
-      <Custom Action="ConfigureComPlusUninstall" After="DeleteServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-      <Custom Action="ConfigureComPlusInstall" Before="InstallServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-    </InstallExecuteSequence>
-  </Fragment>
-
-  <Fragment>
-    <UIRef Id="ComPlusUI" />
-
-    <CustomAction Id="ConfigureComPlusInstall_x64" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ConfigureComPlusUninstall_x64" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusInstallPrepare_64" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusRollbackInstallPrepare_64" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusInstallExecute_64" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusInstallExecuteCommit_64" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusRollbackInstallExecute_64" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusInstallCommit_64" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusUninstallPrepare_64" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusRollbackUninstallPrepare_64" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusUninstallExecute_64" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusRollbackUninstallExecute_64" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-    <CustomAction Id="ComPlusUninstallCommit_64" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="ComPlusCA_x64" />
-
-    <Property Id="ComPlusInstallPrepare_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackInstallPrepare_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusInstallExecute_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusInstallExecuteCommit_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackInstallExecute_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusInstallCommit_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusUninstallPrepare_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackUninstallPrepare_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusUninstallExecute_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusRollbackUninstallExecute_64" Hidden="yes" SuppressModularization="yes" />
-    <Property Id="ComPlusUninstallCommit_64" Hidden="yes" SuppressModularization="yes" />
-
-    <InstallExecuteSequence>
-      <Custom Action="ConfigureComPlusUninstall_x64" After="DeleteServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-      <Custom Action="ConfigureComPlusInstall_x64" Before="InstallServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-    </InstallExecuteSequence>
-  </Fragment>
-
-  <Fragment>
-    <Binary Id="ComPlusCA_x86" SourceFile="!(bindpath.x86)complusca.dll" />
-  </Fragment>
-
-  <Fragment>
-    <Binary Id="ComPlusCA_x64" SourceFile="!(bindpath.x64)complusca.dll" />
   </Fragment>
 </Wix>

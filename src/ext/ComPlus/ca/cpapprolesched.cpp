@@ -6,17 +6,17 @@
 // sql queries
 
 LPCWSTR vcsApplicationRoleQuery =
-    L"SELECT `ApplicationRole`, `Application_`, `Component_`, `Name` FROM `ComPlusApplicationRole`";
+    L"SELECT `ApplicationRole`, `Application_`, `Component_`, `Name` FROM `Wix4ComPlusApplicationRole`";
 enum eApplicationRoleQuery { arqApplicationRole = 1, arqApplication, arqComponent, arqName };
 
 LPCWSTR vcsUserInApplicationRoleQuery =
-    L"SELECT `UserInApplicationRole`, `ApplicationRole_`, `ComPlusUserInApplicationRole`.`Component_`, `Domain`, `Name` FROM `ComPlusUserInApplicationRole`, `User` WHERE `User_` = `User`";
+    L"SELECT `UserInApplicationRole`, `ApplicationRole_`, `ComPlusUserInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusUserInApplicationRole`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsGroupInApplicationRoleQuery =
-    L"SELECT `GroupInApplicationRole`, `ApplicationRole_`, `ComPlusGroupInApplicationRole`.`Component_`, `Domain`, `Name` FROM `ComPlusGroupInApplicationRole`, `Group` WHERE `Group_` = `Group`";
+    L"SELECT `GroupInApplicationRole`, `ApplicationRole_`, `ComPlusGroupInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInApplicationRole`, `Group` WHERE `Group_` = `Group`";
 enum eTrusteeInApplicationRoleQuery { tiarqUserInApplicationRole = 1, tiarqApplicationRole, tiarqComponent, tiarqDomain, tiarqName };
 
 LPCWSTR vcsApplicationRolePropertyQuery =
-    L"SELECT `Name`, `Value` FROM `ComPlusApplicationRoleProperty` WHERE `ApplicationRole_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusApplicationRoleProperty` WHERE `ApplicationRole_` = ?";
 
 
 // property definitions

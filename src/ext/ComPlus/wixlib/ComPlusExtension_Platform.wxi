@@ -1,0 +1,44 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include ..\..\caDecor.wxi ?>
+
+  <Fragment>
+    <UIRef Id="ComPlusUI" />
+
+    <CustomAction Id="$(var.Prefix)ConfigureComPlusInstall$(var.Suffix)" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ConfigureComPlusUninstall$(var.Suffix)" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusInstallPrepare$(var.Suffix)" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusRollbackInstallPrepare$(var.Suffix)" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusInstallExecute$(var.Suffix)" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusInstallExecuteCommit$(var.Suffix)" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusRollbackInstallExecute$(var.Suffix)" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusInstallCommit$(var.Suffix)" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusUninstallPrepare$(var.Suffix)" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusRollbackUninstallPrepare$(var.Suffix)" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusUninstallExecute$(var.Suffix)" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusRollbackUninstallExecute$(var.Suffix)" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)ComPlusUninstallCommit$(var.Suffix)" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)cpca$(var.Suffix)" />
+
+    <Property Id="$(var.Prefix)ComPlusInstallPrepare$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusRollbackInstallPrepare$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusInstallExecute$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusInstallExecuteCommit$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusRollbackInstallExecute$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusInstallCommit$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusUninstallPrepare$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusRollbackUninstallPrepare$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusUninstallExecute$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusRollbackUninstallExecute$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+    <Property Id="$(var.Prefix)ComPlusUninstallCommit$(var.Suffix)" Hidden="yes" SuppressModularization="yes" />
+
+    <InstallExecuteSequence>
+      <Custom Action="$(var.Prefix)ConfigureComPlusUninstall$(var.Suffix)" After="DeleteServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
+      <Custom Action="$(var.Prefix)ConfigureComPlusInstall$(var.Suffix)" Before="InstallServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+    <Binary Id="$(var.Prefix)cpca$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))complusca.dll" />
+  </Fragment>
+</Include>
