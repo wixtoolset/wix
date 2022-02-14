@@ -36,8 +36,9 @@
   <ItemGroup>
     <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices" Version="4.7.0" />
-    <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
+    <!-- Warning: The version for System.IO.FileSystem.AccessControl must be kept in sync with WixToolset.Core.Native.nuspec -->
+    <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
     <PackageVersion Include="System.Reflection.Metadata" Version="1.6.0" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="4.7.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.6.0" />
