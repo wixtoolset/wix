@@ -24,13 +24,6 @@
     <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=x64" />
   </ItemGroup>
 
-  <!-- Copy the x64 binaries for unittests since we've standardized on VS2022 (which is 64-bit only) -->
-  <ItemGroup>
-    <None Include="..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" />
     <PackageReference Include="System.IO.FileSystem.AccessControl" />

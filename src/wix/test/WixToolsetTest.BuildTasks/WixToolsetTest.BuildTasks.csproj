@@ -6,7 +6,7 @@
     <TargetFramework>net472</TargetFramework>
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SignOutput>false</SignOutput>
   </PropertyGroup>
 
@@ -20,6 +20,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
+  </ItemGroup>
+
+  <!-- Copy the x64 binaries for unittests since we've standardized on VS2022 (which is 64-bit only) -->
+  <ItemGroup>
+    <None Include="..\..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
