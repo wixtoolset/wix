@@ -441,7 +441,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.Equal((int)LinkerErrors.Ids.OrphanedPayload, result.ExitCode);
+                Assert.Equal(7000, result.ExitCode);
             }
         }
 
@@ -468,7 +468,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.Equal((int)LinkerErrors.Ids.PackageInMultipleContainers, result.ExitCode);
+                Assert.Equal(7001, result.ExitCode);
             }
         }
 
@@ -494,7 +494,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.Equal((int)LinkerErrors.Ids.UnscheduledChainPackage, result.ExitCode);
+                Assert.Equal(7003, result.ExitCode);
             }
         }
 
@@ -520,7 +520,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.Equal((int)LinkerErrors.Ids.UnscheduledRollbackBoundary, result.ExitCode);
+                Assert.Equal(7004, result.ExitCode);
             }
         }
     }

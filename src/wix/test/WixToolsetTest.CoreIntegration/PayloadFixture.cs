@@ -140,7 +140,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath,
                 });
 
-                Assert.Equal((int)LinkerErrors.Ids.PayloadSharedWithBA, result.ExitCode);
+                Assert.Equal(7002, result.ExitCode);
             }
         }
 
