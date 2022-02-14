@@ -24,18 +24,26 @@
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <NativeLibrary Include="..\wixnative\Win32\mergemod.dll" RuntimeIdentifier="win-x86" />
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)'=='.NETFramework' and '$(NCrunch)'=='' ">
+    <!-- Copy the x64 binaries when there is no RuntimeIdentifier since we've standardized on VS2022 (which is 64-bit only) -->
+    <None Include="..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'=='' " />
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'=='' " />
+
+    <None Include="..\wixnative\Win32\mergemod.dll" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x86' " />
+    <None Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.exe" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x86' " />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)'!='.NETFramework' and '$(NCrunch)'=='' ">
+    <NativeLibrary Include="..\wixnative\ARM64\mergemod.dll" RuntimeIdentifier="win-arm64" />
     <NativeLibrary Include="..\wixnative\x64\mergemod.dll" RuntimeIdentifier="win-x64" />
+    <NativeLibrary Include="..\wixnative\Win32\mergemod.dll" RuntimeIdentifier="win-x86" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\ARM64\wixnative.exe" RuntimeIdentifier="win-arm64" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\ARM64\wixnative.pdb" RuntimeIdentifier="win-arm64" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" RuntimeIdentifier="win-x64" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.pdb" RuntimeIdentifier="win-x64" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.exe" RuntimeIdentifier="win-x86" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.pdb" RuntimeIdentifier="win-x86" />
-  </ItemGroup>
 
-  <ItemGroup>
     <!--
       This PackageReference is required so the RuntimeTargetsCopyLocalItems have a package (any package would
       do, WixToolset.Data is as good as any) to "attach" themselves to.
@@ -48,8 +56,9 @@
                                   NuGetPackageId="WixToolset.Data"
                                   RuntimeIdentifier="%(RuntimeIdentifier)"
                                   />
-    <Content Include="@(RuntimeTargetsCopyLocalItems)" 
-             Link="%(DestinationSubDirectory)\%(FileName)%(Extension)" 
-             CopyToOutputDirectory="PreserveNewest" />
+    <None Include="@(RuntimeTargetsCopyLocalItems)" 
+          Link="%(DestinationSubDirectory)\%(FileName)%(Extension)" 
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
 </Project>

@@ -17,7 +17,7 @@ namespace WixToolsetTest.Sdk
 
     public static class MsbuildUtilities
     {
-        public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath), "..", "publish", "WixToolset.Sdk");
+        public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Sdk");
         public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
 
         public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal", bool suppressValidation = true)
