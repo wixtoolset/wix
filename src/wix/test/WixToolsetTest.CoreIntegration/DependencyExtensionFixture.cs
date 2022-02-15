@@ -12,7 +12,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class DependencyExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildBundleUsingExePackageWithProvides()
         {
             var folder = TestData.Get(@"TestData");
@@ -55,7 +55,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildBundleUsingMsiWithProvides()
         {
             var folder = TestData.Get(@"TestData");
@@ -111,7 +111,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildBundleWithCustomProviderKey()
         {
             var folder = TestData.Get(@"TestData");
@@ -157,7 +157,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildPackageUsingProvides()
         {
             var folder = TestData.Get(@"TestData\UsingProvides");

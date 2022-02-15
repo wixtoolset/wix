@@ -11,7 +11,7 @@ namespace WixToolsetTest.Dependency
 
     public class DependencyExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingProvides()
         {
             var folder = TestData.Get(@"TestData\UsingProvides");

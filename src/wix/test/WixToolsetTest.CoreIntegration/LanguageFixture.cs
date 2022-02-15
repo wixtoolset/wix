@@ -13,7 +13,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class LanguageFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWithDefaultProductLanguage()
         {
             var folder = TestData.Get(@"TestData", "Language");
@@ -66,7 +66,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildEnuWxl()
         {
             var folder = TestData.Get(@"TestData", "Language");
@@ -101,7 +101,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildJpnWxl()
         {
             var folder = TestData.Get(@"TestData", "Language");
@@ -136,7 +136,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildJpnWxlWithEnuSummaryInfo()
         {
             var folder = TestData.Get(@"TestData", "Language");

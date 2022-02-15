@@ -8,7 +8,7 @@ namespace WixE2E
 
     public class WixE2EFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWixlibWithNativeDll()
         {
             var projectPath = TestData.Get("TestData", "WixprojLibraryVcxprojDll", "WixprojLibraryVcxprojDll.wixproj");
@@ -19,7 +19,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildModuleWithWinFormsApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojModuleCsprojWinFormsNetFx", "WixprojModuleCsprojWinFormsNetFx.wixproj");
@@ -30,7 +30,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildPackageWithWebApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore", "WixprojPackageCsprojWebApplicationNetCore.wixproj");
@@ -41,7 +41,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildPackageWithNativeWindowsApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojPackageVcxprojWindowsApp", "WixprojPackageVcxprojWindowsApp.wixproj");

@@ -9,7 +9,7 @@ namespace WixToolsetTest.Http
 
     public class HttpExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingSniSssl()
         {
             var folder = TestData.Get("TestData", "SniSsl");
@@ -28,7 +28,7 @@ namespace WixToolsetTest.Http
             }, results);
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingUrlReservation()
         {
             var folder = TestData.Get(@"TestData\UsingUrlReservation");

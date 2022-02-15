@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class ApprovedExeFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWithApprovedExe()
         {
             var folder = TestData.Get(@"TestData");
@@ -35,7 +35,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWithApprovedExe64()
         {
             var folder = TestData.Get(@"TestData");

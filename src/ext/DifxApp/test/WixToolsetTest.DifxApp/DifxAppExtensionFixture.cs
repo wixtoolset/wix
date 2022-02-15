@@ -10,7 +10,7 @@ namespace WixToolsetTest.DifxApp
 
     public class DifxAppExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingDriver()
         {
             var folder = TestData.Get(@"TestData\UsingDriver");

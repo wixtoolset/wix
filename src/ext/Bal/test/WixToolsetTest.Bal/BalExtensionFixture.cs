@@ -12,7 +12,7 @@ namespace WixToolsetTest.Bal
 
     public class BalExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingDisplayInternalUICondition()
         {
             using (var fs = new DisposableFileSystem())
@@ -48,7 +48,7 @@ namespace WixToolsetTest.Bal
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingOverridable()
         {
             using (var fs = new DisposableFileSystem())
@@ -81,7 +81,7 @@ namespace WixToolsetTest.Bal
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingWixStdBa()
         {
             using (var fs = new DisposableFileSystem())

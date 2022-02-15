@@ -11,7 +11,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class BindVariablesFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildBundleWithPackageBindVariables()
         {
             var folder = TestData.Get(@"TestData");
@@ -39,7 +39,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildPackageWithBindVariables()
         {
             var folder = TestData.Get(@"TestData", "BindVariables");
@@ -73,7 +73,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWithDefaultValue()
         {
             var folder = TestData.Get(@"TestData", "BindVariables");

@@ -10,7 +10,7 @@ namespace WixToolsetTest.ComPlus
 
     public class ComPlusExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingComPlusPartition()
         {
             var folder = TestData.Get(@"TestData\UsingComPlusPartition");

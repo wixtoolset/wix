@@ -9,7 +9,7 @@ namespace WixToolsetTest.VisualStudio
 
     public class VisualStudioExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingVsixPackage()
         {
             var folder = TestData.Get(@"TestData\UsingVsixPackage");

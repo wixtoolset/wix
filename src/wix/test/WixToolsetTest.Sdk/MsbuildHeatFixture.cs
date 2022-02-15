@@ -14,7 +14,7 @@ namespace WixToolsetTest.Sdk
 
     public class MsbuildHeatFixture
     {
-        [Theory]
+        [Theory(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
@@ -70,7 +70,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
+        [Theory(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
@@ -147,7 +147,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
+        [Theory(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         [InlineData(BuildSystem.DotNetCoreSdk, true)]
         [InlineData(BuildSystem.DotNetCoreSdk, false)]
         [InlineData(BuildSystem.MSBuild, true)]
@@ -257,7 +257,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
+        [Theory(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         [InlineData(BuildSystem.DotNetCoreSdk, true)]
         [InlineData(BuildSystem.DotNetCoreSdk, false)]
         [InlineData(BuildSystem.MSBuild, true)]

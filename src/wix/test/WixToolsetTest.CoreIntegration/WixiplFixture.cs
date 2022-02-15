@@ -14,7 +14,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class WixiplFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildSingleFile()
         {
             var folder = TestData.Get(@"TestData\SingleFile");
@@ -103,7 +103,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildMsiUsingExtensionLibrary()
 #if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
         {
@@ -157,7 +157,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 #endif
 
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWixiplUsingExtensionLibrary()
 #if !(NET461 || NET472 || NET48 || NETCOREAPP3_1 || NET5_0)
         {

@@ -10,7 +10,7 @@ namespace WixToolsetTest.Iis
 
     public class IisExtensionFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildUsingIIsWebAddress()
         {
             var folder = TestData.Get(@"TestData\UsingIis");

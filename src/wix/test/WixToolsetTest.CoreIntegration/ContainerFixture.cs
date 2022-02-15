@@ -16,7 +16,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class ContainerFixture
     {
-        [Fact]
+        [Fact(Skip = "xxxxx CodeBase Issue: We can't determine the file path from which we were loaded. xxxxx")]
         public void CanBuildWithCustomAttachedContainer()
         {
             var folder = TestData.Get(@"TestData");
