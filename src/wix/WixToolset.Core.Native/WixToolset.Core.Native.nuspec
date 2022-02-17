@@ -33,10 +33,7 @@
     <file src="$projectFolder$\..\wixnative\x64\mergemod.dll" target="runtimes\win-x64\native" />
 
     <file src="..\ARM64\wixnative.exe" target="runtimes\win-arm64\native" />
-    <file src="..\ARM64\wixnative.pdb" target="runtimes\win-arm64\native" />
     <file src="..\x86\wixnative.exe" target="runtimes\win-x86\native" />
-    <file src="..\x86\wixnative.pdb" target="runtimes\win-x86\native" />
     <file src="..\x64\wixnative.exe" target="runtimes\win-x64\native" />
-    <file src="..\x64\wixnative.pdb" target="runtimes\win-x64\native" />
   </files>
 </package>

@@ -38,11 +38,8 @@
     <NativeLibrary Include="..\wixnative\x64\mergemod.dll" RuntimeIdentifier="win-x64" />
     <NativeLibrary Include="..\wixnative\Win32\mergemod.dll" RuntimeIdentifier="win-x86" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\ARM64\wixnative.exe" RuntimeIdentifier="win-arm64" />
-    <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\ARM64\wixnative.pdb" RuntimeIdentifier="win-arm64" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" RuntimeIdentifier="win-x64" />
-    <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.pdb" RuntimeIdentifier="win-x64" />
     <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.exe" RuntimeIdentifier="win-x86" />
-    <NativeLibrary Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.pdb" RuntimeIdentifier="win-x86" />
 
     <!--
       This PackageReference is required so the RuntimeTargetsCopyLocalItems have a package (any package would

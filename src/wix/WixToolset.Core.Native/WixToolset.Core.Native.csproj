@@ -8,8 +8,6 @@
     <DebugType>embedded</DebugType>
     <Description>WiX Toolset Native Processing</Description>
     <CreateDocumentationFile>true</CreateDocumentationFile>
-    <!-- https://github.com/NuGet/Home/issues/10665 -->
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
