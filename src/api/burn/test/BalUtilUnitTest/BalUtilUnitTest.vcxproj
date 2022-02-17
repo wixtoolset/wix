@@ -25,6 +25,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
     <SignOutput>false</SignOutput>
+    <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

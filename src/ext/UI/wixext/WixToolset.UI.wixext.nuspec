@@ -20,7 +20,5 @@
     <file src="$projectFolder$\..\..\..\internal\images\wix-white-bg.png" />
 
     <file src="$id$.dll" target="tools" />
-
-    <file src="..\x86\*.pdb" target="pdbs\x86" />
   </files>
 </package>

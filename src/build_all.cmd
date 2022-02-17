@@ -58,6 +58,12 @@ call samples\samples.cmd %_C% || exit /b
 
 call test\test.cmd %_C% || exit /b
 
+
+:: finalize build
+
+call internal\finalize.cmd %_C% || exit /b
+
+
 goto LExit
 
 :StartDeveloperCommandPrompt

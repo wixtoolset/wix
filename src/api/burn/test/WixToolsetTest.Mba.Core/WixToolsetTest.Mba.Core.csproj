@@ -8,6 +8,7 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <SignOutput>false</SignOutput>
     <RollForward>Major</RollForward>
+    <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 
   <ItemGroup>
