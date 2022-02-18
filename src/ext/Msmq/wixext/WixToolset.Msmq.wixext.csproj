@@ -8,7 +8,6 @@
     <Description>WiX Toolset MSMQ Extension</Description>
     <Title>WiX Toolset MSMQ Extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,7 +8,6 @@
     <Description>WiX Toolset Dependency Extension</Description>
     <Title>WiX Toolset Dependency Extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

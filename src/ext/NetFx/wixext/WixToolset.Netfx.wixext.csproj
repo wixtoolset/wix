@@ -8,7 +8,6 @@
     <Description>WiX Toolset .NET extension</Description>
     <Title>WiX Toolset .NET extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
