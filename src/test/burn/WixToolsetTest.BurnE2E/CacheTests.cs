@@ -67,6 +67,7 @@ namespace WixToolsetTest.BurnE2E
                 { "/BundleA/PackageA.msi", Path.Combine(this.TestContext.TestDataFolder, "PackageA.msi") },
                 { "/BundleA/PackageB.msi", Path.Combine(this.TestContext.TestDataFolder, "PackageB.msi") },
             });
+            webServer.DisableHeadResponses = true;
             webServer.Start();
 
             // Don't install PackageB initially so it will be installed when run from the package cache.
@@ -95,11 +96,13 @@ namespace WixToolsetTest.BurnE2E
 
             testBAController.SetPackageRequestedState("PackageB", RequestState.Present);
 
-            bundleA.Modify(bundlePackageCachePath);
+            var modifyLogPath = bundleA.Modify(bundlePackageCachePath);
             bundleA.VerifyRegisteredAndInPackageCache();
 
             packageA.VerifyInstalled(true);
             packageB.VerifyInstalled(true);
+
+            Assert.True(LogVerifier.MessageInLogFile(modifyLogPath, "Ignoring failure to get size and time for URL: http://localhost:9999/e2e/BundleA/PackageB.msi (error 0x80070002)"));
         }
 
         [Fact]

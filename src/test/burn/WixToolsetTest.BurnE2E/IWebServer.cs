@@ -7,6 +7,8 @@ namespace WixToolsetTest.BurnE2E
 
     public interface IWebServer : IDisposable
     {
+        bool DisableHeadResponses { get; set; }
+
         /// <summary>
         /// Registers a collection of relative URLs (the key) with its absolute path to the file (the value).
         /// </summary>
