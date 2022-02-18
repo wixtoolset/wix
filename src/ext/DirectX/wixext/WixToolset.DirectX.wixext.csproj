@@ -8,7 +8,6 @@
     <Description>WiX Toolset DirectX Extension</Description>
     <Title>WiX Toolset DirectX Extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

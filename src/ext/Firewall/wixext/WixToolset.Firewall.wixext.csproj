@@ -8,7 +8,6 @@
     <Description>WiX Toolset Firewallity Extension</Description>
     <Title>WiX Toolset Firewall Extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

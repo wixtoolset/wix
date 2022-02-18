@@ -8,7 +8,6 @@
     <Description>WiX Toolset Bundle extension</Description>
     <Title>WiX Toolset Bundle extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

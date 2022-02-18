@@ -9,7 +9,6 @@
     <DebugType>embedded</DebugType>
     <Description>Managed Bootstrapper Application Core</Description>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
-    <IncludeSymbols>true</IncludeSymbols>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 

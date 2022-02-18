@@ -24,10 +24,7 @@
     <file src="netstandard2.0\$id$.xml" target="lib\netstandard2.0" />
 
     <file src="v143\ARM64\mbanative.dll" target="runtimes\win-arm64\native" />
-    <file src="v143\ARM64\mbanative.pdb" target="runtimes\win-arm64\native" />
     <file src="v143\x64\mbanative.dll" target="runtimes\win-x64\native" />
-    <file src="v143\x64\mbanative.pdb" target="runtimes\win-x64\native" />
     <file src="v143\x86\mbanative.dll" target="runtimes\win-x86\native" />
-    <file src="v143\x86\mbanative.pdb" target="runtimes\win-x86\native" />
   </files>
 </package>

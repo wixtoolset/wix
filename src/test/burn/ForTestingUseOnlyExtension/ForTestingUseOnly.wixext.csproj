@@ -6,7 +6,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>ForTestingUseOnly</RootNamespace>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

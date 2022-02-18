@@ -8,7 +8,6 @@
     <Description>WiX Toolset Sql Extension</Description>
     <Title>WiX Toolset Sql Extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

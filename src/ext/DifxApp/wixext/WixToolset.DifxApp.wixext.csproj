@@ -8,7 +8,6 @@
     <Description>WiX Toolset DIFxApp Extension</Description>
     <Title>WiX Toolset DIFxApp Extension</Title>
     <DebugType>embedded</DebugType>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
