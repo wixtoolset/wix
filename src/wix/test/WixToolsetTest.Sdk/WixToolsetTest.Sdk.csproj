@@ -8,16 +8,11 @@
     <DebugType>embedded</DebugType>
     <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <SignOutput>false</SignOutput>
+    <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <!-- Copy the x64 binaries for unittests since we've standardized on VS2022 (which is 64-bit only) -->
-  <ItemGroup>
-    <None Include="..\..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
