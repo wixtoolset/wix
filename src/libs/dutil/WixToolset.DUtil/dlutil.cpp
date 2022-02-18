@@ -158,7 +158,10 @@ extern "C" HRESULT DAPI DownloadUrl(
 
     // Get the resource size and creation time from the internet.
     hr = GetResourceMetadata(hSession, &sczUrl, pDownloadSource->sczUser, pDownloadSource->sczPassword, pAuthenticate, &dw64Size, &ftCreated);
-    DlExitOnFailure(hr, "Failed to get size and time for URL: %ls", sczUrl);
+    if (FAILED(hr))
+    {
+        LogStringLine(REPORT_VERBOSE, "Ignoring failure to get size and time for URL: %ls (error 0x%x)", sczUrl, hr);
+    }
 
     // Ignore failure to initialize resume because we will fall back to full download then
     // download.

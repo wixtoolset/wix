@@ -7,6 +7,7 @@ namespace WixToolsetTest.BurnE2E
     using System.IO;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.StaticFiles;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.FileProviders.Physical;
     using Microsoft.Extensions.Hosting;
@@ -17,6 +18,8 @@ namespace WixToolsetTest.BurnE2E
         private Dictionary<string, string> PhysicalPathsByRelativeUrl { get; } = new Dictionary<string, string>();
 
         private IHost WebHost { get; set; }
+
+        public bool DisableHeadResponses { get; set; }
 
         public void AddFiles(Dictionary<string, string> physicalPathsByRelativeUrl)
         {
@@ -40,11 +43,20 @@ namespace WixToolsetTest.BurnE2E
                                            FileProvider = this,
                                            RequestPath = "/e2e",
                                            ServeUnknownFileTypes = true,
+                                           OnPrepareResponse = this.OnPrepareStaticFileResponse,
                                        });
                                    });
                                })
                                .Build();
             this.WebHost.Start();
+        }
+
+        private void OnPrepareStaticFileResponse(StaticFileResponseContext obj)
+        {
+            if (this.DisableHeadResponses && obj.Context.Request.Method == "HEAD")
+            {
+                obj.Context.Response.StatusCode = 404;
+            }
         }
 
         public void Dispose()
@@ -53,7 +65,10 @@ namespace WixToolsetTest.BurnE2E
             this.WebHost?.StopAsync(waitTime).Wait(waitTime);
         }
 
-        public IDirectoryContents GetDirectoryContents(string subpath) => throw new NotImplementedException();
+        public IDirectoryContents GetDirectoryContents(string subpath)
+        {
+            throw new NotImplementedException();
+        }
 
         public IFileInfo GetFileInfo(string subpath)
         {
@@ -65,6 +80,9 @@ namespace WixToolsetTest.BurnE2E
             return new NotFoundFileInfo(subpath);
         }
 
-        public IChangeToken Watch(string filter) => throw new NotImplementedException();
+        public IChangeToken Watch(string filter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
