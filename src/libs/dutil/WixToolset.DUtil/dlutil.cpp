@@ -295,7 +295,10 @@ static HRESULT DownloadResource(
     HANDLE hPayloadFile = INVALID_HANDLE_VALUE;
     DWORD cbMaxData = 64 * 1024; // 64 KB
     BYTE* pbData = NULL;
-    BOOL fRangeRequestsAccepted = TRUE;
+    BOOL fUseRangeRequest = TRUE;
+    BOOL fRangeRequestsAccepted = FALSE;
+    BOOL fRequestedRangeRequest = FALSE;
+    BOOL fInvalidRangeRequestResponse = FALSE;
     LPWSTR sczRangeRequestHeader = NULL;
     HINTERNET hConnect = NULL;
     HINTERNET hUrl = NULL;
@@ -315,16 +318,32 @@ static HRESULT DownloadResource(
     // are not supported we'll have to start over and accept the fact that we only get one shot
     // downloading the file however big it is. Hopefully, not more than 2 GB since wininet doesn't
     // like files that big.
-    while (fRangeRequestsAccepted && (0 == dw64ResourceLength || dw64ResumeOffset < dw64ResourceLength))
+    for (;;)
     {
-        hr = AllocateRangeRequestHeader(dw64ResumeOffset, 0 == dw64ResourceLength ? dw64AuthoredResourceLength : dw64ResourceLength, &sczRangeRequestHeader);
-        DlExitOnFailure(hr, "Failed to allocate range request header.");
+        fInvalidRangeRequestResponse = FALSE;
+
+        if (fUseRangeRequest)
+        {
+            hr = AllocateRangeRequestHeader(dw64ResumeOffset, 0 == dw64ResourceLength ? dw64AuthoredResourceLength : dw64ResourceLength, &sczRangeRequestHeader);
+            DlExitOnFailure(hr, "Failed to allocate range request header.");
+        }
+        else
+        {
+            ReleaseNullStr(sczRangeRequestHeader);
+        }
 
         ReleaseNullInternet(hConnect);
         ReleaseNullInternet(hUrl);
 
         hr = MakeRequest(hSession, psczUrl, L"GET", sczRangeRequestHeader, wzUser, wzPassword, pAuthenticate, &hConnect, &hUrl, &fRangeRequestsAccepted);
         DlExitOnFailure(hr, "Failed to request URL for download: %ls", *psczUrl);
+
+        fRequestedRangeRequest = sczRangeRequestHeader && *sczRangeRequestHeader;
+
+        if (fRequestedRangeRequest && !fRangeRequestsAccepted)
+        {
+            LogStringLine(REPORT_VERBOSE, "Range request not supported for URL: %ls", *psczUrl);
+        }
 
         // If we didn't get the size of the resource from the initial "HEAD" request
         // then let's try to get the size from this "GET" request.
@@ -337,23 +356,36 @@ static HRESULT DownloadResource(
             }
             else // server didn't tell us the resource length.
             {
+                LogStringLine(REPORT_VERBOSE, "Content-Length not returned for URL: %ls", *psczUrl);
+
                 // Fallback to the authored size of the resource. However, since we
                 // don't really know the size on the server, don't try to use
                 // range requests either.
                 dw64ResourceLength = dw64AuthoredResourceLength;
+                fInvalidRangeRequestResponse = fRequestedRangeRequest;
                 fRangeRequestsAccepted = FALSE;
             }
         }
 
-        // If we just tried to do a range request and found out that it isn't supported, start over.
-        if (!fRangeRequestsAccepted)
+        // If we just tried to do a range request and found out that it isn't supported, ignore the offset.
+        if (fRequestedRangeRequest && !fRangeRequestsAccepted)
         {
-            // TODO: log a message that the server did not accept range requests.
             dw64ResumeOffset = 0;
+            fUseRangeRequest = FALSE;
+        }
+
+        if (fInvalidRangeRequestResponse)
+        {
+            continue;
         }
 
         hr = WriteToFile(hUrl, hPayloadFile, &dw64ResumeOffset, hResumeFile, dw64ResourceLength, pbData, cbMaxData, pCache);
         DlExitOnFailure(hr, "Failed while reading from internet and writing to: %ls", wzDestinationPath);
+
+        if (!fUseRangeRequest || dw64ResumeOffset >= dw64ResourceLength)
+        {
+            break;
+        }
     }
 
 LExit:

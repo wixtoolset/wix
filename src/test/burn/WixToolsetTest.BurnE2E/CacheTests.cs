@@ -15,8 +15,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public CacheTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
-        public void CanCache5GBFile()
+        private bool Is5GBFileAvailable()
         {
             // Recreate the 5GB payload to avoid having to copy it to the VM to run the tests.
             const long FiveGB = 5_368_709_120;
@@ -28,8 +27,8 @@ namespace WixToolsetTest.BurnE2E
             var drive = new DriveInfo(targetFilePath.Substring(0, 1));
             if (drive.AvailableFreeSpace < FiveGB + OneGB)
             {
-                Console.WriteLine("Skipping CanCache5GBFile() test because there is not enough disk space available to run the test.");
-                return;
+                Console.WriteLine($"Skipping {this.TestContext.TestName} because there is not enough disk space available to run the test.");
+                return false;
             }
 
             if (!File.Exists(targetFilePath))
@@ -42,6 +41,17 @@ namespace WixToolsetTest.BurnE2E
                 testTool.Run(true);
             }
 
+            return true;
+        }
+
+        [Fact]
+        public void CanCache5GBFile()
+        {
+            if (!this.Is5GBFileAvailable())
+            {
+                return;
+            }
+
             var packageA = this.CreatePackageInstaller("PackageA");
             var bundleC = this.CreateBundleInstaller("BundleC");
 
@@ -51,6 +61,69 @@ namespace WixToolsetTest.BurnE2E
             bundleC.VerifyRegisteredAndInPackageCache();
 
             packageA.VerifyInstalled(true);
+        }
+
+        private string Cache5GBFileFromDownload(bool disableRangeRequests)
+        {
+            if (!this.Is5GBFileAvailable())
+            {
+                return null;
+            }
+
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundleC = this.CreateBundleInstaller("BundleC");
+            var webServer = this.CreateWebServer();
+
+            webServer.AddFiles(new Dictionary<string, string>
+            {
+                { "/BundleC/fivegb.file", Path.Combine(this.TestContext.TestDataFolder, "fivegb.file") },
+                { "/BundleC/PackageA.msi", Path.Combine(this.TestContext.TestDataFolder, "PackageA.msi") },
+            });
+            webServer.DisableRangeRequests = disableRangeRequests;
+            webServer.Start();
+
+            using var dfs = new DisposableFileSystem();
+            var separateDirectory = dfs.GetFolder(true);
+
+            // Manually copy bundle to separate directory and then run from there so the non-compressed payloads have to be resolved.
+            var bundleCFileInfo = new FileInfo(bundleC.Bundle);
+            var bundleCCopiedPath = Path.Combine(separateDirectory, bundleCFileInfo.Name);
+            bundleCFileInfo.CopyTo(bundleCCopiedPath);
+
+            packageA.VerifyInstalled(false);
+
+            var installLogPath = bundleC.Install(bundleCCopiedPath);
+            bundleC.VerifyRegisteredAndInPackageCache();
+
+            packageA.VerifyInstalled(true);
+
+            return installLogPath;
+        }
+
+        [Fact]
+        public void CanCache5GBFileFromDownloadWithRangeRequestSupport()
+        {
+            var logPath = this.Cache5GBFileFromDownload(false);
+            if (logPath == null)
+            {
+                return;
+            }
+
+            Assert.False(LogVerifier.MessageInLogFile(logPath, "Range request not supported for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
+        }
+
+        [Fact]
+        public void CanCache5GBFileFromDownloadWithoutRangeRequestSupport()
+        {
+            var logPath = this.Cache5GBFileFromDownload(true);
+            if (logPath == null)
+            {
+                return;
+            }
+
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "Range request not supported for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
         }
 
         [Fact]

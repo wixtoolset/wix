@@ -5,7 +5,7 @@
   <Fragment>
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)">
-        <Payload SourceFile="fivegb.file" Compressed="no" />
+        <Payload SourceFile="fivegb.file" Compressed="no" DownloadUrl="$(var.WebServerBaseUrl)BundleC/{2}" />
       </MsiPackage>
     </PackageGroup>
   </Fragment>
