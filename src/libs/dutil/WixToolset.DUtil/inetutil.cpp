@@ -30,16 +30,14 @@ extern "C" HRESULT DAPI InternetGetSizeByHandle(
     Assert(pllSize);
 
     HRESULT hr = S_OK;
-    DWORD dwSize = 0;
-    DWORD cb = 0;
+    LPWSTR sczValue = NULL;
 
-    cb = sizeof(dwSize);
-    if (!::HttpQueryInfoW(hiFile, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, reinterpret_cast<LPVOID>(&dwSize), &cb, NULL))
-    {
-        InetExitOnLastError(hr, "Failed to get size for internet file handle");
-    }
+    hr = InternetQueryInfoString(hiFile, HTTP_QUERY_CONTENT_LENGTH, &sczValue);
+    InetExitOnLastError(hr, "Failed to get content length string for internet file handle");
 
-    *pllSize = dwSize;
+    hr = StrStringToInt64(sczValue, 0, pllSize);
+    InetExitOnLastError(hr, "Failed to parse size for internet file handle: %ls", sczValue);
+
 LExit:
     return hr;
 }
