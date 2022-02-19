@@ -110,7 +110,7 @@ namespace WixToolsetTest.BurnE2E
             }
 
             Assert.False(LogVerifier.MessageInLogFile(logPath, "Range request not supported for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
-            Assert.True(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
+            Assert.False(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace WixToolsetTest.BurnE2E
             }
 
             Assert.True(LogVerifier.MessageInLogFile(logPath, "Range request not supported for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
-            Assert.True(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
+            Assert.False(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
         }
 
         [Fact]
