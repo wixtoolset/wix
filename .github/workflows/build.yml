@@ -26,9 +26,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure Visual Studio
-        shell: cmd
-        run: ./src/vs_config.cmd
+      # - name: Configure Visual Studio
+      #   shell: cmd
+      #   run: ./src/vs_config.cmd
 
       - name: Build wix4
         shell: cmd
