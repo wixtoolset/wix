@@ -42,6 +42,17 @@ namespace WixToolset.Core.TestPackage
             Assert.True(0 == exitCode, $"\r\n\r\nWixRunner failed with exit code: {exitCode}\r\n   Output: {String.Join("\r\n           ", FormatMessages(messages))}\r\n");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expectedExitCode"></param>
+        /// <param name="actualExitCode"></param>
+        /// <param name="messages"></param>
+        public static void AssertFailure(int expectedExitCode, int actualExitCode, IEnumerable<Message> messages)
+        {
+            Assert.True(expectedExitCode != actualExitCode, $"\r\n\r\nWixRunner failed with exit code: {actualExitCode} but {expectedExitCode} was expected.\r\n   Output: {String.Join("\r\n           ", FormatMessages(messages))}\r\n");
+        }
+
         private static IEnumerable<string> FormatMessages(IEnumerable<Message> messages)
         {
             foreach (var message in messages)
