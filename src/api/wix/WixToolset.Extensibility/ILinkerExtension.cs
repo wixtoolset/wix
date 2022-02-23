@@ -6,7 +6,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Extensibility.Data;
 
     /// <summary>
-    /// Interface all binder extensions implement.
+    /// Interface all linker extensions implement.
     /// </summary>
     public interface ILinkerExtension
     {
