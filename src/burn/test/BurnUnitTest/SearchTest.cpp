@@ -523,7 +523,7 @@ namespace Bootstrapper
                     L"    <SetVariable Id='Search6' Type='string' Value='VAL6' Variable='PROP6' />"
                     L"    <SetVariable Id='Search7' Type='string' Value='7' Variable='PROP7' />"
                     L"    <SetVariable Id='Search8' Type='version' Value='1.1.0.0' Variable='PROP8' />"
-                    L"    <SetVariable Id='Search9' Type='formatted' Value='[VAL9]' Variable='PROP9' />"
+                    L"    <SetVariable Id='Search9' Type='formatted' Value='[\\[]VAL9[\\]]' Variable='PROP9' />"
                     L"    <SetVariable Id='Search10' Type='numeric' Value='42' Variable='OVERWRITTEN_STRING' />"
                     L"    <SetVariable Id='Search11' Type='string' Value='NEW' Variable='OVERWRITTEN_NUMBER' />"
                     L"    <SetVariable Id='Search12' Variable='REMOVED_NUMBER' />"
@@ -549,7 +549,9 @@ namespace Bootstrapper
 
                 // check variable values
                 Assert::Equal<String^>(gcnew String(L"VAL1"), VariableGetStringHelper(&variables, L"PROP1"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables, L"PROP1"));
                 Assert::Equal(2ll, VariableGetNumericHelper(&variables, L"PROP2"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_NUMERIC, VariableGetTypeHelper(&variables, L"PROP2"));
                 Assert::Equal<String^>(gcnew String(L"2"), VariableGetStringHelper(&variables, L"PROP2"));
                 Assert::Equal<String^>(gcnew String(L"VAL3"), VariableGetStringHelper(&variables, L"PROP3"));
                 Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables, L"PROP4"));
@@ -557,8 +559,10 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"VAL6"), VariableGetStringHelper(&variables, L"PROP6"));
                 Assert::Equal(7ll, VariableGetNumericHelper(&variables, L"PROP7"));
                 Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetVersionHelper(&variables, L"PROP8"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_VERSION, VariableGetTypeHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"[VAL9]"), VariableGetStringHelper(&variables, L"PROP9"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_FORMATTED, VariableGetTypeHelper(&variables, L"PROP9"));
 
                 Assert::Equal(42ll, VariableGetNumericHelper(&variables, L"OVERWRITTEN_STRING"));
                 Assert::Equal<String^>(gcnew String(L"NEW"), VariableGetStringHelper(&variables, L"OVERWRITTEN_NUMBER"));

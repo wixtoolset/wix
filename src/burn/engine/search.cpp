@@ -65,7 +65,6 @@ extern "C" HRESULT SearchesParseFromXml(
     BSTR bstrNodeName = NULL;
     BOOL fXmlFound = FALSE;
     LPWSTR scz = NULL;
-    BURN_VARIANT_TYPE valueType = BURN_VARIANT_TYPE_NONE;
 
     // select search nodes
     hr = XmlSelectNodes(pixnBundle, L"DirectorySearch|FileSearch|RegistrySearch|MsiComponentSearch|MsiProductSearch|MsiFeatureSearch|ExtensionSearch|SetVariable", &pixnNodes);
@@ -357,8 +356,8 @@ extern "C" HRESULT SearchesParseFromXml(
 
             if (fXmlFound)
             {
-                hr = BVariantSetString(&pSearch->SetVariable.value, scz, 0, FALSE);
-                ExitOnFailure(hr, "Failed to set variant value.");
+                pSearch->SetVariable.sczValue = scz;
+                scz = NULL;
 
                 // @Type
                 hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
@@ -366,19 +365,19 @@ extern "C" HRESULT SearchesParseFromXml(
 
                 if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
                 {
-                    valueType = BURN_VARIANT_TYPE_FORMATTED;
+                    pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_FORMATTED;
                 }
                 else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
                 {
-                    valueType = BURN_VARIANT_TYPE_NUMERIC;
+                    pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_NUMERIC;
                 }
                 else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"string", -1))
                 {
-                    valueType = BURN_VARIANT_TYPE_STRING;
+                    pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_STRING;
                 }
                 else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
                 {
-                    valueType = BURN_VARIANT_TYPE_VERSION;
+                    pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_VERSION;
                 }
                 else
                 {
@@ -387,12 +386,8 @@ extern "C" HRESULT SearchesParseFromXml(
             }
             else
             {
-                valueType = BURN_VARIANT_TYPE_NONE;
+                pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_NONE;
             }
-
-            // change value variant to correct type
-            hr = BVariantChangeType(&pSearch->SetVariable.value, valueType);
-            ExitOnFailure(hr, "Failed to change variant type.");
         }
         else
         {
@@ -551,7 +546,7 @@ extern "C" void SearchesUninitialize(
                 ReleaseStr(pSearch->MsiProductSearch.sczGuid);
                 break;
             case BURN_SEARCH_TYPE_SET_VARIABLE:
-                BVariantUninitialize(&pSearch->SetVariable.value);
+                ReleaseStr(pSearch->SetVariable.sczValue);
                 break;
             }
         }
@@ -1207,10 +1202,32 @@ static HRESULT PerformSetVariable(
     )
 {
     HRESULT hr = S_OK;
+    BURN_VARIANT newValue = { };
+    LPWSTR sczFormattedValue = NULL;
+    SIZE_T cchOut = 0;
 
-    hr = VariableSetVariant(pVariables, pSearch->sczVariable, &pSearch->SetVariable.value);
+    if (BURN_VARIANT_TYPE_NONE == pSearch->SetVariable.targetType)
+    {
+        BVariantUninitialize(&newValue);
+    }
+    else
+    {
+        hr = VariableFormatString(pVariables, pSearch->SetVariable.sczValue, &sczFormattedValue, &cchOut);
+        ExitOnFailure(hr, "Failed to format search value.");
+
+        hr = BVariantSetString(&newValue, sczFormattedValue, 0, FALSE);
+        ExitOnFailure(hr, "Failed to set variant value.");
+
+        // change value variant to correct type
+        hr = BVariantChangeType(&newValue, pSearch->SetVariable.targetType);
+        ExitOnFailure(hr, "Failed to change variant type.");
+    }
+
+    hr = VariableSetVariant(pVariables, pSearch->sczVariable, &newValue);
     ExitOnFailure(hr, "Failed to set variable: %ls", pSearch->sczVariable);
 
 LExit:
+    BVariantUninitialize(&newValue);
+
     return hr;
 }
