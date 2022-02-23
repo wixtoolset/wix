@@ -22,9 +22,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class MergeModulesCommand
     {
-        public MergeModulesCommand(IMessaging messaging, IEnumerable<IFileFacade> fileFacades, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
+        public MergeModulesCommand(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IFileFacade> fileFacades, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.FileFacades = fileFacades;
             this.Section = section;
             this.SuppressedTableNames = suppressedTableNames ?? Array.Empty<string>();
@@ -33,6 +34,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         }
 
         private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private IEnumerable<IFileFacade> FileFacades { get; }
 
@@ -44,8 +47,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string IntermediateFolder { get; }
 
+        public IReadOnlyList<ITrackedFile> TrackedFiles { get; private set; }
+
         public void Execute()
         {
+            var trackedFiles = new List<ITrackedFile>();
+
             var wixMergeSymbols = this.Section.Symbols.OfType<WixMergeSymbol>().ToList();
             if (!wixMergeSymbols.Any())
             {
@@ -92,6 +99,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.Messaging.Write(VerboseMessages.OpeningMergeModule(wixMergeRow.SourceFile, mergeLanguage));
                         merge.OpenModule(wixMergeRow.SourceFile, mergeLanguage);
                         moduleOpen = true;
+
+                        trackedFiles.Add(this.BackendHelper.TrackFile(wixMergeRow.SourceFile, TrackedFileType.Input, wixMergeRow.SourceLineNumbers));
 
                         // If there is merge configuration data, create a callback object to contain it all.
                         ConfigurationCallback callback = null;
@@ -326,6 +335,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 db.Commit();
             }
+
+            this.TrackedFiles = trackedFiles;
         }
     }
 }

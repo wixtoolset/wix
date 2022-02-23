@@ -5,9 +5,16 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Create libraries from input intermediates.
+    /// </summary>
     public interface ILibrarian
     {
-        Intermediate Combine(ILibraryContext context);
+        /// <summary>
+        /// Combine intermediates into a single result.
+        /// </summary>
+        /// <param name="context">Library context.</param>
+        /// <returns>Library result.</returns>
+        ILibraryResult Combine(ILibraryContext context);
     }
 }

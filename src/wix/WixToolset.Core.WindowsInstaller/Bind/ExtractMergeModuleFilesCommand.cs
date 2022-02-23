@@ -49,9 +49,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IFileFacade> MergeModulesFileFacades { get; private set; }
 
+        public IReadOnlyList<ITrackedFile> TrackedFiles { get; private set; }
+
         public void Execute()
         {
             var mergeModulesFileFacades = new List<IFileFacade>();
+            var trackedFiles = new List<ITrackedFile>();
 
             var merge = MsmInterop.GetMsmMerge();
 
@@ -66,21 +69,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var wixMergeRow in this.WixMergeSymbols)
             {
-                var containsFiles = this.CreateFacadesForMergeModuleFiles(wixMergeRow, mergeModulesFileFacades, indexedFileFacades);
+                var modulesTrackedFiles = this.CreateFacadesForMergeModuleFiles(wixMergeRow, mergeModulesFileFacades, indexedFileFacades);
 
                 // If the module has files and creating layout
-                if (containsFiles && !this.SuppressLayout)
+                if (modulesTrackedFiles.Count > 0 && !this.SuppressLayout)
                 {
                     this.ExtractFilesFromMergeModule(merge, wixMergeRow);
+                    trackedFiles.AddRange(modulesTrackedFiles);
                 }
             }
 
             this.MergeModulesFileFacades = mergeModulesFileFacades;
+            this.TrackedFiles = trackedFiles;
         }
 
-        private bool CreateFacadesForMergeModuleFiles(WixMergeSymbol wixMergeRow, List<IFileFacade> mergeModulesFileFacades, Dictionary<string, IFileFacade> indexedFileFacades)
+        private IReadOnlyCollection<ITrackedFile> CreateFacadesForMergeModuleFiles(WixMergeSymbol wixMergeRow, List<IFileFacade> mergeModulesFileFacades, Dictionary<string, IFileFacade> indexedFileFacades)
         {
-            var containsFiles = false;
+            var trackedFiles = new List<ITrackedFile>();
 
             try
             {
@@ -125,12 +130,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 {
                                     mergeModulesFileFacades.Add(mergeModuleFileFacade);
 
-                                    // Keep updating the indexes as new rows are added.
+                                    // Keep updating the indexes as new facades are added.
                                     indexedFileFacades.Add(mergeModuleFileFacade.Id, mergeModuleFileFacade);
                                     uniqueModuleFileIdentifiers.Add(mergeModuleFileFacade.Id, mergeModuleFileFacade);
-                                }
 
-                                containsFiles = true;
+                                    // Track where file will be extracted.
+                                    trackedFiles.Add(this.BackendHelper.TrackFile(mergeModuleFileFacade.SourcePath, TrackedFileType.Intermediate, mergeModuleFileFacade.SourceLineNumber));
+                                }
                             }
                         }
                     }
@@ -164,7 +170,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 throw new WixException(ErrorMessages.CannotOpenMergeModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.SourceFile));
             }
 
-            return containsFiles;
+            return trackedFiles;
         }
 
         private void ExtractFilesFromMergeModule(IMsmMerge2 merge, WixMergeSymbol wixMergeRow)

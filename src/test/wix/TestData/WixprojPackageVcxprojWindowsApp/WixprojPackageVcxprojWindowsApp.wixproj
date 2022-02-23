@@ -5,5 +5,7 @@
     <ProjectReference Include="..\VcxprojWindowsApp\VcxprojWindowsApp.vcxproj" />
     <ProjectReference Include="..\WixprojLibraryVcxprojDll\WixprojLibraryVcxprojDll.wixproj" />
     <ProjectReference Include="..\WixprojModuleCsprojWinFormsNetFx\WixprojModuleCsprojWinFormsNetFx.wixproj" />
+
+    <PackageReference Include="Wixtoolset.UI.wixext" Version="4.0.0-preview.1-build.205" />
   </ItemGroup>
 </Project>

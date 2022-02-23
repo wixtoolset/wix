@@ -48,8 +48,8 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the end of combining.
         /// </summary>
-        /// <param name="library">Combined library intermediate.</param>
-        public virtual void PostCombine(Intermediate library)
+        /// <param name="result">Combined library result.</param>
+        public virtual void PostCombine(ILibraryResult result)
         {
         }
 

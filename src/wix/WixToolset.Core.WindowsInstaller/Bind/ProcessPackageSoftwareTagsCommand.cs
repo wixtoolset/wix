@@ -9,12 +9,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class ProcessPackageSoftwareTagsCommand
     {
-        public ProcessPackageSoftwareTagsCommand(IntermediateSection section, IEnumerable<WixProductTagSymbol> softwareTags, string intermediateFolder)
+        public ProcessPackageSoftwareTagsCommand(IntermediateSection section, IBackendHelper backendHelper, IEnumerable<WixProductTagSymbol> softwareTags, string intermediateFolder)
         {
             this.Section = section;
+            this.BackendHelper = backendHelper;
             this.SoftwareTags = softwareTags;
             this.IntermediateFolder = intermediateFolder;
         }
@@ -23,10 +26,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IntermediateSection Section { get; }
 
+        private IBackendHelper BackendHelper { get; }
+
         private IEnumerable<WixProductTagSymbol> SoftwareTags { get; }
+
+        public IReadOnlyCollection<ITrackedFile> TrackedFiles { get; private set; }
 
         public void Execute()
         {
+            var trackedFiles = new List<ITrackedFile>();
+
             string productName = null;
             string productVersion = null;
             string manufacturer = null;
@@ -70,6 +79,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // Write the tag file.
                     fileSymbol.Source = new IntermediateFieldPathValue { Path = Path.Combine(workingFolder, fileSymbol.Name) };
 
+                    trackedFiles.Add(this.BackendHelper.TrackFile(fileSymbol.Source.Path, TrackedFileType.Intermediate, tagRow.SourceLineNumbers));
+
                     using (var fs = new FileStream(fileSymbol.Source.Path, FileMode.Create))
                     {
                         CreateTagFile(fs, uniqueId, productName, productVersion, tagRow.Regid, manufacturer, persistentId);
@@ -86,6 +97,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     });
                 }
             }
+
+            this.TrackedFiles = trackedFiles;
         }
 
         private static string NormalizeGuid(string guidString)

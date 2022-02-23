@@ -31,6 +31,7 @@ namespace WixToolset.Core.Bind
             foreach (var expectedEmbeddedFileByUri in group)
             {
                 var baseUri = expectedEmbeddedFileByUri.Key;
+                trackedFiles.Add(this.BackendHelper.TrackFile(baseUri.LocalPath, TrackedFileType.Input));
 
                 using (var wixout = WixOutput.Read(baseUri))
                 {
@@ -41,7 +42,7 @@ namespace WixToolset.Core.Bind
                         if (uniqueIds.Add(embeddedFile.EmbeddedFileId))
                         {
                             wixout.ExtractEmbeddedFile(embeddedFile.EmbeddedFileId, embeddedFile.OutputPath);
-                            trackedFiles.Add(this.BackendHelper.TrackFile(embeddedFile.OutputPath, TrackedFileType.Temporary));
+                            trackedFiles.Add(this.BackendHelper.TrackFile(embeddedFile.OutputPath, TrackedFileType.Intermediate));
                         }
                     }
                 }
