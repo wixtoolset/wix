@@ -250,7 +250,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolDefinitionType.WixPatchRef:
                     case SymbolDefinitionType.WixPatchTarget:
                     case SymbolDefinitionType.WixProperty:
-                    case SymbolDefinitionType.WixProductTag:
+                    case SymbolDefinitionType.WixPackageTag:
                     case SymbolDefinitionType.WixSimpleReference:
                     case SymbolDefinitionType.WixSuppressAction:
                     case SymbolDefinitionType.WixSuppressModularization:

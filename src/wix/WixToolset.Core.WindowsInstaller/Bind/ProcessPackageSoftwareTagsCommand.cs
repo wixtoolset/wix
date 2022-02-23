@@ -14,7 +14,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class ProcessPackageSoftwareTagsCommand
     {
-        public ProcessPackageSoftwareTagsCommand(IntermediateSection section, IBackendHelper backendHelper, IEnumerable<WixProductTagSymbol> softwareTags, string intermediateFolder)
+        public ProcessPackageSoftwareTagsCommand(IntermediateSection section, IBackendHelper backendHelper, IEnumerable<WixPackageTagSymbol> softwareTags, string intermediateFolder)
         {
             this.Section = section;
             this.BackendHelper = backendHelper;
@@ -28,7 +28,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IBackendHelper BackendHelper { get; }
 
-        private IEnumerable<WixProductTagSymbol> SoftwareTags { get; }
+        private IEnumerable<WixPackageTagSymbol> SoftwareTags { get; }
 
         public IReadOnlyCollection<ITrackedFile> TrackedFiles { get; private set; }
 

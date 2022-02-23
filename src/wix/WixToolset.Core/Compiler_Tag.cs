@@ -249,7 +249,7 @@ namespace WixToolset.Core
                 this.Core.CreateComplexReference(sourceLineNumbers, ComplexReferenceParentType.Feature, feature, null, ComplexReferenceChildType.Component, id.Id, true);
 
                 this.Core.EnsureTable(sourceLineNumbers, "SoftwareIdentificationTag");
-                this.Core.AddSymbol(new WixProductTagSymbol(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixPackageTagSymbol(sourceLineNumbers, id)
                 {
                     FileRef = id.Id,
                     Regid = regid,
