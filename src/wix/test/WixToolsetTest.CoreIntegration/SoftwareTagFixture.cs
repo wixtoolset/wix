@@ -29,7 +29,7 @@ namespace WixToolsetTest.CoreIntegration
             WixAssert.CompareLineByLine(new[]
             {
                 "File:filF5_pLhBuF5b4N9XEo52g_hUM5Lo\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\texample.txt\t20\t\t\t512\t1",
-                "File:tagEYRYWwOt95punO7qPPAQ9p1GBpY\ttagEYRYWwOt95punO7qPPAQ9p1GBpY\trdcfonyt.swi|~TagTestPackage.swidtag\t449\t\t\t1\t2",
+                "File:tagEYRYWwOt95punO7qPPAQ9p1GBpY\ttagEYRYWwOt95punO7qPPAQ9p1GBpY\tqcfv-gdx.swi|WixprojPackageVcxprojWindowsApp.swidtag\t465\t\t\t1\t2",
                 "SoftwareIdentificationTag:tagEYRYWwOt95punO7qPPAQ9p1GBpY\twixtoolset.org\tmsi:package/???\tmsi:upgrade/047730A5-30FE-4A62-A520-DA9381B8226A\t"
             }, results.ToArray());
         }
