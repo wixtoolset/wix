@@ -519,7 +519,7 @@
     -->
   <Target
       Name="CreateManifestResourceNames"
-      Condition=" '@(EmbeddedResource)' !='' ">
+      Condition=" '@(EmbeddedResource)' != '' ">
 
       <ItemGroup>
         <_WixLocalizationFile Include="@(EmbeddedResource)">
@@ -571,7 +571,8 @@
   </PropertyGroup>
   <Target
       Name="CoreCompile"
-      Inputs="@(Compile);
+      Inputs="$(MSBuildAllProjects);
+      @(Compile);
       @(Content);
       @(_WixLocalizationFile);
       @(_WixReferencedProjectOutputs);
