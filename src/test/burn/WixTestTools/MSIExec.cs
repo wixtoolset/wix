@@ -697,6 +697,11 @@ namespace WixTestTools
             /// Uninstalls the product as part of cleanup
             /// </summary>
             Cleanup,
+
+            /// <summary>
+            /// No action automatically added to arguments
+            /// </summary>
+            Custom,
         }
 
         /// <summary>

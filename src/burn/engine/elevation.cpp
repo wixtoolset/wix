@@ -2289,8 +2289,21 @@ static HRESULT OnApplyInitialize(
 
         LogId(REPORT_STANDARD, MSG_SYSTEM_RESTORE_POINT_STARTING);
 
-        BOOTSTRAPPER_ACTION action = static_cast<BOOTSTRAPPER_ACTION>(dwAction);
-        SRP_ACTION restoreAction = (BOOTSTRAPPER_ACTION_INSTALL == action) ? SRP_ACTION_INSTALL : (BOOTSTRAPPER_ACTION_UNINSTALL == action) ? SRP_ACTION_UNINSTALL : SRP_ACTION_MODIFY;
+        SRP_ACTION restoreAction = SRP_ACTION_UNKNOWN;
+        switch (static_cast<BOOTSTRAPPER_ACTION>(dwAction))
+        {
+        case BOOTSTRAPPER_ACTION_INSTALL:
+            restoreAction = SRP_ACTION_INSTALL;
+            break;
+        case BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL: __fallthrough;
+        case BOOTSTRAPPER_ACTION_UNINSTALL:
+            restoreAction = SRP_ACTION_UNINSTALL;
+            break;
+        default:
+            restoreAction = SRP_ACTION_MODIFY;
+            break;
+        }
+
         hrStatus = hr = SrpCreateRestorePoint(sczBundleName, restoreAction);
         if (SUCCEEDED(hr))
         {

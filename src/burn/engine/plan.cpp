@@ -361,13 +361,15 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
     else if (BOOTSTRAPPER_RELATION_PATCH == relationType && BURN_PACKAGE_TYPE_MSP == packageType)
     {
         // For patch related bundles, only install a patch if currently absent during install, modify, or repair.
-        if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT == currentState && BOOTSTRAPPER_ACTION_INSTALL <= action)
-        {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
-        }
-        else
+        if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT != currentState)
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        }
+        else if (BOOTSTRAPPER_ACTION_INSTALL == action ||
+                 BOOTSTRAPPER_ACTION_MODIFY == action ||
+                 BOOTSTRAPPER_ACTION_REPAIR == action)
+        {
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
         }
     }
     else // pick the best option for the action state and install condition.
@@ -375,7 +377,7 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
         hr = GetActionDefaultRequestState(action, currentState, &defaultRequestState);
         ExitOnFailure(hr, "Failed to get default request state for action.");
 
-        if (BOOTSTRAPPER_ACTION_UNINSTALL != action)
+        if (BOOTSTRAPPER_ACTION_UNINSTALL != action && BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL != action)
         {
             // If we're not doing an uninstall, use the install condition
             // to determine whether to use the default request state or make the package absent.
@@ -485,7 +487,8 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
         {
             fRecommendIgnore = FALSE;
         }
-        else if (BOOTSTRAPPER_ACTION_UNINSTALL == action ||
+        else if (BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == action ||
+                 BOOTSTRAPPER_ACTION_UNINSTALL == action ||
                     BOOTSTRAPPER_ACTION_MODIFY == action ||
                     BOOTSTRAPPER_ACTION_REPAIR == action)
         {
@@ -552,10 +555,10 @@ extern "C" HRESULT PlanRegistration(
     HRESULT hr = S_OK;
     STRINGDICT_HANDLE sdBundleDependents = NULL;
     STRINGDICT_HANDLE sdIgnoreDependents = NULL;
+    BOOL fDependentBlocksUninstall = FALSE;
 
     pPlan->fCanAffectMachineState = TRUE; // register the bundle since we're modifying machine state.
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
-    pPlan->fIgnoreAllDependents = pDependencies->fIgnoreAllDependents;
 
     // Ensure the bundle is cached if not running from the cache.
     if (!CacheBundleRunningFromCache(pPlan->pCache))
@@ -563,7 +566,7 @@ extern "C" HRESULT PlanRegistration(
         pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
     }
 
-    if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
+    if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action)
     {
         // If our provider key was not owned by a different bundle,
         // then plan to write our provider key registration to "fix it" if broken
@@ -588,7 +591,7 @@ extern "C" HRESULT PlanRegistration(
             ExitOnFailure(hr, "Failed to add self-dependent to ignore dependents.");
         }
 
-        if (!pPlan->fIgnoreAllDependents)
+        if (!pDependencies->fIgnoreAllDependents)
         {
             // If we are not doing an upgrade, we check to see if there are still dependents on us and if so we skip planning.
             // However, when being upgraded, we always execute our uninstall because a newer version of us is probably
@@ -641,10 +644,9 @@ extern "C" HRESULT PlanRegistration(
                         hr = S_OK;
 
                         // TODO: callback to the BA and let it have the option to ignore this dependent?
-                        if (!pPlan->fDisallowRemoval)
+                        if (!fDependentBlocksUninstall)
                         {
-                            pPlan->fDisallowRemoval = TRUE; // ensure the registration stays
-                            *pfContinuePlanning = FALSE; // skip the rest of planning.
+                            fDependentBlocksUninstall = TRUE;
 
                             LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DUE_TO_DEPENDENTS);
                         }
@@ -652,6 +654,20 @@ extern "C" HRESULT PlanRegistration(
                         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_DEPENDENT, pDependent->sczKey, LoggingStringOrUnknownIfNull(pDependent->sczName));
                     }
                     ExitOnFailure(hr, "Failed to check for remaining dependents during planning.");
+                }
+
+                if (fDependentBlocksUninstall)
+                {
+                    if (BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action)
+                    {
+                        fDependentBlocksUninstall = FALSE;
+                        LogId(REPORT_STANDARD, MSG_PLAN_NOT_SKIPPED_DUE_TO_DEPENDENTS);
+                    }
+                    else
+                    {
+                        pPlan->fDisallowRemoval = TRUE; // ensure the registration stays
+                        *pfContinuePlanning = FALSE; // skip the rest of planning.
+                    }
                 }
             }
         }
@@ -776,11 +792,12 @@ static HRESULT PlanPackagesHelper(
     HRESULT hr = S_OK;
     BOOL fBundlePerMachine = pPlan->fPerMachine; // bundle is per-machine if plan starts per-machine.
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
+    BOOL fReverseOrder = BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action;
 
     // Initialize the packages.
     for (DWORD i = 0; i < cPackages; ++i)
     {
-        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
         hr = InitializePackage(pPlan, pUX, pVariables, pPackage);
@@ -790,7 +807,7 @@ static HRESULT PlanPackagesHelper(
     // Initialize the patch targets after all packages, since they could rely on the requested state of packages that are after the patch's package in the chain.
     for (DWORD i = 0; i < cPackages; ++i)
     {
-        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
         if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
@@ -803,7 +820,7 @@ static HRESULT PlanPackagesHelper(
     // Plan the packages.
     for (DWORD i = 0; i < cPackages; ++i)
     {
-        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
         hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, &pRollbackBoundary);
@@ -825,7 +842,7 @@ static HRESULT PlanPackagesHelper(
         // Plan clean up of packages.
         for (DWORD i = 0; i < cPackages; ++i)
         {
-            DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+            DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
             BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
             hr = PlanCleanPackage(pPlan, pPackage);
@@ -842,7 +859,7 @@ static HRESULT PlanPackagesHelper(
     // Let the BA know the actions that were planned.
     for (DWORD i = 0; i < cPackages; ++i)
     {
-        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
         UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, pPackage->fPlannedCache, pPackage->fPlannedUncache);
@@ -931,8 +948,9 @@ static HRESULT ProcessPackage(
 {
     HRESULT hr = S_OK;
     BURN_ROLLBACK_BOUNDARY* pEffectiveRollbackBoundary = NULL;
+    BOOL fBackward = BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action;
 
-    pEffectiveRollbackBoundary = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? pPackage->pRollbackBoundaryBackward : pPackage->pRollbackBoundaryForward;
+    pEffectiveRollbackBoundary = fBackward ? pPackage->pRollbackBoundaryBackward : pPackage->pRollbackBoundaryForward;
     hr = ProcessPackageRollbackBoundary(pPlan, pUX, pLog, pVariables, pEffectiveRollbackBoundary, ppRollbackBoundary);
     ExitOnFailure(hr, "Failed to process package rollback boundary.");
 
@@ -1205,6 +1223,7 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
 {
     HRESULT hr = S_OK;
     int nCompareResult = 0;
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == action;
 
     // Never touch related bundles during Cache.
     if (BOOTSTRAPPER_ACTION_CACHE == action)
@@ -1215,7 +1234,7 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
     switch (relatedBundleRelationType)
     {
     case BOOTSTRAPPER_RELATION_UPGRADE:
-        if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && BOOTSTRAPPER_ACTION_UNINSTALL < action)
+        if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && !fUninstalling)
         {
             hr = VerCompareParsedVersions(pRegistrationVersion, pRelatedBundleVersion, &nCompareResult);
             ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistrationVersion ? pRegistrationVersion->sczVersion : NULL, pRelatedBundleVersion ? pRelatedBundleVersion->sczVersion : NULL);
@@ -1225,7 +1244,7 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
         break;
     case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;
     case BOOTSTRAPPER_RELATION_ADDON:
-        if (BOOTSTRAPPER_ACTION_UNINSTALL == action)
+        if (fUninstalling)
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
         }
@@ -1242,7 +1261,7 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
         // Automatically repair dependent bundles to restore missing
         // packages after uninstall unless we're being upgraded with the
         // assumption that upgrades are cumulative (as intended).
-        if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && BOOTSTRAPPER_ACTION_UNINSTALL == action)
+        if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && fUninstalling)
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
         }
@@ -1270,6 +1289,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
     LPWSTR* rgsczAncestors = NULL;
     UINT cAncestors = 0;
     STRINGDICT_HANDLE sdAncestors = NULL;
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action;
 
     if (pPlan->pInternalCommand->sczAncestors)
     {
@@ -1329,7 +1349,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         ExitOnRootFailure(hr, "BA aborted plan related bundle.");
 
         // If uninstalling and the dependent related bundle may be executed, ignore its provider key to allow for downgrades with ref-counting.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
+        if (fUninstalling && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
         {
             if (0 < pRelatedBundle->package.cDependencyProviders)
             {
@@ -1361,6 +1381,9 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
     HRESULT hr = S_OK;
     LPWSTR sczIgnoreDependencies = NULL;
     STRINGDICT_HANDLE sdProviderKeys = NULL;
+    BOOL fExecutingAnyPackage = FALSE;
+    BOOL fInstallingAnyPackage = FALSE;
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action;
 
     // Get the list of dependencies to ignore to pass to related bundles.
     hr = DependencyAllocIgnoreDependencies(pPlan, &sczIgnoreDependencies);
@@ -1368,9 +1391,6 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
     hr = DictCreateStringList(&sdProviderKeys, pPlan->cExecuteActions, DICT_FLAG_CASEINSENSITIVE);
     ExitOnFailure(hr, "Failed to create dictionary for planned packages.");
-
-    BOOL fExecutingAnyPackage = FALSE;
-    BOOL fInstallingAnyPackage = FALSE;
 
     for (DWORD i = 0; i < pPlan->cExecuteActions; ++i)
     {
@@ -1444,7 +1464,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
         }
 
         // For an uninstall, there is no need to repair dependent bundles if no packages are executing.
-        if (!fExecutingAnyPackage && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pRelatedBundle->package.requested && BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
+        if (!fExecutingAnyPackage && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pRelatedBundle->package.requested && fUninstalling)
         {
             pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
             LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DEPENDENT_BUNDLE_REPAIR, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType));
@@ -1457,7 +1477,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             ExitOnFailure(hr, "Failed to copy the list of dependencies to ignore.");
 
             // Uninstall addons and patches early in the chain, before other packages are uninstalled.
-            if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
+            if (fUninstalling)
             {
                 pdwInsertIndex = &dwExecuteActionEarlyIndex;
             }
@@ -1475,7 +1495,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
                 ExitOnFailure(hr, "Failed to begin plan dependency actions to  package: %ls", pRelatedBundle->package.sczId);
 
                 // If uninstalling a related bundle, make sure the bundle is uninstalled after removing registration.
-                if (pdwInsertIndex && BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
+                if (pdwInsertIndex && fUninstalling)
                 {
                     ++(*pdwInsertIndex);
                 }
@@ -1599,9 +1619,10 @@ extern "C" HRESULT PlanCleanPackage(
     HRESULT hr = S_OK;
     BOOL fPlanCleanPackage = FALSE;
     BURN_CLEAN_ACTION* pCleanAction = NULL;
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action;
 
     // The following is a complex set of logic that determines when a package should be cleaned from the cache.
-    if (BOOTSTRAPPER_CACHE_TYPE_FORCE > pPackage->cacheType || BOOTSTRAPPER_ACTION_CACHE > pPlan->action)
+    if (BOOTSTRAPPER_CACHE_TYPE_FORCE > pPackage->cacheType || fUninstalling)
     {
         // The following are all different reasons why the package should be cleaned from the cache.
         // The else-ifs are used to make the conditions easier to see (rather than have them combined
@@ -1624,7 +1645,7 @@ extern "C" HRESULT PlanCleanPackage(
         {
             fPlanCleanPackage = TRUE;
         }
-        else if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action &&                  // uninstalling and
+        else if (fUninstalling &&                                                   // uninstalling and
                  BOOTSTRAPPER_REQUEST_STATE_NONE == pPackage->requested &&          // requested do nothing (aka: default) and
                  BOOTSTRAPPER_ACTION_STATE_NONE == pPackage->execute &&             // execute is still do nothing and
                  !pPackage->fDependencyManagerWasHere &&                            // dependency manager didn't change execute and
@@ -2091,6 +2112,7 @@ static HRESULT GetActionDefaultRequestState(
         *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
         break;
 
+    case BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL: __fallthrough;
     case BOOTSTRAPPER_ACTION_UNINSTALL:
         *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
         break;
@@ -2671,7 +2693,7 @@ static BOOL ForceCache(
                BOOTSTRAPPER_REQUEST_STATE_CACHE < pPackage->requested;
     case BOOTSTRAPPER_CACHE_TYPE_FORCE:
         // All packages that have cacheType set to force should be cached if the bundle is going to be present.
-        return BOOTSTRAPPER_ACTION_UNINSTALL < pPlan->action;
+        return BOOTSTRAPPER_ACTION_UNINSTALL != pPlan->action && BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL != pPlan->action;
     default:
         return FALSE;
     }

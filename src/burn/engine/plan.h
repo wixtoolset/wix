@@ -248,7 +248,6 @@ typedef struct _BURN_PLAN
     BOOL fDisallowRemoval;
     BOOL fDisableRollback;
     BOOL fAffectedMachineState;
-    BOOL fIgnoreAllDependents;
     LPWSTR sczLayoutDirectory;
     BOOL fBundleAlreadyRegistered;
 
