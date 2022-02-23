@@ -17,7 +17,6 @@ enum BURN_SEARCH_TYPE
     BURN_SEARCH_TYPE_REGISTRY,
     BURN_SEARCH_TYPE_MSI_COMPONENT,
     BURN_SEARCH_TYPE_MSI_PRODUCT,
-    BURN_SEARCH_TYPE_MSI_FEATURE,
     BURN_SEARCH_TYPE_EXTENSION,
     BURN_SEARCH_TYPE_SET_VARIABLE,
 };
@@ -68,12 +67,6 @@ enum BURN_MSI_PRODUCT_SEARCH_GUID_TYPE
     BURN_MSI_PRODUCT_SEARCH_GUID_TYPE_UPGRADECODE
 };
 
-enum BURN_MSI_FEATURE_SEARCH_TYPE
-{
-    BURN_MSI_FEATURE_SEARCH_TYPE_NONE,
-    BURN_MSI_FEATURE_SEARCH_TYPE_STATE,
-};
-
 
 // structs
 
@@ -118,12 +111,6 @@ typedef struct _BURN_SEARCH
             BURN_MSI_PRODUCT_SEARCH_GUID_TYPE GuidType;
             LPWSTR sczGuid;
         } MsiProductSearch;
-        struct
-        {
-            BURN_MSI_FEATURE_SEARCH_TYPE Type;
-            LPWSTR sczProductCode;
-            LPWSTR sczFeatureId;
-        } MsiFeatureSearch;
         struct
         {
             BURN_EXTENSION* pExtension;
