@@ -35,6 +35,7 @@ namespace WixToolset.Core
             this.AddService<IPreprocessContext>((provider, singletons) => new PreprocessContext(provider));
             this.AddService<ICompileContext>((provider, singletons) => new CompileContext(provider));
             this.AddService<ILibraryContext>((provider, singletons) => new LibraryContext(provider));
+            this.AddService<ILibraryResult>((provider, singletons) => new LibraryResult());
             this.AddService<ILinkContext>((provider, singletons) => new LinkContext(provider));
             this.AddService<IResolveContext>((provider, singletons) => new ResolveContext(provider));
             this.AddService<IBindContext>((provider, singletons) => new BindContext(provider));

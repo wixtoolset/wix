@@ -21,17 +21,20 @@ namespace WixToolset.Core
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            this.LayoutServices = this.ServiceProvider.GetService<ILayoutServices>();
         }
 
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
+        private ILayoutServices LayoutServices { get; }
+
         /// <summary>
         /// Create a library by combining several intermediates (objects).
         /// </summary>
-        /// <returns>Returns the new library.</returns>
-        public Intermediate Combine(ILibraryContext context)
+        /// <returns>Returns tracked input files and the new library.</returns>
+        public ILibraryResult Combine(ILibraryContext context)
         {
             if (String.IsNullOrEmpty(context.LibraryId))
             {
@@ -43,7 +46,9 @@ namespace WixToolset.Core
                 extension.PreCombine(context);
             }
 
+            ILibraryResult result = this.ServiceProvider.GetService<ILibraryResult>();
             Intermediate library = null;
+            IReadOnlyCollection<ITrackedFile> trackedFiles = null;
             try
             {
                 var sections = context.Intermediates.SelectMany(i => i.Sections).ToList();
@@ -56,7 +61,7 @@ namespace WixToolset.Core
                     return null;
                 }
 
-                this.ResolveFilePathsToEmbed(context, sections);
+                trackedFiles = this.ResolveFilePathsToEmbed(context, sections);
 
                 foreach (var section in sections)
                 {
@@ -71,17 +76,22 @@ namespace WixToolset.Core
             }
             finally
             {
+                result.Library = library;
+                result.TrackedFiles = trackedFiles;
+
                 foreach (var extension in context.Extensions)
                 {
-                    extension.PostCombine(library);
+                    extension.PostCombine(result);
                 }
             }
 
-            return this.Messaging.EncounteredError ? null : library;
+            return result;
         }
 
-        private void ResolveFilePathsToEmbed(ILibraryContext context, IEnumerable<IntermediateSection> sections)
+        private IReadOnlyCollection<ITrackedFile> ResolveFilePathsToEmbed(ILibraryContext context, IEnumerable<IntermediateSection> sections)
         {
+            var trackedFiles = new List<ITrackedFile>();
+
             // Resolve paths to files that are to be embedded in the library.
             if (context.BindFiles)
             {
@@ -105,6 +115,8 @@ namespace WixToolset.Core
                             {
                                 // File was successfully resolved so track the embedded index as the embedded file index.
                                 field.Set(new IntermediateFieldPathValue { Embed = true, Path = file });
+
+                                trackedFiles.Add(this.LayoutServices.TrackFile(file, TrackedFileType.Input, symbol.SourceLineNumbers));
                             }
                             else
                             {
@@ -114,6 +126,8 @@ namespace WixToolset.Core
                     }
                 }
             }
+
+            return trackedFiles;
         }
 
         private void Validate(Intermediate library)

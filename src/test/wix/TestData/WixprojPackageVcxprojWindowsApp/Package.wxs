@@ -1,5 +1,7 @@
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Name='!(loc.PackageName)' Manufacturer='WiX Toolset' Version='0.0.1' UpgradeCode='41a2c17e-1976-465b-bcde-eae03516ca68'>
+    <SoftwareTag Regid='wixtoolset.org' InstallDirectory='ApplicationFolder' />
 
     <StandardDirectory Id='ProgramFiles6432Folder'>
       <Directory Id='ApplicationFolder' Name='Test App'>
@@ -16,5 +18,7 @@
 
       <MergeRef Id='WinFormsModule' />
     </Feature>
+
+    <ui:WixUI Id="WixUI_Minimal" />
   </Package>
 </Wix>

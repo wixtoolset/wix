@@ -132,12 +132,7 @@ namespace WixToolset.Core.CommandLine
             {
                 using (new IntermediateFieldContext("wix.lib"))
                 {
-                    var wixlib = this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths, cancellationToken);
-
-                    if (!this.Messaging.EncounteredError)
-                    {
-                        wixlib.Save(this.OutputFile);
-                    }
+                    this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths, cancellationToken);
                 }
             }
             else
@@ -260,7 +255,7 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private Intermediate LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, CancellationToken cancellationToken)
+        private void LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, CancellationToken cancellationToken)
         {
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
@@ -270,18 +265,22 @@ namespace WixToolset.Core.CommandLine
             context.Intermediates = intermediates;
             context.CancellationToken = cancellationToken;
 
-            Intermediate library = null;
             try
             {
                 var librarian = this.ServiceProvider.GetService<ILibrarian>();
-                library = librarian.Combine(context);
+                var result = librarian.Combine(context);
+
+                if (!this.Messaging.EncounteredError)
+                {
+                    result.Library.Save(this.OutputFile);
+
+                    this.LayoutFiles(this.IntermediateFolder, result.TrackedFiles, null, cancellationToken);
+                }
             }
             catch (WixException e)
             {
                 this.Messaging.Write(e.Error);
             }
-
-            return library;
         }
 
         private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, CancellationToken cancellationToken)
@@ -365,24 +364,27 @@ namespace WixToolset.Core.CommandLine
                     return;
                 }
 
-                {
-                    var context = this.ServiceProvider.GetService<ILayoutContext>();
-                    context.Extensions = this.ExtensionManager.GetServices<ILayoutExtension>();
-                    context.TrackedFiles = bindResult.TrackedFiles;
-                    context.FileTransfers = bindResult.FileTransfers;
-                    context.IntermediateFolder = intermediateFolder;
-                    context.TrackingFile = this.TrackingFile;
-                    context.ResetAcls = this.commandLine.ResetAcls;
-                    context.CancellationToken = cancellationToken;
-
-                    var layout = this.ServiceProvider.GetService<ILayoutCreator>();
-                    layout.Layout(context);
-                }
+                this.LayoutFiles(intermediateFolder, bindResult.TrackedFiles, bindResult.FileTransfers, cancellationToken);
             }
             finally
             {
                 bindResult?.Dispose();
             }
+        }
+
+        private void LayoutFiles(string intermediateFolder, IReadOnlyCollection<ITrackedFile> trackedFiles, IReadOnlyCollection<IFileTransfer> fileTransfers, CancellationToken cancellationToken)
+        {
+            var context = this.ServiceProvider.GetService<ILayoutContext>();
+            context.Extensions = this.ExtensionManager.GetServices<ILayoutExtension>();
+            context.TrackedFiles = trackedFiles;
+            context.FileTransfers = fileTransfers;
+            context.IntermediateFolder = intermediateFolder;
+            context.TrackingFile = this.TrackingFile;
+            context.ResetAcls = this.commandLine.ResetAcls;
+            context.CancellationToken = cancellationToken;
+
+            var layout = this.ServiceProvider.GetService<ILayoutCreator>();
+            layout.Layout(context);
         }
 
         private IEnumerable<Intermediate> LoadLibraries(IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator)

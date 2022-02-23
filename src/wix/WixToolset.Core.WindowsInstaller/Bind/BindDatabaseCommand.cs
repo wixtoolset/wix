@@ -244,6 +244,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     command.Execute();
 
                     fileFacades.AddRange(command.MergeModulesFileFacades);
+                    trackedFiles.AddRange(command.TrackedFiles);
                 }
             }
 
@@ -260,8 +261,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (softwareTags.Any())
                 {
-                    var command = new ProcessPackageSoftwareTagsCommand(section, softwareTags, this.IntermediateFolder);
+                    var command = new ProcessPackageSoftwareTagsCommand(section, this.WindowsInstallerBackendHelper, softwareTags, this.IntermediateFolder);
                     command.Execute();
+
+                    trackedFiles.AddRange(command.TrackedFiles);
                 }
             }
 
@@ -483,8 +486,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.MergingModules());
 
-                var command = new MergeModulesCommand(this.Messaging, fileFacades, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
+                var command = new MergeModulesCommand(this.Messaging, this.WindowsInstallerBackendHelper, fileFacades, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
                 command.Execute();
+
+                trackedFiles.AddRange(command.TrackedFiles);
             }
 
             if (this.Messaging.EncounteredError)
@@ -508,8 +513,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 trackedFiles.AddRange(command.TrackedFiles);
             }
 
-            // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
-            trackedFiles.AddRange(fileFacades.Select(f => this.WindowsInstallerBackendHelper.TrackFile(f.SourcePath, TrackedFileType.Input, f.SourceLineNumber)));
+            var trackedInputFiles = this.TrackInputFiles(data, trackedFiles);
+            trackedFiles.AddRange(trackedInputFiles);
 
             var result = this.ServiceProvider.GetService<IBindResult>();
             result.FileTransfers = fileTransfers;
@@ -612,6 +617,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return layout;
+        }
+
+        private IEnumerable<ITrackedFile> TrackInputFiles(WindowsInstallerData data, List<ITrackedFile> trackedFiles)
+        {
+            var trackedInputFiles = new List<ITrackedFile>();
+            var intermediateAndTemporaryPaths = new HashSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Intermediate || t.Type == TrackedFileType.Temporary).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var row in data.Tables.SelectMany(t => t.Rows))
+            {
+                foreach (var field in row.Fields.Where(f => f.Column.Type == ColumnType.Object))
+                {
+                    var path = field.AsString();
+
+                    if (!intermediateAndTemporaryPaths.Contains(path))
+                    {
+                        trackedInputFiles.Add(this.WindowsInstallerBackendHelper.TrackFile(path, TrackedFileType.Input, row.SourceLineNumbers));
+                    }
+                }
+            }
+
+            return trackedInputFiles;
         }
     }
 }
