@@ -834,7 +834,7 @@ extern "C" HRESULT MsiEnginePlanInitializePackage(
     {
         Assert(BURN_PACKAGE_TYPE_MSI == pPackage->compatiblePackage.type);
 
-        pPackage->compatiblePackage.fDefaultRequested = BOOTSTRAPPER_ACTION_UNINSTALL == overallAction;
+        pPackage->compatiblePackage.fDefaultRequested = BOOTSTRAPPER_ACTION_UNINSTALL == overallAction || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == overallAction;
         pPackage->compatiblePackage.fRequested = pPackage->compatiblePackage.fDefaultRequested;
 
         hr = UserExperienceOnPlanCompatibleMsiPackageBegin(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.Msi.pVersion, &pPackage->compatiblePackage.fRequested);

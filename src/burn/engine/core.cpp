@@ -488,7 +488,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.pPayloads = &pEngineState->payloads;
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
-    pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback;
+    pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
     pEngineState->plan.fBundleAlreadyRegistered = pEngineState->registration.fInstalled;
 
     hr = PlanSetVariables(action, &pEngineState->variables);
@@ -756,6 +756,14 @@ extern "C" HRESULT CoreApply(
         }
     }
 
+    if (BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action)
+    {
+        fSuspend = FALSE;
+        restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+
+        LogId(REPORT_STANDARD, MSG_UNSAFE_APPLY_COMPLETED);
+    }
+
     if (fSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
     {
         // Leave cache alone.
@@ -773,7 +781,7 @@ extern "C" HRESULT CoreApply(
     }
 
 LExit:
-    if (fRollbackCache)
+    if (fRollbackCache && !pEngineState->plan.fDisableRollback)
     {
         ApplyCacheRollback(&pEngineState->userExperience, &pEngineState->plan, pEngineState->companionConnection.hCachePipe, &applyContext);
     }
@@ -977,6 +985,9 @@ static HRESULT CoreRecreateCommandLine(
         break;
     case BOOTSTRAPPER_ACTION_UNINSTALL:
         hr = StrAllocConcat(psczCommandLine, L" /uninstall", 0);
+        break;
+    case BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL:
+        hr = StrAllocConcat(psczCommandLine, L" /unsafeuninstall", 0);
         break;
     }
     ExitOnFailure(hr, "Failed to append action state to command-line");
@@ -1412,6 +1423,13 @@ extern "C" HRESULT CoreParseCommandLine(
 
                     hr = PathExpand(&pCommand->wzLayoutDirectory, argv[i], PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
                     ExitOnFailure(hr, "Failed to copy path for layout directory.");
+                }
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"unsafeuninstall", -1))
+            {
+                if (BOOTSTRAPPER_ACTION_HELP != pCommand->action)
+                {
+                    pCommand->action = BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL;
                 }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"uninstall", -1))
@@ -2207,7 +2225,7 @@ static void LogPackages(
     __in const BOOTSTRAPPER_ACTION action
     )
 {
-    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == action;
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == action;
 
     if (pUpgradeBundlePackage)
     {
@@ -2286,8 +2304,8 @@ static void LogPackages(
             }
         }
 
-        // Display related bundles last if caching, installing, modifying, or repairing.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL < action)
+        // Display related bundles last if not uninstalling.
+        if (!fUninstalling)
         {
             LogRelatedBundles(pRelatedBundles, FALSE);
         }

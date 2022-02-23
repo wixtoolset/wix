@@ -492,6 +492,13 @@ Language=English
 Planned rollback boundary: '%1!ls!', vital: %2!hs!, transaction: %3!hs! (default: %4!hs!)
 .
 
+MessageId=223
+Severity=Success
+SymbolicName=MSG_PLAN_NOT_SKIPPED_DUE_TO_DEPENDENTS
+Language=English
+Ignoring bundle dependents due to action UnsafeUninstall...
+.
+
 MessageId=299
 Severity=Success
 SymbolicName=MSG_PLAN_COMPLETE
@@ -945,6 +952,20 @@ Severity=Success
 SymbolicName=MSG_POST_APPLY_PACKAGE
 Language=English
   package: %1!ls!, install registration state: %2!hs!, cache registration state: %3!hs!
+.
+
+MessageId=375
+Severity=Success
+SymbolicName=MSG_UNSAFE_APPLY_COMPLETED
+Language=English
+Ignoring suspend and restart values due to action UnsafeUninstall...
+.
+
+MessageId=376
+Severity=Success
+SymbolicName=MSG_UNSAFE_SESSION_END
+Language=English
+Ignoring resume and registration values due to action UnsafeUninstall...
 .
 
 MessageId=380

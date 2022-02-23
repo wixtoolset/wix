@@ -505,8 +505,7 @@ extern "C" HRESULT ApplyUnregister(
 
     registrationType = defaultRegistrationType;
 
-    hr = UserExperienceOnUnregisterBegin(&pEngineState->userExperience, &registrationType);
-    ExitOnRootFailure(hr, "BA aborted unregister begin.");
+    UserExperienceOnUnregisterBegin(&pEngineState->userExperience, &registrationType);
 
     // Barring the special cases, if it was determined that we should keep the registration then
     // do that, otherwise the resume mode is NONE and registration will be removed.
@@ -517,7 +516,7 @@ extern "C" HRESULT ApplyUnregister(
 
     // If apply failed in any way and we're going to be keeping the bundle registered then
     // execute any rollback dependency registration actions.
-    if (fFailed && BURN_RESUME_MODE_NONE < resumeMode)
+    if (fFailed && BURN_RESUME_MODE_NONE < resumeMode && !pEngineState->plan.fDisableRollback)
     {
         // Execute any rollback registration actions.
         HRESULT hrRegistrationRollback = ExecuteDependentRegistrationActions(pEngineState->companionConnection.hPipe, &pEngineState->registration, pEngineState->plan.rgRollbackRegistrationActions, pEngineState->plan.cRollbackRegistrationActions);
@@ -525,6 +524,14 @@ extern "C" HRESULT ApplyUnregister(
     }
 
     LogId(REPORT_STANDARD, MSG_SESSION_END, pEngineState->registration.sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingRestartToString(restart), LoggingBoolToString(pEngineState->registration.fDisableResume), LoggingRegistrationTypeToString(defaultRegistrationType), LoggingRegistrationTypeToString(registrationType));
+
+    if (BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action)
+    {
+        registrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
+        resumeMode = BURN_RESUME_MODE_NONE;
+
+        LogId(REPORT_STANDARD, MSG_UNSAFE_SESSION_END);
+    }
 
     if (pEngineState->registration.fPerMachine)
     {

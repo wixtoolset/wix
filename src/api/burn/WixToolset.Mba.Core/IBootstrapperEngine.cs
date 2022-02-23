@@ -341,6 +341,11 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
+        UnsafeUninstall,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Uninstall,
 
         /// <summary>

@@ -18,6 +18,38 @@ namespace WixToolsetTest.BurnE2E
         private const string V200 = "2.0.0.0";
 
         [Fact]
+        public void CanIgnoreBundleDependentForUnsafeUninstall()
+        {
+            string providerId = BundleAProviderId;
+            string parent = "~BundleAv1";
+            string parentSwitch = String.Concat("-parent ", parent);
+
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var bundleAv1 = this.CreateBundleInstaller("BundleAv1");
+            var testBAController = this.CreateTestBAController();
+
+            packageAv1.VerifyInstalled(false);
+
+            // Install the v1 bundle with a parent.
+            bundleAv1.Install(arguments: parentSwitch);
+            bundleAv1.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            Assert.True(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out var actualProviderVersion));
+            Assert.Equal(V100, actualProviderVersion);
+            Assert.True(BundleRegistration.DependencyDependentExists(providerId, parent));
+
+            // Cancel package B right away.
+            testBAController.SetPackageCancelExecuteAtProgress("PackageA", 1);
+
+            bundleAv1.UnsafeUninstall((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
+        }
+
+        [Fact]
         public void CanTrack1ForwardCompatibleDependentThroughMajorUpgrade()
         {
             string providerId = BundleAProviderId;
@@ -70,7 +102,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageAv1.VerifyInstalled(false);
             packageAv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
         [Fact]
@@ -116,7 +148,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageAv1.VerifyInstalled(false);
             packageAv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
         [Fact]
@@ -198,7 +230,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageAv1.VerifyInstalled(false);
             packageAv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
         [Fact]
@@ -280,7 +312,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageCv1.VerifyInstalled(false);
             packageCv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
         [Fact]
@@ -366,7 +398,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageAv1.VerifyInstalled(false);
             packageAv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
         [Fact]
@@ -414,7 +446,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageAv1.VerifyInstalled(false);
             packageAv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
         [Fact]
@@ -463,7 +495,7 @@ namespace WixToolsetTest.BurnE2E
 
             packageAv1.VerifyInstalled(false);
             packageAv2.VerifyInstalled(false);
-            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out actualProviderVersion));
+            Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
     }
 }

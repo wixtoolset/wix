@@ -15,13 +15,12 @@ extern "C" {
 
 static const HRESULT E_SUSPECTED_AV_INTERFERENCE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIX, 2000);
 
-// Note that ordering of the enumeration values is important.
-// Some code paths use < or > comparisions and simply reording values will break those comparisons.
 enum BOOTSTRAPPER_ACTION
 {
     BOOTSTRAPPER_ACTION_UNKNOWN,
     BOOTSTRAPPER_ACTION_HELP,
     BOOTSTRAPPER_ACTION_LAYOUT,
+    BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL,
     BOOTSTRAPPER_ACTION_UNINSTALL,
     BOOTSTRAPPER_ACTION_CACHE,
     BOOTSTRAPPER_ACTION_INSTALL,

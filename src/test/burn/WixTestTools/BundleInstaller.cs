@@ -3,6 +3,7 @@
 namespace WixTestTools
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
 
@@ -128,6 +129,35 @@ namespace WixTestTools
         public string Uninstall(string bundlePath, int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
         {
             return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.Uninstall, arguments, bundlePath: bundlePath);
+        }
+
+        /// <summary>
+        /// Uninstalls the bundle unsafely with optional arguments.
+        /// </summary>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string UnsafeUninstall(int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            var newArgumentList = new List<string>();
+            newArgumentList.Add("-unsafeuninstall");
+            newArgumentList.AddRange(arguments);
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.Custom, newArgumentList.ToArray());
+        }
+
+        /// <summary>
+        /// Uninstalls the bundle unsafely at the given path with optional arguments.
+        /// </summary>
+        /// <param name="bundlePath">This should be the bundle in the package cache.</param>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string UnsafeUninstall(string bundlePath, int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            var newArgumentList = new List<string>();
+            newArgumentList.Add("-unsafeuninstall");
+            newArgumentList.AddRange(arguments);
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.Custom, newArgumentList.ToArray(), bundlePath: bundlePath);
         }
 
         /// <summary>
