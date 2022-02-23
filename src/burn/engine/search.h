@@ -117,7 +117,8 @@ typedef struct _BURN_SEARCH
         } ExtensionSearch;
         struct
         {
-            BURN_VARIANT value;
+            LPWSTR sczValue;
+            BURN_VARIANT_TYPE targetType;
         } SetVariable;
     };
 } BURN_SEARCH;
