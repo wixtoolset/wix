@@ -257,7 +257,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Process SoftwareTags in MSI packages.
             if (SectionType.Product == section.Type)
             {
-                var softwareTags = section.Symbols.OfType<WixProductTagSymbol>().ToList();
+                var softwareTags = section.Symbols.OfType<WixPackageTagSymbol>().ToList();
 
                 if (softwareTags.Any())
                 {

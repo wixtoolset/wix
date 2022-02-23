@@ -179,7 +179,7 @@ namespace WixToolset.Data
         WixPatchRef,
         WixPatchTarget,
         WixProductSearch,
-        WixProductTag,
+        WixPackageTag,
         WixProperty,
         WixRegistrySearch,
         WixRelatedBundle,
@@ -729,8 +729,8 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixProductSearch:
                     return SymbolDefinitions.WixProductSearch;
 
-                case SymbolDefinitionType.WixProductTag:
-                    return SymbolDefinitions.WixProductTag;
+                case SymbolDefinitionType.WixPackageTag:
+                    return SymbolDefinitions.WixPackageTag;
 
                 case SymbolDefinitionType.WixProperty:
                     return SymbolDefinitions.WixProperty;
