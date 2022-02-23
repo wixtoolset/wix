@@ -427,42 +427,6 @@ namespace Bootstrapper
         }
 
         [Fact]
-        void MsiFeatureSearchTest()
-        {
-            HRESULT hr = S_OK;
-            IXMLDOMElement* pixeBundle = NULL;
-            BURN_VARIABLES variables = { };
-            BURN_SEARCHES searches = { };
-            BURN_EXTENSIONS burnExtensions = { };
-            try
-            {
-                LPCWSTR wzDocument =
-                    L"<Bundle>"
-                    L"    <MsiFeatureSearch Id='Search1' Type='state' ProductCode='{BAD00000-0000-0000-0000-000000000000}' FeatureId='' Variable='Variable1' />"
-                    L"</Bundle>";
-
-                hr = VariableInitialize(&variables);
-                TestThrowOnFailure(hr, L"Failed to initialize variables.");
-
-                // load XML document
-                LoadBundleXmlHelper(wzDocument, &pixeBundle);
-
-                hr = SearchesParseFromXml(&searches, &burnExtensions, pixeBundle);
-                TestThrowOnFailure(hr, L"Failed to parse searches from XML.");
-
-                // execute searches
-                hr = SearchesExecute(&searches, &variables);
-                TestThrowOnFailure(hr, L"Failed to execute searches.");
-            }
-            finally
-            {
-                ReleaseObject(pixeBundle);
-                VariablesUninitialize(&variables);
-                SearchesUninitialize(&searches);
-            }
-        }
-
-        [Fact]
         void ConditionalSearchTest()
         {
             HRESULT hr = S_OK;

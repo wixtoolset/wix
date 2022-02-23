@@ -41,10 +41,6 @@ static HRESULT MsiProductSearch(
     __in BURN_SEARCH* pSearch,
     __in BURN_VARIABLES* pVariables
     );
-static HRESULT MsiFeatureSearch(
-    __in BURN_SEARCH* pSearch,
-    __in BURN_VARIABLES* pVariables
-    );
 static HRESULT PerformExtensionSearch(
     __in BURN_SEARCH* pSearch
     );
@@ -67,6 +63,7 @@ extern "C" HRESULT SearchesParseFromXml(
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
     BSTR bstrNodeName = NULL;
+    BOOL fXmlFound = FALSE;
     LPWSTR scz = NULL;
     BURN_VARIANT_TYPE valueType = BURN_VARIANT_TYPE_NONE;
 
@@ -76,7 +73,7 @@ extern "C" HRESULT SearchesParseFromXml(
 
     // get search node count
     hr = pixnNodes->get_length((long*)&cNodes);
-    ExitOnFailure(hr, "Failed to get search node count.");
+    ExitOnRootFailure(hr, "Failed to get search node count.");
 
     if (!cNodes)
     {
@@ -99,18 +96,15 @@ extern "C" HRESULT SearchesParseFromXml(
 
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &pSearch->sczKey);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
         // @Variable
         hr = XmlGetAttributeEx(pixnNode, L"Variable", &pSearch->sczVariable);
-        ExitOnFailure(hr, "Failed to get @Variable.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Variable.");
 
         // @Condition
         hr = XmlGetAttributeEx(pixnNode, L"Condition", &pSearch->sczCondition);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Condition.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Condition.");
 
         // read type specific attributes
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"DirectorySearch", -1))
@@ -119,11 +113,11 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @Path
             hr = XmlGetAttributeEx(pixnNode, L"Path", &pSearch->DirectorySearch.sczPath);
-            ExitOnFailure(hr, "Failed to get @Path.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Path.");
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
             {
@@ -135,8 +129,7 @@ extern "C" HRESULT SearchesParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"FileSearch", -1))
@@ -145,11 +138,11 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @Path
             hr = XmlGetAttributeEx(pixnNode, L"Path", &pSearch->FileSearch.sczPath);
-            ExitOnFailure(hr, "Failed to get @Path.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Path.");
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
             {
@@ -165,8 +158,7 @@ extern "C" HRESULT SearchesParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"RegistrySearch", -1))
@@ -175,7 +167,7 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @Root
             hr = XmlGetAttributeEx(pixnNode, L"Root", &scz);
-            ExitOnFailure(hr, "Failed to get @Root.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Root.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"HKCR", -1))
             {
@@ -195,30 +187,23 @@ extern "C" HRESULT SearchesParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Root: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Root: %ls", scz);
             }
 
             // @Key
             hr = XmlGetAttributeEx(pixnNode, L"Key", &pSearch->RegistrySearch.sczKey);
-            ExitOnFailure(hr, "Failed to get Key attribute.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get Key attribute.");
 
             // @Value
             hr = XmlGetAttributeEx(pixnNode, L"Value", &pSearch->RegistrySearch.sczValue);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get Value attribute.");
-            }
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get Value attribute.");
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             hr = XmlGetYesNoAttribute(pixnNode, L"Win64", &pSearch->RegistrySearch.fWin64);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get Win64 attribute.");
-            }
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get Win64 attribute.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
             {
@@ -230,14 +215,11 @@ extern "C" HRESULT SearchesParseFromXml(
 
                 // @ExpandEnvironment
                 hr = XmlGetYesNoAttribute(pixnNode, L"ExpandEnvironment", &pSearch->RegistrySearch.fExpandEnvironment);
-                if (E_NOTFOUND != hr)
-                {
-                    ExitOnFailure(hr, "Failed to get @ExpandEnvironment.");
-                }
+                ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @ExpandEnvironment.");
 
                 // @VariableType
                 hr = XmlGetAttributeEx(pixnNode, L"VariableType", &scz);
-                ExitOnFailure(hr, "Failed to get @VariableType.");
+                ExitOnRequiredXmlQueryFailure(hr, "Failed to get @VariableType.");
 
                 if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
                 {
@@ -257,14 +239,12 @@ extern "C" HRESULT SearchesParseFromXml(
                 }
                 else
                 {
-                    hr = E_INVALIDARG;
-                    ExitOnFailure(hr, "Invalid value for @VariableType: %ls", scz);
+                    ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @VariableType: %ls", scz);
                 }
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsiComponentSearch", -1))
@@ -273,18 +253,15 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @ProductCode
             hr = XmlGetAttributeEx(pixnNode, L"ProductCode", &pSearch->MsiComponentSearch.sczProductCode);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @ProductCode.");
-            }
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @ProductCode.");
 
             // @ComponentId
             hr = XmlGetAttributeEx(pixnNode, L"ComponentId", &pSearch->MsiComponentSearch.sczComponentId);
-            ExitOnFailure(hr, "Failed to get @ComponentId.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ComponentId.");
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"keyPath", -1))
             {
@@ -300,8 +277,7 @@ extern "C" HRESULT SearchesParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsiProductSearch", -1))
@@ -311,18 +287,20 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @ProductCode (if we don't find a product code then look for an upgrade code)
             hr = XmlGetAttributeEx(pixnNode, L"ProductCode", &pSearch->MsiProductSearch.sczGuid);
-            if (E_NOTFOUND != hr)
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @ProductCode.");
+
+            if (fXmlFound)
             {
-                ExitOnFailure(hr, "Failed to get @ProductCode.");
                 pSearch->MsiProductSearch.GuidType = BURN_MSI_PRODUCT_SEARCH_GUID_TYPE_PRODUCTCODE;
             }
             else
             {
                 // @UpgradeCode
                 hr = XmlGetAttributeEx(pixnNode, L"UpgradeCode", &pSearch->MsiProductSearch.sczGuid);
-                if (E_NOTFOUND != hr)
+                ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @UpgradeCode.");
+
+                if (fXmlFound)
                 {
-                    ExitOnFailure(hr, "Failed to get @UpgradeCode.");
                     pSearch->MsiProductSearch.GuidType = BURN_MSI_PRODUCT_SEARCH_GUID_TYPE_UPGRADECODE;
                 }
             }
@@ -330,13 +308,12 @@ extern "C" HRESULT SearchesParseFromXml(
             // make sure we found either a product or upgrade code
             if (BURN_MSI_PRODUCT_SEARCH_GUID_TYPE_NONE == pSearch->MsiProductSearch.GuidType)
             {
-                hr = E_NOTFOUND;
-                ExitOnFailure(hr, "Failed to get @ProductCode or @UpgradeCode.");
+                ExitWithRootFailure(hr, E_NOTFOUND, "Failed to get @ProductCode or @UpgradeCode.");
             }
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
             {
@@ -356,34 +333,7 @@ extern "C" HRESULT SearchesParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
-            }
-        }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsiFeatureSearch", -1))
-        {
-            pSearch->Type = BURN_SEARCH_TYPE_MSI_FEATURE;
-
-            // @ProductCode
-            hr = XmlGetAttributeEx(pixnNode, L"ProductCode", &pSearch->MsiFeatureSearch.sczProductCode);
-            ExitOnFailure(hr, "Failed to get @ProductCode.");
-
-            // @FeatureId
-            hr = XmlGetAttributeEx(pixnNode, L"FeatureId", &pSearch->MsiFeatureSearch.sczFeatureId);
-            ExitOnFailure(hr, "Failed to get @FeatureId.");
-
-            // @Type
-            hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
-
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"state", -1))
-            {
-                pSearch->MsiFeatureSearch.Type = BURN_MSI_FEATURE_SEARCH_TYPE_STATE;
-            }
-            else
-            {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"ExtensionSearch", -1))
@@ -392,10 +342,10 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @ExtensionId
             hr = XmlGetAttributeEx(pixnNode, L"ExtensionId", &scz);
-            ExitOnFailure(hr, "Failed to get @ExtensionId.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ExtensionId.");
 
             hr = BurnExtensionFindById(pBurnExtensions, scz, &pSearch->ExtensionSearch.pExtension);
-            ExitOnFailure(hr, "Failed to find extension '%ls' for search '%ls'", scz, pSearch->sczKey);
+            ExitOnRootFailure(hr, "Failed to find extension '%ls' for search '%ls'", scz, pSearch->sczKey);
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"SetVariable", -1))
         {
@@ -403,16 +353,16 @@ extern "C" HRESULT SearchesParseFromXml(
 
             // @Value
             hr = XmlGetAttributeEx(pixnNode, L"Value", &scz);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @Value.");
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Value.");
 
+            if (fXmlFound)
+            {
                 hr = BVariantSetString(&pSearch->SetVariable.value, scz, 0, FALSE);
                 ExitOnFailure(hr, "Failed to set variant value.");
 
                 // @Type
                 hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-                ExitOnFailure(hr, "Failed to get @Type.");
+                ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
                 if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
                 {
@@ -432,8 +382,7 @@ extern "C" HRESULT SearchesParseFromXml(
                 }
                 else
                 {
-                    hr = E_INVALIDARG;
-                    ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                    ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
                 }
             }
             else
@@ -447,8 +396,7 @@ extern "C" HRESULT SearchesParseFromXml(
         }
         else
         {
-            hr = E_UNEXPECTED;
-            ExitOnFailure(hr, "Unexpected element name: %ls", bstrNodeName);
+            ExitWithRootFailure(hr, E_UNEXPECTED, "Unexpected element name: %ls", bstrNodeName);
         }
 
         // prepare next iteration
@@ -546,9 +494,6 @@ extern "C" HRESULT SearchesExecute(
         case BURN_SEARCH_TYPE_MSI_PRODUCT:
             hr = MsiProductSearch(pSearch, pVariables);
             break;
-        case BURN_SEARCH_TYPE_MSI_FEATURE:
-            hr = MsiFeatureSearch(pSearch, pVariables);
-            break;
         case BURN_SEARCH_TYPE_EXTENSION:
             hr = PerformExtensionSearch(pSearch);
             break;
@@ -604,10 +549,6 @@ extern "C" void SearchesUninitialize(
                 break;
             case BURN_SEARCH_TYPE_MSI_PRODUCT:
                 ReleaseStr(pSearch->MsiProductSearch.sczGuid);
-                break;
-            case BURN_SEARCH_TYPE_MSI_FEATURE:
-                ReleaseStr(pSearch->MsiFeatureSearch.sczProductCode);
-                ReleaseStr(pSearch->MsiFeatureSearch.sczFeatureId);
                 break;
             case BURN_SEARCH_TYPE_SET_VARIABLE:
                 BVariantUninitialize(&pSearch->SetVariable.value);
@@ -1245,22 +1186,6 @@ LExit:
     StrSecureZeroFreeString(sczGuid);
     ReleaseStrArray(rgsczRelatedProductCodes, dwRelatedProducts);
     BVariantUninitialize(&value);
-
-    return hr;
-}
-
-static HRESULT MsiFeatureSearch(
-    __in BURN_SEARCH* pSearch,
-    __in BURN_VARIABLES* /*pVariables*/
-    )
-{
-    HRESULT hr = E_NOTIMPL;
-
-//LExit:
-    if (FAILED(hr))
-    {
-        LogStringLine(REPORT_STANDARD, "MsiFeatureSearch failed: ID '%ls', HRESULT 0x%x", pSearch->sczKey, hr);
-    }
 
     return hr;
 }
