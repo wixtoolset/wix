@@ -207,7 +207,7 @@ PublishScripts/
 *.nuget.targets
 
 # Nuget personal access tokens and Credentials
-nuget.config
+# nuget.config
 
 # Microsoft Azure Build Output
 csx/
@@ -391,8 +391,8 @@ FodyWeavers.xsd
 # WiX Specific Ignores
 
 # Ignore global.json and Directory.Package.props since they are generated
-src/global.json
-src/Directory.Packages.props
+global.json
+Directory.Packages.props
 
 # Ignore downloaded tools
 build/.tools/

@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\..\global.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\TestData\**" CopyToOutputDirectory="PreserveNewest" Link="TestData\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 

@@ -11,6 +11,9 @@ if exist ..\packages rd /s/q ..\packages
 if exist Directory.Packages.props (del Directory.Packages.props)
 if exist global.json (del global.json)
 
+if exist ..\Directory.Packages.props (del ..\Directory.Packages.props)
+if exist ..\global.json (del ..\global.json)
+
 if exist "%_NUGET_CACHE%\wixbuildtools.testsupport" rd /s/q "%_NUGET_CACHE%\wixbuildtools.testsupport"
 if exist "%_NUGET_CACHE%\wixtoolset.bal.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bal.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.balutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.balutil"
