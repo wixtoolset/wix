@@ -20,8 +20,8 @@
       SetDirectoryPackagesProps;
     </SetBuildNumbersDependsOn>
 
-    <GlobalJsonPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\global.json))</GlobalJsonPath>
-    <CentralPackageVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\Directory.Packages.props))</CentralPackageVersionsPath>
+    <GlobalJsonPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\global.json))</GlobalJsonPath>
+    <CentralPackageVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\Directory.Packages.props))</CentralPackageVersionsPath>
   </PropertyGroup>
 
   <Target Name="SetAppVeyorBuildNumber"
