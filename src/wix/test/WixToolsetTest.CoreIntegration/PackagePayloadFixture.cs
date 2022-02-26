@@ -57,6 +57,26 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanSpecifyPackagePayloadWithCertificate()
+        {
+            var folder = TestData.Get(@"TestData", "PackagePayload");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SpecifiedCertificate.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                result.AssertSuccess();
+            }
+        }
+
+        [Fact]
         public void ErrorWhenMissingSourceFileAndHash()
         {
             var folder = TestData.Get(@"TestData", "PackagePayload");
@@ -75,7 +95,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(44, result.ExitCode);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The MsuPackagePayload element's SourceFile or Hash attribute was not found; one of these is required.",
+                    "The MsuPackagePayload element's SourceFile, CertificatePublicKey, or Hash attribute was not found; one of these is required.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
             }
         }
@@ -144,10 +164,10 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", Path.Combine(baseFolder, "test.wixlib")
                 });
 
-                Assert.Equal(10, result.ExitCode);
+                Assert.Equal(408, result.ExitCode);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The MsuPackagePayload/@DownloadUrl attribute was not found; it is required when attribute Hash is specified.",
+                    "The MsuPackagePayload element's DownloadUrl attribute was not found; it is required without attribute SourceFile present.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
             }
         }
@@ -173,6 +193,102 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "The ExePackagePayload/@Hash attribute cannot be specified when attribute SourceFile is present.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
+            }
+        }
+
+        [Fact]
+        public void ErrorWhenSpecifiedSourceFileAndCertificatePublicKey()
+        {
+            var folder = TestData.Get(@"TestData", "PackagePayload");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SpecifiedSourceFileAndCertificatePublicKey.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackagePayload/@CertificatePublicKey attribute cannot be specified when attribute SourceFile is present.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(35, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void ErrorWhenSpecifiedSourceFileAndCertificateThumprint()
+        {
+            var folder = TestData.Get(@"TestData", "PackagePayload");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SpecifiedSourceFileAndCertificateThumbprint.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackagePayload/@CertificateThumbprint attribute cannot be specified when attribute SourceFile is present.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(35, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void ErrorWhenSpecifiedCertificateThumbprintWithoutPublicKey()
+        {
+            var folder = TestData.Get(@"TestData", "PackagePayload");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SpecifiedHashAndCertificatePublicKey.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackagePayload/@CertificatePublicKey attribute was not found; it is required when attribute CertificateThumbprint is specified.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(10, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void ErrorWhenSpecifiedCertificatePublicKeyWithoutThumbprint()
+        {
+            var folder = TestData.Get(@"TestData", "PackagePayload");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SpecifiedCertificatePublicKeyWithoutThumbprint.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackagePayload/@CertificateThumbprint attribute was not found; it is required when attribute CertificatePublicKey is specified.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(10, result.ExitCode);
             }
         }
 

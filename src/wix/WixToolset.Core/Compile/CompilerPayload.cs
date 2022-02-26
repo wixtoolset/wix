@@ -11,11 +11,30 @@ namespace WixToolset.Core
 
     internal class CompilerPayload
     {
+        public string Version { get; set; }
+
+        public CompilerPayload(CompilerCore core, SourceLineNumber sourceLineNumbers, XElement element)
+        {
+            this.Core = core;
+            this.Element = element;
+            this.SourceLineNumbers = sourceLineNumbers;
+        }
+
+        private CompilerCore Core { get; }
+
+        private XElement Element { get; }
+
+        private SourceLineNumber SourceLineNumbers { get; }
+
         public YesNoDefaultType Compressed { get; set; } = YesNoDefaultType.Default;
 
         public string Description { get; set; }
 
         public string DownloadUrl { get; set; }
+
+        public string CertificatePublicKey { get; set; }
+
+        public string CertificateThumbprint { get; set; }
 
         public string Hash { get; set; }
 
@@ -33,24 +52,9 @@ namespace WixToolset.Core
 
         public string SourceFile { get; set; }
 
-        public string Version { get; set; }
-
-        public CompilerPayload(CompilerCore core, SourceLineNumber sourceLineNumbers, XElement element)
-        {
-            this.Core = core;
-            this.Element = element;
-            this.SourceLineNumbers = sourceLineNumbers;
-        }
-
-        private CompilerCore Core { get; }
-
-        private XElement Element { get; }
-
-        private SourceLineNumber SourceLineNumbers { get; }
-
         private void CalculateAndVerifyFields()
         {
-            var isRemote = this.IsRemoteAllowed && !String.IsNullOrEmpty(this.Hash);
+            var isRemote = this.IsRemoteAllowed && (!String.IsNullOrEmpty(this.CertificatePublicKey) || !String.IsNullOrEmpty(this.CertificateThumbprint) || !String.IsNullOrEmpty(this.Hash));
 
             if (String.IsNullOrEmpty(this.SourceFile))
             {
@@ -81,7 +85,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "SourceFile", "Hash"));
+                        this.Core.Write(ErrorMessages.ExpectedAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "SourceFile", "CertificatePublicKey", "Hash"));
                     }
                 }
             }
@@ -93,7 +97,20 @@ namespace WixToolset.Core
                 {
                     if (isRemote)
                     {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
+                        if (!String.IsNullOrEmpty(this.Hash))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
+                        }
+
+                        if (!String.IsNullOrEmpty(this.CertificatePublicKey))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "CertificatePublicKey", "SourceFile"));
+                        }
+
+                        if (!String.IsNullOrEmpty(this.CertificateThumbprint))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "CertificateThumbprint", "SourceFile"));
+                        }
                     }
 
                     if (!String.IsNullOrEmpty(this.Description))
@@ -120,17 +137,34 @@ namespace WixToolset.Core
                 {
                     if (String.IsNullOrEmpty(this.DownloadUrl))
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "DownloadUrl", "Hash"));
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "DownloadUrl", "SourceFile"));
                     }
 
                     if (String.IsNullOrEmpty(this.Name))
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "Hash"));
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "SourceFile"));
                     }
 
                     if (!this.Size.HasValue)
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "Hash"));
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "SourceFile"));
+                    }
+
+                    if (String.IsNullOrEmpty(this.Hash))
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
+                    }
+
+                    if (!String.IsNullOrEmpty(this.CertificatePublicKey) || !String.IsNullOrEmpty(this.CertificateThumbprint))
+                    {
+                        if (String.IsNullOrEmpty(this.CertificateThumbprint))
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "CertificateThumbprint", "CertificatePublicKey"));
+                        }
+                        else if (String.IsNullOrEmpty(this.CertificatePublicKey))
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "CertificatePublicKey", "CertificateThumbprint"));
+                        }
                     }
 
                     if (YesNoDefaultType.Yes == this.Compressed)
@@ -177,6 +211,8 @@ namespace WixToolset.Core
                     Hash = this.Hash,
                     FileSize = this.Size,
                     Version = this.Version,
+                    CertificatePublicKey = this.CertificatePublicKey,
+                    CertificateThumbprint = this.CertificateThumbprint
                 });
 
                 this.Core.CreateGroupAndOrderingRows(this.SourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Payload, symbol.Id.Id, ComplexReferenceChildType.Unknown, null);
@@ -248,6 +284,16 @@ namespace WixToolset.Core
             this.DownloadUrl = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
         }
 
+        public void ParseCertificatePublicKey(XAttribute attrib)
+        {
+            this.CertificatePublicKey = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
+        }
+
+        public void ParseCertificateThumbprint(XAttribute attrib)
+        {
+            this.CertificateThumbprint = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
+        }
+
         public void ParseHash(XAttribute attrib)
         {
             this.Hash = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
@@ -286,6 +332,5 @@ namespace WixToolset.Core
         {
             this.Version = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
         }
-
     }
 }

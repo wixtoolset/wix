@@ -24,6 +24,10 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     {
         hr = EnumCabCommand(argc - 2, argv + 2);
     }
+    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"certhashes", -1))
+    {
+        hr = CertificateHashesCommand(argc - 2, argv + 2);
+    }
     else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"resetacls", -1))
     {
         hr = ResetAclsCommand(argc - 2, argv + 2);

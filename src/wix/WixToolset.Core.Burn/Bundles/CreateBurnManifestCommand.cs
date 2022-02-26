@@ -672,7 +672,16 @@ namespace WixToolset.Core.Burn.Bundles
             writer.WriteAttributeString("Id", payload.Id.Id);
             writer.WriteAttributeString("FilePath", payload.Name);
             writer.WriteAttributeString("FileSize", payload.FileSize.Value.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString("Hash", payload.Hash);
+
+            if (!String.IsNullOrEmpty(payload.CertificatePublicKey) && !String.IsNullOrEmpty(payload.CertificateThumbprint))
+            {
+                writer.WriteAttributeString("CertificateRootPublicKeyIdentifier", payload.CertificatePublicKey);
+                writer.WriteAttributeString("CertificateRootThumbprint", payload.CertificateThumbprint);
+            }
+            else
+            {
+                writer.WriteAttributeString("Hash", payload.Hash);
+            }
 
             if (payload.LayoutOnly)
             {

@@ -30,7 +30,7 @@ namespace WixToolset.Core.Native
             this.stdinLines.AddRange(lines);
         }
 
-        public IEnumerable<string> Run()
+        public IReadOnlyCollection<string> Run()
         {
             EnsurePathToWixNativeExeSet();
 

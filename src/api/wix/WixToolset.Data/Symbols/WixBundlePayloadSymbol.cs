@@ -26,6 +26,8 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.LayoutOnly), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Packaging), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ParentPackagePayloadRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.CertificatePublicKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.CertificateThumbprint), IntermediateFieldType.String),
             },
             typeof(WixBundlePayloadSymbol));
     }
@@ -53,6 +55,8 @@ namespace WixToolset.Data.Symbols
         LayoutOnly,
         Packaging,
         ParentPackagePayloadRef,
+        CertificatePublicKey,
+        CertificateThumbprint,
     }
 
     public class WixBundlePayloadSymbol : IntermediateSymbol
@@ -161,6 +165,18 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.ParentPackagePayloadRef];
             set => this.Set((int)WixBundlePayloadSymbolFields.ParentPackagePayloadRef, value);
+        }
+
+        public string CertificatePublicKey
+        {
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.CertificatePublicKey];
+            set => this.Set((int)WixBundlePayloadSymbolFields.CertificatePublicKey, value);
+        }
+
+        public string CertificateThumbprint
+        {
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.CertificateThumbprint];
+            set => this.Set((int)WixBundlePayloadSymbolFields.CertificateThumbprint, value);
         }
     }
 }
