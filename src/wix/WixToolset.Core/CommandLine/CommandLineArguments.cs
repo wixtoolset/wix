@@ -41,7 +41,10 @@ namespace WixToolset.Core.CommandLine
             this.ProcessArgumentsAndParseExtensions(this.OriginalArguments);
         }
 
-        public ICommandLineParser Parse() => new CommandLineParser(this.Messaging, this.Arguments, this.ErrorArgument);
+        public ICommandLineParser Parse()
+        {
+            return new CommandLineParser(this.Messaging, this.Arguments, this.ErrorArgument);
+        }
 
         private void FlattenArgumentsWithResponseFilesIntoOriginalArguments(string[] commandLineArguments)
         {
@@ -49,7 +52,7 @@ namespace WixToolset.Core.CommandLine
 
             foreach (var arg in commandLineArguments)
             {
-                if (arg != null)
+                if (!String.IsNullOrEmpty(arg))
                 {
                     if ('@' == arg[0])
                     {
@@ -202,6 +205,9 @@ namespace WixToolset.Core.CommandLine
             return arguments;
         }
 
-        private static bool IsSwitchAt(string[] args, int index) => args.Length > index && !String.IsNullOrEmpty(args[index]) && ('/' == args[index][0] || '-' == args[index][0]);
+        private static bool IsSwitchAt(string[] args, int index)
+        {
+            return args.Length > index && !String.IsNullOrEmpty(args[index]) && ('/' == args[index][0] || '-' == args[index][0]);
+        }
     }
 }
