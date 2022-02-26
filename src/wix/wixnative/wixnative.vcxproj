@@ -42,7 +42,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>crypt32.lib;cabinet.lib;msi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>crypt32.lib;cabinet.lib;msi.lib;wintrust.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
@@ -50,6 +50,7 @@
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="certhashes.cpp" />
     <ClCompile Include="enumcab.cpp" />
     <ClCompile Include="extractcab.cpp" />
     <ClCompile Include="resetacls.cpp" />

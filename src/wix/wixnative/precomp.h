@@ -4,9 +4,12 @@
 #include <windows.h>
 #include <aclapi.h>
 #include <mergemod.h>
+#include <softpub.h>
 #include <strsafe.h>
+#include <wintrust.h>
 
 #include "dutil.h"
+#include "certutil.h"
 #include "conutil.h"
 #include "memutil.h"
 #include "pathutil.h"
@@ -15,6 +18,7 @@
 #include "cabutil.h"
 
 HRESULT WixNativeReadStdinPreamble();
+HRESULT CertificateHashesCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
 HRESULT SmartCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
 HRESULT ResetAclsCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
 HRESULT EnumCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);

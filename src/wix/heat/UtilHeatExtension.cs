@@ -87,14 +87,6 @@ namespace WixToolset.Harvesters
                     harvesterExtension = new FileHarvester();
                     active = true;
                     break;
-                case "exepackagepayload":
-                    harvesterExtension = new PayloadHarvester(this.PayloadHarvester, WixBundlePackageType.Exe);
-                    active = true;
-                    break;
-                case "msupackagepayload":
-                    harvesterExtension = new PayloadHarvester(this.PayloadHarvester, WixBundlePackageType.Msu);
-                    active = true;
-                    break;
                 case "perf":
                     harvesterExtension = new PerformanceCategoryHarvester();
                     active = true;

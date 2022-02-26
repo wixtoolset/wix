@@ -52,6 +52,10 @@ namespace WixToolset.Core.Burn.CommandLine
                     case "reattach":
                         this.Subcommand = new ReattachSubcommand(this.ServiceProvider);
                         return true;
+
+                    case "remotepayload":
+                        this.Subcommand = new RemotePayloadSubcommand(this.ServiceProvider);
+                        return true;
                 }
 
                 return false;

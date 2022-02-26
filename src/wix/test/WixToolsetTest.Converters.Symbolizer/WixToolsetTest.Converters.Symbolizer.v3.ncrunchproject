@@ -1,5 +1,8 @@
 ﻿<ProjectConfiguration>
   <Settings>
+    <HiddenComponentWarnings>
+      <Value>LostReference</Value>
+    </HiddenComponentWarnings>
     <IgnoredTests>
       <NamedTestSelector>
         <TestName>WixToolsetTest.Converters.Symbolizer.ConvertSymbolsFixture.CanLoadWixoutAndConvertToIntermediate</TestName>

@@ -2459,6 +2459,20 @@ namespace WixToolset.Core
                         case "SourceFile":
                             compilerPayload.ParseSourceFile(attrib);
                             break;
+                        case "CertificatePublicKey":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseCertificatePublicKey(attrib);
+                            }
+                            break;
+                        case "CertificateThumbprint":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseCertificateThumbprint(attrib);
+                            }
+                            break;
                         case "DownloadUrl":
                             compilerPayload.ParseDownloadUrl(attrib);
                             break;

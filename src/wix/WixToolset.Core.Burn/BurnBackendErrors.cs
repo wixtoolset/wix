@@ -56,6 +56,11 @@ namespace WixToolset.Core.Burn
             return Message(null, Ids.IncompatibleWixBurnSection, "Unable to read bundle executable '{0}', because this bundle was created with a different version of WiX burn (.wixburn section version '{1}'). You must use the same version of Windows Installer XML in order to read this bundle.", bundleExecutable, bundleVersion);
         }
 
+        public static Message UnsupportedRemotePackagePayload(string extension, string path)
+        {
+            return Message(null, Ids.UnsupportedRemotePackagePayload, "The first remote payload must be a supported package type of .exe or .msu. Use the -packageType switch to override the inferred extension: {0} from file: {1}", extension, path);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -73,6 +78,7 @@ namespace WixToolset.Core.Burn
             PackageCachePayloadCollision2 = 8007,
             TooManyAttachedContainers = 8008,
             IncompatibleWixBurnSection = 8009,
+            UnsupportedRemotePackagePayload = 8010,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }
