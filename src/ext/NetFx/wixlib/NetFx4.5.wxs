@@ -4,19 +4,12 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
-        .NET Framework installation state properties
-
-        Official documentation can be found at the following location:
-
-           .NET Framework 4.5 - http://msdn.microsoft.com/en-us/library/5a4x27ek.aspx, http://msdn.microsoft.com/en-us/library/ee942965(v=VS.110).aspx
-    -->
+    .NET Framework installation state properties
+    Official documentation can be found at the following location:
+      .NET Framework 4.5 - http://msdn.microsoft.com/en-us/library/5a4x27ek.aspx, http://msdn.microsoft.com/en-us/library/ee942965(v=VS.110).aspx
+  -->
 
   <?define NetFx45MinRelease = 378389?>
-  <?define NetFx45WebLink = http://go.microsoft.com/fwlink/?LinkId=225704 ?>
-  <?define NetFx45RedistLink = http://go.microsoft.com/fwlink/?LinkId=225702 ?>
-  <?define NetFx45EulaLink = http://go.microsoft.com/fwlink/?LinkID=260867 ?>
-  <?define NetFx45WebId = NetFx45Web ?>
-  <?define NetFx45RedistId = NetFx45Redist ?>
 
   <Fragment>
     <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />

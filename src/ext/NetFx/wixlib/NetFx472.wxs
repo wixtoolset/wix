@@ -3,10 +3,10 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
-        .NET Framework installation state properties
-        Official documentation can be found at the following location:
-        .NET Framework 4.5/4.5.1/4.5.2/4.6/4.6.1/4.6.2/4.7/4.7.1/4.7.2 - https://msdn.microsoft.com/en-us/library/w0x726c2(v=vs.110).aspx
-    -->
+    .NET Framework installation state properties
+    Official documentation can be found at the following location:
+      .NET Framework 4.5/4.5.1/4.5.2/4.6/4.6.1/4.6.2/4.7/4.7.1/4.7.2 - https://msdn.microsoft.com/en-us/library/w0x726c2(v=vs.110).aspx
+  -->
 
   <?define NetFx472MinRelease = 461808 ?>
   <?define NetFx472WebLink = https://go.microsoft.com/fwlink/?LinkId=863262 ?>
@@ -30,7 +30,7 @@
 
     <PackageGroup Id="$(var.NetFx472WebId)">
       <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx472WebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx472WebDetectCondition)" InstallCondition="!(wix.NetFx472WebInstallCondition)" Id="$(var.NetFx472WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx472WebLog" Cache="remove">
-        <ExePackagePayload Name="!(wix.NetFx472WebPackageDirectory)NDP472-KB4054531-Web.exe" DownloadUrl="$(var.NetFx472WebLink)" Description="Microsoft .NET Framework 4.7.2 Setup" Hash="213CDEE35D320FE126CB64FE59963DB355062A14592E0B2FC4D45C2EDEF5F6A91305D0674D27152869202E3440090DFC207A0C5EB14D812F61E437907A81887E" ProductName="Microsoft .NET Framework 4.7.2" Size="1399888" Version="4.7.3081.0" />
+        <ExePackagePayload Name="!(wix.NetFx472WebPackageDirectory)NDP472-KB4054531-Web.exe" DownloadUrl="$(var.NetFx472WebLink)" ProductName="Microsoft .NET Framework 4.7.2" Description="Microsoft .NET Framework 4.7.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Hash="99B1D7F9264E7D5AEA7B01B69EF541065030055A37CFD76F9846B3CC84FD6F2BAB612042D68DDF992BDA41553C493FB45830699BA5F56AB0AEE200CC539CC5D8" Size="1405792" Version="4.7.3081.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
@@ -52,7 +52,7 @@
 
     <PackageGroup Id="$(var.NetFx472RedistId)">
       <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx472RedistLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx472RedistDetectCondition)" InstallCondition="!(wix.NetFx472RedistInstallCondition)" Id="$(var.NetFx472RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx472RedistLog" Cache="remove">
-        <ExePackagePayload Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx472RedistLink)" Description="Microsoft .NET Framework 4.7.2 Setup" Hash="F4EA32D8189DD269FF02D68B39D7DE866AE5F46EEA5A71BF8F4715FB0E4F8B7AC64B274DFA7BFF69B52C719E65256906C8D92FDD355F52C977175AE3E1919098" ProductName="Microsoft .NET Framework 4.7.2" Size="83940592" Version="4.7.3081.0" />
+        <ExePackagePayload Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx472RedistLink)" ProductName="Microsoft .NET Framework 4.7.2" Description="Microsoft .NET Framework 4.7.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Hash="F4EA32D8189DD269FF02D68B39D7DE866AE5F46EEA5A71BF8F4715FB0E4F8B7AC64B274DFA7BFF69B52C719E65256906C8D92FDD355F52C977175AE3E1919098" Size="83940592" Version="4.7.3081.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
