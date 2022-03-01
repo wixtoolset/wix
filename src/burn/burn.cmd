@@ -15,7 +15,8 @@ nuget restore || exit /b
 
 msbuild burn_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\burn_build.binlog || exit /b
 
-msbuild test\BurnUnitTest -t:Test -p:Configuration=%_C% -nologo -p:CppCliTestResultsFile="%_L%\TestResults\BurnUnitTest.xunit2.xml" || exit /b
+msbuild test\BurnUnitTest -t:Test -p:Configuration=%_C% -p:Platform=Win32 -nologo -p:CppCliTestResultsFile="%_L%\TestResults\BurnUnitTest32.xunit2.xml" || exit /b
+msbuild test\BurnUnitTest -t:Test -p:Configuration=%_C% -p:Platform=x64 -nologo -p:CppCliTestResultsFile="%_L%\TestResults\BurnUnitTest64.xunit2.xml" || exit /b
 
 @popd
 @endlocal

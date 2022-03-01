@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
     <ProjectReference Include="test\BurnUnitTest\BurnUnitTest.vcxproj" Properties="Platform=x86" BuildInParallel="false" />
+    <ProjectReference Include="test\BurnUnitTest\BurnUnitTest.vcxproj" Properties="Platform=x64" BuildInParallel="false" />
 
     <ProjectReference Include="stub\stub.vcxproj" Properties="Platform=x86" />
     <ProjectReference Include="stub\stub.vcxproj" Properties="Platform=x64" />

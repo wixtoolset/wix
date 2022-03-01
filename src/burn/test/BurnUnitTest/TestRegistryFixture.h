@@ -11,8 +11,6 @@ namespace TestSupport
     {
     private:
         String^ rootPath;
-        String^ hkcuPath;
-        String^ hklmPath;
     public:
         TestRegistryFixture();
 
@@ -22,9 +20,9 @@ namespace TestSupport
 
         void TearDown();
 
-        String^ GetDirectHkcuPath(... array<String^>^ paths);
+        String^ GetDirectHkcuPath(REG_KEY_BITNESS bitness, ... array<String^>^ paths);
 
-        String^ GetDirectHklmPath(... array<String^>^ paths);
+        String^ GetDirectHklmPath(REG_KEY_BITNESS bitness, ... array<String^>^ paths);
     };
 }
 }
