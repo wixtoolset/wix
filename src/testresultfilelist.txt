@@ -1,7 +1,8 @@
 build/logs/TestResults/api_wix.trx
 build/logs/TestResults/BalUtilUnitTest.xunit2.xml
 build/logs/TestResults/BextUtilUnitTest.xunit2.xml
-build/logs/TestResults/BurnUnitTest.xunit2.xml
+build/logs/TestResults/BurnUnitTest32.xunit2.xml
+build/logs/TestResults/BurnUnitTest64.xunit2.xml
 build/logs/TestResults/DutilUnitTest.xunit2.xml
 build/logs/TestResults/WixToolsetTest.BuildTasks.trx
 build/logs/TestResults/WixToolsetTest.BurnE2E.trx

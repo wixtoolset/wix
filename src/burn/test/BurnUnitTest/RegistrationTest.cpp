@@ -37,8 +37,8 @@ namespace Bootstrapper
         {
             this->testRegistry = registryFixture;
 
-            this->testRunKeyPath = this->testRegistry->GetDirectHkcuPath(gcnew String(REGISTRY_RUN_KEY));
-            this->testUninstallKeyPath = this->testRegistry->GetDirectHkcuPath(gcnew String(REGISTRY_UNINSTALL_KEY), gcnew String(TEST_BUNDLE_ID));
+            this->testRunKeyPath = this->testRegistry->GetDirectHkcuPath(REG_KEY_DEFAULT, gcnew String(REGISTRY_RUN_KEY));
+            this->testUninstallKeyPath = this->testRegistry->GetDirectHkcuPath(REG_KEY_DEFAULT, gcnew String(REGISTRY_UNINSTALL_KEY), gcnew String(TEST_BUNDLE_ID));
             this->testVariableKeyPath = Path::Combine(this->testUninstallKeyPath, gcnew String(L"variables"));
         }
 

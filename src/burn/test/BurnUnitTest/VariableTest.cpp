@@ -497,7 +497,11 @@ namespace Bootstrapper
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData) + "\\", VariableGetStringHelper(&variables, L"AppDataFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::CommonApplicationData) + "\\", VariableGetStringHelper(&variables, L"CommonAppDataFolder"));
 
+#if defined(_WIN64)
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::ProgramFiles) + "\\", VariableGetStringHelper(&variables, L"ProgramFiles64Folder"));
+#else
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::ProgramFiles) + "\\", VariableGetStringHelper(&variables, L"ProgramFilesFolder"));
+#endif
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::DesktopDirectory) + "\\", VariableGetStringHelper(&variables, L"DesktopFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Favorites) + "\\", VariableGetStringHelper(&variables, L"FavoritesFolder"));
                 VariableGetStringHelper(&variables, L"FontsFolder");
@@ -514,7 +518,11 @@ namespace Bootstrapper
                 Assert::Equal<String^>(System::IO::Path::GetTempPath(), System::IO::Path::GetFullPath(VariableGetStringHelper(&variables, L"TempFolder")));
 
                 VariableGetStringHelper(&variables, L"AdminToolsFolder");
+#if defined(_WIN64)
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::CommonProgramFiles) + "\\", VariableGetStringHelper(&variables, L"CommonFiles64Folder"));
+#else
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::CommonProgramFiles) + "\\", VariableGetStringHelper(&variables, L"CommonFilesFolder"));
+#endif
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::MyPictures) + "\\", VariableGetStringHelper(&variables, L"MyPicturesFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Templates) + "\\", VariableGetStringHelper(&variables, L"TemplateFolder"));
 
