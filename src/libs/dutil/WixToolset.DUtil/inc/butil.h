@@ -12,6 +12,37 @@ typedef enum _BUNDLE_INSTALL_CONTEXT
     BUNDLE_INSTALL_CONTEXT_USER,
 } BUNDLE_INSTALL_CONTEXT;
 
+typedef enum _BUNDLE_QUERY_CALLBACK_RESULT
+{
+    BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE,
+    BUNDLE_QUERY_CALLBACK_RESULT_CANCEL,
+} BUNDLE_QUERY_CALLBACK_RESULT;
+
+typedef enum _BUNDLE_RELATION_TYPE
+{
+    BUNDLE_RELATION_NONE,
+    BUNDLE_RELATION_DETECT,
+    BUNDLE_RELATION_UPGRADE,
+    BUNDLE_RELATION_ADDON,
+    BUNDLE_RELATION_PATCH,
+    BUNDLE_RELATION_DEPENDENT,
+    BUNDLE_RELATION_UPDATE,
+} BUNDLE_RELATION_TYPE;
+
+typedef struct _BUNDLE_QUERY_RELATED_BUNDLE_RESULT
+{
+    LPCWSTR wzBundleId;
+    BUNDLE_INSTALL_CONTEXT installContext;
+    REG_KEY_BITNESS regBitness;
+    HKEY hkBundle;
+    BUNDLE_RELATION_TYPE relationType;
+} BUNDLE_QUERY_RELATED_BUNDLE_RESULT;
+
+typedef BUNDLE_QUERY_CALLBACK_RESULT(CALLBACK *PFNBUNDLE_QUERY_RELATED_BUNDLE_CALLBACK)(
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
+    __in_opt LPVOID pvContext
+    );
+
 
 /********************************************************************
 BundleGetBundleInfo - Queries the bundle installation metadata for a given property,
@@ -153,6 +184,24 @@ HRESULT DAPI BundleGetBundleVariableFixed(
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
     __inout SIZE_T* pcchValue
+    );
+
+/********************************************************************
+BundleQueryRelatedBundles - Queries the bundle installation metadata for installs with the given detect, upgrade, addon, and patch codes.
+                            Passes each related bundle to the callback function.
+********************************************************************/
+HRESULT BundleQueryRelatedBundles(
+    __in BUNDLE_INSTALL_CONTEXT installContext,
+    __in_z_opt LPCWSTR* rgwzDetectCodes,
+    __in DWORD cDetectCodes,
+    __in_z_opt LPCWSTR* rgwzUpgradeCodes,
+    __in DWORD cUpgradeCodes,
+    __in_z_opt LPCWSTR* rgwzAddonCodes,
+    __in DWORD cAddonCodes,
+    __in_z_opt LPCWSTR* rgwzPatchCodes,
+    __in DWORD cPatchCodes,
+    __in PFNBUNDLE_QUERY_RELATED_BUNDLE_CALLBACK pfnCallback,
+    __in_opt LPVOID pvContext
     );
 
 

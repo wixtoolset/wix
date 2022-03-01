@@ -2,6 +2,12 @@
 
 #include "precomp.h"
 
+typedef struct _BUNDLE_QUERY_CONTEXT
+{
+    BURN_REGISTRATION* pRegistration;
+    BURN_RELATED_BUNDLES* pRelatedBundles;
+} BUNDLE_QUERY_CONTEXT;
+
 // internal function declarations
 
 static __callback int __cdecl CompareRelatedBundles(
@@ -9,24 +15,14 @@ static __callback int __cdecl CompareRelatedBundles(
     __in const void* pvLeft,
     __in const void* pvRight
 );
-static HRESULT InitializeForScopeAndBitness(
-    __in BOOL fPerMachine,
-    __in REG_KEY_BITNESS regBitness,
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_RELATED_BUNDLES* pRelatedBundles
+static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
+    __in_opt LPVOID pvContext
     );
 static HRESULT LoadIfRelatedBundle(
-    __in BOOL fPerMachine,
-    __in REG_KEY_BITNESS regBitness,
-    __in HKEY hkUninstallKey,
-    __in_z LPCWSTR sczRelatedBundleId,
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_RELATED_BUNDLES* pRelatedBundles
-    );
-static HRESULT DetermineRelationType(
-    __in HKEY hkBundleId,
-    __in BURN_REGISTRATION* pRegistration,
-    __out BOOTSTRAPPER_RELATION_TYPE* pRelationType
     );
 static HRESULT LoadRelatedBundleFromKey(
     __in_z LPCWSTR wzRelatedBundleId,
@@ -46,12 +42,25 @@ extern "C" HRESULT RelatedBundlesInitializeForScope(
     )
 {
     HRESULT hr = S_OK;
+    BUNDLE_INSTALL_CONTEXT installContext = fPerMachine ? BUNDLE_INSTALL_CONTEXT_MACHINE : BUNDLE_INSTALL_CONTEXT_USER;
+    BUNDLE_QUERY_CONTEXT queryContext = { };
 
-    hr = InitializeForScopeAndBitness(fPerMachine, REG_KEY_32BIT, pRegistration, pRelatedBundles);
-    ExitOnFailure(hr, "Failed to open 32-bit uninstall registry key.");
+    queryContext.pRegistration = pRegistration;
+    queryContext.pRelatedBundles = pRelatedBundles;
 
-    hr = InitializeForScopeAndBitness(fPerMachine, REG_KEY_64BIT, pRegistration, pRelatedBundles);
-    ExitOnFailure(hr, "Failed to open 64-bit uninstall registry key.");
+    hr = BundleQueryRelatedBundles(
+        installContext,
+        const_cast<LPCWSTR*>(pRegistration->rgsczDetectCodes),
+        pRegistration->cDetectCodes,
+        const_cast<LPCWSTR*>(pRegistration->rgsczUpgradeCodes),
+        pRegistration->cUpgradeCodes,
+        const_cast<LPCWSTR*>(pRegistration->rgsczAddonCodes),
+        pRegistration->cAddonCodes,
+        const_cast<LPCWSTR*>(pRegistration->rgsczPatchCodes),
+        pRegistration->cPatchCodes,
+        QueryRelatedBundlesCallback,
+        &queryContext);
+    ExitOnFailure(hr, "Failed to initialize related bundles for scope.");
 
 LExit:
     return hr;
@@ -166,346 +175,53 @@ static __callback int __cdecl CompareRelatedBundles(
     return ret;
 }
 
-static HRESULT InitializeForScopeAndBitness(
-    __in BOOL fPerMachine,
-    __in REG_KEY_BITNESS regBitness,
-    __in BURN_REGISTRATION * pRegistration,
-    __in BURN_RELATED_BUNDLES * pRelatedBundles
-)
+static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
+    __in_opt LPVOID pvContext
+    )
 {
     HRESULT hr = S_OK;
-    HKEY hkRoot = fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-    HKEY hkUninstallKey = NULL;
-    LPWSTR sczRelatedBundleId = NULL;
+    BUNDLE_QUERY_CALLBACK_RESULT result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
+    BUNDLE_QUERY_CONTEXT* pContext = reinterpret_cast<BUNDLE_QUERY_CONTEXT*>(pvContext);
 
-    hr = RegOpenEx(hkRoot, BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, regBitness, &hkUninstallKey);
-    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
-    {
-        ExitFunction1(hr = S_OK);
-    }
-    ExitOnFailure(hr, "Failed to open uninstall registry key.");
-
-    for (DWORD dwIndex = 0; /* exit via break below */; ++dwIndex)
-    {
-        hr = RegKeyEnum(hkUninstallKey, dwIndex, &sczRelatedBundleId);
-        if (E_NOMOREITEMS == hr)
-        {
-            hr = S_OK;
-            break;
-        }
-        ExitOnFailure(hr, "Failed to enumerate uninstall key for related bundles.");
-
-        // If we did not find our bundle id, try to load the subkey as a related bundle.
-        if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczRelatedBundleId, -1, pRegistration->sczId, -1))
-        {
-            // Ignore failures here since we'll often find products that aren't actually
-            // related bundles (or even bundles at all).
-            HRESULT hrRelatedBundle = LoadIfRelatedBundle(fPerMachine, regBitness, hkUninstallKey, sczRelatedBundleId, pRegistration, pRelatedBundles);
-            UNREFERENCED_PARAMETER(hrRelatedBundle);
-        }
-    }
+    hr = LoadIfRelatedBundle(pBundle, pContext->pRegistration, pContext->pRelatedBundles);
+    ExitOnFailure(hr, "Failed to load related bundle: %ls", pBundle->wzBundleId);
 
 LExit:
-    ReleaseStr(sczRelatedBundleId);
-    ReleaseRegKey(hkUninstallKey);
-
-    return hr;
+    return result;
 }
 
 static HRESULT LoadIfRelatedBundle(
-    __in BOOL fPerMachine,
-    __in REG_KEY_BITNESS regBitness,
-    __in HKEY hkUninstallKey,
-    __in_z LPCWSTR sczRelatedBundleId,
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_RELATED_BUNDLES* pRelatedBundles
     )
 {
     HRESULT hr = S_OK;
-    HKEY hkBundleId = NULL;
-    BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_NONE;
+    BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
+    BOOTSTRAPPER_RELATION_TYPE relationType = (BOOTSTRAPPER_RELATION_TYPE)pBundle->relationType;
+    BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
 
-    hr = RegOpenEx(hkUninstallKey, sczRelatedBundleId, KEY_READ, regBitness, &hkBundleId);
-    ExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", sczRelatedBundleId);
-
-    hr = DetermineRelationType(hkBundleId, pRegistration, &relationType);
-    if (FAILED(hr) || BOOTSTRAPPER_RELATION_NONE == relationType)
+    // If we found our bundle id, it's not a related bundle.
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleId, -1, pRegistration->sczId, -1))
     {
-        // Must not be a related bundle.
-        hr = E_NOTFOUND;
+        ExitFunction1(hr = S_FALSE);
     }
-    else // load the related bundle.
-    {
-        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRelatedBundles->rgRelatedBundles), pRelatedBundles->cRelatedBundles + 1, sizeof(BURN_RELATED_BUNDLE), 5);
-        ExitOnFailure(hr, "Failed to ensure there is space for related bundles.");
 
-        BURN_RELATED_BUNDLE* pRelatedBundle = pRelatedBundles->rgRelatedBundles + pRelatedBundles->cRelatedBundles;
+    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRelatedBundles->rgRelatedBundles), pRelatedBundles->cRelatedBundles + 1, sizeof(BURN_RELATED_BUNDLE), 5);
+    ExitOnFailure(hr, "Failed to ensure there is space for related bundles.");
 
-        hr = LoadRelatedBundleFromKey(sczRelatedBundleId, hkBundleId, fPerMachine, relationType, pRelatedBundle);
-        ExitOnFailure(hr, "Failed to initialize package from related bundle id: %ls", sczRelatedBundleId);
+    pRelatedBundle = pRelatedBundles->rgRelatedBundles + pRelatedBundles->cRelatedBundles;
 
-        hr = DependencyDetectRelatedBundle(pRelatedBundle, pRegistration);
-        ExitOnFailure(hr, "Failed to detect dependencies for related bundle.");
+    hr = LoadRelatedBundleFromKey(pBundle->wzBundleId, pBundle->hkBundle, fPerMachine, relationType, pRelatedBundle);
+    ExitOnFailure(hr, "Failed to initialize package from related bundle id: %ls", pBundle->wzBundleId);
 
-        ++pRelatedBundles->cRelatedBundles;
-    }
+    hr = DependencyDetectRelatedBundle(pRelatedBundle, pRegistration);
+    ExitOnFailure(hr, "Failed to detect dependencies for related bundle.");
+
+    ++pRelatedBundles->cRelatedBundles;
 
 LExit:
-    ReleaseRegKey(hkBundleId);
-
-    return hr;
-}
-
-static HRESULT DetermineRelationType(
-    __in HKEY hkBundleId,
-    __in BURN_REGISTRATION* pRegistration,
-    __out BOOTSTRAPPER_RELATION_TYPE* pRelationType
-    )
-{
-    HRESULT hr = S_OK;
-    LPWSTR* rgsczUpgradeCodes = NULL;
-    DWORD cUpgradeCodes = 0;
-    STRINGDICT_HANDLE sdUpgradeCodes = NULL;
-    LPWSTR* rgsczAddonCodes = NULL;
-    DWORD cAddonCodes = 0;
-    STRINGDICT_HANDLE sdAddonCodes = NULL;
-    LPWSTR* rgsczDetectCodes = NULL;
-    DWORD cDetectCodes = 0;
-    STRINGDICT_HANDLE sdDetectCodes = NULL;
-    LPWSTR* rgsczPatchCodes = NULL;
-    DWORD cPatchCodes = 0;
-    STRINGDICT_HANDLE sdPatchCodes = NULL;
-
-    *pRelationType = BOOTSTRAPPER_RELATION_NONE;
-
-    // All remaining operations should treat all related bundles as non-vital.
-    hr = RegReadStringArray(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes, &cUpgradeCodes);
-    if (HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE) == hr)
-    {
-        TraceError(hr, "Failed to read upgrade codes as REG_MULTI_SZ. Trying again as REG_SZ in case of older bundles.");
-
-        rgsczUpgradeCodes = reinterpret_cast<LPWSTR*>(MemAlloc(sizeof(LPWSTR), TRUE));
-        ExitOnNull(rgsczUpgradeCodes, hr, E_OUTOFMEMORY, "Failed to allocate list for a single upgrade code from older bundle.");
-
-        hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes[0]);
-        if (SUCCEEDED(hr))
-        {
-            cUpgradeCodes = 1;
-        }
-    }
-
-    // Compare upgrade codes.
-    if (SUCCEEDED(hr))
-    {
-        hr = DictCreateStringListFromArray(&sdUpgradeCodes, rgsczUpgradeCodes, cUpgradeCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "upgrade codes");
-
-        // Upgrade relationship: when their upgrade codes match our upgrade codes.
-        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pRegistration->rgsczUpgradeCodes), pRegistration->cUpgradeCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for upgrade code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_UPGRADE;
-            ExitFunction();
-        }
-
-        // Detect relationship: when their upgrade codes match our detect codes.
-        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pRegistration->rgsczDetectCodes), pRegistration->cDetectCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for detect code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_DETECT;
-            ExitFunction();
-        }
-
-        // Dependent relationship: when their upgrade codes match our addon codes.
-        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pRegistration->rgsczAddonCodes), pRegistration->cAddonCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_DEPENDENT;
-            ExitFunction();
-        }
-
-        // Dependent relationship: when their upgrade codes match our patch codes.
-        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pRegistration->rgsczPatchCodes), pRegistration->cPatchCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_DEPENDENT;
-            ExitFunction();
-        }
-
-        ReleaseNullDict(sdUpgradeCodes);
-        ReleaseNullStrArray(rgsczUpgradeCodes, cUpgradeCodes);
-    }
-
-    // Compare addon codes.
-    hr = RegReadStringArray(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_ADDON_CODE, &rgsczAddonCodes, &cAddonCodes);
-    if (SUCCEEDED(hr))
-    {
-        hr = DictCreateStringListFromArray(&sdAddonCodes, rgsczAddonCodes, cAddonCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "addon codes");
-
-        // Addon relationship: when their addon codes match our detect codes.
-        hr = DictCompareStringListToArray(sdAddonCodes, const_cast<LPCWSTR*>(pRegistration->rgsczDetectCodes), pRegistration->cDetectCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_ADDON;
-            ExitFunction();
-        }
-
-        // Addon relationship: when their addon codes match our upgrade codes.
-        hr = DictCompareStringListToArray(sdAddonCodes, const_cast<LPCWSTR*>(pRegistration->rgsczUpgradeCodes), pRegistration->cUpgradeCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_ADDON;
-            ExitFunction();
-        }
-
-        ReleaseNullDict(sdAddonCodes);
-        ReleaseNullStrArray(rgsczAddonCodes, cAddonCodes);
-    }
-
-    // Compare patch codes.
-    hr = RegReadStringArray(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE, &rgsczPatchCodes, &cPatchCodes);
-    if (SUCCEEDED(hr))
-    {
-        hr = DictCreateStringListFromArray(&sdPatchCodes, rgsczPatchCodes, cPatchCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "patch codes");
-
-        // Patch relationship: when their patch codes match our detect codes.
-        hr = DictCompareStringListToArray(sdPatchCodes, const_cast<LPCWSTR*>(pRegistration->rgsczDetectCodes), pRegistration->cDetectCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for patch code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_PATCH;
-            ExitFunction();
-        }
-
-        // Patch relationship: when their patch codes match our upgrade codes.
-        hr = DictCompareStringListToArray(sdPatchCodes, const_cast<LPCWSTR*>(pRegistration->rgsczUpgradeCodes), pRegistration->cUpgradeCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for patch code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_PATCH;
-            ExitFunction();
-        }
-
-        ReleaseNullDict(sdPatchCodes);
-        ReleaseNullStrArray(rgsczPatchCodes, cPatchCodes);
-    }
-
-    // Compare detect codes.
-    hr = RegReadStringArray(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_DETECT_CODE, &rgsczDetectCodes, &cDetectCodes);
-    if (SUCCEEDED(hr))
-    {
-        hr = DictCreateStringListFromArray(&sdDetectCodes, rgsczDetectCodes, cDetectCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "detect codes");
-
-        // Detect relationship: when their detect codes match our detect codes.
-        hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pRegistration->rgsczDetectCodes), pRegistration->cDetectCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for detect code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_DETECT;
-            ExitFunction();
-        }
-
-        // Dependent relationship: when their detect codes match our addon codes.
-        hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pRegistration->rgsczAddonCodes), pRegistration->cAddonCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_DEPENDENT;
-            ExitFunction();
-        }
-
-        // Dependent relationship: when their detect codes match our patch codes.
-        hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pRegistration->rgsczPatchCodes), pRegistration->cPatchCodes);
-        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
-
-            *pRelationType = BOOTSTRAPPER_RELATION_DEPENDENT;
-            ExitFunction();
-        }
-
-        ReleaseNullDict(sdDetectCodes);
-        ReleaseNullStrArray(rgsczDetectCodes, cDetectCodes);
-    }
-
-LExit:
-    if (SUCCEEDED(hr) && BOOTSTRAPPER_RELATION_NONE == *pRelationType)
-    {
-        hr = E_NOTFOUND;
-    }
-
-    ReleaseDict(sdUpgradeCodes);
-    ReleaseStrArray(rgsczUpgradeCodes, cUpgradeCodes);
-    ReleaseDict(sdAddonCodes);
-    ReleaseStrArray(rgsczAddonCodes, cAddonCodes);
-    ReleaseDict(sdDetectCodes);
-    ReleaseStrArray(rgsczDetectCodes, cDetectCodes);
-    ReleaseDict(sdPatchCodes);
-    ReleaseStrArray(rgsczPatchCodes, cPatchCodes);
-
     return hr;
 }
 

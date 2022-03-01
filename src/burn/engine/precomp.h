@@ -55,6 +55,7 @@
 #include <atomutil.h>
 #include <apuputil.h>
 #include <dpiutil.h>
+#include <butil.h>
 
 #include "BootstrapperEngine.h"
 #include "BootstrapperApplication.h"

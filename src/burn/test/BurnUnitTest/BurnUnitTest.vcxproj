@@ -56,6 +56,7 @@
       <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="RegistrationTest.cpp" />
+    <ClCompile Include="RelatedBundleTest.cpp" />
     <ClCompile Include="SearchTest.cpp" />
     <ClCompile Include="TestRegistryFixture.cpp" />
     <ClCompile Include="VariableHelpers.cpp" />

@@ -19,6 +19,9 @@
 // constants
 // From engine/registration.h
 const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_ADDON_CODE = L"BundleAddonCode";
+const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_DETECT_CODE = L"BundleDetectCode";
+const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE = L"BundlePatchCode";
 const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE = L"BundleUpgradeCode";
 const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_PROVIDER_KEY = L"BundleProviderKey";
 const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY = L"variables";
@@ -30,7 +33,41 @@ enum INTERNAL_BUNDLE_STATUS
     INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY,
 };
 
+typedef struct _BUNDLE_QUERY_CONTEXT
+{
+    BUNDLE_INSTALL_CONTEXT installContext;
+    REG_KEY_BITNESS regBitness;
+    PFNBUNDLE_QUERY_RELATED_BUNDLE_CALLBACK pfnCallback;
+    LPVOID pvContext;
+
+    LPCWSTR* rgwzDetectCodes;
+    DWORD cDetectCodes;
+
+    LPCWSTR* rgwzUpgradeCodes;
+    DWORD cUpgradeCodes;
+
+    LPCWSTR* rgwzAddonCodes;
+    DWORD cAddonCodes;
+
+    LPCWSTR* rgwzPatchCodes;
+    DWORD cPatchCodes;
+} BUNDLE_QUERY_CONTEXT;
+
 // Forward declarations.
+static HRESULT QueryRelatedBundlesForScopeAndBitness(
+    __in BUNDLE_QUERY_CONTEXT* pQueryContext
+    );
+static HRESULT QueryPotentialRelatedBundle(
+    __in BUNDLE_QUERY_CONTEXT* pQueryContext,
+    __in HKEY hkUninstallKey,
+    __in_z LPCWSTR wzRelatedBundleId,
+    __inout BUNDLE_QUERY_CALLBACK_RESULT* pResult
+    );
+static HRESULT DetermineRelationType(
+    __in BUNDLE_QUERY_CONTEXT* pQueryContext,
+    __in HKEY hkBundleId,
+    __out BUNDLE_RELATION_TYPE* pRelationType
+    );
 /********************************************************************
 LocateAndQueryBundleValue - Locates the requested key for the bundle,
     then queries the registry type for requested value.
@@ -160,11 +197,13 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
     HKEY hkBundle = NULL;
     LPWSTR sczUninstallSubKey = NULL;
     LPWSTR sczUninstallSubKeyPath = NULL;
-    LPWSTR sczValue = NULL;
-    DWORD dwType = 0;
-    LPWSTR* rgsczBundleUpgradeCodes = NULL;
-    DWORD cBundleUpgradeCodes = 0;
     HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == context ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
+    BUNDLE_QUERY_CONTEXT queryContext = { };
+    BUNDLE_RELATION_TYPE relationType = BUNDLE_RELATION_NONE;
+
+    queryContext.installContext = context;
+    queryContext.rgwzUpgradeCodes = &wzUpgradeCode;
+    queryContext.cUpgradeCodes = 1;
 
     if (!wzUpgradeCode || !pdwStartIndex)
     {
@@ -185,60 +224,12 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
         hr = RegOpenEx(hkRoot, sczUninstallSubKeyPath, KEY_READ, kbKeyBitness, &hkBundle);
         ButilExitOnFailure(hr, "Failed to open uninstall key path.");
 
-        // If it's a bundle, it should have a BundleUpgradeCode value of type REG_SZ (old) or REG_MULTI_SZ
-        hr = RegGetType(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &dwType);
-        if (FAILED(hr))
+        hr = DetermineRelationType(&queryContext, hkBundle, &relationType);
+        if (SUCCEEDED(hr) && BUNDLE_RELATION_UPGRADE == relationType)
         {
-            ReleaseRegKey(hkBundle);
-            ReleaseNullStr(sczUninstallSubKey);
-            ReleaseNullStr(sczUninstallSubKeyPath);
-            // Not a bundle
-            continue;
-        }
+            fUpgradeCodeFound = TRUE;
+            *pdwStartIndex = dwIndex;
 
-        switch (dwType)
-        {
-        case REG_SZ:
-            hr = RegReadString(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &sczValue);
-            ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode string property.");
-
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, sczValue, -1, wzUpgradeCode, -1))
-            {
-                *pdwStartIndex = dwIndex;
-                fUpgradeCodeFound = TRUE;
-                break;
-            }
-
-            ReleaseNullStr(sczValue);
-
-            break;
-        case REG_MULTI_SZ:
-            hr = RegReadStringArray(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczBundleUpgradeCodes, &cBundleUpgradeCodes);
-            ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode multi-string property.");
-
-            for (DWORD i = 0; i < cBundleUpgradeCodes; i++)
-            {
-                LPWSTR wzBundleUpgradeCode = rgsczBundleUpgradeCodes[i];
-                if (wzBundleUpgradeCode && *wzBundleUpgradeCode)
-                {
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzBundleUpgradeCode, -1, wzUpgradeCode, -1))
-                    {
-                        *pdwStartIndex = dwIndex;
-                        fUpgradeCodeFound = TRUE;
-                        break;
-                    }
-                }
-            }
-            ReleaseNullStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
-
-            break;
-
-        default:
-            ButilExitWithRootFailure(hr, E_NOTIMPL, "BundleUpgradeCode of type 0x%x not implemented.", dwType);
-        }
-
-        if (fUpgradeCodeFound)
-        {
             if (psczBundleId)
             {
                 *psczBundleId = sczUninstallSubKey;
@@ -250,17 +241,13 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
 
         // Cleanup before next iteration
         ReleaseRegKey(hkBundle);
-        ReleaseNullStr(sczUninstallSubKey);
-        ReleaseNullStr(sczUninstallSubKeyPath);
     }
 
 LExit:
-    ReleaseStr(sczValue);
     ReleaseStr(sczUninstallSubKey);
     ReleaseStr(sczUninstallSubKeyPath);
     ReleaseRegKey(hkBundle);
     ReleaseRegKey(hkUninstall);
-    ReleaseStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
 
     return FAILED(hr) ? hr : fUpgradeCodeFound ? S_OK : S_FALSE;
 }
@@ -366,6 +353,379 @@ DAPI_(HRESULT) BundleGetBundleVariableFixed(
 
 LExit:
     ReleaseStr(sczValue);
+
+    return hr;
+}
+
+DAPI_(HRESULT) BundleQueryRelatedBundles(
+    __in BUNDLE_INSTALL_CONTEXT installContext,
+    __in_z_opt LPCWSTR* rgwzDetectCodes,
+    __in DWORD cDetectCodes,
+    __in_z_opt LPCWSTR* rgwzUpgradeCodes,
+    __in DWORD cUpgradeCodes,
+    __in_z_opt LPCWSTR* rgwzAddonCodes,
+    __in DWORD cAddonCodes,
+    __in_z_opt LPCWSTR* rgwzPatchCodes,
+    __in DWORD cPatchCodes,
+    __in PFNBUNDLE_QUERY_RELATED_BUNDLE_CALLBACK pfnCallback,
+    __in_opt LPVOID pvContext
+    )
+{
+    HRESULT hr = S_OK;
+    BUNDLE_QUERY_CONTEXT queryContext = { };
+
+    queryContext.installContext = installContext;
+    queryContext.rgwzDetectCodes = rgwzDetectCodes;
+    queryContext.cDetectCodes = cDetectCodes;
+    queryContext.rgwzUpgradeCodes = rgwzUpgradeCodes;
+    queryContext.cUpgradeCodes = cUpgradeCodes;
+    queryContext.rgwzAddonCodes = rgwzAddonCodes;
+    queryContext.cAddonCodes = cAddonCodes;
+    queryContext.rgwzPatchCodes = rgwzPatchCodes;
+    queryContext.cPatchCodes = cPatchCodes;
+    queryContext.pfnCallback = pfnCallback;
+    queryContext.pvContext = pvContext;
+
+    queryContext.regBitness = REG_KEY_32BIT;
+
+    hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
+    ExitOnFailure(hr, "Failed to query 32-bit related bundles.");
+
+    queryContext.regBitness = REG_KEY_64BIT;
+
+    hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
+    ExitOnFailure(hr, "Failed to query 64-bit related bundles.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT QueryRelatedBundlesForScopeAndBitness(
+    __in BUNDLE_QUERY_CONTEXT* pQueryContext
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == pQueryContext->installContext ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
+    HKEY hkUninstallKey = NULL;
+    LPWSTR sczRelatedBundleId = NULL;
+    BUNDLE_QUERY_CALLBACK_RESULT result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
+
+    hr = RegOpenEx(hkRoot, BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, pQueryContext->regBitness, &hkUninstallKey);
+    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    ExitOnFailure(hr, "Failed to open uninstall registry key.");
+
+    for (DWORD dwIndex = 0; /* exit via break below */; ++dwIndex)
+    {
+        hr = RegKeyEnum(hkUninstallKey, dwIndex, &sczRelatedBundleId);
+        if (E_NOMOREITEMS == hr)
+        {
+            hr = S_OK;
+            break;
+        }
+        ExitOnFailure(hr, "Failed to enumerate uninstall key for related bundles.");
+
+        // Ignore failures here since we'll often find products that aren't actually
+        // related bundles (or even bundles at all).
+        HRESULT hrRelatedBundle = QueryPotentialRelatedBundle(pQueryContext, hkUninstallKey, sczRelatedBundleId, &result);
+        if (SUCCEEDED(hrRelatedBundle) && BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE != result)
+        {
+            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
+        }
+    }
+
+LExit:
+    ReleaseStr(sczRelatedBundleId);
+    ReleaseRegKey(hkUninstallKey);
+
+    return hr;
+}
+
+static HRESULT QueryPotentialRelatedBundle(
+    __in BUNDLE_QUERY_CONTEXT* pQueryContext,
+    __in HKEY hkUninstallKey,
+    __in_z LPCWSTR wzRelatedBundleId,
+    __inout BUNDLE_QUERY_CALLBACK_RESULT* pResult
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hkBundleId = NULL;
+    BUNDLE_RELATION_TYPE relationType = BUNDLE_RELATION_NONE;
+    BUNDLE_QUERY_RELATED_BUNDLE_RESULT bundle = { };
+
+    hr = RegOpenEx(hkUninstallKey, wzRelatedBundleId, KEY_READ, pQueryContext->regBitness, &hkBundleId);
+    ExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", wzRelatedBundleId);
+
+    hr = DetermineRelationType(pQueryContext, hkBundleId, &relationType);
+    if (FAILED(hr))
+    {
+        ExitFunction();
+    }
+
+    bundle.installContext = pQueryContext->installContext;
+    bundle.regBitness = pQueryContext->regBitness;
+    bundle.wzBundleId = wzRelatedBundleId;
+    bundle.relationType = relationType;
+    bundle.hkBundle = hkBundleId;
+
+    *pResult = pQueryContext->pfnCallback(&bundle, pQueryContext->pvContext);
+
+LExit:
+    ReleaseRegKey(hkBundleId);
+
+    return hr;
+}
+
+static HRESULT DetermineRelationType(
+    __in BUNDLE_QUERY_CONTEXT* pQueryContext,
+    __in HKEY hkBundleId,
+    __out BUNDLE_RELATION_TYPE* pRelationType
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR* rgsczUpgradeCodes = NULL;
+    DWORD cUpgradeCodes = 0;
+    STRINGDICT_HANDLE sdUpgradeCodes = NULL;
+    LPWSTR* rgsczAddonCodes = NULL;
+    DWORD cAddonCodes = 0;
+    STRINGDICT_HANDLE sdAddonCodes = NULL;
+    LPWSTR* rgsczDetectCodes = NULL;
+    DWORD cDetectCodes = 0;
+    STRINGDICT_HANDLE sdDetectCodes = NULL;
+    LPWSTR* rgsczPatchCodes = NULL;
+    DWORD cPatchCodes = 0;
+    STRINGDICT_HANDLE sdPatchCodes = NULL;
+
+    *pRelationType = BUNDLE_RELATION_NONE;
+
+    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes, &cUpgradeCodes);
+    if (HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE) == hr)
+    {
+        TraceError(hr, "Failed to read upgrade codes as REG_MULTI_SZ. Trying again as REG_SZ in case of older bundles.");
+
+        rgsczUpgradeCodes = reinterpret_cast<LPWSTR*>(MemAlloc(sizeof(LPWSTR), TRUE));
+        ExitOnNull(rgsczUpgradeCodes, hr, E_OUTOFMEMORY, "Failed to allocate list for a single upgrade code from older bundle.");
+
+        hr = RegReadString(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes[0]);
+        if (SUCCEEDED(hr))
+        {
+            cUpgradeCodes = 1;
+        }
+    }
+
+    // Compare upgrade codes.
+    if (SUCCEEDED(hr))
+    {
+        hr = DictCreateStringListFromArray(&sdUpgradeCodes, rgsczUpgradeCodes, cUpgradeCodes, DICT_FLAG_CASEINSENSITIVE);
+        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "upgrade codes");
+
+        // Upgrade relationship: when their upgrade codes match our upgrade codes.
+        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzUpgradeCodes), pQueryContext->cUpgradeCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for upgrade code match.");
+
+            *pRelationType = BUNDLE_RELATION_UPGRADE;
+            ExitFunction();
+        }
+
+        // Detect relationship: when their upgrade codes match our detect codes.
+        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for detect code match.");
+
+            *pRelationType = BUNDLE_RELATION_DETECT;
+            ExitFunction();
+        }
+
+        // Dependent relationship: when their upgrade codes match our addon codes.
+        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzAddonCodes), pQueryContext->cAddonCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+
+            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            ExitFunction();
+        }
+
+        // Dependent relationship: when their upgrade codes match our patch codes.
+        hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzPatchCodes), pQueryContext->cPatchCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+
+            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            ExitFunction();
+        }
+
+        ReleaseNullDict(sdUpgradeCodes);
+        ReleaseNullStrArray(rgsczUpgradeCodes, cUpgradeCodes);
+    }
+
+    // Compare addon codes.
+    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_ADDON_CODE, &rgsczAddonCodes, &cAddonCodes);
+    if (SUCCEEDED(hr))
+    {
+        hr = DictCreateStringListFromArray(&sdAddonCodes, rgsczAddonCodes, cAddonCodes, DICT_FLAG_CASEINSENSITIVE);
+        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "addon codes");
+
+        // Addon relationship: when their addon codes match our detect codes.
+        hr = DictCompareStringListToArray(sdAddonCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+
+            *pRelationType = BUNDLE_RELATION_ADDON;
+            ExitFunction();
+        }
+
+        // Addon relationship: when their addon codes match our upgrade codes.
+        hr = DictCompareStringListToArray(sdAddonCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzUpgradeCodes), pQueryContext->cUpgradeCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+
+            *pRelationType = BUNDLE_RELATION_ADDON;
+            ExitFunction();
+        }
+
+        ReleaseNullDict(sdAddonCodes);
+        ReleaseNullStrArray(rgsczAddonCodes, cAddonCodes);
+    }
+
+    // Compare patch codes.
+    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE, &rgsczPatchCodes, &cPatchCodes);
+    if (SUCCEEDED(hr))
+    {
+        hr = DictCreateStringListFromArray(&sdPatchCodes, rgsczPatchCodes, cPatchCodes, DICT_FLAG_CASEINSENSITIVE);
+        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "patch codes");
+
+        // Patch relationship: when their patch codes match our detect codes.
+        hr = DictCompareStringListToArray(sdPatchCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for patch code match.");
+
+            *pRelationType = BUNDLE_RELATION_PATCH;
+            ExitFunction();
+        }
+
+        // Patch relationship: when their patch codes match our upgrade codes.
+        hr = DictCompareStringListToArray(sdPatchCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzUpgradeCodes), pQueryContext->cUpgradeCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for patch code match.");
+
+            *pRelationType = BUNDLE_RELATION_PATCH;
+            ExitFunction();
+        }
+
+        ReleaseNullDict(sdPatchCodes);
+        ReleaseNullStrArray(rgsczPatchCodes, cPatchCodes);
+    }
+
+    // Compare detect codes.
+    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_DETECT_CODE, &rgsczDetectCodes, &cDetectCodes);
+    if (SUCCEEDED(hr))
+    {
+        hr = DictCreateStringListFromArray(&sdDetectCodes, rgsczDetectCodes, cDetectCodes, DICT_FLAG_CASEINSENSITIVE);
+        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "detect codes");
+
+        // Detect relationship: when their detect codes match our detect codes.
+        hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for detect code match.");
+
+            *pRelationType = BUNDLE_RELATION_DETECT;
+            ExitFunction();
+        }
+
+        // Dependent relationship: when their detect codes match our addon codes.
+        hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzAddonCodes), pQueryContext->cAddonCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+
+            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            ExitFunction();
+        }
+
+        // Dependent relationship: when their detect codes match our patch codes.
+        hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzPatchCodes), pQueryContext->cPatchCodes);
+        if (HRESULT_FROM_WIN32(ERROR_NO_MATCH) == hr)
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+
+            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            ExitFunction();
+        }
+
+        ReleaseNullDict(sdDetectCodes);
+        ReleaseNullStrArray(rgsczDetectCodes, cDetectCodes);
+    }
+
+LExit:
+    if (SUCCEEDED(hr) && BUNDLE_RELATION_NONE == *pRelationType)
+    {
+        hr = E_NOTFOUND;
+    }
+
+    ReleaseDict(sdUpgradeCodes);
+    ReleaseStrArray(rgsczUpgradeCodes, cUpgradeCodes);
+    ReleaseDict(sdAddonCodes);
+    ReleaseStrArray(rgsczAddonCodes, cAddonCodes);
+    ReleaseDict(sdDetectCodes);
+    ReleaseStrArray(rgsczDetectCodes, cDetectCodes);
+    ReleaseDict(sdPatchCodes);
+    ReleaseStrArray(rgsczPatchCodes, cPatchCodes);
 
     return hr;
 }

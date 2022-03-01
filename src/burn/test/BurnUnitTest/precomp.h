@@ -53,6 +53,7 @@
 #include "update.h"
 #include "pseudobundle.h"
 #include "registration.h"
+#include "relatedbundle.h"
 #include "plan.h"
 #include "pipe.h"
 #include "logging.h"
