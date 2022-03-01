@@ -13,19 +13,14 @@ namespace Test
 namespace Bootstrapper
 {
     using namespace System;
+    using namespace WixBuildTools::TestSupport;
 
-    public ref struct BurnTestException : public System::Exception
+    public ref struct BurnTestException : public SucceededException
     {
     public:
-        BurnTestException(HRESULT error)
-        {
-            this->HResult = error;
-        }
-
         BurnTestException(HRESULT error, String^ message)
-            : Exception(message)
+            : SucceededException(error, message)
         {
-            this->HResult = error;
         }
 
         property Int32 ErrorCode

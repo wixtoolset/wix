@@ -13,6 +13,7 @@ namespace WixBuildTools.TestSupport
                                  "Message:  {1}",
                                  hr, userMessage))
         {
+            this.HResult = hr;
         }
     }
 }
