@@ -57,6 +57,7 @@
     </ClCompile>
     <ClCompile Include="RegistrationTest.cpp" />
     <ClCompile Include="SearchTest.cpp" />
+    <ClCompile Include="TestRegistryFixture.cpp" />
     <ClCompile Include="VariableHelpers.cpp" />
     <ClCompile Include="VariableTest.cpp" />
     <ClCompile Include="VariantTest.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="BurnUnitTest.h" />
     <ClInclude Include="ManifestHelpers.h" />
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="TestRegistryFixture.h" />
     <ClInclude Include="VariableHelpers.h" />
   </ItemGroup>
 

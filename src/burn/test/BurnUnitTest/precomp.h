@@ -78,3 +78,4 @@
 #include "BurnUnitTest.h"
 #include "VariableHelpers.h"
 #include "ManifestHelpers.h"
+#include "TestRegistryFixture.h"
