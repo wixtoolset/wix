@@ -3,43 +3,11 @@
 #include "precomp.h"
 
 
-#define ROOT_PATH L"SOFTWARE\\WiX_Burn_UnitTest"
-#define HKLM_PATH ROOT_PATH L"\\HKLM"
-#define HKCU_PATH ROOT_PATH L"\\HKCU"
 #define REGISTRY_UNINSTALL_KEY L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
 #define REGISTRY_RUN_KEY L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
 #define TEST_BUNDLE_ID L"{D54F896D-1952-43E6-9C67-B5652240618C}"
 #define TEST_BUNDLE_UPGRADE_CODE L"{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}"
 
-#define TEST_UNINSTALL_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_UNINSTALL_KEY L"\\" TEST_BUNDLE_ID
-#define TEST_RUN_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_RUN_KEY
-#define TEST_VARIABLE_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_UNINSTALL_KEY L"\\" TEST_BUNDLE_ID L"\\variables"
-
-
-static LSTATUS APIENTRY RegistrationTest_RegCreateKeyExW(
-    __in HKEY hKey,
-    __in LPCWSTR lpSubKey,
-    __reserved DWORD Reserved,
-    __in_opt LPWSTR lpClass,
-    __in DWORD dwOptions,
-    __in REGSAM samDesired,
-    __in_opt CONST LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-    __out PHKEY phkResult,
-    __out_opt LPDWORD lpdwDisposition
-    );
-static LSTATUS APIENTRY RegistrationTest_RegOpenKeyExW(
-    __in HKEY hKey,
-    __in_opt LPCWSTR lpSubKey,
-    __reserved DWORD ulOptions,
-    __in REGSAM samDesired,
-    __out PHKEY phkResult
-    );
-static LSTATUS APIENTRY RegistrationTest_RegDeleteKeyExW(
-    __in HKEY hKey,
-    __in LPCWSTR lpSubKey,
-    __in REGSAM samDesired,
-    __reserved DWORD Reserved
-    );
 
 namespace Microsoft
 {
@@ -55,12 +23,23 @@ namespace Bootstrapper
     using namespace System;
     using namespace System::IO;
     using namespace Xunit;
+    using namespace WixBuildTools::TestSupport;
 
-    public ref class RegistrationTest : BurnUnitTest
+    public ref class RegistrationTest : BurnUnitTest, IClassFixture<TestRegistryFixture^>
     {
+    private:
+        TestRegistryFixture^ testRegistry;
+        String^ testRunKeyPath;
+        String^ testUninstallKeyPath;
+        String^ testVariableKeyPath;
     public:
-        RegistrationTest(BurnTestFixture^ fixture) : BurnUnitTest(fixture)
+        RegistrationTest(BurnTestFixture^ fixture, TestRegistryFixture^ registryFixture) : BurnUnitTest(fixture)
         {
+            this->testRegistry = registryFixture;
+
+            this->testRunKeyPath = this->testRegistry->GetDirectHkcuPath(gcnew String(REGISTRY_RUN_KEY));
+            this->testUninstallKeyPath = this->testRegistry->GetDirectHkcuPath(gcnew String(REGISTRY_UNINSTALL_KEY), gcnew String(TEST_BUNDLE_ID));
+            this->testVariableKeyPath = Path::Combine(this->testUninstallKeyPath, gcnew String(L"variables"));
         }
 
         [Fact]
@@ -79,14 +58,12 @@ namespace Bootstrapper
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
+            String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
 
             try
             {
-                // set mock API's
-                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
-
-                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+                this->testRegistry->SetUp();
 
                 logging.sczPath = L"BurnUnitTest.txt";
 
@@ -133,8 +110,8 @@ namespace Bootstrapper
                 Assert::True(Directory::Exists(cacheDirectory));
                 Assert::True(File::Exists(Path::Combine(cacheDirectory, gcnew String(L"setup.exe"))));
 
-                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)(Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr)));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // end session
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -143,8 +120,8 @@ namespace Bootstrapper
                 // verify that registration was removed
                 Assert::False(Directory::Exists(cacheDirectory));
 
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyNull(L"Resume");
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
             }
             finally
             {
@@ -154,13 +131,12 @@ namespace Bootstrapper
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
-                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
                 if (Directory::Exists(cacheDirectory))
                 {
                     Directory::Delete(cacheDirectory, true);
                 }
 
-                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                this->testRegistry->TearDown();
             }
         }
 
@@ -180,13 +156,11 @@ namespace Bootstrapper
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
+            String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
             try
             {
-                // set mock API's
-                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
-
-                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+                this->testRegistry->SetUp();
 
                 logging.sczPath = L"BurnUnitTest.txt";
 
@@ -234,18 +208,18 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
-                Assert::Equal<String^>(gcnew String(L"Product1 Installation"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayName"), nullptr));
-                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyDisplayName(L"Product1 Installation");
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // complete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was updated
-                Assert::Equal(Int32(BURN_RESUME_MODE_ARP), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ARP));
+                this->ValidateUninstallKeyInstalled(1);
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
 
                 //
                 // uninstall
@@ -256,18 +230,18 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
-                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
+                this->ValidateUninstallKeyInstalled(1);
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyNull(L"Resume");
+                this->ValidateUninstallKeyNull(L"Installed");
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
             }
             finally
             {
@@ -277,13 +251,12 @@ namespace Bootstrapper
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
-                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
                 if (Directory::Exists(cacheDirectory))
                 {
                     Directory::Delete(cacheDirectory, true);
                 }
 
-                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                this->testRegistry->TearDown();
             }
         }
 
@@ -303,13 +276,11 @@ namespace Bootstrapper
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
+            String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
             try
             {
-                // set mock API's
-                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
-
-                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+                this->testRegistry->SetUp();
 
                 logging.sczPath = L"BurnUnitTest.txt";
 
@@ -357,15 +328,15 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
-                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // complete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_REQUIRED, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration variables were updated
-                Assert::Equal<String^>(gcnew String(L"Product1"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayName"), nullptr));
+                this->ValidateUninstallKeyDisplayName(L"Product1");
                 registration.fInstalled = TRUE;
 
                 hr = RegistrationSetVariables(&registration, &variables);
@@ -385,9 +356,9 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyNull(L"Resume");
+                this->ValidateUninstallKeyNull(L"Installed");
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
             }
             finally
             {
@@ -397,13 +368,12 @@ namespace Bootstrapper
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
-                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
                 if (Directory::Exists(cacheDirectory))
                 {
                     Directory::Delete(cacheDirectory, true);
                 }
 
-                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                this->testRegistry->TearDown();
             }
         }
 
@@ -423,13 +393,11 @@ namespace Bootstrapper
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
+            String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
             try
             {
-                // set mock API's
-                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
-
-                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+                this->testRegistry->SetUp();
 
                 logging.sczPath = L"BurnUnitTest.txt";
 
@@ -479,29 +447,29 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
-                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // finish registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
-                Assert::Equal(Int32(BURN_RESUME_MODE_ARP), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ARP));
+                this->ValidateUninstallKeyInstalled(1);
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
 
-                Assert::Equal<String^>(gcnew String(L"DisplayName1"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayName"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"1.2.3.4"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayVersion"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"Publisher1"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Publisher"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"http://www.microsoft.com/help"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"HelpLink"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"555-555-5555"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"HelpTelephone"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"http://www.microsoft.com/about"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"URLInfoAbout"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"http://www.microsoft.com/update"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"URLUpdateInfo"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"Comments1"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Comments"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"Contact1"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Contact"), nullptr));
-                Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"NoModify"), nullptr));
-                Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"NoRemove"), nullptr));
+                this->ValidateUninstallKeyDisplayName(L"DisplayName1");
+                this->ValidateUninstallKeyString(L"DisplayVersion", L"1.2.3.4");
+                this->ValidateUninstallKeyString(L"Publisher", L"Publisher1");
+                this->ValidateUninstallKeyString(L"HelpLink", L"http://www.microsoft.com/help");
+                this->ValidateUninstallKeyString(L"HelpTelephone", L"555-555-5555");
+                this->ValidateUninstallKeyString(L"URLInfoAbout", L"http://www.microsoft.com/about");
+                this->ValidateUninstallKeyString(L"URLUpdateInfo", L"http://www.microsoft.com/update");
+                this->ValidateUninstallKeyString(L"Comments", L"Comments1");
+                this->ValidateUninstallKeyString(L"Contact", L"Contact1");
+                this->ValidateUninstallKeyNumber(L"NoModify", 1);
+                this->ValidateUninstallKeyNumber(L"NoRemove", 1);
 
                 //
                 // uninstall
@@ -512,17 +480,17 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
-                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateUninstallKeyNull(L"Resume");
+                this->ValidateUninstallKeyNull(L"Installed");
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
             }
             finally
             {
@@ -532,13 +500,12 @@ namespace Bootstrapper
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
-                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
                 if (Directory::Exists(cacheDirectory))
                 {
                     Directory::Delete(cacheDirectory, true);
                 }
-            
-                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+                this->testRegistry->TearDown();
             }
         }
 
@@ -567,10 +534,7 @@ namespace Bootstrapper
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
-                // set mock API's
-                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
-
-                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+                this->testRegistry->SetUp();
 
                 logging.sczPath = L"BurnUnitTest.txt";
 
@@ -641,10 +605,10 @@ namespace Bootstrapper
                 cbBuffer = 0;
 
                 // Verify the variables exist
-                Assert::Equal<String^>(gcnew String(L"42"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable1"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"bar"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable2"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"1.0-beta"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable3"), nullptr));
-                Assert::Empty((System::Collections::IEnumerable ^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"WixBundleForcedRestartPackage"), nullptr));
+                this->ValidateVariableKey(L"MyBurnVariable1", gcnew String(L"42"));
+                this->ValidateVariableKey(L"MyBurnVariable2", gcnew String(L"bar"));
+                this->ValidateVariableKey(L"MyBurnVariable3", gcnew String(L"1.0-beta"));
+                this->ValidateVariableKeyEmpty(L"WixBundleForcedRestartPackage");
 
                 hr = StrAlloc(&sczRelatedBundleId, MAX_GUID_CHARS + 1);
                 NativeAssert::Succeeded(hr, "Failed to allocate buffer for related bundle id.");
@@ -674,13 +638,12 @@ namespace Bootstrapper
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
-                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
                 if (Directory::Exists(cacheDirectory))
                 {
                     Directory::Delete(cacheDirectory, true);
                 }
 
-                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                this->testRegistry->TearDown();
             }
         }
 
@@ -705,13 +668,11 @@ namespace Bootstrapper
             SIZE_T cbBuffer = 0;
             SIZE_T piBuffer = 0;
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
+            String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
             try
             {
-                // set mock API's
-                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
-
-                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+                this->testRegistry->SetUp();
 
                 logging.sczPath = L"BurnUnitTest.txt";
 
@@ -786,10 +747,10 @@ namespace Bootstrapper
                 cbBuffer = 0;
 
                 // Verify the variables exist
-                Assert::Equal<String^>(gcnew String(L"42"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable1"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"bar"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable2"), nullptr));
-                Assert::Equal<String^>(gcnew String(L"1.0-beta"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable3"), nullptr));
-                Assert::Empty((System::Collections::IEnumerable^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"WixBundleForcedRestartPackage"), nullptr));
+                this->ValidateVariableKey(L"MyBurnVariable1", gcnew String(L"42"));
+                this->ValidateVariableKey(L"MyBurnVariable2", gcnew String(L"bar"));
+                this->ValidateVariableKey(L"MyBurnVariable3", gcnew String(L"1.0-beta"));
+                this->ValidateVariableKeyEmpty(L"WixBundleForcedRestartPackage");
 
                 hr = BundleGetBundleVariable(TEST_BUNDLE_ID, L"MyBurnVariable1", &sczValue);
                 TestThrowOnFailure(hr, L"Failed to read MyBurnVariable1.");
@@ -807,7 +768,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to suspend session.");
 
                 // verify that run key was removed
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
 
                 // read suspend resume type
                 hr = RegistrationDetectResumeType(&registration, &resumeType);
@@ -827,7 +788,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to write active resume mode.");
 
                 // verify that run key was put back
-                Assert::NotEqual((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // end session
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -847,155 +808,67 @@ namespace Bootstrapper
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
-                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
                 if (Directory::Exists(cacheDirectory))
                 {
                     Directory::Delete(cacheDirectory, true);
                 }
 
-                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                this->testRegistry->TearDown();
             }
         }
 
-    //BOOTSTRAPPER_RESUME_TYPE_NONE,
-    //BOOTSTRAPPER_RESUME_TYPE_INVALID,        // resume information is present but invalid
-    //BOOTSTRAPPER_RESUME_TYPE_UNEXPECTED,     // relaunched after an unexpected interruption
-    //BOOTSTRAPPER_RESUME_TYPE_REBOOT,         // relaunched after reboot
-    //BOOTSTRAPPER_RESUME_TYPE_SUSPEND,        // relaunched after suspend
-    //BOOTSTRAPPER_RESUME_TYPE_ARP,            // launched from ARP
+        void ValidateRunOnceKeyString(LPCWSTR valueName, String^ expected)
+        {
+            WixAssert::StringEqual(expected, (String^)Registry::GetValue(this->testRunKeyPath, gcnew String(valueName), nullptr), false);
+        }
+
+        void ValidateRunOnceKeyEntry(String^ exePath)
+        {
+            this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, String::Concat(L"\"", exePath, L"\" /burn.clean.room /burn.runonce"));
+        }
+
+        void ValidateUninstallKeyNull(LPCWSTR valueName)
+        {
+            Assert::Null(Registry::GetValue(this->testUninstallKeyPath, gcnew String(valueName), nullptr));
+        }
+
+        void ValidateUninstallKeyNumber(LPCWSTR valueName, Int32 expected)
+        {
+            Assert::Equal(expected, (Int32)Registry::GetValue(this->testUninstallKeyPath, gcnew String(valueName), nullptr));
+        }
+
+        void ValidateUninstallKeyString(LPCWSTR valueName, String^ expected)
+        {
+            WixAssert::StringEqual(expected, (String^)Registry::GetValue(this->testUninstallKeyPath, gcnew String(valueName), nullptr), false);
+        }
+
+        void ValidateUninstallKeyDisplayName(String^ expected)
+        {
+            this->ValidateUninstallKeyString(L"DisplayName", expected);
+        }
+
+        void ValidateUninstallKeyInstalled(Int32 expected)
+        {
+            this->ValidateUninstallKeyNumber(L"Installed", expected);
+        }
+
+        void ValidateUninstallKeyResume(Int32 expected)
+        {
+            this->ValidateUninstallKeyNumber(L"Resume", expected);
+        }
+
+        void ValidateVariableKey(LPCWSTR valueName, String^ expected)
+        {
+            WixAssert::StringEqual(expected, (String^)Registry::GetValue(this->testVariableKeyPath, gcnew String(valueName), nullptr), false);
+        }
+
+        void ValidateVariableKeyEmpty(LPCWSTR valueName)
+        {
+            Assert::Empty((System::Collections::IEnumerable^)Registry::GetValue(this->testVariableKeyPath, gcnew String(valueName), nullptr));
+        }
     };
 }
 }
 }
 }
-}
-
-
-static LSTATUS APIENTRY RegistrationTest_RegCreateKeyExW(
-    __in HKEY hKey,
-    __in LPCWSTR lpSubKey,
-    __reserved DWORD Reserved,
-    __in_opt LPWSTR lpClass,
-    __in DWORD dwOptions,
-    __in REGSAM samDesired,
-    __in_opt CONST LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-    __out PHKEY phkResult,
-    __out_opt LPDWORD lpdwDisposition
-    )
-{
-    LSTATUS ls = ERROR_SUCCESS;
-    LPCWSTR wzRoot = NULL;
-    HKEY hkRoot = NULL;
-
-    if (HKEY_LOCAL_MACHINE == hKey)
-    {
-        wzRoot = HKLM_PATH;
-    }
-    else if (HKEY_CURRENT_USER == hKey)
-    {
-        wzRoot = HKCU_PATH;
-    }
-    else
-    {
-        hkRoot = hKey;
-    }
-
-    if (wzRoot)
-    {
-        ls = ::RegOpenKeyExW(HKEY_CURRENT_USER, wzRoot, 0, KEY_WRITE, &hkRoot);
-        if (ERROR_SUCCESS != ls)
-        {
-            ExitFunction();
-        }
-    }
-
-    ls = ::RegCreateKeyExW(hkRoot, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
-
-LExit:
-    ReleaseRegKey(hkRoot);
-
-    return ls;
-}
-
-static LSTATUS APIENTRY RegistrationTest_RegOpenKeyExW(
-    __in HKEY hKey,
-    __in_opt LPCWSTR lpSubKey,
-    __reserved DWORD ulOptions,
-    __in REGSAM samDesired,
-    __out PHKEY phkResult
-    )
-{
-    LSTATUS ls = ERROR_SUCCESS;
-    LPCWSTR wzRoot = NULL;
-    HKEY hkRoot = NULL;
-
-    if (HKEY_LOCAL_MACHINE == hKey)
-    {
-        wzRoot = HKLM_PATH;
-    }
-    else if (HKEY_CURRENT_USER == hKey)
-    {
-        wzRoot = HKCU_PATH;
-    }
-    else
-    {
-        hkRoot = hKey;
-    }
-
-    if (wzRoot)
-    {
-        ls = ::RegOpenKeyExW(HKEY_CURRENT_USER, wzRoot, 0, KEY_WRITE, &hkRoot);
-        if (ERROR_SUCCESS != ls)
-        {
-            ExitFunction();
-        }
-    }
-
-    ls = ::RegOpenKeyExW(hkRoot, lpSubKey, ulOptions, samDesired, phkResult);
-
-LExit:
-    ReleaseRegKey(hkRoot);
-
-    return ls;
-}
-
-static LSTATUS APIENTRY RegistrationTest_RegDeleteKeyExW(
-    __in HKEY hKey,
-    __in LPCWSTR lpSubKey,
-    __in REGSAM samDesired,
-    __reserved DWORD Reserved
-    )
-{
-    LSTATUS ls = ERROR_SUCCESS;
-    LPCWSTR wzRoot = NULL;
-    HKEY hkRoot = NULL;
-
-    if (HKEY_LOCAL_MACHINE == hKey)
-    {
-        wzRoot = HKLM_PATH;
-    }
-    else if (HKEY_CURRENT_USER == hKey)
-    {
-        wzRoot = HKCU_PATH;
-    }
-    else
-    {
-        hkRoot = hKey;
-    }
-
-    if (wzRoot)
-    {
-        ls = ::RegOpenKeyExW(HKEY_CURRENT_USER, wzRoot, 0, KEY_WRITE | samDesired, &hkRoot);
-        if (ERROR_SUCCESS != ls)
-        {
-            ExitFunction();
-        }
-    }
-
-    ls = ::RegDeleteKeyExW(hkRoot, lpSubKey, samDesired, Reserved);
-
-LExit:
-    ReleaseRegKey(hkRoot);
-
-    return ls;
 }

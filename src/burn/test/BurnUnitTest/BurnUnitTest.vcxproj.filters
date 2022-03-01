@@ -42,6 +42,9 @@
     <ClCompile Include="SearchTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestRegistryFixture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="VariableHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,19 +59,22 @@
     <ClInclude Include="BurnTestException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BurnTestFixture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BurnUnitTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ManifestHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="precomp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TestRegistryFixture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="VariableHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BurnUnitTest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BurnTestFixture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
