@@ -2,8 +2,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" DetectCondition="none" />
-            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" DetectCondition="none" />
+            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" DetectCondition="none" UninstallArguments="-u" />
+            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" DetectCondition="none" UninstallArguments="-u" />
         </PackageGroup>
         <SetVariableRef Id="Dummy" />
     </Fragment>

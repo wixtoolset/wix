@@ -9,7 +9,7 @@
             <bal:WixDotNetCoreBootstrapperApplicationHost />
         </BootstrapperApplication>
         <Chain>
-            <ExePackage DetectCondition="none" SourceFile="..\.data\notanexe.exe"  bal:PrereqPackage="yes" />
+            <ExePackage DetectCondition="none" UninstallArguments="-foo" SourceFile="..\.data\notanexe.exe"  bal:PrereqPackage="yes" />
         </Chain>
     </Bundle>
 </Wix>

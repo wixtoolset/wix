@@ -6,7 +6,6 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -2099,7 +2098,7 @@ namespace WixToolset.Core
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
                     case "UninstallArguments":
-                        uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
                     case "PerMachine":
@@ -2187,49 +2186,104 @@ namespace WixToolset.Core
                 rollbackPathVariable = String.Concat("WixBundleRollbackLog_", id.Id);
             }
 
-            if (!String.IsNullOrEmpty(protocol) && !protocol.Equals("burn", StringComparison.Ordinal) && !protocol.Equals("netfx4", StringComparison.Ordinal) && !protocol.Equals("none", StringComparison.Ordinal))
+            if (packageType == WixBundlePackageType.Exe)
             {
-                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
-            }
-
-            if (!String.IsNullOrEmpty(protocol) && protocol.Equals("netfx4", StringComparison.Ordinal))
-            {
-                foreach (var expectedArgument in expectedNetFx4Args)
+                // Set default scope for EXEs and MSPs if not already set.
+                if (perMachine == YesNoDefaultType.NotSet)
                 {
-                    if (null == installArguments || -1 == installArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallArguments", installArguments, expectedArgument, "Protocol", "netfx4"));
-                    }
+                    perMachine = YesNoDefaultType.Default;
+                }
 
-                    if (!String.IsNullOrEmpty(repairArguments) && -1 == repairArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                if (permanent == YesNoType.No)
+                {
+                    if (uninstallArguments == null)
                     {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairArguments", repairArguments, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", "Permanent", "no"));
                     }
-
-                    if (!String.IsNullOrEmpty(uninstallArguments) && -1 == uninstallArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                }
+                else if (permanent == YesNoType.NotSet)
+                {
+                    if (uninstallArguments == null)
                     {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", uninstallArguments, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", "Permanent"));
+                    }
+                }
+
+                // Detect condition is recommended or required for Exe packages (depending on whether repair or uninstall arguments were provided).
+                if (String.IsNullOrEmpty(detectCondition))
+                {
+                    if (repairArguments != null)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "RepairArguments"));
+                    }
+                    else if (uninstallArguments != null)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallArguments"));
+                    }
+                    else
+                    {
+                        this.Core.Write(WarningMessages.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
+                    }
+                }
+
+                // Validate the protocol if provided.
+                if (!String.IsNullOrEmpty(protocol))
+                {
+                    if (protocol.Equals("netfx4", StringComparison.Ordinal))
+                    {
+                        foreach (var expectedArgument in expectedNetFx4Args)
+                        {
+                            if (null == installArguments || -1 == installArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                            {
+                                this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallArguments", installArguments, expectedArgument, "Protocol", "netfx4"));
+                            }
+
+                            if (!String.IsNullOrEmpty(repairArguments) && -1 == repairArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                            {
+                                this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairArguments", repairArguments, expectedArgument, "Protocol", "netfx4"));
+                            }
+
+                            if (!String.IsNullOrEmpty(uninstallArguments) && -1 == uninstallArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                            {
+                                this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", uninstallArguments, expectedArgument, "Protocol", "netfx4"));
+                            }
+                        }
+                    }
+                    else if (!protocol.Equals("burn", StringComparison.Ordinal) && !protocol.Equals("none", StringComparison.Ordinal))
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
                     }
                 }
             }
-
-            // Only set default scope for EXEs and MSPs if not already set.
-            if ((WixBundlePackageType.Exe == packageType || WixBundlePackageType.Msp == packageType) && YesNoDefaultType.NotSet == perMachine)
+            else if (packageType == WixBundlePackageType.Msp)
             {
-                perMachine = YesNoDefaultType.Default;
+                // Set default scope for EXEs and MSPs if not already set.
+                if (perMachine == YesNoDefaultType.NotSet)
+                {
+                    perMachine = YesNoDefaultType.Default;
+                }
             }
-
-            // Detect condition is recommended or required for Exe and Msu packages
-            // (depending on whether uninstall arguments were provided).
-            if ((packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu) && String.IsNullOrEmpty(detectCondition))
+            else if (packageType == WixBundlePackageType.Msu)
             {
-                if (String.IsNullOrEmpty(uninstallArguments))
+                if (permanent == YesNoType.No)
+                {
+                    if (String.IsNullOrEmpty(msuKB))
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "KB", "Permanent", "no"));
+                    }
+                }
+                else if (permanent == YesNoType.NotSet)
+                {
+                    if (String.IsNullOrEmpty(msuKB))
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "KB", "Permanent"));
+                    }
+                }
+
+                // Detect condition is recommended for Msu packages.
+                if (String.IsNullOrEmpty(detectCondition))
                 {
                     this.Core.Write(WarningMessages.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
-                }
-                else
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallArguments"));
                 }
             }
 
