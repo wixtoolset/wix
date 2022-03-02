@@ -5,7 +5,7 @@
             <PayloadGroupRef Id="publish.Example.LatestCoreMBA.trimmedscd" />
         </BootstrapperApplication>
         <Chain>
-            <ExePackage DetectCondition="none" SourceFile="..\.data\notanexe.exe" PerMachine="yes" />
+            <ExePackage DetectCondition="none" UninstallArguments="-foo" SourceFile="..\.data\notanexe.exe" PerMachine="yes" />
         </Chain>
     </Bundle>
 </Wix>

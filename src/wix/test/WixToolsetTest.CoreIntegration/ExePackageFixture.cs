@@ -3,6 +3,7 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
+    using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
@@ -25,6 +26,11 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", Path.Combine(baseFolder, "test.wixlib")
                 });
 
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackage element's UninstallArguments attribute was not found; it is required without attribute Permanent present.",
+                    "The ExePackage/@DetectCondition attribute is recommended so the package is only installed when absent."
+                }, result.Messages.Select(m => m.ToString()).ToArray());
                 Assert.Equal(1153, result.ExitCode);
             }
         }

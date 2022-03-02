@@ -2,13 +2,11 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Xml;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;

@@ -2,12 +2,12 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" DetectCondition="none" />
-            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" DetectCondition="none" />
-            <ExePackage Id="DuplicateCacheIds.wxs" SourceFile="$(sys.SOURCEFILEDIR)DuplicateCacheIds.wxs" Compressed="no" DetectCondition="none" Name="PayloadCollision">
+            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" DetectCondition="none" UninstallArguments="-u" />
+            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" DetectCondition="none" UninstallArguments="-u" />
+            <ExePackage Id="DuplicateCacheIds.wxs" SourceFile="$(sys.SOURCEFILEDIR)DuplicateCacheIds.wxs" Compressed="no" DetectCondition="none" UninstallArguments="-u" Name="PayloadCollision">
                 <Payload SourceFile="$(sys.SOURCEFILEDIR)BundleVariable.wxs" Compressed="no" Name="ContainerCollision" />
             </ExePackage>
-            <ExePackage Id="HiddenPersistedBundleVariable.wxs" SourceFile="$(sys.SOURCEFILEDIR)HiddenPersistedBundleVariable.wxs" Compressed="no" DetectCondition="none" Name="PayloadCollision" />
+            <ExePackage Id="HiddenPersistedBundleVariable.wxs" SourceFile="$(sys.SOURCEFILEDIR)HiddenPersistedBundleVariable.wxs" Compressed="no" DetectCondition="none" UninstallArguments="-u" Name="PayloadCollision" />
             <PackageGroupRef Id="MsiPackages" />
         </PackageGroup>
 

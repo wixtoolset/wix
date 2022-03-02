@@ -2,7 +2,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage DetectCondition="DetectedSomething" SourceFile="burn.exe" />
+            <ExePackage DetectCondition="DetectedSomething" UninstallArguments="-uninstall" SourceFile="burn.exe" />
         </PackageGroup>
     </Fragment>
 </Wix>
