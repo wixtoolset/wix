@@ -63,13 +63,14 @@ jobs:
         shell: cmd
         run: wevtutil epl System build\logs\System.evtx /q:"Event/System/TimeCreated[timediff(@SystemTime) <= 86400000]"
 
+      # Do NOT publish logs on `master` branch as they may contain secrets in them.
       - name: Save logs
-        if: always()
+        if: github.ref != 'refs/heads/master' && (success() || failure())
         uses: actions/upload-artifact@v2
         with:
           name: logs_${{ github.run_id }}
           path: build/logs/
 
       - name: Push to GitHub Packages
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') }}
+        if: github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
         run: dotnet nuget push "build/artifacts/**/*.nupkg" --source https://nuget.pkg.github.com/wixtoolset/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
