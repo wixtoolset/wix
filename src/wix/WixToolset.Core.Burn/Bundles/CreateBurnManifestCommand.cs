@@ -386,6 +386,7 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("DetectCondition", exePackage.DetectCondition);
                         writer.WriteAttributeString("InstallArguments", exePackage.InstallCommand);
                         writer.WriteAttributeString("UninstallArguments", exePackage.UninstallCommand);
+                        writer.WriteAttributeString("Uninstallable", exePackage.Uninstallable ? "yes" : "no");
                         writer.WriteAttributeString("RepairArguments", exePackage.RepairCommand);
                         writer.WriteAttributeString("Repairable", exePackage.Repairable ? "yes" : "no");
                         if (!String.IsNullOrEmpty(exePackage.ExeProtocol))

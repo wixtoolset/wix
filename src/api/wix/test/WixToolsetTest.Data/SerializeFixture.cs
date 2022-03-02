@@ -25,9 +25,10 @@ namespace WixToolsetTest.Data
 
             section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
-                ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
+                ComponentId = String.Empty,
                 DirectoryRef = "TestFolder",
                 Location = ComponentLocation.Either,
+                KeyPath = null,
             });
 
             var intermediate = new Intermediate("TestIntermediate", IntermediateLevels.Compiled, new[] { section }, null);
@@ -50,8 +51,10 @@ namespace WixToolsetTest.Data
 
                 Assert.Equal("TestComponent", symbol.Id.Id);
                 Assert.Equal(AccessModifier.Global, symbol.Id.Access);
+                Assert.Equal(String.Empty, symbol.ComponentId);
                 Assert.Equal("TestFolder", symbol.DirectoryRef);
                 Assert.Equal(ComponentLocation.Either, symbol.Location);
+                Assert.Null(symbol.KeyPath);
             }
             finally
             {
