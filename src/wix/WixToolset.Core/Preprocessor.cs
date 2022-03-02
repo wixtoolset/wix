@@ -185,6 +185,7 @@ namespace WixToolset.Core
             }
 
             if ("=" == operation ||
+                "==" == operation ||
                 "!=" == operation ||
                 "<" == operation ||
                 "<=" == operation ||
@@ -885,6 +886,7 @@ namespace WixToolset.Core
                 // or end of string, whichever comes first
                 var space = expression.IndexOf(" ", StringComparison.Ordinal);
                 var equals = expression.IndexOf("=", StringComparison.Ordinal);
+                var doubleEquals = expression.IndexOf("==", StringComparison.Ordinal);
                 var lessThan = expression.IndexOf("<", StringComparison.Ordinal);
                 var lessThanEquals = expression.IndexOf("<=", StringComparison.Ordinal);
                 var greaterThan = expression.IndexOf(">", StringComparison.Ordinal);
@@ -901,6 +903,11 @@ namespace WixToolset.Core
                 if (equals == -1)
                 {
                     equals = Int32.MaxValue;
+                }
+
+                if (doubleEquals == -1)
+                {
+                    doubleEquals = Int32.MaxValue;
                 }
 
                 if (lessThan == -1)
@@ -933,7 +940,7 @@ namespace WixToolset.Core
                     equalsNoCase = Int32.MaxValue;
                 }
 
-                closingIndex = Math.Min(space, Math.Min(equals, Math.Min(lessThan, Math.Min(lessThanEquals, Math.Min(greaterThan, Math.Min(greaterThanEquals, Math.Min(equalsNoCase, notEquals)))))));
+                closingIndex = Math.Min(space, Math.Min(equals, Math.Min(doubleEquals, Math.Min(lessThan, Math.Min(lessThanEquals, Math.Min(greaterThan, Math.Min(greaterThanEquals, Math.Min(equalsNoCase, notEquals))))))));
 
                 if (Int32.MaxValue == closingIndex)
                 {
@@ -944,7 +951,7 @@ namespace WixToolset.Core
                 if (0 == closingIndex)
                 {
                     // Length 2 operators
-                    if (closingIndex == lessThanEquals || closingIndex == greaterThanEquals || closingIndex == notEquals || closingIndex == equalsNoCase)
+                    if (closingIndex == doubleEquals || closingIndex == lessThanEquals || closingIndex == greaterThanEquals || closingIndex == notEquals || closingIndex == equalsNoCase)
                     {
                         closingIndex = 2;
                     }
@@ -1096,7 +1103,7 @@ namespace WixToolset.Core
             {
                 leftValue = leftValue.Trim();
                 rightValue = rightValue.Trim();
-                if ("=" == operation)
+                if ("=" == operation || "==" == operation)
                 {
                     if (leftValue == rightValue)
                     {
