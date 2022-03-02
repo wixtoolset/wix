@@ -1089,10 +1089,10 @@ namespace WixToolset.Core
             else if (operation.Length == 0)
             {
                 // There is no right side of the equation.
-                // If the variable was evaluated, it exists, so the expression is true
+                // If the variable was evaluated, test to see if it is a "false" value.
                 if (startsWithVariable)
                 {
-                    expressionValue = true;
+                    expressionValue = !(leftValue == String.Empty || leftValue == "0" || leftValue == "false" || leftValue == "no");
                 }
                 else
                 {

@@ -61,6 +61,52 @@ namespace WixToolsetTest.Core
             WixAssert.CompareLineByLine(expected, actual);
         }
 
+        [Fact]
+        public void CanPreprocessFalsyCondition()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?define A=0?>",
+                "<?if $(A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix />"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessTruthyCondition()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?define A=1?>",
+                "<?if $(A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
         private static IPreprocessResult PreprocessFromString(string xml)
         {
             using var stringReader = new StringReader(xml);
