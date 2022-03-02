@@ -402,8 +402,7 @@ namespace WixToolset.Core
                 switch (reader.NodeType)
                 {
                 case XmlNodeType.XmlDeclaration:
-                    var document = currentContainer as XDocument;
-                    if (null != document)
+                    if (currentContainer is XDocument document)
                     {
                         document.Declaration = new XDeclaration(null, null, null);
                         while (reader.MoveToNextAttribute())
@@ -705,15 +704,13 @@ namespace WixToolset.Core
             }
 
             // get the offset of this xml fragment (for some reason its always off by 1)
-            var lineInfoReader = reader as IXmlLineInfo;
-            if (null != lineInfoReader)
+            if (reader is IXmlLineInfo lineInfoReader)
             {
                 offset += lineInfoReader.LineNumber - 1;
             }
 
-            var textReader = reader as XmlTextReader;
             // dump the xml to a string (maintaining whitespace if possible)
-            if (null != textReader)
+            if (reader is XmlTextReader textReader)
             {
                 textReader.WhitespaceHandling = WhitespaceHandling.All;
             }
@@ -1344,8 +1341,7 @@ namespace WixToolset.Core
         /// <param name="offset">This is the artificial offset of the line numbers from the reader.  Used for the foreach processing.</param>
         private void UpdateCurrentLineNumber(ProcessingState state, XmlReader reader, int offset)
         {
-            var lineInfoReader = reader as IXmlLineInfo;
-            if (null != lineInfoReader)
+            if (reader is IXmlLineInfo lineInfoReader)
             {
                 var newLine = lineInfoReader.LineNumber + offset;
 
