@@ -89,6 +89,8 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleExePackageSymbolFields.ExeProtocol, value);
         }
 
-        public bool Repairable => !String.IsNullOrEmpty(this.RepairCommand);
+        public bool Repairable => this.RepairCommand != null;
+
+        public bool Uninstallable => this.UninstallCommand != null;
     }
 }
