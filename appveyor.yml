@@ -10,6 +10,9 @@ image: Visual Studio 2022
 version: 0.0.0.{build}
 configuration: Release
 
+init:
+  - git config --global core.autocrlf true
+
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
