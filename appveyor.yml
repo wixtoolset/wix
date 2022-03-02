@@ -28,6 +28,8 @@ after_build:
   - 7z a "build\testresults.zip" @src\testresultfilelist.txt
 
 on_finish:
+  - wevtutil epl Application build\logs\Application.evtx /q:"Event/System/TimeCreated[timediff(@SystemTime) <= 86400000]"
+  - wevtutil epl System build\logs\System.evtx /q:"Event/System/TimeCreated[timediff(@SystemTime) <= 86400000]"
   - ps: 7z a ('temp_logs_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') $env:TEMP\*.log $env:TEMP\..\*.log
   - ps: 7z a ('build_logs_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') build\logs\ build\logs\TestResults\
   - ps: Push-AppveyorArtifact temp_logs_*.zip
