@@ -248,6 +248,7 @@ extern "C" HRESULT VariableInitialize(
 #endif
         {L"ProgramFiles6432Folder", InitializeVariable6432Folder, CSIDL_PROGRAM_FILES},
         {L"ProgramMenuFolder", InitializeVariableCsidlFolder, CSIDL_PROGRAMS},
+        {L"RebootPending", InitializeVariableNumeric, 0},
         {L"SendToFolder", InitializeVariableCsidlFolder, CSIDL_SENDTO},
         {L"ServicePackLevel", InitializeVariableVersionNT, OS_INFO_VARIABLE_ServicePackLevel},
         {L"StartMenuFolder", InitializeVariableCsidlFolder, CSIDL_STARTMENU},
@@ -1571,6 +1572,9 @@ static HRESULT SetVariableValue(
     // Insert element if not found.
     if (S_FALSE == hr)
     {
+        // Not possible from external callers so just assert.
+        AssertSz(SET_VARIABLE_OVERRIDE_BUILTIN != setBuiltin, "Intent to set missing built-in variable.");
+
         hr = InsertVariable(pVariables, wzVariable, iVariable);
         ExitOnFailure(hr, "Failed to insert variable '%ls'.", wzVariable);
     }

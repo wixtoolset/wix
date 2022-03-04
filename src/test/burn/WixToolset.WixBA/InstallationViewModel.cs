@@ -53,9 +53,9 @@ namespace WixToolset.WixBA
     /// </summary>
     public class InstallationViewModel : PropertyNotifyBase
     {
-        private RootViewModel root;
+        private readonly RootViewModel root;
 
-        private Dictionary<string, int> downloadRetries;
+        private readonly Dictionary<string, int> downloadRetries;
         private bool downgrade;
         private string downgradeMessage;
 
@@ -407,7 +407,7 @@ namespace WixToolset.WixBA
 
         private void DetectBegin(object sender, DetectBeginEventArgs e)
         {
-            this.root.DetectState = e.Installed ? DetectionState.Present : DetectionState.Absent;
+            this.root.DetectState = RegistrationType.Full == e.RegistrationType ? DetectionState.Present : DetectionState.Absent;
             WixBA.Model.PlannedAction = LaunchAction.Unknown;
         }
 

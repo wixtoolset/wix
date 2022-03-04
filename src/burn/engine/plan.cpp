@@ -1692,7 +1692,7 @@ extern "C" HRESULT PlanExecuteCacheSyncAndRollback(
     HRESULT hr = S_OK;
     BURN_EXECUTE_ACTION* pAction = NULL;
 
-    if (!pPlan->fBundleAlreadyRegistered)
+    if (pPlan->fPlanPackageCacheRollback)
     {
         hr = PlanAppendRollbackAction(pPlan, &pAction);
         ExitOnFailure(hr, "Failed to append rollback action.");
@@ -2241,7 +2241,7 @@ static HRESULT AddCachePackageHelper(
     pCacheAction->type = BURN_CACHE_ACTION_TYPE_CHECKPOINT;
     pCacheAction->checkpoint.dwId = dwCheckpoint;
 
-    if (!pPlan->fBundleAlreadyRegistered)
+    if (pPlan->fPlanPackageCacheRollback)
     {
         // Create a package cache rollback action *before* the checkpoint.
         hr = AppendRollbackCacheAction(pPlan, &pCacheAction);

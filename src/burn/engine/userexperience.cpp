@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 2, 22, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 4, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -988,7 +988,7 @@ LExit:
 EXTERN_C BAAPI UserExperienceOnDetectBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fCached,
-    __in BOOL fInstalled,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in DWORD cPackages
     )
 {
@@ -998,7 +998,7 @@ EXTERN_C BAAPI UserExperienceOnDetectBegin(
 
     args.cbSize = sizeof(args);
     args.cPackages = cPackages;
-    args.fInstalled = fInstalled;
+    args.registrationType = registrationType;
     args.fCached = fCached;
 
     results.cbSize = sizeof(results);

@@ -245,7 +245,7 @@ BAAPI UserExperienceOnCommitMsiTransactionComplete(
 BAAPI UserExperienceOnDetectBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fCached,
-    __in BOOL fInstalled,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in DWORD cPackages
     );
 BAAPI UserExperienceOnDetectCompatibleMsiPackage(

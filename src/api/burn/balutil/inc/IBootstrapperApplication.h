@@ -42,7 +42,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     // OnDetectBegin - called when the engine begins detection.
     STDMETHOD(OnDetectBegin)(
         __in BOOL fCached,
-        __in BOOL fInstalled,
+        __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
         __in DWORD cPackages,
         __inout BOOL* pfCancel
         ) = 0;

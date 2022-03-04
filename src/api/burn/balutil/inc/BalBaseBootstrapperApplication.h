@@ -109,7 +109,7 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnDetectBegin(
         __in BOOL /*fCached*/,
-        __in BOOL /*fInstalled*/,
+        __in BOOTSTRAPPER_REGISTRATION_TYPE /*registrationType*/,
         __in DWORD /*cPackages*/,
         __inout BOOL* pfCancel
         )

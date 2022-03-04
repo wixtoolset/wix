@@ -93,7 +93,7 @@ typedef struct _BURN_REGISTRATION
     BOOL fRegisterArp;
     BOOL fDisableResume;
     BOOL fCached;
-    BOOL fInstalled;
+    BOOTSTRAPPER_REGISTRATION_TYPE detectedRegistrationType;
     LPWSTR sczId;
     LPWSTR sczTag;
 
@@ -168,6 +168,10 @@ void RegistrationUninitialize(
     __in BURN_REGISTRATION* pRegistration
     );
 HRESULT RegistrationSetVariables(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables
+    );
+HRESULT RegistrationSetDynamicVariables(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables
     );

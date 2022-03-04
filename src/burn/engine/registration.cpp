@@ -69,6 +69,7 @@ static HRESULT UpdateResumeMode(
     __in BURN_REGISTRATION* pRegistration,
     __in HKEY hkRegistration,
     __in BURN_RESUME_MODE resumeMode,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in BOOL fRestartInitiated
     );
 static HRESULT ParseRelatedCodes(
@@ -444,11 +445,8 @@ extern "C" HRESULT RegistrationSetVariables(
     HRESULT hr = S_OK;
     LPWSTR scz = NULL;
 
-    if (pRegistration->fInstalled)
-    {
-        hr = VariableSetNumeric(pVariables, BURN_BUNDLE_INSTALLED, 1, TRUE);
-        ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");
-    }
+    hr = RegistrationSetDynamicVariables(pRegistration, pVariables);
+    ExitOnFailure(hr, "Failed to set the dynamic registration variables.");
 
     // Ensure the registration bundle name is updated.
     hr = GetBundleInProgressName(pRegistration, pVariables, &scz);
@@ -469,12 +467,32 @@ extern "C" HRESULT RegistrationSetVariables(
     hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->pVersion, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle version built-in variable.");
 
+LExit:
+    ReleaseStr(scz);
+
+    return hr;
+}
+
+/*******************************************************************
+ RegistrationSetDynamicVariables - Initializes bundle variables that
+     map to registration entities that can change during execution.
+
+*******************************************************************/
+extern "C" HRESULT RegistrationSetDynamicVariables(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables
+    )
+{
+    HRESULT hr = S_OK;
+    LONGLONG llInstalled = BOOTSTRAPPER_REGISTRATION_TYPE_FULL == pRegistration->detectedRegistrationType ? 1 : 0;
+
+    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_INSTALLED, llInstalled, TRUE);
+    ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");
+
     hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
 LExit:
-    ReleaseStr(scz);
-
     return hr;
 }
 
@@ -487,12 +505,15 @@ extern "C" HRESULT RegistrationDetectInstalled(
     DWORD dwInstalled = 0;
 
     pRegistration->fCached = FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
+    pRegistration->detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
 
     // open registration key
     hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
     if (SUCCEEDED(hr))
     {
         hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, &dwInstalled);
+
+        pRegistration->detectedRegistrationType = (1 == dwInstalled) ? BOOTSTRAPPER_REGISTRATION_TYPE_FULL : BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
     }
 
     // Not finding the key or value is okay.
@@ -500,8 +521,6 @@ extern "C" HRESULT RegistrationDetectInstalled(
     {
         hr = S_OK;
     }
-
-    pRegistration->fInstalled = (1 == dwInstalled);
 
     ReleaseRegKey(hkRegistration);
     return hr;
@@ -833,7 +852,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     }
 
     // update resume mode
-    hr = UpdateResumeMode(pRegistration, hkRegistration, BURN_RESUME_MODE_ACTIVE, FALSE);
+    hr = UpdateResumeMode(pRegistration, hkRegistration, BURN_RESUME_MODE_ACTIVE, registrationType, FALSE);
     ExitOnFailure(hr, "Failed to update resume mode.");
 
 LExit:
@@ -864,7 +883,7 @@ extern "C" HRESULT RegistrationSessionResume(
     ExitOnFailure(hr, "Failed to open registration key.");
 
     // update resume mode
-    hr = UpdateResumeMode(pRegistration, hkRegistration, BURN_RESUME_MODE_ACTIVE, FALSE);
+    hr = UpdateResumeMode(pRegistration, hkRegistration, BURN_RESUME_MODE_ACTIVE, registrationType, FALSE);
     ExitOnFailure(hr, "Failed to update resume mode.");
 
     // update display name
@@ -934,7 +953,7 @@ extern "C" HRESULT RegistrationSessionEnd(
     }
 
     // Update resume mode.
-    hr = UpdateResumeMode(pRegistration, hkRegistration, resumeMode, BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart);
+    hr = UpdateResumeMode(pRegistration, hkRegistration, resumeMode, registrationType, BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart);
     ExitOnFailure(hr, "Failed to update resume mode.");
 
 LExit:
@@ -1271,6 +1290,7 @@ static HRESULT UpdateResumeMode(
     __in BURN_REGISTRATION* pRegistration,
     __in HKEY hkRegistration,
     __in BURN_RESUME_MODE resumeMode,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in BOOL fRestartInitiated
     )
 {
@@ -1289,16 +1309,9 @@ static HRESULT UpdateResumeMode(
         hr = RegWriteNumber(hkRegistration, L"Resume", (DWORD)resumeMode);
         ExitOnFailure(hr, "Failed to write Resume value.");
 
-        // Write the Installed value *only* when the mode is ARP. This will tell us
-        // that the bundle considers itself "installed" on the machine. Note that we
-        // never change the value to "0" after that. The bundle will be considered
-        // "uninstalled" when all of the registration is removed.
-        if (BURN_RESUME_MODE_ARP == resumeMode)
-        {
-            // Write Installed value.
-            hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, 1);
-            ExitOnFailure(hr, "Failed to write Installed value.");
-        }
+        // Write Installed value.
+        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, BOOTSTRAPPER_REGISTRATION_TYPE_FULL == registrationType ? 1 : 0);
+        ExitOnFailure(hr, "Failed to write Installed value.");
     }
 
     // If the engine is active write the run key so we resume if there is an unexpected

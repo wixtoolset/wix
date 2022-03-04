@@ -218,7 +218,7 @@ namespace Bootstrapper
 
                 // verify that registration was updated
                 this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ARP));
-                this->ValidateUninstallKeyInstalled(1);
+                this->ValidateUninstallKeyInstalled(0);
                 this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
 
                 //
@@ -231,7 +231,7 @@ namespace Bootstrapper
 
                 // verify that registration was updated
                 this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
-                this->ValidateUninstallKeyInstalled(1);
+                this->ValidateUninstallKeyInstalled(0);
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // delete registration
@@ -337,7 +337,7 @@ namespace Bootstrapper
 
                 // verify that registration variables were updated
                 this->ValidateUninstallKeyDisplayName(L"Product1");
-                registration.fInstalled = TRUE;
+                registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
                 hr = RegistrationSetVariables(&registration, &variables);
                 TestThrowOnFailure(hr, L"Failed to set registration variables.");
