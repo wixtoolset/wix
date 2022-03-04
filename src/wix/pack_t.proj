@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Build.Traversal/3.0.23">
+<Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
     <ProjectReference Include="pack-wix\pack-wix.csproj" Properties="NoBuild=true" Targets="Pack" />
     <ProjectReference Include="WixToolset.Sdk\WixToolset.Sdk.csproj" Properties="NoBuild=true" Targets="Pack" />
