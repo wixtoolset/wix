@@ -1378,9 +1378,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectBegin(bool fCached, bool fInstalled, int cPackages, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectBegin(bool fCached, RegistrationType registrationType, int cPackages, ref bool fCancel)
         {
-            DetectBeginEventArgs args = new DetectBeginEventArgs(fCached, fInstalled, cPackages, fCancel);
+            DetectBeginEventArgs args = new DetectBeginEventArgs(fCached, registrationType, cPackages, fCancel);
             this.OnDetectBegin(args);
 
             fCancel = args.Cancel;

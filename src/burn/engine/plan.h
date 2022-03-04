@@ -249,7 +249,7 @@ typedef struct _BURN_PLAN
     BOOL fDisableRollback;
     BOOL fAffectedMachineState;
     LPWSTR sczLayoutDirectory;
-    BOOL fBundleAlreadyRegistered;
+    BOOL fPlanPackageCacheRollback;
 
     DWORD64 qwCacheSizeTotal;
 

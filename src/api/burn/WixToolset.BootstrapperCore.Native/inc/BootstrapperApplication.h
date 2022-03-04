@@ -642,7 +642,7 @@ struct BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS
 struct BA_ONDETECTBEGIN_ARGS
 {
     DWORD cbSize;
-    BOOL fInstalled;
+    BOOTSTRAPPER_REGISTRATION_TYPE registrationType;
     DWORD cPackages;
     BOOL fCached;
 };

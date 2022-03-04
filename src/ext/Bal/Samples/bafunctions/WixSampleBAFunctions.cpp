@@ -9,14 +9,14 @@ class CWixSampleBAFunctions : public CBalBaseBAFunctions
 public: // IBootstrapperApplication
     virtual STDMETHODIMP OnDetectBegin(
         __in BOOL fCached,
-        __in BOOL fInstalled,
+        __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
         __in DWORD cPackages,
         __inout BOOL* pfCancel
         )
     {
         HRESULT hr = S_OK;
 
-        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Running detect begin BA function. fCached=%d, fInstalled=%d, cPackages=%u, fCancel=%d", fCached, fInstalled, cPackages, *pfCancel);
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Running detect begin BA function. fCached=%d, registrationType=%d, cPackages=%u, fCancel=%d", fCached, registrationType, cPackages, *pfCancel);
 
         //-------------------------------------------------------------------------------------------------
         // YOUR CODE GOES HERE

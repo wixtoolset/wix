@@ -315,26 +315,19 @@ extern "C" HRESULT CoreDetect(
     DetectReset(&pEngineState->registration, &pEngineState->packages);
     PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
-    // Detect if bundle installed state has changed since start up. This
-    // only happens if Apply() changed the state of bundle (installed or
-    // uninstalled). In that case, Detect() can be used here to reset
-    // the installed state.
+    // Detect if bundle installed state has changed since start up.
+    // This only happens if Apply() changed the state of bundle (installed, in progress, or uninstalled).
+    // In that case, Detect() can be used here to reset the installed state.
+    // Of course, there's also cases outside of this bundle's control,
+    // like other processes messing with its registration.
     hr = RegistrationDetectInstalled(&pEngineState->registration);
     ExitOnFailure(hr, "Failed to detect bundle install state.");
 
-    if (pEngineState->registration.fInstalled)
-    {
-        hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_INSTALLED, 1, TRUE);
-        ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");
-    }
-    else
-    {
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_INSTALLED, NULL, TRUE, FALSE);
-        ExitOnFailure(hr, "Failed to unset the bundle installed built-in variable.");
-    }
+    hr = RegistrationSetDynamicVariables(&pEngineState->registration, &pEngineState->variables);
+    ExitOnFailure(hr, "Failed to reset the dynamic registration variables during detect.");
 
     fDetectBegan = TRUE;
-    hr = UserExperienceOnDetectBegin(&pEngineState->userExperience, pEngineState->registration.fCached, pEngineState->registration.fInstalled, pEngineState->packages.cPackages);
+    hr = UserExperienceOnDetectBegin(&pEngineState->userExperience, pEngineState->registration.fCached, pEngineState->registration.detectedRegistrationType, pEngineState->packages.cPackages);
     ExitOnRootFailure(hr, "UX aborted detect begin.");
 
     pEngineState->userExperience.hwndDetect = hwndParent;
@@ -444,7 +437,7 @@ LExit:
 
     pEngineState->userExperience.hwndDetect = NULL;
 
-    LogId(REPORT_STANDARD, MSG_DETECT_COMPLETE, hr, !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fInstalled), !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fCached), FAILED(hr) ? "(failed)" : LoggingBoolToString(pEngineState->registration.fEligibleForCleanup));
+    LogId(REPORT_STANDARD, MSG_DETECT_COMPLETE, hr, !fDetectBegan ? "(failed)" : LoggingRegistrationTypeToString(pEngineState->registration.detectedRegistrationType), !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fCached), FAILED(hr) ? "(failed)" : LoggingBoolToString(pEngineState->registration.fEligibleForCleanup));
 
     return hr;
 }
@@ -489,7 +482,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
-    pEngineState->plan.fBundleAlreadyRegistered = pEngineState->registration.fInstalled;
+    pEngineState->plan.fPlanPackageCacheRollback = BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pEngineState->registration.detectedRegistrationType;
 
     hr = PlanSetVariables(action, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to update action.");

@@ -792,7 +792,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectPackagesAsAbsent(pEngineState);
 
-            pEngineState->registration.fInstalled = TRUE;
+            pEngineState->registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_MODIFY);
             NativeAssert::Succeeded(hr, "CorePlan failed");
@@ -1457,7 +1457,7 @@ namespace Bootstrapper
         {
             PlanTestDetect(pEngineState);
 
-            pEngineState->registration.fInstalled = TRUE;
+            pEngineState->registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
             for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
             {
@@ -1486,7 +1486,7 @@ namespace Bootstrapper
         {
             PlanTestDetect(pEngineState);
 
-            pEngineState->registration.fInstalled = TRUE;
+            pEngineState->registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
             for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
             {

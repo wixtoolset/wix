@@ -249,11 +249,11 @@ namespace WixToolset.Mba.Core
     public class DetectBeginEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public DetectBeginEventArgs(bool cached, bool installed, int packageCount, bool cancelRecommendation)
+        public DetectBeginEventArgs(bool cached, RegistrationType registrationType, int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.Cached = cached;
-            this.Installed = installed;
+            this.RegistrationType = registrationType;
             this.PackageCount = packageCount;
         }
 
@@ -263,9 +263,9 @@ namespace WixToolset.Mba.Core
         public bool Cached { get; private set; }
 
         /// <summary>
-        /// Gets whether the bundle is installed.
+        /// Gets the bundle's registration state.
         /// </summary>
-        public bool Installed { get; private set; }
+        public RegistrationType RegistrationType { get; private set; }
 
         /// <summary>
         /// Gets the number of packages to detect.

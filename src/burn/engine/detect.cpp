@@ -165,7 +165,7 @@ extern "C" HRESULT DetectReportRelatedBundles(
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_REQUEST_STATE uninstallRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-    *pfEligibleForCleanup = pRegistration->fInstalled || pRegistration->fCached;
+    *pfEligibleForCleanup = BOOTSTRAPPER_REGISTRATION_TYPE_NONE != pRegistration->detectedRegistrationType || pRegistration->fCached;
 
     for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
     {

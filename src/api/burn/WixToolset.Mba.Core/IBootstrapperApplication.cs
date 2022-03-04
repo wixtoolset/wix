@@ -70,7 +70,7 @@ namespace WixToolset.Mba.Core
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectBegin(
             [MarshalAs(UnmanagedType.Bool)] bool fCached,
-            [MarshalAs(UnmanagedType.Bool)] bool fInstalled,
+            [MarshalAs(UnmanagedType.U4)] RegistrationType registrationType,
             [MarshalAs(UnmanagedType.U4)] int cPackages,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );

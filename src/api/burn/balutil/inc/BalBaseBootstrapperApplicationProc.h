@@ -15,7 +15,7 @@ static HRESULT BalBaseBAProcOnDetectBegin(
     __inout BA_ONDETECTBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnDetectBegin(pArgs->fCached, pArgs->fInstalled, pArgs->cPackages, &pResults->fCancel);
+    return pBA->OnDetectBegin(pArgs->fCached, pArgs->registrationType, pArgs->cPackages, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectComplete(
