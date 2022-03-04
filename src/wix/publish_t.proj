@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Build.Traversal/3.0.23">
+<Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
     <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=netcoreapp3.1;PublishDir=$(BaseOutputPath)$(Configuration)\publish\wix\" Targets="Publish" />
 
