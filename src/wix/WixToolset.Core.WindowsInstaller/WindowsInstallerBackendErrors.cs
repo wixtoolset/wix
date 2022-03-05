@@ -2,14 +2,17 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
+    using System;
     using WixToolset.Data;
 
     internal static class WindowsInstallerBackendErrors
     {
-        //public static Message ReplaceThisWithTheFirstError(SourceLineNumber sourceLineNumbers)
-        //{
-        //    return Message(sourceLineNumbers, Ids.ReplaceThisWithTheFirstError, "format string", arg1, arg2);
-        //}
+        public static Message CannotLoadWixoutAsTransform(SourceLineNumber sourceLineNumbers, Exception exception)
+        {
+            var additionalDetail = exception == null ? String.Empty : ", detail: " + exception.Message;
+
+            return Message(sourceLineNumbers, Ids.CannotLoadWixoutAsTransform, "Could not load wixout file as a transform{1}", additionalDetail);
+        }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
@@ -18,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         public enum Ids
         {
-            // ReplaceThisWithTheFirstError = 7500,
+            CannotLoadWixoutAsTransform = 7500,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }

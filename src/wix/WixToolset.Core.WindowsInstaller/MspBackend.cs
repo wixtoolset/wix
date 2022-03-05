@@ -4,13 +4,7 @@ namespace WixToolset.Core.WindowsInstaller
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
     using WixToolset.Core.WindowsInstaller.Bind;
-    using WixToolset.Core.Native.Msi;
-    using WixToolset.Core.WindowsInstaller.Unbind;
-    using WixToolset.Data;
-    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -74,9 +68,9 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
+#if TODO_PATCHING
         public Intermediate Unbind(IUnbindContext context)
         {
-#if TODO_PATCHING
             Output patch;
 
             // patch files are essentially database files (use a special flag to let the API know its a patch file)
@@ -156,8 +150,7 @@ namespace WixToolset.Core.WindowsInstaller
             }
 
             return patch;
-#endif
-            throw new NotImplementedException();
         }
+#endif
     }
 }

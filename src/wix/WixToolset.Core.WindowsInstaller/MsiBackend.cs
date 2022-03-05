@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
+    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Core.WindowsInstaller.Decompile;
     using WixToolset.Core.WindowsInstaller.Unbind;
@@ -71,8 +72,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         public Intermediate Unbind(IUnbindContext context)
         {
-            var command = new UnbindMsiOrMsmCommand(context);
-            return command.Execute();
+            throw new NotImplementedException();
         }
     }
 }

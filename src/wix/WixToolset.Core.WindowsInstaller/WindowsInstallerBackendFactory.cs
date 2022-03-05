@@ -37,11 +37,6 @@ namespace WixToolset.Core.WindowsInstaller
                 //case "patchcreation":
                 //case ".pcp":
                 //    return new PatchCreationBackend();
-
-                case "transform":
-                case ".mst":
-                    backend = new MstBackend();
-                    return true;
             }
 
             backend = null;
