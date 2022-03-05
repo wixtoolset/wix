@@ -178,6 +178,7 @@ static HRESULT OnApplyInitialize(
     );
 static HRESULT ElevatedProcessDetect(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables,
     __in BURN_PACKAGES* pPackages
     );
 static HRESULT OnApplyUninitialize(
@@ -2245,7 +2246,7 @@ static HRESULT OnApplyInitialize(
     ExitOnFailure(hr, "Failed to acquire lock due to setup in other session.");
 
     // Detect.
-    hr = ElevatedProcessDetect(pRegistration, pPackages);
+    hr = ElevatedProcessDetect(pRegistration, pVariables, pPackages);
     ExitOnFailure(hr, "Failed to run detection in elevated process.");
 
     // Attempt to pause AU with best effort.
@@ -2331,12 +2332,16 @@ LExit:
 
 static HRESULT ElevatedProcessDetect(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables,
     __in BURN_PACKAGES* pPackages
     )
 {
     HRESULT hr = S_OK;
 
     DetectReset(pRegistration, pPackages);
+
+    hr = RegistrationSetDynamicVariables(pRegistration, pVariables);
+    ExitOnFailure(hr, "Failed to reset the dynamic registration variables during elevated detect.");
 
     hr = RelatedBundlesInitializeForScope(TRUE, pRegistration, &pRegistration->relatedBundles);
     ExitOnFailure(hr, "Failed to initialize per-machine related bundles.");

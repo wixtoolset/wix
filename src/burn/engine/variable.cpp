@@ -271,7 +271,7 @@ extern "C" HRESULT VariableInitialize(
         {BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_FORCED_RESTART_PACKAGE, InitializeVariableString, NULL, TRUE, TRUE},
-        {BURN_BUNDLE_INSTALLED, InitializeVariableNumeric, 0, FALSE, TRUE},
+        {BURN_BUNDLE_INSTALLED, InitializeVariableNumeric, 0},
         {BURN_BUNDLE_ELEVATED, InitializeVariableNumeric, 0, FALSE, TRUE},
         {BURN_BUNDLE_ACTIVE_PARENT, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_PROVIDER_KEY, InitializeVariableString, (DWORD_PTR)L"", FALSE, TRUE},
