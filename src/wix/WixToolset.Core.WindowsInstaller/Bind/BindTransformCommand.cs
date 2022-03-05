@@ -62,18 +62,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (this.Transform.TryGetTable("Property", out var propertyTable))
             {
-                for (int i = propertyTable.Rows.Count - 1; i >= 0; i--)
+                for (var i = propertyTable.Rows.Count - 1; i >= 0; i--)
                 {
-                    Row row = propertyTable.Rows[i];
+                    var row = propertyTable.Rows[i];
+                    var id = row.FieldAsString(0);
 
-                    if ("ProductCode" == (string)row[0] || "ProductLanguage" == (string)row[0] || "ProductVersion" == (string)row[0] || "UpgradeCode" == (string)row[0])
+                    if ("ProductCode" == id || "ProductLanguage" == id || "ProductVersion" == id)
                     {
                         propertyTable.Rows.RemoveAt(i);
-
-                        if ("UpgradeCode" == (string)row[0])
-                        {
-                            updatedUpgradeCode = (string)row[1];
-                        }
+                    }
+                    else if ("UpgradeCode" == id)
+                    {
+                        updatedUpgradeCode = id;
+                        propertyTable.Rows.RemoveAt(i);
                     }
                 }
             }
@@ -382,11 +383,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
             }
-
-            //foreach (BinderExtension extension in this.Extensions)
-            //{
-            //    extension.PostBind(this.Context);
-            //}
 
             // Any errors encountered up to this point can cause errors during generation.
             if (this.Messaging.EncounteredError)

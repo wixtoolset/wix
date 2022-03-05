@@ -41,7 +41,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         private TableDefinitionCollection TableDefinitions { get; }
 
         private string EmptyFile { get; set; }
-        
+
         public WindowsInstallerData Execute()
         {
             var transform = new WindowsInstallerData(new SourceLineNumber(this.TransformFile));

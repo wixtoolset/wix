@@ -2,9 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
-    using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -32,9 +30,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public TableDefinitionCollection Execute()
         {
             var tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
-            var customColumnsById = this.Section.Symbols.OfType<WixCustomTableColumnSymbol>().ToDictionary(t => t.Id.Id);
+            var customColumnsById = this.Section?.Symbols.OfType<WixCustomTableColumnSymbol>().ToDictionary(t => t.Id.Id);
 
-            if (customColumnsById.Any())
+            if (customColumnsById?.Any() == true)
             {
                 foreach (var symbol in this.Section.Symbols.OfType<WixCustomTableSymbol>())
                 {

@@ -49,6 +49,10 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                         this.Subcommand = new InscribeSubcommand(this.ServiceProvider);
                         return true;
 
+                    case "transform":
+                        this.Subcommand = new TransformSubcommand(this.ServiceProvider);
+                        return true;
+
                     case "validate":
                         this.Subcommand = new ValidateSubcommand(this.ServiceProvider);
                         return true;
@@ -72,6 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             Console.WriteLine("Commands:");
             Console.WriteLine();
             Console.WriteLine("  inscribe          Updates MSI database with cabinet signature information.");
+            Console.WriteLine("  transform         Creates an MST transform file.");
             Console.WriteLine("  validate          Validates MSI database using standard or custom ICEs.");
         }
     }
