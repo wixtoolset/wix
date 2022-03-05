@@ -8,25 +8,18 @@ namespace WixBuildTools.TestSupport
 
     public class MsbuildRunner : ExternalExecutable
     {
-        private static readonly string VswhereFindArguments = "-property installationPath";
-        private static readonly string Msbuild15RelativePath = @"MSBuild\15.0\Bin\MSBuild.exe";
-        private static readonly string Msbuild15RelativePath64 = @"MSBuild\15.0\Bin\amd64\MSBuild.exe";
+        private static readonly string VswhereFindArguments = "-property installationPath -version [17.0,18.0)";
         private static readonly string MsbuildCurrentRelativePath = @"MSBuild\Current\Bin\MSBuild.exe";
         private static readonly string MsbuildCurrentRelativePath64 = @"MSBuild\Current\Bin\amd64\MSBuild.exe";
 
         private static readonly object InitLock = new object();
 
         private static bool Initialized;
-        private static MsbuildRunner Msbuild15Runner;
-        private static MsbuildRunner Msbuild15Runner64;
         private static MsbuildRunner MsbuildCurrentRunner;
         private static MsbuildRunner MsbuildCurrentRunner64;
 
         public static MsbuildRunnerResult Execute(string projectPath, string[] arguments = null, bool x64 = false) =>
             InitAndExecute(String.Empty, projectPath, arguments, x64);
-
-        public static MsbuildRunnerResult ExecuteWithMsbuild15(string projectPath, string[] arguments = null, bool x64 = false) =>
-            InitAndExecute("15", projectPath, arguments, x64);
 
         public static MsbuildRunnerResult ExecuteWithMsbuildCurrent(string projectPath, string[] arguments = null, bool x64 = false) =>
             InitAndExecute("Current", projectPath, arguments, x64);
@@ -44,8 +37,6 @@ namespace WixBuildTools.TestSupport
                         throw new InvalidOperationException($"Failed to execute vswhere.exe, exit code: {vswhereResult.ExitCode}. Output:\r\n{String.Join("\r\n", vswhereResult.StandardOutput)}");
                     }
 
-                    string msbuild15Path = null;
-                    string msbuild15Path64 = null;
                     string msbuildCurrentPath = null;
                     string msbuildCurrentPath64 = null;
 
@@ -68,24 +59,6 @@ namespace WixBuildTools.TestSupport
                                 msbuildCurrentPath64 = path;
                             }
                         }
-
-                        if (msbuild15Path == null)
-                        {
-                            var path = Path.Combine(installPath, Msbuild15RelativePath);
-                            if (File.Exists(path))
-                            {
-                                msbuild15Path = path;
-                            }
-                        }
-
-                        if (msbuild15Path64 == null)
-                        {
-                            var path = Path.Combine(installPath, Msbuild15RelativePath64);
-                            if (File.Exists(path))
-                            {
-                                msbuild15Path64 = path;
-                            }
-                        }
                     }
 
                     if (msbuildCurrentPath != null)
@@ -97,39 +70,10 @@ namespace WixBuildTools.TestSupport
                     {
                         MsbuildCurrentRunner64 = new MsbuildRunner(msbuildCurrentPath64);
                     }
-
-                    if (msbuild15Path != null)
-                    {
-                        Msbuild15Runner = new MsbuildRunner(msbuild15Path);
-                    }
-
-                    if (msbuild15Path64 != null)
-                    {
-                        Msbuild15Runner64 = new MsbuildRunner(msbuild15Path64);
-                    }
                 }
             }
 
-            MsbuildRunner runner;
-            switch (msbuildVersion)
-            {
-                case "15":
-                    {
-                        runner = x64 ? Msbuild15Runner64 : Msbuild15Runner;
-                        break;
-                    }
-                case "Current":
-                    {
-                        runner = x64 ? MsbuildCurrentRunner64 : MsbuildCurrentRunner;
-                        break;
-                    }
-                default:
-                    {
-                        runner = x64 ? MsbuildCurrentRunner64 ?? Msbuild15Runner64
-                                     : MsbuildCurrentRunner ?? Msbuild15Runner;
-                        break;
-                    }
-            }
+            MsbuildRunner runner = x64 ? MsbuildCurrentRunner64 : MsbuildCurrentRunner;
 
             if (runner == null)
             {
