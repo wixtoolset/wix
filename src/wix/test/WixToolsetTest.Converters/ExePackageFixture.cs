@@ -3,6 +3,7 @@
 namespace WixToolsetTest.Converters
 {
     using System;
+    using System.Linq;
     using System.Xml.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Converters;
@@ -43,6 +44,12 @@ namespace WixToolsetTest.Converters
             Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(new[]
+            {
+                "[Converted] The ExePackage element InstallCommand attribute has been renamed InstallArguments. (RenameExePackageCommandToArguments)",
+                "[Converted] The ExePackage element RepairCommand attribute has been renamed RepairArguments. (RenameExePackageCommandToArguments)",
+                "[Converted] The ExePackage element UninstallCommand attribute has been renamed UninstallArguments. (RenameExePackageCommandToArguments)",
+            }, messaging.Messages.Select(m => m.ToString()).ToArray());
             WixAssert.CompareLineByLine(expected, actualLines);
         }
     }
