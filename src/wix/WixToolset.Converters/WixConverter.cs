@@ -15,7 +15,6 @@ namespace WixToolset.Converters
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
-#pragma warning disable 1591 // TODO: add documentation
     /// <summary>
     /// How to convert CustomTable elements.
     /// </summary>
@@ -295,7 +294,7 @@ namespace WixToolset.Converters
 
         private int SourceVersion { get; set; }
 
-        public XElement XRoot { get; private set; }
+        private XElement XRoot { get; set; }
 
         /// <summary>
         /// Convert a file.
@@ -2085,31 +2084,7 @@ namespace WixToolset.Converters
         /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
         private bool OnError(ConverterTestType converterTestType, XObject node, string message, params object[] args)
         {
-            // Ignore the error if explicitly ignored or outside the range of the current operation.
-            if (this.IgnoreErrors.Contains(converterTestType) ||
-                (this.Operation == ConvertOperation.Convert && converterTestType < ConverterTestType.EndIgnoreInConvert) ||
-                (this.Operation == ConvertOperation.Format && converterTestType > ConverterTestType.BeginIgnoreInFormat))
-            {
-                return false;
-            }
-
-            // Increase the message count.
-            this.Messages++;
-
-            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wix.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
-            var warning = this.ErrorsAsWarnings.Contains(converterTestType);
-            
-            var msg = new Message(
-                    sourceLine,
-                    warning ? MessageLevel.Warning : MessageLevel.Error,
-                    (int)converterTestType,
-                    "{0} ({1})",
-                    String.Format(CultureInfo.CurrentCulture, message, args),
-                    converterTestType.ToString());
-
-            this.Messaging.Write(msg);
-
-            return true;
+            return this.OnMessage(MessageLevel.Error, converterTestType, node, message, args);
         }
 
         /// <summary>
@@ -2119,8 +2094,13 @@ namespace WixToolset.Converters
         /// <param name="node">The node that caused the error.</param>
         /// <param name="message">Detailed error message.</param>
         /// <param name="args">Additional formatted string arguments.</param>
-        /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
+        /// <returns>Returns true indicating that action should be taken on this message, and false if it should be ignored.</returns>
         private bool OnInformation(ConverterTestType converterTestType, XObject node, string message, params object[] args)
+        {
+            return this.OnMessage(MessageLevel.Information, converterTestType, node, message, args);
+        }
+
+        private bool OnMessage(MessageLevel level, ConverterTestType converterTestType, XObject node, string message, params object[] args)
         {
             // Ignore the error if explicitly ignored or outside the range of the current operation.
             if (this.IgnoreErrors.Contains(converterTestType) ||
@@ -2134,14 +2114,19 @@ namespace WixToolset.Converters
             this.Messages++;
 
             var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wix.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
+            var prefix = String.Empty;
+            if (level == MessageLevel.Information)
+            {
+                prefix = "[Converted] ";
+            }
+            else if (level == MessageLevel.Error && this.ErrorsAsWarnings.Contains(converterTestType))
+            {
+                level = MessageLevel.Warning;
+            }
 
-            var msg = new Message(
-                    sourceLine,
-                    MessageLevel.Information,
-                    (int)converterTestType,
-                    "[Converted] {0} ({1})",
-                    String.Format(CultureInfo.CurrentCulture, message, args),
-                    converterTestType.ToString());
+            var format = prefix + message + $" ({converterTestType})";
+
+            var msg = new Message(sourceLine, level, (int)converterTestType, format, args);
 
             this.Messaging.Write(msg);
 
