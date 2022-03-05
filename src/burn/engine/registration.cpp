@@ -484,7 +484,13 @@ extern "C" HRESULT RegistrationSetDynamicVariables(
     )
 {
     HRESULT hr = S_OK;
-    LONGLONG llInstalled = BOOTSTRAPPER_REGISTRATION_TYPE_FULL == pRegistration->detectedRegistrationType ? 1 : 0;
+    LONGLONG llInstalled = 0;
+
+    // Detect if bundle is already installed.
+    hr = RegistrationDetectInstalled(pRegistration);
+    ExitOnFailure(hr, "Failed to detect bundle install state.");
+
+    llInstalled = BOOTSTRAPPER_REGISTRATION_TYPE_FULL == pRegistration->detectedRegistrationType ? 1 : 0;
 
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_INSTALLED, llInstalled, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");

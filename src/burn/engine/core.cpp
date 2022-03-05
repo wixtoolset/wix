@@ -264,10 +264,6 @@ extern "C" HRESULT CoreQueryRegistration(
     SIZE_T cbBuffer = 0;
     SIZE_T iBuffer = 0;
 
-    // Detect if bundle is already installed.
-    hr = RegistrationDetectInstalled(&pEngineState->registration);
-    ExitOnFailure(hr, "Failed to detect bundle install state.");
-
     // detect resume type
     hr = RegistrationDetectResumeType(&pEngineState->registration, &pEngineState->command.resumeType);
     ExitOnFailure(hr, "Failed to detect resume type.");
@@ -314,14 +310,6 @@ extern "C" HRESULT CoreDetect(
     pEngineState->fPlanned = FALSE;
     DetectReset(&pEngineState->registration, &pEngineState->packages);
     PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
-
-    // Detect if bundle installed state has changed since start up.
-    // This only happens if Apply() changed the state of bundle (installed, in progress, or uninstalled).
-    // In that case, Detect() can be used here to reset the installed state.
-    // Of course, there's also cases outside of this bundle's control,
-    // like other processes messing with its registration.
-    hr = RegistrationDetectInstalled(&pEngineState->registration);
-    ExitOnFailure(hr, "Failed to detect bundle install state.");
 
     hr = RegistrationSetDynamicVariables(&pEngineState->registration, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to reset the dynamic registration variables during detect.");
