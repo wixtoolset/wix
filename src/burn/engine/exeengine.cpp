@@ -37,11 +37,8 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Repairable.");
 
     // @Uninstallable
-    pPackage->Exe.fUninstallable = TRUE; // TODO: https://github.com/wixtoolset/issues/issues/6459
-    /*
-    hr = XmlGetYesNoAttribute(pixnNode, L"Uninstallable", &pPackage->Exe.fUninstallable);
+    hr = XmlGetYesNoAttribute(pixnExePackage, L"Uninstallable", &pPackage->Exe.fUninstallable);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Uninstallable.");
-    */
 
     // @Protocol
     hr = XmlGetAttributeEx(pixnExePackage, L"Protocol", &scz);
