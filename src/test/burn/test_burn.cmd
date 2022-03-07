@@ -16,9 +16,6 @@ msbuild -t:Build -Restore TestData\TestData.proj -p:Configuration=%_C% -m -bl:%_
 
 @if not "%RuntimeTestsEnabled%"=="true" goto :LExit
 
-reg add HKLM\Software\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
-reg add HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
-
 dotnet test -c %_C% --no-build WixToolsetTest.BurnE2E -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.BurnE2E.trx" || exit /b
 
 :LExit
