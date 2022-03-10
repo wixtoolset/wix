@@ -49,6 +49,10 @@ namespace WixToolset.Core.Burn.CommandLine
                         this.Subcommand = new DetachSubcommand(this.ServiceProvider);
                         return true;
 
+                    case "extract":
+                        this.Subcommand = new ExtractSubcommand(this.ServiceProvider);
+                        return true;
+
                     case "reattach":
                         this.Subcommand = new ReattachSubcommand(this.ServiceProvider);
                         return true;

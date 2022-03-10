@@ -5,10 +5,8 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Extensibility.Services;
     using Xunit;
 
     public class BundleExtractionFixture
@@ -23,13 +21,10 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var exePath = Path.Combine(baseFolder, @"bin\test.exe");
-                var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
-                var baFolderPath = Path.Combine(extractFolderPath, "UX");
+                var baFolderPath = Path.Combine(extractFolderPath, "BA");
                 var attachedContainerFolderPath = Path.Combine(extractFolderPath, "WixAttachedContainer");
 
-                // TODO: use WixRunner.Execute(string[]) to always go through the command line.
-                var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
@@ -40,14 +35,24 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", exePath,
-                }, serviceProvider, out var messages).Result;
+                });
 
-                WixRunnerResult.AssertSuccess(result, messages);
-                Assert.Empty(messages.Where(m => m.Level == MessageLevel.Warning));
+                result.AssertSuccess();
+                Assert.Empty(result.Messages.Where(m => m.Level == MessageLevel.Warning));
 
                 Assert.True(File.Exists(exePath));
 
+                result = WixRunner.Execute(new[]
+                {
+                    "burn", "extract",
+                    exePath,
+                    "-o", extractFolderPath
+                });
 
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "manifest.xml")));
+                Assert.False(Directory.Exists(attachedContainerFolderPath));
             }
         }
     }
