@@ -65,10 +65,5 @@ namespace WixToolset.Core.WindowsInstaller
 
             return result;
         }
-
-        public Intermediate Unbind(IUnbindContext context)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

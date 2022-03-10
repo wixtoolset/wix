@@ -7,7 +7,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class UnbindMsiOrMsmCommand
@@ -22,16 +21,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.IsAdminImage = adminImage;
             this.SuppressDemodularization = suppressDemodularization;
             this.SuppressExtractCabinets = suppressExtractCabinets;
-        }
-
-        public UnbindMsiOrMsmCommand(IUnbindContext context)
-        {
-            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
-            this.DatabasePath = context.InputFilePath;
-            this.ExportBasePath = context.ExportBasePath;
-            this.IntermediateFolder = context.IntermediateFolder;
-            this.IsAdminImage = context.IsAdminImage;
-            this.SuppressDemodularization = context.SuppressDemodularization;
         }
 
         private IMessaging Messaging { get; }

@@ -2,16 +2,21 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Interface all backends implement.
+    /// </summary>
     public interface IBackend
     {
+        /// <summary>
+        /// Bind the intermediate into the final output.
+        /// </summary>
+        /// <param name="context">Bind context.</param>
+        /// <returns>Result of the bind operation.</returns>
         IBindResult Bind(IBindContext context);
 
+#pragma warning disable 1591 // TODO: add documentation
         IDecompileResult Decompile(IDecompileContext context);
-
-        Intermediate Unbind(IUnbindContext context);
     }
 }

@@ -41,7 +41,6 @@ namespace WixToolset.Core
             this.AddService<IBindContext>((provider, singletons) => new BindContext(provider));
             this.AddService<IDecompileContext>((provider, singletons) => new DecompileContext(provider));
             this.AddService<ILayoutContext>((provider, singletons) => new LayoutContext(provider));
-            this.AddService<IUnbindContext>((provider, singletons) => new UnbindContext(provider));
 
             this.AddService<IBindFileWithPath>((provider, singletons) => new BindFileWithPath());
             this.AddService<IBindPath>((provider, singletons) => new BindPath());
@@ -64,7 +63,6 @@ namespace WixToolset.Core
             this.AddService<ILibrarian>((provider, singletons) => new Librarian(provider));
             this.AddService<ILinker>((provider, singletons) => new Linker(provider));
             this.AddService<IResolver>((provider, singletons) => new Resolver(provider));
-            this.AddService<IUnbinder>((provider, singletons) => new Unbinder(provider));
 
             this.AddService<ILocalizationParser>((provider, singletons) => new LocalizationParser(provider));
             this.AddService<IVariableResolver>((provider, singletons) => new VariableResolver(provider));
