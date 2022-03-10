@@ -3,9 +3,6 @@
 namespace WixToolset.Core.Burn
 {
     using System;
-    using System.IO;
-    using WixToolset.Core.Burn.Bundles;
-    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -42,20 +39,6 @@ namespace WixToolset.Core.Burn
         public IDecompileResult Decompile(IDecompileContext context)
         {
             throw new NotImplementedException();
-        }
-
-        public Intermediate Unbind(IUnbindContext context)
-        {
-            var uxExtractPath = Path.Combine(context.ExportBasePath, "UX");
-            var messaging = context.ServiceProvider.GetService<IMessaging>();
-
-            using (var reader = BurnReader.Open(messaging, context.InputFilePath))
-            {
-                reader.ExtractUXContainer(uxExtractPath, context.IntermediateFolder);
-                reader.ExtractAttachedContainers(context.ExportBasePath, context.IntermediateFolder);
-            }
-
-            return null;
         }
     }
 }
