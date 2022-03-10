@@ -47,11 +47,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(exePath));
 
-                var unbinder = serviceProvider.GetService<IUnbinder>();
-                unbinder.Unbind(exePath, OutputType.Bundle, extractFolderPath);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "manifest.xml")));
-                Assert.False(Directory.Exists(attachedContainerFolderPath));
             }
         }
     }
