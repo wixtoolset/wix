@@ -120,6 +120,47 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanInscribe64BitBundle()
+        {
+            var folder = TestData.Get(@"TestData", "SimpleBundle");
+            var signedFolder = TestData.Get(@"TestData", ".Data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var signedExe = Path.Combine(intermediateFolder, @"signed.exe");
+                var reattachedExe = Path.Combine(baseFolder, @"bin\final.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Bundle.wxs"),
+                    "-platform", "x64",
+                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-bindpath", signedFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+{
+                    "burn",
+                    "detach",
+                    exePath,
+                    "-engine", signedExe
+                });
+
+                result.AssertSuccess();
+                Assert.True(File.Exists(signedExe));
+            }
+        }
+
+        [Fact]
         public void CanInscribeUncompressedBundle()
         {
             var folder = TestData.Get(@"TestData", "BundleUncompressed");
