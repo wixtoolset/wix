@@ -49,6 +49,51 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanCabReallyOldFiles()
+        {
+            var folder = TestData.Get(@"TestData", "SingleFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder(create: true);
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+                var cabPath = Path.Combine(baseFolder, @"bin\cab1.cab");
+
+                var old = new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                var oldTxt = Path.Combine(baseFolder, "test.txt");
+                File.Copy(Path.Combine(folder, "data", "test.txt"), oldTxt);
+                File.SetCreationTime(oldTxt, old);
+                File.SetLastWriteTime(oldTxt, old);
+                File.SetLastAccessTime(oldTxt, old);
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-d", "MediaTemplateCompressionLevel",
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", baseFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+                Assert.True(File.Exists(cabPath));
+
+                var fileTable = Query.QueryDatabase(msiPath, new[] { "File" });
+                var fileRows = fileTable.Select(r => new FileRow(r)).OrderBy(f => f.Sequence).ToList();
+
+                Assert.Equal(new[] { 1 }, fileRows.Select(f => f.Sequence).ToArray());
+                WixAssert.CompareLineByLine(new[] { "test.txt" }, fileRows.Select(f => f.Name).ToArray());
+
+                var files = Query.GetCabinetFiles(cabPath);
+                Assert.Equal(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());
+            }
+        }
+
         private class FileRow
         {
             public FileRow(string row)
