@@ -1047,12 +1047,12 @@ static HRESULT UtcFileTimeToLocalDosDateTime(
 
     if (!::FileTimeToLocalFileTime(pFileTime, &ftLocal))
     {
-        CabcExitWithLastError(hr, "Filed to convert file time to local file time.");
+        CabcExitWithLastError(hr, "Failed to convert file time to local file time.");
     }
 
     if (!::FileTimeToDosDateTime(&ftLocal, pDate, pTime))
     {
-        CabcExitWithLastError(hr, "Filed to convert file time to DOS date time.");
+        CabcExitWithLastError(hr, "Failed to convert file time to DOS date time.");
     }
 
 LExit:
@@ -1508,7 +1508,15 @@ static __callback INT_PTR DIAMONDAPI CabCGetOpenInfo(
         // found. This would create further problems if the file was written to the CAB without this value. Windows
         // Installer would then fail to extract the file.
         hr = UtcFileTimeToLocalDosDateTime(&fad.ftCreationTime, pdate, ptime);
-        CabcExitOnFailure(hr, "Filed to read a valid file time stucture on file '%s'.", pszName);
+
+        // If we could not convert the ftLastWriteTime or ftCreationTime to a DOS time, then set the date/time to
+        // the smallest value that can be represented: midnight on 1/1/1980.
+        if (FAILED(hr))
+        {
+            *pdate = 0;
+            *ptime = 0;
+            hr = S_OK;
+        }
     }
 
     iResult = CabCOpen(pszFilePlusMagic, _O_BINARY|_O_RDONLY, 0, err, pv);
