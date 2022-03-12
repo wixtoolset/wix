@@ -320,6 +320,35 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildBundleWithInvalidUpgradeCode()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidUpgradeCode.wxs"),
+                    "-loc", Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidUpgradeCode.wxl"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                var message = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString().Replace(folder, "<testdata>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The Bundle/@UpgradeCode attribute's value, 'NOT-A-GUID', is not a legal guid value."
+                }, message);
+            }
+        }
+
+        [Fact]
         public void CanBuildUncompressedBundle()
         {
             var folder = TestData.Get(@"TestData") + Path.DirectorySeparatorChar;

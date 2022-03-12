@@ -102,6 +102,8 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.ProviderKey = bundleSymbol.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
+            bundleSymbol.UpgradeCode = this.NormalizeBundleUpgradeCode(bundleSymbol.SourceLineNumbers, bundleSymbol.UpgradeCode);
+
             bundleSymbol.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
             // Ensure there is one and only one WixBootstrapperApplicationDllSymbol.
@@ -492,6 +494,20 @@ namespace WixToolset.Core.Burn
             this.FileTransfers = fileTransfers;
             this.TrackedFiles = trackedFiles;
             this.Wixout = this.CreateWixout(trackedFiles, this.Output, manifestPath, baManifestPath, bextManifestPath);
+        }
+
+        private string NormalizeBundleUpgradeCode(SourceLineNumber sourceLineNumber, string upgradeCode)
+        {
+            if (Guid.TryParse(upgradeCode, out var guid))
+            {
+                return guid.ToString("B").ToUpperInvariant();
+            }
+            else
+            {
+                this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumber, "Bundle", "UpgradeCode", upgradeCode));
+            }
+
+            return upgradeCode;
         }
 
         private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, string manifestPath, string baDataPath, string bextDataPath)
