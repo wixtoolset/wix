@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.Burn
 {
+    using System;
     using WixToolset.Data;
 
     internal static class BurnBackendErrors
@@ -34,6 +35,29 @@ namespace WixToolset.Core.Burn
         public static Message ExternalPayloadCollision2(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.ExternalPayloadCollision2, "The location of the symbol related to the previous error.");
+        }
+
+        public static Message FailedToAddIconOrSplashScreenToBundle(SourceLineNumber sourceLineNumbers, string iconPath, string splashScreenPath)
+        {
+            var additionalDetail = String.Empty;
+
+            if (String.IsNullOrEmpty(iconPath) && String.IsNullOrEmpty(splashScreenPath))
+            {
+            }
+            else if (String.IsNullOrEmpty(iconPath))
+            {
+                additionalDetail = $" Ensure the splash screen file is a bitmap file at '{splashScreenPath}'";
+            }
+            else if (String.IsNullOrEmpty(splashScreenPath))
+            {
+                additionalDetail = $" Ensure the bundle icon file is an icon file at '{iconPath}'";
+            }
+            else
+            {
+                additionalDetail = $" Ensure the bundle icon file is an icon file at '{iconPath}' and the splash screen file is a bitmap file at '{splashScreenPath}'";
+            }
+
+            return Message(sourceLineNumbers, Ids.FailedToAddIconOrSplashScreenToBundle, "Failed to add resources to the bundle.{0}", additionalDetail);
         }
 
         public static Message PackageCachePayloadCollision(SourceLineNumber sourceLineNumbers, string payloadId, string payloadName, string packageId)
@@ -79,6 +103,7 @@ namespace WixToolset.Core.Burn
             TooManyAttachedContainers = 8008,
             IncompatibleWixBurnSection = 8009,
             UnsupportedRemotePackagePayload = 8010,
+            FailedToAddIconOrSplashScreenToBundle = 8011,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }
