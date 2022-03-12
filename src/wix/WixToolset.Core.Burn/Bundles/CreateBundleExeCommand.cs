@@ -259,11 +259,11 @@ namespace WixToolset.Core.Burn.Bundles
             return new Version(major, minor, build, revision);
         }
 
-        private static void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo, Version windowsAssemblyVersion, byte[] applicationManifestData)
+        private void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo, Version windowsAssemblyVersion, byte[] applicationManifestData)
         {
             const int burnLocale = 1033;
-            var resources = new Dtf.Resources.ResourceCollection();
-            var version = new Dtf.Resources.VersionResource("#1", burnLocale);
+            var resources = new ResourceCollection();
+            var version = new VersionResource("#1", burnLocale);
 
             version.Load(bundleTempPath);
             resources.Add(version);
@@ -292,10 +292,10 @@ namespace WixToolset.Core.Burn.Bundles
                 strings["CompanyName"] = String.Empty;
             }
 
-            if (!String.IsNullOrEmpty(bundleInfo.IconSourceFile))
+            if (bundleInfo.IconSourceFile != null)
             {
-                var iconGroup = new Dtf.Resources.GroupIconResource("#1", burnLocale);
-                iconGroup.ReadFromFile(bundleInfo.IconSourceFile);
+                var iconGroup = new GroupIconResource("#1", burnLocale);
+                iconGroup.ReadFromFile(bundleInfo.IconSourceFile.Path);
                 resources.Add(iconGroup);
 
                 foreach (var icon in iconGroup.Icons)
@@ -306,10 +306,10 @@ namespace WixToolset.Core.Burn.Bundles
 
             var splashScreenType = BURN_SPLASH_SCREEN_TYPE.BURN_SPLASH_SCREEN_TYPE_NONE;
 
-            if (!String.IsNullOrEmpty(bundleInfo.SplashScreenSourceFile))
+            if (bundleInfo.SplashScreenSourceFile != null)
             {
-                var bitmap = new Dtf.Resources.BitmapResource("#1", burnLocale);
-                bitmap.ReadFromFile(bundleInfo.SplashScreenSourceFile);
+                var bitmap = new BitmapResource("#1", burnLocale);
+                bitmap.ReadFromFile(bundleInfo.SplashScreenSourceFile.Path);
                 resources.Add(bitmap);
 
                 splashScreenType = BURN_SPLASH_SCREEN_TYPE.BURN_SPLASH_SCREEN_TYPE_BITMAP_RESOURCE;
@@ -321,13 +321,26 @@ namespace WixToolset.Core.Burn.Bundles
                 ResourceId = 1,
             };
 
-            var splashScreenConfigResource = new Dtf.Resources.Resource(ResourceType.RCData, "#1", burnLocale, splashScreenConfig.ToBytes());
+            var splashScreenConfigResource = new Resource(ResourceType.RCData, "#1", burnLocale, splashScreenConfig.ToBytes());
             resources.Add(splashScreenConfigResource);
 
             var manifestResource = new Resource(ResourceType.Manifest, "#1", burnLocale, applicationManifestData);
             resources.Add(manifestResource);
 
-            resources.Save(bundleTempPath);
+            try
+            {
+                resources.Save(bundleTempPath);
+            }
+            catch (IOException)
+            {
+                // If there was no icon or splash screen then this is unexpected so rethrow.
+                if (bundleInfo.IconSourceFile == null && bundleInfo.SplashScreenSourceFile == null)
+                {
+                    throw;
+                }
+
+                this.Messaging.Write(BurnBackendErrors.FailedToAddIconOrSplashScreenToBundle(bundleInfo.SourceLineNumbers, bundleInfo.IconSourceFile?.Path, bundleInfo.SplashScreenSourceFile?.Path));
+            }
         }
 
         enum BURN_SPLASH_SCREEN_TYPE

@@ -183,15 +183,15 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleSymbolFields.LogExtension, value);
         }
 
-        public string IconSourceFile
+        public IntermediateFieldPathValue IconSourceFile
         {
-            get => (string)this.Fields[(int)WixBundleSymbolFields.IconSourceFile];
+            get => this.Fields[(int)WixBundleSymbolFields.IconSourceFile].AsPath();
             set => this.Set((int)WixBundleSymbolFields.IconSourceFile, value);
         }
 
-        public string SplashScreenSourceFile
+        public IntermediateFieldPathValue SplashScreenSourceFile
         {
-            get => (string)this.Fields[(int)WixBundleSymbolFields.SplashScreenSourceFile];
+            get => this.Fields[(int)WixBundleSymbolFields.SplashScreenSourceFile].AsPath();
             set => this.Set((int)WixBundleSymbolFields.SplashScreenSourceFile, value);
         }
 
