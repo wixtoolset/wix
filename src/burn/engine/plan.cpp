@@ -2786,6 +2786,36 @@ static BOOL ForceCache(
     }
 }
 
+static void DependentRegistrationActionLog(
+    __in DWORD iAction,
+    __in BURN_DEPENDENT_REGISTRATION_ACTION* pAction,
+    __in BOOL fRollback
+    )
+{
+    LPCWSTR wzBase = fRollback ? L"   Rollback dependent registration" : L"   Dependent registration";
+    LPCWSTR wzType = NULL;
+
+    switch (pAction->type)
+    {
+    case BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER:
+        wzType = L"REGISTER";
+        break;
+
+    case BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER:
+        wzType = L"UNREGISTER";
+        break;
+
+    default:
+        AssertSz(FALSE, "Unknown cache action type.");
+        break;
+    }
+
+    if (wzType)
+    {
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: %ls bundle id: %ls, provider key: %ls", wzBase, iAction, wzType, pAction->sczBundleId, pAction->sczDependentProviderKey);
+    }
+}
+
 static void CacheActionLog(
     __in DWORD iAction,
     __in BURN_CACHE_ACTION* pAction,
@@ -2974,12 +3004,28 @@ extern "C" void PlanDump(
     LogStringLine(PlanDumpLevel, "--- Begin plan dump ---");
 
     LogStringLine(PlanDumpLevel, "Plan action: %hs", LoggingBurnActionToString(pPlan->action));
+    LogStringLine(PlanDumpLevel, "     bundle id: %ls", pPlan->wzBundleId);
+    LogStringLine(PlanDumpLevel, "     bundle provider key: %ls", pPlan->wzBundleProviderKey);
+    LogStringLine(PlanDumpLevel, "     use-forward-compatible: %hs", LoggingTrueFalseToString(pPlan->fEnabledForwardCompatibleBundle));
     LogStringLine(PlanDumpLevel, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));
+    LogStringLine(PlanDumpLevel, "     can affect machine state: %hs", LoggingTrueFalseToString(pPlan->fCanAffectMachineState));
     LogStringLine(PlanDumpLevel, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));
+    LogStringLine(PlanDumpLevel, "     disallow-removal: %hs", LoggingTrueFalseToString(pPlan->fDisallowRemoval));
+    LogStringLine(PlanDumpLevel, "     registration options: %hs", LoggingRegistrationOptionsToString(pPlan->dwRegistrationOperations));
     LogStringLine(PlanDumpLevel, "     estimated size: %llu", pPlan->qwEstimatedSize);
     if (pPlan->sczLayoutDirectory)
     {
         LogStringLine(PlanDumpLevel, "     layout directory: %ls", pPlan->sczLayoutDirectory);
+    }
+
+    for (DWORD i = 0; i < pPlan->cRegistrationActions; ++i)
+    {
+        DependentRegistrationActionLog(i, pPlan->rgRegistrationActions + i, FALSE);
+    }
+
+    for (DWORD i = 0; i < pPlan->cRollbackRegistrationActions; ++i)
+    {
+        DependentRegistrationActionLog(i, pPlan->rgRollbackRegistrationActions + i, TRUE);
     }
 
     LogStringLine(PlanDumpLevel, "Plan cache size: %llu", pPlan->qwCacheSizeTotal);

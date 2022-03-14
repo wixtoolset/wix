@@ -158,6 +158,10 @@ LPCSTR LoggingPlanRelationTypeToString(
     __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE type
     );
 
+LPCSTR LoggingRegistrationOptionsToString(
+    __in DWORD dwRegistrationOptions
+    );
+
 LPCSTR LoggingRelationTypeToString(
     __in BOOTSTRAPPER_RELATION_TYPE type
     );
