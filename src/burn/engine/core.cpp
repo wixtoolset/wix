@@ -527,8 +527,15 @@ extern "C" HRESULT CorePlan(
             hr = PlanRelatedBundlesInitialize(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
             ExitOnFailure(hr, "Failed to initialize related bundles for plan.");
 
-            hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, &pEngineState->dependencies, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
-            ExitOnFailure(hr, "Failed to plan registration.");
+            if (pEngineState->plan.fDowngrade)
+            {
+                fContinuePlanning = FALSE;
+            }
+            else
+            {
+                hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, &pEngineState->dependencies, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
+                ExitOnFailure(hr, "Failed to plan registration.");
+            }
 
             if (fContinuePlanning)
             {
@@ -615,6 +622,7 @@ extern "C" HRESULT CoreApply(
 {
     HRESULT hr = S_OK;
     HANDLE hLock = NULL;
+    BOOL fApplyBegan = FALSE;
     BOOL fApplyInitialize = FALSE;
     BOOL fElevated = FALSE;
     BOOL fRegistered = FALSE;
@@ -627,8 +635,6 @@ extern "C" HRESULT CoreApply(
     DWORD dwPhaseCount = 0;
     BOOTSTRAPPER_APPLYCOMPLETE_ACTION applyCompleteAction = BOOTSTRAPPER_APPLYCOMPLETE_ACTION_NONE;
 
-    LogId(REPORT_STANDARD, MSG_APPLY_BEGIN);
-
     if (!pEngineState->fPlanned)
     {
         ExitOnFailure(hr = E_INVALIDSTATE, "Apply cannot be done without a successful Plan.");
@@ -637,6 +643,10 @@ extern "C" HRESULT CoreApply(
     {
         ExitOnFailure(hr = E_INVALIDSTATE, "Plans cannot be applied multiple times.");
     }
+
+    fApplyBegan = TRUE;
+
+    LogId(REPORT_STANDARD, MSG_APPLY_BEGIN);
 
     // Ensure any previous attempts to execute are reset.
     ApplyReset(&pEngineState->userExperience, &pEngineState->packages);
@@ -652,6 +662,14 @@ extern "C" HRESULT CoreApply(
 
     hr = UserExperienceOnApplyBegin(&pEngineState->userExperience, dwPhaseCount);
     ExitOnRootFailure(hr, "BA aborted apply begin.");
+
+    if (pEngineState->plan.fDowngrade)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_PRODUCT_VERSION);
+        UserExperienceOnApplyDowngrade(&pEngineState->userExperience, &hr);
+
+        ExitFunction();
+    }
 
     pEngineState->plan.fAffectedMachineState = pEngineState->plan.fCanAffectMachineState;
 
@@ -804,13 +822,16 @@ LExit:
         DeleteCriticalSection(&applyContext.csApply);
     }
 
-    UserExperienceOnApplyComplete(&pEngineState->userExperience, hr, restart, &applyCompleteAction);
-    if (BOOTSTRAPPER_APPLYCOMPLETE_ACTION_RESTART == applyCompleteAction)
+    if (fApplyBegan)
     {
-        pEngineState->fRestart = TRUE;
-    }
+        UserExperienceOnApplyComplete(&pEngineState->userExperience, hr, restart, &applyCompleteAction);
+        if (BOOTSTRAPPER_APPLYCOMPLETE_ACTION_RESTART == applyCompleteAction)
+        {
+            pEngineState->fRestart = TRUE;
+        }
 
-    LogId(REPORT_STANDARD, MSG_APPLY_COMPLETE, hr, LoggingRestartToString(restart), LoggingBoolToString(pEngineState->fRestart));
+        LogId(REPORT_STANDARD, MSG_APPLY_COMPLETE, hr, LoggingRestartToString(restart), LoggingBoolToString(pEngineState->fRestart));
+    }
 
     return hr;
 }

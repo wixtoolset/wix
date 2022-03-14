@@ -209,6 +209,9 @@ namespace WixToolset.Mba.Core
         public event EventHandler<ApplyCompleteEventArgs> ApplyComplete;
 
         /// <inheritdoc/>
+        public event EventHandler<ApplyDowngradeEventArgs> ApplyDowngrade;
+
+        /// <inheritdoc/>
         public event EventHandler<ExecuteProgressEventArgs> ExecuteProgress;
 
         /// <inheritdoc/>
@@ -1049,6 +1052,19 @@ namespace WixToolset.Mba.Core
         protected virtual void OnApplyComplete(ApplyCompleteEventArgs args)
         {
             EventHandler<ApplyCompleteEventArgs> handler = this.ApplyComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="ApplyDowngrade"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnApplyDowngrade(ApplyDowngradeEventArgs args)
+        {
+            EventHandler<ApplyDowngradeEventArgs> handler = this.ApplyDowngrade;
             if (null != handler)
             {
                 handler(this, args);
@@ -1904,6 +1920,15 @@ namespace WixToolset.Mba.Core
             this.applying = false;
 
             pAction = args.Action;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnApplyDowngrade(int hrRecommendation, ref int hrStatus)
+        {
+            ApplyDowngradeEventArgs args = new ApplyDowngradeEventArgs(hrRecommendation, hrStatus);
+            this.OnApplyDowngrade(args);
+
+            hrStatus = args.Status;
             return args.HResult;
         }
 

@@ -254,21 +254,12 @@ public: // IBootstrapperApplication
         )
     {
         BAL_INFO_PACKAGE* pPackage = NULL;
-        int nCompare = 0;
 
         if (!fMissingFromCache)
         {
             if (SUCCEEDED(BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleId, relationType, fPerMachine, &pPackage)))
             {
                 InitializePackageInfoForPackage(pPackage);
-            }
-
-            // If we're not doing a prerequisite install, remember when our bundle would cause a downgrade.
-            if (!m_fPrereq && BOOTSTRAPPER_RELATION_UPGRADE == relationType &&
-                SUCCEEDED(m_pEngine->CompareVersions(m_sczBundleVersion, wzVersion, &nCompare)) && 0 > nCompare)
-            {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "A newer version (v%ls) of this product is installed.", wzVersion);
-                m_fDowngrading = TRUE;
             }
         }
 
@@ -345,23 +336,6 @@ public: // IBootstrapperApplication
                     }
                 }
             }
-            else if (m_fDowngrading && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
-            {
-                if (m_fSuppressDowngradeFailure)
-                {
-                    BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Downgrade failure has been suppressed; exiting bundle.");
-
-                    hr = S_OK;
-                    SetState(WIXSTDBA_STATE_APPLIED, hr);
-                    ExitFunction();
-                }
-                else
-                {
-                    // If we are going to apply a downgrade, bail.
-                    hr = HRESULT_FROM_WIN32(ERROR_PRODUCT_VERSION);
-                    BalExitOnFailure(hr, "Cannot install a product when a newer version is installed.");
-                }
-            }
         }
 
         SetState(WIXSTDBA_STATE_DETECTED, hrStatus);
@@ -371,7 +345,6 @@ public: // IBootstrapperApplication
             ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PACKAGES, 0, m_command.action);
         }
 
-    LExit:
         return hr;
     }
 
@@ -1092,6 +1065,20 @@ public: // IBootstrapperApplication
         return hr;
     }
 
+    virtual STDMETHODIMP OnApplyDowngrade(
+        __in HRESULT /*hrRecommendation*/,
+        __in HRESULT* phrStatus
+        )
+    {
+        HRESULT hr = S_OK;
+
+        if (m_fSuppressDowngradeFailure)
+        {
+            *phrStatus = S_OK;
+        }
+
+        return hr;
+    }
 
     virtual STDMETHODIMP OnApplyComplete(
         __in HRESULT hrStatus,
@@ -1444,6 +1431,9 @@ public: // IBootstrapperApplication
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE:
             OnPlanRelatedBundleTypeFallback(reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYDOWNGRADE:
+            OnApplyDowngradeFallback(reinterpret_cast<BA_ONAPPLYDOWNGRADE_ARGS*>(pvArgs), reinterpret_cast<BA_ONAPPLYDOWNGRADE_RESULTS*>(pvResults));
             break;
         default:
 #ifdef DEBUG
@@ -2116,6 +2106,14 @@ private: // privates
         BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRESTORERELATEDBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RESTORE_RELATED_BUNDLE, m_hModule, pArgs->wzBundleId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
+    }
+
+    void OnApplyDowngradeFallback(
+        __in BA_ONAPPLYDOWNGRADE_ARGS* pArgs,
+        __inout BA_ONAPPLYDOWNGRADE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONAPPLYDOWNGRADE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
 
@@ -4195,7 +4193,7 @@ public:
         __in BOOL fPrereq,
         __in HRESULT hrHostInitialization,
         __in IBootstrapperEngine* pEngine
-    ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
+        ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
     {
         THEME_ASSIGN_CONTROL_ID* pAssignControl = NULL;
 
@@ -4224,7 +4222,6 @@ public:
         m_state = WIXSTDBA_STATE_INITIALIZING;
         m_hrFinal = hrHostInitialization;
 
-        m_fDowngrading = FALSE;
         m_restartResult = BOOTSTRAPPER_APPLY_RESTART_NONE;
         m_fRestartRequired = FALSE;
         m_fShouldRestart = FALSE;
@@ -4529,7 +4526,6 @@ private:
     DWORD m_dwCalculatedCacheProgress;
     DWORD m_dwCalculatedExecuteProgress;
 
-    BOOL m_fDowngrading;
     BOOTSTRAPPER_APPLY_RESTART m_restartResult;
     BOOL m_fRestartRequired;
     BOOL m_fShouldRestart;

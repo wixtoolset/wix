@@ -1859,6 +1859,30 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ApplyDowngrade"/>
+    /// </summary>
+    [Serializable]
+    public class ApplyDowngradeEventArgs : HResultEventArgs
+    {
+        /// <summary />
+        public ApplyDowngradeEventArgs(int hrRecommendation, int hrStatus)
+        {
+            this.Recommendation = hrRecommendation;
+            this.Status = hrStatus;
+        }
+
+        /// <summary>
+        /// Gets the recommended HRESULT.
+        /// </summary>
+        public int Recommendation { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the HRESULT for Apply.
+        /// </summary>
+        public int Status { get; set; }
+    }
+
+    /// <summary>
     /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheAcquireResolving"/>.
     /// </summary>
     [Serializable]

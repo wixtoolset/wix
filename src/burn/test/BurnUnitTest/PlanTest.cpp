@@ -67,6 +67,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -226,6 +227,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -358,6 +360,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -457,6 +460,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -575,6 +579,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -677,6 +682,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -742,6 +748,76 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void SingleMsiDowngradeTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPackagesAsAbsent(pEngineState);
+            DetectRelatedBundle(pEngineState, L"{AF8355C9-CCDD-4D61-BF5F-EA5F948D8F01}", L"1.1.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fCanAffectMachineState);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(TRUE, pPlan->fDowngrade);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(0ull, pPlan->qwEstimatedSize);
+            Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(0ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN, BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN);
+        }
+
+        [Fact]
         void SingleMsiForceAbsentTest()
         {
             HRESULT hr = S_OK;
@@ -770,6 +846,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -858,6 +935,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -948,6 +1026,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1053,6 +1132,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1131,6 +1211,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1225,6 +1306,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(TRUE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1294,6 +1376,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1377,6 +1460,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(TRUE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1471,6 +1555,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1601,6 +1686,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1716,6 +1802,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1810,6 +1897,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;

@@ -20,6 +20,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<ApplyCompleteEventArgs> ApplyComplete;
 
         /// <summary>
+        /// Fired when the plan determined that nothing should happen to prevent downgrading.
+        /// </summary>
+        event EventHandler<ApplyDowngradeEventArgs> ApplyDowngrade;
+
+        /// <summary>
         /// Fired when the engine is about to begin an MSI transaction.
         /// </summary>
         event EventHandler<BeginMsiTransactionBeginEventArgs> BeginMsiTransactionBegin;

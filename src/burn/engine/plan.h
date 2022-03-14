@@ -250,6 +250,7 @@ typedef struct _BURN_PLAN
     BOOL fAffectedMachineState;
     LPWSTR sczLayoutDirectory;
     BOOL fPlanPackageCacheRollback;
+    BOOL fDowngrade;
 
     DWORD64 qwCacheSizeTotal;
 

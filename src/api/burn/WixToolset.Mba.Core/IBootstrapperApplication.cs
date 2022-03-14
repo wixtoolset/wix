@@ -1160,6 +1160,16 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] ref RelatedBundlePlanType pRequestedType,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.ApplyDowngrade"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnApplyDowngrade(
+            [MarshalAs(UnmanagedType.I4)] int hrRecommended,
+            [MarshalAs(UnmanagedType.I4)] ref int hrStatus
+            );
     }
 
     /// <summary>
