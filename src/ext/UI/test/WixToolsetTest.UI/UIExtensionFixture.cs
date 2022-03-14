@@ -100,6 +100,18 @@ namespace WixToolsetTest.UI
         }
 
         [Fact]
+        public void CanBuildUsingWixUIMinimalInKazakh()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Minimal");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(BuildInKazakh, "Dialog");
+            var welcomeDlg = results.Where(r => r.StartsWith("Dialog:WelcomeDlg\t")).Select(r => r.Split('\t')).Single();
+            Assert.Equal("[ProductName] бағдарламасын орнату", welcomeDlg[6]);
+        }
+
+        [Fact]
         public void CanBuildUsingWixUIMinimalAndReadPdb()
         {
             var folder = TestData.Get(@"TestData\WixUI_Minimal");
@@ -173,6 +185,14 @@ namespace WixToolsetTest.UI
         private static void BuildInGerman(string[] args)
         {
             var localizedArgs = args.Append("-culture").Append("de-DE").ToArray();
+
+            var result = WixRunner.Execute(localizedArgs)
+                                  .AssertSuccess();
+        }
+
+        private static void BuildInKazakh(string[] args)
+        {
+            var localizedArgs = args.Append("-culture").Append("kk-KZ").ToArray();
 
             var result = WixRunner.Execute(localizedArgs)
                                   .AssertSuccess();
