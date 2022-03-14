@@ -84,9 +84,9 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             Directory.CreateDirectory(outputDirectory);
-            string tempCabPath = Path.Combine(tempDirectory, "ux.cab");
-            string manifestOriginalPath = Path.Combine(outputDirectory, "0");
-            string manifestPath = Path.Combine(outputDirectory, "manifest.xml");
+            var tempCabPath = Path.Combine(tempDirectory, "ux.cab");
+            var manifestOriginalPath = Path.Combine(outputDirectory, "0");
+            var manifestPath = Path.Combine(outputDirectory, "manifest.xml");
             var uxContainerSlot = this.AttachedContainers[0];
 
             this.binaryReader.BaseStream.Seek(this.UXAddress, SeekOrigin.Begin);
@@ -101,20 +101,20 @@ namespace WixToolset.Core.Burn.Bundles
             Directory.CreateDirectory(Path.GetDirectoryName(manifestPath));
             FileSystem.MoveFile(manifestOriginalPath, manifestPath);
 
-            XmlDocument document = new XmlDocument();
+            var document = new XmlDocument();
             document.Load(manifestPath);
-            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(document.NameTable);
+            var namespaceManager = new XmlNamespaceManager(document.NameTable);
             namespaceManager.AddNamespace("burn", BurnCommon.BurnNamespace);
-            XmlNodeList uxPayloads = document.SelectNodes("/burn:BurnManifest/burn:UX/burn:Payload", namespaceManager);
-            XmlNodeList payloads = document.SelectNodes("/burn:BurnManifest/burn:Payload", namespaceManager);
+            var uxPayloads = document.SelectNodes("/burn:BurnManifest/burn:UX/burn:Payload", namespaceManager);
+            var payloads = document.SelectNodes("/burn:BurnManifest/burn:Payload", namespaceManager);
 
             foreach (XmlNode uxPayload in uxPayloads)
             {
-                XmlNode sourcePathNode = uxPayload.Attributes.GetNamedItem("SourcePath");
-                XmlNode filePathNode = uxPayload.Attributes.GetNamedItem("FilePath");
+                var sourcePathNode = uxPayload.Attributes.GetNamedItem("SourcePath");
+                var filePathNode = uxPayload.Attributes.GetNamedItem("FilePath");
 
-                string sourcePath = Path.Combine(outputDirectory, sourcePathNode.Value);
-                string destinationPath = Path.Combine(outputDirectory, filePathNode.Value);
+                var sourcePath = Path.Combine(outputDirectory, sourcePathNode.Value);
+                var destinationPath = Path.Combine(outputDirectory, filePathNode.Value);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
                 FileSystem.MoveFile(sourcePath, destinationPath);
@@ -122,29 +122,24 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (XmlNode payload in payloads)
             {
-                XmlNode packagingNode = payload.Attributes.GetNamedItem("Packaging");
+                var packagingNode = payload.Attributes.GetNamedItem("Packaging");
 
-                string packaging = packagingNode.Value;
+                var packaging = packagingNode.Value;
 
                 if (packaging.Equals("embedded", StringComparison.OrdinalIgnoreCase))
                 {
-                    XmlNode sourcePathNode = payload.Attributes.GetNamedItem("SourcePath");
-                    XmlNode filePathNode = payload.Attributes.GetNamedItem("FilePath");
-                    XmlNode containerNode = payload.Attributes.GetNamedItem("Container");
+                    var sourcePathNode = payload.Attributes.GetNamedItem("SourcePath");
+                    var filePathNode = payload.Attributes.GetNamedItem("FilePath");
+                    var containerNode = payload.Attributes.GetNamedItem("Container");
 
-                    string sourcePath = sourcePathNode.Value;
-                    string destinationPath = Path.Combine(containerNode.Value, filePathNode.Value);
+                    var sourcePath = sourcePathNode.Value;
+                    var destinationPath = Path.Combine(containerNode.Value, filePathNode.Value);
 
                     this.attachedContainerPayloadNames.Add(new DictionaryEntry(sourcePath, destinationPath));
                 }
             }
 
             return true;
-        }
-
-        internal void ExtractUXContainer(string uxExtractPath, object intermediateFolder)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -167,11 +162,11 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             Directory.CreateDirectory(outputDirectory);
-            uint nextAddress = this.EngineSize;
-            for (int i = 1; i < this.AttachedContainers.Count; i++)
+            var nextAddress = this.EngineSize;
+            for (var i = 1; i < this.AttachedContainers.Count; i++)
             {
-                ContainerSlot cntnr = this.AttachedContainers[i];
-                string tempCabPath = Path.Combine(tempDirectory, $"a{i}.cab");
+                var cntnr = this.AttachedContainers[i];
+                var tempCabPath = Path.Combine(tempDirectory, $"a{i}.cab");
 
                 this.binaryReader.BaseStream.Seek(nextAddress, SeekOrigin.Begin);
                 using (Stream tempCab = File.Open(tempCabPath, FileMode.Create, FileAccess.Write))
@@ -185,10 +180,10 @@ namespace WixToolset.Core.Burn.Bundles
                 nextAddress += cntnr.Size;
             }
 
-            foreach (DictionaryEntry entry in this.attachedContainerPayloadNames)
+            foreach (var entry in this.attachedContainerPayloadNames)
             {
-                string sourcePath = Path.Combine(outputDirectory, (string)entry.Key);
-                string destinationPath = Path.Combine(outputDirectory, (string)entry.Value);
+                var sourcePath = Path.Combine(outputDirectory, (string)entry.Key);
+                var destinationPath = Path.Combine(outputDirectory, (string)entry.Value);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
                 FileSystem.MoveFile(sourcePath, destinationPath);
