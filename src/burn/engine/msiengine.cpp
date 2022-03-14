@@ -1129,8 +1129,7 @@ extern "C" HRESULT MsiEngineBeginTransaction(
     ExitOnFailure(hr, "Failed to begin an MSI transaction");
 
 LExit:
-    ReleaseMsi(hTransactionHandle);
-    ReleaseHandle(hChangeOfOwnerEvent);
+    // Assume that MsiEndTransaction cleans up the handles.
 
     return hr;
 }

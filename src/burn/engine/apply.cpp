@@ -3123,12 +3123,10 @@ static HRESULT ExecuteMsiCommitTransaction(
         hr = MsiEngineCommitTransaction(pRollbackBoundary);
     }
 
-    if (SUCCEEDED(hr))
-    {
-        pRollbackBoundary->fActiveTransaction = FALSE;
+    // Assume that MsiEndTransaction can only be called once for each MsiBeginTransaction.
+    pRollbackBoundary->fActiveTransaction = FALSE;
 
-        ResetTransactionRegistrationState(pEngineState, TRUE);
-    }
+    ResetTransactionRegistrationState(pEngineState, TRUE);
 
 LExit:
     if (fCommitBeginCalled)
