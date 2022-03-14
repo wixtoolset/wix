@@ -52,7 +52,15 @@ namespace WixToolset.Core.Burn.CommandLine
             using (var reader = BurnReader.Open(this.Messaging, this.InputPath))
             {
                 reader.ExtractUXContainer(uxExtractPath, this.IntermediateFolder);
-                reader.ExtractAttachedContainers(this.ExtractPath, this.IntermediateFolder);
+
+                try
+                {
+                    reader.ExtractAttachedContainers(this.ExtractPath, this.IntermediateFolder);
+                }
+                catch
+                {
+                    this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new Data.SourceLineNumber(this.ExtractPath)));
+                }
             }
 
             return Task.FromResult(this.Messaging.LastErrorNumber);
