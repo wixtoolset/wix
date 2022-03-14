@@ -45,6 +45,9 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var cabinetPath = Path.GetFullPath(this.OutputPath);
+            var cabinetFolder = Path.GetDirectoryName(cabinetPath);
+
+            Directory.CreateDirectory(cabinetFolder);
 
             var files = new List<CabinetCompressFile>();
 
