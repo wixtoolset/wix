@@ -859,6 +859,16 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnPlanRelatedBundleType(
+        __in_z LPCWSTR /*wzBundleId*/,
+        __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE /*recommendedType*/,
+        __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* /*pRequestedType*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
 public: // IBAFunctions
     virtual STDMETHODIMP OnPlan(
         )

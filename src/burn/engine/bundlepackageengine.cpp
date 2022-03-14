@@ -2,7 +2,9 @@
 
 #include "precomp.h"
 
-
+static BOOTSTRAPPER_RELATION_TYPE ConvertRelationType(
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE relationType
+    );
 
 // function definitions
 
@@ -265,7 +267,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     GENERIC_EXECUTE_MESSAGE message = { };
     BOOTSTRAPPER_ACTION_STATE action = pExecuteAction->relatedBundle.action;
     BURN_RELATED_BUNDLE* pRelatedBundle = pExecuteAction->relatedBundle.pRelatedBundle;
-    BOOTSTRAPPER_RELATION_TYPE relationType = pRelatedBundle->relationType;
+    BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
     LPCWSTR wzRelationTypeCommandLine = CoreRelationTypeToCommandLineString(relationType);
@@ -466,4 +468,27 @@ LExit:
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE, FALSE);
 
     return hr;
+}
+
+static BOOTSTRAPPER_RELATION_TYPE ConvertRelationType(
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE relationType
+    )
+{
+    switch (relationType)
+    {
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE: __fallthrough;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE:
+        return BOOTSTRAPPER_RELATION_UPGRADE;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_ADDON:
+        return BOOTSTRAPPER_RELATION_ADDON;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_PATCH:
+        return BOOTSTRAPPER_RELATION_PATCH;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON:
+        return BOOTSTRAPPER_RELATION_DEPENDENT_ADDON;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH:
+        return BOOTSTRAPPER_RELATION_DEPENDENT_PATCH;
+    default:
+        AssertSz(BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE == relationType, "Unknown BUNDLE_RELATION_TYPE");
+        return BOOTSTRAPPER_RELATION_NONE;
+    }
 }

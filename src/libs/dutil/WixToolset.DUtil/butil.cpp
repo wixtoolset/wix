@@ -559,7 +559,7 @@ static HRESULT DetermineRelationType(
         {
             ExitOnFailure(hr, "Failed to do array search for addon code match.");
 
-            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            *pRelationType = BUNDLE_RELATION_DEPENDENT_ADDON;
             ExitFunction();
         }
 
@@ -571,9 +571,9 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+            ExitOnFailure(hr, "Failed to do array search for patch code match.");
 
-            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            *pRelationType = BUNDLE_RELATION_DEPENDENT_PATCH;
             ExitFunction();
         }
 
@@ -690,7 +690,7 @@ static HRESULT DetermineRelationType(
         {
             ExitOnFailure(hr, "Failed to do array search for addon code match.");
 
-            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            *pRelationType = BUNDLE_RELATION_DEPENDENT_ADDON;
             ExitFunction();
         }
 
@@ -702,9 +702,9 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+            ExitOnFailure(hr, "Failed to do array search for patch code match.");
 
-            *pRelationType = BUNDLE_RELATION_DEPENDENT;
+            *pRelationType = BUNDLE_RELATION_DEPENDENT_PATCH;
             ExitFunction();
         }
 

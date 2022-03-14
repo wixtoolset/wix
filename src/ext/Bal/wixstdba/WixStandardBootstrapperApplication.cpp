@@ -169,6 +169,9 @@ static LPCSTR LoggingBoolToString(
 static LPCSTR LoggingRequestStateToString(
     __in BOOTSTRAPPER_REQUEST_STATE requestState
     );
+static LPCSTR LoggingPlanRelationTypeToString(
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE type
+    );
 static LPCSTR LoggingMsiFeatureStateToString(
     __in BOOTSTRAPPER_FEATURE_STATE featureState
     );
@@ -1436,6 +1439,12 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDCOMPATIBLEPACKAGE:
             OnPlannedCompatiblePackageFallback(reinterpret_cast<BA_ONPLANNEDCOMPATIBLEPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANNEDCOMPATIBLEPACKAGE_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRESTORERELATEDBUNDLE:
+            OnPlanRestoreRelatedBundleFallback(reinterpret_cast<BA_ONPLANRESTORERELATEDBUNDLE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANRESTORERELATEDBUNDLE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE:
+            OnPlanRelatedBundleTypeFallback(reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_RESULTS*>(pvResults));
+            break;
         default:
 #ifdef DEBUG
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
@@ -1583,6 +1592,16 @@ private: // privates
         BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRELATEDBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE, m_hModule, pArgs->wzBundleId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
+    }
+
+    void OnPlanRelatedBundleTypeFallback(
+        __in BA_ONPLANRELATEDBUNDLETYPE_ARGS* pArgs,
+        __inout BA_ONPLANRELATEDBUNDLETYPE_RESULTS* pResults
+        )
+    {
+        BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE requestedType = pResults->requestedType;
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRELATEDBUNDLETYPE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE_TYPE, m_hModule, pArgs->wzBundleId, LoggingPlanRelationTypeToString(requestedType), LoggingPlanRelationTypeToString(pResults->requestedType));
     }
 
     void OnPlanPackageBeginFallback(
@@ -4667,6 +4686,31 @@ static LPCSTR LoggingRequestStateToString(
         return "Present";
     case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
         return "Repair";
+    default:
+        return "Invalid";
+    }
+}
+
+static LPCSTR LoggingPlanRelationTypeToString(
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE type
+    )
+{
+    switch (type)
+    {
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE:
+        return "None";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE:
+        return "Downgrade";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE:
+        return "Upgrade";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_ADDON:
+        return "Addon";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_PATCH:
+        return "Patch";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON:
+        return "DependentAddon";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH:
+        return "DependentPatch";
     default:
         return "Invalid";
     }

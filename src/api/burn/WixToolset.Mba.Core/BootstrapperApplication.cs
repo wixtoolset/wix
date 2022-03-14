@@ -89,6 +89,9 @@ namespace WixToolset.Mba.Core
         public event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
 
         /// <inheritdoc/>
+        public event EventHandler<PlanRelatedBundleTypeEventArgs> PlanRelatedBundleType;
+
+        /// <inheritdoc/>
         public event EventHandler<PlanRollbackBoundaryEventArgs> PlanRollbackBoundary;
 
         /// <inheritdoc/>
@@ -527,6 +530,19 @@ namespace WixToolset.Mba.Core
         protected virtual void OnPlanRelatedBundle(PlanRelatedBundleEventArgs args)
         {
             EventHandler<PlanRelatedBundleEventArgs> handler = this.PlanRelatedBundle;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlanRelatedBundleType"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlanRelatedBundleType(PlanRelatedBundleTypeEventArgs args)
+        {
+            EventHandler<PlanRelatedBundleTypeEventArgs> handler = this.PlanRelatedBundleType;
             if (null != handler)
             {
                 handler(this, args);
@@ -1510,6 +1526,16 @@ namespace WixToolset.Mba.Core
             this.OnPlanRelatedBundle(args);
 
             pRequestedState = args.State;
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlanRelatedBundleType(string wzBundleId, RelatedBundlePlanType recommendedType, ref RelatedBundlePlanType pRequestedType, ref bool fCancel)
+        {
+            PlanRelatedBundleTypeEventArgs args = new PlanRelatedBundleTypeEventArgs(wzBundleId, recommendedType, pRequestedType, fCancel);
+            this.OnPlanRelatedBundleType(args);
+
+            pRequestedType = args.Type;
             fCancel = args.Cancel;
             return args.HResult;
         }

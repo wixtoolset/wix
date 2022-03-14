@@ -614,7 +614,28 @@ extern "C" HRESULT RegistrationDetectRelatedBundles(
     hr = RelatedBundlesInitializeForScope(FALSE, pRegistration, &pRegistration->relatedBundles);
     ExitOnFailure(hr, "Failed to initialize per-user related bundles.");
 
-    RelatedBundlesSort(&pRegistration->relatedBundles);
+    RelatedBundlesSortDetect(&pRegistration->relatedBundles);
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT RegistrationPlanInitialize(
+    __in BURN_REGISTRATION* pRegistration
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pRegistration->relatedBundles.cRelatedBundles && !pRegistration->relatedBundles.rgpPlanSortedRelatedBundles)
+    {
+        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRegistration->relatedBundles.rgpPlanSortedRelatedBundles), pRegistration->relatedBundles.cRelatedBundles, sizeof(BURN_RELATED_BUNDLE*), 5);
+        ExitOnFailure(hr, "Failed to initialize plan related bundles array.");
+
+        for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
+        {
+            pRegistration->relatedBundles.rgpPlanSortedRelatedBundles[i] = pRegistration->relatedBundles.rgRelatedBundles + i;
+        }
+    }
 
 LExit:
     return hr;

@@ -92,3 +92,10 @@ Language=English
 WIXSTDBA: Planned restore related bundle: %1!ls!, wixstdba requested: %2!hs!, bafunctions requested: %3!hs!
 .
 
+MessageId=10
+Severity=Success
+SymbolicName=MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE_TYPE
+Language=English
+WIXSTDBA: Planned related bundle type: %1!ls!, wixstdba requested: %2!hs!, bafunctions requested: %3!hs!
+.
+

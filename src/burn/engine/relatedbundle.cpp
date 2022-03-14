@@ -10,11 +10,16 @@ typedef struct _BUNDLE_QUERY_CONTEXT
 
 // internal function declarations
 
-static __callback int __cdecl CompareRelatedBundles(
+static __callback int __cdecl CompareRelatedBundlesDetect(
     __in void* pvContext,
     __in const void* pvLeft,
     __in const void* pvRight
-);
+    );
+static __callback int __cdecl CompareRelatedBundlesPlan(
+    __in void* /*pvContext*/,
+    __in const void* pvLeft,
+    __in const void* pvRight
+    );
 static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
     __in_opt LPVOID pvContext
@@ -88,6 +93,8 @@ extern "C" void RelatedBundlesUninitialize(
         MemFree(pRelatedBundles->rgRelatedBundles);
     }
 
+    ReleaseMem(pRelatedBundles->rgpPlanSortedRelatedBundles);
+
     memset(pRelatedBundles, 0, sizeof(BURN_RELATED_BUNDLES));
 }
 
@@ -122,17 +129,24 @@ LExit:
     return hr;
 }
 
-extern "C" void RelatedBundlesSort(
+extern "C" void RelatedBundlesSortDetect(
     __in BURN_RELATED_BUNDLES* pRelatedBundles
     )
 {
-    qsort_s(pRelatedBundles->rgRelatedBundles, pRelatedBundles->cRelatedBundles, sizeof(BURN_RELATED_BUNDLE), CompareRelatedBundles, NULL);
+    qsort_s(pRelatedBundles->rgRelatedBundles, pRelatedBundles->cRelatedBundles, sizeof(BURN_RELATED_BUNDLE), CompareRelatedBundlesDetect, NULL);
+}
+
+extern "C" void RelatedBundlesSortPlan(
+    __in BURN_RELATED_BUNDLES* pRelatedBundles
+    )
+{
+    qsort_s(pRelatedBundles->rgpPlanSortedRelatedBundles, pRelatedBundles->cRelatedBundles, sizeof(BURN_RELATED_BUNDLE*), CompareRelatedBundlesPlan, NULL);
 }
 
 
 // internal helper functions
 
-static __callback int __cdecl CompareRelatedBundles(
+static __callback int __cdecl CompareRelatedBundlesDetect(
     __in void* /*pvContext*/,
     __in const void* pvLeft,
     __in const void* pvRight
@@ -143,18 +157,61 @@ static __callback int __cdecl CompareRelatedBundles(
     const BURN_RELATED_BUNDLE* pBundleRight = static_cast<const BURN_RELATED_BUNDLE*>(pvRight);
 
     // Sort by relation type, then version, then bundle id.
-    if (pBundleLeft->relationType != pBundleRight->relationType)
+    if (pBundleLeft->detectRelationType != pBundleRight->detectRelationType)
     {
         // Upgrade bundles last, everything else according to the enum.
-        if (BOOTSTRAPPER_RELATION_UPGRADE == pBundleLeft->relationType)
+        if (BOOTSTRAPPER_RELATION_UPGRADE == pBundleLeft->detectRelationType)
         {
             ret = 1;
         }
-        else if (BOOTSTRAPPER_RELATION_UPGRADE == pBundleRight->relationType)
+        else if (BOOTSTRAPPER_RELATION_UPGRADE == pBundleRight->detectRelationType)
         {
             ret = -1;
         }
-        else if (pBundleLeft->relationType < pBundleRight->relationType)
+        else if (pBundleLeft->detectRelationType < pBundleRight->detectRelationType)
+        {
+            ret = -1;
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    else
+    {
+        VerCompareParsedVersions(pBundleLeft->pVersion, pBundleRight->pVersion, &ret);
+        if (0 == ret)
+        {
+            ret = ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pBundleLeft->package.sczId, -1, pBundleRight->package.sczId, -1) - 2;
+        }
+    }
+
+    return ret;
+}
+
+static __callback int __cdecl CompareRelatedBundlesPlan(
+    __in void* /*pvContext*/,
+    __in const void* pvLeft,
+    __in const void* pvRight
+    )
+{
+    int ret = 0;
+    const BURN_RELATED_BUNDLE* pBundleLeft = *reinterpret_cast<BURN_RELATED_BUNDLE**>(const_cast<void*>(pvLeft));
+    const BURN_RELATED_BUNDLE* pBundleRight = *reinterpret_cast<BURN_RELATED_BUNDLE**>(const_cast<void*>(pvRight));
+
+    // Sort by relation type, then version, then bundle id.
+    if (pBundleLeft->planRelationType != pBundleRight->planRelationType)
+    {
+        // Upgrade bundles last, everything else according to the enum.
+        if (BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE == pBundleLeft->planRelationType)
+        {
+            ret = 1;
+        }
+        else if (BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE == pBundleRight->planRelationType)
+        {
+            ret = -1;
+        }
+        else if (pBundleLeft->planRelationType < pBundleRight->planRelationType)
         {
             ret = -1;
         }
@@ -191,6 +248,30 @@ LExit:
     return result;
 }
 
+static BOOTSTRAPPER_RELATION_TYPE ConvertRelationType(
+    __in BUNDLE_RELATION_TYPE relationType
+    )
+{
+    switch (relationType)
+    {
+    case BUNDLE_RELATION_DETECT:
+        return BOOTSTRAPPER_RELATION_DETECT;
+    case BUNDLE_RELATION_UPGRADE:
+        return BOOTSTRAPPER_RELATION_UPGRADE;
+    case BUNDLE_RELATION_ADDON:
+        return BOOTSTRAPPER_RELATION_ADDON;
+    case BUNDLE_RELATION_PATCH:
+        return BOOTSTRAPPER_RELATION_PATCH;
+    case BUNDLE_RELATION_DEPENDENT_ADDON:
+        return BOOTSTRAPPER_RELATION_DEPENDENT_ADDON;
+    case BUNDLE_RELATION_DEPENDENT_PATCH:
+        return BOOTSTRAPPER_RELATION_DEPENDENT_PATCH;
+    default:
+        AssertSz(BUNDLE_RELATION_NONE == relationType, "Unknown BUNDLE_RELATION_TYPE");
+        return BOOTSTRAPPER_RELATION_NONE;
+    }
+}
+
 static HRESULT LoadIfRelatedBundle(
     __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
     __in BURN_REGISTRATION* pRegistration,
@@ -199,7 +280,7 @@ static HRESULT LoadIfRelatedBundle(
 {
     HRESULT hr = S_OK;
     BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
-    BOOTSTRAPPER_RELATION_TYPE relationType = (BOOTSTRAPPER_RELATION_TYPE)pBundle->relationType;
+    BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pBundle->relationType);
     BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
 
     // If we found our bundle id, it's not a related bundle.
@@ -316,11 +397,11 @@ static HRESULT LoadRelatedBundleFromKey(
     }
     ExitOnFailure(hr, "Failed to read tag from registry for bundle: %ls", wzRelatedBundleId);
 
-    pRelatedBundle->relationType = relationType;
+    pRelatedBundle->detectRelationType = relationType;
 
     hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, fSupportsBurnProtocol, fPerMachine, wzRelatedBundleId,
 #ifdef DEBUG
-                                       pRelatedBundle->relationType,
+                                       pRelatedBundle->detectRelationType,
 #endif
                                        fCached, sczCachePath, qwFileSize, pBundleDependencyProvider);
     ExitOnFailure(hr, "Failed to initialize related bundle to represent bundle: %ls", wzRelatedBundleId);

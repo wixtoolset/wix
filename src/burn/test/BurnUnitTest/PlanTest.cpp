@@ -18,6 +18,8 @@ static BOOL vfUsePackageRequestState = FALSE;
 static BOOTSTRAPPER_REQUEST_STATE vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
 static BOOL vfUseRelatedBundleRequestState = FALSE;
 static BOOTSTRAPPER_REQUEST_STATE vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+static BOOL vfUseRelatedBundlePlanType = FALSE;
+static BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE vRelatedBundlePlanType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
 
 static BURN_DEPENDENCY_ACTION registerActions1[] = { BURN_DEPENDENCY_ACTION_REGISTER };
 static BURN_DEPENDENCY_ACTION unregisterActions1[] = { BURN_DEPENDENCY_ACTION_UNREGISTER };
@@ -52,7 +54,7 @@ namespace Bootstrapper
 
             InitializeEngineStateForCorePlan(wzMsiTransactionManifestFileName, pEngineState);
             DetectPackagesAsAbsent(pEngineState);
-            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"1.0.0.0");
+            DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"1.0.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
             NativeAssert::Succeeded(hr, "CorePlan failed");
@@ -375,6 +377,122 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void RelatedBundlesAreSortedByPlanType()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPackagesAsAbsent(pEngineState);
+            DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
+            DetectRelatedBundle(pEngineState, L"{6B2D8401-C0C2-4060-BFEF-5DDFD04BD586}", L"0.2.0.0", BOOTSTRAPPER_RELATION_PATCH);
+            DetectRelatedBundle(pEngineState, L"{5C80A327-61B9-44CF-A6D4-64C45F4F90A9}", L"0.4.0.0", BOOTSTRAPPER_RELATION_ADDON);
+            DetectRelatedBundle(pEngineState, L"{33A8757F-32EA-4974-888E-D15547259B3C}", L"0.3.0.0", BOOTSTRAPPER_RELATION_DEPENDENT_PATCH);
+            DetectRelatedBundle(pEngineState, L"{59CD5A25-0398-41CA-AD53-AD8C061E2A1A}", L"0.7.0.0", BOOTSTRAPPER_RELATION_DEPENDENT_ADDON);
+
+            RelatedBundlesSortDetect(&pEngineState->registration.relatedBundles);
+            NativeAssert::StringEqual(L"{5C80A327-61B9-44CF-A6D4-64C45F4F90A9}", pEngineState->registration.relatedBundles.rgRelatedBundles[0].package.sczId);
+            NativeAssert::StringEqual(L"{6B2D8401-C0C2-4060-BFEF-5DDFD04BD586}", pEngineState->registration.relatedBundles.rgRelatedBundles[1].package.sczId);
+            NativeAssert::StringEqual(L"{59CD5A25-0398-41CA-AD53-AD8C061E2A1A}", pEngineState->registration.relatedBundles.rgRelatedBundles[2].package.sczId);
+            NativeAssert::StringEqual(L"{33A8757F-32EA-4974-888E-D15547259B3C}", pEngineState->registration.relatedBundles.rgRelatedBundles[3].package.sczId);
+            NativeAssert::StringEqual(L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", pEngineState->registration.relatedBundles.rgRelatedBundles[4].package.sczId);
+
+            vfUseRelatedBundlePlanType = TRUE;
+            vRelatedBundlePlanType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE;
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateCacheRollbackPackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(35694ull, pPlan->qwEstimatedSize);
+            Assert::Equal(168715ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", registerActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteMsiPackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_INSTALL, BURN_MSI_PROPERTY_INSTALL, INSTALLUILEVEL_NONE, FALSE, BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER, 0);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", registerActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{6B2D8401-C0C2-4060-BFEF-5DDFD04BD586}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{33A8757F-32EA-4974-888E-D15547259B3C}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{5C80A327-61B9-44CF-A6D4-64C45F4F90A9}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{59CD5A25-0398-41CA-AD53-AD8C061E2A1A}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteUncachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageA", unregisterActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteMsiPackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, BURN_MSI_PROPERTY_UNINSTALL, INSTALLUILEVEL_NONE, FALSE, BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER, 0);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", unregisterActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{6B2D8401-C0C2-4060-BFEF-5DDFD04BD586}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{33A8757F-32EA-4974-888E-D15547259B3C}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{5C80A327-61B9-44CF-A6D4-64C45F4F90A9}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{59CD5A25-0398-41CA-AD53-AD8C061E2A1A}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateExecuteRelatedBundle(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(6ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(7ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{6B2D8401-C0C2-4060-BFEF-5DDFD04BD586}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{33A8757F-32EA-4974-888E-D15547259B3C}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{5C80A327-61B9-44CF-A6D4-64C45F4F90A9}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{59CD5A25-0398-41CA-AD53-AD8C061E2A1A}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            ValidateRestoreRelatedBundle(pPlan, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
+        }
+
+        [Fact]
         void RelatedBundleMissingFromCacheTest()
         {
             HRESULT hr = S_OK;
@@ -385,7 +503,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsAbsent(pEngineState);
-            BURN_RELATED_BUNDLE* pRelatedBundle = DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+            BURN_RELATED_BUNDLE* pRelatedBundle = DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
             pRelatedBundle->fPlannable = FALSE;
 
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
@@ -473,7 +591,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsAbsent(pEngineState);
-            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+            DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_CACHE);
             NativeAssert::Succeeded(hr, "CorePlan failed");
@@ -546,7 +664,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsAbsent(pEngineState);
-            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+            DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
             vfUsePackageRequestState = TRUE;
             vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT;
@@ -621,7 +739,7 @@ namespace Bootstrapper
 
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
-            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+            DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
             vfUsePackageRequestState = TRUE;
             vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
@@ -703,7 +821,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsAbsent(pEngineState);
-            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+            DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
             NativeAssert::Succeeded(hr, "CorePlan failed");
@@ -1475,6 +1593,7 @@ namespace Bootstrapper
 
             vfUsePackageRequestState = FALSE;
             vfUseRelatedBundleRequestState = FALSE;
+            vfUseRelatedBundlePlanType = FALSE;
 
             ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
 
@@ -1686,10 +1805,11 @@ namespace Bootstrapper
             }
         }
 
-        BURN_RELATED_BUNDLE* DetectUpgradeBundle(
+        BURN_RELATED_BUNDLE* DetectRelatedBundle(
             __in BURN_ENGINE_STATE* pEngineState,
             __in LPCWSTR wzId,
-            __in LPCWSTR wzVersion
+            __in LPCWSTR wzVersion,
+            __in BOOTSTRAPPER_RELATION_TYPE relationType
             )
         {
             HRESULT hr = S_OK;
@@ -1717,11 +1837,11 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "Failed to parse pseudo bundle version: %ls", wzVersion);
 
             pRelatedBundle->fPlannable = TRUE;
-            pRelatedBundle->relationType = BOOTSTRAPPER_RELATION_UPGRADE;
+            pRelatedBundle->detectRelationType = relationType;
 
             hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, TRUE, TRUE, wzId,
 #ifdef DEBUG
-                                               pRelatedBundle->relationType,
+                                               pRelatedBundle->detectRelationType,
 #endif
                                                TRUE, wzFilePath, 0, &dependencyProvider);
             NativeAssert::Succeeded(hr, "Failed to initialize related bundle to represent bundle: %ls", wzId);
@@ -1746,7 +1866,7 @@ namespace Bootstrapper
             pEngineState->command.relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 
             DetectPackagesAsPresentAndCached(pEngineState);
-            DetectUpgradeBundle(pEngineState, wzId, wzVersion);
+            DetectRelatedBundle(pEngineState, wzId, wzVersion, BOOTSTRAPPER_RELATION_UPGRADE);
 
             for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
             {
@@ -2197,6 +2317,13 @@ static HRESULT WINAPI PlanTestBAProc(
         {
             BA_ONPLANRELATEDBUNDLE_RESULTS* pResults = reinterpret_cast<BA_ONPLANRELATEDBUNDLE_RESULTS*>(pvResults);
             pResults->requestedState = vRelatedBundleRequestState;
+        }
+        break;
+    case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE:
+        if (vfUseRelatedBundlePlanType)
+        {
+            BA_ONPLANRELATEDBUNDLETYPE_RESULTS* pResults = reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_RESULTS*>(pvResults);
+            pResults->requestedType = vRelatedBundlePlanType;
         }
         break;
     }

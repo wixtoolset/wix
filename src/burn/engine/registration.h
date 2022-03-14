@@ -53,7 +53,9 @@ typedef struct _BURN_UPDATE_REGISTRATION
 
 typedef struct _BURN_RELATED_BUNDLE
 {
-    BOOTSTRAPPER_RELATION_TYPE relationType;
+    BOOTSTRAPPER_RELATION_TYPE detectRelationType;
+    BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE defaultPlanRelationType;
+    BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE planRelationType;
     BOOL fForwardCompatible;
 
     VERUTIL_VERSION* pVersion;
@@ -71,6 +73,7 @@ typedef struct _BURN_RELATED_BUNDLES
 {
     BURN_RELATED_BUNDLE* rgRelatedBundles;
     DWORD cRelatedBundles;
+    BURN_RELATED_BUNDLE** rgpPlanSortedRelatedBundles;
 } BURN_RELATED_BUNDLES;
 
 typedef struct _BURN_SOFTWARE_TAG
@@ -183,6 +186,9 @@ HRESULT RegistrationDetectResumeType(
     __out BOOTSTRAPPER_RESUME_TYPE* pResumeType
     );
 HRESULT RegistrationDetectRelatedBundles(
+    __in BURN_REGISTRATION* pRegistration
+    );
+HRESULT RegistrationPlanInitialize(
     __in BURN_REGISTRATION* pRegistration
     );
 HRESULT RegistrationSessionBegin(

@@ -334,6 +334,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
 
         /// <summary>
+        /// Fired when the engine has begun planning the related bundle relation type.
+        /// </summary>
+        event EventHandler<PlanRelatedBundleTypeEventArgs> PlanRelatedBundleType;
+
+        /// <summary>
         /// Fired when the engine has begun planning an upgrade related bundle for restoring in case of failure.
         /// </summary>
         event EventHandler<PlanRestoreRelatedBundleEventArgs> PlanRestoreRelatedBundle;

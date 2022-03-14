@@ -699,4 +699,12 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
         __inout BOOL* pfCancel
         ) = 0;
+
+    // OnPlanRelatedBundleType - called when the engine begins planning the related bundle relation type.
+    STDMETHOD(OnPlanRelatedBundleType)(
+        __in_z LPCWSTR wzBundleId,
+        __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE recommendedType,
+        __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType,
+        __inout BOOL* pfCancel
+        ) = 0;
 };

@@ -874,6 +874,9 @@ extern "C" HRESULT ElevationExecuteRelatedBundle(
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->relatedBundle.action);
     ExitOnFailure(hr, "Failed to write action to message buffer.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->relatedBundle.pRelatedBundle->planRelationType);
+    ExitOnFailure(hr, "Failed to write planRelationType to message buffer.");
+
     hr = BuffWriteNumber(&pbData, &cbData, fRollback);
     ExitOnFailure(hr, "Failed to write rollback.");
 
@@ -2723,6 +2726,7 @@ static HRESULT OnExecuteRelatedBundle(
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
+    DWORD dwPlanRelationType = 0;
     DWORD dwRollback = 0;
     BURN_EXECUTE_ACTION executeAction = { };
     LPWSTR sczIgnoreDependencies = NULL;
@@ -2738,6 +2742,9 @@ static HRESULT OnExecuteRelatedBundle(
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.relatedBundle.action);
     ExitOnFailure(hr, "Failed to read action.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, &dwPlanRelationType);
+    ExitOnFailure(hr, "Failed to read planRelationType.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRollback);
     ExitOnFailure(hr, "Failed to read rollback.");
@@ -2756,6 +2763,8 @@ static HRESULT OnExecuteRelatedBundle(
 
     hr = RelatedBundleFindById(pRelatedBundles, sczPackage, &executeAction.relatedBundle.pRelatedBundle);
     ExitOnFailure(hr, "Failed to find related bundle: %ls", sczPackage);
+
+    executeAction.relatedBundle.pRelatedBundle->planRelationType = (BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE)dwPlanRelationType;
 
     // Pass the list of dependencies to ignore, if any, to the related bundle.
     if (sczIgnoreDependencies && *sczIgnoreDependencies)

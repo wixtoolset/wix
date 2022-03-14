@@ -154,6 +154,10 @@ LPCSTR LoggingResumeModeToString(
     __in BURN_RESUME_MODE resumeMode
     );
 
+LPCSTR LoggingPlanRelationTypeToString(
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE type
+    );
+
 LPCSTR LoggingRelationTypeToString(
     __in BOOTSTRAPPER_RELATION_TYPE type
     );
