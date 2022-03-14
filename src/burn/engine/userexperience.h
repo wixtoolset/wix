@@ -110,6 +110,10 @@ BAAPI UserExperienceOnApplyComplete(
     __in BOOTSTRAPPER_APPLY_RESTART restart,
     __inout BOOTSTRAPPER_APPLYCOMPLETE_ACTION* pAction
     );
+BAAPI UserExperienceOnApplyDowngrade(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __inout HRESULT* phrStatus
+    );
 BAAPI UserExperienceOnBeginMsiTransactionBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId

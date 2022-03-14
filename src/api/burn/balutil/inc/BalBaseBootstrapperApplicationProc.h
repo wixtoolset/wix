@@ -738,6 +738,15 @@ static HRESULT BalBaseBAProcOnPlanRelatedBundleType(
     return pBA->OnPlanRelatedBundleType(pArgs->wzBundleId, pArgs->recommendedType, &pResults->requestedType, &pResults->fCancel);
 }
 
+static HRESULT BalBaseBAProcOnApplyDowngrade(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONAPPLYDOWNGRADE_ARGS* pArgs,
+    __inout BA_ONAPPLYDOWNGRADE_RESULTS* pResults
+    )
+{
+    return pBA->OnApplyDowngrade(pArgs->hrRecommended, &pResults->hrStatus);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -999,6 +1008,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE:
             hr = BalBaseBAProcOnPlanRelatedBundleType(pBA, reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANRELATEDBUNDLETYPE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYDOWNGRADE:
+            hr = BalBaseBAProcOnApplyDowngrade(pBA, reinterpret_cast<BA_ONAPPLYDOWNGRADE_ARGS*>(pvArgs), reinterpret_cast<BA_ONAPPLYDOWNGRADE_RESULTS*>(pvResults));
             break;
         }
     }

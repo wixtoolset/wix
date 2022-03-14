@@ -1069,6 +1069,14 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnApplyDowngrade(
+        __in HRESULT /*hrRecommended*/,
+        __in HRESULT* /*phrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
 public: //CBalBaseBootstrapperApplication
     virtual STDMETHODIMP Initialize(
         __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs

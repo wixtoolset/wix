@@ -707,4 +707,11 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType,
         __inout BOOL* pfCancel
         ) = 0;
+
+    // OnApplyDowngrade - called when the plan determined that nothing should happen to prevent downgrading.
+    //
+    STDMETHOD(OnApplyDowngrade)(
+        __in HRESULT hrRecommended,
+        __inout HRESULT* phrStatus
+        ) = 0;
 };

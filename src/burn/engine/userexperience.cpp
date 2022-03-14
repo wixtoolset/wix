@@ -335,6 +335,30 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnApplyDowngrade(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __inout HRESULT* phrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONAPPLYDOWNGRADE_ARGS args = { };
+    BA_ONAPPLYDOWNGRADE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.hrRecommended = *phrStatus;
+
+    results.cbSize = sizeof(results);
+    results.hrStatus = *phrStatus;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYDOWNGRADE, &args, &results);
+    ExitOnFailure(hr, "BA OnApplyDowngrade failed.");
+
+    *phrStatus = results.hrStatus;
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnBeginMsiTransactionBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId

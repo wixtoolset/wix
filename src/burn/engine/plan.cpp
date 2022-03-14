@@ -1328,11 +1328,12 @@ LExit:
 extern "C" HRESULT PlanRelatedBundlesInitialize(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
-    __in BURN_PLAN* /*pPlan*/
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BURN_PLAN* pPlan
     )
 {
     HRESULT hr = S_OK;
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action;
 
     for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
     {
@@ -1356,6 +1357,19 @@ extern "C" HRESULT PlanRelatedBundlesInitialize(
 
         hr = UserExperienceOnPlanRelatedBundleType(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->planRelationType);
         ExitOnRootFailure(hr, "BA aborted plan related bundle type.");
+
+        if (BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE == pRelatedBundle->planRelationType &&
+            pRelatedBundle->fPlannable && !fUninstalling && BOOTSTRAPPER_RELATION_UPGRADE != relationType)
+        {
+            if (!pPlan->fDowngrade)
+            {
+                pPlan->fDowngrade = TRUE;
+
+                LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DUE_TO_DOWNGRADE);
+            }
+
+            LogId(REPORT_VERBOSE, MSG_UPGRADE_BUNDLE_DOWNGRADE, pRelatedBundle->package.sczId, pRelatedBundle->pVersion->sczVersion);
+        }
     }
 
     RelatedBundlesSortPlan(&pRegistration->relatedBundles);
@@ -3011,6 +3025,7 @@ extern "C" void PlanDump(
     LogStringLine(PlanDumpLevel, "     can affect machine state: %hs", LoggingTrueFalseToString(pPlan->fCanAffectMachineState));
     LogStringLine(PlanDumpLevel, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));
     LogStringLine(PlanDumpLevel, "     disallow-removal: %hs", LoggingTrueFalseToString(pPlan->fDisallowRemoval));
+    LogStringLine(PlanDumpLevel, "     downgrade: %hs", LoggingTrueFalseToString(pPlan->fDowngrade));
     LogStringLine(PlanDumpLevel, "     registration options: %hs", LoggingRegistrationOptionsToString(pPlan->dwRegistrationOperations));
     LogStringLine(PlanDumpLevel, "     estimated size: %llu", pPlan->qwEstimatedSize);
     if (pPlan->sczLayoutDirectory)

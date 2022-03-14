@@ -869,6 +869,14 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnApplyDowngrade(
+        __in HRESULT /*hrRecommended*/,
+        __in HRESULT* /*phrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
 public: // IBAFunctions
     virtual STDMETHODIMP OnPlan(
         )

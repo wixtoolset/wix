@@ -499,6 +499,20 @@ Language=English
 Ignoring bundle dependents due to action UnsafeUninstall...
 .
 
+MessageId=224
+Severity=Warning
+SymbolicName=MSG_PLAN_SKIPPED_DUE_TO_DOWNGRADE
+Language=English
+Plan skipped due to related bundle of plan type Downgrade:
+.
+
+MessageId=225
+Severity=Warning
+SymbolicName=MSG_UPGRADE_BUNDLE_DOWNGRADE
+Language=English
+    id: %1!ls!, version: %2!ls!
+.
+
 MessageId=299
 Severity=Success
 SymbolicName=MSG_PLAN_COMPLETE
