@@ -8,9 +8,9 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using System.Text;
     using System.Xml;
+    using System.Xml.Linq;
     using Example.Extension;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core;
     using WixToolset.Core.Burn;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
@@ -526,6 +526,35 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 Assert.Equal(7001, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void CantBuildWithSubfolderContainer()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin", "test.exe");
+                var containerPath = Path.Combine(baseFolder, "bin", "Data", "c1");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Bundle", "SubfolderContainer.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(containerPath), $"Failed to find external container: {containerPath}");
             }
         }
 
