@@ -1148,6 +1148,18 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlanRelatedBundleType"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanRelatedBundleType(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.U4)] RelatedBundlePlanType recommendedType,
+            [MarshalAs(UnmanagedType.U4)] ref RelatedBundlePlanType pRequestedType,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
     }
 
     /// <summary>
@@ -1669,12 +1681,58 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
-        Dependent,
+        DependentAddon,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        DependentPatch,
 
         /// <summary>
         /// 
         /// </summary>
         Update,
+    }
+
+    /// <summary>
+    /// The planned relation type for related bundles.
+    /// </summary>
+    public enum RelatedBundlePlanType
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Downgrade,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Upgrade,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Addon,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Patch,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        DependentAddon,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        DependentPatch,
     }
 
     /// <summary>

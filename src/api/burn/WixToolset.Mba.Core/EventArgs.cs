@@ -746,6 +746,37 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanRelatedBundleType"/>
+    /// </summary>
+    [Serializable]
+    public class PlanRelatedBundleTypeEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public PlanRelatedBundleTypeEventArgs(string bundleId, RelatedBundlePlanType recommendedType, RelatedBundlePlanType type, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.BundleId = bundleId;
+            this.RecommendedType = recommendedType;
+            this.Type = type;
+        }
+
+        /// <summary>
+        /// Gets the identity of the bundle to plan for.
+        /// </summary>
+        public string BundleId { get; private set; }
+
+        /// <summary>
+        /// Gets the recommended plan type for the bundle.
+        /// </summary>
+        public RelatedBundlePlanType RecommendedType { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the plan type for the bundle.
+        /// </summary>
+        public RelatedBundlePlanType Type { get; set; }
+    }
+
+    /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanPackageBegin"/>
     /// </summary>
     [Serializable]

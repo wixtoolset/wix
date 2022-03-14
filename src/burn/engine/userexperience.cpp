@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 4, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 14, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -2171,6 +2171,36 @@ EXTERN_C BAAPI UserExperienceOnPlanRelatedBundle(
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
     *pRequestedState = results.requestedState;
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPlanRelatedBundleType(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzBundleId,
+    __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANRELATEDBUNDLETYPE_ARGS args = { };
+    BA_ONPLANRELATEDBUNDLETYPE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzBundleId = wzBundleId;
+    args.recommendedType = *pRequestedType;
+
+    results.cbSize = sizeof(results);
+    results.requestedType = *pRequestedType;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanRelatedBundleType failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    *pRequestedType = results.requestedType;
 
 LExit:
     return hr;

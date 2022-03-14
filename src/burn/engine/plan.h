@@ -316,6 +316,12 @@ HRESULT PlanSetVariables(
     __in BOOTSTRAPPER_ACTION action,
     __in BURN_VARIABLES* pVariables
     );
+HRESULT PlanDefaultRelatedBundlePlanType(
+    __in BOOTSTRAPPER_RELATION_TYPE relatedBundleRelationType,
+    __in VERUTIL_VERSION* pRegistrationVersion,
+    __in VERUTIL_VERSION* pRelatedBundleVersion,
+    __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pPlanRelationType
+    );
 HRESULT PlanDefaultPackageRequestState(
     __in BURN_PACKAGE_TYPE packageType,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
@@ -383,11 +389,15 @@ HRESULT PlanExecutePackage(
     );
 HRESULT PlanDefaultRelatedBundleRequestState(
     __in BOOTSTRAPPER_RELATION_TYPE commandRelationType,
-    __in BOOTSTRAPPER_RELATION_TYPE relatedBundleRelationType,
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE relatedBundleRelationType,
     __in BOOTSTRAPPER_ACTION action,
-    __in VERUTIL_VERSION* pRegistrationVersion,
-    __in VERUTIL_VERSION* pRelatedBundleVersion,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState
+    );
+HRESULT PlanRelatedBundlesInitialize(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BURN_REGISTRATION* pRegistration,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BURN_PLAN* pPlan
     );
 HRESULT PlanRelatedBundlesBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,

@@ -511,7 +511,7 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
 
         fIgnoreBundle = fRecommendIgnore;
 
-        hr = UserExperienceOnPlanForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
+        hr = UserExperienceOnPlanForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
         ExitOnRootFailure(hr, "BA aborted plan forward compatible bundle.");
 
         if (!fIgnoreBundle)
@@ -621,7 +621,8 @@ extern "C" HRESULT PlanRegistration(
                 {
                     const BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
 
-                    if (BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType)
+                    if (BOOTSTRAPPER_RELATION_DEPENDENT_ADDON == pRelatedBundle->planRelationType ||
+                        BOOTSTRAPPER_RELATION_DEPENDENT_PATCH == pRelatedBundle->planRelationType)
                     {
                         for (DWORD j = 0; j < pRelatedBundle->package.cDependencyProviders; ++j)
                         {
@@ -703,7 +704,8 @@ extern "C" HRESULT PlanRegistration(
         {
             const BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
 
-            if (BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType)
+            if (BOOTSTRAPPER_RELATION_DEPENDENT_ADDON == pRelatedBundle->planRelationType ||
+                BOOTSTRAPPER_RELATION_DEPENDENT_PATCH == pRelatedBundle->planRelationType)
             {
                 for (DWORD j = 0; j < pRelatedBundle->package.cDependencyProviders; ++j)
                 {
@@ -1212,17 +1214,63 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
-    __in BOOTSTRAPPER_RELATION_TYPE commandRelationType,
+extern "C" HRESULT PlanDefaultRelatedBundlePlanType(
     __in BOOTSTRAPPER_RELATION_TYPE relatedBundleRelationType,
-    __in BOOTSTRAPPER_ACTION action,
     __in VERUTIL_VERSION* pRegistrationVersion,
     __in VERUTIL_VERSION* pRelatedBundleVersion,
-    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState
+    __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pPlanRelationType
     )
 {
     HRESULT hr = S_OK;
     int nCompareResult = 0;
+
+    switch (relatedBundleRelationType)
+    {
+    case BOOTSTRAPPER_RELATION_UPGRADE:
+        hr = VerCompareParsedVersions(pRegistrationVersion, pRelatedBundleVersion, &nCompareResult);
+        ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistrationVersion->sczVersion, pRelatedBundleVersion->sczVersion);
+
+        if (nCompareResult < 0)
+        {
+            *pPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE;
+        }
+        else
+        {
+            *pPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE;
+        }
+        break;
+    case BOOTSTRAPPER_RELATION_ADDON:
+        *pPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_ADDON;
+        break;
+    case BOOTSTRAPPER_RELATION_PATCH:
+        *pPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_PATCH;
+        break;
+    case BOOTSTRAPPER_RELATION_DEPENDENT_ADDON:
+        *pPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON;
+        break;
+    case BOOTSTRAPPER_RELATION_DEPENDENT_PATCH:
+        *pPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH;
+        break;
+    case BOOTSTRAPPER_RELATION_DETECT:
+        break;
+    default:
+        hr = E_UNEXPECTED;
+        ExitOnFailure(hr, "Unexpected relation type encountered during plan: %d", relatedBundleRelationType);
+        break;
+    }
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
+    __in BOOTSTRAPPER_RELATION_TYPE commandRelationType,
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE relatedBundleRelationType,
+    __in BOOTSTRAPPER_ACTION action,
+    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState
+    )
+{
+    HRESULT hr = S_OK;
     BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == action;
 
     // Never touch related bundles during Cache.
@@ -1233,17 +1281,14 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
 
     switch (relatedBundleRelationType)
     {
-    case BOOTSTRAPPER_RELATION_UPGRADE:
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE:
         if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && !fUninstalling)
         {
-            hr = VerCompareParsedVersions(pRegistrationVersion, pRelatedBundleVersion, &nCompareResult);
-            ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistrationVersion ? pRegistrationVersion->sczVersion : NULL, pRelatedBundleVersion ? pRelatedBundleVersion->sczVersion : NULL);
-
-            *pRequestState = (nCompareResult < 0) ? BOOTSTRAPPER_REQUEST_STATE_NONE : BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
         }
         break;
-    case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;
-    case BOOTSTRAPPER_RELATION_ADDON:
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_PATCH: __fallthrough;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_ADDON:
         if (fUninstalling)
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
@@ -1257,7 +1302,8 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
         }
         break;
-    case BOOTSTRAPPER_RELATION_DEPENDENT:
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON: __fallthrough;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH:
         // Automatically repair dependent bundles to restore missing
         // packages after uninstall unless we're being upgraded with the
         // assumption that upgrades are cumulative (as intended).
@@ -1266,13 +1312,53 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
         }
         break;
-    case BOOTSTRAPPER_RELATION_DETECT:
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE: __fallthrough;
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE:
         break;
     default:
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Unexpected relation type encountered during plan: %d", relatedBundleRelationType);
+        ExitOnFailure(hr, "Unexpected plan relation type encountered during plan: %d", relatedBundleRelationType);
         break;
     }
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT PlanRelatedBundlesInitialize(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BURN_REGISTRATION* pRegistration,
+    __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
+    __in BURN_PLAN* /*pPlan*/
+    )
+{
+    HRESULT hr = S_OK;
+
+    for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
+    {
+        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
+
+        pRelatedBundle->defaultRequestedRestore = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        pRelatedBundle->requestedRestore = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_NONE;
+        pRelatedBundle->package.defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        pRelatedBundle->defaultPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
+        pRelatedBundle->planRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
+
+        // Determine the plan relation type even if later it is ignored due to the planned action, the command relation type, or the related bundle not being plannable.
+        // This gives more information to the BA in case it wants to override default behavior.
+        // Doing it during plan instead of Detect allows the BA to change its mind without having to go all the way through Detect again.
+        hr = PlanDefaultRelatedBundlePlanType(pRelatedBundle->detectRelationType, pRegistration->pVersion, pRelatedBundle->pVersion, &pRelatedBundle->defaultPlanRelationType);
+        ExitOnFailure(hr, "Failed to get default plan type for related bundle.");
+
+        pRelatedBundle->planRelationType = pRelatedBundle->defaultPlanRelationType;
+
+        hr = UserExperienceOnPlanRelatedBundleType(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->planRelationType);
+        ExitOnRootFailure(hr, "BA aborted plan related bundle type.");
+    }
+
+    RelatedBundlesSortPlan(&pRegistration->relatedBundles);
 
 LExit:
     return hr;
@@ -1302,18 +1388,15 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
 
     for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
     {
-        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
+        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgpPlanSortedRelatedBundles[i];
 
         if (!pRelatedBundle->fPlannable)
         {
             continue;
         }
 
-        pRelatedBundle->defaultRequestedRestore = BOOTSTRAPPER_REQUEST_STATE_NONE;
-        pRelatedBundle->requestedRestore = BOOTSTRAPPER_REQUEST_STATE_NONE;
-        pRelatedBundle->restore = BOOTSTRAPPER_ACTION_STATE_NONE;
-        pRelatedBundle->package.defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
-        pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
+        BOOL fDependent = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON == pRelatedBundle->planRelationType ||
+                          BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH == pRelatedBundle->planRelationType;
 
         // Do not execute the same bundle twice.
         if (sdAncestors)
@@ -1321,7 +1404,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
             hr = DictKeyExists(sdAncestors, pRelatedBundle->package.sczId);
             if (SUCCEEDED(hr))
             {
-                LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_RELATED_BUNDLE_SCHEDULED, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType));
+                LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_RELATED_BUNDLE_SCHEDULED, pRelatedBundle->package.sczId);
                 continue;
             }
             else if (E_NOTFOUND != hr)
@@ -1329,10 +1412,10 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
                 ExitOnFailure(hr, "Failed to lookup the bundle ID in the ancestors dictionary.");
             }
         }
-        else if (BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_RELATION_NONE != relationType)
+        else if (fDependent && BOOTSTRAPPER_RELATION_NONE != relationType)
         {
             // Avoid repair loops for older bundles that do not handle ancestors.
-            LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_RELATED_BUNDLE_DEPENDENT, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingRelationTypeToString(relationType));
+            LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_RELATED_BUNDLE_DEPENDENT, pRelatedBundle->package.sczId, LoggingRelationTypeToString(relationType));
             continue;
         }
 
@@ -1340,7 +1423,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         pRelatedBundle->package.Bundle.wzAncestors = pRegistration->sczBundlePackageAncestors;
         pRelatedBundle->package.Bundle.wzEngineWorkingDirectory = pPlan->pInternalCommand->sczEngineWorkingDirectory;
 
-        hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, pPlan->action, pRegistration->pVersion, pRelatedBundle->pVersion, &pRelatedBundle->package.requested);
+        hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->planRelationType, pPlan->action, &pRelatedBundle->package.requested);
         ExitOnFailure(hr, "Failed to get default request state for related bundle.");
 
         pRelatedBundle->package.defaultRequested = pRelatedBundle->package.requested;
@@ -1349,7 +1432,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         ExitOnRootFailure(hr, "BA aborted plan related bundle.");
 
         // If uninstalling and the dependent related bundle may be executed, ignore its provider key to allow for downgrades with ref-counting.
-        if (fUninstalling && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
+        if (fUninstalling && fDependent && BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
         {
             if (0 < pRelatedBundle->package.cDependencyProviders)
             {
@@ -1437,7 +1520,11 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
     for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
     {
         DWORD *pdwInsertIndex = NULL;
-        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
+        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgpPlanSortedRelatedBundles[i];
+        BOOL fDependent = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON == pRelatedBundle->planRelationType ||
+                          BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH == pRelatedBundle->planRelationType;
+        BOOL fAddonOrPatch = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_ADDON == pRelatedBundle->planRelationType ||
+                             BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_PATCH == pRelatedBundle->planRelationType;
 
         if (!pRelatedBundle->fPlannable)
         {
@@ -1454,7 +1541,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             {
                 ExitOnFailure(hr, "Failed to check the dictionary for a related bundle provider key: \"%ls\".", pProvider->sczKey);
                 // Key found, so there is an embedded bundle with the same provider key that will be executed.  So this related bundle should not be added to the plan
-                LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_RELATED_BUNDLE_EMBEDDED_BUNDLE_NEWER, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), pProvider->sczKey);
+                LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_RELATED_BUNDLE_EMBEDDED_BUNDLE_NEWER, pRelatedBundle->package.sczId, pProvider->sczKey);
                 continue;
             }
             else
@@ -1464,13 +1551,13 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
         }
 
         // For an uninstall, there is no need to repair dependent bundles if no packages are executing.
-        if (!fExecutingAnyPackage && BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pRelatedBundle->package.requested && fUninstalling)
+        if (!fExecutingAnyPackage && fDependent && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pRelatedBundle->package.requested && fUninstalling)
         {
             pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
-            LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DEPENDENT_BUNDLE_REPAIR, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType));
+            LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DEPENDENT_BUNDLE_REPAIR, pRelatedBundle->package.sczId);
         }
 
-        if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
+        if (fAddonOrPatch)
         {
             // Addon and patch bundles will be passed a list of dependencies to ignore for planning.
             hr = StrAllocString(&pRelatedBundle->package.Bundle.sczIgnoreDependencies, sczIgnoreDependencies, 0);
@@ -1489,7 +1576,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             ExitOnFailure(hr, "Failed to calculate plan for related bundle: %ls", pRelatedBundle->package.sczId);
 
             // Calculate package states based on reference count for addon and patch related bundles.
-            if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
+            if (fAddonOrPatch)
             {
                 hr = DependencyPlanPackageBegin(pRegistration->fPerMachine, &pRelatedBundle->package, pPlan);
                 ExitOnFailure(hr, "Failed to begin plan dependency actions to  package: %ls", pRelatedBundle->package.sczId);
@@ -1505,7 +1592,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             ExitOnFailure(hr, "Failed to add to plan related bundle: %ls", pRelatedBundle->package.sczId);
 
             // Calculate package states based on reference count for addon and patch related bundles.
-            if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
+            if (fAddonOrPatch)
             {
                 hr = DependencyPlanPackageComplete(&pRelatedBundle->package, pPlan);
                 ExitOnFailure(hr, "Failed to complete plan dependency actions for related bundle package: %ls", pRelatedBundle->package.sczId);
@@ -1517,7 +1604,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
                 PlannedExecutePackage(pPlan, &pRelatedBundle->package);
             }
         }
-        else if (BOOTSTRAPPER_RELATION_ADDON == pRelatedBundle->relationType || BOOTSTRAPPER_RELATION_PATCH == pRelatedBundle->relationType)
+        else if (fAddonOrPatch)
         {
             // Make sure the package is properly ref-counted even if no plan is requested.
             hr = DependencyPlanPackageBegin(pRegistration->fPerMachine, &pRelatedBundle->package, pPlan);
@@ -1530,7 +1617,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
             ExitOnFailure(hr, "Failed to complete plan dependency actions for related bundle package: %ls", pRelatedBundle->package.sczId);
         }
 
-        if (fInstallingAnyPackage && BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->relationType)
+        if (fInstallingAnyPackage && BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE == pRelatedBundle->planRelationType)
         {
             BURN_EXECUTE_ACTION* pAction = NULL;
 

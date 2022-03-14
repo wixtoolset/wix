@@ -384,7 +384,7 @@ MessageId=207
 Severity=Success
 SymbolicName=MSG_PLANNED_RELATED_BUNDLE
 Language=English
-Planned related bundle: %1!ls!, type: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, default requested restore: %7!hs!, ba requested restore: %8!hs!, restore: %9!hs!, dependency: %10!hs!
+Planned related bundle: %1!ls!, detect type: %2!hs!, default plan type: %3!hs!, ba plan type: %4!hs!, default requested: %5!hs!, ba requested: %6!hs!, execute: %7!hs!, rollback: %8!hs!, default requested restore: %9!hs!, ba requested restore: %10!hs!, restore: %11!hs!, dependency: %12!hs!
 .
 
 MessageId=208
@@ -426,14 +426,14 @@ MessageId=213
 Severity=Success
 SymbolicName=MSG_PLAN_SKIPPED_RELATED_BUNDLE_DEPENDENT
 Language=English
-Plan skipped related bundle: %1!ls!, type: %2!hs!, because it was dependent and the current bundle is being executed as type: %3!hs!.
+Plan skipped related bundle: %1!ls!, because it was dependent and the current bundle is being executed as type: %2!hs!.
 .
 
 MessageId=214
 Severity=Success
 SymbolicName=MSG_PLAN_SKIPPED_RELATED_BUNDLE_SCHEDULED
 Language=English
-Plan skipped related bundle: %1!ls!, type: %2!hs!, because it was previously scheduled.
+Plan skipped related bundle: %1!ls!, because it was previously scheduled.
 .
 
 MessageId=215
@@ -447,14 +447,14 @@ MessageId=216
 Severity=Success
 SymbolicName=MSG_PLAN_SKIPPED_RELATED_BUNDLE_EMBEDDED_BUNDLE_NEWER
 Language=English
-Plan skipped related bundle: %1!ls!, type: %2!hs!, provider key: %3!ls!, because an embedded bundle with the same provider key is being installed.
+Plan skipped related bundle: %1!ls!, provider key: %2!ls!, because an embedded bundle with the same provider key is being installed.
 .
 
 MessageId=217
 Severity=Success
 SymbolicName=MSG_PLAN_SKIPPED_DEPENDENT_BUNDLE_REPAIR
 Language=English
-Plan skipped dependent bundle repair: %1!ls!, type: %2!hs!, because no packages are being executed during this uninstall operation.
+Plan skipped dependent bundle repair: %1!ls!, because no packages are being executed during this uninstall operation.
 .
 
 MessageId=218

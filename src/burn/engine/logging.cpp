@@ -715,6 +715,31 @@ extern "C" LPCSTR LoggingResumeModeToString(
     }
 }
 
+extern "C" LPCSTR LoggingPlanRelationTypeToString(
+    __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE type
+    )
+{
+    switch (type)
+    {
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE:
+        return "None";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE:
+        return "Downgrade";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE:
+        return "Upgrade";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_ADDON:
+        return "Addon";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_PATCH:
+        return "Patch";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON:
+        return "DependentAddon";
+    case BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH:
+        return "DependentPatch";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingRelationTypeToString(
     __in BOOTSTRAPPER_RELATION_TYPE type
     )
@@ -731,8 +756,10 @@ extern "C" LPCSTR LoggingRelationTypeToString(
         return "Addon";
     case BOOTSTRAPPER_RELATION_PATCH:
         return "Patch";
-    case BOOTSTRAPPER_RELATION_DEPENDENT:
-        return "Dependent";
+    case BOOTSTRAPPER_RELATION_DEPENDENT_ADDON:
+        return "DependentAddon";
+    case BOOTSTRAPPER_RELATION_DEPENDENT_PATCH:
+        return "DependentPatch";
     case BOOTSTRAPPER_RELATION_UPDATE:
         return "Update";
     default:

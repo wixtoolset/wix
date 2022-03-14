@@ -497,6 +497,11 @@ BAAPI UserExperienceOnPlanRelatedBundle(
     __in_z LPCWSTR wzBundleId,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     );
+BAAPI UserExperienceOnPlanRelatedBundleType(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzBundleId,
+    __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType
+    );
 BAAPI UserExperienceOnPlanRestoreRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzBundleId,

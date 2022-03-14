@@ -449,11 +449,11 @@ extern "C" HRESULT CorePlan(
 
     if (!pEngineState->fDetected)
     {
-        ExitOnFailure(hr = E_INVALIDSTATE, "Plan cannot be done without a successful Detect.");
+        ExitWithRootFailure(hr, E_INVALIDSTATE, "Plan cannot be done without a successful Detect.");
     }
     else if (pEngineState->plan.fAffectedMachineState)
     {
-        ExitOnFailure(hr = E_INVALIDSTATE, "Plan requires a new successful Detect after calling Apply.");
+        ExitWithRootFailure(hr, E_INVALIDSTATE, "Plan requires a new successful Detect after calling Apply.");
     }
 
     // Always reset the plan.
@@ -481,6 +481,9 @@ extern "C" HRESULT CorePlan(
 
     hr = DependencyPlanInitialize(&pEngineState->dependencies, &pEngineState->plan);
     ExitOnFailure(hr, "Failed to initialize the dependencies for the plan.");
+
+    hr = RegistrationPlanInitialize(&pEngineState->registration);
+    ExitOnFailure(hr, "Failed to initialize registration for the plan.");
 
     if (BOOTSTRAPPER_ACTION_LAYOUT == action)
     {
@@ -520,6 +523,9 @@ extern "C" HRESULT CorePlan(
         else // doing an action that modifies the machine state.
         {
             pEngineState->plan.fPerMachine = pEngineState->registration.fPerMachine; // default the scope of the plan to the per-machine state of the bundle.
+
+            hr = PlanRelatedBundlesInitialize(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
+            ExitOnFailure(hr, "Failed to initialize related bundles for plan.");
 
             hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, &pEngineState->dependencies, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
             ExitOnFailure(hr, "Failed to plan registration.");
@@ -918,8 +924,8 @@ extern "C" LPCWSTR CoreRelationTypeToCommandLineString(
     case BOOTSTRAPPER_RELATION_UPDATE:
         wzRelationTypeCommandLine = BURN_COMMANDLINE_SWITCH_RELATED_UPDATE;
         break;
-    case BOOTSTRAPPER_RELATION_DEPENDENT:
-        break;
+    case BOOTSTRAPPER_RELATION_DEPENDENT_ADDON: __fallthrough;
+    case BOOTSTRAPPER_RELATION_DEPENDENT_PATCH: __fallthrough;
     case BOOTSTRAPPER_RELATION_NONE: __fallthrough;
     default:
         wzRelationTypeCommandLine = NULL;
@@ -2308,7 +2314,7 @@ static void LogRelatedBundles(
 
             if (pRelatedBundle->fPlannable)
             {
-                LogId(REPORT_STANDARD, MSG_PLANNED_RELATED_BUNDLE, pPackage->sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingRequestStateToString(pRelatedBundle->defaultRequestedRestore), LoggingRequestStateToString(pRelatedBundle->requestedRestore), LoggingActionStateToString(pRelatedBundle->restore), LoggingDependencyActionToString(pPackage->dependencyExecute));
+                LogId(REPORT_STANDARD, MSG_PLANNED_RELATED_BUNDLE, pPackage->sczId, LoggingRelationTypeToString(pRelatedBundle->detectRelationType), LoggingPlanRelationTypeToString(pRelatedBundle->defaultPlanRelationType), LoggingPlanRelationTypeToString(pRelatedBundle->planRelationType), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingRequestStateToString(pRelatedBundle->defaultRequestedRestore), LoggingRequestStateToString(pRelatedBundle->requestedRestore), LoggingActionStateToString(pRelatedBundle->restore), LoggingDependencyActionToString(pPackage->dependencyExecute));
             }
         }
     }

@@ -19,7 +19,10 @@ HRESULT RelatedBundleFindById(
     __in_z LPCWSTR wzId,
     __out BURN_RELATED_BUNDLE** ppRelatedBundle
     );
-void RelatedBundlesSort(
+void RelatedBundlesSortDetect(
+    __in BURN_RELATED_BUNDLES* pRelatedBundles
+    );
+void RelatedBundlesSortPlan(
     __in BURN_RELATED_BUNDLES* pRelatedBundles
     );
 

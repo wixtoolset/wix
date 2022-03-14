@@ -129,7 +129,7 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
         {
             BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
 
-            if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->relationType &&
+            if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->detectRelationType &&
                 CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRelatedBundle->package.sczId, -1))
             {
                 hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
@@ -143,10 +143,10 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
                         pRegistration->fForwardCompatibleBundleExists = TRUE;
                     }
 
-                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
+                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
                     ExitOnRootFailure(hr, "BA aborted detect forward compatible bundle.");
 
-                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
+                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->detectRelationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
                 }
             }
         }
@@ -164,6 +164,7 @@ extern "C" HRESULT DetectReportRelatedBundles(
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE planRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
     BOOTSTRAPPER_REQUEST_STATE uninstallRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
     *pfEligibleForCleanup = BOOTSTRAPPER_REGISTRATION_TYPE_NONE != pRegistration->detectedRegistrationType || pRegistration->fCached;
 
@@ -171,16 +172,21 @@ extern "C" HRESULT DetectReportRelatedBundles(
     {
         const BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
+        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->detectRelationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
 
-        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
+        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
         ExitOnRootFailure(hr, "BA aborted detect related bundle.");
 
         // For now, if any related bundles will be executed during uninstall by default then never automatically clean up the bundle.
         if (*pfEligibleForCleanup && pRelatedBundle->fPlannable)
         {
+            planRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
             uninstallRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-            hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, BOOTSTRAPPER_ACTION_UNINSTALL, pRegistration->pVersion, pRelatedBundle->pVersion, &uninstallRequestState);
+
+            hr = PlanDefaultRelatedBundlePlanType(pRelatedBundle->detectRelationType, pRegistration->pVersion, pRelatedBundle->pVersion, &planRelationType);
+            ExitOnFailure(hr, "Failed to get the default plan type for related bundle for calculating fEligibleForCleanup");
+
+            hr = PlanDefaultRelatedBundleRequestState(relationType, planRelationType, BOOTSTRAPPER_ACTION_UNINSTALL, &uninstallRequestState);
             ExitOnFailure(hr, "Failed to get the default request state for related bundle for calculating fEligibleForCleanup");
 
             if (BOOTSTRAPPER_REQUEST_STATE_NONE != uninstallRequestState)
