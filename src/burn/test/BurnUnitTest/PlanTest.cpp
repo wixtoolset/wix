@@ -60,11 +60,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -204,11 +219,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -321,11 +351,24 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -407,11 +450,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -510,11 +568,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -597,11 +670,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_CACHE, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -675,11 +763,24 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -750,11 +851,24 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -827,11 +941,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -917,11 +1046,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_MODIFY, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -980,11 +1124,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -1044,6 +1203,76 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void SingleMsiUninstallWithDependentTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
+            DetectPackagesAsPresentAndCached(pEngineState);
+            DetectBundleDependent(pEngineState, L"{29855EB1-724D-4285-A89C-5D37D8549DCD}");
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(TRUE, pPlan->fDisallowRemoval);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(0ull, pPlan->qwEstimatedSize);
+            Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(0ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN, BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN);
+        }
+
+        [Fact]
         void SingleMsiUninstallTestFromUpgradeBundleWithSameExactPackage()
         {
             HRESULT hr = S_OK;
@@ -1058,11 +1287,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -1126,11 +1370,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(TRUE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -1205,11 +1464,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"NetFx48Web");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -1320,11 +1594,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -1420,11 +1709,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
             fRollback = TRUE;
@@ -1475,7 +1779,7 @@ namespace Bootstrapper
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
-            ValidatePlannedProvider(pPlan, uIndex++, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", NULL);
+            ValidatePlannedProvider(pPlan, uIndex++, L"{DC94A8E0-4BF4-4026-B80B-2755DAFC05D3}", NULL);
             ValidatePlannedProvider(pPlan, uIndex++, L"{5FF7F534-3FFC-41E0-80CD-E6361E5E7B7B}", NULL);
             Assert::Equal(uIndex, pPlan->cPlannedProviders);
 
@@ -1499,11 +1803,26 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             ValidateCachePackage(pPlan, fRollback, dwIndex++, L"NetFx48Web");
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
@@ -1576,7 +1895,7 @@ namespace Bootstrapper
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
-            ValidatePlannedProvider(pPlan, uIndex++, L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", NULL);
+            ValidatePlannedProvider(pPlan, uIndex++, L"{DC94A8E0-4BF4-4026-B80B-2755DAFC05D3}", NULL);
             Assert::Equal(uIndex, pPlan->cPlannedProviders);
 
             Assert::Equal(2ul, pEngineState->packages.cPackages);
@@ -1728,6 +2047,29 @@ namespace Bootstrapper
             }
         }
 
+        void DetectBundleDependent(BURN_ENGINE_STATE* pEngineState, LPCWSTR wzId)
+        {
+            HRESULT hr = S_OK;
+            BURN_DEPENDENCIES* pDependencies = &pEngineState->dependencies;
+            BURN_REGISTRATION* pRegistration = &pEngineState->registration;
+
+            hr = DepDependencyArrayAlloc(&pRegistration->rgDependents, &pRegistration->cDependents, wzId, NULL);
+            NativeAssert::Succeeded(hr, "Failed to add package dependent");
+
+            if (pDependencies->fSelfDependent || pDependencies->fActiveParent)
+            {
+                if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzActiveParent, -1, wzId, -1))
+                {
+                    pRegistration->fParentRegisteredAsDependent = TRUE;
+                }
+
+                if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzSelfDependent, -1, wzId, -1))
+                {
+                    pRegistration->fSelfRegisteredAsDependent = TRUE;
+                }
+            }
+        }
+
         void DetectPackageDependent(BURN_PACKAGE* pPackage, LPCWSTR wzId)
         {
             HRESULT hr = S_OK;
@@ -1760,6 +2102,11 @@ namespace Bootstrapper
             PlanTestDetect(pEngineState);
 
             pEngineState->registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
+
+            if (pEngineState->dependencies.wzSelfDependent)
+            {
+                DetectBundleDependent(pEngineState, pEngineState->dependencies.wzSelfDependent);
+            }
 
             for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
             {
@@ -1969,6 +2316,27 @@ namespace Bootstrapper
             Assert::Equal<DWORD>(BURN_CLEAN_ACTION_TYPE_COMPATIBLE_PACKAGE, pCleanAction->type);
             Assert::NotEqual((DWORD_PTR)0, (DWORD_PTR)pCleanAction->pPackage);
             NativeAssert::StringEqual(wzPackageId, pCleanAction->pPackage->sczId);
+        }
+
+        BURN_DEPENDENT_REGISTRATION_ACTION* ValidateDependentRegistrationActionExists(BURN_PLAN* pPlan, BOOL fRollback, DWORD dwIndex)
+        {
+            Assert::InRange(dwIndex + 1ul, 1ul, (fRollback ? pPlan->cRollbackRegistrationActions : pPlan->cRegistrationActions));
+            return (fRollback ? pPlan->rgRollbackRegistrationActions : pPlan->rgRegistrationActions) + dwIndex;
+        }
+
+        void ValidateDependentRegistrationAction(
+            __in BURN_PLAN* pPlan,
+            __in BOOL fRollback,
+            __in DWORD dwIndex,
+            __in BOOL fRegister,
+            __in LPCWSTR wzBundleId,
+            __in LPCWSTR wzProviderKey
+            )
+        {
+            BURN_DEPENDENT_REGISTRATION_ACTION* pAction = ValidateDependentRegistrationActionExists(pPlan, fRollback, dwIndex);
+            Assert::Equal<DWORD>(fRegister ? BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER : BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pAction->type);
+            NativeAssert::StringEqual(wzBundleId, pAction->sczBundleId);
+            NativeAssert::StringEqual(wzProviderKey, pAction->sczDependentProviderKey);
         }
 
         BURN_EXECUTE_ACTION* ValidateExecuteActionExists(BURN_PLAN* pPlan, BOOL fRollback, DWORD dwIndex)

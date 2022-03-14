@@ -740,6 +740,25 @@ extern "C" LPCSTR LoggingPlanRelationTypeToString(
     }
 }
 
+extern "C" LPCSTR LoggingRegistrationOptionsToString(
+    __in DWORD dwRegistrationOptions
+    )
+{
+    switch (dwRegistrationOptions)
+    {
+    case BURN_REGISTRATION_ACTION_OPERATIONS_NONE:
+        return "None";
+    case BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE:
+        return "CacheBundle";
+    case BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY:
+        return "WriteProviderKey";
+    case BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE + BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY:
+        return "CacheBundle, WriteProviderKey";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingRelationTypeToString(
     __in BOOTSTRAPPER_RELATION_TYPE type
     )
