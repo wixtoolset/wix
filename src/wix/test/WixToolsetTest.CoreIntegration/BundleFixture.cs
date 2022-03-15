@@ -332,8 +332,8 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidUpgradeCode.wxs"),
-                    "-loc", Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidUpgradeCode.wxl"),
+                    Path.Combine(folder, "BundleLocalized", "BundleWithLocalizedUpgradeCode.wxs"),
+                    "-loc", Path.Combine(folder, "BundleLocalized", "BundleWithInvalidUpgradeCode.wxl"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,

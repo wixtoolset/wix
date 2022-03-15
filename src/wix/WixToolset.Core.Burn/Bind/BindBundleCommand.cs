@@ -102,9 +102,9 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.ProviderKey = bundleSymbol.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
-            bundleSymbol.UpgradeCode = this.NormalizeBundleUpgradeCode(bundleSymbol.SourceLineNumbers, bundleSymbol.UpgradeCode);
-
             bundleSymbol.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
+
+            this.NormalizeRelatedBundles(bundleSymbol, section);
 
             // Ensure there is one and only one WixBootstrapperApplicationDllSymbol.
             // The compiler and linker behavior should have colluded to get
@@ -178,33 +178,33 @@ namespace WixToolset.Core.Burn
             {
                 switch (facade.PackageSymbol.Type)
                 {
-                case WixBundlePackageType.Exe:
-                {
-                    var command = new ProcessExePackageCommand(facade, payloadSymbols);
-                    command.Execute();
-                }
-                break;
+                    case WixBundlePackageType.Exe:
+                    {
+                        var command = new ProcessExePackageCommand(facade, payloadSymbols);
+                        command.Execute();
+                    }
+                    break;
 
-                case WixBundlePackageType.Msi:
-                {
-                    var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, packagesPayloads[facade.PackageId]);
-                    command.Execute();
-                }
-                break;
+                    case WixBundlePackageType.Msi:
+                    {
+                        var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, packagesPayloads[facade.PackageId]);
+                        command.Execute();
+                    }
+                    break;
 
-                case WixBundlePackageType.Msp:
-                {
-                    var command = new ProcessMspPackageCommand(this.Messaging, section, facade, payloadSymbols);
-                    command.Execute();
-                }
-                break;
+                    case WixBundlePackageType.Msp:
+                    {
+                        var command = new ProcessMspPackageCommand(this.Messaging, section, facade, payloadSymbols);
+                        command.Execute();
+                    }
+                    break;
 
-                case WixBundlePackageType.Msu:
-                {
-                    var command = new ProcessMsuPackageCommand(facade, payloadSymbols);
-                    command.Execute();
-                }
-                break;
+                    case WixBundlePackageType.Msu:
+                    {
+                        var command = new ProcessMsuPackageCommand(facade, payloadSymbols);
+                        command.Execute();
+                    }
+                    break;
                 }
 
                 if (null != variableCache)
@@ -496,18 +496,39 @@ namespace WixToolset.Core.Burn
             this.Wixout = this.CreateWixout(trackedFiles, this.Output, manifestPath, baManifestPath, bextManifestPath);
         }
 
-        private string NormalizeBundleUpgradeCode(SourceLineNumber sourceLineNumber, string upgradeCode)
+        private void NormalizeRelatedBundles(WixBundleSymbol bundleSymbol, IntermediateSection section)
         {
-            if (Guid.TryParse(upgradeCode, out var guid))
+            var upgradeCode = bundleSymbol.UpgradeCode;
+
+            foreach (var relatedBundleSymbol in section.Symbols.OfType<WixRelatedBundleSymbol>())
+            {
+                var elementName = "RelatedBundle";
+                var attributeName = "Id";
+
+                if (upgradeCode == relatedBundleSymbol.BundleId)
+                {
+                    elementName = "Bundle";
+                    attributeName = "UpgradeCode";
+                }
+
+                relatedBundleSymbol.BundleId = this.NormalizeBundleRelatedBundleId(relatedBundleSymbol.SourceLineNumbers, relatedBundleSymbol.BundleId, elementName, attributeName);
+            }
+
+            bundleSymbol.UpgradeCode = this.NormalizeBundleRelatedBundleId(bundleSymbol.SourceLineNumbers, bundleSymbol.UpgradeCode, null, null);
+        }
+
+        private string NormalizeBundleRelatedBundleId(SourceLineNumber sourceLineNumber, string relatedBundleId, string elementName, string attributeName)
+        {
+            if (Guid.TryParse(relatedBundleId, out var guid))
             {
                 return guid.ToString("B").ToUpperInvariant();
             }
-            else
+            else if (!String.IsNullOrEmpty(elementName))
             {
-                this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumber, "Bundle", "UpgradeCode", upgradeCode));
+                this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumber, elementName, attributeName, relatedBundleId));
             }
 
-            return upgradeCode;
+            return relatedBundleId;
         }
 
         private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, string manifestPath, string baDataPath, string bextDataPath)
@@ -552,7 +573,7 @@ namespace WixToolset.Core.Burn
             variableCache.Add(String.Concat("packageVersion.", id), package.Version);
 
             if (facade.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage)
-            { 
+            {
                 variableCache.Add(String.Concat("packageLanguage.", id), msiPackage.ProductLanguage.ToString());
                 variableCache.Add(String.Concat("packageManufacturer.", id), msiPackage.Manufacturer ?? String.Empty);
             }

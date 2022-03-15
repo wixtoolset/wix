@@ -1,3 +1,3 @@
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
-  <String Id="InvalidUpgradeCode">NOT-A-GUID</String>
+  <String Id="UpgradeCode">NOT-A-GUID</String>
 </WixLocalization>
