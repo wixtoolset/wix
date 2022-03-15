@@ -53,6 +53,49 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildMultiarchWixlib()
+        {
+            var folder = TestData.Get(@"TestData", "WixlibMultiarch");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "MultiarchFile.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath
+                });
+
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "x64",
+                    Path.Combine(folder, "MultiarchFile.wxs"),
+                    wixlibPath,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath
+                });
+
+                result.AssertSuccess();
+
+                var wixlib = Intermediate.Load(wixlibPath);
+                var componentSymbols = wixlib.Sections.SelectMany(s => s.Symbols).OfType<ComponentSymbol>().ToList();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "x64 filcV1yrx0x8wJWj4qMzcH21jwkPko",
+                    "x86 filcV1yrx0x8wJWj4qMzcH21jwkPko",
+                }, componentSymbols.Select(c => (c.Win64 ? "x64 " : "x86 ") + c.Id.Id).OrderBy(s => s).ToArray());
+            }
+        }
+
+        [Fact]
         public void CanBuildWixlibWithBinariesFromNamedBindPaths()
         {
             var folder = TestData.Get(@"TestData\WixlibWithBinaries");
