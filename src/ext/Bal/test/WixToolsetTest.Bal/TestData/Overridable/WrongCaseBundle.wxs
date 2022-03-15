@@ -8,6 +8,8 @@
         <Variable Name="Test1" bal:Overridable="yes" />
         <Chain>
             <ExePackage Permanent="yes" DetectCondition="none" SourceFile="runtimes\win-x86\native\wixnative.exe" />
+            <MsiPackage SourceFile="test.msi" bal:DisplayInternalUICondition="!(loc.NonsensePlanCondition)" />
         </Chain>
+        <bal:Condition Condition="!(loc.NonsenseDetectCondition)" Message="Unsupported" />
     </Bundle>
 </Wix>

@@ -150,7 +150,7 @@ namespace WixToolset.Core.Burn
             // Process the explicitly authored payloads.
             ISet<string> processedPayloads;
             {
-                var command = new ProcessPayloadsCommand(this.BackendHelper, this.PayloadHarvester, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.InternalBurnBackendHelper, this.PayloadHarvester, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -228,7 +228,7 @@ namespace WixToolset.Core.Burn
             {
                 var toProcess = payloadSymbols.Values.Where(r => !processedPayloads.Contains(r.Id.Id)).ToList();
 
-                var command = new ProcessPayloadsCommand(this.BackendHelper, this.PayloadHarvester, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.InternalBurnBackendHelper, this.PayloadHarvester, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -374,6 +374,17 @@ namespace WixToolset.Core.Burn
             foreach (var extension in this.BackendExtensions)
             {
                 extension.SymbolsFinalized(section);
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
+            // Now that extensions can't change anything else, verify everything is still valid.
+            {
+                var command = new PerformBundleBackendValidationCommand(this.Messaging, this.InternalBurnBackendHelper, section, facades);
+                command.Execute();
             }
 
             if (this.Messaging.EncounteredError)

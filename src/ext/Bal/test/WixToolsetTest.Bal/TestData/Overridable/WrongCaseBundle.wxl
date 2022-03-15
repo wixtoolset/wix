@@ -1,0 +1,4 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
+  <String Id="NonsenseDetectCondition">WixBundleAction = 4</String>
+  <String Id="NonsensePlanCondition">=</String>
+</WixLocalization>

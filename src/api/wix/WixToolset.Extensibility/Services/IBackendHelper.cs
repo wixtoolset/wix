@@ -74,17 +74,6 @@ namespace WixToolset.Extensibility.Services
         string GenerateIdentifier(string prefix, params string[] args);
 
         /// <summary>
-        /// Validates path is relative and canonicalizes it.
-        /// For example, "a\..\c\.\d.exe" => "c\d.exe".
-        /// </summary>
-        /// <param name="sourceLineNumbers"></param>
-        /// <param name="elementName"></param>
-        /// <param name="attributeName"></param>
-        /// <param name="relativePath"></param>
-        /// <returns>The original value if not relative, otherwise the canonicalized relative path.</returns>
-        string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath);
-
-        /// <summary>
         /// Gets a valid code page from the given web name or integer value.
         /// </summary>
         /// <param name="value">A code page web name or integer value as a string.</param>

@@ -22,10 +22,13 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             this.ServiceProvider = serviceProvider;
 
+            this.BundleValidator = serviceProvider.GetService<IBundleValidator>();
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IBundleValidator BundleValidator { get; }
 
         private IMessaging Messaging { get; }
 
@@ -239,10 +242,13 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId)
         {
-            // TODO: verify variable is not a standard bundle variable
             if (variable == null)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, elementName, "Variable"));
+            }
+            else
+            {
+                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, "Variable", variable);
             }
 
             section.AddSymbol(new WixSearchSymbol(sourceLineNumbers, id)
@@ -623,11 +629,6 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
-        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
-        {
-            return Common.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath, this.Messaging);
-        }
-
         public SourceLineNumber GetSourceLineNumbers(XElement element)
         {
             return Preprocessor.GetSourceLineNumbers(element);
@@ -858,5 +859,27 @@ namespace WixToolset.Core.ExtensibilityServices
 
             return extension != null;
         }
+
+        #region IBundleValidator
+        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
+        {
+            return this.BundleValidator.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
+        }
+
+        public bool ValidateBundleMsiPropertyName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string propertyName)
+        {
+            return this.BundleValidator.ValidateBundleMsiPropertyName(sourceLineNumbers, elementName, attributeName, propertyName);
+        }
+
+        public bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
+        {
+            return this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, attributeName, variableName);
+        }
+
+        public bool ValidateBundleCondition(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string condition, BundleConditionPhase phase)
+        {
+            return this.BundleValidator.ValidateBundleCondition(sourceLineNumbers, elementName, attributeName, condition, phase);
+        }
+        #endregion
     }
 }

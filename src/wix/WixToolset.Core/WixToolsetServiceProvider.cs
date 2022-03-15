@@ -20,6 +20,7 @@ namespace WixToolset.Core
             // Singletons.
             this.AddService((provider, singletons) => AddSingleton<IExtensionManager>(singletons, new ExtensionManager(provider)));
             this.AddService((provider, singletons) => AddSingleton<IMessaging>(singletons, new Messaging()));
+            this.AddService((provider, singletons) => AddSingleton<IBundleValidator>(singletons, new BundleValidator(provider)));
             this.AddService((provider, singletons) => AddSingleton<ISymbolDefinitionCreator>(singletons, new SymbolDefinitionCreator(provider)));
             this.AddService((provider, singletons) => AddSingleton<IParseHelper>(singletons, new ParseHelper(provider)));
             this.AddService((provider, singletons) => AddSingleton<IPreprocessHelper>(singletons, new PreprocessHelper(provider)));

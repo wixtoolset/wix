@@ -13,7 +13,7 @@ namespace WixToolset.Extensibility.Services
     /// <summary>
     /// Interface provided to help compiler extensions parse.
     /// </summary>
-    public interface IParseHelper
+    public interface IParseHelper : IBundleValidator
     {
         /// <summary>
         /// Creates a version 3 name-based UUID.
@@ -321,17 +321,6 @@ namespace WixToolset.Extensibility.Services
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's YesNoType value.</returns>
         YesNoDefaultType GetAttributeYesNoDefaultValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
-
-        /// <summary>
-        /// Validates path is relative and canonicalizes it.
-        /// For example, "a\..\c\.\d.exe" => "c\d.exe".
-        /// </summary>
-        /// <param name="sourceLineNumbers"></param>
-        /// <param name="elementName"></param>
-        /// <param name="attributeName"></param>
-        /// <param name="relativePath"></param>
-        /// <returns>The original value if not relative, otherwise the canonicalized relative path.</returns>
-        string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath);
 
         /// <summary>
         /// Gets a source line number for an element.
