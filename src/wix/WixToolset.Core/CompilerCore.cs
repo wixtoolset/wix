@@ -17,24 +17,6 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    internal enum ValueListKind
-    {
-        /// <summary>
-        /// A list of values with nothing before the final value.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// A list of values with 'and' before the final value.
-        /// </summary>
-        And,
-
-        /// <summary>
-        /// A list of values with 'or' before the final value.
-        /// </summary>
-        Or
-    }
-
     /// <summary>
     /// Core class for the compiler.
     /// </summary>
@@ -42,80 +24,6 @@ namespace WixToolset.Core
     {
         internal static readonly XNamespace W3SchemaPrefix = "http://www.w3.org/";
         internal static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
-
-        // Built-in variables (from burn\engine\variable.cpp, "vrgBuiltInVariables", around line 113)
-        private static readonly List<string> BuiltinBundleVariables = new List<string>(
-            new string[] {
-                "AdminToolsFolder",
-                "AppDataFolder",
-                "CommonAppDataFolder",
-                "CommonFiles64Folder",
-                "CommonFilesFolder",
-                "CompatibilityMode",
-                "Date",
-                "DesktopFolder",
-                "FavoritesFolder",
-                "FontsFolder",
-                "InstallerName",
-                "InstallerVersion",
-                "LocalAppDataFolder",
-                "LogonUser",
-                "MyPicturesFolder",
-                "NativeMachine",
-                "NTProductType",
-                "NTSuiteBackOffice",
-                "NTSuiteDataCenter",
-                "NTSuiteEnterprise",
-                "NTSuitePersonal",
-                "NTSuiteSmallBusiness",
-                "NTSuiteSmallBusinessRestricted",
-                "NTSuiteWebServer",
-                "PersonalFolder",
-                "Privileged",
-                "ProgramFiles64Folder",
-                "ProgramFiles6432Folder",
-                "ProgramFilesFolder",
-                "ProgramMenuFolder",
-                "RebootPending",
-                "SendToFolder",
-                "ServicePackLevel",
-                "StartMenuFolder",
-                "StartupFolder",
-                "System64Folder",
-                "SystemFolder",
-                "TempFolder",
-                "TemplateFolder",
-                "TerminalServer",
-                "UserLanguageID",
-                "UserUILanguageID",
-                "VersionMsi",
-                "VersionNT",
-                "VersionNT64",
-                "WindowsFolder",
-                "WindowsVolume",
-                "WixBundleAction",
-                "WixBundleCommandLineAction",
-                "WixBundleForcedRestartPackage",
-                "WixBundleElevated",
-                "WixBundleInstalled",
-                "WixBundleProviderKey",
-                "WixBundleTag",
-                "WixBundleVersion",
-            });
-
-        private static readonly List<string> DisallowedMsiProperties = new List<string>(
-            new string[] {
-                "ACTION",
-                "ADDLOCAL",
-                "ADDSOURCE",
-                "ADDDEFAULT",
-                "ADVERTISE",
-                "ALLUSERS",
-                "REBOOT",
-                "REINSTALL",
-                "REINSTALLMODE",
-                "REMOVE"
-            });
 
         private readonly Dictionary<XNamespace, ICompilerExtension> extensions;
         private readonly IParseHelper parseHelper;
@@ -857,11 +765,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(value))
             {
-                if (CompilerCore.BuiltinBundleVariables.Contains(value))
-                {
-                    string illegalValues = CompilerCore.CreateValueList(ValueListKind.Or, CompilerCore.BuiltinBundleVariables);
-                    this.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, illegalValues));
-                }
+                this.parseHelper.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
             }
 
             return value;
@@ -879,11 +783,7 @@ namespace WixToolset.Core
 
             if (0 < value.Length)
             {
-                if (CompilerCore.DisallowedMsiProperties.Contains(value))
-                {
-                    string illegalValues = CompilerCore.CreateValueList(ValueListKind.Or, CompilerCore.DisallowedMsiProperties);
-                    this.Write(ErrorMessages.DisallowedMsiProperty(sourceLineNumbers, value, illegalValues));
-                }
+                this.parseHelper.ValidateBundleMsiPropertyName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
             }
 
             return value;
@@ -1094,75 +994,6 @@ namespace WixToolset.Core
         internal WixActionSymbol ScheduleActionSymbol(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)
         {
             return this.parseHelper.ScheduleActionSymbol(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
-        }
-
-        private static string CreateValueList(ValueListKind kind, IEnumerable<string> values)
-        {
-            // Ideally, we could denote the list kind (and the list itself) directly in the
-            // message XML, and detect and expand in the MessageHandler.GenerateMessageString()
-            // method.  Doing so would make vararg-style messages much easier, but impacts
-            // every single message we format.  For now, callers just have to know when a
-            // message takes a list of values in a single string argument, the caller will
-            // have to do the expansion themselves.  (And, unfortunately, hard-code the knowledge
-            // that the list is an 'and' or 'or' list.)
-
-            // For a localizable solution, we need to be able to get the list format string
-            // from resources. We aren't currently localized right now, so the values are
-            // just hard-coded.
-            const string valueFormat = "'{0}'";
-            const string valueSeparator = ", ";
-            string terminalTerm = String.Empty;
-
-            switch (kind)
-            {
-                case ValueListKind.None:
-                    terminalTerm = "";
-                    break;
-                case ValueListKind.And:
-                    terminalTerm = "and ";
-                    break;
-                case ValueListKind.Or:
-                    terminalTerm = "or ";
-                    break;
-            }
-
-            StringBuilder list = new StringBuilder();
-
-            // This weird construction helps us determine when we're adding the last value
-            // to the list.  Instead of adding them as we encounter them, we cache the current
-            // value and append the *previous* one.
-            string previousValue = null;
-            bool haveValues = false;
-            foreach (string value in values)
-            {
-                if (null != previousValue)
-                {
-                    if (haveValues)
-                    {
-                        list.Append(valueSeparator);
-                    }
-                    list.AppendFormat(valueFormat, previousValue);
-                    haveValues = true;
-                }
-
-                previousValue = value;
-            }
-
-            // If we have no previous value, that means that the list contained no values, and
-            // something has gone very wrong.
-            Debug.Assert(null != previousValue);
-            if (null != previousValue)
-            {
-                if (haveValues)
-                {
-                    list.Append(valueSeparator);
-                    list.Append(terminalTerm);
-                }
-                list.AppendFormat(valueFormat, previousValue);
-                haveValues = true;
-            }
-
-            return list.ToString();
         }
     }
 }

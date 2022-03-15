@@ -15,7 +15,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class ProcessPayloadsCommand
     {
-        public ProcessPayloadsCommand(IBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        public ProcessPayloadsCommand(IBurnBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
         {
             this.BackendHelper = backendHelper;
             this.PayloadHarvester = payloadHarvester;
@@ -28,7 +28,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
-        private IBackendHelper BackendHelper { get; }
+        private IBurnBackendHelper BackendHelper { get; }
 
         private IPayloadHarvester PayloadHarvester { get; }
 

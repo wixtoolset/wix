@@ -1184,6 +1184,11 @@ namespace WixToolset.Data
             return Message(null, Ids.InvalidCommandLineFileName, "Invalid file name specified on the command line: '{0}'. Error message: '{1}'", fileName, error);
         }
 
+        public static Message InvalidBundleCondition(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string condition)
+        {
+            return Message(sourceLineNumbers, Ids.InvalidBundleCondition, "The {0}/@{1} attribute's value '{2}' is not a valid bundle condition.", elementName, attributeName, condition);
+        }
+
         public static Message InvalidDateTimeFormat(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
             return Message(sourceLineNumbers, Ids.InvalidDateTimeFormat, "The {0}/@{1} attribute's value '{2}' is not a valid date/time value. A date/time value should follow the format YYYY-MM-DDTHH:mm:ss.", elementName, attributeName, value);
@@ -2686,6 +2691,7 @@ namespace WixToolset.Data
             MultiplePackagePayloads3 = 406,
             MissingPackagePayload = 407,
             ExpectedAttributeWithoutOtherAttributes = 408,
+            InvalidBundleCondition = 409,
         }
     }
 }

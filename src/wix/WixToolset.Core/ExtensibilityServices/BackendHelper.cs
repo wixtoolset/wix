@@ -64,11 +64,6 @@ namespace WixToolset.Core.ExtensibilityServices
             return Common.GenerateIdentifier(prefix, args);
         }
 
-        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
-        {
-            return Common.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath, this.Messaging);
-        }
-
         public int GetValidCodePage(string value, bool allowNoChange = false, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null)
         {
             return Common.GetValidCodePage(value, allowNoChange, onlyAnsi, sourceLineNumbers);

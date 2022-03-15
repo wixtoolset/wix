@@ -27,27 +27,6 @@ namespace WixToolset.Core
         internal static readonly char[] IllegalRelativeLongFilenameCharacters = new[] { '?', '*', '|', '>', '<', ':', '\"' }; // like illegal, but we allow '\' and '/'
         internal static readonly char[] IllegalWildcardLongFilenameCharacters = new[] { '\\', '/', '|', '>', '<', ':', '\"' };   // like illegal: but we allow '*' and '?'
 
-        public static string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath, IMessaging messageHandler)
-        {
-            const string root = @"C:\";
-            if (!Path.IsPathRooted(relativePath))
-            {
-                var normalizedPath = Path.GetFullPath(root + relativePath);
-                if (normalizedPath.StartsWith(root))
-                {
-                    var canonicalizedPath = normalizedPath.Substring(root.Length);
-                    if (canonicalizedPath != relativePath)
-                    {
-                        messageHandler.Write(WarningMessages.PathCanonicalized(sourceLineNumbers, elementName, attributeName, relativePath, canonicalizedPath));
-                    }
-                    return canonicalizedPath;
-                }
-            }
-
-            messageHandler.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, elementName, attributeName, relativePath));
-            return relativePath;
-        }
-
         /// <summary>
         /// Gets a valid code page from the given web name or integer value.
         /// </summary>

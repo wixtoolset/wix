@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.Bal
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Xml;
@@ -138,20 +139,33 @@ namespace WixToolsetTest.Bal
             {
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\Overridable");
+                var bundleSourceFolder = TestData.Get(@"TestData");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
-                var compileResult = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    Path.Combine(bundleSourceFolder, "WrongCaseBundle.wxs"),
+                    Path.Combine(bundleSourceFolder, "Overridable", "WrongCaseBundle.wxs"),
+                    "-loc", Path.Combine(bundleSourceFolder, "Overridable", "WrongCaseBundle.wxl"),
+                    "-bindpath", Path.Combine(bundleSourceFolder, "WixStdBa", "Data"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
                 });
-                Assert.Equal((int)BalErrors.Ids.NonUpperCaseOverridableVariable, compileResult.ExitCode);
+
+                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+
+                var messages = result.Messages.Select(m => m.ToString()).ToList();
+                messages.Sort();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "bal:Condition/@Condition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
+                    "Overridable variable 'Test1' must be 'TEST1' with Bundle/@CommandLineVariables value 'upperCase'.",
+                    "The *Package/@bal:DisplayInternalUICondition attribute's value '=' is not a valid bundle condition.",
+                }, messages.ToArray());
             }
         }
     }

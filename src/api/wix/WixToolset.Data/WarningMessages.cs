@@ -593,6 +593,11 @@ namespace WixToolset.Data
             return Message(null, Ids.UnableToResetAcls, "Unable to reset acls on destination files. Exception detail: {0}", error);
         }
 
+        public static Message UnavailableBundleConditionVariable(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variable, string illegalValueList)
+        {
+            return Message(sourceLineNumbers, Ids.UnavailableBundleConditionVariable, "{0}/@{1} contains the built-in Variable '{2}', which is not available when it is evaluated. (Unavailable Variables are: {3}.). Rewrite the condition to avoid Variables that are never valid during its evaluation.", elementName, attributeName, variable, illegalValueList);
+        }
+
         public static Message UnclearShortcut(SourceLineNumber sourceLineNumbers, string shortcutId, string fileId, string componentId)
         {
             return Message(sourceLineNumbers, Ids.UnclearShortcut, "Because it is an advertised shortcut, the target of shortcut '{0}' will be the keypath of component '{2}' rather than parent file '{1}'. To eliminate this warning, you can (1) make the Shortcut element a child of the File element that is the keypath of component '{2}', (2) make file '{1}' the keypath of component '{2}', or (3) remove the @Advertise attribute so the shortcut is a non-advertised shortcut.", shortcutId, fileId, componentId);
@@ -804,6 +809,7 @@ namespace WixToolset.Data
             DetectConditionRecommended = 1153,
             CollidingModularizationTypes = 1156,
             InvalidEnvironmentVariable = 1157,
+            UnavailableBundleConditionVariable = 1159,
         }
     }
 }

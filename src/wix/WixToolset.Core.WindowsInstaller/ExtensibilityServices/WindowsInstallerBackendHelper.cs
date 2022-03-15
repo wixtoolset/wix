@@ -23,45 +23,100 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
 
         #region IBackendHelper interfaces
 
-        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly) => this.backendHelper.CreateFileFacade(file, assembly);
+        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly)
+        {
+            return this.backendHelper.CreateFileFacade(file, assembly);
+        }
 
-        public IFileFacade CreateFileFacade(FileRow fileRow) => this.backendHelper.CreateFileFacade(fileRow);
+        public IFileFacade CreateFileFacade(FileRow fileRow)
+        {
+            return this.backendHelper.CreateFileFacade(fileRow);
+        }
 
-        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol) => this.backendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
+        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol)
+        {
+            return this.backendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
+        }
 
-        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.CreateFileTransfer(source, destination, move, sourceLineNumbers);
+        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)
+        {
+            return this.backendHelper.CreateFileTransfer(source, destination, move, sourceLineNumbers);
+        }
 
-        public string CreateGuid() => this.backendHelper.CreateGuid();
+        public string CreateGuid()
+        {
+            return this.backendHelper.CreateGuid();
+        }
 
-        public string CreateGuid(Guid namespaceGuid, string value) => this.backendHelper.CreateGuid(namespaceGuid, value);
+        public string CreateGuid(Guid namespaceGuid, string value)
+        {
+            return this.backendHelper.CreateGuid(namespaceGuid, value);
+        }
 
-        public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name) => this.backendHelper.CreateResolvedDirectory(directoryParent, name);
+        public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name)
+        {
+            return this.backendHelper.CreateResolvedDirectory(directoryParent, name);
+        }
 
-        public IReadOnlyList<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles) => this.backendHelper.ExtractEmbeddedFiles(embeddedFiles);
+        public IReadOnlyList<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles)
+        {
+            return this.backendHelper.ExtractEmbeddedFiles(embeddedFiles);
+        }
 
-        public string GenerateIdentifier(string prefix, params string[] args) => this.backendHelper.GenerateIdentifier(prefix, args);
+        public string GenerateIdentifier(string prefix, params string[] args)
+        {
+            return this.backendHelper.GenerateIdentifier(prefix, args);
+        }
 
-        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath) => this.backendHelper.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
+        public int GetValidCodePage(string value, bool allowNoChange, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null)
+        {
+            return this.backendHelper.GetValidCodePage(value, allowNoChange, onlyAnsi, sourceLineNumbers);
+        }
 
-        public int GetValidCodePage(string value, bool allowNoChange, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.GetValidCodePage(value, allowNoChange, onlyAnsi, sourceLineNumbers);
+        public string GetMsiFileName(string value, bool source, bool longName)
+        {
+            return this.backendHelper.GetMsiFileName(value, source, longName);
+        }
 
-        public string GetMsiFileName(string value, bool source, bool longName) => this.backendHelper.GetMsiFileName(value, source, longName);
+        public bool IsValidBinderVariable(string variable)
+        {
+            return this.backendHelper.IsValidBinderVariable(variable);
+        }
 
-        public bool IsValidBinderVariable(string variable) => this.backendHelper.IsValidBinderVariable(variable);
+        public bool IsValidFourPartVersion(string version)
+        {
+            return this.backendHelper.IsValidFourPartVersion(version);
+        }
 
-        public bool IsValidFourPartVersion(string version) => this.backendHelper.IsValidFourPartVersion(version);
+        public bool IsValidIdentifier(string id)
+        {
+            return this.backendHelper.IsValidIdentifier(id);
+        }
 
-        public bool IsValidIdentifier(string id) => this.backendHelper.IsValidIdentifier(id);
+        public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)
+        {
+            return this.backendHelper.IsValidLongFilename(filename, allowWildcards, allowRelative);
+        }
 
-        public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative) => this.backendHelper.IsValidLongFilename(filename, allowWildcards, allowRelative);
+        public bool IsValidShortFilename(string filename, bool allowWildcards)
+        {
+            return this.backendHelper.IsValidShortFilename(filename, allowWildcards);
+        }
 
-        public bool IsValidShortFilename(string filename, bool allowWildcards) => this.backendHelper.IsValidShortFilename(filename, allowWildcards);
+        public void ResolveDelayedFields(IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)
+        {
+            this.backendHelper.ResolveDelayedFields(delayedFields, variableCache);
+        }
 
-        public void ResolveDelayedFields(IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache) => this.backendHelper.ResolveDelayedFields(delayedFields, variableCache);
+        public string[] SplitMsiFileName(string value)
+        {
+            return this.backendHelper.SplitMsiFileName(value);
+        }
 
-        public string[] SplitMsiFileName(string value) => this.backendHelper.SplitMsiFileName(value);
-
-        public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.TrackFile(path, type, sourceLineNumbers);
+        public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)
+        {
+            return this.backendHelper.TrackFile(path, type, sourceLineNumbers);
+        }
 
         #endregion
 

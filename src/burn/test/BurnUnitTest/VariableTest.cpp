@@ -381,6 +381,7 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"(PROP3 = \"NOT\" OR PROP1 = \"VAL1\") AND PROP2 = \"VAL2\""));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP3 = \"NOT\" OR (PROP1 = \"VAL1\" AND PROP2 = \"VAL2\")"));
 
+                Assert::True(EvaluateFailureConditionHelper(&variables, L""));
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"="));
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"(PROP1"));
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"(PROP1 = \""));

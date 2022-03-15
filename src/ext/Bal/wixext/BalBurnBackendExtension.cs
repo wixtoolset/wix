@@ -10,6 +10,7 @@ namespace WixToolset.Bal
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     public class BalBurnBackendExtension : BaseBurnBackendBinderExtension
     {
@@ -31,6 +32,8 @@ namespace WixToolset.Bal
         {
             base.SymbolsFinalized(section);
 
+            this.VerifyBalConditions(section);
+            this.VerifyBalPackageInfos(section);
             this.VerifyOverridableVariables(section);
 
             var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationDllSymbol>().SingleOrDefault();
@@ -100,7 +103,7 @@ namespace WixToolset.Bal
             {
                 foreach (var payloadPropertiesSymbol in payloadPropertiesSymbols)
                 {
-                    if (string.Equals(payloadPropertiesSymbol.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase) &&
+                    if (String.Equals(payloadPropertiesSymbol.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase) &&
                         BurnConstants.BurnUXContainerName == payloadPropertiesSymbol.ContainerRef)
                     {
                         this.Messaging.Write(BalWarnings.UnmarkedBAFunctionsDLL(payloadPropertiesSymbol.SourceLineNumbers));
@@ -117,6 +120,24 @@ namespace WixToolset.Bal
                 }
 
                 baFunctionsSymbol.FilePath = bundlePayloadSymbol.Name;
+            }
+        }
+
+        private void VerifyBalConditions(IntermediateSection section)
+        {
+            var balConditionSymbols = section.Symbols.OfType<WixBalConditionSymbol>().ToList();
+            foreach (var balConditionSymbol in balConditionSymbols)
+            {
+                this.BackendHelper.ValidateBundleCondition(balConditionSymbol.SourceLineNumbers, "bal:Condition", "Condition", balConditionSymbol.Condition, BundleConditionPhase.Detect);
+            }
+        }
+
+        private void VerifyBalPackageInfos(IntermediateSection section)
+        {
+            var balPackageInfoSymbols = section.Symbols.OfType<WixBalPackageInfoSymbol>().ToList();
+            foreach (var balPackageInfoSymbol in balPackageInfoSymbols)
+            {
+                this.BackendHelper.ValidateBundleCondition(balPackageInfoSymbol.SourceLineNumbers, "*Package", "bal:DisplayInternalUICondition", balPackageInfoSymbol.DisplayInternalUICondition, BundleConditionPhase.Plan);
             }
         }
 
