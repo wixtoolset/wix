@@ -139,6 +139,49 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildBundleManifestWithNormalizedRelatedBundles()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+{
+                    "build",
+                    Path.Combine(folder, "BundleLocalized", "BundleWithLocalizedUpgradeCode.wxs"),
+                    "-loc", Path.Combine(folder, "BundleLocalized", "BundleWithValidUpgradeCode.wxl"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                result.AssertSuccess();
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var manifestRelatedBundlesElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:RelatedBundle");
+                Assert.Equal("<RelatedBundle Id='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' Action='Upgrade' />", manifestRelatedBundlesElements[0].GetTestXml());
+                Assert.Equal(1, manifestRelatedBundlesElements.Count);
+
+                var dataRelatedBundlesElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixBundleProperties");
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixBundleProperties", new List<string> { "DisplayName", "Id" } },
+                };
+                Assert.Equal("<WixBundleProperties DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' Id='*' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' PerMachine='yes' />", dataRelatedBundlesElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal(1, dataRelatedBundlesElements.Count);
+            }
+        }
+
+        [Fact]
         public void PopulatesBEManifestWithBundleExtensionBundleCustomData()
         {
             var folder = TestData.Get(@"TestData");
