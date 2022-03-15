@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <Directory Id="ProgramFiles3264Folder">
+      <Directory Id="INSTALLFOLDER" Name="Foo">
+        <Component>
+          <File Source="test.txt" />
+        </Component>
+      </Directory>
+    </Directory>
+  </Fragment>
+</Wix>

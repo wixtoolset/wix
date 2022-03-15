@@ -49,17 +49,7 @@ namespace WixToolset.Core.CommandLine
 
         private string IntermediateFolder { get; set; }
 
-        private OutputType OutputType { get; set; }
-
-        private List<string> IncludeSearchPaths { get; set; }
-
-        public string PdbFile { get; set; }
-
-        public PdbType PdbType { get; set; }
-
         private Platform Platform { get; set; }
-
-        private string OutputFile { get; set; }
 
         private CompressionLevel? DefaultCompressionLevel { get; set; }
 
@@ -75,93 +65,70 @@ namespace WixToolset.Core.CommandLine
 
             this.IntermediateFolder = this.commandLine.CalculateIntermedateFolder();
 
-            this.OutputType = this.commandLine.CalculateOutputType();
-
-            this.IncludeSearchPaths = this.commandLine.IncludeSearchPaths;
-
-            this.PdbFile = this.commandLine.PdbFile;
-
-            this.PdbType = this.commandLine.PdbType;
-
             this.Platform = this.commandLine.Platform;
 
             this.TrackingFile = this.commandLine.TrackingFile;
 
             this.DefaultCompressionLevel = this.commandLine.DefaultCompressionLevel;
 
-            var preprocessorVariables = this.commandLine.GatherPreprocessorVariables();
-
-            var sourceFiles = this.commandLine.GatherSourceFiles(this.IntermediateFolder);
+            var preprocessorVariables = this.commandLine.CalculatePreprocessorVariables();
 
             var filterCultures = this.commandLine.CalculateFilterCultures();
 
             var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
 
-            this.EvaluateSourceFiles(sourceFiles, creator, out var codeFiles, out var wixipl);
-
-            this.OutputFile = this.commandLine.OutputFile;
-
-            if (String.IsNullOrEmpty(this.OutputFile))
-            {
-                if (codeFiles.Count == 1)
-                {
-                    // If output type is unknown, the extension will be replaced with the right default based on output type.
-                    this.OutputFile = Path.ChangeExtension(codeFiles[0].OutputPath, DefaultExtensionForOutputType(this.OutputType));
-                }
-                else
-                {
-                    this.Messaging.Write(ErrorMessages.MustSpecifyOutputWithMoreThanOneInput());
-                }
-            }
+            var inputsOutputs = this.commandLine.CalculateInputsAndOutputs(creator);
 
             if (this.Messaging.EncounteredError)
             {
                 return Task.FromResult(this.Messaging.LastErrorNumber);
             }
 
-            var wixobjs = this.CompilePhase(preprocessorVariables, codeFiles, cancellationToken);
+            var wixobjs = this.CompilePhase(preprocessorVariables, inputsOutputs.SourcePaths, this.commandLine.IncludeSearchPaths, cancellationToken);
 
-            var wxls = this.LoadLocalizationFiles(this.commandLine.LocalizationFilePaths, preprocessorVariables, cancellationToken);
+            var wxls = this.LoadLocalizationFiles(inputsOutputs.LocalizationPaths, preprocessorVariables, this.commandLine.IncludeSearchPaths, cancellationToken);
 
             if (this.Messaging.EncounteredError)
             {
                 return Task.FromResult(this.Messaging.LastErrorNumber);
             }
 
-            if (this.OutputType == OutputType.Library)
+            if (inputsOutputs.OutputType == OutputType.Library)
             {
                 using (new IntermediateFieldContext("wix.lib"))
                 {
-                    this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths, cancellationToken);
+                    this.LibraryPhase(wixobjs, wxls, inputsOutputs.LibraryPaths, creator, this.commandLine.BindFiles, this.commandLine.BindPaths, inputsOutputs.OutputPath, cancellationToken);
                 }
             }
             else
             {
                 using (new IntermediateFieldContext("wix.link"))
                 {
+                    var wixipl = inputsOutputs.Wixipls.SingleOrDefault();
+
                     if (wixipl == null)
                     {
-                        wixipl = this.LinkPhase(wixobjs, this.commandLine.LibraryFilePaths, creator, cancellationToken);
+                        wixipl = this.LinkPhase(wixobjs, inputsOutputs, creator, cancellationToken);
                     }
 
                     if (!this.Messaging.EncounteredError)
                     {
-                        var outputExtension = Path.GetExtension(this.OutputFile);
+                        var outputExtension = Path.GetExtension(inputsOutputs.OutputPath);
                         if (String.IsNullOrEmpty(outputExtension) || ".wix" == outputExtension)
                         {
                             var entrySectionType = wixipl.Sections.Single().Type;
-                            this.OutputFile = Path.ChangeExtension(this.OutputFile, DefaultExtensionForSectionType(entrySectionType));
+                            inputsOutputs.OutputPath = Path.ChangeExtension(inputsOutputs.OutputPath, DefaultExtensionForSectionType(entrySectionType));
                         }
 
-                        if (this.OutputType == OutputType.IntermediatePostLink)
+                        if (inputsOutputs.OutputType == OutputType.IntermediatePostLink)
                         {
-                            wixipl.Save(this.OutputFile);
+                            wixipl.Save(inputsOutputs.OutputPath);
                         }
                         else
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, cancellationToken);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, inputsOutputs, cancellationToken);
                             }
                         }
                     }
@@ -176,51 +143,13 @@ namespace WixToolset.Core.CommandLine
             return this.commandLine.TryParseArgument(argument, parser);
         }
 
-        private void EvaluateSourceFiles(IEnumerable<SourceFile> sourceFiles, ISymbolDefinitionCreator creator, out List<SourceFile> codeFiles, out Intermediate wixipl)
-        {
-            codeFiles = new List<SourceFile>();
-
-            wixipl = null;
-
-            foreach (var sourceFile in sourceFiles)
-            {
-                var extension = Path.GetExtension(sourceFile.SourcePath);
-
-                if (wixipl != null || ".wxs".Equals(extension, StringComparison.OrdinalIgnoreCase))
-                {
-                    codeFiles.Add(sourceFile);
-                }
-                else
-                {
-                    try
-                    {
-                        wixipl = Intermediate.Load(sourceFile.SourcePath, creator);
-                    }
-                    catch (WixException)
-                    {
-                        // We'll assume anything that isn't a valid intermediate is source code to compile.
-                        codeFiles.Add(sourceFile);
-                    }
-                }
-            }
-
-            if (wixipl == null && codeFiles.Count == 0)
-            {
-                this.Messaging.Write(ErrorMessages.NoSourceFiles());
-            }
-            else if (wixipl != null && codeFiles.Count != 0)
-            {
-                this.Messaging.Write(ErrorMessages.WixiplSourceFileIsExclusive());
-            }
-        }
-
-        private IReadOnlyList<Intermediate> CompilePhase(IDictionary<string, string> preprocessorVariables, IEnumerable<SourceFile> sourceFiles, CancellationToken cancellationToken)
+        private IReadOnlyList<Intermediate> CompilePhase(IDictionary<string, string> preprocessorVariables, IEnumerable<string> sourceFiles, IReadOnlyCollection<string> includeSearchPaths, CancellationToken cancellationToken)
         {
             var intermediates = new List<Intermediate>();
 
             foreach (var sourceFile in sourceFiles)
             {
-                var document = this.Preprocess(preprocessorVariables, sourceFile.SourcePath, cancellationToken);
+                var document = this.Preprocess(preprocessorVariables, sourceFile, includeSearchPaths, cancellationToken);
 
                 if (this.Messaging.EncounteredError)
                 {
@@ -255,14 +184,21 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private void LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, CancellationToken cancellationToken)
+        private void LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, string outputPath, CancellationToken cancellationToken)
         {
+            var libraries = this.LoadLibraries(libraryFiles, creator);
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
             context.BindPaths = bindPaths;
             context.Extensions = this.ExtensionManager.GetServices<ILibrarianExtension>();
             context.Localizations = localizations;
-            context.Intermediates = intermediates;
+            context.Intermediates = intermediates.Concat(libraries).ToList();
             context.CancellationToken = cancellationToken;
 
             try
@@ -272,7 +208,7 @@ namespace WixToolset.Core.CommandLine
 
                 if (!this.Messaging.EncounteredError)
                 {
-                    result.Library.Save(this.OutputFile);
+                    result.Library.Save(outputPath);
 
                     this.LayoutFiles(this.IntermediateFolder, result.TrackedFiles, null, cancellationToken);
                 }
@@ -283,9 +219,9 @@ namespace WixToolset.Core.CommandLine
             }
         }
 
-        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, CancellationToken cancellationToken)
+        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, InputsAndOutputs inputsOutputs, ISymbolDefinitionCreator creator, CancellationToken cancellationToken)
         {
-            var libraries = this.LoadLibraries(libraryFiles, creator);
+            var libraries = this.LoadLibraries(inputsOutputs.LibraryPaths, creator);
 
             if (this.Messaging.EncounteredError)
             {
@@ -295,7 +231,7 @@ namespace WixToolset.Core.CommandLine
             var context = this.ServiceProvider.GetService<ILinkContext>();
             context.Extensions = this.ExtensionManager.GetServices<ILinkerExtension>();
             context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
-            context.ExpectedOutputType = this.OutputType;
+            context.ExpectedOutputType = inputsOutputs.OutputType;
             context.Intermediates = intermediates.Concat(libraries).ToList();
             context.SymbolDefinitionCreator = creator;
             context.CancellationToken = cancellationToken;
@@ -304,7 +240,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, IReadOnlyCollection<IBindPath> bindPaths, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, IReadOnlyCollection<IBindPath> bindPaths, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
         {
             var intermediateFolder = this.IntermediateFolder;
             if (String.IsNullOrEmpty(intermediateFolder))
@@ -350,9 +286,9 @@ namespace WixToolset.Core.CommandLine
                     context.FileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
                     context.IntermediateFolder = intermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
-                    context.OutputPath = this.OutputFile;
-                    context.PdbType = this.PdbType;
-                    context.PdbPath = this.PdbType == PdbType.None ? null : this.PdbFile ?? Path.ChangeExtension(this.OutputFile, ".wixpdb");
+                    context.OutputPath = inputsOutputs.OutputPath;
+                    context.PdbType = inputsOutputs.PdbType;
+                    context.PdbPath = inputsOutputs.PdbPath;
                     context.CancellationToken = cancellationToken;
 
                     var binder = this.ServiceProvider.GetService<IBinder>();
@@ -405,14 +341,14 @@ namespace WixToolset.Core.CommandLine
             return Array.Empty<Intermediate>();
         }
 
-        private IReadOnlyList<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables, CancellationToken cancellationToken)
+        private IReadOnlyList<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables, IReadOnlyCollection<string> includeSearchPaths, CancellationToken cancellationToken)
         {
             var localizations = new List<Localization>();
             var parser = this.ServiceProvider.GetService<ILocalizationParser>();
 
             foreach (var loc in locFiles)
             {
-                var document = this.Preprocess(preprocessorVariables, loc, cancellationToken);
+                var document = this.Preprocess(preprocessorVariables, loc, includeSearchPaths, cancellationToken);
 
                 if (this.Messaging.EncounteredError)
                 {
@@ -426,12 +362,12 @@ namespace WixToolset.Core.CommandLine
             return localizations;
         }
 
-        private XDocument Preprocess(IDictionary<string, string> preprocessorVariables, string sourcePath, CancellationToken cancellationToken)
+        private XDocument Preprocess(IDictionary<string, string> preprocessorVariables, string sourcePath, IReadOnlyCollection<string> includeSearchPaths, CancellationToken cancellationToken)
         {
             var context = this.ServiceProvider.GetService<IPreprocessContext>();
             context.Extensions = this.ExtensionManager.GetServices<IPreprocessorExtension>();
             context.Platform = this.Platform;
-            context.IncludeSearchPaths = this.IncludeSearchPaths;
+            context.IncludeSearchPaths = includeSearchPaths;
             context.SourcePath = sourcePath;
             context.Variables = preprocessorVariables;
             context.CancellationToken = cancellationToken;
@@ -518,6 +454,8 @@ namespace WixToolset.Core.CommandLine
             public List<string> LibraryFilePaths { get; } = new List<string>();
 
             public List<string> SourceFilePaths { get; } = new List<string>();
+
+            public List<string> UnevaluatedInputFilePaths { get; } = new List<string>();
 
             public Platform Platform { get; private set; }
 
@@ -632,6 +570,10 @@ namespace WixToolset.Core.CommandLine
                             parser.GetNextArgumentAsFilePathOrError(arg, "library files", this.LibraryFilePaths);
                             return true;
 
+                        case "src":
+                            parser.GetNextArgumentAsFilePathOrError(arg, "source code", this.SourceFilePaths);
+                            return true;
+
                         case "o":
                         case "out":
                             this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg);
@@ -665,7 +607,7 @@ namespace WixToolset.Core.CommandLine
                 }
                 else
                 {
-                    parser.GetArgumentAsFilePathOrError(arg, "source code", this.SourceFilePaths);
+                    parser.GetArgumentAsFilePathOrError(arg, "input file", this.UnevaluatedInputFilePaths);
                     return true;
                 }
             }
@@ -747,7 +689,7 @@ namespace WixToolset.Core.CommandLine
                 return result;
             }
 
-            public IDictionary<string, string> GatherPreprocessorVariables()
+            public IDictionary<string, string> CalculatePreprocessorVariables()
             {
                 var variables = new Dictionary<string, string>();
 
@@ -767,19 +709,89 @@ namespace WixToolset.Core.CommandLine
                 return variables;
             }
 
-            public IEnumerable<SourceFile> GatherSourceFiles(string intermediateDirectory)
+            public InputsAndOutputs CalculateInputsAndOutputs(ISymbolDefinitionCreator creator)
             {
-                var files = new List<SourceFile>();
+                var codePaths = new List<string>(this.SourceFilePaths);
+                var localizationPaths = new List<string>(this.LocalizationFilePaths);
+                var libraryPaths = new List<string>(this.LibraryFilePaths);
+                var wixipls = new List<Intermediate>();
+                string lastWixiplPath = null;
 
-                foreach (var item in this.SourceFilePaths)
+                var outputPath = this.OutputFile;
+                var outputType = this.CalculateOutputType();
+
+                foreach (var path in this.UnevaluatedInputFilePaths)
                 {
-                    var sourcePath = item;
-                    var outputPath = Path.Combine(intermediateDirectory, Path.GetFileNameWithoutExtension(sourcePath) + ".wir");
+                    var extension = Path.GetExtension(path);
 
-                    files.Add(new SourceFile(sourcePath, outputPath));
+                    if (".wxs".Equals(extension, StringComparison.OrdinalIgnoreCase))
+                    {
+                        codePaths.Add(path);
+                    }
+                    else if (".wxl".Equals(extension, StringComparison.OrdinalIgnoreCase))
+                    {
+                        localizationPaths.Add(path);
+                    }
+                    else if (".wixlib".Equals(extension, StringComparison.OrdinalIgnoreCase))
+                    {
+                        libraryPaths.Add(path);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // Try to load the file as an intermediate to determine whether it is a
+                            // .wixipl or a .wixlib.
+                            var intermediate = Intermediate.Load(path, creator);
+
+                            if (intermediate.HasLevel(IntermediateLevels.Linked))
+                            {
+                                wixipls.Add(intermediate);
+                                lastWixiplPath = path;
+                            }
+                            else
+                            {
+                                libraryPaths.Add(path);
+                            }
+                        }
+                        catch (WixException)
+                        {
+                            // We'll assume anything that isn't a valid intermediate is source code to compile.
+                            codePaths.Add(path);
+                        }
+                    }
                 }
 
-                return files;
+                if (wixipls.Count > 0)
+                {
+                    if (wixipls.Count > 1 || codePaths.Count > 0 || libraryPaths.Count > 0)
+                    {
+                        this.Messaging.Write(ErrorMessages.WixiplSourceFileIsExclusive());
+                    }
+                }
+                else if (codePaths.Count == 0 && libraryPaths.Count == 0)
+                {
+                    this.Messaging.Write(ErrorMessages.NoSourceFiles());
+                }
+
+                if (!this.Messaging.EncounteredError && String.IsNullOrEmpty(outputPath))
+                {
+                    var singleInputPath = codePaths.Count == 1 ? codePaths[0] : lastWixiplPath;
+
+                    if (String.IsNullOrEmpty(singleInputPath))
+                    {
+                        this.Messaging.Write(ErrorMessages.MustSpecifyOutputWithMoreThanOneInput());
+                    }
+                    else
+                    {
+                        // If output type is unknown, the extension will be replaced with the right default based on output type.
+                        outputPath = Path.ChangeExtension(singleInputPath, DefaultExtensionForOutputType(outputType));
+                    }
+                }
+
+                var pdbPath = this.PdbType == PdbType.None ? null : this.PdbFile ?? Path.ChangeExtension(outputPath ?? "error.above", ".wixpdb");
+
+                return new InputsAndOutputs(codePaths, localizationPaths, libraryPaths, wixipls, outputPath, outputType, pdbPath, this.PdbType);
             }
 
             private bool TryParseBindPath(string bindPath, out IBindPath bp)
@@ -806,6 +818,37 @@ namespace WixToolset.Core.CommandLine
 
                 return true;
             }
+        }
+
+        private class InputsAndOutputs
+        {
+            public InputsAndOutputs(IReadOnlyCollection<string> sourcePaths, IReadOnlyCollection<string> localizationPaths, IReadOnlyCollection<string> libraryPaths, IReadOnlyCollection<Intermediate> wixipls, string outputPath, OutputType outputType, string pdbPath, PdbType pdbType)
+            {
+                this.SourcePaths = sourcePaths;
+                this.LocalizationPaths = localizationPaths;
+                this.LibraryPaths = libraryPaths;
+                this.Wixipls = wixipls;
+                this.OutputPath = outputPath;
+                this.OutputType = outputType;
+                this.PdbPath = pdbPath;
+                this.PdbType = pdbType;
+            }
+
+            public IReadOnlyCollection<string> SourcePaths { get; }
+
+            public IReadOnlyCollection<string> LocalizationPaths { get; }
+
+            public IReadOnlyCollection<string> LibraryPaths { get; }
+
+            public IReadOnlyCollection<Intermediate> Wixipls { get; }
+
+            public string OutputPath { get; set; }
+
+            public OutputType OutputType { get; }
+
+            public string PdbPath { get; }
+
+            public PdbType PdbType { get; }
         }
     }
 }

@@ -6,25 +6,10 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Data;
     using Xunit;
 
     public class BadInputFixture
     {
-        [Fact]
-        public void SwitchIsNotConsideredAnArgument()
-        {
-            var result = WixRunner.Execute(new[]
-            {
-                "build",
-                "-bindpath", "-thisisaswitchnotanarg",
-            });
-
-            Assert.Single(result.Messages, m => m.Id == (int)ErrorMessages.Ids.ExpectedArgument);
-            // TODO: when CantBuildSingleExeBundleWithInvalidArgument is fixed, uncomment:
-            //Assert.Equal((int)ErrorMessages.Ids.ExpectedArgument, result.ExitCode);
-        }
-
         [Fact]
         public void HandleInvalidIds()
         {
