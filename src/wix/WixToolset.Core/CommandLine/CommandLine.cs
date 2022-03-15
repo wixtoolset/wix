@@ -14,9 +14,6 @@ namespace WixToolset.Core.CommandLine
         Unknown,
         Build,
         Preprocess,
-        Compile,
-        Link,
-        Bind,
         Decompile,
     }
 
@@ -163,10 +160,6 @@ namespace WixToolset.Core.CommandLine
                     {
                         case CommandTypes.Build:
                             command = new BuildCommand(this.ServiceProvider);
-                            break;
-
-                        case CommandTypes.Compile:
-                            command = new CompileCommand(this.ServiceProvider);
                             break;
 
                         case CommandTypes.Decompile:
