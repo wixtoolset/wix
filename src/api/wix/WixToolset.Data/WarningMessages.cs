@@ -673,6 +673,16 @@ namespace WixToolset.Data
             return Message(null, Ids.InvalidEnvironmentVariable, "The {0} environment variable is set to an invalid value of '{1}'. The default value '{2}' will be used instead.", environmentVariable, value, defaultValue);
         }
 
+        public static Message WindowsInstallerFileTooLarge(SourceLineNumber sourceLineNumbers, string path, string fileDescription)
+        {
+            if (String.IsNullOrEmpty(fileDescription))
+            {
+                fileDescription = "MSI or cabinet";
+            }
+
+            return Message(sourceLineNumbers, Ids.WindowsInstallerFileTooLarge, "The Windows Installer does not support {0} files larger than 2GB in size. Reduce the size or number of files embedded in '{1}' or the installation will likely fail with an unexpected error.", fileDescription, path);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -809,6 +819,7 @@ namespace WixToolset.Data
             DetectConditionRecommended = 1153,
             CollidingModularizationTypes = 1156,
             InvalidEnvironmentVariable = 1157,
+            WindowsInstallerFileTooLarge = 1158,
             UnavailableBundleConditionVariable = 1159,
         }
     }

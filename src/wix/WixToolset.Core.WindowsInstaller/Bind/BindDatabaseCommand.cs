@@ -513,6 +513,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 trackedFiles.AddRange(command.TrackedFiles);
             }
 
+            // Best effort check to see if the MSI file is too large for the Windows Installer.
+            try
+            {
+                var fi = new FileInfo(this.OutputPath);
+                if (fi.Length > Int32.MaxValue)
+                {
+                    this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(null, this.OutputPath, "MSI"));
+                }
+            }
+            catch
+            {
+            }
+
             var trackedInputFiles = this.TrackInputFiles(data, trackedFiles);
             trackedFiles.AddRange(trackedInputFiles);
 
