@@ -306,6 +306,7 @@ typedef struct _BURN_PLAN
 
 void PlanReset(
     __in BURN_PLAN* pPlan,
+    __in BURN_VARIABLES* pVariables,
     __in BURN_CONTAINERS* pContainers,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOAD_GROUP* pLayoutPayloads

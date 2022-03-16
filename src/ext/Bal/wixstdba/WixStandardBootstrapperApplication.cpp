@@ -242,6 +242,60 @@ public: // IBootstrapperApplication
         return hr;
     }
 
+    virtual STDMETHODIMP OnDetectBegin(
+        __in BOOL fCached,
+        __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
+        __in DWORD cPackages,
+        __inout BOOL* pfCancel
+        )
+    {
+        HRESULT hr = S_OK;
+        BOOL fInstalled = BOOTSTRAPPER_REGISTRATION_TYPE_FULL == registrationType;
+
+        if (m_fPrereq)
+        {
+            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
+            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+            }
+        }
+        else // maybe modify the action state if the bundle is or is not already installed.
+        {
+            if (fInstalled && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
+            }
+            else if (!fInstalled && (BOOTSTRAPPER_ACTION_MODIFY == m_command.action || BOOTSTRAPPER_ACTION_REPAIR == m_command.action))
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+            }
+        }
+
+        // When resuming from restart doing some install-like operation, try to find the package that forced the
+        // restart. We'll use this information during planning.
+        if (BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
+        {
+            // Ensure the forced restart package variable is null when it is an empty string.
+            hr = BalGetStringVariable(L"WixBundleForcedRestartPackage", &m_sczAfterForcedRestartPackage);
+            if (FAILED(hr) || !m_sczAfterForcedRestartPackage || !*m_sczAfterForcedRestartPackage)
+            {
+                ReleaseNullStr(m_sczAfterForcedRestartPackage);
+            }
+
+            hr = S_OK;
+        }
+
+        // If the UI should be visible, display it now and hide the splash screen
+        if (BOOTSTRAPPER_DISPLAY_NONE < m_command.display)
+        {
+            ::ShowWindow(m_pTheme->hwndParent, SW_SHOW);
+        }
+
+        m_pEngine->CloseSplashScreen();
+
+        return __super::OnDetectBegin(fCached, registrationType, cPackages, pfCancel);
+    }
 
     virtual STDMETHODIMP OnDetectRelatedBundle(
         __in LPCWSTR wzBundleId,
@@ -2123,7 +2177,6 @@ public: //CBalBaseBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
-        LONGLONG llInstalled = 0;
 
         hr = __super::Initialize(pCreateArgs);
         BalExitOnFailure(hr, "CBalBaseBootstrapperApplication initialization failed.");
@@ -2131,39 +2184,6 @@ public: //CBalBaseBootstrapperApplication
         memcpy_s(&m_command, sizeof(m_command), pCreateArgs->pCommand, sizeof(BOOTSTRAPPER_COMMAND));
         memcpy_s(&m_createArgs, sizeof(m_createArgs), pCreateArgs, sizeof(BOOTSTRAPPER_CREATE_ARGS));
         m_createArgs.pCommand = &m_command;
-
-        if (m_fPrereq)
-        {
-            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
-            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
-            }
-        }
-        else // maybe modify the action state if the bundle is or is not already installed.
-        {
-            hr = BalGetNumericVariable(L"WixBundleInstalled", &llInstalled);
-            if (SUCCEEDED(hr) && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && llInstalled && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
-            }
-            else if (!llInstalled && (BOOTSTRAPPER_ACTION_MODIFY == m_command.action || BOOTSTRAPPER_ACTION_REPAIR == m_command.action))
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
-            }
-        }
-
-        // When resuming from restart doing some install-like operation, try to find the package that forced the
-        // restart. We'll use this information during planning.
-        if (BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
-        {
-            // Ensure the forced restart package variable is null when it is an empty string.
-            hr = BalGetStringVariable(L"WixBundleForcedRestartPackage", &m_sczAfterForcedRestartPackage);
-            if (FAILED(hr) || !m_sczAfterForcedRestartPackage || !*m_sczAfterForcedRestartPackage)
-            {
-                ReleaseNullStr(m_sczAfterForcedRestartPackage);
-            }
-        }
 
         hr = BalGetStringVariable(L"WixBundleVersion", &m_sczBundleVersion);
         BalExitOnFailure(hr, "CWixStandardBootstrapperApplication initialization failed.");
@@ -2320,7 +2340,7 @@ private:
             BalExitOnFailure(hr, "Failed to read bootstrapper application data.");
         }
 
-        if (BOOTSTRAPPER_ACTION_CACHE == m_plannedAction)
+        if (m_fRequestedCacheOnly)
         {
             if (m_fSupportCacheOnly)
             {
@@ -2335,7 +2355,6 @@ private:
             else
             {
                 BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to only cache a bundle that does not explicitly support it.");
-                m_plannedAction = BOOTSTRAPPER_ACTION_UNKNOWN;
             }
         }
 
@@ -2385,7 +2404,7 @@ private:
                     }
                     else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"cache", -1))
                     {
-                        m_plannedAction = BOOTSTRAPPER_ACTION_CACHE;
+                        m_fRequestedCacheOnly = TRUE;
                     }
                     else
                     {
@@ -3226,14 +3245,6 @@ private:
         HRESULT hr = S_OK;
 
         SetState(WIXSTDBA_STATE_DETECTING, hr);
-
-        // If the UI should be visible, display it now and hide the splash screen
-        if (BOOTSTRAPPER_DISPLAY_NONE < m_command.display)
-        {
-            ::ShowWindow(m_pTheme->hwndParent, SW_SHOW);
-        }
-
-        m_pEngine->CloseSplashScreen();
 
         // Tell the core we're ready for the packages to be processed now.
         hr = m_pEngine->Detect();
@@ -4232,6 +4243,7 @@ public:
         m_fSuppressDowngradeFailure = FALSE;
         m_fSuppressRepair = FALSE;
         m_fSupportCacheOnly = FALSE;
+        m_fRequestedCacheOnly = FALSE;
 
         m_pTaskbarList = NULL;
         m_uTaskbarButtonCreatedMessage = UINT_MAX;
@@ -4536,6 +4548,7 @@ private:
     BOOL m_fSuppressDowngradeFailure;
     BOOL m_fSuppressRepair;
     BOOL m_fSupportCacheOnly;
+    BOOL m_fRequestedCacheOnly;
 
     BOOL m_fPrereq;
     BOOL m_fPrereqInstalled;

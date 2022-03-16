@@ -557,8 +557,8 @@ static HRESULT RunNormal(
     hr = S_OK;
 
     // Set some built-in variables before loading the BA.
-    hr = PlanSetVariables(pEngineState->command.action, &pEngineState->variables);
-    ExitOnFailure(hr, "Failed to set action variables.");
+    hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_COMMAND_LINE_ACTION, pEngineState->command.action, TRUE);
+    ExitOnFailure(hr, "Failed to set command line action variable.");
 
     hr = RegistrationSetVariables(&pEngineState->registration, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to set registration variables.");

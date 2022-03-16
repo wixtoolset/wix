@@ -445,9 +445,6 @@ extern "C" HRESULT RegistrationSetVariables(
     HRESULT hr = S_OK;
     LPWSTR scz = NULL;
 
-    hr = RegistrationSetDynamicVariables(pRegistration, pVariables);
-    ExitOnFailure(hr, "Failed to set the dynamic registration variables.");
-
     // Ensure the registration bundle name is updated.
     hr = GetBundleInProgressName(pRegistration, pVariables, &scz);
     ExitOnFailure(hr, "Failed to initialize bundle name.");

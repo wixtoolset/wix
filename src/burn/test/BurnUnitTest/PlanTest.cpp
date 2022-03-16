@@ -2040,7 +2040,7 @@ namespace Bootstrapper
         void PlanTestDetect(BURN_ENGINE_STATE* pEngineState)
         {
             DetectReset(&pEngineState->registration, &pEngineState->packages);
-            PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
+            PlanReset(&pEngineState->plan, &pEngineState->variables, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
             pEngineState->userExperience.fEngineActive = TRUE;
             pEngineState->fDetected = TRUE;
