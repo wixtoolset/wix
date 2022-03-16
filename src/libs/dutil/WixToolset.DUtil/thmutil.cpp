@@ -5609,8 +5609,8 @@ static HRESULT ShowControl(
         // Try to format each control's text based on context, except for editboxes since their text comes from the user.
         if (pTheme->pfnFormatString && ((pControl->sczText && *pControl->sczText) || pControl->cConditionalText) && THEME_CONTROL_TYPE_EDITBOX != pControl->type)
         {
-            LPWSTR wzText = pControl->sczText;
-            LPWSTR wzNote = pControl->sczNote;
+            LPCWSTR wzText = pControl->sczText;
+            LPCWSTR wzNote = pControl->sczNote;
 
             if (pTheme->pfnEvaluateCondition)
             {
@@ -5619,7 +5619,6 @@ static HRESULT ShowControl(
                 for (DWORD j = 0; j < pControl->cConditionalText; ++j)
                 {
                     THEME_CONDITIONAL_TEXT* pConditionalText = pControl->rgConditionalText + j;
-                    wzText = pConditionalText->sczText;
 
                     if (pConditionalText->sczCondition)
                     {
@@ -5641,7 +5640,6 @@ static HRESULT ShowControl(
                     for (DWORD j = 0; j < pControl->CommandLink.cConditionalNotes; ++j)
                     {
                         THEME_CONDITIONAL_TEXT* pConditionalNote = pControl->CommandLink.rgConditionalNotes + j;
-                        wzNote = pConditionalNote->sczText;
 
                         if (pConditionalNote->sczCondition)
                         {
