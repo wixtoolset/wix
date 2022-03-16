@@ -309,7 +309,7 @@ extern "C" HRESULT CoreDetect(
     pEngineState->fDetected = FALSE;
     pEngineState->fPlanned = FALSE;
     DetectReset(&pEngineState->registration, &pEngineState->packages);
-    PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
+    PlanReset(&pEngineState->plan, &pEngineState->variables, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
     hr = RegistrationSetDynamicVariables(&pEngineState->registration, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to reset the dynamic registration variables during detect.");
@@ -441,6 +441,9 @@ extern "C" HRESULT CorePlan(
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
     BOOL fContinuePlanning = TRUE; // assume we won't skip planning due to dependencies.
 
+    hr = PlanSetVariables(action, &pEngineState->variables);
+    ExitOnFailure(hr, "Failed to update action.");
+
     LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action));
 
     fPlanBegan = TRUE;
@@ -458,7 +461,7 @@ extern "C" HRESULT CorePlan(
 
     // Always reset the plan.
     pEngineState->fPlanned = FALSE;
-    PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
+    PlanReset(&pEngineState->plan, &pEngineState->variables, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
     // Remember the overall action state in the plan since it shapes the changes
     // we make everywhere.
@@ -471,9 +474,6 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
     pEngineState->plan.fPlanPackageCacheRollback = BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pEngineState->registration.detectedRegistrationType;
-
-    hr = PlanSetVariables(action, &pEngineState->variables);
-    ExitOnFailure(hr, "Failed to update action.");
 
     // Set resume commandline
     hr = PlanSetResumeCommand(&pEngineState->plan, &pEngineState->registration, &pEngineState->log);

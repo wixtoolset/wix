@@ -313,6 +313,9 @@ namespace Bootstrapper
                 plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
+                hr = RegistrationSetVariables(&registration, &variables);
+                TestThrowOnFailure(hr, L"Failed to set registration variables.");
+
                 hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
@@ -339,8 +342,8 @@ namespace Bootstrapper
                 this->ValidateUninstallKeyDisplayName(L"Product1");
                 registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
-                hr = RegistrationSetVariables(&registration, &variables);
-                TestThrowOnFailure(hr, L"Failed to set registration variables.");
+                hr = RegistrationSetDynamicVariables(&registration, &variables);
+                TestThrowOnFailure(hr, L"Failed to set dynamic registration variables.");
 
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, BURN_BUNDLE_INSTALLED));
                 Assert::Equal<String^>(gcnew String(L"foo"), VariableGetStringHelper(&variables, BURN_BUNDLE_TAG));

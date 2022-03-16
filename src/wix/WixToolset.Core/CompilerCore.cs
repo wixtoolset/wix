@@ -94,6 +94,7 @@ namespace WixToolset.Core
                 "WindowsFolder",
                 "WindowsVolume",
                 "WixBundleAction",
+                "WixBundleCommandLineAction",
                 "WixBundleForcedRestartPackage",
                 "WixBundleElevated",
                 "WixBundleInstalled",

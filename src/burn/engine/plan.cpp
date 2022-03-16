@@ -147,6 +147,7 @@ static BOOL ForceCache(
 
 extern "C" void PlanReset(
     __in BURN_PLAN* pPlan,
+    __in BURN_VARIABLES* pVariables,
     __in BURN_CONTAINERS* pContainers,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOAD_GROUP* pLayoutPayloads
@@ -274,6 +275,8 @@ extern "C" void PlanReset(
             ResetPlannedRollbackBoundaryState(&pPackages->rgRollbackBoundaries[i]);
         }
     }
+
+    PlanSetVariables(BOOTSTRAPPER_ACTION_UNKNOWN, pVariables);
 }
 
 extern "C" void PlanUninitializeExecuteAction(
