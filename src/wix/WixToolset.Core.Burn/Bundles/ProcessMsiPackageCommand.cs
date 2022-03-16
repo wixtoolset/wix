@@ -63,6 +63,8 @@ namespace WixToolset.Core.Burn.Bundles
             var compressed = false;
             try
             {
+                this.CheckIfWindowsInstallerFileTooLarge(packagePayload.SourceLineNumbers, sourcePath, "MSI");
+
                 using (var db = new Database(sourcePath, OpenDatabase.ReadOnly))
                 {
                     // Read data out of the msi database...
@@ -397,6 +399,8 @@ namespace WixToolset.Core.Burn.Bundles
                                     Packaging = packagePayload.Packaging,
                                     ParentPackagePayloadRef = packagePayload.Id.Id,
                                 });
+
+                                this.CheckIfWindowsInstallerFileTooLarge(this.Facade.PackageSymbol.SourceLineNumbers, payloadSourceFile, "cabinet");
                             }
                         }
                     }
@@ -544,6 +548,22 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             return resolvedPath;
+        }
+
+        private void CheckIfWindowsInstallerFileTooLarge(SourceLineNumber sourceLineNumber, string path, string description)
+        {
+            // Best effort check to see if the file is too large for the Windows Installer.
+            try
+            {
+                var fi = new FileInfo(path);
+                if (fi.Length > Int32.MaxValue)
+                {
+                    this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(sourceLineNumber, path, description));
+                }
+            }
+            catch
+            {
+            }
         }
 
         private static string GetProperty(View view, string property)

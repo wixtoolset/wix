@@ -190,7 +190,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (CabinetBuildOption.BuildAndCopy == resolvedCabinet.BuildOption || CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption)
             {
                 // Default to the threshold for best smartcabbing (makes smallest cabinet).
-                cabinetWorkItem = new CabinetWorkItem(fileFacades, resolvedCabinet.Path, maxThreshold: 0, compressionLevel, this.ModularizationSuffix /*, this.FileManager*/);
+                cabinetWorkItem = new CabinetWorkItem(mediaSymbol.SourceLineNumbers, resolvedCabinet.Path, fileFacades, maxThreshold: 0, compressionLevel: compressionLevel, modularizationSuffix: this.ModularizationSuffix);
             }
             else // reuse the cabinet from the cabinet cache.
             {

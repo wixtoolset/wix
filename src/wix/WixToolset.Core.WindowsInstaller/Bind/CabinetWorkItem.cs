@@ -14,21 +14,26 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Instantiate a new CabinetWorkItem.
         /// </summary>
+        /// <param name="sourceLineNumber">Source line number that requires the cabinet creation.</param>
         /// <param name="fileFacades">The collection of files in this cabinet.</param>
         /// <param name="cabinetFile">The cabinet file.</param>
         /// <param name="maxThreshold">Maximum threshold for each cabinet.</param>
         /// <param name="compressionLevel">The compression level of the cabinet.</param>
         /// <param name="modularizationSuffix">Modularization suffix used when building a Merge Module.</param>
-        /// <!--<param name="binderFileManager">The binder file manager.</param>-->
-        public CabinetWorkItem(IEnumerable<IFileFacade> fileFacades, string cabinetFile, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix /*, BinderFileManager binderFileManager*/)
+        public CabinetWorkItem(SourceLineNumber sourceLineNumber, string cabinetFile, IEnumerable<IFileFacade> fileFacades, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix)
         {
+            this.SourceLineNumber = sourceLineNumber;
             this.CabinetFile = cabinetFile;
             this.CompressionLevel = compressionLevel;
             this.ModularizationSuffix = modularizationSuffix;
             this.FileFacades = fileFacades;
-            //this.BinderFileManager = binderFileManager;
             this.MaxThreshold = maxThreshold;
         }
+
+        /// <summary>
+        /// Source line that requires the cabinet creation.
+        /// </summary>
+        public SourceLineNumber SourceLineNumber { get; }
 
         /// <summary>
         /// Gets the cabinet file.
@@ -52,12 +57,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         /// <value>The collection of files in this cabinet.</value>
         public IEnumerable<IFileFacade> FileFacades { get;  }
-
-        // <summary>
-        // Gets the binder file manager.
-        // </summary>
-        // <value>The binder file manager.</value>
-        //public BinderFileManager BinderFileManager { get; private set; }
 
         /// <summary>
         /// Gets the max threshold.

@@ -165,7 +165,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var cab = new Cabinet(cabinetPath);
             cab.Compress(files, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
 
-            // TODO: Handle newCabNamesCallBackAddress from compression.
+            // Best effort check to see if the cabinet is too large for the Windows Installer.
+            try
+            {
+                var fi = new FileInfo(cabinetPath);
+                if (fi.Length > Int32.MaxValue)
+                {
+                    this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(cabinetWorkItem.SourceLineNumber, cabinetPath, "cabinet"));
+                }
+            }
+            catch
+            {
+            }
         }
     }
 }
