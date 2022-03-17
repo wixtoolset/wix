@@ -26,6 +26,7 @@ namespace WixToolset.Core
         internal static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
 
         private readonly Dictionary<XNamespace, ICompilerExtension> extensions;
+        private readonly IBundleValidator bundleValidator;
         private readonly IParseHelper parseHelper;
         private readonly Intermediate intermediate;
         private readonly IMessaging messaging;
@@ -37,11 +38,13 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="intermediate">The Intermediate object representing compiled source document.</param>
         /// <param name="messaging"></param>
+        /// <param name="bundleValidator"></param>
         /// <param name="parseHelper"></param>
         /// <param name="extensions">The WiX extensions collection.</param>
-        internal CompilerCore(Intermediate intermediate, IMessaging messaging, IParseHelper parseHelper, Dictionary<XNamespace, ICompilerExtension> extensions)
+        internal CompilerCore(Intermediate intermediate, IMessaging messaging, IBundleValidator bundleValidator, IParseHelper parseHelper, Dictionary<XNamespace, ICompilerExtension> extensions)
         {
             this.extensions = extensions;
+            this.bundleValidator = bundleValidator;
             this.parseHelper = parseHelper;
             this.intermediate = intermediate;
             this.messaging = messaging;
@@ -765,7 +768,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(value))
             {
-                this.parseHelper.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
+                this.bundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
             }
 
             return value;
@@ -783,7 +786,7 @@ namespace WixToolset.Core
 
             if (0 < value.Length)
             {
-                this.parseHelper.ValidateBundleMsiPropertyName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
+                this.bundleValidator.ValidateBundleMsiPropertyName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
             }
 
             return value;

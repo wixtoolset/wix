@@ -468,7 +468,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else if (allowRelative)
                 {
-                    value = this.GetCanonicalRelativePath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
+                    value = this.BundleValidator.GetCanonicalRelativePath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
@@ -859,27 +859,5 @@ namespace WixToolset.Core.ExtensibilityServices
 
             return extension != null;
         }
-
-        #region IBundleValidator
-        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
-        {
-            return this.BundleValidator.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
-        }
-
-        public bool ValidateBundleMsiPropertyName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string propertyName)
-        {
-            return this.BundleValidator.ValidateBundleMsiPropertyName(sourceLineNumbers, elementName, attributeName, propertyName);
-        }
-
-        public bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
-        {
-            return this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, attributeName, variableName);
-        }
-
-        public bool ValidateBundleCondition(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string condition, BundleConditionPhase phase)
-        {
-            return this.BundleValidator.ValidateBundleCondition(sourceLineNumbers, elementName, attributeName, condition, phase);
-        }
-        #endregion
     }
 }

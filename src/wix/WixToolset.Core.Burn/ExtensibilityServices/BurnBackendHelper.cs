@@ -158,6 +158,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
         #endregion
 
         #region IBundleValidator
+
         public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
         {
             return this.bundleValidator.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
@@ -177,6 +178,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
         {
             return this.bundleValidator.ValidateBundleCondition(sourceLineNumbers, elementName, attributeName, condition, phase);
         }
+
         #endregion
 
         #region IInternalBurnBackendHelper interfaces
