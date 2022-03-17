@@ -114,9 +114,10 @@ namespace WixToolset.Core
             // Try to compile it.
             try
             {
+                var bundleValidator = this.Context.ServiceProvider.GetService<IBundleValidator>();
                 var parseHelper = this.Context.ServiceProvider.GetService<IParseHelper>();
 
-                this.Core = new CompilerCore(target, this.Messaging, parseHelper, extensionsByNamespace);
+                this.Core = new CompilerCore(target, this.Messaging, bundleValidator, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
                 this.componentIdPlaceholders = new Dictionary<string, string>();
 

@@ -19,13 +19,13 @@ namespace WixToolset.Core.Burn.Bundles
             this.PackageFacadesById = packageFacadesById;
         }
 
-        public IMessaging Messaging { get; }
+        private IMessaging Messaging { get; }
 
-        public IBurnBackendHelper BackendHelper { get; }
+        private IBurnBackendHelper BackendHelper { get; }
 
-        public IntermediateSection Section { get; }
+        private IntermediateSection Section { get; }
 
-        public IDictionary<string, PackageFacade> PackageFacadesById { get; }
+        private IDictionary<string, PackageFacade> PackageFacadesById { get; }
 
         public void Execute()
         {

@@ -13,7 +13,7 @@ namespace WixToolset.Extensibility.Services
     /// <summary>
     /// Interface provided to help compiler extensions parse.
     /// </summary>
-    public interface IParseHelper : IBundleValidator
+    public interface IParseHelper
     {
         /// <summary>
         /// Creates a version 3 name-based UUID.
