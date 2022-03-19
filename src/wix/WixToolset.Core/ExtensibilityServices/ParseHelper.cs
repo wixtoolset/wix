@@ -306,9 +306,6 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 Table = tableDefinition.Name,
             });
-
-            // TODO: Check if the given table definition is a custom table. For now we have to assume that it isn't.
-            //this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixCustomTable, tableDefinition.Name);
         }
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName)
@@ -317,20 +314,6 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 Table = tableName,
             });
-
-            if (this.Creator == null)
-            {
-                this.CreateSymbolDefinitionCreator();
-            }
-
-            // TODO: The tableName may not be the same as the symbolName. For now, we have to assume that it is.
-            // We don't add custom table definitions to the tableDefinitions collection,
-            // so if it's not in there, it better be a custom table. If the Id is just wrong,
-            // instead of a custom table, we get an unresolved reference at link time.
-            if (!this.Creator.TryGetSymbolDefinitionByName(tableName, out var _))
-            {
-                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixCustomTable, tableName);
-            }
         }
 
         public string GetAttributeGuidValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool generatable = false, bool canBeEmpty = false)

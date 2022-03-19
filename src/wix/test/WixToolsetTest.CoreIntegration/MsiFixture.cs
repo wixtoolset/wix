@@ -846,8 +846,8 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
-        public void FailsBuildAtLinkTimeForMissingEnsureTable()
+        [Fact]
+        public void FailsBuildAtBindTimeForMissingEnsureTable()
         {
             var folder = TestData.Get(@"TestData");
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
@@ -873,7 +873,7 @@ namespace WixToolsetTest.CoreIntegration
                     first =>
                     {
                         Assert.Equal(MessageLevel.Error, first.Level);
-                        Assert.Equal("The identifier 'WixCustomTable:TableDefinitionNotExposedByExtension' could not be found. Ensure you have typed the reference correctly and that all the necessary inputs are provided to the linker.", first.ToString());
+                        Assert.Equal("Cannot find the table definitions for the 'TableDefinitionNotExposedByExtension' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", first.ToString());
                     });
 
                 Assert.False(File.Exists(msiPath));
@@ -884,7 +884,7 @@ namespace WixToolsetTest.CoreIntegration
         {
             return table.Rows.Select(r => JoinFields(r.Fields)).ToArray();
 
-            string JoinFields(Field[] fields)
+            static string JoinFields(Field[] fields)
             {
                 return String.Join('\t', fields.Select(f => f.ToString()));
             }
