@@ -1121,11 +1121,20 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertFirewallRemoteAddressElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertFirewallRemoteAddressElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
-        private void ConvertEmbeddedChainerElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+        private void ConvertEmbeddedChainerElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Condition");
+        }
 
-        private void ConvertErrorElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Message");
+        private void ConvertErrorElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Message");
+        }
 
         private void ConvertExePackageElement(XElement element)
         {
@@ -1161,7 +1170,10 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertProgressTextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Message");
+        private void ConvertProgressTextElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Message");
+        }
 
         private void ConvertModuleElement(XElement element)
         {
@@ -1522,7 +1534,10 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertMultiStringValueElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertMultiStringValueElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
         private void ConvertRegistryKeyElement(XElement element)
         {
@@ -1595,9 +1610,15 @@ namespace WixToolset.Converters
             this.RenameWin64ToBitness(element);
         }
 
-        private void ConvertRequiredPrivilegeElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Name");
+        private void ConvertRequiredPrivilegeElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Name");
+        }
 
-        private void ConvertDataElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertDataElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
         private void ConvertSequenceElement(XElement element)
         {
@@ -1607,13 +1628,25 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertServiceArgumentElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertServiceArgumentElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
-        private void ConvertSetDirectoryElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+        private void ConvertSetDirectoryElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Condition");
+        }
 
-        private void ConvertSetPropertyElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+        private void ConvertSetPropertyElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Condition");
+        }
 
-        private void ConvertShortcutPropertyElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertShortcutPropertyElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
         private void ConvertProvidesElement(XElement element)
         {
@@ -1690,9 +1723,15 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertTextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertTextElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
-        private void ConvertUITextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertUITextElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
         private void ConvertWindowsInstallerPackageElement(XElement element)
         {
@@ -1820,7 +1859,10 @@ namespace WixToolset.Converters
             this.ConvertInnerTextToAttribute(xProperty, "Value");
         }
 
-        private void ConvertUtilCloseApplicationElementName(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+        private void ConvertUtilCloseApplicationElementName(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Condition");
+        }
 
         private void ConvertUtilPermissionExElement(XElement element)
         {
@@ -1851,7 +1893,10 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertUtilXmlConfigElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+        private void ConvertUtilXmlConfigElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
 
         /// <summary>
         /// Converts a Wix element.
