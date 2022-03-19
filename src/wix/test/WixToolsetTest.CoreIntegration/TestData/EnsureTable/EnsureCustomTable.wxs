@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup" />
+        </ComponentGroup>
+
+        <CustomTableRef Id="SomeCustomTable" />
+    </Fragment>
+
+    <Fragment>
+        <CustomTable Id="SomeCustomTable">
+            <Column Id="SomeRow" Type="string" Width="72" PrimaryKey="yes" Category="identifier" />
+        </CustomTable>
+    </Fragment>
+</Wix>
