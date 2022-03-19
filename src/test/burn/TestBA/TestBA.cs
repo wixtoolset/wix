@@ -21,7 +21,7 @@ namespace WixToolset.Test.BA
         private Form dummyWindow;
         private IntPtr windowHandle;
         private LaunchAction action;
-        private ManualResetEvent wait;
+        private readonly ManualResetEvent wait;
         private int result;
 
         private string updateBundlePath;
@@ -397,6 +397,35 @@ namespace WixToolset.Test.BA
             }
         }
 
+        protected override void OnExecutePackageComplete(ExecutePackageCompleteEventArgs args)
+        {
+            bool logTestRegistryValue;
+            string recordTestRegistryValue = this.ReadPackageAction(args.PackageId, "RecordTestRegistryValue");
+            if (!String.IsNullOrEmpty(recordTestRegistryValue) && Boolean.TryParse(recordTestRegistryValue, out logTestRegistryValue) && logTestRegistryValue)
+            {
+                var value = this.ReadTestRegistryValue(args.PackageId);
+                this.Log("TestRegistryValue: {0}, Version, '{1}'", args.PackageId, value);
+            }
+        }
+
+        protected override void OnExecuteProcessCancel(ExecuteProcessCancelEventArgs args)
+        {
+            BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION action;
+            string actionValue = this.ReadPackageAction(args.PackageId, "ProcessCancelAction");
+            if (actionValue != null && TryParseEnum<BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION>(actionValue, out action))
+            {
+                args.Action = action;
+            }
+
+            if (args.Action == BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION.Abandon)
+            {
+                // Give time to the process to start before its files are deleted.
+                Thread.Sleep(2000);
+            }
+
+            this.Log("OnExecuteProcessCancel({0})", args.Action);
+        }
+
         protected override void OnExecuteFilesInUse(ExecuteFilesInUseEventArgs args)
         {
             this.Log("OnExecuteFilesInUse() - package: {0}, source: {1}, retries remaining: {2}, data: {3}", args.PackageId, args.Source, this.retryExecuteFilesInUse, String.Join(", ", args.Files.ToArray()));
@@ -488,43 +517,34 @@ namespace WixToolset.Test.BA
         private void TestVariables()
         {
             // First make sure we can check and get standard variables of each type.
+            if (this.Engine.ContainsVariable("WindowsFolder"))
             {
-                string value = null;
-                if (this.Engine.ContainsVariable("WindowsFolder"))
-                {
-                    value = this.Engine.GetVariableString("WindowsFolder");
-                    this.Engine.Log(LogLevel.Verbose, "TEST: Successfully retrieved a string variable: WindowsFolder");
-                }
-                else
-                {
-                    throw new Exception("Engine did not define a standard variable: WindowsFolder");
-                }
+                string value = this.Engine.GetVariableString("WindowsFolder");
+                this.Engine.Log(LogLevel.Verbose, String.Format("TEST: Successfully retrieved a string variable: WindowsFolder '{0}'", value));
+            }
+            else
+            {
+                throw new Exception("Engine did not define a standard variable: WindowsFolder");
             }
 
+            if (this.Engine.ContainsVariable("NTProductType"))
             {
-                long value = 0;
-                if (this.Engine.ContainsVariable("NTProductType"))
-                {
-                    value = this.Engine.GetVariableNumeric("NTProductType");
-                    this.Engine.Log(LogLevel.Verbose, "TEST: Successfully retrieved a numeric variable: NTProductType");
-                }
-                else
-                {
-                    throw new Exception("Engine did not define a standard variable: NTProductType");
-                }
+                long value = this.Engine.GetVariableNumeric("NTProductType");
+                this.Engine.Log(LogLevel.Verbose, String.Format("TEST: Successfully retrieved a numeric variable: NTProductType '{0}'", value));
+            }
+            else
+            {
+                throw new Exception("Engine did not define a standard variable: NTProductType");
             }
 
+            if (this.Engine.ContainsVariable("VersionMsi"))
             {
-                string value = null;
-                if (this.Engine.ContainsVariable("VersionMsi"))
-                {
-                    value = this.Engine.GetVariableVersion("VersionMsi");
-                    this.Engine.Log(LogLevel.Verbose, "TEST: Successfully retrieved a version variable: VersionMsi");
-                }
-                else
-                {
-                    throw new Exception("Engine did not define a standard variable: VersionMsi");
-                }
+                string value = this.Engine.GetVariableVersion("VersionMsi");
+                this.Engine.Log(LogLevel.Verbose, String.Format("TEST: Successfully retrieved a version variable: VersionMsi '{0}'", value));
+            }
+            else
+            {
+                throw new Exception("Engine did not define a standard variable: VersionMsi");
             }
 
             // Now validate that Contians returns false for non-existant variables of each type.
@@ -593,6 +613,15 @@ namespace WixToolset.Test.BA
             {
                 string registryName = String.Concat(featureId, state);
                 return testKey == null ? null : testKey.GetValue(registryName) as string;
+            }
+        }
+
+        private string ReadTestRegistryValue(string name)
+        {
+            string testName = this.Engine.GetVariableString("TestGroupName");
+            using (RegistryKey testKey = Registry.LocalMachine.OpenSubKey(String.Format(@"Software\WiX\Tests\{0}\{1}", testName, name)))
+            {
+                return testKey == null ? null : testKey.GetValue("Version") as string;
             }
         }
 

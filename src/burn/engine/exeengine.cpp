@@ -317,7 +317,6 @@ extern "C" HRESULT ExeEngineExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    int nResult = IDNOACTION;
     LPCWSTR wzArguments = NULL;
     LPWSTR sczArguments = NULL;
     LPWSTR sczArgumentsFormatted = NULL;
@@ -327,10 +326,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
     LPWSTR sczCommand = NULL;
     LPWSTR sczCommandObfuscated = NULL;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
-    STARTUPINFOW si = { };
-    PROCESS_INFORMATION pi = { };
     DWORD dwExitCode = 0;
-    GENERIC_EXECUTE_MESSAGE message = { };
     BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
 
@@ -442,37 +438,10 @@ extern "C" HRESULT ExeEngineExecutePackage(
         hr = NetFxRunChainer(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run netfx chainer: %ls", sczExecutablePath);
     }
-    else // create and wait for the executable process while sending fake progress to allow cancel.
+    else
     {
-        // Make the cache location of the executable the current directory to help those executables
-        // that expect stuff to be relative to them.
-        si.cb = sizeof(si);
-        if (!::CreateProcessW(sczExecutablePath, sczCommand, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, sczCachedDirectory, &si, &pi))
-        {
-            ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", sczExecutablePath);
-        }
-
-        if (pPackage->Exe.fFireAndForget)
-        {
-            ::WaitForInputIdle(pi.hProcess, 5000);
-            ExitFunction();
-        }
-
-        do
-        {
-            message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-            message.dwUIHint = MB_OKCANCEL;
-            message.progress.dwPercentage = 50;
-            nResult = pfnGenericMessageHandler(&message, pvContext);
-            hr = (IDOK == nResult || IDNOACTION == nResult) ? S_OK : IDCANCEL == nResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
-            ExitOnRootFailure(hr, "Bootstrapper application aborted during EXE progress.");
-
-            hr = ProcWaitForCompletion(pi.hProcess, 500, &dwExitCode);
-            if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) != hr)
-            {
-                ExitOnFailure(hr, "Failed to wait for executable to complete: %ls", sczExecutablePath);
-            }
-        } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
+        hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczExecutablePath, sczCommand, sczCachedDirectory, &dwExitCode);
+        ExitOnFailure(hr, "Failed to run EXE process");
     }
 
     hr = ExeEngineHandleExitCode(pPackage->Exe.rgExitCodes, pPackage->Exe.cExitCodes, dwExitCode, pRestart);
@@ -487,13 +456,104 @@ LExit:
     StrSecureZeroFreeString(sczCommand);
     ReleaseStr(sczCommandObfuscated);
 
-    ReleaseHandle(pi.hThread);
-    ReleaseHandle(pi.hProcess);
     ReleaseFileHandle(hExecutableFile);
 
     // Best effort to clear the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE, FALSE);
+
+    return hr;
+}
+
+extern "C" HRESULT ExeEngineRunProcess(
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __in BURN_PACKAGE* pPackage,
+    __in_z LPCWSTR wzExecutablePath,
+    __in_z LPWSTR wzCommand,
+    __in_z_opt LPCWSTR wzCachedDirectory,
+    __inout DWORD* pdwExitCode
+    )
+{
+    HRESULT hr = S_OK;
+    STARTUPINFOW si = { };
+    PROCESS_INFORMATION pi = { };
+    GENERIC_EXECUTE_MESSAGE message = { };
+    int nResult = IDNOACTION;
+    DWORD dwProcessId = 0;
+    BOOL fDelayedCancel = FALSE;
+    BOOL fFireAndForget = BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fFireAndForget;
+    BOOL fInheritHandles = BURN_PACKAGE_TYPE_BUNDLE == pPackage->type;
+
+    // Make the cache location of the executable the current directory to help those executables
+    // that expect stuff to be relative to them.
+    si.cb = sizeof(si);
+    if (!::CreateProcessW(wzExecutablePath, wzCommand, NULL, NULL, fInheritHandles, CREATE_NO_WINDOW, NULL, wzCachedDirectory, &si, &pi))
+    {
+        ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
+    }
+
+    if (fFireAndForget)
+    {
+        ::WaitForInputIdle(pi.hProcess, 5000);
+        ExitFunction();
+    }
+
+    dwProcessId = ::GetProcessId(pi.hProcess);
+
+    // Wait for the executable process while sending fake progress to allow cancel.
+    do
+    {
+        message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
+        message.dwUIHint = MB_OKCANCEL;
+        message.progress.dwPercentage = 50;
+        nResult = pfnGenericMessageHandler(&message, pvContext);
+
+        if (IDCANCEL == nResult)
+        {
+            memset(&message, 0, sizeof(message));
+            message.type = GENERIC_EXECUTE_MESSAGE_PROCESS_CANCEL;
+            message.dwUIHint = MB_ABORTRETRYIGNORE;
+            message.processCancel.dwProcessId = dwProcessId;
+            nResult = pfnGenericMessageHandler(&message, pvContext);
+
+            if (IDIGNORE == nResult) // abandon
+            {
+                nResult = IDCANCEL;
+                fDelayedCancel = FALSE;
+            }
+            //else if (IDABORT == nResult) // kill
+            else // wait
+            {
+                if (!fDelayedCancel)
+                {
+                    fDelayedCancel = TRUE;
+
+                    LogId(REPORT_STANDARD, MSG_EXECUTE_PROCESS_DELAYED_CANCEL_REQUESTED, pPackage->sczId);
+                }
+
+                nResult = IDNOACTION;
+            }
+        }
+
+        hr = (IDOK == nResult || IDNOACTION == nResult) ? S_OK : IDCANCEL == nResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
+        ExitOnRootFailure(hr, "Bootstrapper application aborted during package process progress.");
+
+        hr = ProcWaitForCompletion(pi.hProcess, 500, pdwExitCode);
+        if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) != hr)
+        {
+            ExitOnFailure(hr, "Failed to wait for executable to complete: %ls", wzExecutablePath);
+        }
+    } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
+
+    if (fDelayedCancel)
+    {
+        ExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT), "Bootstrapper application cancelled during package process progress, exit code: 0x%x", *pdwExitCode);
+    }
+
+LExit:
+    ReleaseHandle(pi.hThread);
+    ReleaseHandle(pi.hProcess);
 
     return hr;
 }

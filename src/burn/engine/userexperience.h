@@ -398,6 +398,12 @@ BAAPI UserExperienceOnExecutePatchTarget(
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzTargetProductCode
     );
+BAAPI UserExperienceOnExecuteProcessCancel(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in DWORD dwProcessId,
+    __inout BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION* pAction
+    );
 BAAPI UserExperienceOnExecuteProgress(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,

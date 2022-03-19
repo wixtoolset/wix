@@ -251,7 +251,6 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     )
 {
     HRESULT hr = S_OK;
-    int nResult = IDNOACTION;
     LPCWSTR wzArguments = NULL;
     LPWSTR sczArguments = NULL;
     LPWSTR sczArgumentsFormatted = NULL;
@@ -420,31 +419,10 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
         hr = EmbeddedRunBundle(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run bundle as embedded from path: %ls", sczExecutablePath);
     }
-    else // create and wait for the executable process while sending fake progress to allow cancel.
+    else
     {
-        // Make the cache location of the executable the current directory to help those executables
-        // that expect stuff to be relative to them.
-        si.cb = sizeof(si);
-        if (!::CreateProcessW(sczExecutablePath, sczCommand, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, sczCachedDirectory, &si, &pi))
-        {
-            ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", sczExecutablePath);
-        }
-
-        do
-        {
-            message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-            message.dwUIHint = MB_OKCANCEL;
-            message.progress.dwPercentage = 50;
-            nResult = pfnGenericMessageHandler(&message, pvContext);
-            hr = (IDOK == nResult || IDNOACTION == nResult) ? S_OK : IDCANCEL == nResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
-            ExitOnRootFailure(hr, "Bootstrapper application aborted during BUNDLE progress.");
-
-            hr = ProcWaitForCompletion(pi.hProcess, 500, &dwExitCode);
-            if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) != hr)
-            {
-                ExitOnFailure(hr, "Failed to wait for executable to complete: %ls", sczExecutablePath);
-            }
-        } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
+        hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczExecutablePath, sczCommand, sczCachedDirectory, &dwExitCode);
+        ExitOnFailure(hr, "Failed to run BUNDLE process");
     }
 
     hr = ExeEngineHandleExitCode(pPackage->Bundle.rgExitCodes, pPackage->Bundle.cExitCodes, dwExitCode, pRestart);

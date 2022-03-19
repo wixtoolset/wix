@@ -264,7 +264,6 @@ extern "C" HRESULT MsuEngineExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    int nResult = IDNOACTION;
     LPWSTR sczCachedDirectory = NULL;
     LPWSTR sczMsuPath = NULL;
     LPWSTR sczWindowsPath = NULL;
@@ -350,35 +349,8 @@ extern "C" HRESULT MsuEngineExecutePackage(
     hr = EnsureWUServiceEnabled(fStopWusaService, &schWu, &fWuWasDisabled);
     ExitOnFailure(hr, "Failed to ensure WU service was enabled to install MSU package.");
 
-    // create process
-    si.cb = sizeof(si);
-    if (!::CreateProcessW(sczWusaPath, sczCommand, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-    {
-        ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", sczWusaPath);
-    }
-
-    do
-    {
-        message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
-        message.dwUIHint = MB_OKCANCEL;
-        message.progress.dwPercentage = 50;
-        nResult = pfnGenericMessageHandler(&message, pvContext);
-        hr = (IDOK == nResult || IDNOACTION == nResult) ? S_OK : IDCANCEL == nResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
-        ExitOnRootFailure(hr, "Bootstrapper application aborted during MSU progress.");
-
-        // wait for process to terminate
-        hr = ProcWaitForCompletion(pi.hProcess, 500, &dwExitCode);
-        if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) != hr)
-        {
-            ExitOnFailure(hr, "Failed to wait for executable to complete: %ls", sczWusaPath);
-        }
-    } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
-
-    // get process exit code
-    if (!::GetExitCodeProcess(pi.hProcess, &dwExitCode))
-    {
-        ExitWithLastError(hr, "Failed to get process exit code.");
-    }
+    hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczWusaPath, sczCommand, NULL, &dwExitCode);
+    ExitOnFailure(hr, "Failed to run MSU process");
 
     // We'll normalize the restart required error code from wusa.exe just in case. Most likely
     // that on reboot we'll actually get WU_S_REBOOT_REQUIRED.

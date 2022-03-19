@@ -486,6 +486,15 @@ static HRESULT BalBaseBAProcOnExecutePackageComplete(
     return pBA->OnExecutePackageComplete(pArgs->wzPackageId, pArgs->hrStatus, pArgs->restart, pArgs->recommendation, &pResults->action);
 }
 
+static HRESULT BalBaseBAProcOnExecuteProcessCancel(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONEXECUTEPROCESSCANCEL_ARGS* pArgs,
+    __inout BA_ONEXECUTEPROCESSCANCEL_RESULTS* pResults
+    )
+{
+    return pBA->OnExecuteProcessCancel(pArgs->wzPackageId, pArgs->dwProcessId, pArgs->recommendation, &pResults->action);
+}
+
 static HRESULT BalBaseBAProcOnExecuteComplete(
     __in IBootstrapperApplication* pBA,
     __in BA_ONEXECUTECOMPLETE_ARGS* pArgs,
@@ -1011,6 +1020,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYDOWNGRADE:
             hr = BalBaseBAProcOnApplyDowngrade(pBA, reinterpret_cast<BA_ONAPPLYDOWNGRADE_ARGS*>(pvArgs), reinterpret_cast<BA_ONAPPLYDOWNGRADE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPROCESSCANCEL:
+            hr = BalBaseBAProcOnExecuteProcessCancel(pBA, reinterpret_cast<BA_ONEXECUTEPROCESSCANCEL_ARGS*>(pvArgs), reinterpret_cast<BA_ONEXECUTEPROCESSCANCEL_RESULTS*>(pvResults));
             break;
         }
     }

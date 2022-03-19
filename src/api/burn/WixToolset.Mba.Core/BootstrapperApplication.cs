@@ -280,6 +280,9 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public event EventHandler<PlanRestoreRelatedBundleEventArgs> PlanRestoreRelatedBundle;
 
+        /// <inheritdoc/>
+        public event EventHandler<ExecuteProcessCancelEventArgs> ExecuteProcessCancel;
+
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
@@ -1369,6 +1372,19 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="ExecuteProcessCancel"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnExecuteProcessCancel(ExecuteProcessCancelEventArgs args)
+        {
+            EventHandler<ExecuteProcessCancelEventArgs> handler = this.ExecuteProcessCancel;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
 
         int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
@@ -2116,6 +2132,15 @@ namespace WixToolset.Mba.Core
 
             pRequestedState = args.State;
             fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnExecuteProcessCancel(string wzPackageId, int processId, BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation, ref BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION pAction)
+        {
+            ExecuteProcessCancelEventArgs args = new ExecuteProcessCancelEventArgs(wzPackageId, processId, recommendation, pAction);
+            this.OnExecuteProcessCancel(args);
+
+            pAction = args.Action;
             return args.HResult;
         }
 

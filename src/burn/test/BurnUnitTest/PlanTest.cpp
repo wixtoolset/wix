@@ -10,7 +10,9 @@ static HRESULT WINAPI PlanTestBAProc(
     );
 
 static LPCWSTR wzMsiTransactionManifestFileName = L"MsiTransaction_BundleAv1_manifest.xml";
+static LPCWSTR wzSingleExeManifestFileName = L"Failure_BundleD_manifest.xml";
 static LPCWSTR wzSingleMsiManifestFileName = L"BasicFunctionality_BundleA_manifest.xml";
+static LPCWSTR wzSingleMsuManifestFileName = L"MsuPackageFixture_manifest.xml";
 static LPCWSTR wzSlipstreamManifestFileName = L"Slipstream_BundleA_manifest.xml";
 static LPCWSTR wzSlipstreamModifiedManifestFileName = L"Slipstream_BundleA_modified_manifest.xml";
 
@@ -656,6 +658,97 @@ namespace Bootstrapper
 
             Assert::Equal(1ul, pEngineState->packages.cPackages);
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
+        }
+
+        [Fact]
+        void SingleExeInstallTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleExeManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"ExeA");
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(1463267ull, pPlan->qwEstimatedSize);
+            Assert::Equal(119695ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"ExeA");
+            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"ExeA", BOOTSTRAPPER_ACTION_STATE_INSTALL);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"ExeA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(1ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(2ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            ValidateCleanAction(pPlan, dwIndex++, L"NetFx48Web");
+            ValidateCleanAction(pPlan, dwIndex++, L"ExeA");
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(2ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[1], L"ExeA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
         [Fact]
@@ -1530,6 +1623,98 @@ namespace Bootstrapper
 
             Assert::Equal(1ul, pEngineState->packages.cPackages);
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
+        }
+
+        [Fact]
+        void SingleMsuInstallTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsuManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPackagesAsAbsent(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{06077C60-DC46-4F4A-8D3C-05F869187191}", L"{06077C60-DC46-4F4A-8D3C-05F869187191}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{06077C60-DC46-4F4A-8D3C-05F869187191}", L"{06077C60-DC46-4F4A-8D3C-05F869187191}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"test.msu");
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateCacheRollbackPackage(pPlan, fRollback, dwIndex++, L"test.msu");
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(56ull, pPlan->qwEstimatedSize);
+            Assert::Equal(140ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"test.msu");
+            ValidateExecuteMsuPackage(pPlan, fRollback, dwIndex++, L"test.msu", BOOTSTRAPPER_ACTION_STATE_INSTALL);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteUncachePackage(pPlan, fRollback, dwIndex++, L"test.msu");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteMsuPackage(pPlan, fRollback, dwIndex++, L"test.msu", BOOTSTRAPPER_ACTION_STATE_UNINSTALL);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(1ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(2ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{06077C60-DC46-4F4A-8D3C-05F869187191}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(1ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"test.msu", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
         [Fact]
@@ -2569,6 +2754,21 @@ namespace Bootstrapper
             Assert::InRange(dwIndex + 1ul, 1ul, pAction->mspTarget.cOrderedPatches);
             BURN_ORDERED_PATCHES* pOrderedPatch = pAction->mspTarget.rgOrderedPatches + dwIndex;
             NativeAssert::StringEqual(wzPackageId, pOrderedPatch->pPackage->sczId);
+        }
+
+        void ValidateExecuteMsuPackage(
+            __in BURN_PLAN* pPlan,
+            __in BOOL fRollback,
+            __in DWORD dwIndex,
+            __in LPCWSTR wzPackageId,
+            __in BOOTSTRAPPER_ACTION_STATE action
+            )
+        {
+            BURN_EXECUTE_ACTION* pAction = ValidateExecuteActionExists(pPlan, fRollback, dwIndex);
+            Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE, pAction->type);
+            NativeAssert::StringEqual(wzPackageId, pAction->msuPackage.pPackage->sczId);
+            Assert::Equal<DWORD>(action, pAction->msuPackage.action);
+            Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
 
         void ValidateExecutePackageDependency(
