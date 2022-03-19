@@ -6,6 +6,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
     /// Compiler of the WiX toolset.
@@ -248,7 +249,7 @@ namespace WixToolset.Core
                 }
                 this.Core.CreateComplexReference(sourceLineNumbers, ComplexReferenceParentType.Feature, feature, null, ComplexReferenceChildType.Component, id.Id, true);
 
-                this.Core.EnsureTable(sourceLineNumbers, "SoftwareIdentificationTag");
+                this.Core.EnsureTable(sourceLineNumbers, WindowsInstallerTableDefinitions.SoftwareIdentificationTag);
                 this.Core.AddSymbol(new WixPackageTagSymbol(sourceLineNumbers, id)
                 {
                     FileRef = id.Id,
