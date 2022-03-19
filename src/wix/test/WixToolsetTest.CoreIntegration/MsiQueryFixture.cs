@@ -335,6 +335,38 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildMsiWithEmptyCustomTableBecauseOfCustomTableRef()
+        {
+            var folder = TestData.Get(@"TestData");
+            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "EnsureTable", "EnsureCustomTable.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-ext", extensionPath,
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabaseByTable(msiPath, new[] { "SomeCustomTable" });
+                WixAssert.StringCollectionEmpty(results["SomeCustomTable"]);
+            }
+        }
+
+        [Fact]
         public void CanBuildMsiWithEmptyStandardTableBecauseOfEnsureTable()
         {
             var folder = TestData.Get(@"TestData");
