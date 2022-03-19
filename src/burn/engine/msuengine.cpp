@@ -222,19 +222,6 @@ extern "C" HRESULT MsuEnginePlanAddPackage(
     hr = DependencyPlanPackage(NULL, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to plan package dependency actions.");
 
-    // add execute action
-    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
-    {
-        hr = PlanAppendExecuteAction(pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to append execute action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE;
-        pAction->msuPackage.pPackage = pPackage;
-        pAction->msuPackage.action = pPackage->execute;
-
-        LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msuPackage.sczLogPath); // ignore errors.
-    }
-
     // add rollback action
     if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback)
     {
@@ -246,6 +233,22 @@ extern "C" HRESULT MsuEnginePlanAddPackage(
         pAction->msuPackage.action = pPackage->rollback;
 
         LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, &pAction->msuPackage.sczLogPath); // ignore errors.
+
+        hr = PlanExecuteCheckpoint(pPlan);
+        ExitOnFailure(hr, "Failed to append execute checkpoint.");
+    }
+
+    // add execute action
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
+    {
+        hr = PlanAppendExecuteAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append execute action.");
+
+        pAction->type = BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE;
+        pAction->msuPackage.pPackage = pPackage;
+        pAction->msuPackage.action = pPackage->execute;
+
+        LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msuPackage.sczLogPath); // ignore errors.
     }
 
 LExit:

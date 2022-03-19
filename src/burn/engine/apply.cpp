@@ -63,6 +63,7 @@ typedef struct _BURN_EXECUTE_CONTEXT
     LPCWSTR wzExecutingPackageId;
     DWORD cExecutedPackages;
     DWORD cExecutePackagesTotal;
+    BOOL fAbandonedProcess;
 } BURN_EXECUTE_CONTEXT;
 
 
@@ -322,6 +323,7 @@ static HRESULT ExecutePackageComplete(
     __in BURN_VARIABLES* pVariables,
     __in LPCWSTR wzPackageId,
     __in BOOL fPackageVital,
+    __in BOOL fAbandonedProcess,
     __in HRESULT hrOverall,
     __in HRESULT hrExecute,
     __in BOOL fRollback,
@@ -369,6 +371,7 @@ extern "C" void ApplyReset(
         BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
         pPackage->hrCacheResult = S_OK;
         pPackage->fReachedExecution = FALSE;
+        pPackage->fAbandonedProcess = FALSE;
         pPackage->transactionRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
     }
 }
@@ -714,6 +717,9 @@ extern "C" HRESULT ApplyExecute(
         {
             continue;
         }
+
+        context.wzExecutingPackageId = NULL;
+        context.fAbandonedProcess = FALSE;
 
         // If we are seeking the end of the rollback boundary, skip if this action wasn't it.
         if (fSeekRollbackBoundaryEnd)
@@ -2437,6 +2443,9 @@ static HRESULT DoRollbackActions(
             continue;
         }
 
+        pContext->wzExecutingPackageId = NULL;
+        pContext->fAbandonedProcess = FALSE;
+
         if (BURN_EXECUTE_ACTION_TYPE_CHECKPOINT == pRollbackAction->type)
         {
             if (pRollbackAction->checkpoint.dwId == dwCheckpoint)
@@ -2533,6 +2542,28 @@ LExit:
     return hr;
 }
 
+static BOOL ShouldSkipPackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fRollback
+    )
+{
+    BOOL fSkip = FALSE;
+
+    if (FAILED(pPackage->hrCacheResult))
+    {
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
+        ExitFunction1(fSkip = TRUE);
+    }
+    else if (fRollback && pPackage->fAbandonedProcess)
+    {
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_PACKAGE_WITH_ABANDONED_PROCESS, pPackage->sczId);
+        ExitFunction1(fSkip = TRUE);
+    }
+
+LExit:
+    return fSkip;
+}
+
 static HRESULT ExecuteRelatedBundle(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
@@ -2551,13 +2582,13 @@ static HRESULT ExecuteRelatedBundle(
     BURN_RELATED_BUNDLE* pRelatedBundle = pExecuteAction->relatedBundle.pRelatedBundle;
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
 
-    if (FAILED(pPackage->hrCacheResult))
+    Assert(pContext->fRollback == fRollback);
+
+    if (ShouldSkipPackage(pPackage, fRollback))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
-    Assert(pContext->fRollback == fRollback);
     pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
@@ -2599,7 +2630,8 @@ static HRESULT ExecuteRelatedBundle(
 LExit:
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2623,6 +2655,9 @@ static HRESULT DoRestoreRelatedBundleActions(
         {
             continue;
         }
+
+        pContext->wzExecutingPackageId = NULL;
+        pContext->fAbandonedProcess = FALSE;
 
         BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
         switch (pRestoreRelatedBundleAction->type)
@@ -2665,13 +2700,13 @@ static HRESULT ExecuteExePackage(
     BOOL fExecuted = FALSE;
     BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
 
-    if (FAILED(pPackage->hrCacheResult))
+    Assert(pContext->fRollback == fRollback);
+
+    if (ShouldSkipPackage(pPackage, fRollback))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
-    Assert(pContext->fRollback == fRollback);
     pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
@@ -2720,7 +2755,8 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2743,13 +2779,13 @@ static HRESULT ExecuteMsiPackage(
     BOOL fExecuted = FALSE;
     BURN_PACKAGE* pPackage = pExecuteAction->msiPackage.pPackage;
 
-    if (FAILED(pPackage->hrCacheResult))
+    Assert(pContext->fRollback == fRollback);
+
+    if (ShouldSkipPackage(pPackage, fRollback))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
-    Assert(pContext->fRollback == fRollback);
     pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
@@ -2784,7 +2820,8 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        Assert(!pContext->fAbandonedProcess);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2807,13 +2844,13 @@ static HRESULT ExecuteMspPackage(
     BOOL fExecuted = FALSE;
     BURN_PACKAGE* pPackage = pExecuteAction->mspTarget.pPackage;
 
-    if (FAILED(pPackage->hrCacheResult))
+    Assert(pContext->fRollback == fRollback);
+
+    if (ShouldSkipPackage(pPackage, fRollback))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
-    Assert(pContext->fRollback == fRollback);
     pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
@@ -2857,7 +2894,8 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        Assert(!pContext->fAbandonedProcess);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2882,13 +2920,13 @@ static HRESULT ExecuteMsuPackage(
     BOOL fExecuted = FALSE;
     BURN_PACKAGE* pPackage = pExecuteAction->msuPackage.pPackage;
 
-    if (FAILED(pPackage->hrCacheResult))
+    Assert(pContext->fRollback == fRollback);
+
+    if (ShouldSkipPackage(pPackage, fRollback))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
-    Assert(pContext->fRollback == fRollback);
     pContext->wzExecutingPackageId = pPackage->sczId;
     fBeginCalled = TRUE;
 
@@ -2937,7 +2975,8 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -3256,7 +3295,8 @@ LExit:
 
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pContext->wzExecutingPackageId, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        Assert(!pContext->fAbandonedProcess);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pContext->wzExecutingPackageId, FALSE, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -3332,6 +3372,14 @@ static int GenericExecuteMessageHandler(
             UserExperienceOnExecuteProcessCancel(pContext->pUX, pContext->wzExecutingPackageId, pMessage->processCancel.dwProcessId, &action); // ignore return value.
             nResult = BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION_WAIT == action ? IDRETRY : IDIGNORE;
         }
+        break;
+
+    case GENERIC_EXECUTE_MESSAGE_PROCESS_STARTED:
+        pContext->fAbandonedProcess = TRUE;
+        break;
+
+    case GENERIC_EXECUTE_MESSAGE_PROCESS_COMPLETED:
+        pContext->fAbandonedProcess = FALSE;
         break;
 
     case GENERIC_EXECUTE_MESSAGE_ERROR:
@@ -3428,6 +3476,7 @@ static HRESULT ExecutePackageComplete(
     __in BURN_VARIABLES* pVariables,
     __in LPCWSTR wzPackageId,
     __in BOOL fPackageVital,
+    __in BOOL fAbandonedProcess,
     __in HRESULT hrOverall,
     __in HRESULT hrExecute,
     __in BOOL fRollback,
@@ -3445,7 +3494,7 @@ static HRESULT ExecutePackageComplete(
     {
         *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
     }
-    *pfRetry = (FAILED(hrExecute) && BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RETRY == executePackageCompleteAction); // allow retry only on failures.
+    *pfRetry = (FAILED(hrExecute) && BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RETRY == executePackageCompleteAction && !fAbandonedProcess); // allow retry only on failures.
     *pfSuspend = (BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_SUSPEND == executePackageCompleteAction);
 
     // Remember this package as the package that initiated the forced restart.

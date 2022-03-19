@@ -25,12 +25,8 @@ namespace WixToolsetTest.BurnE2E
             var logPath = bundleD.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
             bundleD.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: ExeA, Version, ''"));
-
-            // Make sure ExeA finishes running.
-            Thread.Sleep(3000);
-
-            bundleD.VerifyExeTestRegistryValue("ExeA", "1.0.0.0");
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: Execute, ExeA, Version, ''"));
+            Assert.False(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: Rollback, ExeA, Version"));
         }
 
         [Fact]
@@ -47,9 +43,11 @@ namespace WixToolsetTest.BurnE2E
             var logPath = bundleD.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
             bundleD.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: ExeA, Version, '1.0.0.0'"));
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: Execute, ExeA, Version, '1.0.0.0'"));
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: Rollback, ExeA, Version, ''"));
 
-            bundleD.VerifyExeTestRegistryValue("ExeA", "1.0.0.0");
+            // The package should have rolled back.
+            bundleD.VerifyExeTestRegistryRootDeleted("ExeA");
         }
 
         [Fact]

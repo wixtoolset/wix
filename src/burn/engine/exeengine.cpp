@@ -276,19 +276,6 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
     hr = DependencyPlanPackage(NULL, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to plan package dependency actions.");
 
-    // add execute action
-    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
-    {
-        hr = PlanAppendExecuteAction(pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to append execute action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
-        pAction->exePackage.pPackage = pPackage;
-        pAction->exePackage.action = pPackage->execute;
-
-        LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, NULL); // ignore errors.
-    }
-
     // add rollback action
     if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback)
     {
@@ -300,6 +287,22 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
         pAction->exePackage.action = pPackage->rollback;
 
         LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, NULL); // ignore errors.
+
+        hr = PlanExecuteCheckpoint(pPlan);
+        ExitOnFailure(hr, "Failed to append execute checkpoint.");
+    }
+
+    // add execute action
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
+    {
+        hr = PlanAppendExecuteAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append execute action.");
+
+        pAction->type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
+        pAction->exePackage.pPackage = pPackage;
+        pAction->exePackage.action = pPackage->execute;
+
+        LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, NULL); // ignore errors.
     }
 
 LExit:
@@ -493,6 +496,10 @@ extern "C" HRESULT ExeEngineRunProcess(
         ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
     }
 
+    message.type = GENERIC_EXECUTE_MESSAGE_PROCESS_STARTED;
+    message.dwUIHint = MB_OK;
+    pfnGenericMessageHandler(&message, pvContext);
+
     if (fFireAndForget)
     {
         ::WaitForInputIdle(pi.hProcess, 5000);
@@ -504,6 +511,7 @@ extern "C" HRESULT ExeEngineRunProcess(
     // Wait for the executable process while sending fake progress to allow cancel.
     do
     {
+        memset(&message, 0, sizeof(message));
         message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
         message.dwUIHint = MB_OKCANCEL;
         message.progress.dwPercentage = 50;
@@ -545,6 +553,11 @@ extern "C" HRESULT ExeEngineRunProcess(
             ExitOnFailure(hr, "Failed to wait for executable to complete: %ls", wzExecutablePath);
         }
     } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
+
+    memset(&message, 0, sizeof(message));
+    message.type = GENERIC_EXECUTE_MESSAGE_PROCESS_COMPLETED;
+    message.dwUIHint = MB_OK;
+    pfnGenericMessageHandler(&message, pvContext);
 
     if (fDelayedCancel)
     {

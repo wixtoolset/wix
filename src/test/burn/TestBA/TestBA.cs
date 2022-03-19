@@ -4,6 +4,7 @@ namespace WixToolset.Test.BA
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -37,6 +38,7 @@ namespace WixToolset.Test.BA
         private string cancelExecuteActionName;
         private int cancelOnProgressAtProgress;
         private int retryExecuteFilesInUse;
+        private bool rollingBack;
 
         private IBootstrapperCommand Command { get; }
 
@@ -350,6 +352,8 @@ namespace WixToolset.Test.BA
         {
             this.Log("OnExecutePackageBegin() - package: {0}, rollback: {1}", args.PackageId, !args.ShouldExecute);
 
+            this.rollingBack = !args.ShouldExecute;
+
             string slowProgress = this.ReadPackageAction(args.PackageId, "SlowExecute");
             if (String.IsNullOrEmpty(slowProgress) || !Int32.TryParse(slowProgress, out this.sleepDuringExecute))
             {
@@ -404,7 +408,7 @@ namespace WixToolset.Test.BA
             if (!String.IsNullOrEmpty(recordTestRegistryValue) && Boolean.TryParse(recordTestRegistryValue, out logTestRegistryValue) && logTestRegistryValue)
             {
                 var value = this.ReadTestRegistryValue(args.PackageId);
-                this.Log("TestRegistryValue: {0}, Version, '{1}'", args.PackageId, value);
+                this.Log("TestRegistryValue: {0}, {1}, Version, '{2}'", this.rollingBack ? "Rollback" : "Execute", args.PackageId, value);
             }
         }
 
@@ -419,8 +423,22 @@ namespace WixToolset.Test.BA
 
             if (args.Action == BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION.Abandon)
             {
-                // Give time to the process to start before its files are deleted.
-                Thread.Sleep(2000);
+                // Kill process to make sure it doesn't affect other tests.
+                try
+                {
+                    using (Process process = Process.GetProcessById(args.ProcessId))
+                    {
+                        if (process != null)
+                        {
+                            process.Kill();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.Log("Failed to kill process {0}: {1}", args.ProcessId, e);
+                    Thread.Sleep(5000);
+                }
             }
 
             this.Log("OnExecuteProcessCancel({0})", args.Action);
@@ -494,6 +512,7 @@ namespace WixToolset.Test.BA
             this.cancelOnProgressAtProgress = -1;
             this.cancelExecuteAtProgress = -1;
             this.cancelCacheAtProgress = -1;
+            this.rollingBack = false;
         }
 
         protected override void OnApplyComplete(ApplyCompleteEventArgs args)

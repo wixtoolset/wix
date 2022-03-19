@@ -282,6 +282,7 @@ typedef struct _BURN_PACKAGE
     LPWSTR sczCacheFolder;                      // only valid during Apply.
     HRESULT hrCacheResult;                      // only valid during Apply.
     BOOL fReachedExecution;                     // only valid during Apply.
+    BOOL fAbandonedProcess;                     // only valid during Apply.
 
     BURN_PACKAGE_REGISTRATION_STATE cacheRegistrationState;          // initialized during Detect, updated during Apply.
     BURN_PACKAGE_REGISTRATION_STATE installRegistrationState;        // initialized during Detect, updated during Apply.

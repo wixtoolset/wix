@@ -940,6 +940,13 @@ Language=English
 Bootstrapper application requested delayed cancel during package process progress, id: %1!ls!. Waiting...
 .
 
+MessageId=365
+Severity=Success
+SymbolicName=MSG_APPLY_SKIPPED_PACKAGE_WITH_ABANDONED_PROCESS
+Language=English
+Skipping rollback of package: %1!ls! due to abandoning its process. Continuing...
+.
+
 MessageId=370
 Severity=Success
 SymbolicName=MSG_SESSION_BEGIN
