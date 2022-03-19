@@ -42,6 +42,15 @@ HRESULT ExeEngineExecutePackage(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+HRESULT ExeEngineRunProcess(
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __in BURN_PACKAGE* pPackage,
+    __in_z LPCWSTR wzExecutablePath,
+    __in_z LPWSTR wzCommand,
+    __in_z_opt LPCWSTR wzCachedDirectory,
+    __inout DWORD* pdwExitCode
+    );
 void ExeEngineUpdateInstallRegistrationState(
     __in BURN_EXECUTE_ACTION* pAction,
     __in HRESULT hrExecute

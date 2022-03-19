@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 14, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 17, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -1696,6 +1696,34 @@ EXTERN_C BAAPI UserExperienceOnExecutePatchTarget(
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
+
+LExit:
+    return hr;
+}
+
+BAAPI UserExperienceOnExecuteProcessCancel(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in DWORD dwProcessId,
+    __inout BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION* pAction
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONEXECUTEPROCESSCANCEL_ARGS args = { };
+    BA_ONEXECUTEPROCESSCANCEL_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.dwProcessId = dwProcessId;
+    args.recommendation = *pAction;
+
+    results.cbSize = sizeof(results);
+    results.action = *pAction;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPROCESSCANCEL, &args, &results);
+    ExitOnFailure(hr, "BA OnExecuteProcessCancel failed.");
+
+    *pAction = results.action;
 
 LExit:
     return hr;

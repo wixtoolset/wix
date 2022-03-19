@@ -224,6 +224,7 @@ enum BOOTSTRAPPER_APPLICATION_MESSAGE
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRESTORERELATEDBUNDLE,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYDOWNGRADE,
+    BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPROCESSCANCEL,
 };
 
 enum BOOTSTRAPPER_APPLYCOMPLETE_ACTION
@@ -280,6 +281,18 @@ enum BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION
     // Instructs the engine to stop processing the chain and
     // suspend the current state.
     BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_SUSPEND,
+};
+
+enum BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION
+{
+    // Instructs the engine to stop waiting for the process to exit.
+    // The package is immediately considered to have failed with ERROR_INSTALL_USEREXIT.
+    // The engine will never rollback the package.
+    BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION_ABANDON,
+    // Instructs the engine to wait for the process to exit.
+    // Once the process has exited, the package is considered to have failed with ERROR_INSTALL_USEREXIT.
+    // This allows the engine to rollback the package if necessary.
+    BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION_WAIT,
 };
 
 enum BOOTSTRAPPER_SHUTDOWN_ACTION
@@ -995,6 +1008,20 @@ struct BA_ONEXECUTEPATCHTARGET_RESULTS
 {
     DWORD cbSize;
     BOOL fCancel;
+};
+
+struct BA_ONEXECUTEPROCESSCANCEL_ARGS
+{
+    DWORD cbSize;
+    LPCWSTR wzPackageId;
+    DWORD dwProcessId;
+    BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation;
+};
+
+struct BA_ONEXECUTEPROCESSCANCEL_RESULTS
+{
+    DWORD cbSize;
+    BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION action;
 };
 
 struct BA_ONEXECUTEPROGRESS_ARGS

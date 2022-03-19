@@ -2,13 +2,55 @@
 
 namespace WixToolsetTest.BurnE2E
 {
+    using System.Threading;
     using WixTestTools;
+    using WixToolset.Mba.Core;
     using Xunit;
     using Xunit.Abstractions;
 
     public class FailureTests : BurnE2ETests
     {
         public FailureTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+        [Fact]
+        public void CanCancelExePackageAndAbandonIt()
+        {
+            var bundleD = this.CreateBundleInstaller("BundleD");
+            var testBAController = this.CreateTestBAController();
+
+            // Cancel package ExeA after it starts.
+            testBAController.SetPackageCancelExecuteAtProgress("ExeA", 1);
+            testBAController.SetPackageRecordTestRegistryValue("ExeA");
+
+            var logPath = bundleD.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleD.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: ExeA, Version, ''"));
+
+            // Make sure ExeA finishes running.
+            Thread.Sleep(3000);
+
+            bundleD.VerifyExeTestRegistryValue("ExeA", "1.0.0.0");
+        }
+
+        [Fact]
+        public void CanCancelExePackageAndWaitUntilItCompletes()
+        {
+            var bundleD = this.CreateBundleInstaller("BundleD");
+            var testBAController = this.CreateTestBAController();
+
+            // Cancel package ExeA after it starts.
+            testBAController.SetPackageCancelExecuteAtProgress("ExeA", 1);
+            testBAController.SetPackageProcessCancelAction("ExeA", BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION.Wait);
+            testBAController.SetPackageRecordTestRegistryValue("ExeA");
+
+            var logPath = bundleD.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleD.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: ExeA, Version, '1.0.0.0'"));
+
+            bundleD.VerifyExeTestRegistryValue("ExeA", "1.0.0.0");
+        }
 
         [Fact]
         public void CanCancelMsiPackageVeryEarly()

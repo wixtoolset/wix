@@ -1170,6 +1170,18 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.I4)] int hrRecommended,
             [MarshalAs(UnmanagedType.I4)] ref int hrStatus
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.ExecuteProcessCancel"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnExecuteProcessCancel(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            int processId,
+            [MarshalAs(UnmanagedType.I4)] BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation,
+            [MarshalAs(UnmanagedType.I4)] ref BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION pAction
+            );
     }
 
     /// <summary>
@@ -1904,6 +1916,26 @@ namespace WixToolset.Mba.Core
         /// Instructs the engine to stop processing the chain and suspend the current state.
         /// </summary>
         Suspend,
+    }
+
+    /// <summary>
+    /// The available actions for <see cref="IDefaultBootstrapperApplication.ExecuteProcessCancel"/>.
+    /// </summary>
+    public enum BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION
+    {
+        /// <summary>
+        /// Instructs the engine to stop waiting for the process to exit.
+        /// The package is immediately considered to have failed with ERROR_INSTALL_USEREXIT.
+        /// The engine will never rollback the package.
+        /// </summary>
+        Abandon,
+
+        /// <summary>
+        /// Instructs the engine to wait for the process to exit.
+        /// Once the process has exited, the package is considered to have failed with ERROR_INSTALL_USEREXIT.
+        /// This allows the engine to rollback the package if necessary.
+        /// </summary>
+        Wait,
     }
 
     /// <summary>

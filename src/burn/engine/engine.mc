@@ -933,6 +933,13 @@ Language=English
 Could not create system restore point, error: 0x%1!x!. Continuing...
 .
 
+MessageId=364
+Severity=Success
+SymbolicName=MSG_EXECUTE_PROCESS_DELAYED_CANCEL_REQUESTED
+Language=English
+Bootstrapper application requested delayed cancel during package process progress, id: %1!ls!. Waiting...
+.
+
 MessageId=370
 Severity=Success
 SymbolicName=MSG_SESSION_BEGIN

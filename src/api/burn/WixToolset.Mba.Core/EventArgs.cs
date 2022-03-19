@@ -2488,4 +2488,40 @@ namespace WixToolset.Mba.Core
         /// </summary>
         public RequestState State { get; set; }
     }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecuteProcessCancel"/>
+    /// </summary>
+    [Serializable]
+    public class ExecuteProcessCancelEventArgs : HResultEventArgs
+    {
+        /// <summary />
+        public ExecuteProcessCancelEventArgs(string packageId, int processId, BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation, BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION action)
+        {
+            this.PackageId = packageId;
+            this.ProcessId = processId;
+            this.Recommendation = recommendation;
+            this.Action = action;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the process id.
+        /// </summary>
+        public int ProcessId { get; private set; }
+
+        /// <summary>
+        /// Gets the recommended action from the engine.
+        /// </summary>
+        public BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION Recommendation { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the action to be performed. This is passed back to the engine.
+        /// </summary>
+        public BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION Action { get; set; }
+    }
 }

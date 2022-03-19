@@ -3326,6 +3326,14 @@ static int GenericExecuteMessageHandler(
         }
         break;
 
+    case GENERIC_EXECUTE_MESSAGE_PROCESS_CANCEL:
+        {
+            BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION action = BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION_ABANDON;
+            UserExperienceOnExecuteProcessCancel(pContext->pUX, pContext->wzExecutingPackageId, pMessage->processCancel.dwProcessId, &action); // ignore return value.
+            nResult = BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION_WAIT == action ? IDRETRY : IDIGNORE;
+        }
+        break;
+
     case GENERIC_EXECUTE_MESSAGE_ERROR:
         UserExperienceOnError(pContext->pUX, BOOTSTRAPPER_ERROR_TYPE_EXE_PACKAGE, pContext->wzExecutingPackageId, pMessage->error.dwErrorCode, pMessage->error.wzMessage, pMessage->dwUIHint, 0, NULL, &nResult); // ignore return value.
         break;

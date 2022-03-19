@@ -714,4 +714,13 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in HRESULT hrRecommended,
         __inout HRESULT* phrStatus
         ) = 0;
+
+    // OnExecuteProcessCancel - called when a package that spawned a process is cancelled.
+    //
+    STDMETHOD(OnExecuteProcessCancel)(
+        __in_z LPCWSTR wzPackageId,
+        __in DWORD dwProcessId,
+        __in BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation,
+        __inout BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION* pAction
+        ) = 0;
 };

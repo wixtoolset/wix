@@ -1077,6 +1077,16 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnExecuteProcessCancel(
+        __in_z LPCWSTR /*wzPackageId*/,
+        __in DWORD /*dwProcessId*/,
+        __in BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION /*recommendation*/,
+        __inout BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION* /*pAction*/
+        )
+    {
+        return S_OK;
+    }
+
 public: //CBalBaseBootstrapperApplication
     virtual STDMETHODIMP Initialize(
         __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs

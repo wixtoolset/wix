@@ -43,6 +43,7 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_COMPLETE,
     BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS,
+    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROCESS_CANCEL,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_MESSAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_FILES_IN_USE,
@@ -1812,7 +1813,14 @@ static HRESULT ProcessGenericExecuteMessages(
 
         // read message parameters
         hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.progress.dwPercentage);
-        ExitOnFailure(hr, "Failed to progress.");
+        ExitOnFailure(hr, "Failed to read progress.");
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROCESS_CANCEL:
+        message.type = GENERIC_EXECUTE_MESSAGE_PROCESS_CANCEL;
+
+        hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.processCancel.dwProcessId);
+        ExitOnFailure(hr, "Failed to read processId.");
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR:
@@ -3448,6 +3456,13 @@ static int GenericExecuteMessageHandler(
         ExitOnFailure(hr, "Failed to write progress percentage to message buffer.");
 
         dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS;
+        break;
+
+    case GENERIC_EXECUTE_MESSAGE_PROCESS_CANCEL:
+        hr = BuffWriteNumber(&pbData, &cbData, pMessage->processCancel.dwProcessId);
+        ExitOnFailure(hr, "Failed to write progress percentage to message buffer.");
+
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROCESS_CANCEL;
         break;
 
     case GENERIC_EXECUTE_MESSAGE_ERROR:

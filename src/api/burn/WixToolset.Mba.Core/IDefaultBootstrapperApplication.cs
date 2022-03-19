@@ -244,6 +244,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<ExecutePackageCompleteEventArgs> ExecutePackageComplete;
 
         /// <summary>
+        /// Fired when a package that spawned a process is cancelled.
+        /// </summary>
+        event EventHandler<ExecuteProcessCancelEventArgs> ExecuteProcessCancel;
+
+        /// <summary>
         /// Fired when the engine executes one or more patches targeting a product.
         /// </summary>
         event EventHandler<ExecutePatchTargetEventArgs> ExecutePatchTarget;

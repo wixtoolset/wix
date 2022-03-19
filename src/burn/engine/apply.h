@@ -13,6 +13,7 @@ enum GENERIC_EXECUTE_MESSAGE_TYPE
     GENERIC_EXECUTE_MESSAGE_ERROR,
     GENERIC_EXECUTE_MESSAGE_PROGRESS,
     GENERIC_EXECUTE_MESSAGE_NETFX_FILES_IN_USE,
+    GENERIC_EXECUTE_MESSAGE_PROCESS_CANCEL,
 };
 
 typedef struct _APPLY_AUTHENTICATION_REQUIRED_DATA
@@ -43,6 +44,10 @@ typedef struct _GENERIC_EXECUTE_MESSAGE
             DWORD cFiles;
             LPCWSTR* rgwzFiles;
         } filesInUse;
+        struct
+        {
+            DWORD dwProcessId;
+        } processCancel;
     };
 } GENERIC_EXECUTE_MESSAGE;
 

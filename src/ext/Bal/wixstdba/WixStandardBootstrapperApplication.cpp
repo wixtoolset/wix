@@ -2170,6 +2170,14 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONAPPLYDOWNGRADE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
+    void OnExecuteProcessCancelFallback(
+        __in BA_ONEXECUTEPROCESSCANCEL_ARGS* pArgs,
+        __inout BA_ONEXECUTEPROCESSCANCEL_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONEXECUTEPROCESSCANCEL, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
 
 public: //CBalBaseBootstrapperApplication
     virtual STDMETHODIMP Initialize(

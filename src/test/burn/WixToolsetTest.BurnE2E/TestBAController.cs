@@ -148,6 +148,21 @@ namespace WixToolsetTest.BurnE2E
         }
 
         /// <summary>
+        /// Requests the BA to log the test registry value for the specified package.
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="value"></param>
+        public void SetPackageRecordTestRegistryValue(string packageId, string value = "true")
+        {
+            this.SetPackageState(packageId, "RecordTestRegistryValue", value);
+        }
+
+        public void SetPackageProcessCancelAction(string packageId, BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION action)
+        {
+            this.SetPackageState(packageId, "ProcessCancelAction", action.ToString());
+        }
+
+        /// <summary>
         /// Sets the number of times to re-run the Detect phase.
         /// </summary>
         /// <param name="state">Number of times to run Detect (after the first, normal, Detect).</param>
