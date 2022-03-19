@@ -57,6 +57,7 @@ namespace WixToolset.Data
         ModuleExclusion,
         ModuleIgnoreTable,
         WixModule,
+        ModuleSignature,
         ModuleSubstitution,
         MoveFile,
         Assembly,

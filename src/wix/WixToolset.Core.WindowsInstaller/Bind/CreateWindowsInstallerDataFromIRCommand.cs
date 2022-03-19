@@ -1224,8 +1224,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddWixEnsureTableSymbol(WixEnsureTableSymbol symbol)
         {
-            var tableDefinition = this.TableDefinitions[symbol.Table];
-            this.Data.EnsureTable(tableDefinition);
+            try
+            {
+                var tableDefinition = this.TableDefinitions[symbol.Table];
+                this.Data.EnsureTable(tableDefinition);
+            }
+            catch (WixMissingTableDefinitionException e)
+            {
+                this.Messaging.Write(e.Error);
+            }
         }
 
         private void AddWixPackageSymbol(WixPackageSymbol symbol)
