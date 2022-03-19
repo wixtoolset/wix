@@ -60,6 +60,8 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixUiNamespace = "http://wixtoolset.org/schemas/v4/wxs/ui";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
         private static readonly XNamespace WixVSNamespace = "http://wixtoolset.org/schemas/v4/wxs/vs";
+        private static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
+        private static readonly XNamespace Wxl3Namespace = "http://schemas.microsoft.com/wix/2006/localization";
 
         private static readonly XName AdminExecuteSequenceElementName = WixNamespace + "AdminExecuteSequence";
         private static readonly XName AdminUISequenceSequenceElementName = WixNamespace + "AdminUISequence";
@@ -157,6 +159,10 @@ namespace WixToolset.Converters
 
         private static readonly XName DependencyCheckAttributeName = WixDependencyNamespace + "Check";
         private static readonly XName DependencyEnforceAttributeName = WixDependencyNamespace + "Enforce";
+
+        private static readonly XName WixLocalization4ElementName = WxlNamespace + "WixLocalization";
+        private static readonly XName WixLocalization3ElementName = Wxl3Namespace + "WixLocalization";
+        private static readonly XName WixLocalizationElementWithoutNamespaceName = XNamespace.None + "WixLocalization";
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
         {
@@ -263,6 +269,7 @@ namespace WixToolset.Converters
                 { WixConverter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
                 { WixConverter.VerbElementName, this.ConvertVerbElement },
                 { WixConverter.UIRefElementName, this.ConvertUIRefElement },
+                { WixConverter.WixLocalizationElementWithoutNamespaceName, this.ConvertWixLocalizationElementWithoutNamespace },
             };
 
             this.Messaging = messaging;
@@ -551,11 +558,11 @@ namespace WixToolset.Converters
                     // Gather any deprecated namespaces, then update this element tree based on those deprecations.
                     var declaration = attribute;
 
-                    if (element.Name == Wix3ElementName || element.Name == Include3ElementName)
+                    if (element.Name == Wix3ElementName || element.Name == Include3ElementName || element.Name == WixLocalization3ElementName)
                     {
                         this.SourceVersion = 3;
                     }
-                    else if (element.Name == Wix4ElementName || element.Name == Include4ElementName)
+                    else if (element.Name == Wix4ElementName || element.Name == Include4ElementName || element.Name == WixLocalization4ElementName)
                     {
                         this.SourceVersion = 4;
                     }
@@ -1862,6 +1869,26 @@ namespace WixToolset.Converters
                 foreach (var elementWithoutNamespace in element.DescendantsAndSelf().Where(e => XNamespace.None == e.Name.Namespace))
                 {
                     elementWithoutNamespace.Name = WixNamespace.GetName(elementWithoutNamespace.Name.LocalName);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Converts a WixLocalization element.
+        /// </summary>
+        /// <param name="element">The WixLocalization element to convert.</param>
+        /// <returns>The converted element.</returns>
+        private void ConvertWixLocalizationElementWithoutNamespace(XElement element)
+        {
+            if (this.OnInformation(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WxlNamespace.NamespaceName))
+            {
+                element.Name = WxlNamespace.GetName(element.Name.LocalName);
+
+                element.Add(new XAttribute("xmlns", WxlNamespace.NamespaceName)); // set the default namespace.
+
+                foreach (var elementWithoutNamespace in element.DescendantsAndSelf().Where(e => XNamespace.None == e.Name.Namespace))
+                {
+                    elementWithoutNamespace.Name = WxlNamespace.GetName(elementWithoutNamespace.Name.LocalName);
                 }
             }
         }
