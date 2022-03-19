@@ -33,31 +33,27 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             // First, look in the built-ins.
             symbolDefinition = SymbolDefinitions.ByName(name);
-
-            if (symbolDefinition == null)
+            if (symbolDefinition != null)
             {
-                if (this.ExtensionData == null)
-                {
-                    this.LoadExtensionData();
-                }
+                return true;
+            }
 
-                // Second, look in the extensions.
-                foreach (var data in this.ExtensionData)
-                {
-                    if (data.TryGetSymbolDefinitionByName(name, out symbolDefinition))
-                    {
-                        break;
-                    }
-                }
+            if (this.ExtensionData == null)
+            {
+                this.LoadExtensionData();
+            }
 
-                // Finally, look in the custom symbol definitions provided during an intermediate load.
-                if (symbolDefinition == null)
+            // Second, look in the extensions.
+            foreach (var data in this.ExtensionData)
+            {
+                if (data.TryGetSymbolDefinitionByName(name, out symbolDefinition))
                 {
-                    this.CustomDefinitionByName.TryGetValue(name, out symbolDefinition);
+                    return true;
                 }
             }
 
-            return symbolDefinition != null;
+            // Finally, look in the custom symbol definitions provided during an intermediate load.
+            return this.CustomDefinitionByName.TryGetValue(name, out symbolDefinition);
         }
 
         private void LoadExtensionData()
