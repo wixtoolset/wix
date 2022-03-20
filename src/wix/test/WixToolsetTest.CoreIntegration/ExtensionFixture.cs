@@ -144,6 +144,52 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanManipulateExtensionCache()
+        {
+            var currentFolder = Environment.CurrentDirectory;
+
+            try
+            {
+                using (var fs = new DisposableFileSystem())
+                {
+                    var folder = fs.GetFolder(true);
+                    Environment.CurrentDirectory = folder;
+
+                    var result = WixRunner.Execute(new[]
+                    {
+                        "extension", "add", "WixToolset.UI.wixext"
+                    });
+
+                    result.AssertSuccess();
+
+                    var cacheFolder = Path.Combine(folder, ".wix4", "extensions", "WixToolset.UI.wixext");
+                    Assert.True(Directory.Exists(cacheFolder), $"Expected folder '{cacheFolder}' to exist");
+
+                    result = WixRunner.Execute(new[]
+                    {
+                        "extension", "list"
+                    });
+
+                    result.AssertSuccess();
+                    var output = result.Messages.Select(m => m.ToString()).Single();
+                    Assert.StartsWith("WixToolset.UI.wixext 4.", output);
+
+                    result = WixRunner.Execute(new[]
+                    {
+                        "extension", "remove", "WixToolset.UI.wixext"
+                    });
+
+                    result.AssertSuccess();
+                    Assert.False(Directory.Exists(cacheFolder), $"Expected folder '{cacheFolder}' to NOT exist");
+                }
+            }
+            finally
+            {
+                Environment.CurrentDirectory = currentFolder;
+            }
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args)

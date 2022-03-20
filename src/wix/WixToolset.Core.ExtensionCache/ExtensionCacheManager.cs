@@ -15,21 +15,25 @@ namespace WixToolset.Core.ExtensionCache
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Extension cache manager.
     /// </summary>
     internal class ExtensionCacheManager
     {
-        public string CacheFolder(bool global) => global ? this.GlobalCacheFolder() : this.LocalCacheFolder();
+        private IReadOnlyCollection<IExtensionCacheLocation> cacheLocations;
 
-        public string LocalCacheFolder() => Path.Combine(Environment.CurrentDirectory, ".wix", "extensions");
-
-        public string GlobalCacheFolder()
+        public ExtensionCacheManager(IMessaging messaging, IExtensionManager extensionManager)
         {
-            var baseFolder = Environment.GetEnvironmentVariable("WIX_EXTENSIONS") ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return Path.Combine(baseFolder, ".wix", "extensions");
+            this.Messaging = messaging;
+            this.ExtensionManager = extensionManager;
         }
+
+        private IMessaging Messaging { get; }
+
+        private IExtensionManager ExtensionManager { get; }
 
         public async Task<bool> AddAsync(bool global, string extension, CancellationToken cancellationToken)
         {
@@ -54,11 +58,11 @@ namespace WixToolset.Core.ExtensionCache
 
             (var extensionId, var extensionVersion) = ParseExtensionReference(extension);
 
-            var cacheFolder = this.CacheFolder(global);
+            var cacheFolder = this.GetCacheFolder(global);
 
-            cacheFolder = Path.Combine(cacheFolder, extensionId, extensionVersion);
+            var extensionFolder = Path.Combine(cacheFolder, extensionId, extensionVersion);
 
-            if (Directory.Exists(cacheFolder))
+            if (Directory.Exists(extensionFolder))
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -75,7 +79,7 @@ namespace WixToolset.Core.ExtensionCache
 
             (var extensionId, var extensionVersion) = ParseExtensionReference(extension);
 
-            var cacheFolder = this.CacheFolder(global);
+            var cacheFolder = this.GetCacheFolder(global);
 
             var searchFolder = Path.Combine(cacheFolder, extensionId, extensionVersion);
 
@@ -127,6 +131,20 @@ namespace WixToolset.Core.ExtensionCache
             return Task.FromResult((IEnumerable<CachedExtension>)found);
         }
 
+        private string GetCacheFolder(bool global)
+        {
+            if (this.cacheLocations == null)
+            {
+                this.cacheLocations = this.ExtensionManager.GetCacheLocations();
+            }
+
+            var requestedScope = global ? ExtensionCacheLocationScope.User : ExtensionCacheLocationScope.Project;
+
+            var cacheLocation = this.cacheLocations.First(l => l.Scope == requestedScope);
+
+            return cacheLocation.Path;
+        }
+
         private async Task<bool> DownloadAndExtractAsync(bool global, string id, string version, CancellationToken cancellationToken)
         {
             var logger = NullLogger.Instance;
@@ -149,14 +167,21 @@ namespace WixToolset.Core.ExtensionCache
                         var repository = Repository.Factory.GetCoreV3(source.Source);
                         var resource = await repository.GetResourceAsync<FindPackageByIdResource>();
 
-                        var availableVersions = await resource.GetAllVersionsAsync(id, cache, logger, cancellationToken);
-                        foreach (var availableVersion in availableVersions)
+                        try
                         {
-                            if (nugetVersion is null || nugetVersion < availableVersion)
+                            var availableVersions = await resource.GetAllVersionsAsync(id, cache, logger, cancellationToken);
+                            foreach (var availableVersion in availableVersions)
                             {
-                                nugetVersion = availableVersion;
-                                versionSource = source;
+                                if (nugetVersion is null || nugetVersion < availableVersion)
+                                {
+                                    nugetVersion = availableVersion;
+                                    versionSource = source;
+                                }
                             }
+                        }
+                        catch (FatalProtocolException e)
+                        {
+                            this.Messaging.Write(ExtensionCacheWarnings.NugetException(id, e.Message));
                         }
                     }
 
@@ -168,7 +193,9 @@ namespace WixToolset.Core.ExtensionCache
 
                 var searchSources = versionSource is null ? sources : new[] { versionSource };
 
-                var extensionFolder = Path.Combine(this.CacheFolder(global), id, nugetVersion.ToString());
+                var cacheFolder = this.GetCacheFolder(global);
+
+                var extensionFolder = Path.Combine(cacheFolder, id, nugetVersion.ToString());
 
                 foreach (var source in searchSources)
                 {
@@ -182,6 +209,8 @@ namespace WixToolset.Core.ExtensionCache
                         if (downloaded)
                         {
                             stream.Position = 0;
+
+                            Directory.CreateDirectory(extensionFolder);
 
                             using (var archive = new PackageArchiveReader(stream))
                             {
@@ -198,7 +227,10 @@ namespace WixToolset.Core.ExtensionCache
             return false;
         }
 
-        private string ExtractProgress(string sourceFile, string targetPath, Stream fileStream) => fileStream.CopyToFile(targetPath);
+        private string ExtractProgress(string sourceFile, string targetPath, Stream fileStream)
+        {
+            return fileStream.CopyToFile(targetPath);
+        }
 
         private static (string extensionId, string extensionVersion) ParseExtensionReference(string extensionReference)
         {

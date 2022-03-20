@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility.Services
 {
     using System.Collections.Generic;
     using System.Reflection;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Loads extensions and uses the extensions' factories to provide services.
@@ -31,6 +32,12 @@ namespace WixToolset.Extensibility.Services
         /// </list>
         /// </remarks>
         void Load(string extensionReference);
+
+        /// <summary>
+        /// Gets extensions cache locations.
+        /// </summary>
+        /// <returns>List of cache locations where extensions may be found.</returns>
+        IReadOnlyCollection<IExtensionCacheLocation> GetCacheLocations();
 
         /// <summary>
         /// Gets extensions of specified type from factories loaded into the extension manager.
