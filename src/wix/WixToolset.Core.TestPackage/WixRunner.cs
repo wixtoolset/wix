@@ -7,6 +7,7 @@ namespace WixToolset.Core.TestPackage
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn;
+    using WixToolset.Core.ExtensionCache;
     using WixToolset.Core.WindowsInstaller;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
@@ -65,7 +66,8 @@ namespace WixToolset.Core.TestPackage
         public static Task<int> Execute(string[] args, IWixToolsetCoreServiceProvider coreProvider, out List<Message> messages, bool warningsAsErrors = true)
         {
             coreProvider.AddWindowsInstallerBackend()
-                        .AddBundleBackend();
+                        .AddBundleBackend()
+                        .AddExtensionCacheManager();
 
             var listener = new TestMessageListener();
 

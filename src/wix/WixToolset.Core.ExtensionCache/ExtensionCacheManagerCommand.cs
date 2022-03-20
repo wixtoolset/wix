@@ -25,16 +25,19 @@ namespace WixToolset.Core.ExtensionCache
         public ExtensionCacheManagerCommand(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
             this.ExtensionReferences = new List<string>();
         }
-
-        private IMessaging Messaging { get; }
 
         public bool ShowHelp { get; set; }
 
         public bool ShowLogo { get; set; }
 
         public bool StopParsing { get; set; }
+
+        private IMessaging Messaging { get; }
+
+        private IExtensionManager ExtensionManager { get; }
 
         private bool Global { get; set; }
 
@@ -51,7 +54,7 @@ namespace WixToolset.Core.ExtensionCache
             }
 
             var success = false;
-            var cacheManager = new ExtensionCacheManager();
+            var cacheManager = new ExtensionCacheManager(this.Messaging, this.ExtensionManager);
 
             switch (this.Subcommand)
             {

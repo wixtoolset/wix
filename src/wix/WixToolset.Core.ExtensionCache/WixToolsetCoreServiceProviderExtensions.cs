@@ -27,7 +27,10 @@ namespace WixToolset.Core.ExtensionCache
 
         private static ExtensionCacheManager CreateExtensionCacheManager(IWixToolsetCoreServiceProvider coreProvider, Dictionary<Type, object> singletons)
         {
-            var extensionCacheManager = new ExtensionCacheManager();
+            var messaging = coreProvider.GetService<IMessaging>();
+            var extensionManager = coreProvider.GetService<IExtensionManager>();
+
+            var extensionCacheManager = new ExtensionCacheManager(messaging, extensionManager);
             singletons.Add(typeof(ExtensionCacheManager), extensionCacheManager);
 
             return extensionCacheManager;

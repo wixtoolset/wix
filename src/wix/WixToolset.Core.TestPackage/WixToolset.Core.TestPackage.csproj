@@ -16,6 +16,7 @@
     <ProjectReference Include="..\WixToolset.Core.Native\WixToolset.Core.Native.csproj" PrivateAssets="true" />
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" PrivateAssets="true" />
     <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" PrivateAssets="true" />
+    <ProjectReference Include="..\WixToolset.Core.ExtensionCache\WixToolset.Core.ExtensionCache.csproj" PrivateAssets="true" />
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" PrivateAssets="true" />
   </ItemGroup>
 
