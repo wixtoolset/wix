@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "identity": "WixToolset.Templates.LibraryProject",
+    "name": "WiX Toolset Library",
+    "shortName": "wixlib",
+    "author": "WiX Toolset Team",
+    "classifications": ["WixToolset", "Library"],
+    "tags": {
+        "language": "WiX",
+        "type": "project"
+    },
+    "sourceName": "$safeprojectname$",
+    "defaultName": "Library"
+}

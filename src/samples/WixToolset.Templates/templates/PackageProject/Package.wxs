@@ -1,0 +1,24 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="$safeprojectname$" Manufacturer="$company$" Version="$version$" UpgradeCode="PUT-GUID-HERE">
+    <MajorUpgrade DowngradeError="A newer version of [ProductName] is already installed" />
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="Components" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
+      <Component>
+        <!-- TODO: Install something more useful than this source code file itself -->
+        <File Source="Package.wxs" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="!(Property.Manufacturer) !(Property.ProductName)" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

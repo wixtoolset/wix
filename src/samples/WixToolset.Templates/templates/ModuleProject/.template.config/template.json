@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "identity": "WixToolset.Templates.ModuleProject",
+    "name": "WiX Toolset Module",
+    "shortName": "msm",
+    "author": "WiX Toolset Team",
+    "classifications": ["WixToolset", "Module"],
+    "tags": {
+        "language": "WiX",
+        "type": "project"
+    },
+    "symbols": {
+      "company": {
+        "type": "parameter",
+        "defaultValue": "Your Company Name",
+        "replaces": "$company$"
+      },
+      "version": {
+        "type": "parameter",
+        "defaultValue": "0.0.1",
+        "replaces": "$version$"
+      }
+    },
+    "sourceName": "$safeprojectname$",
+    "defaultName": "Module"
+}
