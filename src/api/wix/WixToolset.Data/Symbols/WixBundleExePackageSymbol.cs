@@ -39,6 +39,7 @@ namespace WixToolset.Data.Symbols
     public enum WixBundleExePackageAttributes
     {
         None = 0,
+        Bundle = 1,
     }
 
     public class WixBundleExePackageSymbol : IntermediateSymbol
@@ -88,6 +89,8 @@ namespace WixToolset.Data.Symbols
             get => (string)this.Fields[(int)WixBundleExePackageSymbolFields.ExeProtocol];
             set => this.Set((int)WixBundleExePackageSymbolFields.ExeProtocol, value);
         }
+
+        public bool IsBundle => this.Attributes.HasFlag(WixBundleExePackageAttributes.Bundle);
 
         public bool Repairable => this.RepairCommand != null;
 

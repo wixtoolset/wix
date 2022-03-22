@@ -234,6 +234,11 @@ extern "C" HRESULT CoreInitializeConstants(
             pPackage->Bundle.wzAncestors = pRegistration->sczBundlePackageAncestors;
             pPackage->Bundle.wzEngineWorkingDirectory = pInternalCommand->sczEngineWorkingDirectory;
         }
+        else if (BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fBundle)
+        {
+            pPackage->Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
+            pPackage->Exe.wzEngineWorkingDirectory = pInternalCommand->sczEngineWorkingDirectory;
+        }
     }
 
 LExit:

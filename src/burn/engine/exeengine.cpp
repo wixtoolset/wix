@@ -40,6 +40,10 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
     hr = XmlGetYesNoAttribute(pixnExePackage, L"Uninstallable", &pPackage->Exe.fUninstallable);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Uninstallable.");
 
+    // @Bundle
+    hr = XmlGetYesNoAttribute(pixnExePackage, L"Bundle", &pPackage->Exe.fBundle);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Bundle.");
+
     // @Protocol
     hr = XmlGetAttributeEx(pixnExePackage, L"Protocol", &scz);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Protocol.");
@@ -87,6 +91,7 @@ extern "C" void ExeEnginePackageUninitialize(
     ReleaseStr(pPackage->Exe.sczInstallArguments);
     ReleaseStr(pPackage->Exe.sczRepairArguments);
     ReleaseStr(pPackage->Exe.sczUninstallArguments);
+    ReleaseStr(pPackage->Exe.sczIgnoreDependencies);
     ReleaseMem(pPackage->Exe.rgExitCodes);
 
     // free command-line arguments
@@ -286,6 +291,24 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
         pAction->exePackage.pPackage = pPackage;
         pAction->exePackage.action = pPackage->rollback;
 
+        if (pPackage->Exe.sczIgnoreDependencies)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczIgnoreDependencies, pPackage->Exe.sczIgnoreDependencies, 0);
+            ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+        }
+
+        if (pPackage->Exe.wzAncestors)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
+            ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+        }
+
+        if (pPackage->Exe.wzEngineWorkingDirectory)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczEngineWorkingDirectory, pPackage->Exe.wzEngineWorkingDirectory, 0);
+            ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+        }
+
         LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, NULL); // ignore errors.
 
         hr = PlanExecuteCheckpoint(pPlan);
@@ -301,6 +324,24 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
         pAction->type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
         pAction->exePackage.pPackage = pPackage;
         pAction->exePackage.action = pPackage->execute;
+
+        if (pPackage->Exe.sczIgnoreDependencies)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczIgnoreDependencies, pPackage->Exe.sczIgnoreDependencies, 0);
+            ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+        }
+
+        if (pPackage->Exe.wzAncestors)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
+            ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+        }
+
+        if (pPackage->Exe.wzEngineWorkingDirectory)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczEngineWorkingDirectory, pPackage->Exe.wzEngineWorkingDirectory, 0);
+            ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+        }
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, NULL); // ignore errors.
     }
@@ -406,27 +447,53 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
 
     // build command
-    if (*sczArguments)
+    AppAppendCommandLineArgument(&sczCommand, sczExecutablePath);
+    ExitOnFailure(hr, "Failed to create executable command.");
+
+    if (pPackage->Exe.fBundle)
+    {
+        hr = StrAllocConcat(&sczCommand, L" -norestart", 0);
+        ExitOnFailure(hr, "Failed to append quiet argument.");
+
+        // Add the list of dependencies to ignore, if any, to the burn command line.
+        if (pExecuteAction->exePackage.sczIgnoreDependencies)
+        {
+            hr = StrAllocConcatFormatted(&sczCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
+            ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
+        }
+
+        // Add the list of ancestors, if any, to the burn command line.
+        if (pExecuteAction->exePackage.sczAncestors)
+        {
+            hr = StrAllocConcatFormatted(&sczCommand, L" -%ls=%ls", sczCommand, BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->exePackage.sczAncestors);
+            ExitOnFailure(hr, "Failed to append the list of ancestors to the command line.");
+        }
+
+        if (pExecuteAction->exePackage.sczEngineWorkingDirectory)
+        {
+            hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->exePackage.sczEngineWorkingDirectory, &sczCommand, NULL);
+            ExitOnFailure(hr, "Failed to append the custom working directory to the exepackage command line.");
+        }
+
+        hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczCommand, NULL);
+        ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
+    }
+
+    // Always add user supplied arguments last.
+    if (sczArguments && *sczArguments)
     {
         hr = VariableFormatString(pVariables, sczArguments, &sczArgumentsFormatted, NULL);
         ExitOnFailure(hr, "Failed to format argument string.");
 
-        hr = StrAllocFormattedSecure(&sczCommand, L"\"%ls\" %ls", sczExecutablePath, sczArgumentsFormatted);
-        ExitOnFailure(hr, "Failed to create executable command.");
-
         hr = VariableFormatStringObfuscated(pVariables, sczArguments, &sczArgumentsObfuscated, NULL);
         ExitOnFailure(hr, "Failed to format obfuscated argument string.");
 
-        hr = StrAllocFormatted(&sczCommandObfuscated, L"\"%ls\" %ls", sczExecutablePath, sczArgumentsObfuscated);
-    }
-    else
-    {
-        hr = StrAllocFormatted(&sczCommand, L"\"%ls\"", sczExecutablePath);
-        ExitOnFailure(hr, "Failed to create executable command.");
+        hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls %ls", sczCommand, sczArgumentsObfuscated);
+        ExitOnFailure(hr, "Failed to copy obfuscated formatted arguments.");
 
-        hr = StrAllocFormatted(&sczCommandObfuscated, L"\"%ls\"", sczExecutablePath);
+        hr = StrAllocConcatFormattedSecure(&sczCommand, L" %ls", sczArgumentsFormatted);
+        ExitOnFailure(hr, "Failed to copy formatted arguments.");
     }
-    ExitOnFailure(hr, "Failed to create obfuscated executable command.");
 
     // Log before we add the secret pipe name and client token for embedded processes.
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), sczExecutablePath, sczCommandObfuscated);

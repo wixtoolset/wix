@@ -940,6 +940,15 @@ extern "C" HRESULT ElevationExecuteExePackage(
     hr = BuffWriteNumber(&pbData, &cbData, fRollback);
     ExitOnFailure(hr, "Failed to write rollback.");
 
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczIgnoreDependencies);
+    ExitOnFailure(hr, "Failed to write the list of dependencies to ignore to the message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczAncestors);
+    ExitOnFailure(hr, "Failed to write the list of ancestors to the message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczEngineWorkingDirectory);
+    ExitOnFailure(hr, "Failed to write the custom working directory to the message buffer.");
+
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
 
@@ -2844,6 +2853,9 @@ static HRESULT OnExecuteExePackage(
     LPWSTR sczPackage = NULL;
     DWORD dwRollback = 0;
     BURN_EXECUTE_ACTION executeAction = { };
+    LPWSTR sczIgnoreDependencies = NULL;
+    LPWSTR sczAncestors = NULL;
+    LPWSTR sczEngineWorkingDirectory = NULL;
     BOOTSTRAPPER_APPLY_RESTART exeRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
@@ -2858,6 +2870,15 @@ static HRESULT OnExecuteExePackage(
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRollback);
     ExitOnFailure(hr, "Failed to read rollback.");
 
+    hr = BuffReadString(pbData, cbData, &iData, &sczIgnoreDependencies);
+    ExitOnFailure(hr, "Failed to read the list of dependencies to ignore.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczAncestors);
+    ExitOnFailure(hr, "Failed to read the list of ancestors.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczEngineWorkingDirectory);
+    ExitOnFailure(hr, "Failed to read the custom working directory.");
+
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
 
@@ -2869,11 +2890,34 @@ static HRESULT OnExecuteExePackage(
         ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an EXE package: %ls", sczPackage);
     }
 
+    // Pass the list of dependencies to ignore, if any, to the related bundle.
+    if (sczIgnoreDependencies && *sczIgnoreDependencies)
+    {
+        hr = StrAllocString(&executeAction.exePackage.sczIgnoreDependencies, sczIgnoreDependencies, 0);
+        ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+    }
+
+    // Pass the list of ancestors, if any, to the related bundle.
+    if (sczAncestors && *sczAncestors)
+    {
+        hr = StrAllocString(&executeAction.exePackage.sczAncestors, sczAncestors, 0);
+        ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+    }
+
+    if (sczEngineWorkingDirectory && *sczEngineWorkingDirectory)
+    {
+        hr = StrAllocString(&executeAction.exePackage.sczEngineWorkingDirectory, sczEngineWorkingDirectory, 0);
+        ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+    }
+
     // Execute EXE package.
     hr = ExeEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &exeRestart);
     ExitOnFailure(hr, "Failed to execute EXE package.");
 
 LExit:
+    ReleaseStr(sczEngineWorkingDirectory);
+    ReleaseStr(sczAncestors);
+    ReleaseStr(sczIgnoreDependencies);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
 
