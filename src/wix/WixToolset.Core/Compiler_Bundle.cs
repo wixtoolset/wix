@@ -1999,6 +1999,7 @@ namespace WixToolset.Core
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
             CompilerPayload childPackageCompilerPayload = null;
+            var bundle = YesNoType.NotSet;
             var slipstream = YesNoType.NotSet;
             var hasPayloadInfo = false;
 
@@ -2088,6 +2089,10 @@ namespace WixToolset.Core
                         break;
                     case "Vital":
                         vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Bundle":
+                        bundle = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Exe);
                         break;
                     case "InstallArguments":
                         installArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2248,11 +2253,20 @@ namespace WixToolset.Core
                                 this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", uninstallArguments, expectedArgument, "Protocol", "netfx4"));
                             }
                         }
+
+                        if (bundle == YesNoType.Yes)
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "Bundle", "yes"));
+                        }
                     }
                     else if (!protocol.Equals("burn", StringComparison.Ordinal) && !protocol.Equals("none", StringComparison.Ordinal))
                     {
                         this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
                     }
+                }
+                else if (bundle == YesNoType.Yes)
+                {
+                    protocol = "burn";
                 }
             }
             else if (packageType == WixBundlePackageType.Msp)
@@ -2409,9 +2423,12 @@ namespace WixToolset.Core
                 switch (packageType)
                 {
                 case WixBundlePackageType.Exe:
+                    WixBundleExePackageAttributes exeAttributes = 0;
+                    exeAttributes |= (YesNoType.Yes == bundle) ? WixBundleExePackageAttributes.Bundle : 0;
+
                     this.Core.AddSymbol(new WixBundleExePackageSymbol(sourceLineNumbers, id)
                     {
-                        Attributes = WixBundleExePackageAttributes.None,
+                        Attributes = exeAttributes,
                         DetectCondition = detectCondition,
                         InstallCommand = installArguments,
                         RepairCommand = repairArguments,

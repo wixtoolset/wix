@@ -86,6 +86,29 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void BundleExePackageWithNetfxProtocolIsRejected()
+        {
+            var folder = TestData.Get(@"TestData\BadInput");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleExePackageWithNetfxProtocol.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                Assert.Equal(193, result.ExitCode);
+            }
+        }
+
+        [Fact]
         public void BundleVariableWithBadTypeIsRejected()
         {
             var folder = TestData.Get(@"TestData\BadInput");

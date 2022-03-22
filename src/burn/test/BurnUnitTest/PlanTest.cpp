@@ -716,7 +716,7 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"ExeA");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"ExeA", BOOTSTRAPPER_ACTION_STATE_INSTALL);
+            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"ExeA", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
@@ -727,7 +727,7 @@ namespace Bootstrapper
             dwExecuteCheckpointId = 2;
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"ExeA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL);
+            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"ExeA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -2125,7 +2125,7 @@ namespace Bootstrapper
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"NetFx48Web");
-            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"NetFx48Web", BOOTSTRAPPER_ACTION_STATE_INSTALL);
+            ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"NetFx48Web", BOOTSTRAPPER_ACTION_STATE_INSTALL, NULL);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             dwExecuteCheckpointId += 1; // cache checkpoints
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -2683,13 +2683,15 @@ namespace Bootstrapper
             __in BOOL fRollback,
             __in DWORD dwIndex,
             __in LPCWSTR wzPackageId,
-            __in BOOTSTRAPPER_ACTION_STATE action
+            __in BOOTSTRAPPER_ACTION_STATE action,
+            __in LPCWSTR wzIgnoreDependencies
             )
         {
             BURN_EXECUTE_ACTION* pAction = ValidateExecuteActionExists(pPlan, fRollback, dwIndex);
             Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE, pAction->type);
             NativeAssert::StringEqual(wzPackageId, pAction->exePackage.pPackage->sczId);
             Assert::Equal<DWORD>(action, pAction->exePackage.action);
+            NativeAssert::StringEqual(wzIgnoreDependencies, pAction->exePackage.sczIgnoreDependencies);
             Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
 

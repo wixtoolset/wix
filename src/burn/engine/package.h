@@ -324,7 +324,11 @@ typedef struct _BURN_PACKAGE
             LPWSTR sczInstallArguments;
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
+            LPWSTR sczIgnoreDependencies;
+            LPCWSTR wzAncestors; // points directly into engine state.
+            LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 
+            BOOL fBundle;
             BOOL fPseudoPackage;
             BOOL fFireAndForget;
             BOOL fRepairable;

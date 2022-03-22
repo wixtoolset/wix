@@ -6,20 +6,20 @@
   <?define AspNetCoreId = ASPNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
   <?define AspNetCoreRedistId = AspNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
   <?define AspNetCoreRedistLog = AspNetCoreRuntime$(var.NetCoreIdVersion)RedistLog?>
-  <?define AspNetCoreRedistInstallArguments = /install /quiet /norestart /log &quot;[$(var.AspNetCoreRedistLog)]&quot;?>
-  <?define AspNetCoreRedistUninstallArguments = /uninstall /quiet /norestart /log &quot;[$(var.AspNetCoreRedistLog)]&quot;?>
+  <?define AspNetCoreRedistInstallArguments = /install /quiet /log &quot;[$(var.AspNetCoreRedistLog)]&quot;?>
+  <?define AspNetCoreRedistUninstallArguments = /uninstall /quiet /log &quot;[$(var.AspNetCoreRedistLog)]&quot;?>
 
   <?define DesktopNetCoreId = DESKTOPNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
   <?define DesktopNetCoreRedistId = DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
   <?define DesktopNetCoreRedistLog = DesktopNetCoreRuntime$(var.NetCoreIdVersion)RedistLog?>
-  <?define DesktopNetCoreRedistInstallArguments = /install /quiet /norestart /log &quot;[$(var.DesktopNetCoreRedistLog)]&quot;?>
-  <?define DesktopNetCoreRedistUninstallArguments = /uninstall /quiet /norestart /log &quot;[$(var.DesktopNetCoreRedistLog)]&quot;?>
+  <?define DesktopNetCoreRedistInstallArguments = /install /quiet /log &quot;[$(var.DesktopNetCoreRedistLog)]&quot;?>
+  <?define DesktopNetCoreRedistUninstallArguments = /uninstall /quiet /log &quot;[$(var.DesktopNetCoreRedistLog)]&quot;?>
 
   <?define DotNetCoreId = DOTNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
   <?define DotNetCoreRedistId = DotNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
   <?define DotNetCoreRedistLog = DotNetCoreRuntime$(var.NetCoreIdVersion)RedistLog?>
-  <?define DotNetCoreRedistInstallArguments = /install /quiet /norestart /log &quot;[$(var.DotNetCoreRedistLog)]&quot;?>
-  <?define DotNetCoreRedistUninstallArguments = /uninstall /quiet /norestart /log &quot;[$(var.DotNetCoreRedistLog)]&quot;?>
+  <?define DotNetCoreRedistInstallArguments = /install /quiet /log &quot;[$(var.DotNetCoreRedistLog)]&quot;?>
+  <?define DotNetCoreRedistUninstallArguments = /uninstall /quiet /log &quot;[$(var.DotNetCoreRedistLog)]&quot;?>
 
   <?define DotNetHomeId = DOTNETHOME_$(var.NetCorePlatform)?>
   <?define NetCoreEulaLink = https://go.microsoft.com/fwlink/?LinkId=329770?>

@@ -291,6 +291,12 @@ extern "C" void PlanUninitializeExecuteAction(
         ReleaseStr(pExecuteAction->relatedBundle.sczEngineWorkingDirectory);
         break;
 
+    case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
+        ReleaseStr(pExecuteAction->exePackage.sczIgnoreDependencies);
+        ReleaseStr(pExecuteAction->exePackage.sczAncestors);
+        ReleaseStr(pExecuteAction->exePackage.sczEngineWorkingDirectory);
+        break;
+
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
         ReleaseStr(pExecuteAction->msiPackage.sczLogPath);
         ReleaseMem(pExecuteAction->msiPackage.rgFeatures);
@@ -1495,26 +1501,21 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
     for (DWORD i = 0; i < pPlan->cExecuteActions; ++i)
     {
         BOOTSTRAPPER_ACTION_STATE packageAction = BOOTSTRAPPER_ACTION_STATE_NONE;
+        BURN_PACKAGE* pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
+        BOOL fBundle = FALSE;
 
         switch (pPlan->rgExecuteActions[i].type)
         {
         case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
             packageAction = pPlan->rgExecuteActions[i].relatedBundle.action;
-
-            if (BOOTSTRAPPER_ACTION_STATE_NONE != packageAction)
-            {
-                BURN_PACKAGE* pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
-                if (pPackage->cDependencyProviders)
-                {
-                    // Bundles only support a single provider key.
-                    const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders;
-                    DictAddKey(sdProviderKeys, pProvider->sczKey);
-                }
-            }
+            pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
+            fBundle = TRUE;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
             packageAction = pPlan->rgExecuteActions[i].exePackage.action;
+            pPackage = pPlan->rgExecuteActions[i].exePackage.pPackage;
+            fBundle = TRUE;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
@@ -1528,6 +1529,16 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
         case BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE:
             packageAction = pPlan->rgExecuteActions[i].msuPackage.action;
             break;
+        }
+
+        if (fBundle && BOOTSTRAPPER_ACTION_STATE_NONE != packageAction)
+        {
+            if (pPackage->cDependencyProviders)
+            {
+                // Bundles only support a single provider key.
+                const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders;
+                DictAddKey(sdProviderKeys, pProvider->sczKey);
+            }
         }
 
         fExecutingAnyPackage |= BOOTSTRAPPER_ACTION_STATE_NONE != packageAction;

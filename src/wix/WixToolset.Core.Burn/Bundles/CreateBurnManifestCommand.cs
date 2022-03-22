@@ -389,9 +389,15 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("Uninstallable", exePackage.Uninstallable ? "yes" : "no");
                         writer.WriteAttributeString("RepairArguments", exePackage.RepairCommand);
                         writer.WriteAttributeString("Repairable", exePackage.Repairable ? "yes" : "no");
+
                         if (!String.IsNullOrEmpty(exePackage.ExeProtocol))
                         {
                             writer.WriteAttributeString("Protocol", exePackage.ExeProtocol);
+                        }
+
+                        if (exePackage.IsBundle)
+                        {
+                            writer.WriteAttributeString("Bundle", "yes");
                         }
                     }
                     else if (package.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage) // MSI
