@@ -945,8 +945,12 @@ extern "C" LPCWSTR CoreRelationTypeToCommandLineString(
     case BOOTSTRAPPER_RELATION_UPDATE:
         wzRelationTypeCommandLine = BURN_COMMANDLINE_SWITCH_RELATED_UPDATE;
         break;
-    case BOOTSTRAPPER_RELATION_DEPENDENT_ADDON: __fallthrough;
-    case BOOTSTRAPPER_RELATION_DEPENDENT_PATCH: __fallthrough;
+    case BOOTSTRAPPER_RELATION_DEPENDENT_ADDON:
+        wzRelationTypeCommandLine = BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_ADDON;
+        break;
+    case BOOTSTRAPPER_RELATION_DEPENDENT_PATCH:
+        wzRelationTypeCommandLine = BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_PATCH;
+        break;
     case BOOTSTRAPPER_RELATION_NONE: __fallthrough;
     default:
         wzRelationTypeCommandLine = NULL;
@@ -1676,9 +1680,21 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_ADDON, -1))
+            {
+                pCommand->relationType = BOOTSTRAPPER_RELATION_DEPENDENT_ADDON;
+
+                LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
+            }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_PATCH, -1))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_PATCH;
+
+                LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_PATCH, -1))
+            {
+                pCommand->relationType = BOOTSTRAPPER_RELATION_DEPENDENT_PATCH;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
