@@ -18,7 +18,6 @@ namespace WixToolset.Core.WindowsInstaller
     /// </summary>
     public sealed class Differ
     {
-        private readonly List<IInspectorExtension> inspectorExtensions;
         private const char sectionDelimiter = '/';
         private readonly IMessaging messaging;
         private SummaryInformationStreams transformSummaryInfo;
@@ -28,7 +27,6 @@ namespace WixToolset.Core.WindowsInstaller
         /// </summary>
         public Differ(IMessaging messaging)
         {
-            this.inspectorExtensions = new List<IInspectorExtension>();
             this.messaging = messaging;
         }
 
@@ -49,15 +47,6 @@ namespace WixToolset.Core.WindowsInstaller
         /// </summary>
         /// <value>The option to keep all rows including unchanged rows.</value>
         public bool PreserveUnchangedRows { get; set; }
-
-        /// <summary>
-        /// Adds an extension.
-        /// </summary>
-        /// <param name="extension">The extension to add.</param>
-        public void AddExtension(IInspectorExtension extension)
-        {
-            this.inspectorExtensions.Add(extension);
-        }
 
         /// <summary>
         /// Creates a transform by diffing two outputs.
