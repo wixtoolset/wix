@@ -40,14 +40,12 @@ namespace WixToolset.Core
             this.AddService<ILinkContext>((provider, singletons) => new LinkContext(provider));
             this.AddService<IResolveContext>((provider, singletons) => new ResolveContext(provider));
             this.AddService<IBindContext>((provider, singletons) => new BindContext(provider));
-            this.AddService<IDecompileContext>((provider, singletons) => new DecompileContext(provider));
             this.AddService<ILayoutContext>((provider, singletons) => new LayoutContext(provider));
 
             this.AddService<IBindFileWithPath>((provider, singletons) => new BindFileWithPath());
             this.AddService<IBindPath>((provider, singletons) => new BindPath());
             this.AddService<IBindResult>((provider, singletons) => new BindResult());
             this.AddService<IComponentKeyPath>((provider, singletons) => new ComponentKeyPath());
-            this.AddService<IDecompileResult>((provider, singletons) => new DecompileResult());
             this.AddService<IIncludedFile>((provider, singletons) => new IncludedFile());
             this.AddService<IPreprocessResult>((provider, singletons) => new PreprocessResult());
             this.AddService<IResolvedDirectory>((provider, singletons) => new ResolvedDirectory());
@@ -58,7 +56,6 @@ namespace WixToolset.Core
 
             this.AddService<IBinder>((provider, singletons) => new Binder(provider));
             this.AddService<ICompiler>((provider, singletons) => new Compiler(provider));
-            this.AddService<IDecompiler>((provider, singletons) => new Decompiler(provider));
             this.AddService<ILayoutCreator>((provider, singletons) => new LayoutCreator(provider));
             this.AddService<IPreprocessor>((provider, singletons) => new Preprocessor(provider));
             this.AddService<ILibrarian>((provider, singletons) => new Librarian(provider));

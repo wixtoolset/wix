@@ -1,8 +1,9 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core
+namespace WixToolset.Core.WindowsInstaller
 {
     using System;
+    using WixToolset.Core.WindowsInstaller.Decompile;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -10,16 +11,16 @@ namespace WixToolset.Core
     /// <summary>
     /// Decompiler of the WiX toolset.
     /// </summary>
-    internal class Decompiler : IDecompiler
+    internal class WindowsInstallerDecompiler : IWindowsInstallerDecompiler
     {
-        internal Decompiler(IServiceProvider serviceProvider)
+        internal WindowsInstallerDecompiler(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IDecompileResult Decompile(IDecompileContext context)
+        public IWindowsInstallerDecompileResult Decompile(IWindowsInstallerDecompileContext context)
         {
             // Pre-decompile.
             //
@@ -30,7 +31,8 @@ namespace WixToolset.Core
 
             // Decompile.
             //
-            var result = this.BackendDecompile(context);
+            var command = new DecompileMsiOrMsmCommand(context);
+            var result = command.Execute();
 
             if (result != null)
             {
@@ -43,26 +45,6 @@ namespace WixToolset.Core
             }
 
             return result;
-        }
-
-        private IDecompileResult BackendDecompile(IDecompileContext context)
-        {
-            var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
-
-            var backendFactories = extensionManager.GetServices<IBackendFactory>();
-
-            foreach (var factory in backendFactories)
-            {
-                if (factory.TryCreateBackend(context.DecompileType.ToString(), context.OutputPath, out var backend))
-                {
-                    var result = backend.Decompile(context);
-                    return result;
-                }
-            }
-
-            // TODO: messaging that a backend could not be found to decompile the decompile type?
-
-            return null;
         }
     }
 }

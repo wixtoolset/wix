@@ -2,7 +2,6 @@
 
 namespace WixToolset.Core.Burn
 {
-    using System;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -34,11 +33,6 @@ namespace WixToolset.Core.Burn
             }
 
             return result;
-        }
-
-        public IDecompileResult Decompile(IDecompileContext context)
-        {
-            throw new NotImplementedException();
         }
     }
 }

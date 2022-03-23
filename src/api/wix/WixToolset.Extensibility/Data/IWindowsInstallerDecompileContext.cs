@@ -5,21 +5,40 @@ namespace WixToolset.Extensibility.Data
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Extensibility.Services;
 
-#pragma warning disable 1591 // TODO: add documentation
-    public interface IDecompileContext
+    /// <summary>
+    /// The context used to decompile Windows Installer packages.
+    /// </summary>
+    public interface IWindowsInstallerDecompileContext
     {
+        /// <summary>
+        /// Gets or sets the service provider.
+        /// </summary>
         IServiceProvider ServiceProvider { get; }
 
+        /// <summary>
+        /// Gets or sets the path to the file to decompile.
+        /// </summary>
         string DecompilePath { get; set; }
 
+        /// <summary>
+        /// Gets or sets the type to decompile.
+        /// </summary>
         OutputType DecompileType { get; set; }
 
-        IReadOnlyCollection<IDecompilerExtension> Extensions { get; set; }
+        /// <summary>
+        /// Gets or sets the decompiler extensions.
+        /// </summary>
+        IReadOnlyCollection<IWindowsInstallerDecompilerExtension> Extensions { get; set; }
 
+        /// <summary>
+        /// Gets or sets the folder where content is extracted.
+        /// </summary>
         string ExtractFolder { get; set; }
 
+        /// <summary>
+        /// Gets or sets the folder where files are extracted.
+        /// </summary>
         string CabinetExtractFolder { get; set; }
 
         /// <summary>
@@ -28,10 +47,19 @@ namespace WixToolset.Extensibility.Data
         /// <remarks>Default value is "SourceDir" to enable use of BindPaths.</remarks>
         string BaseSourcePath { get; set; }
 
+        /// <summary>
+        /// Gets or sets the intermediate folder.
+        /// </summary>
         string IntermediateFolder { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether the decompiler admin image.
+        /// </summary>
         bool IsAdminImage { get; set; }
 
+        /// <summary>
+        /// Gets or sets where to output the result.
+        /// </summary>
         string OutputPath { get; set; }
 
         /// <summary>
@@ -44,7 +72,15 @@ namespace WixToolset.Extensibility.Data
         /// </summary>
         bool SuppressDroppingEmptyTables { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether to prevent extract cabinets.
+        /// </summary>
         bool SuppressExtractCabinets { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to suppress relative action sequencing.
+        /// </summary>
+        bool SuppressRelativeActionSequencing { get; set; }
 
         /// <summary>
         /// Gets or sets the option to suppress decompiling UI-related tables.

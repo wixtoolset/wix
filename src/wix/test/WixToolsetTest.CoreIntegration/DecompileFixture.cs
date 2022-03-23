@@ -20,7 +20,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var result = WixRunner.Execute(new[]
                 {
-                    "decompile",
+                    "msi", "decompile",
                     Path.Combine(folder, msiName),
                     "-intermediateFolder", intermediateFolder,
                     "-o", outputPath
