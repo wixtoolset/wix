@@ -63,23 +63,24 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
         /// </summary>
-        public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files) => null;
+        public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files)
+        {
+            return null;
+        }
 
         /// <summary>
         /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
         /// </summary>
-        public virtual string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
+        public virtual string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory)
+        {
+            return null;
+        }
 
         /// <summary>
         /// See <see cref="IWindowsInstallerBackendBinderExtension.TryProcessSymbol(IntermediateSection, IntermediateSymbol, WindowsInstallerData, TableDefinitionCollection)"/>
         /// </summary>
         public virtual bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinitionCollection tableDefinitions)
         {
-            if (this.TableDefinitions.Any(t => t.SymbolDefinition == symbol.Definition))
-            {
-                return this.BackendHelper.TryAddSymbolToMatchingTableDefinitions(section, symbol, data, tableDefinitions);
-            }
-
             return false;
         }
 
