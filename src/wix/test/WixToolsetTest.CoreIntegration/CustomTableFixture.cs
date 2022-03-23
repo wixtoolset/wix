@@ -219,7 +219,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result = WixRunner.Execute(new[]
                 {
-                    "decompile", msiPath,
+                    "msi", "decompile", msiPath,
                     "-sw1060",
                     "-intermediateFolder", intermediateFolder,
                     "-o", decompiledWxsPath

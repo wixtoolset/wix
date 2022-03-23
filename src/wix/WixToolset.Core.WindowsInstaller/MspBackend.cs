@@ -63,11 +63,6 @@ namespace WixToolset.Core.WindowsInstaller
             }
         }
 
-        public IDecompileResult Decompile(IDecompileContext context)
-        {
-            throw new NotImplementedException();
-        }
-
 #if TODO_PATCHING
         public Intermediate Unbind(IUnbindContext context)
         {

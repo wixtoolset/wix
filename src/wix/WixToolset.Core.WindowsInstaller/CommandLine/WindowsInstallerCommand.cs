@@ -45,6 +45,10 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             {
                 switch (argument.ToLowerInvariant())
                 {
+                    case "decompile":
+                        this.Subcommand = new DecompilerSubcommand(this.ServiceProvider);
+                        return true;
+
                     case "inscribe":
                         this.Subcommand = new InscribeSubcommand(this.ServiceProvider);
                         return true;

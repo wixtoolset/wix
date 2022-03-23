@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+                        // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Decompile
 {
@@ -11,28 +11,24 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class DecompileMsiOrMsmCommand
     {
-        public DecompileMsiOrMsmCommand(IDecompileContext context, IEnumerable<IWindowsInstallerBackendDecompilerExtension> backendExtensions)
+        public DecompileMsiOrMsmCommand(IWindowsInstallerDecompileContext context)
         {
             this.Context = context;
-            this.Extensions = backendExtensions;
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IDecompileContext Context { get; }
-
-        private IEnumerable<IWindowsInstallerBackendDecompilerExtension> Extensions { get; }
+        private IWindowsInstallerDecompileContext Context { get; }
 
         private IMessaging Messaging { get; }
 
-        public IDecompileResult Execute()
+        public IWindowsInstallerDecompileResult Execute()
         {
-            var result = this.Context.ServiceProvider.GetService<IDecompileResult>();
+            var result = this.Context.ServiceProvider.GetService<IWindowsInstallerDecompileResult>();
 
             try
             {
@@ -50,7 +46,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     var output = unbindCommand.Execute();
                     var extractedFilePaths = new List<string>(unbindCommand.ExportedFiles);
 
-                    var decompiler = new Decompiler(this.Messaging, backendHelper, this.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressUI, this.Context.TreatProductAsModule);
+                    var decompiler = new Decompiler(this.Messaging, backendHelper, this.Context.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressRelativeActionSequencing, this.Context.SuppressUI, this.Context.TreatProductAsModule);
                     result.Document = decompiler.Decompile(output);
 
                     result.Platform = GetPlatformFromOutput(output);
@@ -90,7 +86,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             var template = output.Tables["_SummaryInformation"]?.Rows.SingleOrDefault(row => row.FieldAsInteger(0) == 7)?.FieldAsString(1);
 
             return Decompiler.GetPlatformFromTemplateSummaryInformation(template?.Split(';'));
-
         }
     }
 }

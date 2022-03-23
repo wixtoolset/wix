@@ -41,12 +41,16 @@ namespace WixToolset.Core.CommandLine
             return argument;
         }
 
-        public void GetArgumentAsFilePathOrError(string argument, string fileType, IList<string> paths)
+        public bool GetArgumentAsFilePathOrError(string argument, string fileType, IList<string> paths)
         {
-            foreach (var path in this.GetFiles(argument, fileType))
+            var files = this.GetFiles(argument, fileType);
+
+            foreach (var path in files)
             {
                 paths.Add(path);
             }
+
+            return files.Length > 0;
         }
 
         public string GetNextArgumentOrError(string commandLineSwitch)
@@ -137,6 +141,23 @@ namespace WixToolset.Core.CommandLine
             }
 
             arg = null;
+            return false;
+        }
+
+        public string PeekNextArgument()
+        {
+            return this.TryPeekNextArgument(out var argument) ? argument : null;
+        }
+
+        public bool TryPeekNextArgument(out string argument)
+        {
+            if (this.RemainingArguments.Count > 0)
+            {
+                argument = this.RemainingArguments.Peek();
+                return true;
+            }
+
+            argument = null;
             return false;
         }
 

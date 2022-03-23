@@ -3,7 +3,7 @@
 namespace WixToolset.Extensibility
 {
     /// <summary>
-    /// Implemented by extensions to create backends.
+    /// Implemented by extensions that are backends.
     /// </summary>
     public interface IBackendFactory
     {
@@ -12,8 +12,8 @@ namespace WixToolset.Extensibility
         /// </summary>
         /// <param name="outputType">Type of output being created.</param>
         /// <param name="outputPath">Path to the output to create.</param>
-        /// <param name="backend">The backend for the output.</param>
+        /// <param name="binder">The backend for the output.</param>
         /// <returns>True if the backend was created, otherwise false.</returns>
-        bool TryCreateBackend(string outputType, string outputPath, out IBackend backend);
+        bool TryCreateBackend(string outputType, string outputPath, out IBackend binder);
     }
 }

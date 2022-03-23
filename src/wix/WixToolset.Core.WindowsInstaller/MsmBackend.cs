@@ -2,11 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
-    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
-    using WixToolset.Core.WindowsInstaller.Decompile;
-    using WixToolset.Core.WindowsInstaller.Unbind;
-    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -42,28 +38,6 @@ namespace WixToolset.Core.WindowsInstaller
                 result?.Dispose();
                 throw;
             }
-        }
-
-        public IDecompileResult Decompile(IDecompileContext context)
-        {
-            var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
-
-            var backendExtensions = extensionManager.GetServices<IWindowsInstallerBackendDecompilerExtension>();
-
-            foreach (var extension in backendExtensions)
-            {
-                extension.PreBackendDecompile(context);
-            }
-
-            var command = new DecompileMsiOrMsmCommand(context, backendExtensions);
-            var result = command.Execute();
-
-            foreach (var extension in backendExtensions)
-            {
-                extension.PostBackendDecompile(result);
-            }
-
-            return result;
         }
     }
 }

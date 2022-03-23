@@ -1,17 +1,16 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core
+namespace WixToolset.Core.WindowsInstaller
 {
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
 
-    internal class DecompileContext : IDecompileContext
+    internal class WindowsInstallerDecompileContext : IWindowsInstallerDecompileContext
     {
-        internal DecompileContext(IServiceProvider serviceProvider)
+        internal WindowsInstallerDecompileContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
@@ -22,7 +21,7 @@ namespace WixToolset.Core
 
         public OutputType DecompileType { get; set; }
 
-        public IReadOnlyCollection<IDecompilerExtension> Extensions { get; set; }
+        public IReadOnlyCollection<IWindowsInstallerDecompilerExtension> Extensions { get; set; }
 
         public string ExtractFolder { get; set; }
 
@@ -39,6 +38,8 @@ namespace WixToolset.Core
         public bool SuppressCustomTables { get; set; }
 
         public bool SuppressDroppingEmptyTables { get; set; }
+
+        public bool SuppressRelativeActionSequencing { get; set; }
 
         public bool SuppressExtractCabinets { get; set; }
 

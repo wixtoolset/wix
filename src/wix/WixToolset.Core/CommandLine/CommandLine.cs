@@ -9,14 +9,6 @@ namespace WixToolset.Core.CommandLine
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    internal enum CommandTypes
-    {
-        Unknown,
-        Build,
-        Preprocess,
-        Decompile,
-    }
-
     internal class CommandLine : ICommandLine
     {
         public CommandLine(IServiceProvider serviceProvider)
@@ -154,18 +146,9 @@ namespace WixToolset.Core.CommandLine
             }
             else
             {
-                if (Enum.TryParse(arg, true, out CommandTypes commandType))
+                if ("build".Equals(arg, StringComparison.OrdinalIgnoreCase))
                 {
-                    switch (commandType)
-                    {
-                        case CommandTypes.Build:
-                            command = new BuildCommand(this.ServiceProvider);
-                            break;
-
-                        case CommandTypes.Decompile:
-                            command = new DecompileCommand(this.ServiceProvider);
-                            break;
-                    }
+                    command = new BuildCommand(this.ServiceProvider);
                 }
                 else
                 {
@@ -175,8 +158,6 @@ namespace WixToolset.Core.CommandLine
                         {
                             break;
                         }
-
-                        command = null;
                     }
                 }
             }

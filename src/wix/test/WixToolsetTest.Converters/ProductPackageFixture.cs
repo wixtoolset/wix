@@ -249,7 +249,7 @@ namespace WixToolsetTest.Converters
                 var v3msiPath = Path.Combine(folder, "TypicalV3.msi");
                 var result = WixRunner.Execute(new[]
                 {
-                    "decompile", v3msiPath,
+                    "msi", "decompile", v3msiPath,
                     "-intermediateFolder", intermediateFolder,
                     "-o", decompiledWxsPath
                 });

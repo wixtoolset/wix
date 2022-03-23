@@ -15,8 +15,5 @@ namespace WixToolset.Extensibility
         /// <param name="context">Bind context.</param>
         /// <returns>Result of the bind operation.</returns>
         IBindResult Bind(IBindContext context);
-
-#pragma warning disable 1591 // TODO: add documentation
-        IDecompileResult Decompile(IDecompileContext context);
     }
 }

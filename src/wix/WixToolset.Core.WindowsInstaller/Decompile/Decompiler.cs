@@ -43,7 +43,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <summary>
         /// Creates a new decompiler object with a default set of table definitions.
         /// </summary>
-        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IWindowsInstallerBackendDecompilerExtension> extensions, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressUI, bool treatProductAsModule)
+        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IWindowsInstallerDecompilerExtension> extensions, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressRelativeActionSequencing, bool suppressUI, bool treatProductAsModule)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
@@ -51,10 +51,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             this.BaseSourcePath = baseSourcePath ?? "SourceDir";
             this.SuppressCustomTables = suppressCustomTables;
             this.SuppressDroppingEmptyTables = suppressDroppingEmptyTables;
+            this.SuppressRelativeActionSequencing = suppressRelativeActionSequencing;
             this.SuppressUI = suppressUI;
             this.TreatProductAsModule = treatProductAsModule;
 
-            this.ExtensionsByTableName = new Dictionary<string, IWindowsInstallerBackendDecompilerExtension>();
+            this.ExtensionsByTableName = new Dictionary<string, IWindowsInstallerDecompilerExtension>();
             this.StandardActions = WindowsInstallerStandard.StandardActions().ToDictionary(a => a.Id.Id);
 
             this.TableDefinitions = new TableDefinitionCollection();
@@ -64,9 +65,9 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         private IBackendHelper BackendHelper { get; }
 
-        private IEnumerable<IWindowsInstallerBackendDecompilerExtension> Extensions { get; }
+        private IEnumerable<IWindowsInstallerDecompilerExtension> Extensions { get; }
 
-        private Dictionary<string, IWindowsInstallerBackendDecompilerExtension> ExtensionsByTableName { get; }
+        private Dictionary<string, IWindowsInstallerDecompilerExtension> ExtensionsByTableName { get; }
 
         private string BaseSourcePath { get; }
 
@@ -238,7 +239,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        private XElement GetIndexedElement(WixToolset.Data.WindowsInstaller.Row row) => this.GetIndexedElement(row.TableDefinition.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
+        private XElement GetIndexedElement(Row row)
+        {
+            return this.GetIndexedElement(row.TableDefinition.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
+        }
 
         /// <summary>
         /// Gets the element corresponding to the primary key of the given table.
@@ -246,7 +250,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <param name="table">The table corresponding to the element.</param>
         /// <param name="primaryKey">The primary key corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        private XElement GetIndexedElement(string table, params string[] primaryKey) => this.IndexedElements[String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey))];
+        private XElement GetIndexedElement(string table, params string[] primaryKey)
+        {
+            return this.TryGetIndexedElement(table, out var element, primaryKey) ? element : null;
+        }
 
         /// <summary>
         /// Tries to get the element corresponding to the primary key of the given table.
@@ -254,7 +261,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <param name="row">The table corresponding to the element.</param>
         /// <param name="xElement">The indexed element.</param>
         /// <returns>Whether the element was found.</returns>
-        private bool TryGetIndexedElement(WixToolset.Data.WindowsInstaller.Row row, out XElement xElement) => this.TryGetIndexedElement(row.TableDefinition.Name, out xElement, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
+        private bool TryGetIndexedElement(Row row, out XElement xElement)
+        {
+            return this.TryGetIndexedElement(row.TableDefinition.Name, out xElement, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
+        }
 
         /// <summary>
         /// Tries to get the element corresponding to the primary key of the given table.
@@ -263,14 +273,17 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <param name="xElement">The indexed element.</param>
         /// <param name="primaryKey">The primary key corresponding to the element.</param>
         /// <returns>Whether the element was found.</returns>
-        private bool TryGetIndexedElement(string table, out XElement xElement, params string[] primaryKey) => this.IndexedElements.TryGetValue(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), out xElement);
+        private bool TryGetIndexedElement(string table, out XElement xElement, params string[] primaryKey)
+        {
+            return this.IndexedElements.TryGetValue(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), out xElement);
+        }
 
         /// <summary>
         /// Index an element by its corresponding row.
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <param name="element">The element to index.</param>
-        private void IndexElement(WixToolset.Data.WindowsInstaller.Row row, XElement element)
+        private void IndexElement(Row row, XElement element)
         {
             this.IndexedElements.Add(String.Concat(row.TableDefinition.Name, ':', row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter)), element);
         }
@@ -293,9 +306,15 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 .ToDictionary(lookup => lookup.Key, lookup => lookup.ToList());
         }
 
-        private Dictionary<string, List<XElement>> IndexTableOneToMany(TableIndexedCollection tables, string tableName, int column = 0) => this.IndexTableOneToMany(tables[tableName]?.Rows ?? Enumerable.Empty<Row>(), column);
+        private Dictionary<string, List<XElement>> IndexTableOneToMany(TableIndexedCollection tables, string tableName, int column = 0)
+        {
+            return this.IndexTableOneToMany(tables[tableName]?.Rows ?? Enumerable.Empty<Row>(), column);
+        }
 
-        private Dictionary<string, List<XElement>> IndexTableOneToMany(Table table, int column = 0) => this.IndexTableOneToMany(table?.Rows ?? Enumerable.Empty<Row>(), column);
+        private Dictionary<string, List<XElement>> IndexTableOneToMany(Table table, int column = 0)
+        {
+            return this.IndexTableOneToMany(table?.Rows ?? Enumerable.Empty<Row>(), column);
+        }
 
         private void AddChildToParent(string parentName, XElement xChild, Row row, int column)
         {
@@ -310,7 +329,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             }
         }
 
-        private static XAttribute XAttributeIfNotNull(string attributeName, Row row, int column) => row.IsColumnNull(column) ? null : new XAttribute(attributeName, row.FieldAsString(column));
+        private static XAttribute XAttributeIfNotNull(string attributeName, Row row, int column)
+        {
+            return row.IsColumnNull(column) ? null : new XAttribute(attributeName, row.FieldAsString(column));
+        }
 
         private static void SetAttributeIfNotNull(XElement xElement, string attributeName, string value)
         {
@@ -1578,7 +1600,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// Nests the Permission elements below their parent elements.  There are no declared foreign
         /// keys for the parents of the LockPermissions table.
         /// </remarks>
-        private void FinalizeLockPermissionsTable(TableIndexedCollection tables) => this.FinalizePermissionsTable(tables, "LockPermissions");
+        private void FinalizeLockPermissionsTable(TableIndexedCollection tables)
+        {
+            this.FinalizePermissionsTable(tables, "LockPermissions");
+        }
 
         /// <summary>
         /// Finalize the MsiLockPermissionsEx table.
@@ -1588,7 +1613,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// Nests the PermissionEx elements below their parent elements.  There are no declared foreign
         /// keys for the parents of the MsiLockPermissionsEx table.
         /// </remarks>
-        private void FinalizeMsiLockPermissionsExTable(TableIndexedCollection tables) => this.FinalizePermissionsTable(tables, "MsiLockPermissionsEx");
+        private void FinalizeMsiLockPermissionsExTable(TableIndexedCollection tables)
+        {
+            this.FinalizePermissionsTable(tables, "MsiLockPermissionsEx");
+        }
 
         private static Dictionary<string, List<string>> IndexTable(Table table, int keyColumn, int? dataColumn)
         {
@@ -2462,53 +2490,44 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             // index the rows from the extension libraries
             var indexedExtensionTables = new Dictionary<string, HashSet<string>>();
 #if TODO_DECOMPILER_EXTENSIONS
-            foreach (IDecompilerExtension extension in this.extensions)
+            foreach (var extension in this.Extensions)
             {
                 // Get the optional library from the extension with the rows to be removed.
-                Library library = extension.GetLibraryToRemove(this.tableDefinitions);
-                if (null != library)
+                var library = extension.GetLibraryToRemove(this.tableDefinitions);
+                if (library != null)
                 {
-                    foreach (var section in library.Sections)
+                    foreach (var row in library.Sections.SelectMany(s => s.Tables).SelectMany(t => t.Rows))
                     {
-                        foreach (Table table in section.Tables)
+                        string primaryKey;
+                        string tableName;
+
+                        // the Actions table needs to be handled specially
+                        if (table.Name == "WixAction")
                         {
-                            foreach (Row row in table.Rows)
+                            primaryKey = row.FieldAsString(1);
+                            tableName = row.FieldAsString(0);
+
+                            if (this.outputType == OutputType.Module)
                             {
-                                string primaryKey;
-                                string tableName;
-
-                                // the Actions table needs to be handled specially
-                                if ("WixAction" == table.Name)
-                                {
-                                    primaryKey = row.FieldAsString(1);
-
-                                    if (OutputType.Module == this.outputType)
-                                    {
-                                        tableName = String.Concat("Module", row.FieldAsString(0));
-                                    }
-                                    else
-                                    {
-                                        tableName = row.FieldAsString(0);
-                                    }
-                                }
-                                else
-                                {
-                                    primaryKey = row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter);
-                                    tableName = table.Name;
-                                }
-
-                                if (null != primaryKey)
-                                {
-                                    HashSet<string> indexedExtensionRows;
-                                    if (!indexedExtensionTables.TryGetValue(tableName, out indexedExtensionRows))
-                                    {
-                                        indexedExtensionRows = new HashSet<string>();
-                                        indexedExtensionTables.Add(tableName, indexedExtensionRows);
-                                    }
-
-                                    indexedExtensionRows.Add(primaryKey);
-                                }
+                                tableName = "Module" + tableName;
                             }
+                        }
+                        else
+                        {
+                            primaryKey = row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter);
+                            tableName = table.Name;
+                        }
+
+                        if (primaryKey != null)
+                        {
+                            HashSet<string> indexedExtensionRows;
+                            if (!indexedExtensionTables.TryGetValue(tableName, out indexedExtensionRows))
+                            {
+                                indexedExtensionRows = new HashSet<string>();
+                                indexedExtensionTables.Add(tableName, indexedExtensionRows);
+                            }
+
+                            indexedExtensionRows.Add(primaryKey);
                         }
                     }
                 }
