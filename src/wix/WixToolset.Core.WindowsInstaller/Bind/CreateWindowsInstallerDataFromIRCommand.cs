@@ -264,7 +264,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     case SymbolDefinitionType.MustBeFromAnExtension:
-                        unknownSymbol = !this.AddSymbolFromExtension(symbol);
+                        if (!this.AddSymbolFromExtension(symbol))
+                        {
+                            unknownSymbol = !this.AddSymbolDefaultly(symbol);
+                        }
                         break;
 
                     default:
@@ -1267,8 +1270,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return false;
         }
 
-        private bool AddSymbolDefaultly(IntermediateSymbol symbol) =>
-            this.BackendHelper.TryAddSymbolToMatchingTableDefinitions(this.Section, symbol, this.Data, this.TableDefinitions);
+        private bool AddSymbolDefaultly(IntermediateSymbol symbol)
+        {
+            return this.BackendHelper.TryAddSymbolToMatchingTableDefinitions(this.Section, symbol, this.Data, this.TableDefinitions);
+        }
 
         private void EnsureModuleIgnoredTable(IntermediateSymbol symbol, string ignoredTable)
         {
