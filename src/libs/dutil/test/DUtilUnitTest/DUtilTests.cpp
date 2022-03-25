@@ -11,8 +11,8 @@ namespace DutilTests
     public ref class DUtil
     {
     public:
-        [Fact(Skip = "Flaky")]
-        void DUtilTraceErrorSourceFiltersOnTraceLevel()
+        [Fact]
+        Void DUtilTraceErrorSourceFiltersOnTraceLevel()
         {
             DutilInitialize(&DutilTestTraceError);
 
@@ -21,7 +21,12 @@ namespace DutilTests
             Dutil_TraceSetLevel(REPORT_DEBUG, FALSE);
 
             Action^ action = gcnew Action(this, &DUtil::CallDutilTraceErrorSource);
-            Assert::Throws<Exception^>(action);
+            // xxxxx The following line is ambiguous when used with the current version of Xunit.
+            // xxxxx Xunit::Assert::Throws<Exception^>(action);
+            // xxxxx It has therefore been, at least temporarily, replaced by the next line of code.
+            // xxxxx See the comments in WixBuildTools.WixAssert for details.
+
+            WixBuildTools::TestSupport::WixAssert::Throws<Exception^>(action);
 
             DutilUninitialize();
         }
