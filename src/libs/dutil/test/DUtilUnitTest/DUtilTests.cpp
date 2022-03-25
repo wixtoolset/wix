@@ -21,10 +21,11 @@ namespace DutilTests
             Dutil_TraceSetLevel(REPORT_DEBUG, FALSE);
 
             Action^ action = gcnew Action(this, &DUtil::CallDutilTraceErrorSource);
-            // xxxxx The following line is ambiguous when used with the current version of Xunit.
-            // xxxxx Xunit::Assert::Throws<Exception^>(action);
-            // xxxxx It has therefore been, at least temporarily, replaced by the next line of code.
-            // xxxxx See the comments in WixBuildTools.WixAssert for details.
+            // The following line is ambiguous when used with the current version of Xunit.
+            // Xunit::Assert::Throws<Exception^>(action);
+            // It has therefore been, at least temporarily, replaced by the next line of code.
+            // See the comments in WixBuildTools.WixAssert for details.
+            WixAssert::Throws<Exception^>(action);
 
             WixBuildTools::TestSupport::WixAssert::Throws<Exception^>(action);
 

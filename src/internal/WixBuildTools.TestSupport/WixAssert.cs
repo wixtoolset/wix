@@ -92,22 +92,20 @@ namespace WixBuildTools.TestSupport
             }
         }
 
-        // xxxxx There is a bug in Xunit: It does not pass the System.Threading.Tasks.Task
-        // xxxxx metadata to Xunit's clients, even though it exposes the entrypoint. C++/CLR clients
-        // xxxxx are therefore deprived of the information that they need to use this entrypoint.
-        // xxxxx C# clients, however, are not dependent on this metadata, at least not for this purpose.
-        // xxxxx
-        // xxxxx All such types referenced by Xunit's own metadata are treated as <error-type>,
-        // xxxxx making them indistinguishable from each other and, in the case of C++/CLR, this type
-        // xxxxx is indistinguishable from System.Object.
-        // xxxxx
-        // xxxxx When C++/CLI tries to perform overload resolution, it can't distinguish between
-        // xxxxx System.Threading.Tasks.Task and System.Object, making the code ambiguous. The compiler
-        // xxxxx either reports an inscrutable error message or no error at all. It also doesn't emit
-        // xxxxx any code, so execution falls through and it appears that the test has passed, even
-        // xxxxx though it hasn't even been executed.
-        // xxxxx
-        // xxxxx The following method is used to isolate DUtilTests in order to overcome the above problem.
+        // There appears to have been a bug in VC++, which might or might not have been partially
+        // or completely corrected. It was unable to disambiguate a call to:
+        //     Xunit::Assert::Throws(System::Type^, System::Action^)
+        // from a call to:
+        //     Xunit::Assert::Throws(System::Type^, System::Func<System::Object^>^)
+        // that implicitly ignores its return value.
+        //
+        // The ambiguity may have been reported by some versions of the compiler and not by others.
+        // Some versions of the compiler may not have emitted any code in this situation, making it
+        // appear that the test has passed when, in fact, it hasn't been run.
+        //
+        // This situation is not an issue for C#.
+        //
+        // The following method is used to isolate DUtilTests in order to overcome the above problem.
 
         /// <summary>
         /// This shim allows C++/CLR code to call the Xunit method with the same signature
@@ -123,11 +121,11 @@ namespace WixBuildTools.TestSupport
             Xunit.Assert.Throws<T>(testCode);
         }
 
+        // This shim has been tested, but is not currently used anywhere. It was provided
+        // at the same time as the preceding shim because it involved the same overload
+        // resolution conflict.
+
         /// <summary>
-        /// This shim has been tested, but is not currently used anywhere. It was provided
-        /// at the same time as the preceding shim because it involved the same overload
-        /// resolution conflict.
-        /// 
         /// This shim allows C++/CLR code to call the Xunit method with the same signature
         /// without getting an ambiguous overload error.  If the specified test code
         /// fails to generate an exception of the exact specified type, an assertion
