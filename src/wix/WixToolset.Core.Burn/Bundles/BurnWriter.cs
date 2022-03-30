@@ -44,9 +44,9 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>Burn writer.</returns>
         public static BurnWriter Open(IMessaging messaging, string fileExe)
         {
-            BurnWriter writer = new BurnWriter(messaging, fileExe);
+            var writer = new BurnWriter(messaging, fileExe);
 
-            using (BinaryReader binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
+            using (var binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
             {
                 if (!writer.Initialize(binaryReader))
                 {
@@ -93,7 +93,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_FORMAT, 1); // Hard-coded to CAB for now.
             this.AttachedContainers.Clear();
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_COUNT, 0);
-            for (uint i = BURN_SECTION_OFFSET_UXSIZE; i < this.wixburnMaxContainers; i += sizeof(UInt32))
+            for (var i = BURN_SECTION_OFFSET_UXSIZE; i < this.wixburnMaxContainers; i += sizeof(uint))
             {
                 this.WriteToBurnSectionOffset(i, 0);
             }
@@ -112,7 +112,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
         public bool AppendContainer(string fileContainer, BurnCommon.Container container)
         {
-            using (FileStream reader = File.OpenRead(fileContainer))
+            using (var reader = File.OpenRead(fileContainer))
             {
                 return this.AppendContainer(reader, reader.Length, container);
             }
@@ -136,10 +136,10 @@ namespace WixToolset.Core.Burn.Bundles
             this.AttachedContainers.Clear();
             this.AttachedContainers.Add(uxContainerSlot);
 
-            uint nextAddress = this.EngineSize;
-            for (int i = 1; i < reader.AttachedContainers.Count; i++)
+            var nextAddress = this.EngineSize;
+            for (var i = 1; i < reader.AttachedContainers.Count; i++)
             {
-                ContainerSlot cntnr = reader.AttachedContainers[i];
+                var cntnr = reader.AttachedContainers[i];
 
                 reader.Stream.Seek(nextAddress, SeekOrigin.Begin);
                 // TODO: verify that the size in the section data is 0 or the same size.
@@ -160,8 +160,8 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
         public bool AppendContainer(Stream containerStream, long containerSize, BurnCommon.Container container)
         {
-            uint containerCount = (uint)this.AttachedContainers.Count;
-            uint burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + (containerCount * sizeof(UInt32));
+            var containerCount = (uint)this.AttachedContainers.Count;
+            uint burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + (containerCount * sizeof(uint));
             var containerSlot = new ContainerSlot((uint)containerSize);
 
             switch (container)
@@ -239,13 +239,14 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="burnSectionOffsetSize">Offset of size field for this container in ".wixburn" section data.</param>
         /// <param name="burnSectionCount">Number of Burn sections.</param>
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
-        private bool AppendContainer(Stream containerStream, UInt32 containerSize, UInt32 burnSectionOffsetSize, UInt32 burnSectionCount)
+        private bool AppendContainer(Stream containerStream, uint containerSize, uint burnSectionOffsetSize, uint burnSectionCount)
         {
             if (this.invalidBundle)
             {
                 return false;
             }
-            if (burnSectionOffsetSize > (this.wixburnRawDataSize - sizeof(UInt32)))
+
+            if (burnSectionOffsetSize > (this.wixburnRawDataSize - sizeof(uint)))
             {
                 this.invalidBundle = true;
                 this.Messaging.Write(BurnBackendErrors.TooManyAttachedContainers(this.wixburnMaxContainers));

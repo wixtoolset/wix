@@ -129,49 +129,49 @@ namespace WixToolset.Core.Burn.Bundles
 
                 switch (package.Type)
                 {
-                case WixBundlePackageType.Exe:
-                    if (exePackages.TryGetValue(id, out var exePackage))
-                    {
-                        facades.Add(id, new PackageFacade(package, exePackage));
-                    }
-                    else
-                    {
-                        this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleExePackage", id));
-                    }
-                    break;
+                    case WixBundlePackageType.Exe:
+                        if (exePackages.TryGetValue(id, out var exePackage))
+                        {
+                            facades.Add(id, new PackageFacade(package, exePackage));
+                        }
+                        else
+                        {
+                            this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleExePackage", id));
+                        }
+                        break;
 
-                case WixBundlePackageType.Msi:
-                    if (msiPackages.TryGetValue(id, out var msiPackage))
-                    {
-                        facades.Add(id, new PackageFacade(package, msiPackage));
-                    }
-                    else
-                    {
-                        this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMsiPackage", id));
-                    }
-                    break;
+                    case WixBundlePackageType.Msi:
+                        if (msiPackages.TryGetValue(id, out var msiPackage))
+                        {
+                            facades.Add(id, new PackageFacade(package, msiPackage));
+                        }
+                        else
+                        {
+                            this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMsiPackage", id));
+                        }
+                        break;
 
-                case WixBundlePackageType.Msp:
-                    if (mspPackages.TryGetValue(id, out var mspPackage))
-                    {
-                        facades.Add(id, new PackageFacade(package, mspPackage));
-                    }
-                    else
-                    {
-                        this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMspPackage", id));
-                    }
-                    break;
+                    case WixBundlePackageType.Msp:
+                        if (mspPackages.TryGetValue(id, out var mspPackage))
+                        {
+                            facades.Add(id, new PackageFacade(package, mspPackage));
+                        }
+                        else
+                        {
+                            this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMspPackage", id));
+                        }
+                        break;
 
-                case WixBundlePackageType.Msu:
-                    if (msuPackages.TryGetValue(id, out var msuPackage))
-                    {
-                        facades.Add(id, new PackageFacade(package, msuPackage));
-                    }
-                    else
-                    {
-                        this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMsuPackage", id));
-                    }
-                    break;
+                    case WixBundlePackageType.Msu:
+                        if (msuPackages.TryGetValue(id, out var msuPackage))
+                        {
+                            facades.Add(id, new PackageFacade(package, msuPackage));
+                        }
+                        else
+                        {
+                            this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMsuPackage", id));
+                        }
+                        break;
                 }
             }
 

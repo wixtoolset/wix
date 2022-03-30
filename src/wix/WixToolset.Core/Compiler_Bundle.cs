@@ -40,36 +40,36 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Bitness":
-                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (bitnessValue)
-                        {
-                        case "always32":
-                            win64 = false;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "always64":
-                            win64 = true;
+                        case "Bitness":
+                            var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (bitnessValue)
+                            {
+                                case "always32":
+                                    win64 = false;
+                                    break;
+                                case "always64":
+                                    win64 = true;
+                                    break;
+                                case "default":
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                    break;
+                            }
                             break;
-                        case "default":
-                        case "":
+                        case "Key":
+                            key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            valueName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        valueName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -133,7 +133,7 @@ namespace WixToolset.Core
             string parentName = null;
 
             string fileSystemSafeBundleName = null;
-            string logVariablePrefixAndExtension = null;
+            string logVariablePrefixAndExtension;
             string iconSourceFile = null;
             string splashScreenSourceFile = null;
 
@@ -144,98 +144,98 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "AboutUrl":
-                        aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CommandLineVariables":
-                        var commandLineVariablesValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (commandLineVariablesValue)
-                        {
-                        case "upperCase":
-                            commandLineVariables = WixBundleCommandLineVariables.UpperCase;
+                        case "AboutUrl":
+                            aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
-                        case "caseSensitive":
-                            commandLineVariables = WixBundleCommandLineVariables.CaseSensitive;
+                        case "CommandLineVariables":
+                            var commandLineVariablesValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (commandLineVariablesValue)
+                            {
+                                case "upperCase":
+                                    commandLineVariables = WixBundleCommandLineVariables.UpperCase;
+                                    break;
+                                case "caseSensitive":
+                                    commandLineVariables = WixBundleCommandLineVariables.CaseSensitive;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, commandLineVariablesValue, "upperCase", "caseSensitive"));
+                                    break;
+                            }
+                            break;
+                        case "Compressed":
+                            compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Copyright":
+                            copyright = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DisableModify":
+                            var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (value)
+                            {
+                                case "button":
+                                    attributes |= WixBundleAttributes.SingleChangeUninstallButton;
+                                    break;
+                                case "yes":
+                                    attributes |= WixBundleAttributes.DisableModify;
+                                    break;
+                                case "no":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
+                                    break;
+                            }
+                            break;
+                        case "DisableRemove":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WixBundleAttributes.DisableRemove;
+                            }
+                            break;
+                        case "HelpTelephone":
+                            helpTelephone = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "HelpUrl":
+                            helpUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Manufacturer":
+                            manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "IconSourceFile":
+                            iconSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "InProgressName":
+                            inProgressName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ParentName":
+                            parentName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ProviderKey":
+                            // This can't be processed until we create the section.
+                            break;
+                        case "SplashScreenSourceFile":
+                            splashScreenSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Tag":
+                            tag = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UpdateUrl":
+                            updateUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UpgradeCode":
+                            upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Version":
+                            version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, commandLineVariablesValue, "upperCase", "caseSensitive"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "Compressed":
-                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Copyright":
-                        copyright = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisableModify":
-                        var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (value)
-                        {
-                        case "button":
-                            attributes |= WixBundleAttributes.SingleChangeUninstallButton;
-                            break;
-                        case "yes":
-                            attributes |= WixBundleAttributes.DisableModify;
-                            break;
-                        case "no":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
-                            break;
-                        }
-                        break;
-                    case "DisableRemove":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixBundleAttributes.DisableRemove;
-                        }
-                        break;
-                    case "HelpTelephone":
-                        helpTelephone = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "HelpUrl":
-                        helpUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Manufacturer":
-                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IconSourceFile":
-                        iconSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "InProgressName":
-                        inProgressName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ParentName":
-                        parentName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProviderKey":
-                        // This can't be processed until we create the section.
-                        break;
-                    case "SplashScreenSourceFile":
-                        splashScreenSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Tag":
-                        tag = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpdateUrl":
-                        updateUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpgradeCode":
-                        upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Version":
-                        version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
             }
@@ -314,87 +314,87 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ApprovedExeForElevation":
-                        this.ParseApprovedExeForElevation(child);
-                        break;
-                    case "BootstrapperApplication":
-                        this.ParseBootstrapperApplicationElement(child);
-                        break;
-                    case "BootstrapperApplicationRef":
-                        this.ParseBootstrapperApplicationRefElement(child);
-                        break;
-                    case "BundleCustomData":
-                        this.ParseBundleCustomDataElement(child);
-                        break;
-                    case "BundleCustomDataRef":
-                        this.ParseBundleCustomDataRefElement(child);
-                        break;
-                    case "BundleExtension":
-                        this.ParseBundleExtensionElement(child);
-                        break;
-                    case "BundleExtensionRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleExtension);
-                        break;
-                    case "OptionalUpdateRegistration":
-                        this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
-                        break;
-                    case "Chain":
-                        if (chainSeen)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
-                        }
-                        this.ParseChainElement(child);
-                        chainSeen = true;
-                        break;
-                    case "Container":
-                        this.ParseContainerElement(child);
-                        break;
-                    case "ContainerRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleContainer);
-                        break;
-                    case "Log":
-                        if (logSeen)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
-                        }
-                        logVariablePrefixAndExtension = this.ParseLogElement(child, fileSystemSafeBundleName);
-                        logSeen = true;
-                        break;
-                    case "PayloadGroup":
-                        this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
-                        break;
-                    case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
-                        break;
-                    case "RelatedBundle":
-                        this.ParseRelatedBundleElement(child);
-                        break;
-                    case "Requires":
-                        this.ParseRequiresElement(child, null);
-                        break;
-                    case "SetVariable":
-                        this.ParseSetVariableElement(child);
-                        break;
-                    case "SetVariableRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
-                        break;
-                    case "SoftwareTag":
-                        this.ParseBundleTagElement(child);
-                        break;
-                    case "Update":
-                        this.ParseUpdateElement(child);
-                        break;
-                    case "Variable":
-                        this.ParseVariableElement(child);
-                        break;
-                    case "WixVariable":
-                        this.ParseWixVariableElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ApprovedExeForElevation":
+                            this.ParseApprovedExeForElevation(child);
+                            break;
+                        case "BootstrapperApplication":
+                            this.ParseBootstrapperApplicationElement(child);
+                            break;
+                        case "BootstrapperApplicationRef":
+                            this.ParseBootstrapperApplicationRefElement(child);
+                            break;
+                        case "BundleCustomData":
+                            this.ParseBundleCustomDataElement(child);
+                            break;
+                        case "BundleCustomDataRef":
+                            this.ParseBundleCustomDataRefElement(child);
+                            break;
+                        case "BundleExtension":
+                            this.ParseBundleExtensionElement(child);
+                            break;
+                        case "BundleExtensionRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleExtension);
+                            break;
+                        case "OptionalUpdateRegistration":
+                            this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
+                            break;
+                        case "Chain":
+                            if (chainSeen)
+                            {
+                                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
+                            }
+                            this.ParseChainElement(child);
+                            chainSeen = true;
+                            break;
+                        case "Container":
+                            this.ParseContainerElement(child);
+                            break;
+                        case "ContainerRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleContainer);
+                            break;
+                        case "Log":
+                            if (logSeen)
+                            {
+                                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
+                            }
+                            logVariablePrefixAndExtension = this.ParseLogElement(child, fileSystemSafeBundleName);
+                            logSeen = true;
+                            break;
+                        case "PayloadGroup":
+                            this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
+                            break;
+                        case "PayloadGroupRef":
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
+                            break;
+                        case "RelatedBundle":
+                            this.ParseRelatedBundleElement(child);
+                            break;
+                        case "Requires":
+                            this.ParseRequiresElement(child, null);
+                            break;
+                        case "SetVariable":
+                            this.ParseSetVariableElement(child);
+                            break;
+                        case "SetVariableRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
+                            break;
+                        case "SoftwareTag":
+                            this.ParseBundleTagElement(child);
+                            break;
+                        case "Update":
+                            this.ParseUpdateElement(child);
+                            break;
+                        case "Variable":
+                            this.ParseVariableElement(child);
+                            break;
+                        case "WixVariable":
+                            this.ParseWixVariableElement(child);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -508,21 +508,21 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Disable":
-                        disableLog = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "PathVariable":
-                        variable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Prefix":
-                        logPrefix = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Extension":
-                        logExtension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Disable":
+                            disableLog = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "PathVariable":
+                            variable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        case "Prefix":
+                            logPrefix = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Extension":
+                            logExtension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -559,37 +559,37 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        if (id?.Id == BurnConstants.BurnUXContainerName || id?.Id == BurnConstants.BurnDefaultAttachedContainerName)
-                        {
-                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                        }
-                        break;
-                    case "DownloadUrl":
-                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Type":
-                        var typeString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (typeString)
-                        {
-                            case "attached":
-                                type = ContainerType.Attached;
-                                break;
-                            case "detached":
-                                type = ContainerType.Detached;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
-                                break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            if (id?.Id == BurnConstants.BurnUXContainerName || id?.Id == BurnConstants.BurnDefaultAttachedContainerName)
+                            {
+                                this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                            }
+                            break;
+                        case "DownloadUrl":
+                            downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Type":
+                            var typeString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (typeString)
+                            {
+                                case "attached":
+                                    type = ContainerType.Attached;
+                                    break;
+                                case "detached":
+                                    type = ContainerType.Detached;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -631,12 +631,12 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "PackageGroupRef":
-                        this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.Container, id.Id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "PackageGroupRef":
+                            this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.Container, id.Id);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -845,12 +845,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -865,15 +865,15 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Payload":
-                        this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
-                        break;
-                    case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Payload":
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            break;
+                        case "PayloadGroupRef":
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -1303,24 +1303,24 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Manufacturer":
-                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Department":
-                        department = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProductFamily":
-                        productFamily = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Classification":
-                        classification = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Manufacturer":
+                            manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Department":
+                            department = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ProductFamily":
+                            productFamily = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Classification":
+                            classification = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1490,12 +1490,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1517,27 +1517,27 @@ namespace WixToolset.Core
                     WixBundlePackageType? packageType = null;
                     switch (child.Name.LocalName)
                     {
-                    case "ExePackagePayload":
-                        packageType = WixBundlePackageType.Exe;
-                        break;
-                    case "MsiPackagePayload":
-                        packageType = WixBundlePackageType.Msi;
-                        break;
-                    case "MspPackagePayload":
-                        packageType = WixBundlePackageType.Msp;
-                        break;
-                    case "MsuPackagePayload":
-                        packageType = WixBundlePackageType.Msu;
-                        break;
-                    case "Payload":
-                        this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id);
-                        break;
-                    case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ExePackagePayload":
+                            packageType = WixBundlePackageType.Exe;
+                            break;
+                        case "MsiPackagePayload":
+                            packageType = WixBundlePackageType.Msi;
+                            break;
+                        case "MspPackagePayload":
+                            packageType = WixBundlePackageType.Msp;
+                            break;
+                        case "MsuPackagePayload":
+                            packageType = WixBundlePackageType.Msu;
+                            break;
+                        case "Payload":
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id);
+                            break;
+                        case "PayloadGroupRef":
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
 
                     if (packageType.HasValue)
@@ -1584,13 +1584,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, id.Id);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, id.Id);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1628,34 +1628,34 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Value":
-                        value = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
-                        break;
-                    case "Behavior":
-                        var behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (behaviorString)
-                        {
-                            case "error":
-                                behavior = ExitCodeBehaviorType.Error;
-                                break;
-                            case "forceReboot":
-                                behavior = ExitCodeBehaviorType.ForceReboot;
-                                break;
-                            case "scheduleReboot":
-                                behavior = ExitCodeBehaviorType.ScheduleReboot;
-                                break;
-                            case "success":
-                                behavior = ExitCodeBehaviorType.Success;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
-                                behavior = ExitCodeBehaviorType.Success; // set value to avoid ExpectedAttribute below.
-                                break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Value":
+                            value = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
+                            break;
+                        case "Behavior":
+                            var behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (behaviorString)
+                            {
+                                case "error":
+                                    behavior = ExitCodeBehaviorType.Error;
+                                    break;
+                                case "forceReboot":
+                                    behavior = ExitCodeBehaviorType.ForceReboot;
+                                    break;
+                                case "scheduleReboot":
+                                    behavior = ExitCodeBehaviorType.ScheduleReboot;
+                                    break;
+                                case "success":
+                                    behavior = ExitCodeBehaviorType.Success;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
+                                    behavior = ExitCodeBehaviorType.Success; // set value to avoid ExpectedAttribute below.
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1697,27 +1697,27 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "DisableRollback":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixChainAttributes.DisableRollback;
-                        }
-                        break;
-                    case "DisableSystemRestore":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixChainAttributes.DisableSystemRestore;
-                        }
-                        break;
-                    case "ParallelCache":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixChainAttributes.ParallelCache;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "DisableRollback":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WixChainAttributes.DisableRollback;
+                            }
+                            break;
+                        case "DisableSystemRestore":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WixChainAttributes.DisableSystemRestore;
+                            }
+                            break;
+                        case "ParallelCache":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WixChainAttributes.ParallelCache;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1735,33 +1735,33 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "MsiPackage":
-                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MspPackage":
-                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MsuPackage":
-                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "ExePackage":
-                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "RollbackBoundary":
-                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "PackageGroupRef":
-                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PackageGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "MsiPackage":
+                            previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "MspPackage":
+                            previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "MsuPackage":
+                            previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "ExePackage":
+                            previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "RollbackBoundary":
+                            previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "PackageGroupRef":
+                            previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.PackageGroup;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -1872,25 +1872,25 @@ namespace WixToolset.Core
                     var allowed = true;
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        if (id?.Id == BurnConstants.BundleDefaultBoundaryId)
-                        {
-                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                        }
-                        break;
-                    case "Vital":
-                        vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Transaction":
-                        transaction = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "LogPathVariable":
-                        logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    default:
-                        allowed = false;
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            if (id?.Id == BurnConstants.BundleDefaultBoundaryId)
+                            {
+                                this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                            }
+                            break;
+                        case "Vital":
+                            vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Transaction":
+                            transaction = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "LogPathVariable":
+                            logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        default:
+                            allowed = false;
+                            break;
                     }
 
                     if (!allowed)
@@ -2016,126 +2016,126 @@ namespace WixToolset.Core
                     var allowed = true;
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        compilerPayload.ParseId(attrib);
-                        break;
-                    case "Name":
-                        compilerPayload.ParseName(attrib);
-                        hasPayloadInfo = true;
-                        break;
-                    case "SourceFile":
-                        compilerPayload.ParseSourceFile(attrib);
-                        hasPayloadInfo = true;
-                        break;
-                    case "DownloadUrl":
-                        compilerPayload.ParseDownloadUrl(attrib);
-                        hasPayloadInfo = true;
-                        break;
-                    case "After":
-                        after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "InstallCondition":
-                        installCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Cache":
-                        var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (value)
-                        {
-                        case "force":
-                            cache = BundleCacheType.Force;
+                        case "Id":
+                            compilerPayload.ParseId(attrib);
                             break;
-                        case "keep":
-                            cache = BundleCacheType.Keep;
+                        case "Name":
+                            compilerPayload.ParseName(attrib);
+                            hasPayloadInfo = true;
                             break;
-                        case "remove":
-                            cache = BundleCacheType.Remove;
+                        case "SourceFile":
+                            compilerPayload.ParseSourceFile(attrib);
+                            hasPayloadInfo = true;
                             break;
-                        case "":
+                        case "DownloadUrl":
+                            compilerPayload.ParseDownloadUrl(attrib);
+                            hasPayloadInfo = true;
+                            break;
+                        case "After":
+                            after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "InstallCondition":
+                            installCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Cache":
+                            var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (value)
+                            {
+                                case "force":
+                                    cache = BundleCacheType.Force;
+                                    break;
+                                case "keep":
+                                    cache = BundleCacheType.Keep;
+                                    break;
+                                case "remove":
+                                    cache = BundleCacheType.Remove;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "force", "keep", "remove"));
+                                    break;
+                            }
+                            break;
+                        case "CacheId":
+                            cacheId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Description":
+                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DisplayName":
+                            displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "EnableFeatureSelection":
+                            enableFeatureSelection = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Msi);
+                            break;
+                        case "ForcePerMachine":
+                            forcePerMachine = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Msi);
+                            break;
+                        case "LogPathVariable":
+                            logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        case "RollbackLogPathVariable":
+                            rollbackPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        case "Permanent":
+                            permanent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Visible":
+                            visible = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Msi);
+                            break;
+                        case "Vital":
+                            vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Bundle":
+                            bundle = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            break;
+                        case "InstallArguments":
+                            installArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            break;
+                        case "RepairArguments":
+                            repairArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            break;
+                        case "UninstallArguments":
+                            uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            break;
+                        case "PerMachine":
+                            perMachine = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msp);
+                            break;
+                        case "DetectCondition":
+                            detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu);
+                            break;
+                        case "Protocol":
+                            protocol = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            break;
+                        case "InstallSize":
+                            installSize = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, Int64.MaxValue);
+                            break;
+                        case "KB":
+                            msuKB = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Msu);
+                            break;
+                        case "Compressed":
+                            compilerPayload.ParseCompressed(attrib);
+                            hasPayloadInfo = true;
+                            break;
+                        case "Slipstream":
+                            slipstream = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            allowed = (packageType == WixBundlePackageType.Msp);
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "force", "keep", "remove"));
+                            allowed = false;
                             break;
-                        }
-                        break;
-                    case "CacheId":
-                        cacheId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayName":
-                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "EnableFeatureSelection":
-                        enableFeatureSelection = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "ForcePerMachine":
-                        forcePerMachine = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "LogPathVariable":
-                        logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "RollbackLogPathVariable":
-                        rollbackPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Permanent":
-                        permanent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Visible":
-                        visible = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "Vital":
-                        vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Bundle":
-                        bundle = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "InstallArguments":
-                        installArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "RepairArguments":
-                        repairArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "UninstallArguments":
-                        uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "PerMachine":
-                        perMachine = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msp);
-                        break;
-                    case "DetectCondition":
-                        detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu);
-                        break;
-                    case "Protocol":
-                        protocol = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "InstallSize":
-                        installSize = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, Int64.MaxValue);
-                        break;
-                    case "KB":
-                        msuKB = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msu);
-                        break;
-                    case "Compressed":
-                        compilerPayload.ParseCompressed(attrib);
-                        hasPayloadInfo = true;
-                        break;
-                    case "Slipstream":
-                        slipstream = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msp);
-                        break;
-                    default:
-                        allowed = false;
-                        break;
                     }
 
                     if (!allowed)
@@ -2315,53 +2315,53 @@ namespace WixToolset.Core
                     var allowed = true;
                     switch (child.Name.LocalName)
                     {
-                    case "SlipstreamMsp":
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        if (allowed)
-                        {
-                            this.ParseSlipstreamMspElement(child, id.Id);
-                        }
-                        break;
-                    case "MsiProperty":
-                        allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
-                        if (allowed)
-                        {
-                            this.ParseMsiPropertyElement(child, id.Id);
-                        }
-                        break;
-                    case "Payload":
-                        this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id);
-                        break;
-                    case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);
-                        break;
-                    case "Provides":
-                        this.ParseProvidesElement(child, packageType, id.Id, out _);
-                        break;
-                    case "ExitCode":
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        if (allowed)
-                        {
-                            this.ParseExitCodeElement(child, id.Id);
-                        }
-                        break;
-                    case "CommandLine":
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        if (allowed)
-                        {
-                            this.ParseCommandLineElement(child, id.Id);
-                        }
-                        break;
-                    case "ExePackagePayload":
-                    case "MsiPackagePayload":
-                    case "MspPackagePayload":
-                    case "MsuPackagePayload":
-                        allowed = packagePayloadElementName == child.Name.LocalName;
-                        // Handled previously
-                        break;
-                    default:
-                        allowed = false;
-                        break;
+                        case "SlipstreamMsp":
+                            allowed = (packageType == WixBundlePackageType.Msi);
+                            if (allowed)
+                            {
+                                this.ParseSlipstreamMspElement(child, id.Id);
+                            }
+                            break;
+                        case "MsiProperty":
+                            allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
+                            if (allowed)
+                            {
+                                this.ParseMsiPropertyElement(child, id.Id);
+                            }
+                            break;
+                        case "Payload":
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id);
+                            break;
+                        case "PayloadGroupRef":
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);
+                            break;
+                        case "Provides":
+                            this.ParseProvidesElement(child, packageType, id.Id, out _);
+                            break;
+                        case "ExitCode":
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            if (allowed)
+                            {
+                                this.ParseExitCodeElement(child, id.Id);
+                            }
+                            break;
+                        case "CommandLine":
+                            allowed = (packageType == WixBundlePackageType.Exe);
+                            if (allowed)
+                            {
+                                this.ParseCommandLineElement(child, id.Id);
+                            }
+                            break;
+                        case "ExePackagePayload":
+                        case "MsiPackagePayload":
+                        case "MspPackagePayload":
+                        case "MsuPackagePayload":
+                            allowed = packagePayloadElementName == child.Name.LocalName;
+                            // Handled previously
+                            break;
+                        default:
+                            allowed = false;
+                            break;
                     }
 
                     if (!allowed)
@@ -2422,49 +2422,49 @@ namespace WixToolset.Core
 
                 switch (packageType)
                 {
-                case WixBundlePackageType.Exe:
-                    WixBundleExePackageAttributes exeAttributes = 0;
-                    exeAttributes |= (YesNoType.Yes == bundle) ? WixBundleExePackageAttributes.Bundle : 0;
+                    case WixBundlePackageType.Exe:
+                        WixBundleExePackageAttributes exeAttributes = 0;
+                        exeAttributes |= (YesNoType.Yes == bundle) ? WixBundleExePackageAttributes.Bundle : 0;
 
-                    this.Core.AddSymbol(new WixBundleExePackageSymbol(sourceLineNumbers, id)
-                    {
-                        Attributes = exeAttributes,
-                        DetectCondition = detectCondition,
-                        InstallCommand = installArguments,
-                        RepairCommand = repairArguments,
-                        UninstallCommand = uninstallArguments,
-                        ExeProtocol = protocol
-                    });
-                    break;
+                        this.Core.AddSymbol(new WixBundleExePackageSymbol(sourceLineNumbers, id)
+                        {
+                            Attributes = exeAttributes,
+                            DetectCondition = detectCondition,
+                            InstallCommand = installArguments,
+                            RepairCommand = repairArguments,
+                            UninstallCommand = uninstallArguments,
+                            ExeProtocol = protocol
+                        });
+                        break;
 
-                case WixBundlePackageType.Msi:
-                    WixBundleMsiPackageAttributes msiAttributes = 0;
-                    msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
-                    msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
+                    case WixBundlePackageType.Msi:
+                        WixBundleMsiPackageAttributes msiAttributes = 0;
+                        msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
+                        msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
 
-                    this.Core.AddSymbol(new WixBundleMsiPackageSymbol(sourceLineNumbers, id)
-                    {
-                        Attributes = msiAttributes
-                    });
-                    break;
+                        this.Core.AddSymbol(new WixBundleMsiPackageSymbol(sourceLineNumbers, id)
+                        {
+                            Attributes = msiAttributes
+                        });
+                        break;
 
-                case WixBundlePackageType.Msp:
-                    WixBundleMspPackageAttributes mspAttributes = 0;
-                    mspAttributes |= (YesNoType.Yes == slipstream) ? WixBundleMspPackageAttributes.Slipstream : 0;
+                    case WixBundlePackageType.Msp:
+                        WixBundleMspPackageAttributes mspAttributes = 0;
+                        mspAttributes |= (YesNoType.Yes == slipstream) ? WixBundleMspPackageAttributes.Slipstream : 0;
 
-                    this.Core.AddSymbol(new WixBundleMspPackageSymbol(sourceLineNumbers, id)
-                    {
-                        Attributes = mspAttributes
-                    });
-                    break;
+                        this.Core.AddSymbol(new WixBundleMspPackageSymbol(sourceLineNumbers, id)
+                        {
+                            Attributes = mspAttributes
+                        });
+                        break;
 
-                case WixBundlePackageType.Msu:
-                    this.Core.AddSymbol(new WixBundleMsuPackageSymbol(sourceLineNumbers, id)
-                    {
-                        DetectCondition = detectCondition,
-                        MsuKB = msuKB
-                    });
-                    break;
+                    case WixBundlePackageType.Msu:
+                        this.Core.AddSymbol(new WixBundleMsuPackageSymbol(sourceLineNumbers, id)
+                        {
+                            DetectCondition = detectCondition,
+                            MsuKB = msuKB
+                        });
+                        break;
                 }
 
                 this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, after);
@@ -2635,21 +2635,21 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "InstallArgument":
-                        installArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UninstallArgument":
-                        uninstallArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "RepairArgument":
-                        repairArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "InstallArgument":
+                            installArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UninstallArgument":
+                            uninstallArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RepairArgument":
+                            repairArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2693,16 +2693,16 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        if (id?.Id == BurnConstants.BundleChainPackageGroupId)
-                        {
-                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            if (id?.Id == BurnConstants.BundleChainPackageGroupId)
+                            {
+                                this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2725,33 +2725,33 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "MsiPackage":
-                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MspPackage":
-                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MsuPackage":
-                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "ExePackage":
-                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "RollbackBoundary":
-                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "PackageGroupRef":
-                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PackageGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "MsiPackage":
+                            previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "MspPackage":
+                            previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "MsuPackage":
+                            previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "ExePackage":
+                            previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "RollbackBoundary":
+                            previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "PackageGroupRef":
+                            previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.PackageGroup;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -2803,23 +2803,23 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        if (id == BurnConstants.BundleChainPackageGroupId)
-                        {
-                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id));
-                        }
-                        else
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackageGroup, id);
-                        }
-                        break;
-                    case "After":
-                        after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            if (id == BurnConstants.BundleChainPackageGroupId)
+                            {
+                                this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id));
+                            }
+                            else
+                            {
+                                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackageGroup, id);
+                            }
+                            break;
+                        case "After":
+                            after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2933,18 +2933,18 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Name":
-                        name = this.Core.GetAttributeMsiPropertyNameValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Name":
+                            name = this.Core.GetAttributeMsiPropertyNameValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2997,13 +2997,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackage, id);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackage, id);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3045,39 +3045,39 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Action":
-                        var action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (action)
-                        {
-                        case "Detect":
-                        case "detect":
-                            actionType = RelatedBundleActionType.Detect;
+                        case "Id":
+                            id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
                             break;
-                        case "Upgrade":
-                        case "upgrade":
-                            actionType = RelatedBundleActionType.Upgrade;
-                            break;
-                        case "Addon":
-                        case "addon":
-                            actionType = RelatedBundleActionType.Addon;
-                            break;
-                        case "Patch":
-                        case "patch":
-                            actionType = RelatedBundleActionType.Patch;
-                            break;
-                        case "":
+                        case "Action":
+                            var action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (action)
+                            {
+                                case "Detect":
+                                case "detect":
+                                    actionType = RelatedBundleActionType.Detect;
+                                    break;
+                                case "Upgrade":
+                                case "upgrade":
+                                    actionType = RelatedBundleActionType.Upgrade;
+                                    break;
+                                case "Addon":
+                                case "addon":
+                                    actionType = RelatedBundleActionType.Addon;
+                                    break;
+                                case "Patch":
+                                case "patch":
+                                    actionType = RelatedBundleActionType.Patch;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
+                                    break;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -3118,12 +3118,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Location":
-                        location = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Location":
+                            location = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3238,30 +3238,30 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Hidden":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            hidden = true;
-                        }
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeBundleVariableValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Persisted":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            persisted = true;
-                        }
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Type":
-                        typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Hidden":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                hidden = true;
+                            }
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeBundleVariableValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Persisted":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                persisted = true;
+                            }
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        case "Type":
+                            typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
