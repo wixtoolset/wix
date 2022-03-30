@@ -31,31 +31,31 @@ namespace WixToolset.Core.Burn.Bundles
         // See WinNT.h for details about the PE format, including the
         // structure and offsets for IMAGE_DOS_HEADER, IMAGE_NT_HEADERS32,
         // IMAGE_FILE_HEADER, etc.
-        protected const UInt32 IMAGE_DOS_HEADER_SIZE = 64;
-        protected const UInt32 IMAGE_DOS_HEADER_OFFSET_MAGIC = 0;
-        protected const UInt32 IMAGE_DOS_HEADER_OFFSET_NTHEADER = 60;
+        protected const uint IMAGE_DOS_HEADER_SIZE = 64;
+        protected const uint IMAGE_DOS_HEADER_OFFSET_MAGIC = 0;
+        protected const uint IMAGE_DOS_HEADER_OFFSET_NTHEADER = 60;
 
-        protected const UInt32 IMAGE_NT_HEADER_SIZE = 24; // signature DWORD (4) + IMAGE_FILE_HEADER (20)
-        protected const UInt32 IMAGE_NT_HEADER_OFFSET_SIGNATURE = 0;
-        protected const UInt32 IMAGE_NT_HEADER_OFFSET_NUMBEROFSECTIONS = 6;
-        protected const UInt32 IMAGE_NT_HEADER_OFFSET_SIZEOFOPTIONALHEADER = 20;
+        protected const uint IMAGE_NT_HEADER_SIZE = 24; // signature DWORD (4) + IMAGE_FILE_HEADER (20)
+        protected const uint IMAGE_NT_HEADER_OFFSET_SIGNATURE = 0;
+        protected const uint IMAGE_NT_HEADER_OFFSET_NUMBEROFSECTIONS = 6;
+        protected const uint IMAGE_NT_HEADER_OFFSET_SIZEOFOPTIONALHEADER = 20;
 
-        protected const UInt32 IMAGE_OPTIONAL_OFFSET_CHECKSUM = 4 * 16; // checksum is 16 DWORDs into IMAGE_OPTIONAL_HEADER which is right after the IMAGE_NT_HEADER.
-        protected const UInt32 IMAGE_OPTIONAL_NEGATIVE_OFFSET_CERTIFICATETABLE = (IMAGE_DATA_DIRECTORY_SIZE * (IMAGE_NUMBEROF_DIRECTORY_ENTRIES - IMAGE_DIRECTORY_ENTRY_SECURITY));
+        protected const uint IMAGE_OPTIONAL_OFFSET_CHECKSUM = 4 * 16; // checksum is 16 DWORDs into IMAGE_OPTIONAL_HEADER which is right after the IMAGE_NT_HEADER.
+        protected const uint IMAGE_OPTIONAL_NEGATIVE_OFFSET_CERTIFICATETABLE = (IMAGE_DATA_DIRECTORY_SIZE * (IMAGE_NUMBEROF_DIRECTORY_ENTRIES - IMAGE_DIRECTORY_ENTRY_SECURITY));
 
-        protected const UInt32 IMAGE_SECTION_HEADER_SIZE = 40;
-        protected const UInt32 IMAGE_SECTION_HEADER_OFFSET_NAME = 0;
-        protected const UInt32 IMAGE_SECTION_HEADER_OFFSET_VIRTUALSIZE = 8;
-        protected const UInt32 IMAGE_SECTION_HEADER_OFFSET_SIZEOFRAWDATA = 16;
-        protected const UInt32 IMAGE_SECTION_HEADER_OFFSET_POINTERTORAWDATA = 20;
+        protected const uint IMAGE_SECTION_HEADER_SIZE = 40;
+        protected const uint IMAGE_SECTION_HEADER_OFFSET_NAME = 0;
+        protected const uint IMAGE_SECTION_HEADER_OFFSET_VIRTUALSIZE = 8;
+        protected const uint IMAGE_SECTION_HEADER_OFFSET_SIZEOFRAWDATA = 16;
+        protected const uint IMAGE_SECTION_HEADER_OFFSET_POINTERTORAWDATA = 20;
 
-        protected const UInt32 IMAGE_DATA_DIRECTORY_SIZE = 8; // struct of two DWORDs.
-        protected const UInt32 IMAGE_DIRECTORY_ENTRY_SECURITY = 4;
-        protected const UInt32 IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
+        protected const uint IMAGE_DATA_DIRECTORY_SIZE = 8; // struct of two DWORDs.
+        protected const uint IMAGE_DIRECTORY_ENTRY_SECURITY = 4;
+        protected const uint IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
 
-        protected const UInt16 IMAGE_DOS_SIGNATURE = 0x5A4D;
-        protected const UInt32 IMAGE_NT_SIGNATURE = 0x00004550;
-        protected const UInt64 IMAGE_SECTION_WIXBURN_NAME = 0x6E7275627869772E; // ".wixburn", as a qword.
+        protected const ushort IMAGE_DOS_SIGNATURE = 0x5A4D;
+        protected const uint IMAGE_NT_SIGNATURE = 0x00004550;
+        protected const ulong IMAGE_SECTION_WIXBURN_NAME = 0x6E7275627869772E; // ".wixburn", as a qword.
 
         // The ".wixburn" section contains:
         //    0- 3:  magic number
@@ -69,32 +69,32 @@ namespace WixToolset.Core.Burn.Bundles
         //   44-47:  container count
         //   48-51:  byte count of manifest + UX container
         //   52-512:  byte count of attached containers (4 bytes for each container)
-        protected const UInt32 BURN_SECTION_OFFSET_MAGIC = 0;
-        protected const UInt32 BURN_SECTION_OFFSET_VERSION = 4;
-        protected const UInt32 BURN_SECTION_OFFSET_BUNDLEGUID = 8;
-        protected const UInt32 BURN_SECTION_OFFSET_STUBSIZE = 24;
-        protected const UInt32 BURN_SECTION_OFFSET_ORIGINALCHECKSUM = 28;
-        protected const UInt32 BURN_SECTION_OFFSET_ORIGINALSIGNATUREOFFSET = 32;
-        protected const UInt32 BURN_SECTION_OFFSET_ORIGINALSIGNATURESIZE = 36;
-        protected const UInt32 BURN_SECTION_OFFSET_FORMAT = 40;
-        protected const UInt32 BURN_SECTION_OFFSET_COUNT = 44;
-        protected const UInt32 BURN_SECTION_OFFSET_UXSIZE = 48;
-        protected const UInt32 BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0 = 52;
-        protected const UInt32 BURN_SECTION_MIN_SIZE = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0;
+        protected const uint BURN_SECTION_OFFSET_MAGIC = 0;
+        protected const uint BURN_SECTION_OFFSET_VERSION = 4;
+        protected const uint BURN_SECTION_OFFSET_BUNDLEGUID = 8;
+        protected const uint BURN_SECTION_OFFSET_STUBSIZE = 24;
+        protected const uint BURN_SECTION_OFFSET_ORIGINALCHECKSUM = 28;
+        protected const uint BURN_SECTION_OFFSET_ORIGINALSIGNATUREOFFSET = 32;
+        protected const uint BURN_SECTION_OFFSET_ORIGINALSIGNATURESIZE = 36;
+        protected const uint BURN_SECTION_OFFSET_FORMAT = 40;
+        protected const uint BURN_SECTION_OFFSET_COUNT = 44;
+        protected const uint BURN_SECTION_OFFSET_UXSIZE = 48;
+        protected const uint BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0 = 52;
+        protected const uint BURN_SECTION_MIN_SIZE = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0;
 
-        protected const UInt32 BURN_SECTION_MAGIC = 0x00f14300;
-        protected const UInt32 BURN_SECTION_VERSION = 0x00000002;
+        protected const uint BURN_SECTION_MAGIC = 0x00f14300;
+        protected const uint BURN_SECTION_VERSION = 0x00000002;
 
         protected string fileExe;
-        protected UInt32 peOffset = UInt32.MaxValue;
-        protected UInt16 sections = UInt16.MaxValue;
-        protected UInt32 firstSectionOffset = UInt32.MaxValue;
-        protected UInt32 checksumOffset;
-        protected UInt32 certificateTableSignatureOffset;
-        protected UInt32 certificateTableSignatureSize;
-        protected UInt32 wixburnDataOffset = UInt32.MaxValue;
-        protected UInt32 wixburnRawDataSize;
-        protected UInt32 wixburnMaxContainers;
+        protected uint peOffset = UInt32.MaxValue;
+        protected ushort sections = UInt16.MaxValue;
+        protected uint firstSectionOffset = UInt32.MaxValue;
+        protected uint checksumOffset;
+        protected uint certificateTableSignatureOffset;
+        protected uint certificateTableSignatureSize;
+        protected uint wixburnDataOffset = UInt32.MaxValue;
+        protected uint wixburnRawDataSize;
+        protected uint wixburnMaxContainers;
 
         // TODO: does this enum exist in another form somewhere?
         /// <summary>
@@ -104,7 +104,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             Nothing = 0,
             UX,
-            Attached
+            Attached,
         }
 
         /// <summary>
@@ -119,16 +119,16 @@ namespace WixToolset.Core.Burn.Bundles
             this.AttachedContainers = new List<ContainerSlot>();
         }
 
-        public UInt32 Checksum { get; protected set; }
-        public UInt32 SignatureOffset { get; protected set; }
-        public UInt32 SignatureSize { get; protected set; }
-        public UInt32 Version { get; protected set; }
-        public UInt32 StubSize { get; protected set; }
-        public UInt32 OriginalChecksum { get; protected set; }
-        public UInt32 OriginalSignatureOffset { get; protected set; }
-        public UInt32 OriginalSignatureSize { get; protected set; }
-        public UInt32 EngineSize { get; protected set; }
-        public UInt32 UXAddress {  get { return this.StubSize; } }
+        public uint Checksum { get; protected set; }
+        public uint SignatureOffset { get; protected set; }
+        public uint SignatureSize { get; protected set; }
+        public uint Version { get; protected set; }
+        public uint StubSize { get; protected set; }
+        public uint OriginalChecksum { get; protected set; }
+        public uint OriginalSignatureOffset { get; protected set; }
+        public uint OriginalSignatureSize { get; protected set; }
+        public uint EngineSize { get; protected set; }
+        public uint UXAddress {  get { return this.StubSize; } }
         public List<ContainerSlot> AttachedContainers { get; protected set; }
 
         protected IMessaging Messaging { get; }
@@ -179,10 +179,9 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             reader.BaseStream.Seek(this.wixburnDataOffset, SeekOrigin.Begin);
-            byte[] bytes = reader.ReadBytes((int)this.wixburnRawDataSize);
-            UInt32 uint32 = 0;
+            var bytes = reader.ReadBytes((int)this.wixburnRawDataSize);
 
-            uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_MAGIC);
+            var uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_MAGIC);
             if (BURN_SECTION_MAGIC != uint32)
             {
                 this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
@@ -208,7 +207,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.OriginalSignatureOffset = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALSIGNATUREOFFSET);
             this.OriginalSignatureSize = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALSIGNATURESIZE);
 
-            uint containerCount = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_COUNT);
+            var containerCount = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_COUNT);
             uint uxSize = 0;
             if (this.wixburnMaxContainers < containerCount)
             {
@@ -221,7 +220,7 @@ namespace WixToolset.Core.Burn.Bundles
                 for (uint i = 0; i < containerCount; ++i)
                 {
                     uint sizeOffset = BURN_SECTION_OFFSET_UXSIZE + (i * 4);
-                    uint size = BurnCommon.ReadUInt32(bytes, sizeOffset);
+                    var size = BurnCommon.ReadUInt32(bytes, sizeOffset);
                     this.AttachedContainers.Add(new ContainerSlot(size));
                 }
                 uxSize = this.AttachedContainers[0].Size;
@@ -261,11 +260,11 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
                 }
 
-                UInt32 wixburnSectionOffset = UInt32.MaxValue;
-                byte[] bytes = new byte[IMAGE_SECTION_HEADER_SIZE];
+                var wixburnSectionOffset = UInt32.MaxValue;
+                var bytes = new byte[IMAGE_SECTION_HEADER_SIZE];
 
                 reader.BaseStream.Seek(this.firstSectionOffset, SeekOrigin.Begin);
-                for (UInt16 sectionIndex = 0; sectionIndex < this.sections; ++sectionIndex)
+                for (ushort sectionIndex = 0; sectionIndex < this.sections; ++sectionIndex)
                 {
                     reader.Read(bytes, 0, bytes.Length);
 
@@ -292,7 +291,7 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
                 }
 
-                this.wixburnMaxContainers = (this.wixburnRawDataSize - BURN_SECTION_OFFSET_UXSIZE) / sizeof(UInt32);
+                this.wixburnMaxContainers = (this.wixburnRawDataSize - BURN_SECTION_OFFSET_UXSIZE) / sizeof(uint);
                 this.wixburnDataOffset = BurnCommon.ReadUInt32(bytes, IMAGE_SECTION_HEADER_OFFSET_POINTERTORAWDATA);
             }
 
@@ -313,7 +312,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 reader.BaseStream.Seek(this.peOffset, SeekOrigin.Begin);
-                byte[] bytes = reader.ReadBytes((int)IMAGE_NT_HEADER_SIZE);
+                var bytes = reader.ReadBytes((int)IMAGE_NT_HEADER_SIZE);
 
                 // Verify the NT signature...
                 if (IMAGE_NT_SIGNATURE != BurnCommon.ReadUInt32(bytes, IMAGE_NT_HEADER_OFFSET_SIGNATURE))
@@ -322,7 +321,7 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
                 }
 
-                ushort sizeOptionalHeader = BurnCommon.ReadUInt16(bytes, IMAGE_NT_HEADER_OFFSET_SIZEOFOPTIONALHEADER);
+                var sizeOptionalHeader = BurnCommon.ReadUInt16(bytes, IMAGE_NT_HEADER_OFFSET_SIZEOFOPTIONALHEADER);
 
                 this.sections = BurnCommon.ReadUInt16(bytes, IMAGE_NT_HEADER_OFFSET_NUMBEROFSECTIONS);
                 this.firstSectionOffset = this.peOffset + IMAGE_NT_HEADER_SIZE + sizeOptionalHeader;
@@ -348,7 +347,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             if (UInt32.MaxValue == this.peOffset)
             {
-                byte[] bytes = reader.ReadBytes((int)IMAGE_DOS_HEADER_SIZE);
+                var bytes = reader.ReadBytes((int)IMAGE_DOS_HEADER_SIZE);
 
                 // Verify the DOS 'MZ' signature.
                 if (IMAGE_DOS_SIGNATURE != BurnCommon.ReadUInt16(bytes, IMAGE_DOS_HEADER_OFFSET_MAGIC))
@@ -369,10 +368,10 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="bytes">Array from which to read.</param>
         /// <param name="offset">Beginning offset from which to read.</param>
         /// <returns>value at offset</returns>
-        internal static UInt16 ReadUInt16(byte[] bytes, UInt32 offset)
+        internal static ushort ReadUInt16(byte[] bytes, uint offset)
         {
             Debug.Assert(offset + 2 <= bytes.Length);
-            return (UInt16)(bytes[offset] + (bytes[offset + 1] << 8));
+            return (ushort)(bytes[offset] + (bytes[offset + 1] << 8));
         }
 
         /// <summary>
@@ -381,10 +380,10 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="bytes">Array from which to read.</param>
         /// <param name="offset">Beginning offset from which to read.</param>
         /// <returns>value at offset</returns>
-        internal static UInt32 ReadUInt32(byte[] bytes, UInt32 offset)
+        internal static uint ReadUInt32(byte[] bytes, uint offset)
         {
             Debug.Assert(offset + 4 <= bytes.Length);
-            return BurnCommon.ReadUInt16(bytes, offset) + ((UInt32)BurnCommon.ReadUInt16(bytes, offset + 2) << 16);
+            return BurnCommon.ReadUInt16(bytes, offset) + ((uint)BurnCommon.ReadUInt16(bytes, offset + 2) << 16);
         }
 
         /// <summary>
@@ -393,10 +392,10 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="bytes">Array from which to read.</param>
         /// <param name="offset">Beginning offset from which to read.</param>
         /// <returns>value at offset</returns>
-        internal static UInt64 ReadUInt64(byte[] bytes, UInt32 offset)
+        internal static ulong ReadUInt64(byte[] bytes, uint offset)
         {
             Debug.Assert(offset + 8 <= bytes.Length);
-            return BurnCommon.ReadUInt32(bytes, offset) + ((UInt64)BurnCommon.ReadUInt32(bytes, offset + 4) << 32);
+            return BurnCommon.ReadUInt32(bytes, offset) + ((ulong)BurnCommon.ReadUInt32(bytes, offset + 4) << 32);
         }
     }
 

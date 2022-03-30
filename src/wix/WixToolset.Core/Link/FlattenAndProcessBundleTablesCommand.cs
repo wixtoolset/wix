@@ -188,7 +188,6 @@ namespace WixToolset.Core.Link
                     }
                 }
             }
-
         }
     }
 }
