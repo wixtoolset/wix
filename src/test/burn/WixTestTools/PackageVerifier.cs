@@ -19,19 +19,42 @@ namespace WixTestTools
 
         public string GetInstalledFilePath(string filename)
         {
-            return this.TestContext.GetTestInstallFolder(this.IsX64, Path.Combine(this.GetInstallFolderName(), filename));
-        }
+            var fileRow = this.WiData.Tables["File"].Rows.Single(r => r.FieldAsString(2).Contains(filename));
+            var componentRow = this.WiData.Tables["Component"].Rows.Single(r => r.FieldAsString(0) == fileRow.FieldAsString(1));
+            var directoryId = componentRow.FieldAsString(2);
+            var path = filename;
 
-        public string GetInstallFolderName()
-        {
-            var row = this.WiData.Tables["Directory"].Rows.Single(r => r.FieldAsString(0) == "INSTALLFOLDER");
-            var value = row.FieldAsString(2);
-            var longNameIndex = value.IndexOf('|') + 1;
-            if (longNameIndex > 0)
+            while (directoryId != null)
             {
-                return value.Substring(longNameIndex);
+                string directoryName;
+
+                if (directoryId == "ProgramFiles6432Folder")
+                {
+                    var baseDirectory = this.IsX64 ? Environment.SpecialFolder.ProgramFiles : Environment.SpecialFolder.ProgramFilesX86;
+                    directoryName = Environment.GetFolderPath(baseDirectory);
+
+                    directoryId = null;
+                }
+                else if (directoryId == "LocalAppDataFolder")
+                {
+                    directoryName = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                    directoryId = null;
+                }
+                else
+                {
+                    var directoryRow = this.WiData.Tables["Directory"].Rows.Single(r => r.FieldAsString(0) == directoryId);
+                    var value = directoryRow.FieldAsString(2);
+                    var longNameIndex = value.IndexOf('|') + 1;
+                    directoryName = longNameIndex > 0 ? value.Substring(longNameIndex) : value;
+
+                    directoryId = directoryRow.FieldAsString(1);
+                }
+
+                path = Path.Combine(directoryName, path);
             }
-            return value;
+
+            return path;
         }
 
         public string GetProperty(string name)

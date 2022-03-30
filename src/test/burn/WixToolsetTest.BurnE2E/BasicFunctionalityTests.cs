@@ -41,10 +41,14 @@ namespace WixToolsetTest.BurnE2E
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleA_x64");
         }
 
-        [Fact(Skip = "Need to update assertions for per-user-ness.")]
+#if DEBUG
+        [Fact(Skip = "0xc0000005 during shutdown from tiptsf.dll")]
+#else
+        [Fact]
+#endif
         public void CanInstallAndUninstallSimplePerUserBundle_x64_wixstdba()
         {
-            this.CanInstallAndUninstallSimpleBundle("PackageApu_x64", "BundleApu_x64");
+            this.CanInstallAndUninstallSimpleBundle("PackageApu_x64", "BundleApu_x64", "PackagePerUser.wxs");
         }
 
         [Fact]
@@ -65,13 +69,13 @@ namespace WixToolsetTest.BurnE2E
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleD_x64");
         }
 
-        private void CanInstallAndUninstallSimpleBundle(string packageName, string bundleName)
+        private void CanInstallAndUninstallSimpleBundle(string packageName, string bundleName, string fileName = "Package.wxs")
         {
             var package = this.CreatePackageInstaller(packageName);
 
             var bundle = this.CreateBundleInstaller(bundleName);
 
-            var packageSourceCodeInstalled = package.GetInstalledFilePath("Package.wxs");
+            var packageSourceCodeInstalled = package.GetInstalledFilePath(fileName);
 
             // Source file should *not* be installed
             Assert.False(File.Exists(packageSourceCodeInstalled), $"{packageName} payload should not be there on test start: {packageSourceCodeInstalled}");
