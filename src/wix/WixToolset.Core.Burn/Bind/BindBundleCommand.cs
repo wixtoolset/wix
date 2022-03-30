@@ -178,6 +178,13 @@ namespace WixToolset.Core.Burn
             {
                 switch (facade.PackageSymbol.Type)
                 {
+                    case WixBundlePackageType.Bundle:
+                    {
+                        var command = new ProcessBundlePackageCommand(this.ServiceProvider, section, facade, packagesPayloads[facade.PackageId], this.IntermediateFolder);
+                        command.Execute();
+                    }
+                    break;
+
                     case WixBundlePackageType.Exe:
                     {
                         var command = new ProcessExePackageCommand(facade, payloadSymbols);

@@ -28,10 +28,12 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var wixGroupPackagesGroupedById = this.Section.Symbols.OfType<WixGroupSymbol>().Where(g => g.ParentType == ComplexReferenceParentType.Package).ToLookup(g => g.ParentId);
+            var bundlePackages = this.Section.Symbols.OfType<WixBundleBundlePackageSymbol>().ToDictionary(t => t.Id.Id);
             var exePackages = this.Section.Symbols.OfType<WixBundleExePackageSymbol>().ToDictionary(t => t.Id.Id);
             var msiPackages = this.Section.Symbols.OfType<WixBundleMsiPackageSymbol>().ToDictionary(t => t.Id.Id);
             var mspPackages = this.Section.Symbols.OfType<WixBundleMspPackageSymbol>().ToDictionary(t => t.Id.Id);
             var msuPackages = this.Section.Symbols.OfType<WixBundleMsuPackageSymbol>().ToDictionary(t => t.Id.Id);
+            var bundlePackagePayloads = this.Section.Symbols.OfType<WixBundleBundlePackagePayloadSymbol>().ToDictionary(t => t.Id.Id);
             var exePackagePayloads = this.Section.Symbols.OfType<WixBundleExePackagePayloadSymbol>().ToDictionary(t => t.Id.Id);
             var msiPackagePayloads = this.Section.Symbols.OfType<WixBundleMsiPackagePayloadSymbol>().ToDictionary(t => t.Id.Id);
             var mspPackagePayloads = this.Section.Symbols.OfType<WixBundleMspPackagePayloadSymbol>().ToDictionary(t => t.Id.Id);
@@ -49,7 +51,19 @@ namespace WixToolset.Core.Burn.Bundles
                     if (wixGroup.ChildType == ComplexReferenceChildType.PackagePayload)
                     {
                         IntermediateSymbol tempPackagePayload = null;
-                        if (exePackagePayloads.TryGetValue(wixGroup.ChildId, out var exePackagePayload))
+                        if (bundlePackagePayloads.TryGetValue(wixGroup.ChildId, out var bundlePackagePayload))
+                        {
+                            if (package.Type == WixBundlePackageType.Bundle)
+                            {
+                                tempPackagePayload = bundlePackagePayload;
+                            }
+                            else
+                            {
+                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported(bundlePackagePayload.SourceLineNumbers, "Bundle"));
+                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported2(package.SourceLineNumbers));
+                            }
+                        }
+                        else if (exePackagePayloads.TryGetValue(wixGroup.ChildId, out var exePackagePayload))
                         {
                             if (package.Type == WixBundlePackageType.Exe)
                             {
@@ -129,6 +143,17 @@ namespace WixToolset.Core.Burn.Bundles
 
                 switch (package.Type)
                 {
+                    case WixBundlePackageType.Bundle:
+                        if (bundlePackages.TryGetValue(id, out var bundlePackage))
+                        {
+                            facades.Add(id, new PackageFacade(package, bundlePackage));
+                        }
+                        else
+                        {
+                            this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleBundlePackage", id));
+                        }
+                        break;
+
                     case WixBundlePackageType.Exe:
                         if (exePackages.TryGetValue(id, out var exePackage))
                         {

@@ -125,6 +125,8 @@ namespace WixToolset.Data
         WixBundleCustomData,
         WixBundleCustomDataAttribute,
         WixBundleCustomDataCell,
+        WixBundleBundlePackage,
+        WixBundleBundlePackagePayload,
         WixBundleExePackage,
         WixBundleExePackagePayload,
         WixBundleExtension,
@@ -552,6 +554,12 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixBundle:
                     return SymbolDefinitions.WixBundle;
+
+                case SymbolDefinitionType.WixBundleBundlePackage:
+                    return SymbolDefinitions.WixBundleBundlePackage;
+
+                case SymbolDefinitionType.WixBundleBundlePackagePayload:
+                    return SymbolDefinitions.WixBundleBundlePackagePayload;
 
                 case SymbolDefinitionType.WixBundleContainer:
                     return SymbolDefinitions.WixBundleContainer;

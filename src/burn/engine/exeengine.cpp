@@ -91,7 +91,6 @@ extern "C" void ExeEnginePackageUninitialize(
     ReleaseStr(pPackage->Exe.sczInstallArguments);
     ReleaseStr(pPackage->Exe.sczRepairArguments);
     ReleaseStr(pPackage->Exe.sczUninstallArguments);
-    ReleaseStr(pPackage->Exe.sczIgnoreDependencies);
     ReleaseMem(pPackage->Exe.rgExitCodes);
 
     // free command-line arguments
@@ -291,12 +290,6 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
         pAction->exePackage.pPackage = pPackage;
         pAction->exePackage.action = pPackage->rollback;
 
-        if (pPackage->Exe.sczIgnoreDependencies)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczIgnoreDependencies, pPackage->Exe.sczIgnoreDependencies, 0);
-            ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
-        }
-
         if (pPackage->Exe.wzAncestors)
         {
             hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
@@ -324,12 +317,6 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
         pAction->type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
         pAction->exePackage.pPackage = pPackage;
         pAction->exePackage.action = pPackage->execute;
-
-        if (pPackage->Exe.sczIgnoreDependencies)
-        {
-            hr = StrAllocString(&pAction->exePackage.sczIgnoreDependencies, pPackage->Exe.sczIgnoreDependencies, 0);
-            ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
-        }
 
         if (pPackage->Exe.wzAncestors)
         {
@@ -455,12 +442,11 @@ extern "C" HRESULT ExeEngineExecutePackage(
         hr = StrAllocConcat(&sczBaseCommand, L" -norestart", 0);
         ExitOnFailure(hr, "Failed to append norestart argument.");
 
-        // Add the list of dependencies to ignore, if any, to the burn command line.
-        if (pExecuteAction->exePackage.sczIgnoreDependencies)
-        {
-            hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
-            ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
-        }
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls", BURN_COMMANDLINE_SWITCH_RELATED_CHAIN_PACKAGE);
+        ExitOnFailure(hr, "Failed to append the relation type to the command line.");
+
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=ALL", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES);
+        ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
 
         // Add the list of ancestors, if any, to the burn command line.
         if (pExecuteAction->exePackage.sczAncestors)

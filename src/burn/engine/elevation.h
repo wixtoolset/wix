@@ -89,6 +89,15 @@ HRESULT ElevationExecuteRelatedBundle(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+HRESULT ElevationExecuteBundlePackage(
+    __in HANDLE hPipe,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericExecuteProgress,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 HRESULT ElevationExecuteExePackage(
     __in HANDLE hPipe,
     __in BURN_EXECUTE_ACTION* pExecuteAction,

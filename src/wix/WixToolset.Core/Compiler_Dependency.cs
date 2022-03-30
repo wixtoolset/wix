@@ -129,7 +129,7 @@ namespace WixToolset.Core
                 this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "ProductCode");
                 key = "!(bind.property.ProductCode)";
             }
-            else if (WixBundlePackageType.Exe == packageType || WixBundlePackageType.Msu == packageType)
+            else if (WixBundlePackageType.Bundle == packageType || WixBundlePackageType.Exe == packageType || WixBundlePackageType.Msu == packageType)
             {
                 // Must specify the provider key when authored for a package.
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));

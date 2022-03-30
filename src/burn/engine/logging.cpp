@@ -781,6 +781,8 @@ extern "C" LPCSTR LoggingRelationTypeToString(
         return "DependentPatch";
     case BOOTSTRAPPER_RELATION_UPDATE:
         return "Update";
+    case BOOTSTRAPPER_RELATION_CHAIN_PACKAGE:
+        return "ChainPackage";
     default:
         return "Invalid";
     }

@@ -43,6 +43,7 @@ enum BURN_EXECUTE_ACTION_TYPE
     BURN_EXECUTE_ACTION_TYPE_WAIT_CACHE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE,
+    BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_MSP_TARGET,
@@ -165,6 +166,13 @@ typedef struct _BURN_EXECUTE_ACTION
             BURN_PACKAGE* pPackage;
             BOOTSTRAPPER_ACTION_STATE action;
             LPWSTR sczIgnoreDependencies;
+            LPWSTR sczAncestors;
+            LPWSTR sczEngineWorkingDirectory;
+        } bundlePackage;
+        struct
+        {
+            BURN_PACKAGE* pPackage;
+            BOOTSTRAPPER_ACTION_STATE action;
             LPWSTR sczAncestors;
             LPWSTR sczEngineWorkingDirectory;
         } exePackage;

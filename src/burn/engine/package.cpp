@@ -87,7 +87,7 @@ extern "C" HRESULT PackagesParseFromXml(
     ReleaseNullObject(pixnNodes); // done with the RollbackBoundary elements.
 
     // select package nodes
-    hr = XmlSelectNodes(pixnBundle, L"Chain/ExePackage|Chain/MsiPackage|Chain/MspPackage|Chain/MsuPackage", &pixnNodes);
+    hr = XmlSelectNodes(pixnBundle, L"Chain/BundlePackage|Chain/ExePackage|Chain/MsiPackage|Chain/MspPackage|Chain/MsuPackage", &pixnNodes);
     ExitOnFailure(hr, "Failed to select package nodes.");
 
     // get package node count
@@ -199,7 +199,14 @@ extern "C" HRESULT PackagesParseFromXml(
         }
 
         // read type specific attributes
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"ExePackage", -1))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"BundlePackage", -1))
+        {
+            pPackage->type = BURN_PACKAGE_TYPE_BUNDLE;
+
+            hr = BundlePackageEngineParsePackageFromXml(pixnNode, pPackage); // TODO: Modularization
+            ExitOnFailure(hr, "Failed to parse BUNDLE package.");
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"ExePackage", -1))
         {
             pPackage->type = BURN_PACKAGE_TYPE_EXE;
 
@@ -231,7 +238,7 @@ extern "C" HRESULT PackagesParseFromXml(
         }
         else
         {
-            // ignore other package types for now
+            ExitWithRootFailure(hr, E_UNEXPECTED, "Invalid package type: %ls", bstrNodeName);
         }
 
         if (!pPackage->fPermanent)
@@ -371,7 +378,7 @@ extern "C" void PackageUninitialize(
     switch (pPackage->type)
     {
     case BURN_PACKAGE_TYPE_BUNDLE:
-        BundlePackageEnginePackageUninitialize(pPackage);
+        BundlePackageEnginePackageUninitialize(pPackage); // TODO: Modularization
         break;
     case BURN_PACKAGE_TYPE_EXE:
         ExeEnginePackageUninitialize(pPackage); // TODO: Modularization
@@ -648,7 +655,6 @@ static HRESULT ParsePatchTargetCode(
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
-    BSTR bstrNodeText = NULL;
     BOOL fProduct;
 
     hr = XmlSelectNodes(pixnBundle, L"PatchTargetCode", &pixnNodes);
@@ -688,12 +694,10 @@ static HRESULT ParsePatchTargetCode(
         pTargetCode->type = fProduct ? BURN_PATCH_TARGETCODE_TYPE_PRODUCT : BURN_PATCH_TARGETCODE_TYPE_UPGRADE;
 
         // prepare next iteration
-        ReleaseNullBSTR(bstrNodeText);
         ReleaseNullObject(pixnNode);
     }
 
 LExit:
-    ReleaseBSTR(bstrNodeText);
     ReleaseObject(pixnNode);
     ReleaseObject(pixnNodes);
 

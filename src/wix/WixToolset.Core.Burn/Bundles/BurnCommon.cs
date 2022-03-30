@@ -37,6 +37,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         protected const uint IMAGE_NT_HEADER_SIZE = 24; // signature DWORD (4) + IMAGE_FILE_HEADER (20)
         protected const uint IMAGE_NT_HEADER_OFFSET_SIGNATURE = 0;
+        protected const uint IMAGE_NT_HEADER_OFFSET_MACHINE = 4;
         protected const uint IMAGE_NT_HEADER_OFFSET_NUMBEROFSECTIONS = 6;
         protected const uint IMAGE_NT_HEADER_OFFSET_SIZEOFOPTIONALHEADER = 20;
 
@@ -56,6 +57,12 @@ namespace WixToolset.Core.Burn.Bundles
         protected const ushort IMAGE_DOS_SIGNATURE = 0x5A4D;
         protected const uint IMAGE_NT_SIGNATURE = 0x00004550;
         protected const ulong IMAGE_SECTION_WIXBURN_NAME = 0x6E7275627869772E; // ".wixburn", as a qword.
+
+        public const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
+        public const ushort IMAGE_FILE_MACHINE_ARM = 0x1C0;
+        public const ushort IMAGE_FILE_MACHINE_ARM64 = 0xAA64;
+        public const ushort IMAGE_FILE_MACHINE_ARMNT = 0x1C4;
+        public const ushort IMAGE_FILE_MACHINE_I386 = 0x14C;
 
         // The ".wixburn" section contains:
         //    0- 3:  magic number
@@ -119,10 +126,13 @@ namespace WixToolset.Core.Burn.Bundles
             this.AttachedContainers = new List<ContainerSlot>();
         }
 
+        public bool Invalid { get; protected set; }
+        public ushort MachineType { get; private set; }
         public uint Checksum { get; protected set; }
         public uint SignatureOffset { get; protected set; }
         public uint SignatureSize { get; protected set; }
         public uint Version { get; protected set; }
+        public Guid BundleId { get; protected set; }
         public uint StubSize { get; protected set; }
         public uint OriginalChecksum { get; protected set; }
         public uint OriginalSignatureOffset { get; protected set; }
@@ -170,8 +180,12 @@ namespace WixToolset.Core.Burn.Bundles
         /// Initialize the common information about a Burn engine.
         /// </summary>
         /// <param name="reader">Binary reader open against a Burn engine.</param>
-        /// <returns>True if initialized.</returns>
-        protected bool Initialize(BinaryReader reader)
+        protected void Initialize(BinaryReader reader)
+        {
+            this.Invalid = !this.TryInitialize(reader);
+        }
+
+        private bool TryInitialize(BinaryReader reader)
         {
             if (!this.GetWixburnSectionInfo(reader))
             {
@@ -202,6 +216,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return false;
             }
 
+            this.BundleId = BurnCommon.ReadGuid(bytes, BURN_SECTION_OFFSET_BUNDLEGUID);
             this.StubSize = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_STUBSIZE);
             this.OriginalChecksum = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALCHECKSUM);
             this.OriginalSignatureOffset = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALSIGNATUREOFFSET);
@@ -321,6 +336,8 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
                 }
 
+                this.MachineType = BurnCommon.ReadUInt16(bytes, IMAGE_NT_HEADER_OFFSET_MACHINE);
+
                 var sizeOptionalHeader = BurnCommon.ReadUInt16(bytes, IMAGE_NT_HEADER_OFFSET_SIZEOFOPTIONALHEADER);
 
                 this.sections = BurnCommon.ReadUInt16(bytes, IMAGE_NT_HEADER_OFFSET_NUMBEROFSECTIONS);
@@ -360,6 +377,17 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             return true;
+        }
+
+        internal static Guid ReadGuid(byte[] bytes, uint offset)
+        {
+            var guidBytes = new byte[16];
+            for (var i = 0; i < 16; ++i)
+            {
+                guidBytes[i] = bytes[offset + i];
+            }
+
+            return new Guid(guidBytes);
         }
 
         /// <summary>

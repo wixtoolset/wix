@@ -2,16 +2,80 @@
 
 #include "precomp.h"
 
+static HRESULT ExecuteBundle(
+    __in BURN_CACHE* pCache,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BURN_PACKAGE* pPackage,
+    __in_z_opt LPCWSTR wzIgnoreDependencies,
+    __in_z_opt LPCWSTR wzAncestors,
+    __in_z_opt LPCWSTR wzEngineWorkingDirectory,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 static BOOTSTRAPPER_RELATION_TYPE ConvertRelationType(
     __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE relationType
     );
 
 // function definitions
 
+extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
+    __in IXMLDOMNode* pixnBundlePackage,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fFoundXml = FALSE;
+    LPWSTR scz = NULL;
+
+    // @DetectCondition
+    hr = XmlGetAttributeEx(pixnBundlePackage, L"BundleId", &pPackage->Bundle.sczBundleId);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @BundleId.");
+
+    // @InstallArguments
+    hr = XmlGetAttributeEx(pixnBundlePackage, L"InstallArguments", &pPackage->Bundle.sczInstallArguments);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallArguments.");
+
+    // @UninstallArguments
+    hr = XmlGetAttributeEx(pixnBundlePackage, L"UninstallArguments", &pPackage->Bundle.sczUninstallArguments);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UninstallArguments.");
+
+    // @RepairArguments
+    hr = XmlGetAttributeEx(pixnBundlePackage, L"RepairArguments", &pPackage->Bundle.sczRepairArguments);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RepairArguments.");
+
+    // @SupportsBurnProtocol
+    hr = XmlGetYesNoAttribute(pixnBundlePackage, L"SupportsBurnProtocol", &pPackage->Bundle.fSupportsBurnProtocol);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @SupportsBurnProtocol.");
+
+    // @Win64
+    hr = XmlGetYesNoAttribute(pixnBundlePackage, L"Win64", &pPackage->Bundle.fWin64);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Win64.");
+
+    hr = ExeEngineParseExitCodesFromXml(pixnBundlePackage, &pPackage->Bundle.rgExitCodes, &pPackage->Bundle.cExitCodes);
+    ExitOnFailure(hr, "Failed to parse exit codes.");
+
+    hr = ExeEngineParseCommandLineArgumentsFromXml(pixnBundlePackage, &pPackage->Bundle.rgCommandLineArguments, &pPackage->Bundle.cCommandLineArguments);
+    ExitOnFailure(hr, "Failed to parse command lines.");
+
+    hr = StrAllocFormatted(&pPackage->Bundle.sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pPackage->Bundle.sczBundleId);
+    ExitOnFailure(hr, "Failed to build uninstall registry key path.");
+
+LExit:
+    ReleaseStr(scz);
+
+    return hr;
+}
+
 extern "C" void BundlePackageEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     )
 {
+    ReleaseStr(pPackage->Bundle.sczBundleId);
+    ReleaseStr(pPackage->Bundle.sczRegistrationKey);
     ReleaseStr(pPackage->Bundle.sczInstallArguments);
     ReleaseStr(pPackage->Bundle.sczRepairArguments);
     ReleaseStr(pPackage->Bundle.sczUninstallArguments);
@@ -30,6 +94,44 @@ extern "C" void BundlePackageEnginePackageUninitialize(
 
     // clear struct
     memset(&pPackage->Bundle, 0, sizeof(pPackage->Bundle));
+}
+
+extern "C" HRESULT BundlePackageEngineDetectPackage(
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hkRegistration = NULL;
+    DWORD dwInstalled = 0;
+    BOOL fDetected = FALSE;
+    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    REG_KEY_BITNESS bitness = pPackage->Bundle.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT;
+
+    // TODO: detect all related bundles, so that the Obsolete state can be detected.
+    hr = RegOpenEx(hkRoot, pPackage->Bundle.sczRegistrationKey, KEY_QUERY_VALUE, bitness, &hkRegistration);
+    if (SUCCEEDED(hr))
+    {
+        hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, &dwInstalled);
+    }
+
+    // Not finding the key or value is okay.
+    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    {
+        hr = S_OK;
+    }
+
+    fDetected = (1 == dwInstalled);
+
+    // update detect state
+    pPackage->currentState = fDetected ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+
+    ReleaseRegKey(hkRegistration);
+    return hr;
 }
 
 //
@@ -151,6 +253,79 @@ LExit:
 //
 // PlanAdd - adds the calculated execute and rollback actions for the package.
 //
+extern "C" HRESULT BundlePackageEnginePlanAddPackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_PLAN* pPlan,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_EXECUTE_ACTION* pAction = NULL;
+
+    hr = DependencyPlanPackage(NULL, pPackage, pPlan);
+    ExitOnFailure(hr, "Failed to plan package dependency actions.");
+
+    // add rollback action
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback)
+    {
+        hr = PlanAppendRollbackAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append rollback action.");
+
+        pAction->type = BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE;
+        pAction->bundlePackage.pPackage = pPackage;
+        pAction->bundlePackage.action = pPackage->rollback;
+
+        if (pPackage->Bundle.wzAncestors)
+        {
+            hr = StrAllocString(&pAction->bundlePackage.sczAncestors, pPackage->Bundle.wzAncestors, 0);
+            ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+        }
+
+        if (pPackage->Bundle.wzEngineWorkingDirectory)
+        {
+            hr = StrAllocString(&pAction->bundlePackage.sczEngineWorkingDirectory, pPackage->Bundle.wzEngineWorkingDirectory, 0);
+            ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+        }
+
+        LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, NULL); // ignore errors.
+
+        hr = PlanExecuteCheckpoint(pPlan);
+        ExitOnFailure(hr, "Failed to append execute checkpoint.");
+    }
+
+    // add execute action
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
+    {
+        hr = PlanAppendExecuteAction(pPlan, &pAction);
+        ExitOnFailure(hr, "Failed to append execute action.");
+
+        pAction->type = BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE;
+        pAction->bundlePackage.pPackage = pPackage;
+        pAction->bundlePackage.action = pPackage->execute;
+
+        if (pPackage->Bundle.wzAncestors)
+        {
+            hr = StrAllocString(&pAction->bundlePackage.sczAncestors, pPackage->Bundle.wzAncestors, 0);
+            ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+        }
+
+        if (pPackage->Bundle.wzEngineWorkingDirectory)
+        {
+            hr = StrAllocString(&pAction->bundlePackage.sczEngineWorkingDirectory, pPackage->Bundle.wzEngineWorkingDirectory, 0);
+            ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+        }
+
+        LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, NULL); // ignore errors.
+    }
+
+LExit:
+    return hr;
+}
+
+//
+// PlanAdd - adds the calculated execute and rollback actions for the related bundle.
+//
 extern "C" HRESULT BundlePackageEnginePlanAddRelatedBundle(
     __in_opt DWORD *pdwInsertSequence,
     __in BURN_RELATED_BUNDLE* pRelatedBundle,
@@ -164,7 +339,7 @@ extern "C" HRESULT BundlePackageEnginePlanAddRelatedBundle(
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
 
     hr = DependencyPlanPackage(pdwInsertSequence, pPackage, pPlan);
-    ExitOnFailure(hr, "Failed to plan package dependency actions.");
+    ExitOnFailure(hr, "Failed to plan related bundle dependency actions.");
 
     // add execute action
     if (BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute)
@@ -240,6 +415,26 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT BundlePackageEngineExecutePackage(
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    BOOTSTRAPPER_ACTION_STATE action = pExecuteAction->bundlePackage.action;
+    LPCWSTR wzIgnoreDependencies = pExecuteAction->bundlePackage.sczIgnoreDependencies;
+    LPCWSTR wzAncestors = pExecuteAction->bundlePackage.sczAncestors;
+    LPCWSTR wzEngineWorkingDirectory = pExecuteAction->bundlePackage.sczEngineWorkingDirectory;
+    BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
+    BURN_PACKAGE* pPackage = pExecuteAction->bundlePackage.pPackage;
+
+    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+}
+
 extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_CACHE* pCache,
@@ -247,6 +442,57 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     __in BOOL fRollback,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    BOOTSTRAPPER_ACTION_STATE action = pExecuteAction->relatedBundle.action;
+    LPCWSTR wzIgnoreDependencies = pExecuteAction->relatedBundle.sczIgnoreDependencies;
+    LPCWSTR wzAncestors = pExecuteAction->relatedBundle.sczAncestors;
+    LPCWSTR wzEngineWorkingDirectory = pExecuteAction->relatedBundle.sczEngineWorkingDirectory;
+    BURN_RELATED_BUNDLE* pRelatedBundle = pExecuteAction->relatedBundle.pRelatedBundle;
+    BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
+    BURN_PACKAGE* pPackage = &pRelatedBundle->package;
+
+    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+}
+
+extern "C" void BundlePackageEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute
+    )
+{
+    BURN_PACKAGE* pPackage = pAction->bundlePackage.pPackage;
+
+    if (FAILED(hrExecute) || !pPackage->fCanAffectRegistration)
+    {
+        ExitFunction();
+    }
+
+    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pAction->bundlePackage.action)
+    {
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+    else
+    {
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+    }
+
+LExit:
+    return;
+}
+
+static HRESULT ExecuteBundle(
+    __in BURN_CACHE* pCache,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BURN_PACKAGE* pPackage,
+    __in_z_opt LPCWSTR wzIgnoreDependencies,
+    __in_z_opt LPCWSTR wzAncestors,
+    __in_z_opt LPCWSTR wzEngineWorkingDirectory,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
@@ -264,10 +510,6 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     PROCESS_INFORMATION pi = { };
     DWORD dwExitCode = 0;
     GENERIC_EXECUTE_MESSAGE message = { };
-    BOOTSTRAPPER_ACTION_STATE action = pExecuteAction->relatedBundle.action;
-    BURN_RELATED_BUNDLE* pRelatedBundle = pExecuteAction->relatedBundle.pRelatedBundle;
-    BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
-    BURN_PACKAGE* pPackage = &pRelatedBundle->package;
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
     LPCWSTR wzRelationTypeCommandLine = CoreRelationTypeToCommandLineString(relationType);
     LPCWSTR wzOperationCommandLine = NULL;
@@ -376,21 +618,29 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     }
 
     // Add the list of dependencies to ignore, if any, to the burn command line.
-    if (pExecuteAction->relatedBundle.sczIgnoreDependencies)
+    if (BOOTSTRAPPER_RELATION_CHAIN_PACKAGE == relationType)
     {
-        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->relatedBundle.sczIgnoreDependencies);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=ALL", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES);
+        ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
+    }
+    else if (wzIgnoreDependencies)
+    {
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, wzIgnoreDependencies);
         ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
     }
 
     // Add the list of ancestors, if any, to the burn command line.
-    if (pExecuteAction->relatedBundle.sczAncestors)
+    if (wzAncestors)
     {
-        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->relatedBundle.sczAncestors);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, wzAncestors);
         ExitOnFailure(hr, "Failed to append the list of ancestors to the command line.");
     }
 
-    hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->relatedBundle.sczEngineWorkingDirectory, &sczBaseCommand, NULL);
-    ExitOnFailure(hr, "Failed to append the custom working directory to the bundlepackage command line.");
+    if (wzEngineWorkingDirectory)
+    {
+        hr = CoreAppendEngineWorkingDirectoryToCommandLine(wzEngineWorkingDirectory, &sczBaseCommand, NULL);
+        ExitOnFailure(hr, "Failed to append the custom working directory to the bundlepackage command line.");
+    }
 
     hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczBaseCommand, NULL);
     ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);

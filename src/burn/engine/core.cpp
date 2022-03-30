@@ -956,6 +956,9 @@ extern "C" LPCWSTR CoreRelationTypeToCommandLineString(
     case BOOTSTRAPPER_RELATION_DEPENDENT_PATCH:
         wzRelationTypeCommandLine = BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_PATCH;
         break;
+    case BOOTSTRAPPER_RELATION_CHAIN_PACKAGE:
+        wzRelationTypeCommandLine = BURN_COMMANDLINE_SWITCH_RELATED_CHAIN_PACKAGE;
+        break;
     case BOOTSTRAPPER_RELATION_NONE: __fallthrough;
     default:
         wzRelationTypeCommandLine = NULL;
@@ -1709,6 +1712,12 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_CHAIN_PACKAGE, -1))
+            {
+                pCommand->relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
+
+                LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
+            }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PASSTHROUGH, -1))
             {
                 pCommand->fPassthrough = TRUE;
@@ -2111,6 +2120,10 @@ static HRESULT DetectPackage(
     // Use the correct engine to detect the package.
     switch (pPackage->type)
     {
+    case BURN_PACKAGE_TYPE_BUNDLE:
+        hr = BundlePackageEngineDetectPackage(pPackage);
+        break;
+
     case BURN_PACKAGE_TYPE_EXE:
         hr = ExeEngineDetectPackage(pPackage, &pEngineState->registration, &pEngineState->variables);
         break;
@@ -2128,8 +2141,7 @@ static HRESULT DetectPackage(
         break;
 
     default:
-        hr = E_NOTIMPL;
-        ExitOnRootFailure(hr, "Package type not supported by detect yet.");
+        ExitWithRootFailure(hr, E_NOTIMPL, "Package type not supported by detect yet.");
     }
 
 LExit:

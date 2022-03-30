@@ -9,11 +9,24 @@ extern "C" {
 
 // function declarations
 
+HRESULT BundlePackageEngineParsePackageFromXml(
+    __in IXMLDOMNode* pixnBundlePackage,
+    __in BURN_PACKAGE* pPackage
+    );
 void BundlePackageEnginePackageUninitialize(
+    __in BURN_PACKAGE* pPackage
+    );
+HRESULT BundlePackageEngineDetectPackage(
     __in BURN_PACKAGE* pPackage
     );
 HRESULT BundlePackageEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage
+    );
+HRESULT BundlePackageEnginePlanAddPackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_PLAN* pPlan,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT BundlePackageEnginePlanAddRelatedBundle(
     __in_opt DWORD *pdwInsertSequence,
@@ -21,6 +34,15 @@ HRESULT BundlePackageEnginePlanAddRelatedBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables
+    );
+HRESULT BundlePackageEngineExecutePackage(
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 HRESULT BundlePackageEngineExecuteRelatedBundle(
     __in BURN_EXECUTE_ACTION* pExecuteAction,
@@ -30,6 +52,10 @@ HRESULT BundlePackageEngineExecuteRelatedBundle(
     __in PFN_GENERICMESSAGEHANDLER pfnGenericExecuteProgress,
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
+void BundlePackageEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute
     );
 
 

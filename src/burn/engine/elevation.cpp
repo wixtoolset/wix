@@ -20,6 +20,7 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP,
     BURN_ELEVATION_MESSAGE_TYPE_PROCESS_DEPENDENT_REGISTRATION,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE,
+    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE,
@@ -246,6 +247,14 @@ static HRESULT OnExecuteRelatedBundle(
     __in HANDLE hPipe,
     __in BURN_CACHE* pCache,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
+    __in BURN_VARIABLES* pVariables,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    );
+static HRESULT OnExecuteBundlePackage(
+    __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -911,6 +920,63 @@ LExit:
 }
 
 /*******************************************************************
+ ElevationExecuteBundlePackage - 
+
+*******************************************************************/
+extern "C" HRESULT ElevationExecuteBundlePackage(
+    __in HANDLE hPipe,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOL fRollback,
+    __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    BURN_ELEVATION_GENERIC_MESSAGE_CONTEXT context = { };
+    DWORD dwResult = 0;
+
+    // serialize message data
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.pPackage->sczId);
+    ExitOnFailure(hr, "Failed to write package id to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->bundlePackage.action);
+    ExitOnFailure(hr, "Failed to write action to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, fRollback);
+    ExitOnFailure(hr, "Failed to write rollback.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.sczIgnoreDependencies);
+    ExitOnFailure(hr, "Failed to write the list of dependencies to ignore to the message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.sczAncestors);
+    ExitOnFailure(hr, "Failed to write the list of ancestors to the message buffer.");
+
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.sczEngineWorkingDirectory);
+    ExitOnFailure(hr, "Failed to write the custom working directory to the message buffer.");
+
+    hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
+    ExitOnFailure(hr, "Failed to write variables.");
+
+    // send message
+    context.pfnGenericMessageHandler = pfnGenericMessageHandler;
+    context.pvContext = pvContext;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE message to per-machine process.");
+
+    hr = ProcessResult(dwResult, pRestart);
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return hr;
+}
+
+/*******************************************************************
  ElevationExecuteExePackage - 
 
 *******************************************************************/
@@ -939,9 +1005,6 @@ extern "C" HRESULT ElevationExecuteExePackage(
 
     hr = BuffWriteNumber(&pbData, &cbData, fRollback);
     ExitOnFailure(hr, "Failed to write rollback.");
-
-    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczIgnoreDependencies);
-    ExitOnFailure(hr, "Failed to write the list of dependencies to ignore to the message buffer.");
 
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczAncestors);
     ExitOnFailure(hr, "Failed to write the list of ancestors to the message buffer.");
@@ -2124,6 +2187,10 @@ static HRESULT ProcessElevatedChildMessage(
         hrResult = OnExecuteRelatedBundle(pContext->hPipe, pContext->pCache, &pContext->pRegistration->relatedBundles, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
+    case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE:
+        hrResult = OnExecuteBundlePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        break;
+
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE:
         hrResult = OnExecuteExePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
@@ -2839,7 +2906,7 @@ LExit:
     return hr;
 }
 
-static HRESULT OnExecuteExePackage(
+static HRESULT OnExecuteBundlePackage(
     __in HANDLE hPipe,
     __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
@@ -2856,15 +2923,15 @@ static HRESULT OnExecuteExePackage(
     LPWSTR sczIgnoreDependencies = NULL;
     LPWSTR sczAncestors = NULL;
     LPWSTR sczEngineWorkingDirectory = NULL;
-    BOOTSTRAPPER_APPLY_RESTART exeRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    BOOTSTRAPPER_APPLY_RESTART bundleRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
-    executeAction.type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
+    executeAction.type = BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE;
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
     ExitOnFailure(hr, "Failed to read EXE package id.");
 
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.exePackage.action);
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.bundlePackage.action);
     ExitOnFailure(hr, "Failed to read action.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRollback);
@@ -2882,19 +2949,105 @@ static HRESULT OnExecuteExePackage(
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
 
+    hr = PackageFindById(pPackages, sczPackage, &executeAction.bundlePackage.pPackage);
+    ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
+
+    if (BURN_PACKAGE_TYPE_BUNDLE != executeAction.bundlePackage.pPackage->type)
+    {
+        ExitWithRootFailure(hr, E_INVALIDARG, "Package is not a BUNDLE package: %ls", sczPackage);
+    }
+
+    // Pass the list of dependencies to ignore, if any, to the related bundle.
+    if (sczIgnoreDependencies && *sczIgnoreDependencies)
+    {
+        hr = StrAllocString(&executeAction.bundlePackage.sczIgnoreDependencies, sczIgnoreDependencies, 0);
+        ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+    }
+
+    // Pass the list of ancestors, if any, to the related bundle.
+    if (sczAncestors && *sczAncestors)
+    {
+        hr = StrAllocString(&executeAction.bundlePackage.sczAncestors, sczAncestors, 0);
+        ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+    }
+
+    if (sczEngineWorkingDirectory && *sczEngineWorkingDirectory)
+    {
+        hr = StrAllocString(&executeAction.bundlePackage.sczEngineWorkingDirectory, sczEngineWorkingDirectory, 0);
+        ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+    }
+
+    // Execute BUNDLE package.
+    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &bundleRestart);
+    ExitOnFailure(hr, "Failed to execute BUNDLE package.");
+
+LExit:
+    ReleaseStr(sczEngineWorkingDirectory);
+    ReleaseStr(sczAncestors);
+    ReleaseStr(sczIgnoreDependencies);
+    ReleaseStr(sczPackage);
+    PlanUninitializeExecuteAction(&executeAction);
+
+    if (SUCCEEDED(hr))
+    {
+        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == bundleRestart)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
+        }
+        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == bundleRestart)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
+        }
+    }
+
+    return hr;
+}
+
+static HRESULT OnExecuteExePackage(
+    __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_VARIABLES* pVariables,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczPackage = NULL;
+    DWORD dwRollback = 0;
+    BURN_EXECUTE_ACTION executeAction = { };
+    LPWSTR sczAncestors = NULL;
+    LPWSTR sczEngineWorkingDirectory = NULL;
+    BOOTSTRAPPER_APPLY_RESTART exeRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+
+    executeAction.type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
+
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
+    ExitOnFailure(hr, "Failed to read EXE package id.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.exePackage.action);
+    ExitOnFailure(hr, "Failed to read action.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, &dwRollback);
+    ExitOnFailure(hr, "Failed to read rollback.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczAncestors);
+    ExitOnFailure(hr, "Failed to read the list of ancestors.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczEngineWorkingDirectory);
+    ExitOnFailure(hr, "Failed to read the custom working directory.");
+
+    hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
+    ExitOnFailure(hr, "Failed to read variables.");
+
     hr = PackageFindById(pPackages, sczPackage, &executeAction.exePackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
     if (BURN_PACKAGE_TYPE_EXE != executeAction.exePackage.pPackage->type)
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an EXE package: %ls", sczPackage);
-    }
-
-    // Pass the list of dependencies to ignore, if any, to the related bundle.
-    if (sczIgnoreDependencies && *sczIgnoreDependencies)
-    {
-        hr = StrAllocString(&executeAction.exePackage.sczIgnoreDependencies, sczIgnoreDependencies, 0);
-        ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
     }
 
     // Pass the list of ancestors, if any, to the related bundle.
@@ -2917,7 +3070,6 @@ static HRESULT OnExecuteExePackage(
 LExit:
     ReleaseStr(sczEngineWorkingDirectory);
     ReleaseStr(sczAncestors);
-    ReleaseStr(sczIgnoreDependencies);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
 
