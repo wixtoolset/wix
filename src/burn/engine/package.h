@@ -302,6 +302,8 @@ typedef struct _BURN_PACKAGE
     {
         struct
         {
+            LPWSTR sczBundleId;
+            LPWSTR sczRegistrationKey;
             LPWSTR sczInstallArguments;
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
@@ -310,6 +312,7 @@ typedef struct _BURN_PACKAGE
             LPCWSTR wzAncestors; // points directly into engine state.
             LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 
+            BOOL fWin64;
             BOOL fSupportsBurnProtocol;
 
             BURN_EXE_EXIT_CODE* rgExitCodes;
@@ -324,7 +327,6 @@ typedef struct _BURN_PACKAGE
             LPWSTR sczInstallArguments;
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
-            LPWSTR sczIgnoreDependencies;
             LPCWSTR wzAncestors; // points directly into engine state.
             LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 

@@ -65,6 +65,8 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundle:
                     case SymbolDefinitionType.WixBundleContainer:
                     case SymbolDefinitionType.WixBundleCustomDataAttribute:
+                    case SymbolDefinitionType.WixBundleBundlePackage:
+                    case SymbolDefinitionType.WixBundleBundlePackagePayload:
                     case SymbolDefinitionType.WixBundleExePackage:
                     case SymbolDefinitionType.WixBundleExePackagePayload:
                     case SymbolDefinitionType.WixBundleExtension:

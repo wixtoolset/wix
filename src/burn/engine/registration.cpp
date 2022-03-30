@@ -7,7 +7,6 @@
 
 const LPCWSTR REGISTRY_RUN_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 const LPCWSTR REGISTRY_RUN_ONCE_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce";
-const LPCWSTR REGISTRY_BUNDLE_INSTALLED = L"Installed";
 const LPCWSTR REGISTRY_BUNDLE_DISPLAY_ICON = L"DisplayIcon";
 const LPCWSTR REGISTRY_BUNDLE_DISPLAY_VERSION = L"DisplayVersion";
 const LPCWSTR REGISTRY_BUNDLE_ESTIMATED_SIZE = L"EstimatedSize";
@@ -1219,7 +1218,7 @@ static HRESULT SetPaths(
     pRegistration->hkRoot = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
 
     // build uninstall registry key path
-    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%s\\%s", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczId);
+    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczId);
     ExitOnFailure(hr, "Failed to build uninstall registry key path.");
 
     // build cache directory
@@ -1231,7 +1230,7 @@ static HRESULT SetPaths(
     ExitOnFailure(hr, "Failed to build cached executable path.");
 
     // build state file path
-    hr = StrAllocFormatted(&pRegistration->sczStateFile, L"%s\\state.rsm", sczCacheDirectory);
+    hr = StrAllocFormatted(&pRegistration->sczStateFile, L"%ls\\state.rsm", sczCacheDirectory);
     ExitOnFailure(hr, "Failed to build state file path.");
 
 LExit:

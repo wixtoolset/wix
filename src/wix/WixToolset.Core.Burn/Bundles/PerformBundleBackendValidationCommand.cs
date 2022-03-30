@@ -55,7 +55,11 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (var packageFacade in this.PackageFacadesById.Values)
             {
-                if (packageFacade.SpecificPackageSymbol is WixBundleExePackageSymbol wixBundleExePackageSymbol)
+                if (packageFacade.SpecificPackageSymbol is WixBundleBundlePackageSymbol wixBundleBundlePackageSymbol)
+                {
+                    this.ValidateBundlePackage(wixBundleBundlePackageSymbol, packageFacade.PackageSymbol);
+                }
+                else if (packageFacade.SpecificPackageSymbol is WixBundleExePackageSymbol wixBundleExePackageSymbol)
                 {
                     this.ValidateExePackage(wixBundleExePackageSymbol, packageFacade.PackageSymbol);
                 }
@@ -88,6 +92,11 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 this.BackendHelper.ValidateBundleCondition(symbol.SourceLineNumbers, elementName, "InstallCondition", symbol.InstallCondition, BundleConditionPhase.Plan);
             }
+        }
+
+        private void ValidateBundlePackage(WixBundleBundlePackageSymbol symbol, WixBundlePackageSymbol packageSymbol)
+        {
+            this.ValidateChainPackage(packageSymbol, "BundlePackage");
         }
 
         private void ValidateExePackage(WixBundleExePackageSymbol symbol, WixBundlePackageSymbol packageSymbol)

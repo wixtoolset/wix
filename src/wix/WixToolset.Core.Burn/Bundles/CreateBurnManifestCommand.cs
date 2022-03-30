@@ -381,7 +381,16 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("InstallCondition", package.PackageSymbol.InstallCondition);
                     }
 
-                    if (package.SpecificPackageSymbol is WixBundleExePackageSymbol exePackage) // EXE
+                    if (package.SpecificPackageSymbol is WixBundleBundlePackageSymbol bundlePackage) // BUNDLE
+                    {
+                        writer.WriteAttributeString("BundleId", bundlePackage.BundleId);
+                        writer.WriteAttributeString("InstallArguments", bundlePackage.InstallCommand);
+                        writer.WriteAttributeString("UninstallArguments", bundlePackage.UninstallCommand);
+                        writer.WriteAttributeString("RepairArguments", bundlePackage.RepairCommand);
+                        writer.WriteAttributeString("SupportsBurnProtocol", bundlePackage.SupportsBurnProtocol ? "yes" : "no");
+                        writer.WriteAttributeString("Win64", bundlePackage.Win64 ? "yes" : "no");
+                    }
+                    else if (package.SpecificPackageSymbol is WixBundleExePackageSymbol exePackage) // EXE
                     {
                         writer.WriteAttributeString("DetectCondition", exePackage.DetectCondition);
                         writer.WriteAttributeString("InstallArguments", exePackage.InstallCommand);

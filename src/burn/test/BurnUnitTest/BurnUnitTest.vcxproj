@@ -80,6 +80,7 @@
   <ItemGroup>
     <None Include="TestData\CacheTest\CacheSignatureTest.File" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\BasicFunctionality_BundleA_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\BundlePackage_Multiple_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\Failure_BundleD_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\MsiTransaction_BundleAv1_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\MsuPackageFixture_manifest.xml" CopyToOutputDirectory="PreserveNewest" />

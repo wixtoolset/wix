@@ -1714,6 +1714,11 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         Update,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ChainPackage,
     }
 
     /// <summary>

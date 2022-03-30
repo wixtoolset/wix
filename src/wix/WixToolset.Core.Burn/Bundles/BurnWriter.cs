@@ -23,7 +23,6 @@ namespace WixToolset.Core.Burn.Bundles
     internal class BurnWriter : BurnCommon
     {
         private bool disposed;
-        private bool invalidBundle;
         private BinaryWriter binaryWriter;
 
         /// <summary>
@@ -48,13 +47,10 @@ namespace WixToolset.Core.Burn.Bundles
 
             using (var binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
             {
-                if (!writer.Initialize(binaryReader))
-                {
-                    writer.invalidBundle = true;
-                }
+                writer.Initialize(binaryReader);
             }
 
-            if (!writer.invalidBundle)
+            if (!writer.Invalid)
             {
                 writer.binaryWriter = new BinaryWriter(File.Open(fileExe, FileMode.Open, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete));
             }
@@ -70,7 +66,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns></returns>
         public bool InitializeBundleSectionData(long stubSize, string bundleId)
         {
-            if (this.invalidBundle)
+            if (this.Invalid)
             {
                 return false;
             }
@@ -84,6 +80,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.binaryWriter.BaseStream.Seek(this.wixburnDataOffset + BURN_SECTION_OFFSET_BUNDLEGUID, SeekOrigin.Begin);
             this.binaryWriter.Write(bundleGuid.ToByteArray());
 
+            this.BundleId = bundleGuid;
             this.StubSize = (uint)stubSize;
 
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_STUBSIZE, this.StubSize);
@@ -191,7 +188,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         public void RememberThenResetSignature()
         {
-            if (this.invalidBundle)
+            if (this.Invalid)
             {
                 return;
             }
@@ -241,14 +238,14 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
         private bool AppendContainer(Stream containerStream, uint containerSize, uint burnSectionOffsetSize, uint burnSectionCount)
         {
-            if (this.invalidBundle)
+            if (this.Invalid)
             {
                 return false;
             }
 
             if (burnSectionOffsetSize > (this.wixburnRawDataSize - sizeof(uint)))
             {
-                this.invalidBundle = true;
+                this.Invalid = true;
                 this.Messaging.Write(BurnBackendErrors.TooManyAttachedContainers(this.wixburnMaxContainers));
                 return false;
             }

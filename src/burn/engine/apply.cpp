@@ -216,6 +216,15 @@ static HRESULT DoRestoreRelatedBundleActions(
     __in BURN_EXECUTE_CONTEXT* pContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+static HRESULT ExecuteBundlePackage(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fRollback,
+    __out BOOL* pfRetry,
+    __out BOOL* pfSuspend,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
 static HRESULT ExecuteExePackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
@@ -731,6 +740,9 @@ extern "C" HRESULT ApplyExecute(
                 {
                 case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
                     wzId = pExecuteAction->relatedBundle.pRelatedBundle->package.sczId;
+                    break;
+                case BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE:
+                    wzId = pExecuteAction->bundlePackage.pPackage->sczId;
                     break;
                 case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
                     wzId = pExecuteAction->exePackage.pPackage->sczId;
@@ -2352,6 +2364,11 @@ static HRESULT DoExecuteAction(
             ExitOnFailure(hr, "Failed to execute related bundle.");
             break;
 
+        case BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE:
+            hr = ExecuteBundlePackage(pEngineState, pExecuteAction, pContext, FALSE, &fRetry, pfSuspend, &restart);
+            ExitOnFailure(hr, "Failed to execute BUNDLE package.");
+            break;
+
         case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
             hr = ExecuteExePackage(pEngineState, pExecuteAction, pContext, FALSE, &fRetry, pfSuspend, &restart);
             ExitOnFailure(hr, "Failed to execute EXE package.");
@@ -2477,6 +2494,11 @@ static HRESULT DoRollbackActions(
             case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
                 hr = ExecuteRelatedBundle(pEngineState, pRollbackAction, pContext, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
                 ExitOnFailure(hr, "Failed to execute related bundle.");
+                break;
+
+            case BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE:
+                hr = ExecuteBundlePackage(pEngineState, pRollbackAction, pContext, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
+                IgnoreRollbackError(hr, "Failed to rollback BUNDLE package.");
                 break;
 
             case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
@@ -2679,6 +2701,86 @@ static HRESULT DoRestoreRelatedBundleActions(
     }
 
 LExit:
+    return hr;
+}
+
+static HRESULT ExecuteBundlePackage(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fRollback,
+    __out BOOL* pfRetry,
+    __out BOOL* pfSuspend,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    )
+{
+    HRESULT hr = S_OK;
+    HRESULT hrExecute = S_OK;
+    GENERIC_EXECUTE_MESSAGE message = { };
+    int nResult = 0;
+    BOOL fBeginCalled = FALSE;
+    BOOL fExecuted = FALSE;
+    BURN_PACKAGE* pPackage = pExecuteAction->bundlePackage.pPackage;
+
+    Assert(pContext->fRollback == fRollback);
+
+    if (ShouldSkipPackage(pPackage, fRollback))
+    {
+        ExitFunction1(hr = S_OK);
+    }
+
+    pContext->wzExecutingPackageId = pPackage->sczId;
+    fBeginCalled = TRUE;
+
+    // Send package execute begin to BA.
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pPackage->sczId, !fRollback, pExecuteAction->bundlePackage.action, INSTALLUILEVEL_NOCHANGE, FALSE);
+    ExitOnRootFailure(hr, "BA aborted execute BUNDLE package begin.");
+
+    message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
+    message.dwUIHint = MB_OKCANCEL;
+    message.progress.dwPercentage = fRollback ? 100 : 0;
+    nResult = GenericExecuteMessageHandler(&message, pContext);
+    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwUIHint, nResult);
+    ExitOnRootFailure(hr, "BA aborted BUNDLE progress.");
+
+    fExecuted = TRUE;
+
+    // Execute package.
+    if (pPackage->fPerMachine)
+    {
+        hrExecute = ElevationExecuteBundlePackage(pEngineState->companionConnection.hPipe, pExecuteAction, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
+        ExitOnFailure(hrExecute, "Failed to configure per-machine BUNDLE package.");
+    }
+    else
+    {
+        hrExecute = BundlePackageEngineExecutePackage(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
+        ExitOnFailure(hrExecute, "Failed to configure per-user BUNDLE package.");
+    }
+
+    message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
+    message.dwUIHint = MB_OKCANCEL;
+    message.progress.dwPercentage = fRollback ? 0 : 100;
+    nResult = GenericExecuteMessageHandler(&message, pContext);
+    hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwUIHint, nResult);
+    ExitOnRootFailure(hr, "BA aborted BUNDLE progress.");
+
+    pContext->cExecutedPackages += fRollback ? -1 : 1;
+
+    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
+    ExitOnRootFailure(hr, "BA aborted BUNDLE package execute progress.");
+
+LExit:
+    if (fExecuted)
+    {
+        BundlePackageEngineUpdateInstallRegistrationState(pExecuteAction, hrExecute);
+    }
+
+    if (fBeginCalled)
+    {
+        pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+    }
+
     return hr;
 }
 

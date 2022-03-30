@@ -1517,6 +1517,9 @@ namespace WixToolset.Core
                     WixBundlePackageType? packageType = null;
                     switch (child.Name.LocalName)
                     {
+                        case "BundlePackagePayload":
+                            packageType = WixBundlePackageType.Bundle;
+                            break;
                         case "ExePackagePayload":
                             packageType = WixBundlePackageType.Exe;
                             break;
@@ -1751,6 +1754,10 @@ namespace WixToolset.Core
                             previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                             previousType = ComplexReferenceChildType.Package;
                             break;
+                        case "BundlePackage":
+                            previousId = this.ParseBundlePackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
                         case "RollbackBoundary":
                             previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                             previousType = ComplexReferenceChildType.Package;
@@ -1839,6 +1846,20 @@ namespace WixToolset.Core
         private string ParseExePackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
         {
             return this.ParseChainPackage(node, WixBundlePackageType.Exe, parentType, parentId, previousType, previousId);
+        }
+
+        /// <summary>
+        /// Parse BundlePackage element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        private string ParseBundlePackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            return this.ParseChainPackage(node, WixBundlePackageType.Bundle, parentType, parentId, previousType, previousId);
         }
 
         /// <summary>
@@ -2096,15 +2117,15 @@ namespace WixToolset.Core
                             break;
                         case "InstallArguments":
                             installArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            allowed = (packageType == WixBundlePackageType.Exe);
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
                             break;
                         case "RepairArguments":
                             repairArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                            allowed = (packageType == WixBundlePackageType.Exe);
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
                             break;
                         case "UninstallArguments":
                             uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                            allowed = (packageType == WixBundlePackageType.Exe);
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
                             break;
                         case "PerMachine":
                             perMachine = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
@@ -2339,19 +2360,20 @@ namespace WixToolset.Core
                             this.ParseProvidesElement(child, packageType, id.Id, out _);
                             break;
                         case "ExitCode":
-                            allowed = (packageType == WixBundlePackageType.Exe);
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
                             if (allowed)
                             {
                                 this.ParseExitCodeElement(child, id.Id);
                             }
                             break;
                         case "CommandLine":
-                            allowed = (packageType == WixBundlePackageType.Exe);
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
                             if (allowed)
                             {
                                 this.ParseCommandLineElement(child, id.Id);
                             }
                             break;
+                        case "BundlePackagePayload":
                         case "ExePackagePayload":
                         case "MsiPackagePayload":
                         case "MspPackagePayload":
@@ -2422,6 +2444,18 @@ namespace WixToolset.Core
 
                 switch (packageType)
                 {
+                    case WixBundlePackageType.Bundle:
+                        WixBundleBundlePackageAttributes bundleAttributes = 0;
+
+                        this.Core.AddSymbol(new WixBundleBundlePackageSymbol(sourceLineNumbers, id)
+                        {
+                            Attributes = bundleAttributes,
+                            InstallCommand = installArguments,
+                            RepairCommand = repairArguments,
+                            UninstallCommand = uninstallArguments,
+                        });
+                        break;
+
                     case WixBundlePackageType.Exe:
                         WixBundleExePackageAttributes exeAttributes = 0;
                         exeAttributes |= (YesNoType.Yes == bundle) ? WixBundleExePackageAttributes.Bundle : 0;
@@ -2478,6 +2512,10 @@ namespace WixToolset.Core
         {
             switch (packageType)
             {
+                case WixBundlePackageType.Bundle:
+                    this.Core.AddSymbol(new WixBundleBundlePackagePayloadSymbol(sourceLineNumbers, payloadId));
+                    break;
+
                 case WixBundlePackageType.Exe:
                     this.Core.AddSymbol(new WixBundleExePackagePayloadSymbol(sourceLineNumbers, payloadId));
                     break;
@@ -2739,6 +2777,10 @@ namespace WixToolset.Core
                             break;
                         case "ExePackage":
                             previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Package;
+                            break;
+                        case "BundlePackage":
+                            previousId = this.ParseBundlePackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
                             previousType = ComplexReferenceChildType.Package;
                             break;
                         case "RollbackBoundary":

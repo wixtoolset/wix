@@ -66,6 +66,7 @@ namespace WixToolset.Data.Symbols
     /// </summary>
     public enum WixBundlePackageType
     {
+        Bundle,
         Exe,
         Msi,
         Msp,

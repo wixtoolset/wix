@@ -25,7 +25,6 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private bool disposed;
 
-        private bool invalidBundle;
         private BinaryReader binaryReader;
         private readonly List<DictionaryEntry> attachedContainerPayloadNames;
 
@@ -53,13 +52,12 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>Burn reader.</returns>
         public static BurnReader Open(IMessaging messaging, string fileExe)
         {
-            var reader = new BurnReader(messaging, fileExe);
-
-            reader.binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
-            if (!reader.Initialize(reader.binaryReader))
+            var binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
+            var reader = new BurnReader(messaging, fileExe)
             {
-                reader.invalidBundle = true;
-            }
+                binaryReader = binaryReader,
+            };
+            reader.Initialize(reader.binaryReader);
 
             return reader;
         }
@@ -78,7 +76,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return false;
             }
 
-            if (this.invalidBundle)
+            if (this.Invalid)
             {
                 return false;
             }
@@ -156,7 +154,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return false;
             }
 
-            if (this.invalidBundle)
+            if (this.Invalid)
             {
                 return false;
             }

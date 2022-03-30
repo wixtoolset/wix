@@ -292,7 +292,6 @@ extern "C" void PlanUninitializeExecuteAction(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
-        ReleaseStr(pExecuteAction->exePackage.sczIgnoreDependencies);
         ReleaseStr(pExecuteAction->exePackage.sczAncestors);
         ReleaseStr(pExecuteAction->exePackage.sczEngineWorkingDirectory);
         break;
@@ -1181,6 +1180,10 @@ extern "C" HRESULT PlanExecutePackage(
     // Add execute actions.
     switch (pPackage->type)
     {
+    case BURN_PACKAGE_TYPE_BUNDLE:
+        hr = BundlePackageEnginePlanAddPackage(pPackage, pPlan, pLog, pVariables);
+        break;
+
     case BURN_PACKAGE_TYPE_EXE:
         hr = ExeEnginePlanAddPackage(pPackage, pPlan, pLog, pVariables);
         break;
@@ -1506,16 +1509,16 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
         switch (pPlan->rgExecuteActions[i].type)
         {
-        case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
-            packageAction = pPlan->rgExecuteActions[i].relatedBundle.action;
-            pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
+        case BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE:
+            packageAction = pPlan->rgExecuteActions[i].bundlePackage.action;
+            pPackage = pPlan->rgExecuteActions[i].bundlePackage.pPackage;
             fBundle = TRUE;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
             packageAction = pPlan->rgExecuteActions[i].exePackage.action;
             pPackage = pPlan->rgExecuteActions[i].exePackage.pPackage;
-            fBundle = TRUE;
+            fBundle = pPackage->Exe.fBundle;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
@@ -2751,6 +2754,10 @@ static HRESULT CalculateExecuteActions(
     // Calculate execute actions.
     switch (pPackage->type)
     {
+    case BURN_PACKAGE_TYPE_BUNDLE:
+        hr = BundlePackageEnginePlanCalculatePackage(pPackage);
+        break;
+
     case BURN_PACKAGE_TYPE_EXE:
         hr = ExeEnginePlanCalculatePackage(pPackage);
         break;
@@ -2784,7 +2791,8 @@ static BOOL NeedsCache(
     )
 {
     BOOTSTRAPPER_ACTION_STATE action = fExecute ? pPackage->execute : pPackage->rollback;
-    if (BURN_PACKAGE_TYPE_EXE == pPackage->type) // Exe packages require the package for all operations (even uninstall).
+    // TODO: bundles could theoretically use package cache
+    if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type || BURN_PACKAGE_TYPE_EXE == pPackage->type) // Bundle and Exe packages require the package for all operations (even uninstall).
     {
         return BOOTSTRAPPER_ACTION_STATE_NONE != action;
     }
@@ -2916,6 +2924,10 @@ static void ExecuteActionLog(
 
     case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: RELATED_BUNDLE package id: %ls, action: %hs, ignore dependencies: %ls", wzBase, iAction, pAction->relatedBundle.pRelatedBundle->package.sczId, LoggingActionStateToString(pAction->relatedBundle.action), pAction->relatedBundle.sczIgnoreDependencies);
+        break;
+
+    case BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE:
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: BUNDLE_PACKAGE package id: %ls, action: %hs", wzBase, iAction, pAction->bundlePackage.pPackage->sczId, LoggingActionStateToString(pAction->bundlePackage.action));
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
