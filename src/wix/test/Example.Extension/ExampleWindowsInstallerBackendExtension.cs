@@ -18,12 +18,13 @@ namespace Example.Extension
                 switch (symbolType)
                 {
                     case ExampleSymbolDefinitionType.Example:
-                        {
-                            var row = (ExampleRow)this.BackendHelper.CreateRow(section, symbol, output, ExampleTableDefinitions.ExampleTable);
-                            row.Example = symbol.Id.Id;
-                            row.Value = symbol[0].AsString();
-                        }
+                    {
+                        var row = (ExampleRow)this.BackendHelper.CreateRow(section, symbol, output, ExampleTableDefinitions.ExampleTable);
+                        row.Example = symbol.Id.Id;
+                        row.ComponentRef = symbol[0].AsString();
+                        row.Value = symbol[1].AsString();
                         return true;
+                    }
                 }
             }
 

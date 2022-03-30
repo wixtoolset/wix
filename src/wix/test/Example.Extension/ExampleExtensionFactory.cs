@@ -43,6 +43,10 @@ namespace Example.Extension
             {
                 extension = new ExampleWindowsInstallerBackendExtension();
             }
+            else if (extensionType == typeof(IWindowsInstallerDecompilerExtension))
+            {
+                extension = new ExampleWindowsInstallerDecompilerExtension();
+            }
             else
             {
                 extension = null;

@@ -6,6 +6,7 @@ namespace Example.Extension
 
     public enum ExampleSymbolFields
     {
+        ComponentRef,
         Value,
     }
 
@@ -20,6 +21,12 @@ namespace Example.Extension
         }
 
         public IntermediateField this[ExampleSymbolFields index] => this.Fields[(int)index];
+
+        public string ComponentRef
+        {
+            get => this.Fields[(int)ExampleSymbolFields.ComponentRef]?.AsString();
+            set => this.Set((int)ExampleSymbolFields.ComponentRef, value);
+        }
 
         public string Value
         {

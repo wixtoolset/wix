@@ -23,6 +23,10 @@ namespace WixToolset.Core.WindowsInstaller
 
         public IReadOnlyCollection<IWindowsInstallerDecompilerExtension> Extensions { get; set; }
 
+        public IReadOnlyCollection<IExtensionData> ExtensionData { get; set; }
+
+        public ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
+
         public string ExtractFolder { get; set; }
 
         public string CabinetExtractFolder { get; set; }

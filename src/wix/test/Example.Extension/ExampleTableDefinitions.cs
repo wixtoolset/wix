@@ -11,7 +11,8 @@ namespace Example.Extension
             ExampleSymbolDefinitions.Example,
             new[]
             {
-                new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier),
+                new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Component_", ColumnType.String, 72, false, false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Value", ColumnType.String, 0, false, false, ColumnCategory.Formatted),
             },
             strongRowType: typeof(ExampleRow),

@@ -11,6 +11,7 @@ namespace WixToolset.Util
         protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(UtilCompiler),
+            typeof(UtilDecompiler),
             typeof(UtilExtensionData),
             typeof(UtilWindowsInstallerBackendBinderExtension),
         };

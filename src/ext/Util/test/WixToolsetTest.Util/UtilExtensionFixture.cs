@@ -6,8 +6,6 @@ namespace WixToolsetTest.Util
     using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Data;
-    using WixToolset.Data.Symbols;
     using WixToolset.Util;
     using Xunit;
 
@@ -54,6 +52,18 @@ namespace WixToolsetTest.Util
                 "Wix4FileSharePermissions:ExampleFileShare\tEveryone\t1",
             }, results.OrderBy(s => s).ToArray());
         }
+
+        [Fact]
+        public void CanRoundtripFileShare()
+        {
+            var folder = TestData.Get(@"TestData", "UsingFileShare");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+            var output = Path.Combine(folder, "decompile.xml");
+
+            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+            File.Exists(output);
+        }
+
 
         [Fact]
         public void CanBuildCloseApplication()
@@ -311,6 +321,12 @@ namespace WixToolsetTest.Util
             newArgs.Add("arm64");
 
             var result = WixRunner.Execute(newArgs.ToArray());
+            result.AssertSuccess();
+        }
+
+        private static void Decompile(string[] args)
+        {
+            var result = WixRunner.Execute(args);
             result.AssertSuccess();
         }
     }

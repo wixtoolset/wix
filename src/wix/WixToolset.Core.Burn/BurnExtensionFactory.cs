@@ -22,7 +22,7 @@ namespace WixToolset.Core.Burn
             {
                 extension = new BurnExtensionCommandLine(this.ServiceProvider);
             }
-            if (extensionType == typeof(IBackendFactory))
+            else if (extensionType == typeof(IBackendFactory))
             {
                 extension = new BurnBackendFactory();
             }

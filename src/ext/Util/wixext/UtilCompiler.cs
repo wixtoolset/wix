@@ -19,7 +19,7 @@ namespace WixToolset.Util
     /// <summary>
     /// The compiler for the WiX Toolset Utility Extension.
     /// </summary>
-    public sealed class UtilCompiler : BaseCompilerExtension
+    internal sealed class UtilCompiler : BaseCompilerExtension
     {
         // user creation attributes definitions (from sca.h)
         internal const int UserDontExpirePasswrd = 0x00000001;
@@ -37,7 +37,7 @@ namespace WixToolset.Util
 
         private static readonly Regex FindPropertyBrackets = new Regex(@"\[(?!\\|\])|(?<!\[\\\]|\[\\|\\\[)\]", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
-        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/util";
+        public override XNamespace Namespace => UtilConstants.Namespace;
 
         /// <summary>
         /// Types of Internet shortcuts.
@@ -94,13 +94,10 @@ namespace WixToolset.Util
                     var createFolderId = context["DirectoryId"];
                     var createFolderComponentId = context["ComponentId"];
 
-                    // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    var createFolderWin64 = Boolean.Parse(context["Win64"]);
-
                     switch (element.Name.LocalName)
                     {
                         case "PermissionEx":
-                            this.ParsePermissionExElement(intermediate, section, element, createFolderId, createFolderComponentId, createFolderWin64, "CreateFolder");
+                            this.ParsePermissionExElement(intermediate, section, element, createFolderId, createFolderComponentId, "CreateFolder");
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -159,16 +156,13 @@ namespace WixToolset.Util
                     var fileId = context["FileId"];
                     var fileComponentId = context["ComponentId"];
 
-                    // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    var fileWin64 = Boolean.Parse(context["Win64"]);
-
                     switch (element.Name.LocalName)
                     {
                         case "PerfCounter":
                             this.ParsePerfCounterElement(intermediate, section, element, fileComponentId, fileId);
                             break;
                         case "PermissionEx":
-                            this.ParsePermissionExElement(intermediate, section, element, fileId, fileComponentId, fileWin64, "File");
+                            this.ParsePermissionExElement(intermediate, section, element, fileId, fileComponentId, "File");
                             break;
                         case "PerfCounterManifest":
                             this.ParsePerfCounterManifestElement(intermediate, section, element, fileComponentId, fileId);
@@ -177,7 +171,7 @@ namespace WixToolset.Util
                             this.ParseEventManifestElement(intermediate, section, element, fileComponentId, fileId);
                             break;
                         case "FormatFile":
-                            this.ParseFormatFileElement(intermediate, section, element, fileId, fileWin64);
+                            this.ParseFormatFileElement(intermediate, section, element, fileId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -296,13 +290,10 @@ namespace WixToolset.Util
                     var registryId = context["RegistryId"];
                     var registryComponentId = context["ComponentId"];
 
-                    // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    var registryWin64 = Boolean.Parse(context["Win64"]);
-
                     switch (element.Name.LocalName)
                     {
                         case "PermissionEx":
-                            this.ParsePermissionExElement(intermediate, section, element, registryId, registryComponentId, registryWin64, "Registry");
+                            this.ParsePermissionExElement(intermediate, section, element, registryId, registryComponentId, "Registry");
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -314,13 +305,10 @@ namespace WixToolset.Util
                     var serviceInstallName = context["ServiceInstallName"];
                     var serviceInstallComponentId = context["ServiceInstallComponentId"];
 
-                    // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    var serviceInstallWin64 = Boolean.Parse(context["Win64"]);
-
                     switch (element.Name.LocalName)
                     {
                         case "PermissionEx":
-                            this.ParsePermissionExElement(intermediate, section, element, serviceInstallId, serviceInstallComponentId, serviceInstallWin64, "ServiceInstall");
+                            this.ParsePermissionExElement(intermediate, section, element, serviceInstallId, serviceInstallComponentId, "ServiceInstall");
                             break;
                         case "ServiceConfig":
                             this.ParseServiceConfigElement(intermediate, section, element, serviceInstallComponentId, "ServiceInstall", serviceInstallName);
@@ -536,7 +524,6 @@ namespace WixToolset.Util
         private void ParseComponentSearchRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string refId = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -545,7 +532,7 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixComponentSearch, refId);
                             break;
                         default:
@@ -2284,7 +2271,7 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         /// <param name="fileId">Identifier of referenced file.</param>
         /// <param name="win64">Flag to determine whether the component is 64-bit.</param>
-        private void ParseFormatFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileId, bool win64)
+        private void ParseFormatFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileId)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string binaryId = null;
@@ -2415,7 +2402,6 @@ namespace WixToolset.Util
                         ComponentRef = componentId,
                     });
                 }
-
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4ConfigureEventManifestRegister", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
@@ -2435,7 +2421,7 @@ namespace WixToolset.Util
         /// <param name="componentId">Identifier of component, used to determine install state.</param>
         /// <param name="win64">Flag to determine whether the component is 64-bit.</param>
         /// <param name="tableName">Name of table that contains objectId.</param>
-        private void ParsePermissionExElement(Intermediate intermediate, IntermediateSection section, XElement element, string objectId, string componentId, bool win64, string tableName)
+        private void ParsePermissionExElement(Intermediate intermediate, IntermediateSection section, XElement element, string objectId, string componentId, string tableName)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             var bits = new BitArray(32);
@@ -2623,7 +2609,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("wps", variable, condition, after, (productCode == null ? upgradeCode : productCode), attributes.ToString());
+                id = this.ParseHelper.CreateIdentifier("wps", variable, condition, after, productCode ?? upgradeCode, attributes.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);

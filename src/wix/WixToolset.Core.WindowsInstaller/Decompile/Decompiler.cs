@@ -43,11 +43,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <summary>
         /// Creates a new decompiler object with a default set of table definitions.
         /// </summary>
-        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IWindowsInstallerDecompilerExtension> extensions, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressRelativeActionSequencing, bool suppressUI, bool treatProductAsModule)
+        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IWindowsInstallerDecompilerHelper decompilerHelper, IEnumerable<IWindowsInstallerDecompilerExtension> extensions, IEnumerable<IExtensionData> extensionData, ISymbolDefinitionCreator creator, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressRelativeActionSequencing, bool suppressUI, bool treatProductAsModule)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.DecompilerHelper = decompilerHelper;
             this.Extensions = extensions;
+            this.ExtensionData = extensionData;
+            this.SymbolDefinitionCreator = creator;
             this.BaseSourcePath = baseSourcePath ?? "SourceDir";
             this.SuppressCustomTables = suppressCustomTables;
             this.SuppressDroppingEmptyTables = suppressDroppingEmptyTables;
@@ -65,7 +68,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         private IBackendHelper BackendHelper { get; }
 
+        private IWindowsInstallerDecompilerHelper DecompilerHelper { get; }
+
         private IEnumerable<IWindowsInstallerDecompilerExtension> Extensions { get; }
+
+        private IEnumerable<IExtensionData> ExtensionData { get; }
+
+        private ISymbolDefinitionCreator SymbolDefinitionCreator { get; }
 
         private Dictionary<string, IWindowsInstallerDecompilerExtension> ExtensionsByTableName { get; }
 
@@ -87,8 +96,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         private bool Compressed { get; set; }
 
-        private XElement RootElement { get; set; }
-
         private TableDefinitionCollection TableDefinitions { get; }
 
         private bool ShortNames { get; set; }
@@ -101,8 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 if (null == this.uiElement)
                 {
-                    this.uiElement = new XElement(Names.UIElement);
-                    this.RootElement.Add(this.uiElement);
+                    this.uiElement = this.DecompilerHelper.AddElementToRoot(new XElement(Names.UIElement));
                 }
 
                 return this.uiElement;
@@ -110,8 +116,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         }
 
         private Dictionary<string, XElement> Singletons { get; } = new Dictionary<string, XElement>();
-
-        private Dictionary<string, XElement> IndexedElements { get; } = new Dictionary<string, XElement>();
 
         private Dictionary<string, XElement> PatchTargetFiles { get; } = new Dictionary<string, XElement>();
 
@@ -122,12 +126,22 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <returns>The serialized WiX source code.</returns>
         public XDocument Decompile(WindowsInstallerData output)
         {
-            if (null == output)
-            {
-                throw new ArgumentNullException(nameof(output));
-            }
-
             this.OutputType = output.Type;
+
+            switch (this.OutputType)
+            {
+                case OutputType.Module:
+                    this.DecompilerHelper.RootElement = new XElement(Names.ModuleElement);
+                    break;
+                case OutputType.PatchCreation:
+                    this.DecompilerHelper.RootElement = new XElement(Names.PatchCreationElement);
+                    break;
+                case OutputType.Product:
+                    this.DecompilerHelper.RootElement = new XElement(Names.PackageElement);
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown output type.");
+            }
 
             // collect the table definitions from the output
             this.TableDefinitions.Clear();
@@ -146,29 +160,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             }
 
             // add any missing extension table definitions
-#if TODO_DECOMPILER_EXTENSIONS
             foreach (var extension in this.Extensions)
             {
-                this.AddExtension(extension);
+                this.AddExtensionTableDefinitions(extension);
             }
-#endif
-
-            switch (this.OutputType)
-            {
-                case OutputType.Module:
-                    this.RootElement = new XElement(Names.ModuleElement);
-                    break;
-                case OutputType.PatchCreation:
-                    this.RootElement = new XElement(Names.PatchCreationElement);
-                    break;
-                case OutputType.Product:
-                    this.RootElement = new XElement(Names.PackageElement);
-                    break;
-                default:
-                    throw new InvalidOperationException("Unknown output type.");
-            }
-
-            var xWix = new XElement(Names.WixElement, this.RootElement);
 
             // try to decompile the database file
             // stop processing if an error previously occurred
@@ -192,16 +187,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             this.FinalizeDecompile(output.Tables);
 
             // return the XML document only if decompilation completed successfully
-            var document = new XDocument(xWix);
-            return this.Messaging.EncounteredError ? null : document;
+            return this.Messaging.EncounteredError ? null : new XDocument(new XElement(Names.WixElement, this.DecompilerHelper.RootElement));
         }
 
-#if TODO_DECOMPILER_EXTENSIONS
-        private void AddExtension(IWindowsInstallerBackendDecompilerExtension extension)
+        private void AddExtensionTableDefinitions(IWindowsInstallerDecompilerExtension extension)
         {
             if (null != extension.TableDefinitions)
             {
-                foreach (TableDefinition tableDefinition in extension.TableDefinitions)
+                foreach (var tableDefinition in extension.TableDefinitions)
                 {
                     if (!this.ExtensionsByTableName.ContainsKey(tableDefinition.Name))
                     {
@@ -214,7 +207,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
             }
         }
-#endif
 
         internal static Platform? GetPlatformFromTemplateSummaryInformation(string[] template)
         {
@@ -234,75 +226,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             return null;
         }
 
-        /// <summary>
-        /// Gets the element corresponding to the row it came from.
-        /// </summary>
-        /// <param name="row">The row corresponding to the element.</param>
-        /// <returns>The indexed element.</returns>
-        private XElement GetIndexedElement(Row row)
-        {
-            return this.GetIndexedElement(row.TableDefinition.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
-        }
-
-        /// <summary>
-        /// Gets the element corresponding to the primary key of the given table.
-        /// </summary>
-        /// <param name="table">The table corresponding to the element.</param>
-        /// <param name="primaryKey">The primary key corresponding to the element.</param>
-        /// <returns>The indexed element.</returns>
-        private XElement GetIndexedElement(string table, params string[] primaryKey)
-        {
-            return this.TryGetIndexedElement(table, out var element, primaryKey) ? element : null;
-        }
-
-        /// <summary>
-        /// Tries to get the element corresponding to the primary key of the given table.
-        /// </summary>
-        /// <param name="row">The table corresponding to the element.</param>
-        /// <param name="xElement">The indexed element.</param>
-        /// <returns>Whether the element was found.</returns>
-        private bool TryGetIndexedElement(Row row, out XElement xElement)
-        {
-            return this.TryGetIndexedElement(row.TableDefinition.Name, out xElement, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
-        }
-
-        /// <summary>
-        /// Tries to get the element corresponding to the primary key of the given table.
-        /// </summary>
-        /// <param name="table">The table corresponding to the element.</param>
-        /// <param name="xElement">The indexed element.</param>
-        /// <param name="primaryKey">The primary key corresponding to the element.</param>
-        /// <returns>Whether the element was found.</returns>
-        private bool TryGetIndexedElement(string table, out XElement xElement, params string[] primaryKey)
-        {
-            return this.IndexedElements.TryGetValue(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), out xElement);
-        }
-
-        /// <summary>
-        /// Index an element by its corresponding row.
-        /// </summary>
-        /// <param name="row">The row corresponding to the element.</param>
-        /// <param name="element">The element to index.</param>
-        private void IndexElement(Row row, XElement element)
-        {
-            this.IndexedElements.Add(String.Concat(row.TableDefinition.Name, ':', row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter)), element);
-        }
-
-        /// <summary>
-        /// Index an element by its corresponding row.
-        /// </summary>
-        /// <param name="element">The element to index.</param>
-        /// <param name="table"></param>
-        /// <param name="primaryKey"></param>
-        private void IndexElement(XElement element, string table, params string[] primaryKey)
-        {
-            this.IndexedElements.Add(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), element);
-        }
-
         private Dictionary<string, List<XElement>> IndexTableOneToMany(IEnumerable<Row> rows, int column = 0)
         {
             return rows
-                .ToLookup(row => row.FieldAsString(column), row => this.GetIndexedElement(row))
+                .ToLookup(row => row.FieldAsString(column), row => this.DecompilerHelper.GetIndexedElement(row))
                 .ToDictionary(lookup => lookup.Key, lookup => lookup.ToList());
         }
 
@@ -319,7 +246,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         private void AddChildToParent(string parentName, XElement xChild, Row row, int column)
         {
             var key = row.FieldAsString(column);
-            if (this.TryGetIndexedElement(parentName, out var xParent, key))
+            if (this.DecompilerHelper.TryGetIndexedElement(parentName, key, out var xParent))
             {
                 xParent.Add(xChild);
             }
@@ -419,7 +346,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             XElement xAction;
 
-            if (this.TryGetIndexedElement("CustomAction", out var _, actionSymbol.Action)) // custom action
+            if (this.DecompilerHelper.TryGetIndexedElement("CustomAction", actionSymbol.Action, out var _)) // custom action
             {
                 xAction = new XElement(Names.CustomElement,
                     new XAttribute("Action", actionSymbol.Action),
@@ -455,7 +382,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
                 }
             }
-            else if (this.TryGetIndexedElement("Dialog", out var _, actionSymbol.Action)) // dialog
+            else if (this.DecompilerHelper.TryGetIndexedElement("Dialog", actionSymbol.Action, out var _)) // dialog
             {
                 xAction = new XElement(Names.CustomElement,
                     new XAttribute("Dialog", actionSymbol.Action),
@@ -495,7 +422,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 {
                     xSequence = new XElement(Names.WxsNamespace + sequenceTable);
 
-                    this.RootElement.Add(xSequence);
+                    this.DecompilerHelper.AddElementToRoot(xSequence);
                     this.Singletons.Add(sequenceTable, xSequence);
                 }
 
@@ -669,14 +596,12 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <returns>The property element.</returns>
         private XElement EnsureProperty(string id)
         {
-            XElement xProperty;
-
-            if (!this.TryGetIndexedElement("Property", out xProperty, id))
+            if (!this.DecompilerHelper.TryGetIndexedElement("Property", id, out var xProperty))
             {
                 xProperty = new XElement(Names.PropertyElement, new XAttribute("Id", id));
 
-                this.RootElement.Add(xProperty);
-                this.IndexElement(xProperty, "Property", id);
+                this.DecompilerHelper.AddElementToRoot(xProperty);
+                this.DecompilerHelper.IndexElement("Property", id, xProperty);
             }
 
             return xProperty;
@@ -713,6 +638,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 this.FinalizeSequenceTables(tables);
                 this.FinalizeVerbTable(tables);
             }
+
+            foreach (var extension in this.Extensions)
+            {
+                extension.PostDecompileTables(tables);
+            }
         }
 
         /// <summary>
@@ -743,7 +673,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in controlTable.Rows)
                 {
-                    var xControl = this.GetIndexedElement(row);
+                    var xControl = this.DecompilerHelper.GetIndexedElement(row);
 
                     if ("CheckBox" == row.FieldAsString(2))
                     {
@@ -791,9 +721,9 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 // Add the TARGETDIR StandardDirectory if a component is directly parented there.
                 if (componentTable.Rows.Any(row => row.FieldAsString(2) == "TARGETDIR")
-                    && this.TryGetIndexedElement("Directory", out var xDirectory, "TARGETDIR"))
+                    && this.DecompilerHelper.TryGetIndexedElement("Directory", "TARGETDIR", out var xDirectory))
                 {
-                    this.RootElement.Add(xDirectory);
+                    this.DecompilerHelper.AddElementToRoot(xDirectory);
                 }
 
                 foreach (var row in componentTable.Rows)
@@ -803,12 +733,12 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                     if (String.IsNullOrEmpty(keyPath))
                     {
-                        var xComponent = this.GetIndexedElement("Component", row.FieldAsString(0));
+                        var xComponent = this.DecompilerHelper.GetIndexedElement("Component", row.FieldAsString(0));
                         xComponent.SetAttributeValue("KeyPath", "yes");
                     }
                     else if (WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath == (attributes & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath))
                     {
-                        if (this.TryGetIndexedElement("Registry", out var xRegistry, keyPath))
+                        if (this.DecompilerHelper.TryGetIndexedElement("Registry", keyPath, out var xRegistry))
                         {
                             if (xRegistry.Name.LocalName == "RegistryValue")
                             {
@@ -826,7 +756,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                     else if (WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource == (attributes & WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource))
                     {
-                        if (this.TryGetIndexedElement("ODBCDataSource", out var xOdbcDataSource, keyPath))
+                        if (this.DecompilerHelper.TryGetIndexedElement("ODBCDataSource", keyPath, out var xOdbcDataSource))
                         {
                             xOdbcDataSource.SetAttributeValue("KeyPath", "yes");
                         }
@@ -837,7 +767,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                     else
                     {
-                        if (this.TryGetIndexedElement("File", out var xFile, keyPath))
+                        if (this.DecompilerHelper.TryGetIndexedElement("File", keyPath, out var xFile))
                         {
                             xFile.SetAttributeValue("KeyPath", "yes");
                         }
@@ -854,8 +784,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (FileRow fileRow in fileTable.Rows)
                 {
-                    if (this.TryGetIndexedElement("Component", out var xComponent, fileRow.Component)
-                        && this.TryGetIndexedElement(fileRow, out var xFile))
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", fileRow.Component, out var xComponent)
+                        && this.DecompilerHelper.TryGetIndexedElement(fileRow, out var xFile))
                     {
                         xComponent.Add(xFile);
                     }
@@ -871,8 +801,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in odbcDataSourceTable.Rows)
                 {
-                    if (this.TryGetIndexedElement("Component", out var xComponent, row.FieldAsString(1))
-                        && this.TryGetIndexedElement(row, out var xOdbcDataSource))
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", row.FieldAsString(1), out var xComponent)
+                        && this.DecompilerHelper.TryGetIndexedElement(row, out var xOdbcDataSource))
                     {
                         xComponent.Add(xOdbcDataSource);
                     }
@@ -888,8 +818,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in registryTable.Rows)
                 {
-                    if (this.TryGetIndexedElement("Component", out var xComponent, row.FieldAsString(5))
-                        && this.TryGetIndexedElement(row, out var xRegistry))
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", row.FieldAsString(5), out var xComponent)
+                        && this.DecompilerHelper.TryGetIndexedElement(row, out var xRegistry))
                     {
                         xComponent.Add(xRegistry);
                     }
@@ -927,10 +857,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var dialogRow in dialogTable.Rows)
                 {
-                    var xDialog = this.GetIndexedElement(dialogRow);
+                    var xDialog = this.DecompilerHelper.GetIndexedElement(dialogRow);
                     var dialogId = dialogRow.FieldAsString(0);
 
-                    if (!this.TryGetIndexedElement("Control", out var xControl, dialogId, dialogRow.FieldAsString(7)))
+                    if (!this.DecompilerHelper.TryGetIndexedElement("Control", dialogId, dialogRow.FieldAsString(7), out var xControl))
                     {
                         this.Messaging.Write(WarningMessages.ExpectedForeignRow(dialogRow.SourceLineNumbers, "Dialog", dialogRow.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Dialog", dialogId, "Control_First", dialogRow.FieldAsString(7), "Control"));
                     }
@@ -949,7 +879,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         var controlNext = controlRow.FieldAsString(10);
                         if (!String.IsNullOrEmpty(controlNext))
                         {
-                            if (this.TryGetIndexedElement("Control", out xControl, dialogId, controlNext))
+                            if (this.DecompilerHelper.TryGetIndexedElement("Control", dialogId, controlNext, out xControl))
                             {
                                 // looped back to the first control in the dialog
                                 if (addedControls.Contains(xControl))
@@ -972,7 +902,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     var controlDefault = dialogRow.FieldAsString(8);
                     if (!String.IsNullOrEmpty(controlDefault))
                     {
-                        if (this.TryGetIndexedElement("Control", out var xDefaultControl, dialogId, controlDefault))
+                        if (this.DecompilerHelper.TryGetIndexedElement("Control", dialogId, controlDefault, out var xDefaultControl))
                         {
                             xDefaultControl.SetAttributeValue("Default", "yes");
                         }
@@ -986,7 +916,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     var controlCancel = dialogRow.FieldAsString(8);
                     if (!String.IsNullOrEmpty(controlCancel))
                     {
-                        if (this.TryGetIndexedElement("Control", out var xCancelControl, dialogId, controlCancel))
+                        if (this.DecompilerHelper.TryGetIndexedElement("Control", dialogId, controlCancel, out var xCancelControl))
                         {
                             xCancelControl.SetAttributeValue("Cancel", "yes");
                         }
@@ -1004,13 +934,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 foreach (var controlRow in controlTable.Rows)
                 {
                     var dialogId = controlRow.FieldAsString(0);
-                    if (!this.TryGetIndexedElement("Dialog", out var xDialog, dialogId))
+                    if (!this.DecompilerHelper.TryGetIndexedElement("Dialog", dialogId, out var xDialog))
                     {
                         this.Messaging.Write(WarningMessages.ExpectedForeignRow(controlRow.SourceLineNumbers, "Control", controlRow.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Dialog_", dialogId, "Dialog"));
                         continue;
                     }
 
-                    var xControl = this.GetIndexedElement(controlRow);
+                    var xControl = this.DecompilerHelper.GetIndexedElement(controlRow);
                     if (!addedControls.Contains(xControl))
                     {
                         xControl.SetAttributeValue("TabSkip", "yes");
@@ -1035,11 +965,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in duplicateFileTable.Rows)
                 {
-                    var xCopyFile = this.GetIndexedElement(row);
+                    var xCopyFile = this.DecompilerHelper.GetIndexedElement(row);
                     var destination = row.FieldAsString(4);
                     if (!String.IsNullOrEmpty(destination))
                     {
-                        if (this.TryGetIndexedElement("Directory", out var _, destination))
+                        if (this.DecompilerHelper.TryGetIndexedElement("Directory", destination, out var _))
                         {
                             xCopyFile.SetAttributeValue("DestinationDirectory", destination);
                         }
@@ -1056,11 +986,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in moveFileTable.Rows)
                 {
-                    var xCopyFile = this.GetIndexedElement(row);
+                    var xCopyFile = this.DecompilerHelper.GetIndexedElement(row);
                     var source = row.FieldAsString(4);
                     if (!String.IsNullOrEmpty(source))
                     {
-                        if (this.TryGetIndexedElement("Directory", out var _, source))
+                        if (this.DecompilerHelper.TryGetIndexedElement("Directory", source, out var _))
                         {
                             xCopyFile.SetAttributeValue("SourceDirectory", source);
                         }
@@ -1071,7 +1001,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
 
                     var destination = row.FieldAsString(5);
-                    if (this.TryGetIndexedElement("Directory", out var _, destination))
+                    if (this.DecompilerHelper.TryGetIndexedElement("Directory", destination, out var _))
                     {
                         xCopyFile.SetAttributeValue("DestinationDirectory", destination);
                     }
@@ -1134,7 +1064,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         // TODO: warn about mismatch between columns
                     }
 
-                    this.IndexElement(row, xProtectRange);
+                    this.DecompilerHelper.IndexElement(row, xProtectRange);
                 }
             }
 
@@ -1144,8 +1074,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in externalFilesTable.Rows)
                 {
-                    if (this.TryGetIndexedElement(row, out var xExternalFile)
-                        && this.TryGetIndexedElement("FamilyFileRanges", out var xProtectRange, row.FieldAsString(0), row.FieldAsString(0)))
+                    if (this.DecompilerHelper.TryGetIndexedElement(row, out var xExternalFile)
+                        && this.DecompilerHelper.TryGetIndexedElement("FamilyFileRanges", row.FieldAsString(0), row.FieldAsString(0), out var xProtectRange))
                     {
                         xExternalFile.Add(xProtectRange);
                         usedProtectRanges.Add(xProtectRange);
@@ -1178,7 +1108,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         continue;
                     }
 
-                    if (this.TryGetIndexedElement("FamilyFileRanges", out var xProtectRange, upgradedImagesRow.FieldAsString(4), row.FieldAsString(1)))
+                    if (this.DecompilerHelper.TryGetIndexedElement("FamilyFileRanges", upgradedImagesRow.FieldAsString(4), row.FieldAsString(1), out var xProtectRange))
                     {
                         xTargetFile.Add(xProtectRange);
                         usedProtectRanges.Add(xProtectRange);
@@ -1190,7 +1120,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 foreach (var row in familyFileRangesTable.Rows)
                 {
-                    var xProtectRange = this.GetIndexedElement(row);
+                    var xProtectRange = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (!usedProtectRanges.Contains(xProtectRange))
                     {
@@ -1276,7 +1206,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             // set the disk identifiers and sources for files
             foreach (var fileRow in tables["File"]?.Rows.Cast<FileRow>() ?? Enumerable.Empty<FileRow>())
             {
-                var xFile = this.GetIndexedElement("File", fileRow.File);
+                var xFile = this.DecompilerHelper.GetIndexedElement("File", fileRow.File);
 
                 // Don't bother processing files that are orphaned (and won't show up in the output anyway)
                 if (null != xFile.Parent)
@@ -1328,7 +1258,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             // set the file assemblies and manifests
             foreach (var row in tables["MsiAssembly"]?.Rows ?? Enumerable.Empty<Row>())
             {
-                if (this.TryGetIndexedElement("Component", out var xComponent, row.FieldAsString(0)))
+                if (this.DecompilerHelper.TryGetIndexedElement("Component", row.FieldAsString(0), out var xComponent))
                 {
                     foreach (var xFile in xComponent.Elements(Names.FileElement).Where(x => x.Attribute("KeyPath")?.Value == "yes"))
                     {
@@ -1346,8 +1276,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             // nest the TypeLib elements
             foreach (var row in tables["TypeLib"]?.Rows ?? Enumerable.Empty<Row>())
             {
-                var xComponent = this.GetIndexedElement("Component", row.FieldAsString(2));
-                var xTypeLib = this.GetIndexedElement(row);
+                var xComponent = this.DecompilerHelper.GetIndexedElement("Component", row.FieldAsString(2));
+                var xTypeLib = this.DecompilerHelper.GetIndexedElement(row);
 
                 foreach (var xFile in xComponent.Elements(Names.FileElement).Where(x => x.Attribute("KeyPath")?.Value == "yes"))
                 {
@@ -1374,7 +1304,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 var mimeRef = row.FieldAsString(3);
                 if (null != mimeRef)
                 {
-                    if (this.TryGetIndexedElement("MIME", out var xMime, mimeRef))
+                    if (this.DecompilerHelper.TryGetIndexedElement("MIME", mimeRef, out var xMime))
                     {
                         xMime.SetAttributeValue("Default", "yes");
                     }
@@ -1389,7 +1319,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
             foreach (var row in tables["MIME"]?.Rows ?? Enumerable.Empty<Row>())
             {
-                var xMime = this.GetIndexedElement(row);
+                var xMime = this.DecompilerHelper.GetIndexedElement(row);
 
                 if (extensionsByExtensionId.TryGetValue(row.FieldAsString(1), out var xExtensions))
                 {
@@ -1427,9 +1357,9 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             foreach (var row in classRows)
             {
                 var clsid = row.FieldAsString(0);
-                var xClass = this.GetIndexedElement(row);
+                var xClass = this.DecompilerHelper.GetIndexedElement(row);
 
-                if (this.TryGetIndexedElement("ProgId", out var xProgId, row.FieldAsString(3)))
+                if (this.DecompilerHelper.TryGetIndexedElement("ProgId", row.FieldAsString(3), out var xProgId))
                 {
                     if (addedProgIds.TryGetValue(xProgId, out var progid))
                     {
@@ -1451,7 +1381,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             foreach (var row in tables["ProgId"]?.Rows ?? Enumerable.Empty<Row>())
             {
                 var clsid = row.FieldAsString(2);
-                var xProgId = this.GetIndexedElement(row);
+                var xProgId = this.DecompilerHelper.GetIndexedElement(row);
 
                 if (!addedProgIds.ContainsKey(xProgId) && null != clsid && null == xProgId.Parent)
                 {
@@ -1475,7 +1405,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
             foreach (var row in tables["Extension"]?.Rows?.Where(row => row.FieldAsString(2) != null) ?? Enumerable.Empty<Row>())
             {
-                var xProgId = this.GetIndexedElement("ProgId", row.FieldAsString(2));
+                var xProgId = this.DecompilerHelper.GetIndexedElement("ProgId", row.FieldAsString(2));
 
                 // Haven't added the progId yet and it doesn't have a parent progId
                 if (!addedProgIds.ContainsKey(xProgId) && null == xProgId.Parent)
@@ -1510,7 +1440,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 var bits = row.FieldAsInteger(1);
                 if (WindowsInstallerConstants.MsidbCustomActionTypeHideTarget == (bits & WindowsInstallerConstants.MsidbCustomActionTypeHideTarget)
                     && WindowsInstallerConstants.MsidbCustomActionTypeInScript == (bits & WindowsInstallerConstants.MsidbCustomActionTypeInScript)
-                    && this.TryGetIndexedElement("Property", out var xProperty, row.FieldAsString(0))
+                    && this.DecompilerHelper.TryGetIndexedElement("Property", row.FieldAsString(0), out var xProperty)
                     && String.IsNullOrEmpty(xProperty.Attribute("Value")?.Value)
                     && xProperty.Attribute("Secure")?.Value != "yes"
                     && xProperty.Attribute("SuppressModularization")?.Value != "yes")
@@ -1531,10 +1461,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in tables["RemoveFile"]?.Rows ?? Enumerable.Empty<Row>())
             {
-                var xRemove = this.GetIndexedElement(row);
+                var xRemove = this.DecompilerHelper.GetIndexedElement(row);
                 var property = row.FieldAsString(3);
 
-                if (this.TryGetIndexedElement("Directory", out var _, property))
+                if (this.DecompilerHelper.TryGetIndexedElement("Directory", property, out var _))
                 {
                     xRemove.SetAttributeValue("Directory", property);
                 }
@@ -1562,7 +1492,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 var id = row.FieldAsString(0);
                 var table = row.FieldAsString(1);
-                var xPermission = this.GetIndexedElement(row);
+                var xPermission = this.DecompilerHelper.GetIndexedElement(row);
 
                 if ("CreateFolder" == table)
                 {
@@ -1580,7 +1510,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
                 else
                 {
-                    if (this.TryGetIndexedElement(table, out var xParent, id))
+                    if (this.DecompilerHelper.TryGetIndexedElement(table, id, out var xParent))
                     {
                         xParent.Add(xPermission);
                     }
@@ -1651,12 +1581,12 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             var appSearches = IndexTable(tables["AppSearch"], keyColumn: 1, dataColumn: 0);
             var ccpSearches = IndexTable(tables["CCPSearch"], keyColumn: 0, dataColumn: null);
-            var drLocators = tables["DrLocator"]?.Rows.ToDictionary(row => this.GetIndexedElement(row), row => row);
+            var drLocators = tables["DrLocator"]?.Rows.ToDictionary(row => this.DecompilerHelper.GetIndexedElement(row), row => row);
 
             var xComplianceCheck = new XElement(Names.ComplianceCheckElement);
             if (ccpSearches.Keys.Any(ccpSignature => !appSearches.ContainsKey(ccpSignature)))
             {
-                this.RootElement.Add(xComplianceCheck);
+                this.DecompilerHelper.AddElementToRoot(xComplianceCheck);
             }
 
             // index the locator tables by their signatures
@@ -1703,7 +1633,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 foreach (var locatorRow in locatorRows)
                 {
                     var used = true;
-                    var xSearch = this.GetIndexedElement(locatorRow);
+                    var xSearch = this.DecompilerHelper.GetIndexedElement(locatorRow);
 
                     if ("Signature" == locatorRow.TableDefinition.Name && 0 < xSignatureSearches.Count)
                     {
@@ -1791,7 +1721,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 {
                                     if ("DrLocator" == parentLocatorRow.TableDefinition.Name)
                                     {
-                                        var xParentSearch = this.GetIndexedElement(parentLocatorRow);
+                                        var xParentSearch = this.DecompilerHelper.GetIndexedElement(parentLocatorRow);
 
                                         if (xParentSearch.HasElements)
                                         {
@@ -1824,7 +1754,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                     }
                                     else if ("RegLocator" == parentLocatorRow.TableDefinition.Name)
                                     {
-                                        var xParentSearch = this.GetIndexedElement(parentLocatorRow);
+                                        var xParentSearch = this.DecompilerHelper.GetIndexedElement(parentLocatorRow);
 
                                         xParentSearch.Add(xSearch);
                                         xUsedSearches.Add(xSearch);
@@ -1982,11 +1912,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
             foreach (var row in shortcutTable.Rows)
             {
-                var xShortcut = this.GetIndexedElement(row);
+                var xShortcut = this.DecompilerHelper.GetIndexedElement(row);
 
                 var target = row.FieldAsString(4);
 
-                if (this.TryGetIndexedElement("Feature", out var _, target))
+                if (this.DecompilerHelper.TryGetIndexedElement("Feature", target, out var _))
                 {
                     xShortcut.SetAttributeValue("Advertise", "yes");
                     this.SetPrimaryFeature(row, 4, 3);
@@ -2301,7 +2231,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         xMajorUpgrade.SetAttributeValue("Schedule", scheduledType);
                     }
 
-                    this.RootElement.Add(xMajorUpgrade);
+                    this.DecompilerHelper.AddElementToRoot(xMajorUpgrade);
                 }
             }
         }
@@ -2326,7 +2256,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 {
                     if (xExtensions.TryGetValue(row.FieldAsString(0), out var xVerbExtensions))
                     {
-                        var xVerb = this.GetIndexedElement(row);
+                        var xVerb = this.DecompilerHelper.GetIndexedElement(row);
 
                         foreach (var xVerbExtension in xVerbExtensions)
                         {
@@ -2351,8 +2281,9 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             var sourcePath = new StringBuilder();
 
             var component = xFile.Parent;
+            var xDirectory = component.Parent;
 
-            for (var xDirectory = component.Parent; null != xDirectory && xDirectory.Name.LocalName == "Directory"; xDirectory = xDirectory.Parent)
+            while (xDirectory?.Name.LocalName == "Directory")
             {
                 string name;
 
@@ -2387,6 +2318,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     sourcePath.Insert(0, Path.DirectorySeparatorChar);
                     sourcePath.Insert(0, name);
                 }
+
+                xDirectory = xDirectory.Parent;
+            }
+
+            if (xDirectory?.Name.LocalName == "StandardDirectory" && WindowsInstallerStandard.TryGetStandardDirectory(xDirectory.Attribute("Id").Value, out var standardDirectory))
+            {
+                sourcePath.Insert(0, Path.DirectorySeparatorChar);
+                sourcePath.Insert(0, standardDirectory.Name);
             }
 
             return sourcePath.ToString();
@@ -2470,13 +2409,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             this.ShortNames = false;
 
             this.Singletons.Clear();
-            this.IndexedElements.Clear();
+            //this.IndexedElements.Clear();
             this.PatchTargetFiles.Clear();
 
             // set the codepage if its not neutral (0)
             if (0 != codepage)
             {
-                this.RootElement.SetAttributeValue("Codepage", codepage);
+                this.DecompilerHelper.RootElement.SetAttributeValue("Codepage", codepage);
             }
 
             if (this.OutputType == OutputType.Module)
@@ -2484,44 +2423,51 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 var table = tables["_SummaryInformation"];
                 var row = table.Rows.SingleOrDefault(r => r.FieldAsInteger(0) == 9);
                 this.ModularizationGuid = row?.FieldAsString(1);
-                this.RootElement.SetAttributeValue("Guid", this.ModularizationGuid);
+                this.DecompilerHelper.RootElement.SetAttributeValue("Guid", this.ModularizationGuid);
             }
+
+            this.RemoveExtensionDataFromTables(tables);
+
+            foreach (var extension in this.Extensions)
+            {
+                extension.PreDecompileTables(tables);
+            }
+        }
+
+        private void RemoveExtensionDataFromTables(TableIndexedCollection tables)
+        {
+            var tableDefinitionBySymbolDefinitionName = this.TableDefinitions.Where(t => t.SymbolDefinition != null).ToDictionary(t => t.SymbolDefinition.Name);
 
             // index the rows from the extension libraries
             var indexedExtensionTables = new Dictionary<string, HashSet<string>>();
-#if TODO_DECOMPILER_EXTENSIONS
-            foreach (var extension in this.Extensions)
+            foreach (var extension in this.ExtensionData)
             {
                 // Get the optional library from the extension with the rows to be removed.
-                var library = extension.GetLibraryToRemove(this.tableDefinitions);
+                var library = extension.GetLibrary(this.SymbolDefinitionCreator);
                 if (library != null)
                 {
-                    foreach (var row in library.Sections.SelectMany(s => s.Tables).SelectMany(t => t.Rows))
+                    foreach (var symbol in library.Sections.SelectMany(s => s.Symbols))
                     {
-                        string primaryKey;
-                        string tableName;
-
-                        // the Actions table needs to be handled specially
-                        if (table.Name == "WixAction")
+                        if (this.TryGetPrimaryKeyFromSymbol(tableDefinitionBySymbolDefinitionName, symbol, out var tableName, out var primaryKey))
                         {
-                            primaryKey = row.FieldAsString(1);
-                            tableName = row.FieldAsString(0);
+                            //// the Actions table needs to be handled specially
+                            //if (table.Name == "WixAction")
+                            //{
+                            //    primaryKey = symbol.FieldAsString(1);
+                            //    tableName = symbol.FieldAsString(0);
 
-                            if (this.outputType == OutputType.Module)
-                            {
-                                tableName = "Module" + tableName;
-                            }
-                        }
-                        else
-                        {
-                            primaryKey = row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter);
-                            tableName = table.Name;
-                        }
+                            //    if (this.outputType == OutputType.Module)
+                            //    {
+                            //        tableName = "Module" + tableName;
+                            //    }
+                            //}
+                            //else
+                            //{
+                            //    primaryKey = symbol.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter);
+                            //    tableName = table.Name;
+                            //}
 
-                        if (primaryKey != null)
-                        {
-                            HashSet<string> indexedExtensionRows;
-                            if (!indexedExtensionTables.TryGetValue(tableName, out indexedExtensionRows))
+                            if (!indexedExtensionTables.TryGetValue(tableName, out var indexedExtensionRows))
                             {
                                 indexedExtensionRows = new HashSet<string>();
                                 indexedExtensionTables.Add(tableName, indexedExtensionRows);
@@ -2532,7 +2478,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
             }
-#endif
 
             // remove the rows from the extension libraries (to allow full round-tripping)
             foreach (var kvp in indexedExtensionTables)
@@ -2540,8 +2485,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 var tableName = kvp.Key;
                 var indexedExtensionRows = kvp.Value;
 
-                var table = tables[tableName];
-                if (null != table)
+                if (tables.TryGetTable(tableName, out var table))
                 {
                     var originalRows = new RowDictionary<Row>(table);
 
@@ -2550,13 +2494,62 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                     foreach (var row in originalRows.Values)
                     {
-                        if (!indexedExtensionRows.Contains(row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter)))
+                        if (!indexedExtensionRows.Contains(row.GetPrimaryKey()))
                         {
                             table.Rows.Add(row);
                         }
                     }
                 }
             }
+        }
+
+        private bool TryGetPrimaryKeyFromSymbol(Dictionary<string, TableDefinition> tableDefinitionBySymbolDefinitionName, IntermediateSymbol symbol, out string tableName, out string primaryKey)
+        {
+            tableName = null;
+            primaryKey = null;
+
+            if (symbol is WixActionSymbol actionSymbol)
+            {
+                tableName = actionSymbol.SequenceTable.WindowsInstallerTableName();
+                primaryKey = actionSymbol.Action;
+                return true;
+            }
+
+            if (!tableDefinitionBySymbolDefinitionName.TryGetValue(symbol.Definition.Name, out var tableDefinition))
+            {
+                return false;
+            }
+
+            tableName = tableDefinition.Name;
+
+            if (tableDefinition.SymbolIdIsPrimaryKey)
+            {
+                primaryKey = symbol.Id.Id;
+            }
+            else
+            {
+                var sb = new StringBuilder();
+
+                for (var i = 0; i < symbol.Fields.Length && i < tableDefinition.Columns.Length; ++i)
+                {
+                    var column = tableDefinition.Columns[i];
+                    var field = symbol.Fields[i];
+
+                    if (column.PrimaryKey)
+                    {
+                        if (sb.Length > 0)
+                        {
+                            sb.Append('/');
+                        }
+
+                        sb.Append(field.AsString());
+                    }
+                }
+
+                primaryKey = sb.ToString();
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -2581,7 +2574,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 // empty tables may be kept with EnsureTable if the user set the proper option
                 if (0 == table.Rows.Count && this.SuppressDroppingEmptyTables)
                 {
-                    this.RootElement.Add(new XElement(Names.EnsureTableElement, new XAttribute("Id", table.Name)));
+                    this.DecompilerHelper.AddElementToRoot(new XElement(Names.EnsureTableElement, new XAttribute("Id", table.Name)));
                 }
 
                 switch (table.Name)
@@ -2901,14 +2894,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
 
                     default:
-#if TODO_DECOMPILER_EXTENSIONS
-                    if (this.ExtensionsByTableName.TryGetValue(table.Name, out var extension)
-                    {
-                        extension.DecompileTable(table);
-                    }
-                    else
-#endif
-                        if (!this.SuppressCustomTables)
+                        if (this.ExtensionsByTableName.TryGetValue(table.Name, out var extension))
+                        {
+                            extension.TryDecompileTable(table);
+                        }
+                        else if (!this.SuppressCustomTables)
                         {
                             this.DecompileCustomTable(table);
                         }
@@ -3039,7 +3029,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 break;
                             case 3:
                             {
-                                var productName = this.RootElement.Attribute("Name")?.Value;
+                                var productName = this.DecompilerHelper.RootElement.Attribute("Name")?.Value;
                                 if (value != productName)
                                 {
                                     xSummaryInformation.SetAttributeValue("Description", value);
@@ -3048,7 +3038,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                             }
                             case 4:
                             {
-                                var productManufacturer = this.RootElement.Attribute("Manufacturer")?.Value;
+                                var productManufacturer = this.DecompilerHelper.RootElement.Attribute("Manufacturer")?.Value;
                                 if (value != productManufacturer)
                                 {
                                     xSummaryInformation.SetAttributeValue("Manufacturer", value);
@@ -3065,7 +3055,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 var template = value.Split(';');
                                 if (0 < template.Length && 0 < template[template.Length - 1].Length)
                                 {
-                                    this.RootElement.SetAttributeValue("Language", template[template.Length - 1]);
+                                    this.DecompilerHelper.RootElement.SetAttributeValue("Language", template[template.Length - 1]);
                                 }
                                 break;
                             case 14:
@@ -3073,7 +3063,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 // Default InstallerVersion.
                                 if (installerVersion != 500)
                                 {
-                                    this.RootElement.SetAttributeValue("InstallerVersion", installerVersion);
+                                    this.DecompilerHelper.RootElement.SetAttributeValue("InstallerVersion", installerVersion);
                                 }
                                 break;
                             case 15:
@@ -3083,29 +3073,24 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                     this.ShortNames = true;
                                     if (OutputType.Product == this.OutputType)
                                     {
-                                        this.RootElement.SetAttributeValue("ShortNames", "yes");
+                                        this.DecompilerHelper.RootElement.SetAttributeValue("ShortNames", "yes");
                                     }
                                 }
 
                                 if (0x2 == (wordCount & 0x2))
                                 {
                                     this.Compressed = true;
-
-                                    if (OutputType.Product == this.OutputType)
-                                    {
-                                        this.RootElement.SetAttributeValue("Compressed", "yes");
-                                    }
                                 }
 
                                 if (OutputType.Product == this.OutputType)
                                 {
                                     if (0x8 == (wordCount & 0x8))
                                     {
-                                        this.RootElement.SetAttributeValue("Scope", "perUser");
+                                        this.DecompilerHelper.RootElement.SetAttributeValue("Scope", "perUser");
                                     }
                                     else
                                     {
-                                        var xAllUsers = this.RootElement.Elements(Names.PropertyElement).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
+                                        var xAllUsers = this.DecompilerHelper.RootElement.Elements(Names.PropertyElement).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
                                         if (xAllUsers?.Attribute("Value")?.Value == "1")
                                         {
                                             xAllUsers?.Remove();
@@ -3118,9 +3103,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
+                if (OutputType.Product == this.OutputType && !this.Compressed)
+                {
+                    this.DecompilerHelper.RootElement.SetAttributeValue("Compressed", "no");
+                }
+
                 if (xSummaryInformation.HasAttributes)
                 {
-                    this.RootElement.Add(xSummaryInformation);
+                    this.DecompilerHelper.AddElementToRoot(xSummaryInformation);
                 }
             }
             else
@@ -3173,7 +3163,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.RootElement.Add(xPatchInformation);
+                this.DecompilerHelper.AddElementToRoot(xPatchInformation);
             }
         }
 
@@ -3212,8 +3202,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     row.IsColumnNull(5) || row.FieldAsInteger(5) != 1 ? null : new XAttribute("ActivateAtStorage", "yes"),
                     row.IsColumnNull(6) || row.FieldAsInteger(6) != 1 ? null : new XAttribute("RunAsInteractiveUser", "yes"));
 
-                this.RootElement.Add(appId);
-                this.IndexElement(row, appId);
+                this.DecompilerHelper.AddElementToRoot(appId);
+                this.DecompilerHelper.IndexElement(row, appId);
             }
         }
 
@@ -3239,7 +3229,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     SetControlAttributes(bbControlRow.Attributes, xControl);
                 }
 
-                if (this.TryGetIndexedElement("Billboard", out var xBillboard, bbControlRow.Billboard))
+                if (this.DecompilerHelper.TryGetIndexedElement("Billboard", bbControlRow.Billboard, out var xBillboard))
                 {
                     xBillboard.Add(xControl);
                 }
@@ -3264,7 +3254,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("Feature", row.FieldAsString(1)));
 
-                this.IndexElement(row, xBillboard);
+                this.DecompilerHelper.IndexElement(row, xBillboard);
                 billboards.Add(String.Format(CultureInfo.InvariantCulture, "{0}|{1:0000000000}", row[0], row[3]), row);
             }
 
@@ -3272,7 +3262,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
             foreach (var row in billboards.Values)
             {
-                var xBillboard = this.GetIndexedElement(row);
+                var xBillboard = this.DecompilerHelper.GetIndexedElement(row);
 
                 if (!billboardActions.TryGetValue(row.FieldAsString(2), out var xBillboardAction))
                 {
@@ -3299,7 +3289,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("SourceFile", row.FieldAsString(1)));
 
-                this.RootElement.Add(xBinary);
+                this.DecompilerHelper.AddElementToRoot(xBinary);
             }
         }
 
@@ -3311,7 +3301,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in table.Rows)
             {
-                if (this.TryGetIndexedElement("File", out var xFile, row.FieldAsString(0)))
+                if (this.DecompilerHelper.TryGetIndexedElement("File", row.FieldAsString(0), out var xFile))
                 {
                     xFile.SetAttributeValue("BindPath", row.FieldAsString(1));
                 }
@@ -3389,7 +3379,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("Component", xClass, row, 2);
-                this.IndexElement(row, xClass);
+                this.DecompilerHelper.IndexElement(row, xClass);
             }
         }
 
@@ -3656,7 +3646,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(controlRow, xControl);
+                this.DecompilerHelper.IndexElement(controlRow, xControl);
             }
         }
 
@@ -3668,7 +3658,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in table.Rows)
             {
-                if (this.TryGetIndexedElement("Control", out var xControl, row.FieldAsString(0), row.FieldAsString(1)))
+                if (this.DecompilerHelper.TryGetIndexedElement("Control", row.FieldAsString(0), row.FieldAsString(1), out var xControl))
                 {
                     switch (row.FieldAsString(2))
                     {
@@ -3730,14 +3720,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                 controlEvents.Add(String.Format(CultureInfo.InvariantCulture, "{0}|{1}|{2:0000000000}|{3}|{4}|{5}", row.FieldAsString(0), row.FieldAsString(1), row.FieldAsNullableInteger(5) ?? 0, row.FieldAsString(2), row.FieldAsString(3), row.FieldAsString(4)), row);
 
-                this.IndexElement(row, xPublish);
+                this.DecompilerHelper.IndexElement(row, xPublish);
             }
 
             foreach (var row in controlEvents.Values)
             {
-                if (this.TryGetIndexedElement("Control", out var xControl, row.FieldAsString(0), row.FieldAsString(1)))
+                if (this.DecompilerHelper.TryGetIndexedElement("Control", row.FieldAsString(0), row.FieldAsString(1), out var xControl))
                 {
-                    var xPublish = this.GetIndexedElement(row);
+                    var xPublish = this.DecompilerHelper.GetIndexedElement(row);
                     xControl.Add(xPublish);
                 }
                 else
@@ -3928,7 +3918,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xCustomTable.Add(xRow);
                 }
 
-                this.RootElement.Add(xCustomTable);
+                this.DecompilerHelper.AddElementToRoot(xCustomTable);
             }
         }
 
@@ -3944,7 +3934,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Directory", row.FieldAsString(0)));
 
                 this.AddChildToParent("Component", xCreateFolder, row, 1);
-                this.IndexElement(row, xCreateFolder);
+                this.DecompilerHelper.IndexElement(row, xCreateFolder);
             }
         }
 
@@ -4115,8 +4105,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xCustomAction.SetAttributeValue("PatchUninstall", "yes");
                 }
 
-                this.RootElement.Add(xCustomAction);
-                this.IndexElement(row, xCustomAction);
+                this.DecompilerHelper.AddElementToRoot(xCustomAction);
+                this.DecompilerHelper.IndexElement(row, xCustomAction);
             }
         }
 
@@ -4148,7 +4138,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(row, xComponentSearch);
+                this.DecompilerHelper.IndexElement(row, xComponentSearch);
             }
         }
 
@@ -4162,7 +4152,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 if (!row.IsColumnNull(1))
                 {
-                    if (this.TryGetIndexedElement("Component", out var xComponent, row.FieldAsString(0)))
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", row.FieldAsString(0), out var xComponent))
                     {
                         xComponent.SetAttributeValue("ComPlusFlags", row.FieldAsInteger(1));
                     }
@@ -4247,7 +4237,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("Directory", xComponent, row, 2);
-                this.IndexElement(row, xComponent);
+                this.DecompilerHelper.IndexElement(row, xComponent);
             }
         }
 
@@ -4259,7 +4249,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in table.Rows)
             {
-                if (this.TryGetIndexedElement("Feature", out var xFeature, row.FieldAsString(0)))
+                if (this.DecompilerHelper.TryGetIndexedElement("Feature", row.FieldAsString(0), out var xFeature))
                 {
                     var xLevel = new XElement(Names.LevelElement,
                         row.IsColumnNull(2) ? null : new XAttribute("Condition", row.FieldAsString(2)),
@@ -4303,7 +4293,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     !row.IsColumnNull(6) ? new XAttribute("Title", row.FieldAsString(6)) : null);
 
                 this.UIElement.Add(xDialog);
-                this.IndexElement(row, xDialog);
+                this.DecompilerHelper.IndexElement(row, xDialog);
             }
         }
 
@@ -4367,13 +4357,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(row, xDirectory);
+                this.DecompilerHelper.IndexElement(row, xDirectory);
             }
 
             // nest the directories
             foreach (var row in table.Rows)
             {
-                var xDirectory = this.GetIndexedElement(row);
+                var xDirectory = this.DecompilerHelper.GetIndexedElement(row);
 
                 var id = row.FieldAsString(0);
 
@@ -4383,26 +4373,26 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
                 else if (row.IsColumnNull(1) || WindowsInstallerStandard.IsStandardDirectory(id))
                 {
-                    this.RootElement.Add(xDirectory);
+                    this.DecompilerHelper.AddElementToRoot(xDirectory);
                 }
                 else
                 {
                     var parentDirectoryId = row.FieldAsString(1);
 
-                    if (!this.TryGetIndexedElement("Directory", out var xParentDirectory, parentDirectoryId))
+                    if (!this.DecompilerHelper.TryGetIndexedElement("Directory", parentDirectoryId, out var xParentDirectory))
                     {
                         this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Directory_Parent", row.FieldAsString(1), "Directory"));
                     }
                     else if (xParentDirectory == xDirectory) // another way to specify a root directory
                     {
-                        this.RootElement.Add(xDirectory);
+                        this.DecompilerHelper.AddElementToRoot(xDirectory);
                     }
                     else
                     {
                         // TARGETDIR is omitted but if this directory is a first-generation descendant, add it as a root.
                         if (parentDirectoryId == "TARGETDIR")
                         {
-                            this.RootElement.Add(xDirectory);
+                            this.DecompilerHelper.AddElementToRoot(xDirectory);
                         }
                         else
                         {
@@ -4426,7 +4416,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     XAttributeIfNotNull("Path", row, 2),
                     XAttributeIfNotNull("Depth", row, 3));
 
-                this.IndexElement(row, xDirectorySearch);
+                this.DecompilerHelper.IndexElement(row, xDirectorySearch);
             }
         }
 
@@ -4459,7 +4449,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 // destination directory/property is set in FinalizeDuplicateMoveFileTables
 
                 this.AddChildToParent("Component", xCopyFile, row, 1);
-                this.IndexElement(row, xCopyFile);
+                this.DecompilerHelper.IndexElement(row, xCopyFile);
             }
         }
 
@@ -4570,7 +4560,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Event", row.FieldAsString(2)),
                     new XAttribute("Attribute", row.FieldAsString(3)));
 
-                if (this.TryGetIndexedElement("Control", out var xControl, row.FieldAsString(0), row.FieldAsString(1)))
+                if (this.DecompilerHelper.TryGetIndexedElement("Control", row.FieldAsString(0), row.FieldAsString(1), out var xControl))
                 {
                     xControl.Add(xSubscribe);
                 }
@@ -4595,7 +4585,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                 if (!row.IsColumnNull(3))
                 {
-                    if (this.TryGetIndexedElement("MIME", out var xMime, row.FieldAsString(3)))
+                    if (this.DecompilerHelper.TryGetIndexedElement("MIME", row.FieldAsString(3), out var xMime))
                     {
                         xMime.SetAttributeValue("Default", "yes");
                     }
@@ -4614,7 +4604,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     this.AddChildToParent("Component", xExtension, row, 1);
                 }
 
-                this.IndexElement(row, xExtension);
+                this.DecompilerHelper.IndexElement(row, xExtension);
             }
         }
 
@@ -4682,7 +4672,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("ImageFamilies", xExternalFile, row, 0);
-                this.IndexElement(row, xExternalFile);
+                this.DecompilerHelper.IndexElement(row, xExternalFile);
             }
         }
 
@@ -4761,7 +4751,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     feature.SetAttributeValue("Absent", "disallow");
                 }
 
-                this.IndexElement(row, feature);
+                this.DecompilerHelper.IndexElement(row, feature);
 
                 // sort the features by their display column (and append the identifier to ensure unique keys)
                 sortedFeatures.Add(String.Format(CultureInfo.InvariantCulture, "{0:00000}|{1}", row.FieldAsInteger(4), row[0]), row);
@@ -4770,15 +4760,15 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             // nest the features
             foreach (var row in sortedFeatures.Values)
             {
-                var xFeature = this.GetIndexedElement("Feature", row.FieldAsString(0));
+                var xFeature = this.DecompilerHelper.GetIndexedElement("Feature", row.FieldAsString(0));
 
                 if (row.IsColumnNull(1))
                 {
-                    this.RootElement.Add(xFeature);
+                    this.DecompilerHelper.AddElementToRoot(xFeature);
                 }
                 else
                 {
-                    if (this.TryGetIndexedElement("Feature", out var xParentFeature, row.FieldAsString(1)))
+                    if (this.DecompilerHelper.TryGetIndexedElement("Feature", row.FieldAsString(1), out var xParentFeature))
                     {
                         if (xParentFeature == xFeature)
                         {
@@ -4809,7 +4799,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Id", row.FieldAsString(1)));
 
                 this.AddChildToParent("Feature", xComponentRef, row, 0);
-                this.IndexElement(row, xComponentRef);
+                this.DecompilerHelper.IndexElement(row, xComponentRef);
             }
         }
 
@@ -4855,7 +4845,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xFile.SetAttributeValue("Compressed", "yes");
                 }
 
-                this.IndexElement(fileRow, xFile);
+                this.DecompilerHelper.IndexElement(fileRow, xFile);
             }
         }
 
@@ -4882,7 +4872,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in table.Rows)
             {
-                if (this.TryGetIndexedElement("File", out var xFile, row.FieldAsString(0)))
+                if (this.DecompilerHelper.TryGetIndexedElement("File", row.FieldAsString(0), out var xFile))
                 {
                     if (!row.IsColumnNull(1))
                     {
@@ -4912,7 +4902,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("SourceFile", row.FieldAsString(1)));
 
-                this.RootElement.Add(icon);
+                this.DecompilerHelper.AddElementToRoot(icon);
             }
         }
 
@@ -4932,8 +4922,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     row.IsColumnNull(4) ? null : new XAttribute("DiskPrompt", row.FieldAsString(4)),
                     row.IsColumnNull(5) ? null : new XAttribute("VolumeLabel", row.FieldAsString(5)));
 
-                this.RootElement.Add(family);
-                this.IndexElement(row, family);
+                this.DecompilerHelper.AddElementToRoot(family);
+                this.DecompilerHelper.IndexElement(row, family);
             }
         }
 
@@ -5035,7 +5025,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(row, xIniFileSearch);
+                this.DecompilerHelper.IndexElement(row, xIniFileSearch);
             }
         }
 
@@ -5071,7 +5061,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Condition", row.FieldAsString(0)),
                     new XAttribute("Message", row.FieldAsString(1)));
 
-                this.RootElement.Add(condition);
+                this.DecompilerHelper.AddElementToRoot(condition);
             }
         }
 
@@ -5230,7 +5220,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(row, xPermission);
+                this.DecompilerHelper.IndexElement(row, xPermission);
             }
         }
 
@@ -5260,8 +5250,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xMedia.SetAttributeValue("Cabinet", cabinet);
                 }
 
-                this.RootElement.Add(xMedia);
-                this.IndexElement(mediaRow, xMedia);
+                this.DecompilerHelper.AddElementToRoot(xMedia);
+                this.DecompilerHelper.IndexElement(mediaRow, xMedia);
             }
         }
 
@@ -5277,7 +5267,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("ContentType", row.FieldAsString(0)),
                     row.IsColumnNull(2) ? null : new XAttribute("Class", row.FieldAsString(2)));
 
-                this.IndexElement(row, mime);
+                this.DecompilerHelper.IndexElement(row, mime);
             }
         }
 
@@ -5338,7 +5328,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.RootElement.Add(configuration);
+                this.DecompilerHelper.AddElementToRoot(configuration);
             }
         }
 
@@ -5355,7 +5345,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("RequiredLanguage", row.FieldAsString(3)),
                     XAttributeIfNotNull("RequiredVersion", row, 4));
 
-                this.RootElement.Add(xDependency);
+                this.DecompilerHelper.AddElementToRoot(xDependency);
             }
         }
 
@@ -5382,7 +5372,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xExclusion.SetAttributeValue("ExcludeExceptLanguage", -excludedLanguage);
                 }
 
-                this.RootElement.Add(xExclusion);
+                this.DecompilerHelper.AddElementToRoot(xExclusion);
             }
         }
 
@@ -5402,7 +5392,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     var xIgnoreTable = new XElement(Names.IgnoreTableElement,
                         new XAttribute("Id", tableName));
 
-                    this.RootElement.Add(xIgnoreTable);
+                    this.DecompilerHelper.AddElementToRoot(xIgnoreTable);
                 }
             }
         }
@@ -5417,10 +5407,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 var row = table.Rows[0];
 
-                this.RootElement.SetAttributeValue("Id", row.FieldAsString(0));
+                this.DecompilerHelper.RootElement.SetAttributeValue("Id", row.FieldAsString(0));
                 // support Language columns that are treated as integers as well as strings (the WiX default, to support localizability)
-                this.RootElement.SetAttributeValue("Language", row.FieldAsString(1));
-                this.RootElement.SetAttributeValue("Version", row.FieldAsString(2));
+                this.DecompilerHelper.RootElement.SetAttributeValue("Language", row.FieldAsString(1));
+                this.DecompilerHelper.RootElement.SetAttributeValue("Version", row.FieldAsString(2));
             }
             else
             {
@@ -5442,7 +5432,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Column", row.FieldAsString(2)),
                     XAttributeIfNotNull("Value", row, 3));
 
-                this.RootElement.Add(xSubstitution);
+                this.DecompilerHelper.AddElementToRoot(xSubstitution);
             }
         }
 
@@ -5487,7 +5477,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("Component", xCopyFile, row, 1);
-                this.IndexElement(row, xCopyFile);
+                this.DecompilerHelper.IndexElement(row, xCopyFile);
             }
         }
 
@@ -5503,7 +5493,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("SourceFile", row.FieldAsString(1)));
 
-                this.IndexElement(row, xDigitalCertificate);
+                this.DecompilerHelper.IndexElement(row, xDigitalCertificate);
             }
         }
 
@@ -5520,7 +5510,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                 this.AddChildToParent("MsiDigitalCertificate", xDigitalSignature, row, 2);
 
-                if (this.TryGetIndexedElement(row.FieldAsString(0), out var xParentElement, row.FieldAsString(1)))
+                if (this.DecompilerHelper.TryGetIndexedElement(row.FieldAsString(0), row.FieldAsString(1), out var xParentElement))
                 {
                     xParentElement.Add(xDigitalSignature);
                 }
@@ -5560,7 +5550,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
                 }
 
-                this.RootElement.Add(xEmbeddedChainer);
+                this.DecompilerHelper.AddElementToRoot(xEmbeddedChainer);
             }
         }
 
@@ -5735,7 +5725,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         return;
                 }
 
-                this.IndexElement(row, xPermissionEx);
+                this.DecompilerHelper.IndexElement(row, xPermissionEx);
             }
         }
 
@@ -5748,7 +5738,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             if (0 < table.Rows.Count)
             {
                 var xPackageCertificates = new XElement(Names.PatchCertificatesElement);
-                this.RootElement.Add(xPackageCertificates);
+                this.DecompilerHelper.AddElementToRoot(xPackageCertificates);
                 this.AddCertificates(table, xPackageCertificates);
             }
         }
@@ -5762,7 +5752,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             if (0 < table.Rows.Count)
             {
                 var xPatchCertificates = new XElement(Names.PatchCertificatesElement);
-                this.RootElement.Add(xPatchCertificates);
+                this.DecompilerHelper.AddElementToRoot(xPatchCertificates);
                 this.AddCertificates(table, xPatchCertificates);
             }
         }
@@ -5776,7 +5766,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in table.Rows)
             {
-                if (this.TryGetIndexedElement("MsiDigitalCertificate", out var xDigitalCertificate, row.FieldAsString(1)))
+                if (this.DecompilerHelper.TryGetIndexedElement("MsiDigitalCertificate", row.FieldAsString(1), out var xDigitalCertificate))
                 {
                     parent.Add(xDigitalCertificate);
                 }
@@ -5846,7 +5836,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
                 }
 
-                this.IndexElement(row, xOdbcDataSource);
+                this.DecompilerHelper.IndexElement(row, xOdbcDataSource);
             }
         }
 
@@ -5865,7 +5855,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     XAttributeIfNotNull("SetupFile", row, 4));
 
                 this.AddChildToParent("Component", xOdbcDriver, row, 1);
-                this.IndexElement(row, xOdbcDriver);
+                this.DecompilerHelper.IndexElement(row, xOdbcDriver);
             }
         }
 
@@ -6010,7 +6000,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.RootElement.Add(xPatchMetadata);
+                this.DecompilerHelper.AddElementToRoot(xPatchMetadata);
             }
         }
 
@@ -6049,7 +6039,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     patchSequence.SetAttributeValue("Supersede", "yes");
                 }
 
-                this.RootElement.Add(patchSequence);
+                this.DecompilerHelper.AddElementToRoot(patchSequence);
             }
         }
 
@@ -6068,13 +6058,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     XAttributeIfNotNull("Icon", row, 4),
                     XAttributeIfNotNull("IconIndex", row, 5));
 
-                this.IndexElement(row, xProgId);
+                this.DecompilerHelper.IndexElement(row, xProgId);
             }
 
             // nest the ProgIds
             foreach (var row in table.Rows)
             {
-                var xProgId = this.GetIndexedElement(row);
+                var xProgId = this.DecompilerHelper.GetIndexedElement(row);
 
                 if (!row.IsColumnNull(1))
                 {
@@ -6107,13 +6097,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     case "AllowProductCodeMismatches":
                         if ("1" == value)
                         {
-                            this.RootElement.SetAttributeValue("AllowProductCodeMismatches", "yes");
+                            this.DecompilerHelper.RootElement.SetAttributeValue("AllowProductCodeMismatches", "yes");
                         }
                         break;
                     case "AllowProductVersionMajorMismatches":
                         if ("1" == value)
                         {
-                            this.RootElement.SetAttributeValue("AllowMajorVersionMismatches", "yes");
+                            this.DecompilerHelper.RootElement.SetAttributeValue("AllowMajorVersionMismatches", "yes");
                         }
                         break;
                     case "ApiPatchingSymbolFlags":
@@ -6127,7 +6117,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                     value = value.Substring(2);
                                 }
 
-                                this.RootElement.SetAttributeValue("SymbolFlags", Convert.ToInt32(value, 16));
+                                this.DecompilerHelper.RootElement.SetAttributeValue("SymbolFlags", Convert.ToInt32(value, 16));
                             }
                             catch
                             {
@@ -6138,13 +6128,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     case "DontRemoveTempFolderWhenFinished":
                         if ("1" == value)
                         {
-                            this.RootElement.SetAttributeValue("CleanWorkingFolder", "no");
+                            this.DecompilerHelper.RootElement.SetAttributeValue("CleanWorkingFolder", "no");
                         }
                         break;
                     case "IncludeWholeFilesOnly":
                         if ("1" == value)
                         {
-                            this.RootElement.SetAttributeValue("WholeFilesOnly", "yes");
+                            this.DecompilerHelper.RootElement.SetAttributeValue("WholeFilesOnly", "yes");
                         }
                         break;
                     case "ListOfPatchGUIDsToReplace":
@@ -6158,7 +6148,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 var xReplacePatch = new XElement(Names.ReplacePatchElement,
                                     new XAttribute("Id", guidMatch.Value));
 
-                                this.RootElement.Add(xReplacePatch);
+                                this.DecompilerHelper.AddElementToRoot(xReplacePatch);
                             }
                         }
                         break;
@@ -6172,25 +6162,25 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 var xTargetProductCode = new XElement(Names.TargetProductCodeElement,
                                     new XAttribute("Id", targetProductCodeString));
 
-                                this.RootElement.Add(xTargetProductCode);
+                                this.DecompilerHelper.AddElementToRoot(xTargetProductCode);
                             }
                         }
                         break;
                     case "PatchGUID":
-                        this.RootElement.SetAttributeValue("Id", value);
+                        this.DecompilerHelper.RootElement.SetAttributeValue("Id", value);
                         break;
                     case "PatchSourceList":
-                        this.RootElement.SetAttributeValue("SourceList", value);
+                        this.DecompilerHelper.RootElement.SetAttributeValue("SourceList", value);
                         break;
                     case "PatchOutputPath":
-                        this.RootElement.SetAttributeValue("OutputPath", value);
+                        this.DecompilerHelper.RootElement.SetAttributeValue("OutputPath", value);
                         break;
                     default:
                         var patchProperty = new XElement(Names.PatchPropertyElement,
                             new XAttribute("Name", name),
                             new XAttribute("Value", value));
 
-                        this.RootElement.Add(patchProperty);
+                        this.DecompilerHelper.AddElementToRoot(patchProperty);
                         break;
                 }
             }
@@ -6260,22 +6250,22 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     switch (id)
                     {
                         case "Manufacturer":
-                            this.RootElement.SetAttributeValue("Manufacturer", value);
+                            this.DecompilerHelper.RootElement.SetAttributeValue("Manufacturer", value);
                             continue;
                         case "ProductCode":
-                            this.RootElement.SetAttributeValue("ProductCode", value.ToUpper(CultureInfo.InvariantCulture));
+                            this.DecompilerHelper.RootElement.SetAttributeValue("ProductCode", value.ToUpper(CultureInfo.InvariantCulture));
                             continue;
                         case "ProductLanguage":
-                            this.RootElement.SetAttributeValue("Language", value);
+                            this.DecompilerHelper.RootElement.SetAttributeValue("Language", value);
                             continue;
                         case "ProductName":
-                            this.RootElement.SetAttributeValue("Name", value);
+                            this.DecompilerHelper.RootElement.SetAttributeValue("Name", value);
                             continue;
                         case "ProductVersion":
-                            this.RootElement.SetAttributeValue("Version", value);
+                            this.DecompilerHelper.RootElement.SetAttributeValue("Version", value);
                             continue;
                         case "UpgradeCode":
-                            this.RootElement.SetAttributeValue("UpgradeCode", value);
+                            this.DecompilerHelper.RootElement.SetAttributeValue("UpgradeCode", value);
                             continue;
                     }
                 }
@@ -6340,14 +6330,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(row, radioButton);
+                this.DecompilerHelper.IndexElement(row, radioButton);
             }
 
             // nest the radio buttons
             var xRadioButtonGroups = new Dictionary<string, XElement>();
             foreach (var row in table.Rows.OrderBy(row => row.FieldAsString(0)).ThenBy(row => row.FieldAsInteger(1)))
             {
-                var xRadioButton = this.GetIndexedElement(row);
+                var xRadioButton = this.DecompilerHelper.GetIndexedElement(row);
 
                 if (!xRadioButtonGroups.TryGetValue(row.FieldAsString(0), out var xRadioButtonGroup))
                 {
@@ -6395,7 +6385,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                             break;
                     }
 
-                    this.IndexElement(row, xRegistryKey);
+                    this.DecompilerHelper.IndexElement(row, xRegistryKey);
                 }
                 else
                 {
@@ -6480,7 +6470,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         xRegistryValue.SetAttributeValue("Value", String.Empty);
                     }
 
-                    this.IndexElement(row, xRegistryValue);
+                    this.DecompilerHelper.IndexElement(row, xRegistryValue);
                 }
             }
         }
@@ -6552,7 +6542,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                this.IndexElement(row, xRegistrySearch);
+                this.DecompilerHelper.IndexElement(row, xRegistrySearch);
             }
         }
 
@@ -6588,7 +6578,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
 
                     this.AddChildToParent("Component", xRemoveFolder, row, 1);
-                    this.IndexElement(row, xRemoveFolder);
+                    this.DecompilerHelper.IndexElement(row, xRemoveFolder);
                 }
                 else
                 {
@@ -6625,7 +6615,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
 
                     this.AddChildToParent("Component", xRemoveFile, row, 1);
-                    this.IndexElement(row, xRemoveFile);
+                    this.DecompilerHelper.IndexElement(row, xRemoveFile);
                 }
             }
         }
@@ -6738,7 +6728,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             foreach (var row in table.Rows)
             {
-                if (this.TryGetIndexedElement("File", out var xFile, row.FieldAsString(0)))
+                if (this.DecompilerHelper.TryGetIndexedElement("File", row.FieldAsString(0), out var xFile))
                 {
                     xFile.SetAttributeValue("SelfRegCost", row.IsColumnNull(1) ? 0 : row.FieldAsInteger(1));
                 }
@@ -6927,7 +6917,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("Component", xServiceInstall, row, 11);
-                this.IndexElement(row, xServiceInstall);
+                this.DecompilerHelper.IndexElement(row, xServiceInstall);
             }
         }
 
@@ -6943,17 +6933,17 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Name", row.FieldAsString(0)),
                     new XAttribute("SourceFile", row.FieldAsString(1)));
 
-                this.IndexElement(row, xSfpCatalog);
+                this.DecompilerHelper.IndexElement(row, xSfpCatalog);
             }
 
             // nest the SFPCatalog elements
             foreach (var row in table.Rows)
             {
-                var xSfpCatalog = this.GetIndexedElement(row);
+                var xSfpCatalog = this.DecompilerHelper.GetIndexedElement(row);
 
                 if (!row.IsColumnNull(2))
                 {
-                    if (this.TryGetIndexedElement("SFPCatalog", out var xParentSFPCatalog, row.FieldAsString(2)))
+                    if (this.DecompilerHelper.TryGetIndexedElement("SFPCatalog", row.FieldAsString(2), out var xParentSFPCatalog))
                     {
                         xParentSFPCatalog.Add(xSfpCatalog);
                     }
@@ -6961,12 +6951,12 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     {
                         xSfpCatalog.SetAttributeValue("Dependency", row.FieldAsString(2));
 
-                        this.RootElement.Add(xSfpCatalog);
+                        this.DecompilerHelper.AddElementToRoot(xSfpCatalog);
                     }
                 }
                 else
                 {
-                    this.RootElement.Add(xSfpCatalog);
+                    this.DecompilerHelper.AddElementToRoot(xSfpCatalog);
                 }
             }
         }
@@ -7044,7 +7034,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("Component", xShortcut, row, 3);
-                this.IndexElement(row, xShortcut);
+                this.DecompilerHelper.IndexElement(row, xShortcut);
             }
         }
 
@@ -7093,7 +7083,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     fileSearch.SetAttributeValue("MaxDate", ConvertIntegerToDateTime(row.FieldAsInteger(7)));
                 }
 
-                this.IndexElement(row, fileSearch);
+                this.DecompilerHelper.IndexElement(row, fileSearch);
             }
         }
 
@@ -7110,7 +7100,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xPatchTargetFile = new XElement(Names.TargetFileElement,
                         new XAttribute("Id", row.FieldAsString(1)));
 
-                    if (this.TryGetIndexedElement("TargetImages", out var xTargetImage, row.FieldAsString(0)))
+                    if (this.DecompilerHelper.TryGetIndexedElement("TargetImages", row.FieldAsString(0), out var xTargetImage))
                     {
                         xTargetImage.Add(xPatchTargetFile);
                     }
@@ -7192,7 +7182,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 this.AddChildToParent("UpgradedImages", xTargetImage, row, 3);
-                this.IndexElement(row, xTargetImage);
+                this.DecompilerHelper.IndexElement(row, xTargetImage);
             }
         }
 
@@ -7282,7 +7272,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 // nested under the appropriate File element in FinalizeFileTable
-                this.IndexElement(row, xTypeLib);
+                this.DecompilerHelper.IndexElement(row, xTypeLib);
             }
         }
 
@@ -7306,7 +7296,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     xUpgrade = new XElement(Names.UpgradeElement,
                         new XAttribute("Id", upgradeRow.UpgradeCode));
 
-                    this.RootElement.Add(xUpgrade);
+                    this.DecompilerHelper.AddElementToRoot(xUpgrade);
                     xUpgrades.Add(upgradeRow.UpgradeCode, xUpgrade);
                 }
 
@@ -7435,7 +7425,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 AddSymbolPaths(row, 3, xUpgradeImage);
 
                 this.AddChildToParent("ImageFamilies", xUpgradeImage, row, 4);
-                this.IndexElement(row, xUpgradeImage);
+                this.DecompilerHelper.IndexElement(row, xUpgradeImage);
             }
         }
 
@@ -7485,7 +7475,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     XAttributeIfNotNull("Command", row, 3),
                     XAttributeIfNotNull("Argument", row, 4));
 
-                this.IndexElement(row, verb);
+                this.DecompilerHelper.IndexElement(row, verb);
             }
         }
 
@@ -7537,7 +7527,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 var featureField = row.Fields[featureColumnIndex];
                 var componentField = row.Fields[componentColumnIndex];
 
-                if (this.TryGetIndexedElement("FeatureComponents", out var xComponentRef, Convert.ToString(featureField.Data), Convert.ToString(componentField.Data)))
+                if (this.DecompilerHelper.TryGetIndexedElement("FeatureComponents", featureField.AsString(), componentField.AsString(), out var xComponentRef))
                 {
                     xComponentRef.SetAttributeValue("Primary", "yes");
                 }

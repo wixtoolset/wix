@@ -1,48 +1,32 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Util
 {
-#if TODO_CONSIDER_DECOMPILER
     using System;
     using System.IO;
     using System.Text;
     using System.Collections;
     using System.Diagnostics;
-    using System.Globalization;
 
-    using Util = WixToolset.Extensions.Serialize.Util;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using Wix = WixToolset.Data.Serialize;
+    using WixToolset.Data.WindowsInstaller;
+    using System.Collections.Generic;
+    using System.Xml.Linq;
+    using WixToolset.Util.Symbols;
 
     /// <summary>
     /// The decompiler for the WiX Toolset Utility Extension.
     /// </summary>
-    public sealed class UtilDecompiler : DecompilerExtension
+    internal sealed class UtilDecompiler : BaseWindowsInstallerDecompilerExtension
     {
-        /// <summary>
-        /// Creates a decompiler for Utility Extension.
-        /// </summary>
-        public UtilDecompiler()
-        {
-            this.TableDefinitions = UtilExtensionData.GetExtensionTableDefinitions();
-        }
-
-        /// <summary>
-        /// Get the extensions library to be removed.
-        /// </summary>
-        /// <param name="tableDefinitions">Table definitions for library.</param>
-        /// <returns>Library to remove from decompiled output.</returns>
-        public override Library GetLibraryToRemove(TableDefinitionCollection tableDefinitions)
-        {
-            return UtilExtensionData.GetExtensionLibrary(tableDefinitions);
-        }
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => UtilTableDefinitions.All;
 
         /// <summary>
         /// Called at the beginning of the decompilation of a database.
         /// </summary>
         /// <param name="tables">The collection of all tables.</param>
-        public override void Initialize(TableIndexedCollection tables)
+        public override void PreDecompileTables(TableIndexedCollection tables)
         {
             this.CleanupSecureCustomProperties(tables);
             this.CleanupInternetShortcutRemoveFileTables(tables);
@@ -61,24 +45,22 @@ namespace WixToolset.Extensions
         /// <param name="tables">The collection of all tables.</param>
         private void CleanupSecureCustomProperties(TableIndexedCollection tables)
         {
-            Table propertyTable = tables["Property"];
+            var propertyTable = tables["Property"];
 
             if (null != propertyTable)
             {
-                foreach (Row row in propertyTable.Rows)
+                foreach (var row in propertyTable.Rows)
                 {
                     if ("SecureCustomProperties" == row[0].ToString())
                     {
-                        StringBuilder remainingProperties = new StringBuilder();
-                        string[] secureCustomProperties = row[1].ToString().Split(';');
-                        foreach (string property in secureCustomProperties)
+                        var remainingProperties = new StringBuilder();
+                        var secureCustomProperties = row[1].ToString().Split(';');
+                        foreach (var property in secureCustomProperties)
                         {
                             if (property.StartsWith("WIX_SUITE_", StringComparison.Ordinal) || property.StartsWith("WIX_DIR_", StringComparison.Ordinal)
                                 || property.StartsWith("WIX_ACCOUNT_", StringComparison.Ordinal))
                             {
-                                Wix.PropertyRef propertyRef = new Wix.PropertyRef();
-                                propertyRef.Id = property;
-                                this.Core.RootElement.AddChild(propertyRef);
+                                this.DecompilerHelper.AddElementToRoot("PropertyRef", new XAttribute("Id", property));
                             }
                             else
                             {
@@ -104,21 +86,21 @@ namespace WixToolset.Extensions
         private void CleanupInternetShortcutRemoveFileTables(TableIndexedCollection tables)
         {
             // index the WixInternetShortcut table
-            Table wixInternetShortcutTable = tables["WixInternetShortcut"];
-            Hashtable wixInternetShortcuts = new Hashtable();
+            var wixInternetShortcutTable = tables["WixInternetShortcut"];
+            var wixInternetShortcuts = new Hashtable();
             if (null != wixInternetShortcutTable)
             {
-                foreach (Row row in wixInternetShortcutTable.Rows)
+                foreach (var row in wixInternetShortcutTable.Rows)
                 {
-                    wixInternetShortcuts.Add(row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), row);
+                    wixInternetShortcuts.Add(row.GetPrimaryKey(), row);
                 }
             }
 
             // remove the RemoveFile rows with primary keys that match the WixInternetShortcut table's
-            Table removeFileTable = tables["RemoveFile"];
+            var removeFileTable = tables["RemoveFile"];
             if (null != removeFileTable)
             {
-                for (int i = removeFileTable.Rows.Count - 1; 0 <= i; i--)
+                for (var i = removeFileTable.Rows.Count - 1; 0 <= i; i--)
                 {
                     if (null != wixInternetShortcuts[removeFileTable.Rows[i][0]])
                     {
@@ -132,69 +114,86 @@ namespace WixToolset.Extensions
         /// Decompiles an extension table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
-        public override void DecompileTable(Table table)
+        public override bool TryDecompileTable(Table table)
         {
             switch (table.Name)
             {
                 case "WixCloseApplication":
+                case "Wix4CloseApplication":
                     this.DecompileWixCloseApplicationTable(table);
                     break;
                 case "WixRemoveFolderEx":
+                case "Wix4RemoveFolderEx":
                     this.DecompileWixRemoveFolderExTable(table);
                     break;
                 case "WixRestartResource":
+                case "Wix4RestartResource":
                     this.DecompileWixRestartResourceTable(table);
                     break;
                 case "FileShare":
+                case "Wix4FileShare":
                     this.DecompileFileShareTable(table);
                     break;
                 case "FileSharePermissions":
+                case "Wix4FileSharePermissions":
                     this.DecompileFileSharePermissionsTable(table);
                     break;
                 case "WixInternetShortcut":
+                case "Wix4InternetShortcut":
                     this.DecompileWixInternetShortcutTable(table);
                     break;
                 case "Group":
+                case "Wix4Group":
                     this.DecompileGroupTable(table);
                     break;
                 case "Perfmon":
+                case "Wix4Perfmon":
                     this.DecompilePerfmonTable(table);
                     break;
                 case "PerfmonManifest":
+                case "Wix4PerfmonManifest":
                     this.DecompilePerfmonManifestTable(table);
                     break;
                 case "EventManifest":
+                case "Wix4EventManifest":
                     this.DecompileEventManifestTable(table);
                     break;
                 case "SecureObjects":
+                case "Wix4SecureObjects":
                     this.DecompileSecureObjectsTable(table);
                     break;
                 case "ServiceConfig":
+                case "Wix4ServiceConfig":
                     this.DecompileServiceConfigTable(table);
                     break;
                 case "User":
+                case "Wix4User":
                     this.DecompileUserTable(table);
                     break;
                 case "UserGroup":
+                case "Wix4UserGroup":
                     this.DecompileUserGroupTable(table);
                     break;
                 case "XmlConfig":
+                case "Wix4XmlConfig":
                     this.DecompileXmlConfigTable(table);
                     break;
                 case "XmlFile":
+                case "Wix4XmlFile":
                     // XmlFile decompilation has been moved to FinalizeXmlFileTable function
                     break;
                 default:
-                    base.DecompileTable(table);
-                    break;
+                    return false;
             }
+
+            return true;
         }
 
         /// <summary>
         /// Finalize decompilation.
         /// </summary>
         /// <param name="tables">The collection of all tables.</param>
-        public override void Finish(TableIndexedCollection tables)
+        public override void PostDecompileTables(TableIndexedCollection tables)
         {
             this.FinalizePerfmonTable(tables);
             this.FinalizePerfmonManifestTable(tables);
@@ -211,49 +210,21 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileWixCloseApplicationTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.CloseApplication closeApplication = new Util.CloseApplication();
+                var attribute = row.FieldAsNullableInteger(4) ?? 0x2;
 
-                closeApplication.Id = (string)row[0];
-
-                closeApplication.Target = (string)row[1];
-
-                if (null != row[2])
-                {
-                    closeApplication.Description = (string)row[2];
-                }
-
-                if (null != row[3])
-                {
-                    closeApplication.Content = (string)row[3];
-                }
-
-                // set defaults
-                closeApplication.CloseMessage = Util.YesNoType.no;
-                closeApplication.RebootPrompt = Util.YesNoType.yes;
-                closeApplication.ElevatedCloseMessage = Util.YesNoType.no;
-
-                if (null != row[4])
-                {
-                    int attribute = (int)row[4];
-
-                    closeApplication.CloseMessage = (0x1 == (attribute & 0x1)) ? Util.YesNoType.yes : Util.YesNoType.no;
-                    closeApplication.RebootPrompt = (0x2 == (attribute & 0x2)) ? Util.YesNoType.yes : Util.YesNoType.no;
-                    closeApplication.ElevatedCloseMessage = (0x4 == (attribute & 0x4)) ? Util.YesNoType.yes : Util.YesNoType.no;
-                }
-
-                if (null != row[5])
-                {
-                    closeApplication.Sequence = (int)row[5];
-                }
-
-                if (null != row[6])
-                {
-                    closeApplication.Property = (string)row[6];
-                }
-
-                this.Core.RootElement.AddChild(closeApplication);
+                this.DecompilerHelper.AddElementToRoot(UtilConstants.CloseApplicationName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Target", row.FieldAsString(1)),
+                    AttributeIfNotNull("Description", row, 2),
+                    AttributeIfNotNull("Content", row, 3),
+                    AttributeIfNotNull("CloseMessage", 0x1 == (attribute & 0x1)),
+                    AttributeIfNotNull("RebootPrompt", 0x2 == (attribute & 0x2)),
+                    AttributeIfNotNull("ElevatedCloseMessage", 0x4 == (attribute & 0x4)),
+                    NumericAttributeIfNotNull("Sequence", row, 5),
+                    NumericAttributeIfNotNull("Property", row, 6)
+                    );
             }
         }
 
@@ -263,43 +234,45 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileWixRemoveFolderExTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                // Set the Id even if auto-generated previously.
-                Util.RemoveFolderEx removeFolder = new Util.RemoveFolderEx();
-                removeFolder.Id = (string)row[0];
-                removeFolder.Property = (string)row[2];
-
-                int installMode = (int)row[3];
-                switch ((UtilCompiler.WixRemoveFolderExOn)installMode)
+                var on = String.Empty;
+                var installMode = row.FieldAsInteger(3);
+                switch (installMode)
                 {
-                    case UtilCompiler.WixRemoveFolderExOn.Install:
-                        removeFolder.On = Util.RemoveFolderEx.OnType.install;
+                    case (int)WixRemoveFolderExInstallMode.Install:
+                        on = "install";
                         break;
-                      
-                    case UtilCompiler.WixRemoveFolderExOn.Uninstall:
-                        removeFolder.On = Util.RemoveFolderEx.OnType.uninstall;
+
+                    case (int)WixRemoveFolderExInstallMode.Uninstall:
+                        on = "uninstall";
                         break;
-                      
-                    case UtilCompiler.WixRemoveFolderExOn.Both:
-                        removeFolder.On = Util.RemoveFolderEx.OnType.both;
+
+                    case (int)WixRemoveFolderExInstallMode.Both:
+                        on = "both";
                         break;
 
                     default:
-                        this.Core.OnMessage(WixWarnings.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "InstallMode", installMode));
+                        this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "InstallMode", installMode));
                         break;
                 }
 
+                var removeFolder = new XElement(UtilConstants.RemoveFolderExName,
+                    AttributeIfNotNull("Id", row, 0),
+                    AttributeIfNotNull("Property", row, 2),
+                    AttributeIfNotNull("On", on)
+                    );
+
                 // Add to the appropriate Component or section element.
-                string componentId = (string)row[1];
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", componentId);
-                if (null != component)
+                var componentId = row.FieldAsString(1);
+
+                if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                 {
-                    component.AddChild(removeFolder);
+                    component.Add(removeFolder);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", componentId, "Component"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
                 }
             }
         }
@@ -310,53 +283,51 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileWixRestartResourceTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                // Set the Id even if auto-generated previously.
-                Util.RestartResource restartResource = new Util.RestartResource();
-                restartResource.Id = (string)row[0];
+                var restartResource = new XElement(UtilConstants.RestartResourceName,
+                    new XAttribute("Id", row.FieldAsString(0)));
 
                 // Determine the resource type and set accordingly.
-                string resource = (string)row[2];
-                int attributes = (int)row[3];
-                UtilCompiler.WixRestartResourceAttributes type = (UtilCompiler.WixRestartResourceAttributes)(attributes & (int)UtilCompiler.WixRestartResourceAttributes.TypeMask);
+                var resource = row.FieldAsString(2);
+                var attributes = row.FieldAsInteger(3);
+                var type = (WixRestartResourceAttributes)attributes;
 
                 switch (type)
                 {
-                    case UtilCompiler.WixRestartResourceAttributes.Filename:
-                        restartResource.Path = resource;
+                    case WixRestartResourceAttributes.Filename:
+                        restartResource.Add(new XAttribute("Path", resource));
                         break;
 
-                    case UtilCompiler.WixRestartResourceAttributes.ProcessName:
-                        restartResource.ProcessName = resource;
+                    case WixRestartResourceAttributes.ProcessName:
+                        restartResource.Add(new XAttribute("ProcessName", resource));
                         break;
 
-                    case UtilCompiler.WixRestartResourceAttributes.ServiceName:
-                        restartResource.ServiceName = resource;
+                    case WixRestartResourceAttributes.ServiceName:
+                        restartResource.Add(new XAttribute("ServiceName", resource));
                         break;
 
                     default:
-                        this.Core.OnMessage(WixWarnings.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Attributes", attributes));
+                        this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Attributes", attributes));
                         break;
                 }
 
                 // Add to the appropriate Component or section element.
-                string componentId = (string)row[1];
+                var componentId = row.FieldAsString(1);
                 if (!String.IsNullOrEmpty(componentId))
                 {
-                    Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", componentId);
-                    if (null != component)
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                     {
-                        component.AddChild(restartResource);
+                        component.Add(restartResource);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", componentId, "Component"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
                     }
                 }
                 else
                 {
-                    this.Core.RootElement.AddChild(restartResource);
+                    this.DecompilerHelper.AddElementToRoot(restartResource);
                 }
             }
         }
@@ -367,33 +338,28 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileFileShareTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.FileShare fileShare = new Util.FileShare();
-
-                fileShare.Id = (string)row[0];
-
-                fileShare.Name = (string)row[1];
-
-                if (null != row[3])
-                {
-                    fileShare.Description = (string)row[3];
-                }
+                var fileShare = new XElement(UtilConstants.FileShareName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Name", row.FieldAsString(1)),
+                    AttributeIfNotNull("Description", row, 3)
+                    );
 
                 // the Directory_ column is set by the parent Component
 
                 // the User_ and Permissions columns are deprecated
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[2]);
-                if (null != component)
+                if (this.DecompilerHelper.TryGetIndexedElement("Component", row.FieldAsString(2), out var component))
                 {
-                    component.AddChild(fileShare);
+                    component.Add(fileShare);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[2], "Component"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Component_", (string)row[2], "Component"));
                 }
-                this.Core.IndexElement(row, fileShare);
+
+                this.DecompilerHelper.IndexElement(row, fileShare);
             }
         }
 
@@ -403,111 +369,21 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileFileSharePermissionsTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.FileSharePermission fileSharePermission = new Util.FileSharePermission();
+                var fileSharePermission = new XElement(UtilConstants.FileSharePermissionName,
+                    new XAttribute("User", row.FieldAsString(1)));
 
-                fileSharePermission.User = (string)row[1];
+                this.AddPermissionAttributes(fileSharePermission, row, 2, UtilConstants.FolderPermissions);
 
-                string[] specialPermissions = UtilConstants.FolderPermissions;
-                int permissions = (int)row[2];
-                for (int i = 0; i < 32; i++)
+                if (this.DecompilerHelper.TryGetIndexedElement("Wix4FileShare", row.FieldAsString(0), out var fileShare) ||
+                    this.DecompilerHelper.TryGetIndexedElement("FileShare", row.FieldAsString(0), out fileShare))
                 {
-                    if (0 != ((permissions >> i) & 1))
-                    {
-                        string name = null;
-
-                        if (16 > i && specialPermissions.Length > i)
-                        {
-                            name = specialPermissions[i];
-                        }
-                        else if (28 > i && UtilConstants.StandardPermissions.Length > (i - 16))
-                        {
-                            name = UtilConstants.StandardPermissions[i - 16];
-                        }
-                        else if (0 <= (i - 28) && UtilConstants.GenericPermissions.Length > (i - 28))
-                        {
-                            name = UtilConstants.GenericPermissions[i - 28];
-                        }
-
-                        if (null == name)
-                        {
-                            this.Core.OnMessage(WixWarnings.UnknownPermission(row.SourceLineNumbers, row.Table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), i));
-                        }
-                        else
-                        {
-                            switch (name)
-                            {
-                                case "ChangePermission":
-                                    fileSharePermission.ChangePermission = Util.YesNoType.yes;
-                                    break;
-                                case "CreateChild":
-                                    fileSharePermission.CreateChild = Util.YesNoType.yes;
-                                    break;
-                                case "CreateFile":
-                                    fileSharePermission.CreateFile = Util.YesNoType.yes;
-                                    break;
-                                case "Delete":
-                                    fileSharePermission.Delete = Util.YesNoType.yes;
-                                    break;
-                                case "DeleteChild":
-                                    fileSharePermission.DeleteChild = Util.YesNoType.yes;
-                                    break;
-                                case "GenericAll":
-                                    fileSharePermission.GenericAll = Util.YesNoType.yes;
-                                    break;
-                                case "GenericExecute":
-                                    fileSharePermission.GenericExecute = Util.YesNoType.yes;
-                                    break;
-                                case "GenericRead":
-                                    fileSharePermission.GenericRead = Util.YesNoType.yes;
-                                    break;
-                                case "GenericWrite":
-                                    fileSharePermission.GenericWrite = Util.YesNoType.yes;
-                                    break;
-                                case "Read":
-                                    fileSharePermission.Read = Util.YesNoType.yes;
-                                    break;
-                                case "ReadAttributes":
-                                    fileSharePermission.ReadAttributes = Util.YesNoType.yes;
-                                    break;
-                                case "ReadExtendedAttributes":
-                                    fileSharePermission.ReadExtendedAttributes = Util.YesNoType.yes;
-                                    break;
-                                case "ReadPermission":
-                                    fileSharePermission.ReadPermission = Util.YesNoType.yes;
-                                    break;
-                                case "Synchronize":
-                                    fileSharePermission.Synchronize = Util.YesNoType.yes;
-                                    break;
-                                case "TakeOwnership":
-                                    fileSharePermission.TakeOwnership = Util.YesNoType.yes;
-                                    break;
-                                case "Traverse":
-                                    fileSharePermission.Traverse = Util.YesNoType.yes;
-                                    break;
-                                case "WriteAttributes":
-                                    fileSharePermission.WriteAttributes = Util.YesNoType.yes;
-                                    break;
-                                case "WriteExtendedAttributes":
-                                    fileSharePermission.WriteExtendedAttributes = Util.YesNoType.yes;
-                                    break;
-                                default:
-                                    Debug.Fail(String.Format("Unknown permission '{0}'.", name));
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                Util.FileShare fileShare = (Util.FileShare)this.Core.GetIndexedElement("FileShare", (string)row[0]);
-                if (null != fileShare)
-                {
-                    fileShare.AddChild(fileSharePermission);
+                        fileShare.Add(fileSharePermission);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "FileShare_", (string)row[0], "FileShare"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "FileShare_", (string)row[0], "Wix4FileShare"));
                 }
             }
         }
@@ -518,25 +394,18 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileGroupTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.Group group = new Util.Group();
-
-                group.Id = (string)row[0];
-
                 if (null != row[1])
                 {
-                    this.Core.OnMessage(WixWarnings.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Component_", (string)row[1]));
+                    this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Component_", (string)row[1]));
                 }
 
-                group.Name = (string)row[2];
-
-                if (null != row[3])
-                {
-                    group.Domain = (string)row[3];
-                }
-
-                this.Core.RootElement.AddChild(group);
+                this.DecompilerHelper.AddElementToRoot(UtilConstants.GroupName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Name", row.FieldAsString(1)),
+                    AttributeIfNotNull("Domain", row, 3)
+                    );
             }
         }
 
@@ -546,39 +415,41 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileWixInternetShortcutTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.InternetShortcut internetShortcut = new Util.InternetShortcut();
-                internetShortcut.Id = (string)row[0];
-                internetShortcut.Directory = (string)row[2];
-                // remove .lnk/.url extension because compiler extension adds it back for us
-                internetShortcut.Name = Path.ChangeExtension((string)row[3], null);
-                internetShortcut.Target = (string)row[4];
-                internetShortcut.IconFile = (string)row[6];
-                internetShortcut.IconIndex = (int)row[7];
-
-                UtilCompiler.InternetShortcutType shortcutType = (UtilCompiler.InternetShortcutType)row[5];
+                var type = String.Empty;
+                var shortcutType = (UtilCompiler.InternetShortcutType)row.FieldAsInteger(5);
                 switch (shortcutType)
                 {
                     case UtilCompiler.InternetShortcutType.Link:
-                        internetShortcut.Type = Util.InternetShortcut.TypeType.link;
+                        type = "link";
                         break;
                     case UtilCompiler.InternetShortcutType.Url:
-                        internetShortcut.Type = Util.InternetShortcut.TypeType.url;
+                        type = "url";
                         break;
                 }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-                if (null != component)
+                var internetShortcut = new XElement(UtilConstants.InternetShortcutName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Directory", row.FieldAsString(2)),
+                    new XAttribute("Name", Path.GetFileNameWithoutExtension(row.FieldAsString(3))), // remove .lnk/.url extension because compiler extension adds it back for us
+                    new XAttribute("Type", type),
+                    new XAttribute("Target", row.FieldAsString(4)),
+                    new XAttribute("IconFile", row.FieldAsString(6)),
+                    NumericAttributeIfNotNull("IconIndex", row, 7)
+                    );
+
+                var componentId = row.FieldAsString(1);
+                if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                 {
-                    component.AddChild(internetShortcut);
+                    component.Add(internetShortcut);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
                 }
 
-                this.Core.IndexElement(row, internetShortcut);
+                this.DecompilerHelper.IndexElement(row, internetShortcut);
             }
         }
 
@@ -588,54 +459,48 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompilePerfmonTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.PerfCounter perfCounter = new Util.PerfCounter();
-
-                perfCounter.Name = (string)row[2];
-
-                this.Core.IndexElement(row, perfCounter);
+                this.DecompilerHelper.IndexElement(row, new XElement(UtilConstants.PerfCounterName, new XAttribute("Name", row.FieldAsString(2))));
             }
         }
-        
+
         /// <summary>
         /// Decompile the PerfmonManifest table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
         private void DecompilePerfmonManifestTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.PerfCounterManifest perfCounterManifest = new Util.PerfCounterManifest();
-
-                perfCounterManifest.ResourceFileDirectory = (string)row[2];
-
-                this.Core.IndexElement(row, perfCounterManifest);
+                this.DecompilerHelper.IndexElement(row, new XElement(UtilConstants.PerfCounterManifestName, new XAttribute("ResourceFileDirectory", row.FieldAsString(2))));
             }
         }
-        
+
         /// <summary>
         /// Decompile the EventManifest table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
         private void DecompileEventManifestTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.EventManifest eventManifest = new Util.EventManifest();
-                this.Core.IndexElement(row, eventManifest);
+                this.DecompilerHelper.IndexElement(row, new XElement(UtilConstants.EventManifestName));
             }
         }
-        
+
         /// <summary>
         /// Decompile the SecureObjects table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
         private void DecompileSecureObjectsTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.PermissionEx permissionEx = new Util.PermissionEx();
+                var permissionEx = new XElement(UtilConstants.PermissionExName,
+                    AttributeIfNotNull("Domain", row, 2),
+                    AttributeIfNotNull("User", row, 3)
+                    );
 
                 string[] specialPermissions;
                 switch ((string)row[1])
@@ -653,155 +518,13 @@ namespace WixToolset.Extensions
                         specialPermissions = UtilConstants.ServicePermissions;
                         break;
                     default:
-                        this.Core.OnMessage(WixWarnings.IllegalColumnValue(row.SourceLineNumbers, row.Table.Name, row.Fields[1].Column.Name, row[1]));
+                        this.Messaging.Write(WarningMessages.IllegalColumnValue(row.SourceLineNumbers, row.Table.Name, row.Fields[1].Column.Name, row[1]));
                         return;
                 }
 
-                int permissionBits = (int)row[4];
-                for (int i = 0; i < 32; i++)
-                {
-                    if (0 != ((permissionBits >> i) & 1))
-                    {
-                        string name = null;
+                this.AddPermissionAttributes(permissionEx, row, 4, specialPermissions);
 
-                        if (16 > i && specialPermissions.Length > i)
-                        {
-                            name = specialPermissions[i];
-                        }
-                        else if (28 > i && UtilConstants.StandardPermissions.Length > (i - 16))
-                        {
-                            name = UtilConstants.StandardPermissions[i - 16];
-                        }
-                        else if (0 <= (i - 28) && UtilConstants.GenericPermissions.Length > (i - 28))
-                        {
-                            name = UtilConstants.GenericPermissions[i - 28];
-                        }
-
-                        if (null == name)
-                        {
-                            this.Core.OnMessage(WixWarnings.UnknownPermission(row.SourceLineNumbers, row.Table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), i));
-                        }
-                        else
-                        {
-                            switch (name)
-                            {
-                                case "Append":
-                                    permissionEx.Append = Util.YesNoType.yes;
-                                    break;
-                                case "ChangePermission":
-                                    permissionEx.ChangePermission = Util.YesNoType.yes;
-                                    break;
-                                case "CreateChild":
-                                    permissionEx.CreateChild = Util.YesNoType.yes;
-                                    break;
-                                case "CreateFile":
-                                    permissionEx.CreateFile = Util.YesNoType.yes;
-                                    break;
-                                case "CreateLink":
-                                    permissionEx.CreateLink = Util.YesNoType.yes;
-                                    break;
-                                case "CreateSubkeys":
-                                    permissionEx.CreateSubkeys = Util.YesNoType.yes;
-                                    break;
-                                case "Delete":
-                                    permissionEx.Delete = Util.YesNoType.yes;
-                                    break;
-                                case "DeleteChild":
-                                    permissionEx.DeleteChild = Util.YesNoType.yes;
-                                    break;
-                                case "EnumerateSubkeys":
-                                    permissionEx.EnumerateSubkeys = Util.YesNoType.yes;
-                                    break;
-                                case "Execute":
-                                    permissionEx.Execute = Util.YesNoType.yes;
-                                    break;
-                                case "GenericAll":
-                                    permissionEx.GenericAll = Util.YesNoType.yes;
-                                    break;
-                                case "GenericExecute":
-                                    permissionEx.GenericExecute = Util.YesNoType.yes;
-                                    break;
-                                case "GenericRead":
-                                    permissionEx.GenericRead = Util.YesNoType.yes;
-                                    break;
-                                case "GenericWrite":
-                                    permissionEx.GenericWrite = Util.YesNoType.yes;
-                                    break;
-                                case "Notify":
-                                    permissionEx.Notify = Util.YesNoType.yes;
-                                    break;
-                                case "Read":
-                                    permissionEx.Read = Util.YesNoType.yes;
-                                    break;
-                                case "ReadAttributes":
-                                    permissionEx.ReadAttributes = Util.YesNoType.yes;
-                                    break;
-                                case "ReadExtendedAttributes":
-                                    permissionEx.ReadExtendedAttributes = Util.YesNoType.yes;
-                                    break;
-                                case "ReadPermission":
-                                    permissionEx.ReadPermission = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceChangeConfig":
-                                    permissionEx.ServiceChangeConfig = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceEnumerateDependents":
-                                    permissionEx.ServiceEnumerateDependents = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceInterrogate":
-                                    permissionEx.ServiceInterrogate = Util.YesNoType.yes;
-                                    break;
-                                case "ServicePauseContinue":
-                                    permissionEx.ServicePauseContinue = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceQueryConfig":
-                                    permissionEx.ServiceQueryConfig = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceQueryStatus":
-                                    permissionEx.ServiceQueryStatus = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceStart":
-                                    permissionEx.ServiceStart = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceStop":
-                                    permissionEx.ServiceStop = Util.YesNoType.yes;
-                                    break;
-                                case "ServiceUserDefinedControl":
-                                    permissionEx.ServiceUserDefinedControl = Util.YesNoType.yes;
-                                    break;
-                                case "Synchronize":
-                                    permissionEx.Synchronize = Util.YesNoType.yes;
-                                    break;
-                                case "TakeOwnership":
-                                    permissionEx.TakeOwnership = Util.YesNoType.yes;
-                                    break;
-                                case "Traverse":
-                                    permissionEx.Traverse = Util.YesNoType.yes;
-                                    break;
-                                case "Write":
-                                    permissionEx.Write = Util.YesNoType.yes;
-                                    break;
-                                case "WriteAttributes":
-                                    permissionEx.WriteAttributes = Util.YesNoType.yes;
-                                    break;
-                                case "WriteExtendedAttributes":
-                                    permissionEx.WriteExtendedAttributes = Util.YesNoType.yes;
-                                    break;
-                                default:
-                                    throw new InvalidOperationException(String.Format("Unknown permission attribute '{0}'.", name));
-                            }
-                        }
-                    }
-                }
-
-                if (null != row[2])
-                {
-                    permissionEx.Domain = (string)row[2];
-                }
-
-                permissionEx.User = (string)row[3];
-
-                this.Core.IndexElement(row, permissionEx);
+                this.DecompilerHelper.IndexElement(row, permissionEx);
             }
         }
 
@@ -811,90 +534,20 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileServiceConfigTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.ServiceConfig serviceConfig = new Util.ServiceConfig();
+                var serviceConfig = new XElement(UtilConstants.ServiceConfigName,
+                    new XAttribute("ServiceName", row.FieldAsString(0)),
+                    AttributeIfNotNull("FirstFailureActionType", row, 3),
+                    AttributeIfNotNull("SecondFailureActionType", row, 4),
+                    AttributeIfNotNull("ThirdFailureActionType", row, 5),
+                    NumericAttributeIfNotNull("ResetPeriodInDays", row, 6),
+                    NumericAttributeIfNotNull("RestartServiceDelayInSeconds", row, 7),
+                    AttributeIfNotNull("ProgramCommandLine", row, 8),
+                    AttributeIfNotNull("RebootMessage", row, 9)
+                    );
 
-                serviceConfig.ServiceName = (string)row[0];
-
-                switch ((string)row[3])
-                {
-                    case "none":
-                        serviceConfig.FirstFailureActionType = Util.ServiceConfig.FirstFailureActionTypeType.none;
-                        break;
-                    case "reboot":
-                        serviceConfig.FirstFailureActionType = Util.ServiceConfig.FirstFailureActionTypeType.reboot;
-                        break;
-                    case "restart":
-                        serviceConfig.FirstFailureActionType = Util.ServiceConfig.FirstFailureActionTypeType.restart;
-                        break;
-                    case "runCommand":
-                        serviceConfig.FirstFailureActionType = Util.ServiceConfig.FirstFailureActionTypeType.runCommand;
-                        break;
-                    default:
-                        this.Core.OnMessage(WixWarnings.IllegalColumnValue(row.SourceLineNumbers, table.Name, row.Fields[3].Column.Name, row[3]));
-                        break;
-                }
-
-                switch ((string)row[4])
-                {
-                    case "none":
-                        serviceConfig.SecondFailureActionType = Util.ServiceConfig.SecondFailureActionTypeType.none;
-                        break;
-                    case "reboot":
-                        serviceConfig.SecondFailureActionType = Util.ServiceConfig.SecondFailureActionTypeType.reboot;
-                        break;
-                    case "restart":
-                        serviceConfig.SecondFailureActionType = Util.ServiceConfig.SecondFailureActionTypeType.restart;
-                        break;
-                    case "runCommand":
-                        serviceConfig.SecondFailureActionType = Util.ServiceConfig.SecondFailureActionTypeType.runCommand;
-                        break;
-                    default:
-                        this.Core.OnMessage(WixWarnings.IllegalColumnValue(row.SourceLineNumbers, table.Name, row.Fields[4].Column.Name, row[4]));
-                        break;
-                }
-
-                switch ((string)row[5])
-                {
-                    case "none":
-                        serviceConfig.ThirdFailureActionType = Util.ServiceConfig.ThirdFailureActionTypeType.none;
-                        break;
-                    case "reboot":
-                        serviceConfig.ThirdFailureActionType = Util.ServiceConfig.ThirdFailureActionTypeType.reboot;
-                        break;
-                    case "restart":
-                        serviceConfig.ThirdFailureActionType = Util.ServiceConfig.ThirdFailureActionTypeType.restart;
-                        break;
-                    case "runCommand":
-                        serviceConfig.ThirdFailureActionType = Util.ServiceConfig.ThirdFailureActionTypeType.runCommand;
-                        break;
-                    default:
-                        this.Core.OnMessage(WixWarnings.IllegalColumnValue(row.SourceLineNumbers, table.Name, row.Fields[5].Column.Name, row[5]));
-                        break;
-                }
-
-                if (null != row[6])
-                {
-                    serviceConfig.ResetPeriodInDays = (int)row[6];
-                }
-
-                if (null != row[7])
-                {
-                    serviceConfig.RestartServiceDelayInSeconds = (int)row[7];
-                }
-
-                if (null != row[8])
-                {
-                    serviceConfig.ProgramCommandLine = (string)row[8];
-                }
-
-                if (null != row[9])
-                {
-                    serviceConfig.RebootMessage = (string)row[9];
-                }
-
-                this.Core.IndexElement(row, serviceConfig);
+                this.DecompilerHelper.IndexElement(row, serviceConfig);
             }
         }
 
@@ -904,97 +557,58 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileUserTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.User user = new Util.User();
+                var attributes = row.FieldAsNullableInteger(5) ?? 0;
 
-                user.Id = (string)row[0];
+                var user = new XElement(UtilConstants.UserName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Name", row.FieldAsString(2)),
+                    AttributeIfNotNull("Domain", row, 3),
+                    AttributeIfNotNull("Password", row, 4),
+                    AttributeIfTrue("PasswordNeverExpires", UtilCompiler.UserDontExpirePasswrd == (attributes & UtilCompiler.UserDontExpirePasswrd)),
+                    AttributeIfTrue("CanNotChangePassword", UtilCompiler.UserPasswdCantChange == (attributes & UtilCompiler.UserPasswdCantChange)),
+                    AttributeIfTrue("PasswordExpired", UtilCompiler.UserPasswdChangeReqdOnLogin == (attributes & UtilCompiler.UserPasswdChangeReqdOnLogin)),
+                    AttributeIfTrue("Disabled", UtilCompiler.UserDisableAccount == (attributes & UtilCompiler.UserDisableAccount)),
+                    AttributeIfTrue("FailIfExists", UtilCompiler.UserFailIfExists == (attributes & UtilCompiler.UserFailIfExists)),
+                    AttributeIfTrue("UpdateIfExists", UtilCompiler.UserUpdateIfExists == (attributes & UtilCompiler.UserUpdateIfExists)),
+                    AttributeIfTrue("LogonAsService", UtilCompiler.UserLogonAsService == (attributes & UtilCompiler.UserLogonAsService)),
+                    AttributeIfTrue("LogonAsService", UtilCompiler.UserLogonAsService == (attributes & UtilCompiler.UserLogonAsService))
+                    );
 
-                user.Name = (string)row[2];
-
-                if (null != row[3])
+                if (UtilCompiler.UserDontRemoveOnUninstall == (attributes & UtilCompiler.UserDontRemoveOnUninstall))
                 {
-                    user.Domain = (string)row[3];
+                    user.Add(new XAttribute("RemoveOnUninstall", "no"));
                 }
 
-                if (null != row[4])
+                if (UtilCompiler.UserDontCreateUser == (attributes & UtilCompiler.UserDontCreateUser))
                 {
-                    user.Password = (string)row[4];
+                    user.Add(new XAttribute("CreateUser", "no"));
                 }
 
-                if (null != row[5])
+                if (UtilCompiler.UserNonVital == (attributes & UtilCompiler.UserNonVital))
                 {
-                    int attributes = (int)row[5];
-
-                    if (UtilCompiler.UserDontExpirePasswrd == (attributes & UtilCompiler.UserDontExpirePasswrd))
-                    {
-                        user.PasswordNeverExpires = Util.YesNoType.yes;
-                    }
-
-                    if (UtilCompiler.UserPasswdCantChange == (attributes & UtilCompiler.UserPasswdCantChange))
-                    {
-                        user.CanNotChangePassword = Util.YesNoType.yes;
-                    }
-
-                    if (UtilCompiler.UserPasswdChangeReqdOnLogin == (attributes & UtilCompiler.UserPasswdChangeReqdOnLogin))
-                    {
-                        user.PasswordExpired = Util.YesNoType.yes;
-                    }
-
-                    if (UtilCompiler.UserDisableAccount == (attributes & UtilCompiler.UserDisableAccount))
-                    {
-                        user.Disabled = Util.YesNoType.yes;
-                    }
-
-                    if (UtilCompiler.UserFailIfExists == (attributes & UtilCompiler.UserFailIfExists))
-                    {
-                        user.FailIfExists = Util.YesNoType.yes;
-                    }
-
-                    if (UtilCompiler.UserUpdateIfExists == (attributes & UtilCompiler.UserUpdateIfExists))
-                    {
-                        user.UpdateIfExists = Util.YesNoType.yes;
-                    }
-
-                    if (UtilCompiler.UserLogonAsService == (attributes & UtilCompiler.UserLogonAsService))
-                    {
-                        user.LogonAsService = Util.YesNoType.yes;
-                    }
-                    
-                    if (UtilCompiler.UserDontRemoveOnUninstall == (attributes & UtilCompiler.UserDontRemoveOnUninstall))
-                    {
-                        user.RemoveOnUninstall = Util.YesNoType.no;
-                    }
-
-                    if (UtilCompiler.UserDontCreateUser == (attributes & UtilCompiler.UserDontCreateUser))
-                    {
-                        user.CreateUser = Util.YesNoType.no;
-                    }
-
-                    if (UtilCompiler.UserNonVital == (attributes & UtilCompiler.UserNonVital))
-                    {
-                        user.Vital = Util.YesNoType.no;
-                    }
+                    user.Add(new XAttribute("Vital", "no"));
                 }
 
-                if (null != row[1])
+                var componentId = row.FieldAsString(1);
+                if (!String.IsNullOrEmpty(componentId))
                 {
-                    Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-
-                    if (null != component)
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                     {
-                        component.AddChild(user);
+                        component.Add(user);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
                     }
                 }
                 else
                 {
-                    this.Core.RootElement.AddChild(user);
+                    this.DecompilerHelper.AddElementToRoot(user);
                 }
-                this.Core.IndexElement(row, user);
+
+                this.DecompilerHelper.IndexElement(row, user);
             }
         }
 
@@ -1004,21 +618,16 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileUserGroupTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.User user = (Util.User)this.Core.GetIndexedElement("User", (string)row[0]);
-
-                if (null != user)
+                var userId = row.FieldAsString(0);
+                if (this.DecompilerHelper.TryGetIndexedElement("User", userId, out var user))
                 {
-                    Util.GroupRef groupRef = new Util.GroupRef();
-
-                    groupRef.Id = (string)row[1];
-
-                    user.AddChild(groupRef);
+                    user.Add(new XElement(UtilConstants.GroupRefName, new XAttribute("Id", row.FieldAsString(1))));
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Group_", (string)row[0], "Group"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Group_", userId, "Group"));
                 }
             }
         }
@@ -1029,75 +638,58 @@ namespace WixToolset.Extensions
         /// <param name="table">The table to decompile.</param>
         private void DecompileXmlConfigTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
-                Util.XmlConfig xmlConfig = new Util.XmlConfig();
-
-                xmlConfig.Id = (string)row[0];
-
-                xmlConfig.File = (string)row[1];
-
-                xmlConfig.ElementPath = (string)row[2];
-
-                if (null != row[3])
-                {
-                    xmlConfig.VerifyPath = (string)row[3];
-                }
-
-                if (null != row[4])
-                {
-                    xmlConfig.Name = (string)row[4];
-                }
-
-                if (null != row[5])
-                {
-                    xmlConfig.Value = (string)row[5];
-                }
-
-                int flags = (int)row[6];
+                var flags = row.FieldAsNullableInteger(6) ?? 0;
+                string node = null;
+                string action = null;
+                string on = null;
 
                 if (0x1 == (flags & 0x1))
                 {
-                    xmlConfig.Node = Util.XmlConfig.NodeType.element;
+                    node = "element";
                 }
                 else if (0x2 == (flags & 0x2))
                 {
-                    xmlConfig.Node = Util.XmlConfig.NodeType.value;
+                    node = "value";
                 }
                 else if (0x4 == (flags & 0x4))
                 {
-                    xmlConfig.Node = Util.XmlConfig.NodeType.document;
+                    node = "document";
                 }
 
                 if (0x10 == (flags & 0x10))
                 {
-                    xmlConfig.Action = Util.XmlConfig.ActionType.create;
+                    action = "create";
                 }
                 else if (0x20 == (flags & 0x20))
                 {
-                    xmlConfig.Action = Util.XmlConfig.ActionType.delete;
+                    action = "delete";
                 }
 
                 if (0x100 == (flags & 0x100))
                 {
-                    xmlConfig.On = Util.XmlConfig.OnType.install;
+                    on = "install";
                 }
                 else if (0x200 == (flags & 0x200))
                 {
-                    xmlConfig.On = Util.XmlConfig.OnType.uninstall;
+                    on = "uninstall";
                 }
 
-                if (0x00001000 == (flags & 0x00001000))
-                {
-                    xmlConfig.PreserveModifiedDate = Util.YesNoType.yes;
-                }
+                var xmlConfig = new XElement(UtilConstants.XmlConfigName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("File", row.FieldAsString(1)),
+                    new XAttribute("ElementPath", row.FieldAsString(2)),
+                    AttributeIfNotNull("VerifyPath", row, 3),
+                    AttributeIfNotNull("Name", row, 4),
+                    AttributeIfNotNull("Node", node),
+                    AttributeIfNotNull("Action", action),
+                    AttributeIfNotNull("On", on),
+                    AttributeIfTrue("PreserveModifiedDate", 0x00001000 == (flags & 0x00001000)),
+                    NumericAttributeIfNotNull("Sequence", row, 8)
+                    );
 
-                if (null != row[8])
-                {
-                    xmlConfig.Sequence = (int)row[8];
-                }
-
-                this.Core.IndexElement(row, xmlConfig);
+                this.DecompilerHelper.IndexElement(row, xmlConfig);
             }
         }
 
@@ -1114,34 +706,30 @@ namespace WixToolset.Extensions
         /// </remarks>
         private void FinalizePerfmonTable(TableIndexedCollection tables)
         {
-            Table perfmonTable = tables["Perfmon"];
-
-            if (null != perfmonTable)
+            if (tables.TryGetTable("Perfmon", out var perfmonTable))
             {
-                foreach (Row row in perfmonTable.Rows)
+                foreach (var row in perfmonTable.Rows)
                 {
-                    string formattedFile = (string)row[1];
-                    Util.PerfCounter perfCounter = (Util.PerfCounter)this.Core.GetIndexedElement(row);
+                    var formattedFile = row.FieldAsString(1);
 
                     // try to "de-format" the File column's value to determine the proper parent File element
                     if ((formattedFile.StartsWith("[#", StringComparison.Ordinal) || formattedFile.StartsWith("[!", StringComparison.Ordinal))
                         && formattedFile.EndsWith("]", StringComparison.Ordinal))
                     {
-                        string fileId = formattedFile.Substring(2, formattedFile.Length - 3);
-
-                        Wix.File file = (Wix.File)this.Core.GetIndexedElement("File", fileId);
-                        if (null != file)
+                        var fileId = formattedFile.Substring(2, formattedFile.Length - 3);
+                        if (this.DecompilerHelper.TryGetIndexedElement("File", fileId, out var file))
                         {
-                            file.AddChild(perfCounter);
+                            var perfCounter = this.DecompilerHelper.GetIndexedElement(row);
+                            file.Add(perfCounter);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, perfmonTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "File", formattedFile, "File"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, perfmonTable.Name, row.GetPrimaryKey(), "File", formattedFile, "File"));
                         }
                     }
                     else
                     {
-                        this.Core.OnMessage(UtilErrors.IllegalFileValueInPerfmonOrManifest(formattedFile, "Perfmon"));
+                        this.Messaging.Write(UtilErrors.IllegalFileValueInPerfmonOrManifest(formattedFile, "Perfmon"));
                     }
                 }
             }
@@ -1153,34 +741,33 @@ namespace WixToolset.Extensions
         /// <param name="tables">The collection of all tables.</param>
         private void FinalizePerfmonManifestTable(TableIndexedCollection tables)
         {
-            Table perfmonManifestTable = tables["PerfmonManifest"];
-
-            if (null != perfmonManifestTable)
+            if (tables.TryGetTable("PerfmonManifest", out var perfmonManifestTable))
             {
-                foreach (Row row in perfmonManifestTable.Rows)
+                foreach (var row in perfmonManifestTable.Rows)
                 {
-                    string formattedFile = (string)row[1];
-                    Util.PerfCounterManifest perfCounterManifest = (Util.PerfCounterManifest)this.Core.GetIndexedElement(row);
+                    var formattedFile = row.FieldAsString(1);
 
                     // try to "de-format" the File column's value to determine the proper parent File element
                     if ((formattedFile.StartsWith("[#", StringComparison.Ordinal) || formattedFile.StartsWith("[!", StringComparison.Ordinal))
                         && formattedFile.EndsWith("]", StringComparison.Ordinal))
                     {
-                        string fileId = formattedFile.Substring(2, formattedFile.Length - 3);
+                        var perfCounterManifest = this.DecompilerHelper.GetIndexedElement(row);
+                        var fileId = formattedFile.Substring(2, formattedFile.Length - 3);
 
-                        Wix.File file = (Wix.File)this.Core.GetIndexedElement("File", fileId);
-                        if (null != file)
+                        if (this.DecompilerHelper.TryGetIndexedElement("File", fileId, out var file))
                         {
-                            file.AddChild(perfCounterManifest);
+                            file.Add(perfCounterManifest);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, perfCounterManifest.ResourceFileDirectory, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "File", formattedFile, "File"));
+                            var resourceFileDirectory = perfCounterManifest.Attribute("ResourceFileDirectory")?.Value;
+
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, resourceFileDirectory, row.GetPrimaryKey(), "File", formattedFile, "File"));
                         }
                     }
                     else
                     {
-                        this.Core.OnMessage(UtilErrors.IllegalFileValueInPerfmonOrManifest(formattedFile, "PerfmonManifest"));
+                        this.Messaging.Write(UtilErrors.IllegalFileValueInPerfmonOrManifest(formattedFile, "PerfmonManifest"));
                     }
                 }
             }
@@ -1196,64 +783,61 @@ namespace WixToolset.Extensions
         /// </remarks>
         private void FinalizeSecureObjectsTable(TableIndexedCollection tables)
         {
-            Table createFolderTable = tables["CreateFolder"];
-            Table secureObjectsTable = tables["SecureObjects"];
-
-            Hashtable createFolders = new Hashtable();
+            var createFolderElementsByDirectoryId = new Dictionary<string, List<XElement>>();
 
             // index the CreateFolder table because the foreign key to this table from the
             // LockPermissions table is only part of the primary key of this table
-            if (null != createFolderTable)
+            if (tables.TryGetTable("CreateFolder", out var createFolderTable))
             {
-                foreach (Row row in createFolderTable.Rows)
+                foreach (var row in createFolderTable.Rows)
                 {
-                    Wix.CreateFolder createFolder = (Wix.CreateFolder)this.Core.GetIndexedElement(row);
-                    string directoryId = (string)row[0];
+                    var directoryId = row.FieldAsString(0);
 
-                    if (!createFolders.Contains(directoryId))
+                    if (!createFolderElementsByDirectoryId.TryGetValue(directoryId, out var createFolderElements))
                     {
-                        createFolders.Add(directoryId, new ArrayList());
+                        createFolderElements = new List<XElement>();
+                        createFolderElementsByDirectoryId.Add(directoryId, createFolderElements);
                     }
-                    ((ArrayList)createFolders[directoryId]).Add(createFolder);
+
+                    var createFolder = this.DecompilerHelper.GetIndexedElement(row);
+                    createFolderElements.Add(createFolder);
                 }
             }
 
-            if (null != secureObjectsTable)
+            if (tables.TryGetTable("SecureObjects", out var secureObjectsTable))
             {
-                foreach (Row row in secureObjectsTable.Rows)
+                foreach (var row in secureObjectsTable.Rows)
                 {
-                    string id = (string)row[0];
-                    string table = (string)row[1];
+                    var id = row.FieldAsString(0);
+                    var table = row.FieldAsString(1);
 
-                    Util.PermissionEx permissionEx = (Util.PermissionEx)this.Core.GetIndexedElement(row);
+                    var permissionEx = this.DecompilerHelper.GetIndexedElement(row);
 
-                    if ("CreateFolder" == table)
+                    if (table == "CreateFolder")
                     {
-                        ArrayList createFolderElements = (ArrayList)createFolders[id];
-
-                        if (null != createFolderElements)
+                        if (createFolderElementsByDirectoryId.TryGetValue(id, out var createFolderElements))
                         {
-                            foreach (Wix.CreateFolder createFolder in createFolderElements)
+                            foreach (var createFolder in createFolderElements)
                             {
-                                createFolder.AddChild(permissionEx);
+                                createFolder.Add(permissionEx);
                             }
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, "SecureObjects", row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "LockObject", id, table));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, "SecureObjects", row.GetPrimaryKey(), "LockObject", id, table));
                         }
                     }
                     else
                     {
-                        Wix.IParentElement parentElement = (Wix.IParentElement)this.Core.GetIndexedElement(table, id);
+                        var parentElement = this.DecompilerHelper.GetIndexedElement(table, id);
 
-                        if (null != parentElement)
+                        if (parentElement != null)
                         {
-                            parentElement.AddChild(permissionEx);
+                            parentElement.Add(permissionEx);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, "SecureObjects", row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "LockObject", id, table));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, "SecureObjects", row.GetPrimaryKey(), "LockObject", id, table));
                         }
                     }
                 }
@@ -1270,10 +854,8 @@ namespace WixToolset.Extensions
         /// </remarks>
         private void FinalizeServiceConfigTable(TableIndexedCollection tables)
         {
-            Table serviceConfigTable = tables["ServiceConfig"];
-            Table serviceInstallTable = tables["ServiceInstall"];
-
-            Hashtable serviceInstalls = new Hashtable();
+            //var serviceInstalls = new Hashtable();
+            var serviceInstallElementsByName = new Dictionary<string, List<XElement>>();
 
             // index the ServiceInstall table because the foreign key used by the ServiceConfig
             // table is actually the ServiceInstall.Name, not the ServiceInstall.ServiceInstall
@@ -1281,55 +863,54 @@ namespace WixToolset.Extensions
             // decompiler must assume there could be multiple matches and add the ServiceConfig to each
             // TODO: the Component column information should be taken into acount to accurately identify
             // the correct column to use
-            if (null != serviceInstallTable)
+            if (tables.TryGetTable("ServiceInstall", out var serviceInstallTable))
             {
-                foreach (Row row in serviceInstallTable.Rows)
+                foreach (var row in serviceInstallTable.Rows)
                 {
-                    string name = (string)row[1];
-                    Wix.ServiceInstall serviceInstall = (Wix.ServiceInstall)this.Core.GetIndexedElement(row);
+                    var name = row.FieldAsString(1);
 
-                    if (!serviceInstalls.Contains(name))
+                    if (!serviceInstallElementsByName.TryGetValue(name, out var serviceInstallElements))
                     {
-                        serviceInstalls.Add(name, new ArrayList());
+                        serviceInstallElements = new List<XElement>();
+                        serviceInstallElementsByName.Add(name, serviceInstallElements);
                     }
 
-                    ((ArrayList)serviceInstalls[name]).Add(serviceInstall);
+                    var serviceInstall = this.DecompilerHelper.GetIndexedElement(row);
+                    serviceInstallElements.Add(serviceInstall);
                 }
             }
 
-            if (null != serviceConfigTable)
+            if (tables.TryGetTable("ServiceConfig", out var serviceConfigTable))
             {
-                foreach (Row row in serviceConfigTable.Rows)
+                foreach (var row in serviceConfigTable.Rows)
                 {
-                    Util.ServiceConfig serviceConfig = (Util.ServiceConfig)this.Core.GetIndexedElement(row);
+                    var serviceConfig = this.DecompilerHelper.GetIndexedElement(row);
 
-                    if (0 == (int)row[2])
+                    if (row.FieldAsInteger(2) == 0)
                     {
-                        Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-
-                        if (null != component)
+                        var componentId = row.FieldAsString(1);
+                        if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                         {
-                            component.AddChild(serviceConfig);
+                            component.Add(serviceConfig);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, serviceConfigTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, serviceConfigTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
                         }
                     }
                     else
                     {
-                        ArrayList serviceInstallElements = (ArrayList)serviceInstalls[row[0]];
-
-                        if (null != serviceInstallElements)
+                        var name = row.FieldAsString(0);
+                        if (serviceInstallElementsByName.TryGetValue(name, out var serviceInstallElements))
                         {
-                            foreach (Wix.ServiceInstall serviceInstall in serviceInstallElements)
+                            foreach (var serviceInstall in serviceInstallElements)
                             {
-                                serviceInstall.AddChild(serviceConfig);
+                                serviceInstall.Add(serviceConfig);
                             }
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, serviceConfigTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ServiceName", (string)row[0], "ServiceInstall"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, serviceConfigTable.Name, row.GetPrimaryKey(), "ServiceName", name, "ServiceInstall"));
                         }
                     }
                 }
@@ -1342,38 +923,34 @@ namespace WixToolset.Extensions
         /// <param name="tables">Collection of all tables.</param>
         private void FinalizeXmlConfigTable(TableIndexedCollection tables)
         {
-            Table xmlConfigTable = tables["XmlConfig"];
-
-            if (null != xmlConfigTable)
+            if (tables.TryGetTable("XmlConfig", out var xmlConfigTable))
             {
-                foreach (Row row in xmlConfigTable.Rows)
+                foreach (var row in xmlConfigTable.Rows)
                 {
-                    Util.XmlConfig xmlConfig = (Util.XmlConfig)this.Core.GetIndexedElement(row);
+                    var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (null == row[6] || 0 == (int)row[6])
                     {
-                        Util.XmlConfig parentXmlConfig = (Util.XmlConfig)this.Core.GetIndexedElement("XmlConfig", (string)row[2]);
-
-                        if (null != parentXmlConfig)
+                        var id = row.FieldAsString(2);
+                        if (this.DecompilerHelper.TryGetIndexedElement("XmlConfig", id, out var parentXmlConfig))
                         {
-                            parentXmlConfig.AddChild(xmlConfig);
+                            parentXmlConfig.Add(xmlConfig);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, xmlConfigTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ElementPath", (string)row[2], "XmlConfig"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, xmlConfigTable.Name, row.GetPrimaryKey(), "ElementPath", (string)row[2], "XmlConfig"));
                         }
                     }
                     else
                     {
-                        Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[7]);
-
-                        if (null != component)
+                        var componentId = row.FieldAsString(7);
+                        if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                         {
-                            component.AddChild(xmlConfig);
+                            component.Add(xmlConfig);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, xmlConfigTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[7], "Component"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, xmlConfigTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
                         }
                     }
                 }
@@ -1391,113 +968,88 @@ namespace WixToolset.Extensions
         /// </remarks>
         private void FinalizeXmlFileTable(TableIndexedCollection tables)
         {
-            Table xmlFileTable = tables["XmlFile"];
-            Table eventManifestTable = tables["EventManifest"];
-
-            if (null != xmlFileTable)
+            if (tables.TryGetTable("XmlFile", out var xmlFileTable))
             {
-                foreach (Row row in xmlFileTable.Rows)
+                var eventManifestTable = tables["EventManifest"];
+
+                foreach (var row in xmlFileTable.Rows)
                 {
-                    bool bManifestGenerated = false;
-                    string xmlFileConfigId = (string)row[0];
+                    var manifestGenerated = false;
+                    var xmlFileConfigId = (string)row[0];
                     if (null != eventManifestTable)
                     {
-                        foreach (Row emrow in eventManifestTable.Rows)
+                        foreach (var emrow in eventManifestTable.Rows)
                         {
-                            string formattedFile = (string)emrow[1];
+                            var formattedFile = (string)emrow[1];
                             if ((formattedFile.StartsWith("[#", StringComparison.Ordinal) || formattedFile.StartsWith("[!", StringComparison.Ordinal))
                                 && formattedFile.EndsWith("]", StringComparison.Ordinal))
                             {
-                                string fileId = formattedFile.Substring(2, formattedFile.Length - 3);
+                                var fileId = formattedFile.Substring(2, formattedFile.Length - 3);
                                 if (String.Equals(String.Concat("Config_", fileId, "ResourceFile"), xmlFileConfigId))
                                 {
-                                    Util.EventManifest eventManifest = (Util.EventManifest)this.Core.GetIndexedElement(emrow);
-                                    if (null != eventManifest)
+                                    if (this.DecompilerHelper.TryGetIndexedElement(emrow, out var eventManifest))
                                     {
-                                        eventManifest.ResourceFile = (string)row[4];
+                                        eventManifest.Add(new XAttribute("ResourceFile", row.FieldAsString(4)));
                                     }
-                                    bManifestGenerated = true;
+                                    manifestGenerated = true;
                                 }
-                                
+
                                 else if (String.Equals(String.Concat("Config_", fileId, "MessageFile"), xmlFileConfigId))
                                 {
-                                    Util.EventManifest eventManifest = (Util.EventManifest)this.Core.GetIndexedElement(emrow);
-                                    if (null != eventManifest)
+                                    if (this.DecompilerHelper.TryGetIndexedElement(emrow, out var eventManifest))
                                     {
-                                        eventManifest.MessageFile = (string)row[4];
+                                        eventManifest.Add(new XAttribute("MessageFile", row.FieldAsString(4)));
                                     }
-                                    bManifestGenerated = true;
+                                    manifestGenerated = true;
                                 }
                             }
                         }
                     }
 
-                    if (true == bManifestGenerated)
+                    if (manifestGenerated)
+                    {
                         continue;
-                    
-                    Util.XmlFile xmlFile = new Util.XmlFile();
-
-                    xmlFile.Id = (string)row[0];
-                    xmlFile.File = (string)row[1];
-                    xmlFile.ElementPath = (string)row[2];
-
-                    if (null != row[3])
-                    {
-                        xmlFile.Name = (string)row[3];
                     }
 
-                    if (null != row[4])
-                    {
-                        xmlFile.Value = (string)row[4];
-                    }
-
-                    int flags = (int)row[5];
+                    var action = "setValue";
+                    var flags = row.FieldAsInteger(5);
                     if (0x1 == (flags & 0x1) && 0x2 == (flags & 0x2))
                     {
-                        this.Core.OnMessage(WixWarnings.IllegalColumnValue(row.SourceLineNumbers, xmlFileTable.Name, row.Fields[5].Column.Name, row[5]));
+                        this.Messaging.Write(WarningMessages.IllegalColumnValue(row.SourceLineNumbers, xmlFileTable.Name, row.Fields[5].Column.Name, row[5]));
                     }
                     else if (0x1 == (flags & 0x1))
                     {
-                        xmlFile.Action = Util.XmlFile.ActionType.createElement;
+                        action = "createElement";
                     }
                     else if (0x2 == (flags & 0x2))
                     {
-                        xmlFile.Action = Util.XmlFile.ActionType.deleteValue;
+                        action = "deleteValue";
+                    }
+
+                    var selectionLanguage = (0x100 == (flags & 0x100)) ? "XPath" : null;
+                    var preserveModifiedDate = 0x00001000 == (flags & 0x00001000);
+                    var permanent = 0x00010000 == (flags & 0x00010000);
+
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", row.FieldAsString(6), out var component))
+                    {
+                        var xmlFile = new XElement(UtilConstants.XmlFileName,
+                            AttributeIfNotNull("Id", row, 0),
+                            AttributeIfNotNull("File", row, 1),
+                            AttributeIfNotNull("ElementPath", row, 2),
+                            AttributeIfNotNull("Name", row, 3),
+                            AttributeIfNotNull("Value", row, 4),
+                            AttributeIfNotNull("Action", action),
+                            AttributeIfNotNull("SelectionLanguage", selectionLanguage),
+                            AttributeIfTrue("PreserveModifiedDate", preserveModifiedDate),
+                            AttributeIfTrue("Permanent", permanent),
+                            NumericAttributeIfNotNull("Sequence", row, 7)
+                            );
+
+                        component.Add(xmlFile);
                     }
                     else
                     {
-                        xmlFile.Action = Util.XmlFile.ActionType.setValue;
-                    }
-
-                    if (0x100 == (flags & 0x100))
-                    {
-                        xmlFile.SelectionLanguage = Util.XmlFile.SelectionLanguageType.XPath;
-                    }
-
-                    if (0x00001000 == (flags & 0x00001000))
-                    {
-                        xmlFile.PreserveModifiedDate = Util.YesNoType.yes;
-                    }
-
-                    if (0x00010000 == (flags & 0x00010000))
-                    {
-                        xmlFile.Permanent = Util.YesNoType.yes;
-                    }
-
-                    if (null != row[7])
-                    {
-                        xmlFile.Sequence = (int)row[7];
-                    }
-
-                    Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[6]);
-
-                    if (null != component)
-                    {
-                        component.AddChild(xmlFile);
-                    }
-                    else
-                    {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, xmlFileTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[6], "Component"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, xmlFileTable.Name, row.GetPrimaryKey(), "Component_", (string)row[6], "Component"));
                     }
                 }
             }
@@ -1510,34 +1062,122 @@ namespace WixToolset.Extensions
         /// <param name="tables">The collection of all tables.</param>
         private void FinalizeEventManifestTable(TableIndexedCollection tables)
         {
-            Table eventManifestTable = tables["EventManifest"];
-
-            if (null != eventManifestTable)
+            if (tables.TryGetTable("EventManifest", out var eventManifestTable))
             {
-                foreach (Row row in eventManifestTable.Rows)
+                foreach (var row in eventManifestTable.Rows)
                 {
-                    string formattedFile = (string)row[1];
-                    Util.EventManifest eventManifest = (Util.EventManifest)this.Core.GetIndexedElement(row);
+                    var eventManifest = this.DecompilerHelper.GetIndexedElement(row);
+                    var formattedFile = row.FieldAsString(1);
 
                     // try to "de-format" the File column's value to determine the proper parent File element
                     if ((formattedFile.StartsWith("[#", StringComparison.Ordinal) || formattedFile.StartsWith("[!", StringComparison.Ordinal))
                         && formattedFile.EndsWith("]", StringComparison.Ordinal))
                     {
-                        string fileId = formattedFile.Substring(2, formattedFile.Length - 3);
+                        var fileId = formattedFile.Substring(2, formattedFile.Length - 3);
 
-                        Wix.File file = (Wix.File)this.Core.GetIndexedElement("File", fileId);
-                        if (null != file)
+                        if (this.DecompilerHelper.TryGetIndexedElement("File", fileId, out var file))
                         {
-                            file.AddChild(eventManifest);
+                            file.Add(eventManifest);
                         }
                     }
                     else
                     {
-                       this.Core.OnMessage(UtilErrors.IllegalFileValueInPerfmonOrManifest(formattedFile, "EventManifest"));
+                        this.Messaging.Write(UtilErrors.IllegalFileValueInPerfmonOrManifest(formattedFile, "EventManifest"));
                     }
                 }
             }
         }
+
+        private void AddPermissionAttributes(XElement element, Row row, int column, string[] specialPermissions)
+        {
+            var permissions = row.FieldAsInteger(column);
+            for (var i = 0; i < 32; i++)
+            {
+                if (0 != ((permissions >> i) & 1))
+                {
+                    string name = null;
+
+                    if (16 > i && specialPermissions.Length > i)
+                    {
+                        name = specialPermissions[i];
+                    }
+                    else if (28 > i && UtilConstants.StandardPermissions.Length > (i - 16))
+                    {
+                        name = UtilConstants.StandardPermissions[i - 16];
+                    }
+                    else if (0 <= (i - 28) && UtilConstants.GenericPermissions.Length > (i - 28))
+                    {
+                        name = UtilConstants.GenericPermissions[i - 28];
+                    }
+
+                    if (!String.IsNullOrEmpty(name))
+                    {
+                        element.Add(new XAttribute(name, "yes"));
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.UnknownPermission(row.SourceLineNumbers, row.Table.Name, row.GetPrimaryKey(), i));
+                    }
+                }
+            }
+        }
+
+        private static XAttribute AttributeIfNotNull(string name, string value)
+        {
+            return value == null ? null : new XAttribute(name, value);
+        }
+
+        private static XAttribute AttributeIfNotNull(string name, bool value)
+        {
+            return new XAttribute(name, value ? "yes" : "no");
+        }
+
+        private static XAttribute AttributeIfNotNull(string name, Row row, int field)
+        {
+            if (row[field] != null)
+            {
+                return new XAttribute(name, row.FieldAsString(field));
+            }
+
+            return null;
+        }
+
+        private static XAttribute NumericAttributeIfNotNull(string name, Row row, int field)
+        {
+            if (row[field] != null)
+            {
+                return new XAttribute(name, row.FieldAsInteger(field));
+            }
+
+            return null;
+        }
+
+        private static XAttribute AttributeIfTrue(string name, bool value)
+        {
+            return value ? new XAttribute(name, "yes") : null;
+        }
     }
-#endif
+
+    internal static class XElementExtensions
+    {
+        public static XElement AttributeIfNotNull(this XElement element, string name, Row row, int field)
+        {
+            if (row[field] != null)
+            {
+                element.Add(new XAttribute(name, row.FieldAsString(field)));
+            }
+
+            return element;
+        }
+
+        public static XElement NumericAttributeIfNotNull(this XElement element, string name, Row row, int field)
+        {
+            if (row[field] != null)
+            {
+                element.Add(new XAttribute(name, row.FieldAsInteger(field)));
+            }
+
+            return element;
+        }
+    }
 }

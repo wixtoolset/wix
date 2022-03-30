@@ -11,7 +11,7 @@ namespace WixToolset.Core.WindowsInstaller
     {
         public XDocument Document { get; set; }
 
-        public IReadOnlyCollection<string> ExtractedFilePaths { get; set; }
+        public IList<string> ExtractedFilePaths { get; set; }
 
         public Platform? Platform { get; set; }
     }

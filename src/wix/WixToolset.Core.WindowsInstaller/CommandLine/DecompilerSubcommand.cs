@@ -66,11 +66,16 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 this.OutputPath = Path.ChangeExtension(this.InputPath, ".wxs");
             }
 
+            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+            var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
+
             var context = this.ServiceProvider.GetService<IWindowsInstallerDecompileContext>();
-            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().GetServices<IWindowsInstallerDecompilerExtension>();
+            context.Extensions = extensionManager.GetServices<IWindowsInstallerDecompilerExtension>();
+            context.ExtensionData = extensionManager.GetServices<IExtensionData>();
             context.DecompilePath = this.InputPath;
             context.DecompileType = decompileType;
             context.IntermediateFolder = this.IntermediateFolder;
+            context.SymbolDefinitionCreator = creator;
             context.OutputPath = this.OutputPath;
 
             context.ExtractFolder = this.ExportBasePath ?? this.IntermediateFolder;
