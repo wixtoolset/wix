@@ -18,6 +18,7 @@ namespace Example.Extension
             ExampleSymbolDefinitionType.Example.ToString(),
             new[]
             {
+                new IntermediateFieldDefinition(nameof(ExampleSymbolFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ExampleSymbolFields.Value), IntermediateFieldType.String),
             },
             typeof(ExampleSymbol));

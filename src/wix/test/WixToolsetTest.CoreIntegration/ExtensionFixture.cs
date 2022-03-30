@@ -5,6 +5,7 @@ namespace WixToolsetTest.CoreIntegration
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
@@ -23,8 +24,35 @@ namespace WixToolsetTest.CoreIntegration
             var results = build.BuildAndQuery(Build, "Wix4Example");
             WixAssert.CompareLineByLine(new[]
             {
-                "Wix4Example:Foo\tBar"
+                "Wix4Example:Foo\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tBar"
             }, results);
+        }
+
+        [Fact]
+        public void CanRoundtripExampleExtension()
+        {
+            var folder = TestData.Get(@"TestData", "ExampleExtension");
+            var expectedOutputPath = Path.Combine(folder, "Decompiled-Expected.xml");
+
+            var build = new Builder(folder, typeof(ExampleExtensionFactory), new[] { Path.Combine(folder, "data") });
+            using (var fs = new DisposableFileSystem())
+            {
+                var decompileFolder = fs.GetFolder();
+                var actualOutputPath = Path.Combine(decompileFolder, "decompiled.xml");
+
+                build.BuildAndDecompileAndBuild(Build, Decompile, actualOutputPath);
+
+                var expected = File.ReadAllLines(expectedOutputPath);
+                var actual = File.ReadAllLines(actualOutputPath).Select(ReplaceGuids).ToArray(); ;
+                WixAssert.CompareLineByLine(expected, actual);
+            }
+        }
+
+        private static string ReplaceGuids(string value)
+        {
+            value = String.IsNullOrWhiteSpace(value) ? value : Regex.Replace(value, @" ProductCode=\""\{[a-fA-F0-9\-]+\}\""", " ProductCode=\"{GUID}\"");
+            return String.IsNullOrWhiteSpace(value) ? value : Regex.Replace(value, @" Guid=\""\{[a-fA-F0-9\-]+\}\""", " Guid=\"{GUID}\"");
+
         }
 
         [Fact]
@@ -64,7 +92,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
                 Assert.Equal("Foo", example.Id?.Id);
-                Assert.Equal("Bar", example[0].AsString());
+                Assert.Equal("filF5_pLhBuF5b4N9XEo52g_hUM5Lo", example[0].AsString());
+                Assert.Equal("Bar", example[1].AsString());
             }
         }
 
@@ -192,8 +221,14 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
+        }
+
+        private static void Decompile(string[] args)
+        {
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
         }
     }
 }

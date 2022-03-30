@@ -171,7 +171,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 }
                                                 break;
                                             case ColumnType.Object:
-                                                var sourceFile = "FILE NOT EXPORTED, USE THE dark.exe -x OPTION TO EXPORT BINARIES";
+                                                var sourceFile = "FILE NOT EXPORTED";
 
                                                 if (null != this.ExportBasePath)
                                                 {

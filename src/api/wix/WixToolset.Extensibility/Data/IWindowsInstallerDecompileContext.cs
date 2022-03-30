@@ -7,7 +7,7 @@ namespace WixToolset.Extensibility.Data
     using WixToolset.Data;
 
     /// <summary>
-    /// The context used to decompile Windows Installer packages.
+    /// The context used to decompile a Windows Installer database.
     /// </summary>
     public interface IWindowsInstallerDecompileContext
     {
@@ -30,6 +30,16 @@ namespace WixToolset.Extensibility.Data
         /// Gets or sets the decompiler extensions.
         /// </summary>
         IReadOnlyCollection<IWindowsInstallerDecompilerExtension> Extensions { get; set; }
+
+        /// <summary>
+        /// Collection of extension data to use during decompiling.
+        /// </summary>
+        IReadOnlyCollection<IExtensionData> ExtensionData { get; set; }
+
+        /// <summary>
+        /// Symbol definition creator used to load extension data.
+        /// </summary>
+        ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
 
         /// <summary>
         /// Gets or sets the folder where content is extracted.

@@ -2,21 +2,45 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data;
+    using System.Collections.Generic;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
 
     /// <summary>
-    /// Interface all binder extensions implement.
+    /// Interface all windows installer decompiler extensions implement.
     /// </summary>
     public interface IWindowsInstallerDecompilerExtension
     {
         /// <summary>
+        /// Gets the table definitions this extension decompiles.
+        /// </summary>
+        /// <value>Table definitions this extension decompiles.</value>
+        IReadOnlyCollection<TableDefinition> TableDefinitions { get; }
+
+        /// <summary>
         /// Called before decompiling occurs.
         /// </summary>
+        /// <param name="context">Decompile context.</param>
         void PreDecompile(IWindowsInstallerDecompileContext context);
 
-        // TODO: Redesign this interface to be useful.
+        /// <summary>
+        /// Called before decompiling occurs.
+        /// </summary>
+        /// <param name="tables">The collection of all tables.</param>
+        void PreDecompileTables(TableIndexedCollection tables);
+
+        /// <summary>
+        /// Try to decompile an extension table.
+        /// </summary>
+        /// <param name="table">The table to decompile.</param>
+        /// <returns>True if the table was decompiled, false otherwise.</returns>
+        bool TryDecompileTable(Table table);
+
+        /// <summary>
+        /// After decompilation tables.
+        /// </summary>
+        /// <param name="tables">The collection of all tables.</param>
+        void PostDecompileTables(TableIndexedCollection tables);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.

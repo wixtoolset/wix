@@ -23,10 +23,16 @@ namespace Example.Extension
             set { this.Fields[0].Data = value; }
         }
 
-        public string Value
+        public string ComponentRef
         {
             get { return (string)this.Fields[1].Data; }
             set { this.Fields[1].Data = value; }
+        }
+
+        public string Value
+        {
+            get { return (string)this.Fields[2].Data; }
+            set { this.Fields[2].Data = value; }
         }
     }
 }

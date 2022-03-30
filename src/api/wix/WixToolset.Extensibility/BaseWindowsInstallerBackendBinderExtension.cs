@@ -4,7 +4,6 @@ namespace WixToolset.Extensibility
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -12,7 +11,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Extensibility.Services;
 
     /// <summary>
-    /// Base class for creating a preprocessor extension.
+    /// Base class for creating a windows installer backend extension.
     /// </summary>
     public abstract class BaseWindowsInstallerBackendBinderExtension : IWindowsInstallerBackendBinderExtension
     {
@@ -39,7 +38,10 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Creates a resolved cabinet result.
         /// </summary>
-        protected IResolvedCabinet CreateResolvedCabinet() => this.Context.ServiceProvider.GetService<IResolvedCabinet>();
+        protected IResolvedCabinet CreateResolvedCabinet()
+        {
+            return this.Context.ServiceProvider.GetService<IResolvedCabinet>();
+        }
 
         /// <summary>
         /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>

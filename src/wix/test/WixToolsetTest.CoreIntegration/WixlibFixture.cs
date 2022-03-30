@@ -289,7 +289,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
                 Assert.Equal("Foo", example.Id?.Id);
-                Assert.Equal("Bar", example[0].AsString());
+                Assert.Equal("Bar", example[1].AsString());
             }
         }
 
@@ -352,7 +352,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 var examples = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).ToArray();
                 WixAssert.CompareLineByLine(new string[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
-                WixAssert.CompareLineByLine(new[] { "Bar", "Value" }, examples.Select(t => t[0].AsString()).ToArray());
+                WixAssert.CompareLineByLine(new[] { "filF5_pLhBuF5b4N9XEo52g_hUM5Lo", "filvxdStJhRE_M5kbpLsTZJXbs34Sg" }, examples.Select(t => t[0].AsString()).ToArray());
+                WixAssert.CompareLineByLine(new[] { "Bar", "Value" }, examples.Select(t => t[1].AsString()).ToArray());
             }
         }
     }

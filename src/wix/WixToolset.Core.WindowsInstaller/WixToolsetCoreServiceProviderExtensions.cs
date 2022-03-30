@@ -16,8 +16,8 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Adds WindowsInstaller services.
         /// </summary>
-        /// <param name="coreProvider"></param>
-        /// <returns></returns>
+        /// <param name="coreProvider">Core service provider.</param>
+        /// <returns>The core service provider provided to this method.</returns>
         public static IWixToolsetCoreServiceProvider AddWindowsInstallerBackend(this IWixToolsetCoreServiceProvider coreProvider)
         {
             AddServices(coreProvider);
@@ -32,6 +32,7 @@ namespace WixToolset.Core.WindowsInstaller
         {
             // Singletons.
             coreProvider.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper(provider)));
+            coreProvider.AddService((provider, singletons) => AddSingleton<IWindowsInstallerDecompilerHelper>(singletons, new WindowsInstallerDecompilerHelper(provider)));
 
             // Transients.
             coreProvider.AddService<IWindowsInstallerDecompiler>((provider, singletons) => new WindowsInstallerDecompiler(provider));

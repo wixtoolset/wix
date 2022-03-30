@@ -10,8 +10,9 @@ namespace Example.Extension
 
     internal class ExampleCompilerExtension : BaseCompilerExtension
     {
-        public override XNamespace Namespace => "http://www.example.com/scheams/v1/wxs";
-        public string BundleExtensionId => "ExampleBundleExtension";
+        private const string BundleExtensionId = "ExampleBundleExtension";
+
+        public override XNamespace Namespace => ExampleConstants.Namespace;
 
         public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
@@ -38,10 +39,12 @@ namespace Example.Extension
                     }
                     break;
                 case "Component":
+                    var componentId = context["ComponentId"];
+
                     switch (element.Name.LocalName)
                     {
                         case "Example":
-                            this.ParseExampleElement(intermediate, section, element);
+                            this.ParseExampleElement(intermediate, section, element, componentId);
                             processed = true;
                             break;
                     }
@@ -54,7 +57,7 @@ namespace Example.Extension
             }
         }
 
-        private void ParseExampleElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        private void ParseExampleElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
@@ -93,7 +96,8 @@ namespace Example.Extension
             if (!this.Messaging.EncounteredError)
             {
                 var symbol = this.ParseHelper.CreateSymbol(section, sourceLineNumbers, "Example", id);
-                symbol.Set(0, value);
+                symbol.Set(0, componentId);
+                symbol.Set(1, value);
             }
         }
 
@@ -152,12 +156,12 @@ namespace Example.Extension
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, this.BundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, BundleExtensionId);
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                var symbol = section.AddSymbol(new ExampleSearchSymbol(sourceLineNumbers, id)
+                section.AddSymbol(new ExampleSearchSymbol(sourceLineNumbers, id)
                 {
                     SearchFor = searchFor,
                 });

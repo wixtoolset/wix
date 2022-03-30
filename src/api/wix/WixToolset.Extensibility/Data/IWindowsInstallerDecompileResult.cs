@@ -6,13 +6,24 @@ namespace WixToolset.Extensibility.Data
     using System.Xml.Linq;
     using WixToolset.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// The result from decompiling a Windows Installer database.
+    /// </summary>
     public interface IWindowsInstallerDecompileResult
     {
+        /// <summary>
+        /// Decompiled document.
+        /// </summary>
         XDocument Document { get; set; }
 
-        IReadOnlyCollection<string> ExtractedFilePaths { get; set; }
+        /// <summary>
+        /// Extracted paths.
+        /// </summary>
+        IList<string> ExtractedFilePaths { get; set; }
 
+        /// <summary>
+        /// Decompiled platform.
+        /// </summary>
         Platform? Platform { get; set; }
     }
 }
