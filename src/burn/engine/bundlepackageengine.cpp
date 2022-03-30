@@ -252,12 +252,12 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
 {
     HRESULT hr = S_OK;
     LPCWSTR wzArguments = NULL;
-    LPWSTR sczArguments = NULL;
-    LPWSTR sczArgumentsFormatted = NULL;
-    LPWSTR sczArgumentsObfuscated = NULL;
     LPWSTR sczCachedDirectory = NULL;
     LPWSTR sczExecutablePath = NULL;
-    LPWSTR sczCommand = NULL;
+    LPWSTR sczBaseCommand = NULL;
+    LPWSTR sczUnformattedUserArgs = NULL;
+    LPWSTR sczUserArgs = NULL;
+    LPWSTR sczUserArgsObfuscated = NULL;
     LPWSTR sczCommandObfuscated = NULL;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
     STARTUPINFOW si = { };
@@ -309,7 +309,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     // now add optional arguments
     if (wzArguments && *wzArguments)
     {
-        hr = StrAllocString(&sczArguments, wzArguments, 0);
+        hr = StrAllocString(&sczUnformattedUserArgs, wzArguments, 0);
         ExitOnFailure(hr, "Failed to copy package arguments.");
     }
 
@@ -323,26 +323,26 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
 
         if (fCondition)
         {
-            if (sczArguments)
+            if (sczUnformattedUserArgs)
             {
-                hr = StrAllocConcat(&sczArguments, L" ", 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, L" ", 0);
                 ExitOnFailure(hr, "Failed to separate command-line arguments.");
             }
 
             switch (action)
             {
             case BOOTSTRAPPER_ACTION_STATE_INSTALL:
-                hr = StrAllocConcat(&sczArguments, commandLineArgument->sczInstallArgument, 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, commandLineArgument->sczInstallArgument, 0);
                 ExitOnFailure(hr, "Failed to get command-line argument for install.");
                 break;
 
             case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-                hr = StrAllocConcat(&sczArguments, commandLineArgument->sczUninstallArgument, 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, commandLineArgument->sczUninstallArgument, 0);
                 ExitOnFailure(hr, "Failed to get command-line argument for uninstall.");
                 break;
 
             case BOOTSTRAPPER_ACTION_STATE_REPAIR:
-                hr = StrAllocConcat(&sczArguments, commandLineArgument->sczRepairArgument, 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, commandLineArgument->sczRepairArgument, 0);
                 ExitOnFailure(hr, "Failed to get command-line argument for repair.");
                 break;
 
@@ -353,75 +353,72 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
         }
     }
 
-    // build command
-    AppAppendCommandLineArgument(&sczCommand, sczExecutablePath);
-    ExitOnFailure(hr, "Failed to create executable command.");
+    // build base command
+    hr = StrAllocFormatted(&sczBaseCommand, L"\"%ls\"", sczExecutablePath);
+    ExitOnFailure(hr, "Failed to allocate base command.");
 
     if (!fRunEmbedded)
     {
-        hr = StrAllocConcat(&sczCommand, L" -quiet", 0);
+        hr = StrAllocConcat(&sczBaseCommand, L" -quiet", 0);
         ExitOnFailure(hr, "Failed to append quiet argument.");
     }
 
     if (wzOperationCommandLine)
     {
-        hr = StrAllocConcatFormatted(&sczCommand, L" %ls", wzOperationCommandLine);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" %ls", wzOperationCommandLine);
         ExitOnFailure(hr, "Failed to append operation argument.");
     }
 
     if (wzRelationTypeCommandLine)
     {
-        hr = StrAllocConcatFormatted(&sczCommand, L" -%ls", wzRelationTypeCommandLine);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls", wzRelationTypeCommandLine);
         ExitOnFailure(hr, "Failed to append relation type argument.");
     }
 
     // Add the list of dependencies to ignore, if any, to the burn command line.
     if (pExecuteAction->relatedBundle.sczIgnoreDependencies)
     {
-        hr = StrAllocConcatFormatted(&sczCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->relatedBundle.sczIgnoreDependencies);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->relatedBundle.sczIgnoreDependencies);
         ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
     }
 
     // Add the list of ancestors, if any, to the burn command line.
     if (pExecuteAction->relatedBundle.sczAncestors)
     {
-        hr = StrAllocConcatFormatted(&sczCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->relatedBundle.sczAncestors);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->relatedBundle.sczAncestors);
         ExitOnFailure(hr, "Failed to append the list of ancestors to the command line.");
     }
 
-    hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->relatedBundle.sczEngineWorkingDirectory, &sczCommand, NULL);
+    hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->relatedBundle.sczEngineWorkingDirectory, &sczBaseCommand, NULL);
     ExitOnFailure(hr, "Failed to append the custom working directory to the bundlepackage command line.");
 
-    hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczCommand, NULL);
+    hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczBaseCommand, NULL);
     ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
 
-    // Always add user supplied arguments last.
-    if (sczArguments && *sczArguments)
+    // build user args
+    if (sczUnformattedUserArgs && *sczUnformattedUserArgs)
     {
-        hr = VariableFormatString(pVariables, sczArguments, &sczArgumentsFormatted, NULL);
+        hr = VariableFormatString(pVariables, sczUnformattedUserArgs, &sczUserArgs, NULL);
         ExitOnFailure(hr, "Failed to format argument string.");
 
-        hr = VariableFormatStringObfuscated(pVariables, sczArguments, &sczArgumentsObfuscated, NULL);
+        hr = VariableFormatStringObfuscated(pVariables, sczUnformattedUserArgs, &sczUserArgsObfuscated, NULL);
         ExitOnFailure(hr, "Failed to format obfuscated argument string.");
 
-        hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls %ls", sczCommand, sczArgumentsObfuscated);
-        ExitOnFailure(hr, "Failed to copy obfuscated formatted arguments.");
-
-        hr = StrAllocConcatFormattedSecure(&sczCommand, L" %ls", sczArgumentsFormatted);
-        ExitOnFailure(hr, "Failed to copy formatted arguments.");
+        hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls %ls", sczBaseCommand, sczUserArgsObfuscated);
+        ExitOnFailure(hr, "Failed to allocate obfuscated bundle command.");
     }
 
-    // Log before we add the secret pipe name and client token for embedded processes.
-    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(action), sczExecutablePath, sczCommandObfuscated);
+    // Log obfuscated command, which won't include raw hidden variable values or protocol specific arguments to avoid exposing secrets.
+    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(action), sczExecutablePath, sczCommandObfuscated ? sczCommandObfuscated : sczBaseCommand);
 
     if (fRunEmbedded)
     {
-        hr = EmbeddedRunBundle(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
+        hr = EmbeddedRunBundle(sczExecutablePath, sczBaseCommand, sczUserArgs, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run bundle as embedded from path: %ls", sczExecutablePath);
     }
     else
     {
-        hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczExecutablePath, sczCommand, sczCachedDirectory, &dwExitCode);
+        hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczExecutablePath, sczBaseCommand, sczUserArgs, sczCachedDirectory, &dwExitCode);
         ExitOnFailure(hr, "Failed to run BUNDLE process");
     }
 
@@ -429,12 +426,12 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:
-    StrSecureZeroFreeString(sczArguments);
-    StrSecureZeroFreeString(sczArgumentsFormatted);
-    ReleaseStr(sczArgumentsObfuscated);
     ReleaseStr(sczCachedDirectory);
     ReleaseStr(sczExecutablePath);
-    StrSecureZeroFreeString(sczCommand);
+    ReleaseStr(sczBaseCommand);
+    ReleaseStr(sczUnformattedUserArgs);
+    StrSecureZeroFreeString(sczUserArgs);
+    ReleaseStr(sczUserArgsObfuscated);
     ReleaseStr(sczCommandObfuscated);
 
     ReleaseHandle(pi.hThread);

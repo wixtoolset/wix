@@ -47,7 +47,8 @@ HRESULT ExeEngineRunProcess(
     __in LPVOID pvContext,
     __in BURN_PACKAGE* pPackage,
     __in_z LPCWSTR wzExecutablePath,
-    __in_z LPWSTR wzCommand,
+    __in_z LPWSTR sczBaseCommand,
+    __in_z_opt LPCWSTR wzUserArgs,
     __in_z_opt LPCWSTR wzCachedDirectory,
     __inout DWORD* pdwExitCode
     );
