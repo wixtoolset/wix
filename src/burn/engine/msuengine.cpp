@@ -273,6 +273,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
     LPWSTR sczSystemPath = NULL;
     LPWSTR sczWusaPath = NULL;
     LPWSTR sczCommand = NULL;
+    LPWSTR sczEscapedKB = NULL;
     SC_HANDLE schWu = NULL;
     BOOL fWuWasDisabled = FALSE;
     STARTUPINFOW si = { };
@@ -328,8 +329,11 @@ extern "C" HRESULT MsuEngineExecutePackage(
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
+        hr = AppEscapeCommandLineArgumentFormatted(&sczEscapedKB, L"%ls", pPackage->Msu.sczKB);
+        ExitOnFailure(hr, "Failed to escape MSU KB.");
+
         // format command
-        hr = StrAllocFormatted(&sczCommand, L"\"%ls\" /uninstall /kb:%ls /quiet /norestart", sczWusaPath, pPackage->Msu.sczKB);
+        hr = StrAllocFormatted(&sczCommand, L"\"%ls\" /uninstall /kb:%ls /quiet /norestart", sczWusaPath, sczEscapedKB);
         ExitOnFailure(hr, "Failed to format MSU uninstall command.");
         break;
 
@@ -352,7 +356,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
     hr = EnsureWUServiceEnabled(fStopWusaService, &schWu, &fWuWasDisabled);
     ExitOnFailure(hr, "Failed to ensure WU service was enabled to install MSU package.");
 
-    hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczWusaPath, sczCommand, NULL, &dwExitCode);
+    hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczWusaPath, sczCommand, NULL, NULL, &dwExitCode);
     ExitOnFailure(hr, "Failed to run MSU process");
 
     // We'll normalize the restart required error code from wusa.exe just in case. Most likely
@@ -389,6 +393,7 @@ LExit:
     ReleaseStr(sczWindowsPath);
     ReleaseStr(sczWusaPath);
     ReleaseStr(sczCommand);
+    ReleaseStr(sczEscapedKB);
 
     ReleaseHandle(pi.hProcess);
     ReleaseHandle(pi.hThread);

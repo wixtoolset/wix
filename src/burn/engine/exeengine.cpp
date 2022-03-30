@@ -362,12 +362,12 @@ extern "C" HRESULT ExeEngineExecutePackage(
 {
     HRESULT hr = S_OK;
     LPCWSTR wzArguments = NULL;
-    LPWSTR sczArguments = NULL;
-    LPWSTR sczArgumentsFormatted = NULL;
-    LPWSTR sczArgumentsObfuscated = NULL;
     LPWSTR sczCachedDirectory = NULL;
     LPWSTR sczExecutablePath = NULL;
-    LPWSTR sczCommand = NULL;
+    LPWSTR sczBaseCommand = NULL;
+    LPWSTR sczUnformattedUserArgs = NULL;
+    LPWSTR sczUserArgs = NULL;
+    LPWSTR sczUserArgsObfuscated = NULL;
     LPWSTR sczCommandObfuscated = NULL;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
     DWORD dwExitCode = 0;
@@ -406,7 +406,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
 
     // now add optional arguments
-    hr = StrAllocString(&sczArguments, wzArguments && *wzArguments ? wzArguments : L"", 0);
+    hr = StrAllocString(&sczUnformattedUserArgs, wzArguments && *wzArguments ? wzArguments : L"", 0);
     ExitOnFailure(hr, "Failed to copy package arguments.");
 
     for (DWORD i = 0; i < pPackage->Exe.cCommandLineArguments; ++i)
@@ -419,23 +419,23 @@ extern "C" HRESULT ExeEngineExecutePackage(
 
         if (fCondition)
         {
-            hr = StrAllocConcat(&sczArguments, L" ", 0);
+            hr = StrAllocConcat(&sczUnformattedUserArgs, L" ", 0);
             ExitOnFailure(hr, "Failed to separate command-line arguments.");
 
             switch (pExecuteAction->exePackage.action)
             {
             case BOOTSTRAPPER_ACTION_STATE_INSTALL:
-                hr = StrAllocConcat(&sczArguments, commandLineArgument->sczInstallArgument, 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, commandLineArgument->sczInstallArgument, 0);
                 ExitOnFailure(hr, "Failed to get command-line argument for install.");
                 break;
 
             case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-                hr = StrAllocConcat(&sczArguments, commandLineArgument->sczUninstallArgument, 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, commandLineArgument->sczUninstallArgument, 0);
                 ExitOnFailure(hr, "Failed to get command-line argument for uninstall.");
                 break;
 
             case BOOTSTRAPPER_ACTION_STATE_REPAIR:
-                hr = StrAllocConcat(&sczArguments, commandLineArgument->sczRepairArgument, 0);
+                hr = StrAllocConcat(&sczUnformattedUserArgs, commandLineArgument->sczRepairArgument, 0);
                 ExitOnFailure(hr, "Failed to get command-line argument for repair.");
                 break;
 
@@ -446,71 +446,68 @@ extern "C" HRESULT ExeEngineExecutePackage(
         }
     }
 
-    // build command
-    AppAppendCommandLineArgument(&sczCommand, sczExecutablePath);
-    ExitOnFailure(hr, "Failed to create executable command.");
+    // build base command
+    hr = StrAllocFormatted(&sczBaseCommand, L"\"%ls\"", sczExecutablePath);
+    ExitOnFailure(hr, "Failed to allocate base command.");
 
     if (pPackage->Exe.fBundle)
     {
-        hr = StrAllocConcat(&sczCommand, L" -norestart", 0);
-        ExitOnFailure(hr, "Failed to append quiet argument.");
+        hr = StrAllocConcat(&sczBaseCommand, L" -norestart", 0);
+        ExitOnFailure(hr, "Failed to append norestart argument.");
 
         // Add the list of dependencies to ignore, if any, to the burn command line.
         if (pExecuteAction->exePackage.sczIgnoreDependencies)
         {
-            hr = StrAllocConcatFormatted(&sczCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
+            hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
             ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
         }
 
         // Add the list of ancestors, if any, to the burn command line.
         if (pExecuteAction->exePackage.sczAncestors)
         {
-            hr = StrAllocConcatFormatted(&sczCommand, L" -%ls=%ls", sczCommand, BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->exePackage.sczAncestors);
+            hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pExecuteAction->exePackage.sczAncestors);
             ExitOnFailure(hr, "Failed to append the list of ancestors to the command line.");
         }
 
         if (pExecuteAction->exePackage.sczEngineWorkingDirectory)
         {
-            hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->exePackage.sczEngineWorkingDirectory, &sczCommand, NULL);
+            hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->exePackage.sczEngineWorkingDirectory, &sczBaseCommand, NULL);
             ExitOnFailure(hr, "Failed to append the custom working directory to the exepackage command line.");
         }
 
-        hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczCommand, NULL);
+        hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczBaseCommand, NULL);
         ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
     }
 
-    // Always add user supplied arguments last.
-    if (sczArguments && *sczArguments)
+    // build user args
+    if (sczUnformattedUserArgs && *sczUnformattedUserArgs)
     {
-        hr = VariableFormatString(pVariables, sczArguments, &sczArgumentsFormatted, NULL);
+        hr = VariableFormatString(pVariables, sczUnformattedUserArgs, &sczUserArgs, NULL);
         ExitOnFailure(hr, "Failed to format argument string.");
 
-        hr = VariableFormatStringObfuscated(pVariables, sczArguments, &sczArgumentsObfuscated, NULL);
+        hr = VariableFormatStringObfuscated(pVariables, sczUnformattedUserArgs, &sczUserArgsObfuscated, NULL);
         ExitOnFailure(hr, "Failed to format obfuscated argument string.");
 
-        hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls %ls", sczCommand, sczArgumentsObfuscated);
-        ExitOnFailure(hr, "Failed to copy obfuscated formatted arguments.");
-
-        hr = StrAllocConcatFormattedSecure(&sczCommand, L" %ls", sczArgumentsFormatted);
-        ExitOnFailure(hr, "Failed to copy formatted arguments.");
+        hr = StrAllocFormatted(&sczCommandObfuscated, L"%ls %ls", sczBaseCommand, sczUserArgsObfuscated);
+        ExitOnFailure(hr, "Failed to allocate obfuscated exe command.");
     }
 
-    // Log before we add the secret pipe name and client token for embedded processes.
-    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), sczExecutablePath, sczCommandObfuscated);
+    // Log obfuscated command, which won't include raw hidden variable values or protocol specific arguments to avoid exposing secrets.
+    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), sczExecutablePath, sczCommandObfuscated ? sczCommandObfuscated : sczBaseCommand);
 
     if (!pPackage->Exe.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
     {
-        hr = EmbeddedRunBundle(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
+        hr = EmbeddedRunBundle(sczExecutablePath, sczBaseCommand, sczUserArgs, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run exe with Burn protocol from path: %ls", sczExecutablePath);
     }
     else if (!pPackage->Exe.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_NETFX4 == pPackage->Exe.protocol)
     {
-        hr = NetFxRunChainer(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
+        hr = NetFxRunChainer(sczExecutablePath, sczBaseCommand, sczUserArgs, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run netfx chainer: %ls", sczExecutablePath);
     }
     else
     {
-        hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczExecutablePath, sczCommand, sczCachedDirectory, &dwExitCode);
+        hr = ExeEngineRunProcess(pfnGenericMessageHandler, pvContext, pPackage, sczExecutablePath, sczBaseCommand, sczUserArgs, sczCachedDirectory, &dwExitCode);
         ExitOnFailure(hr, "Failed to run EXE process");
     }
 
@@ -518,12 +515,12 @@ extern "C" HRESULT ExeEngineExecutePackage(
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:
-    StrSecureZeroFreeString(sczArguments);
-    StrSecureZeroFreeString(sczArgumentsFormatted);
-    ReleaseStr(sczArgumentsObfuscated);
     ReleaseStr(sczCachedDirectory);
     ReleaseStr(sczExecutablePath);
-    StrSecureZeroFreeString(sczCommand);
+    ReleaseStr(sczBaseCommand);
+    ReleaseStr(sczUnformattedUserArgs);
+    StrSecureZeroFreeString(sczUserArgs);
+    ReleaseStr(sczUserArgsObfuscated);
     ReleaseStr(sczCommandObfuscated);
 
     ReleaseFileHandle(hExecutableFile);
@@ -540,12 +537,14 @@ extern "C" HRESULT ExeEngineRunProcess(
     __in LPVOID pvContext,
     __in BURN_PACKAGE* pPackage,
     __in_z LPCWSTR wzExecutablePath,
-    __in_z LPWSTR wzCommand,
+    __in_z LPWSTR sczBaseCommand,
+    __in_z_opt LPCWSTR wzUserArgs,
     __in_z_opt LPCWSTR wzCachedDirectory,
     __inout DWORD* pdwExitCode
     )
 {
     HRESULT hr = S_OK;
+    LPWSTR sczCommand = NULL;
     STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
     GENERIC_EXECUTE_MESSAGE message = { };
@@ -555,10 +554,17 @@ extern "C" HRESULT ExeEngineRunProcess(
     BOOL fFireAndForget = BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fFireAndForget;
     BOOL fInheritHandles = BURN_PACKAGE_TYPE_BUNDLE == pPackage->type;
 
+    // Always add user supplied arguments last.
+    if (wzUserArgs)
+    {
+        hr = StrAllocFormattedSecure(&sczCommand, L"%ls %ls", sczBaseCommand, wzUserArgs);
+        ExitOnFailure(hr, "Failed to append user args.");
+    }
+
     // Make the cache location of the executable the current directory to help those executables
     // that expect stuff to be relative to them.
     si.cb = sizeof(si);
-    if (!::CreateProcessW(wzExecutablePath, wzCommand, NULL, NULL, fInheritHandles, CREATE_NO_WINDOW, NULL, wzCachedDirectory, &si, &pi))
+    if (!::CreateProcessW(wzExecutablePath, sczCommand ? sczCommand : sczBaseCommand, NULL, NULL, fInheritHandles, CREATE_NO_WINDOW, NULL, wzCachedDirectory, &si, &pi))
     {
         ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
     }
@@ -632,6 +638,7 @@ extern "C" HRESULT ExeEngineRunProcess(
     }
 
 LExit:
+    StrSecureZeroFreeString(sczCommand);
     ReleaseHandle(pi.hThread);
     ReleaseHandle(pi.hProcess);
 

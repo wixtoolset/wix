@@ -329,8 +329,9 @@ LExit:
 }
 
 extern "C" HRESULT NetFxRunChainer(
-    __in LPCWSTR wzExecutablePath,
-    __in LPCWSTR wzArguments,
+    __in_z LPCWSTR wzExecutablePath,
+    __in_z LPWSTR sczBaseCommand,
+    __in_z_opt LPCWSTR wzUserArgs,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __out DWORD* pdwExitCode
@@ -360,8 +361,15 @@ extern "C" HRESULT NetFxRunChainer(
     hr = CreateNetFxChainer(sczSectionName, sczEventName, &pNetfxChainer);
     ExitOnFailure(hr, "Failed to create netfx chainer.");
 
-    hr = StrAllocFormattedSecure(&sczCommand, L"%ls /pipe %ls", wzArguments, sczSectionName);
-    ExitOnFailure(hr, "Failed to allocate netfx chainer arguments.");
+    hr = StrAllocFormatted(&sczCommand, L"%ls /pipe %ls", sczBaseCommand, sczSectionName);
+    ExitOnFailure(hr, "Failed to append netfx chainer args.");
+
+    // Always add user supplied arguments last.
+    if (wzUserArgs)
+    {
+        hr = StrAllocConcatFormattedSecure(&sczCommand, L" %ls", wzUserArgs);
+        ExitOnFailure(hr, "Failed to append user args.");
+    }
 
     si.cb = sizeof(si);
     if (!::CreateProcessW(wzExecutablePath, sczCommand, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))

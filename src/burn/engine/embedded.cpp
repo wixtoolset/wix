@@ -36,12 +36,13 @@ static HRESULT OnEmbeddedProgress(
 // function definitions
 
 /*******************************************************************
- EmbeddedLaunchChildProcess - 
+ EmbeddedRunBundle - 
 
 *******************************************************************/
 extern "C" HRESULT EmbeddedRunBundle(
-    __in LPCWSTR wzExecutablePath,
-    __in LPCWSTR wzArguments,
+    __in_z LPCWSTR wzExecutablePath,
+    __in_z LPWSTR sczBaseCommand,
+    __in_z_opt LPCWSTR wzUserArgs,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __out DWORD* pdwExitCode
@@ -68,8 +69,15 @@ extern "C" HRESULT EmbeddedRunBundle(
     hr = PipeCreatePipes(&connection, FALSE, &hCreatedPipesEvent);
     ExitOnFailure(hr, "Failed to create embedded pipe.");
 
-    hr = StrAllocFormattedSecure(&sczCommand, L"%ls -%ls %ls %ls %u", wzArguments, BURN_COMMANDLINE_SWITCH_EMBEDDED, connection.sczName, connection.sczSecret, dwCurrentProcessId);
-    ExitOnFailure(hr, "Failed to allocate embedded command.");
+    hr = StrAllocFormatted(&sczCommand, L"%ls -%ls %ls %ls %u", sczBaseCommand, BURN_COMMANDLINE_SWITCH_EMBEDDED, connection.sczName, connection.sczSecret, dwCurrentProcessId);
+    ExitOnFailure(hr, "Failed to append embedded args.");
+
+    // Always add user supplied arguments last.
+    if (wzUserArgs)
+    {
+        hr = StrAllocConcatFormattedSecure(&sczCommand, L" %ls", wzUserArgs);
+        ExitOnFailure(hr, "Failed to append user args.");
+    }
 
     if (!::CreateProcessW(wzExecutablePath, sczCommand, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
     {
