@@ -14,7 +14,7 @@ static HRESULT AllocatePipeMessage(
     __in_bcount_opt(cbData) LPVOID pvData,
     __in SIZE_T cbData,
     __out_bcount(cb) LPVOID* ppvMessage,
-    __out SIZE_T* cbMessage
+    __out SIZE_T* pcbMessage
     );
 static void FreePipeMessage(
     __in BURN_PIPE_MESSAGE *pMsg
@@ -553,32 +553,41 @@ static HRESULT AllocatePipeMessage(
     __in_bcount_opt(cbData) LPVOID pvData,
     __in SIZE_T cbData,
     __out_bcount(cb) LPVOID* ppvMessage,
-    __out SIZE_T* cbMessage
+    __out SIZE_T* pcbMessage
     )
 {
     HRESULT hr = S_OK;
     LPVOID pv = NULL;
-    SIZE_T cb = 0;
+    size_t cb = 0;
+    DWORD dwcbData = 0;
 
     // If no data was provided, ensure the count of bytes is zero.
     if (!pvData)
     {
         cbData = 0;
     }
+    else if (MAXDWORD < cbData)
+    {
+        ExitWithRootFailure(hr, E_INVALIDDATA, "Pipe message is too large.");
+    }
+
+    hr = ::SizeTAdd(sizeof(dwMessage) + sizeof(dwcbData), cbData, &cb);
+    ExitOnRootFailure(hr, "Failed to calculate total pipe message size");
+
+    dwcbData = (DWORD)cbData;
 
     // Allocate the message.
-    cb = sizeof(dwMessage) + sizeof(cbData) + cbData;
     pv = MemAlloc(cb, FALSE);
     ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for message.");
 
     memcpy_s(pv, cb, &dwMessage, sizeof(dwMessage));
-    memcpy_s(static_cast<BYTE*>(pv) + sizeof(dwMessage), cb - sizeof(dwMessage), &cbData, sizeof(cbData));
-    if (cbData)
+    memcpy_s(static_cast<BYTE*>(pv) + sizeof(dwMessage), cb - sizeof(dwMessage), &dwcbData, sizeof(dwcbData));
+    if (dwcbData)
     {
-        memcpy_s(static_cast<BYTE*>(pv) + sizeof(dwMessage) + sizeof(cbData), cb - sizeof(dwMessage) - sizeof(cbData), pvData, cbData);
+        memcpy_s(static_cast<BYTE*>(pv) + sizeof(dwMessage) + sizeof(dwcbData), cb - sizeof(dwMessage) - sizeof(dwcbData), pvData, dwcbData);
     }
 
-    *cbMessage = cb;
+    *pcbMessage = cb;
     *ppvMessage = pv;
     pv = NULL;
 
@@ -627,7 +636,7 @@ static HRESULT GetPipeMessage(
     )
 {
     HRESULT hr = S_OK;
-    BYTE pbMessageAndByteCount[sizeof(DWORD) + sizeof(SIZE_T)] = { };
+    BYTE pbMessageAndByteCount[sizeof(DWORD) + sizeof(DWORD)] = { };
 
     hr = FileReadHandle(hPipe, pbMessageAndByteCount, sizeof(pbMessageAndByteCount));
     if (HRESULT_FROM_WIN32(ERROR_BROKEN_PIPE) == hr)
@@ -638,7 +647,7 @@ static HRESULT GetPipeMessage(
     ExitOnFailure(hr, "Failed to read message from pipe.");
 
     pMsg->dwMessage = *(DWORD*)(pbMessageAndByteCount);
-    pMsg->cbData = *(SIZE_T*)(pbMessageAndByteCount + sizeof(DWORD));
+    pMsg->cbData = *(DWORD*)(pbMessageAndByteCount + sizeof(DWORD));
     if (pMsg->cbData)
     {
         pMsg->pvData = MemAlloc(pMsg->cbData, FALSE);
