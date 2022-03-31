@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <icon>wix-white-bg.png</icon>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+      <dependency id="WixToolset.Dtf.WindowsInstaller" version="$version$" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="$projectFolder$\$id$.targets" target="build" />
+    <file src="$projectFolder$\..\..\internal\images\wix-white-bg.png" />
+    <file src="net472\WixToolset.Dtf.MakeSfxCA.exe" target="tools" />
+    <file src="net472\WixToolset.Dtf.MakeSfxCA.exe.config" target="tools" />
+    <file src="net472\WixToolset.Dtf.Compression.dll" target="tools" />
+    <file src="net472\WixToolset.Dtf.Compression.Cab.dll" target="tools" />
+    <file src="net472\WixToolset.Dtf.Resources.dll" target="tools" />
+    <file src="x64\SfxCA.dll" target="tools\x64" />
+    <file src="x86\SfxCA.dll" target="tools\x86" />
+    <file src="ARM64\SfxCA.dll" target="tools\arm64" />
+  </files>
+</package>

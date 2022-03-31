@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Title>The WiX Toolset Managed CustomAction Framework.</Title>
+    <Description>The WiX Toolset lets developers create managed custom actions for the Windows Installer. This package contains the tools necessary to convert your project into a managed custom action.</Description>
+
+    <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Dtf.MakeSfxCA\WixToolset.Dtf.MakeSfxCA.csproj" />
+  </ItemGroup>
+</Project>

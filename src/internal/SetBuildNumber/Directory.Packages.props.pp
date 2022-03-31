@@ -2,6 +2,7 @@
   <ItemGroup>
     <PackageVersion Include="WixToolset.Dtf.Compression" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.Compression.Cab" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Dtf.CustomAction" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.Resources" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.WindowsInstaller" Version="{packageversion}" />
 

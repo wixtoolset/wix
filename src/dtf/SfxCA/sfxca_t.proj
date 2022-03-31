@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=ARM64" />
+  </ItemGroup>
+</Project>

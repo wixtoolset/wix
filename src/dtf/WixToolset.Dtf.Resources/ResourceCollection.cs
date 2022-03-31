@@ -18,7 +18,7 @@ namespace WixToolset.Dtf.Resources
     /// <remarks>
     /// To use this class:<list type="number">
     /// <item>Create a new ResourceCollection</item>
-    /// <item>Locate resources for the collection by calling one of the <see cref="ResourceCollection.Find(string)"/> methods</item>
+    /// <item>Locate resources for the collection by calling one of the <see cref="ResourceCollection.Find(String)"/> methods</item>
     /// <item>Load data of one or more <see cref="Resource"/>s from a file by calling the <see cref="Load"/> method of the
     /// Resource class, or load them all at once (more efficient) with the <see cref="Load"/> method of the ResourceCollection.</item>
     /// <item>Read and/or edit data of the individual Resource objects using the methods on that class.</item>
@@ -28,7 +28,7 @@ namespace WixToolset.Dtf.Resources
     /// </remarks>
     public class ResourceCollection : ICollection<Resource>
     {
-        private List<Resource> resources;
+        private readonly List<Resource> resources;
 
         /// <summary>
         /// Creates a new, empty ResourceCollection.
@@ -48,17 +48,17 @@ namespace WixToolset.Dtf.Resources
         {
             this.Clear();
 
-            IntPtr module = NativeMethods.LoadLibraryEx(resFile, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
+            var module = NativeMethods.LoadLibraryEx(resFile, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
             if (module == IntPtr.Zero)
             {
-                int err = Marshal.GetLastWin32Error();
+                var err = Marshal.GetLastWin32Error();
                 throw new IOException(String.Format(CultureInfo.InvariantCulture, "Failed to load resource file. Error code: {0}", err));
             }
             try
             {
                 if (!NativeMethods.EnumResourceTypes(module, new NativeMethods.EnumResTypesProc(this.EnumResTypes), IntPtr.Zero))
                 {
-                    int err = Marshal.GetLastWin32Error();
+                    var err = Marshal.GetLastWin32Error();
                     throw new IOException(String.Format(CultureInfo.InvariantCulture, "Failed to enumerate resources. Error code: {0}", err));
                 }
             }
@@ -79,12 +79,12 @@ namespace WixToolset.Dtf.Resources
         {
             this.Clear();
 
-            IntPtr module = NativeMethods.LoadLibraryEx(resFile, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
+            var module = NativeMethods.LoadLibraryEx(resFile, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
             try
             {
                 if (!NativeMethods.EnumResourceNames(module, (string) type, new NativeMethods.EnumResNamesProc(this.EnumResNames), IntPtr.Zero))
                 {
-                    int err = Marshal.GetLastWin32Error();
+                    var err = Marshal.GetLastWin32Error();
                     throw new IOException(String.Format(CultureInfo.InvariantCulture, "EnumResourceNames error. Error code: {0}", err));
                 }
             }
@@ -106,12 +106,12 @@ namespace WixToolset.Dtf.Resources
         {
             this.Clear();
 
-            IntPtr module = NativeMethods.LoadLibraryEx(resFile, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
+            var module = NativeMethods.LoadLibraryEx(resFile, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
             try
             {
                 if (!NativeMethods.EnumResourceLanguages(module, (string) type, name, new NativeMethods.EnumResLangsProc(this.EnumResLangs), IntPtr.Zero))
                 {
-                    int err = Marshal.GetLastWin32Error();
+                    var err = Marshal.GetLastWin32Error();
                     throw new IOException(String.Format(CultureInfo.InvariantCulture, "EnumResourceLanguages error. Error code: {0}", err));
                 }
             }
@@ -123,9 +123,9 @@ namespace WixToolset.Dtf.Resources
 
         private bool EnumResTypes(IntPtr module, IntPtr type, IntPtr param)
         {
-            if (!NativeMethods.EnumResourceNames(module, type, new NativeMethods.EnumResNamesProc(EnumResNames), IntPtr.Zero))
+            if (!NativeMethods.EnumResourceNames(module, type, new NativeMethods.EnumResNamesProc(this.EnumResNames), IntPtr.Zero))
             {
-                int err = Marshal.GetLastWin32Error();
+                var err = Marshal.GetLastWin32Error();
                 throw new IOException(String.Format(CultureInfo.InvariantCulture, "EnumResourceNames error! Error code: {0}", err));
             }
             return true;
@@ -133,9 +133,9 @@ namespace WixToolset.Dtf.Resources
 
         private bool EnumResNames(IntPtr module, IntPtr type, IntPtr name, IntPtr param)
         {
-            if (!NativeMethods.EnumResourceLanguages(module, type, name, new NativeMethods.EnumResLangsProc(EnumResLangs), IntPtr.Zero))
+            if (!NativeMethods.EnumResourceLanguages(module, type, name, new NativeMethods.EnumResLangsProc(this.EnumResLangs), IntPtr.Zero))
             {
-                int err = Marshal.GetLastWin32Error();
+                var err = Marshal.GetLastWin32Error();
                 throw new IOException(String.Format(CultureInfo.InvariantCulture, "EnumResourceLanguages error. Error code: {0}", err));
             }
             return true;
@@ -179,10 +179,10 @@ namespace WixToolset.Dtf.Resources
         /// <param name="file">The file from which resources are loaded.</param>
         public void Load(string file)
         {
-            IntPtr module = NativeMethods.LoadLibraryEx(file, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
+            var module = NativeMethods.LoadLibraryEx(file, IntPtr.Zero, NativeMethods.LOAD_LIBRARY_AS_DATAFILE);
             try
             {
-                foreach (Resource res in this)
+                foreach (var res in this)
                 {
                     res.Load(module);
                 }
@@ -199,17 +199,17 @@ namespace WixToolset.Dtf.Resources
         /// <param name="file">The file to which resources are saved.</param>
         public void Save(string file)
         {
-            IntPtr updateHandle = IntPtr.Zero;
+            var updateHandle = IntPtr.Zero;
             try
             {
                 updateHandle = NativeMethods.BeginUpdateResource(file, false);
-                foreach (Resource res in this)
+                foreach (var res in this)
                 {
                     res.Save(updateHandle);
                 }
                 if (!NativeMethods.EndUpdateResource(updateHandle, false))
                 {
-                    int err = Marshal.GetLastWin32Error();
+                    var err = Marshal.GetLastWin32Error();
                     throw new IOException(String.Format(CultureInfo.InvariantCulture, "Failed to save resource. Error {0}", err));
                 }
                 updateHandle = IntPtr.Zero;
