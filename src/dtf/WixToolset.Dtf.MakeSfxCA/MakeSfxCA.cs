@@ -3,11 +3,12 @@
 namespace WixToolset.Dtf.MakeSfxCA
 {
     using System;
-    using System.IO;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using System.Security;
     using System.Text;
-    using System.Reflection;
     using WixToolset.Dtf.Compression;
     using WixToolset.Dtf.Compression.Cab;
     using WixToolset.Dtf.Resources;
@@ -28,12 +29,12 @@ namespace WixToolset.Dtf.MakeSfxCA
         /// Prints usage text for the tool.
         /// </summary>
         /// <param name="w">Console text writer.</param>
-        public static void Usage(TextWriter w)
+        private static void Usage(TextWriter w)
         {
             w.WriteLine("WiX Toolset custom action packager version {0}", Assembly.GetExecutingAssembly().GetName().Version);
             w.WriteLine("Copyright (C) .NET Foundation and contributors. All rights reserved.");
             w.WriteLine();
-            w.WriteLine("Usage: WixToolset.Dtf.MakeSfxCA <outputca.dll> SfxCA.dll <inputca.dll> [support files ...]");
+            w.WriteLine("Usage: WixToolset.Dtf.MakeSfxCA [-v] <outputca.dll> SfxCA.dll <inputca.dll> [support files ...]");
             w.WriteLine();
             w.WriteLine("Makes a self-extracting managed MSI CA or UI DLL package.");
             w.WriteLine("Support files must include " + MakeSfxCA.REQUIRED_WI_ASSEMBLY);
@@ -47,20 +48,42 @@ namespace WixToolset.Dtf.MakeSfxCA
         /// <returns>0 on success, nonzero on failure.</returns>
         public static int Main(string[] args)
         {
-            if (args.Length < 3)
+            var logger = TextWriter.Null;
+            var output = String.Empty;
+            var sfxDll = String.Empty;
+            var inputs = new List<string>();
+
+            var expandedArgs = ExpandArguments(args);
+
+            foreach (var arg in expandedArgs)
+            {
+                if (arg == "-v")
+                {
+                    logger = Console.Out;
+                }
+                else if (String.IsNullOrEmpty(output))
+                {
+                    output = arg;
+                }
+                else if (String.IsNullOrEmpty(sfxDll))
+                {
+                    sfxDll = arg;
+                }
+                else
+                {
+                    inputs.Add(arg);
+                }
+            }
+
+            if (inputs.Count == 0)
             {
                 Usage(Console.Out);
                 return 1;
             }
 
-            var output = args[0];
-            var sfxDll = args[1];
-            var inputs = new string[args.Length - 2];
-            Array.Copy(args, 2, inputs, 0, inputs.Length);
-
             try
             {
-                Build(output, sfxDll, inputs, Console.Out);
+                Build(output, sfxDll, inputs, logger);
                 return 0;
             }
             catch (ArgumentException ex)
@@ -81,11 +104,38 @@ namespace WixToolset.Dtf.MakeSfxCA
         }
 
         /// <summary>
+        /// Read the arguments include parsing response files.
+        /// </summary>
+        /// <param name="args">Arguments to expand</param>
+        /// <returns>Expanded list of arguments</returns>
+        private static List<string> ExpandArguments(string[] args)
+        {
+            var result = new List<string>(args.Length);
+            foreach (var arg in args)
+            {
+                if (String.IsNullOrWhiteSpace(arg))
+                {
+                }
+                else if (arg.StartsWith("@"))
+                {
+                    var parsed = File.ReadAllLines(arg.Substring(1));
+                    result.AddRange(parsed.Select(p => p.Trim('"')).Where(p => !String.IsNullOrWhiteSpace(p)));
+                }
+                else
+                {
+                    result.Add(arg);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Packages up all the inputs to the output location.
         /// </summary>
         /// <exception cref="Exception">Various exceptions are thrown
         /// if things go wrong.</exception>
-        public static void Build(string output, string sfxDll, IList<string> inputs, TextWriter log)
+        private static void Build(string output, string sfxDll, IList<string> inputs, TextWriter log)
         {
             MakeSfxCA.log = log;
 
@@ -205,7 +255,7 @@ namespace WixToolset.Dtf.MakeSfxCA
         /// </remarks>
         private static void ResolveDependentAssemblies(IDictionary<string, string> inputFiles, string inputDir)
         {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += delegate(object sender, ResolveEventArgs args)
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += delegate (object sender, ResolveEventArgs args)
             {
                 AssemblyName resolveName = new AssemblyName(args.Name);
                 Assembly assembly = null;
@@ -416,7 +466,7 @@ namespace WixToolset.Dtf.MakeSfxCA
                     foreach (var argument in attribute.ConstructorArguments)
                     {
                         // The entry point name is the first positional argument, if specified.
-                        entryPointName = (string) argument.Value;
+                        entryPointName = (string)argument.Value;
                         break;
                     }
 
@@ -472,7 +522,7 @@ namespace WixToolset.Dtf.MakeSfxCA
             byte[] fileBytes;
             using (var readStream = File.OpenRead(sfxDll))
             {
-                fileBytes = new byte[(int) readStream.Length];
+                fileBytes = new byte[(int)readStream.Length];
                 readStream.Read(fileBytes, 0, fileBytes.Length);
             }
 

@@ -29,7 +29,7 @@
     @(IntermediateAssembly) - Managed custom action assembly.
     @(Content) - Project items of type Content will be included in the package.
     $(CustomActionContents) - Optional space-delimited list of additional files to include.
-    
+
     [OUT]
     $(IntermediateOutputPath)$(TargetCAFileName) - Managed custom action package with unmanaged stub.
   ==================================================================================================
@@ -44,7 +44,7 @@
                                      Condition=" '%(Extension)' == '.dll' or '%(Extension)' == '.exe' " />
       <CustomActionReferenceContents Include="@(ReferenceComWrappersToCopyLocal)"
                                      Condition=" '%(Extension)' == '.dll' or '%(Extension)' == '.exe' " />
-    
+
       <!-- include PDBs for Debug only -->
       <CustomActionReferenceContents Include="@(IntermediateAssembly->'%(RootDir)%(Directory)%(Filename).pdb')"
                                      Condition=" Exists('%(RootDir)%(Directory)%(Filename).pdb') and '$(Configuration)' == 'Debug' " />
@@ -60,17 +60,27 @@
          - Project items of type Content
          - Additional items in the CustomActionContents property
     -->
-    <PropertyGroup>
-      <CustomActionContents>@(CustomActionReferenceContents);@(Content->'%(FullPath)');$(CustomActionContents)</CustomActionContents>
-    </PropertyGroup>
-
     <ItemGroup>
+      <CustomActionContents Include="@(CustomActionReferenceContents);@(Content->'%(FullPath)');$(CustomActionContents)" />
+
+      <IntermediateCAResponseFile TaskParameter="Value" PropertyName="IntermediateCAResponseFile" />
       <IntermediateCAAssembly Include="@(IntermediateAssembly->'%(FullPath)')" />
       <IntermediateCAPackage Include="@(IntermediateAssembly->'%(RootDir)%(Directory)$(TargetCAFileName)')" />
     </ItemGroup>
 
+    <!-- Use a response file to pass the potentially very long contents to MakeSfxCA.exe -->
+    <PropertyGroup>
+      <IntermediateCAResponseFile>@(IntermediateCAPackage->'%(RootDir)%(Directory)%(Filename).rsp')</IntermediateCAResponseFile>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(IntermediateCAResponseFile)" Lines="@(CustomActionContents->'&quot;%(Identity)&quot;')" Overwrite="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateCAResponseFile)" />
+    </ItemGroup>
+
     <!-- Run the MakeSfxCA.exe CA packaging tool. -->
-    <Exec Command='"$(MakeSfxCA)" "@(IntermediateCAPackage)" "$(SfxCADll)" "@(IntermediateCAAssembly)" "$(CustomActionContents)"'
+    <Exec Command='"$(MakeSfxCA)" "@(IntermediateCAPackage)" "$(SfxCADll)" "@(IntermediateCAAssembly)" "@$(IntermediateCAResponseFile)"'
           WorkingDirectory="$(ProjectDir)" />
 
     <!-- Add modules to be copied to output dir. -->
