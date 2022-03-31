@@ -144,7 +144,7 @@ namespace WixToolset.Dtf.Resources
         private bool EnumResLangs(IntPtr module, IntPtr type, IntPtr name, ushort langId, IntPtr param)
         {
             Resource res;
-            if (((int) type) == ResourceType.Version.IntegerValue)
+            if (type == (IntPtr)ResourceType.Version.IntegerValue)
             {
                 res = new VersionResource(ResourceNameToString(name), langId);
             }
