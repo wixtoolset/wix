@@ -29,6 +29,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.data" rd /s/q "%_NUGET_CACHE%\wixtoolset.dat
 if exist "%_NUGET_CACHE%\wixtoolset.dependency.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.dependency.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.compression" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.compression"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.compression.cab" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.compression.cab"
+if exist "%_NUGET_CACHE%\wixtoolset.dtf.customaction" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.customaction"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.resources" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.resources"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.windowsinstaller" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.windowsinstaller"
 if exist "%_NUGET_CACHE%\wixtoolset.dutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.dutil"

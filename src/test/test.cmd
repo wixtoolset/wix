@@ -13,6 +13,8 @@
 
 @call burn\test_burn.cmd %_C% %_T% || exit /b
 
+msbuild -t:Restore dtf\DtfE2ETests.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\dtfe2etests.binlog || exit /b
+
 dotnet test wix -c %_C% --nologo -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.WixE2ETests.trx" || exit /b
 
 @popd
