@@ -319,6 +319,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var targetCodesByPatch = this.Section.Symbols.OfType<WixBundlePatchTargetCodeSymbol>().ToLookup(r => r.PackageRef);
                 var msiFeaturesByPackage = this.Section.Symbols.OfType<WixBundleMsiFeatureSymbol>().ToLookup(r => r.PackageRef);
                 var msiPropertiesByPackage = this.Section.Symbols.OfType<WixBundleMsiPropertySymbol>().ToLookup(r => r.PackageRef);
+                var relatedBundlesByPackage = this.Section.Symbols.OfType<WixBundlePackageRelatedBundleSymbol>().ToLookup(r => r.PackageRef);
                 var relatedPackagesByPackage = this.Section.Symbols.OfType<WixBundleRelatedPackageSymbol>().ToLookup(r => r.PackageRef);
                 var slipstreamMspsByPackage = this.Section.Symbols.OfType<WixBundleSlipstreamMspSymbol>().ToLookup(r => r.TargetPackageRef);
                 var exitCodesByPackage = this.Section.Symbols.OfType<WixBundlePackageExitCodeSymbol>().ToLookup(r => r.ChainPackageId);
@@ -384,6 +385,7 @@ namespace WixToolset.Core.Burn.Bundles
                     if (package.SpecificPackageSymbol is WixBundleBundlePackageSymbol bundlePackage) // BUNDLE
                     {
                         writer.WriteAttributeString("BundleId", bundlePackage.BundleId);
+                        writer.WriteAttributeString("Version", bundlePackage.Version);
                         writer.WriteAttributeString("InstallArguments", bundlePackage.InstallCommand);
                         writer.WriteAttributeString("UninstallArguments", bundlePackage.UninstallCommand);
                         writer.WriteAttributeString("RepairArguments", bundlePackage.RepairCommand);
@@ -533,6 +535,16 @@ namespace WixToolset.Core.Burn.Bundles
                             writer.WriteAttributeString("Imported", "yes");
                         }
 
+                        writer.WriteEndElement();
+                    }
+
+                    var packageRelatedBundles = relatedBundlesByPackage[package.PackageId];
+
+                    foreach (var relatedBundle in packageRelatedBundles)
+                    {
+                        writer.WriteStartElement("RelatedBundle");
+                        writer.WriteAttributeString("Id", relatedBundle.BundleId);
+                        writer.WriteAttributeString("Action", relatedBundle.Action.ToString());
                         writer.WriteEndElement();
                     }
 

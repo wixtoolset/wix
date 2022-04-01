@@ -56,6 +56,11 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         UpdateBundle,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ChainBundle,
     }
 
     /// <summary>
@@ -220,7 +225,11 @@ namespace WixToolset.Mba.Core
                 return null;
             }
 
-            if (attributeValue.Equals("Exe", StringComparison.InvariantCulture))
+            if (attributeValue.Equals("Bundle", StringComparison.InvariantCulture))
+            {
+                return PackageType.ChainBundle;
+            }
+            else if (attributeValue.Equals("Exe", StringComparison.InvariantCulture))
             {
                 return PackageType.Exe;
             }
@@ -268,7 +277,7 @@ namespace WixToolset.Mba.Core
                     package.Type = PackageType.UpgradeBundle;
                     break;
                 default:
-                    throw new Exception(string.Format("Unknown related bundle type: {0}", relationType));
+                    throw new Exception(String.Format("Unknown related bundle type: {0}", relationType));
             }
 
             return package;
@@ -302,7 +311,7 @@ namespace WixToolset.Mba.Core
 
                 if (!packagesById.TryGetValue(id, out var ipackage))
                 {
-                    throw new Exception(string.Format("Failed to find package specified in WixBalPackageInfo: {0}", id));
+                    throw new Exception(String.Format("Failed to find package specified in WixBalPackageInfo: {0}", id));
                 }
 
                 var package = (PackageInfo)ipackage;
@@ -322,7 +331,7 @@ namespace WixToolset.Mba.Core
 
                 if (!packagesById.TryGetValue(id, out var ipackage))
                 {
-                    throw new Exception(string.Format("Failed to find package specified in WixMbaPrereqInformation: {0}", id));
+                    throw new Exception(String.Format("Failed to find package specified in WixMbaPrereqInformation: {0}", id));
                 }
 
                 var package = (PackageInfo)ipackage;

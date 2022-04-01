@@ -71,10 +71,6 @@ static HRESULT UpdateResumeMode(
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in BOOL fRestartInitiated
     );
-static HRESULT ParseRelatedCodes(
-    __in BURN_REGISTRATION* pRegistration,
-    __in IXMLDOMNode* pixnBundle
-    );
 static HRESULT FormatUpdateRegistrationKey(
     __in BURN_REGISTRATION* pRegistration,
     __out_z LPWSTR* psczKey
@@ -143,7 +139,7 @@ extern "C" HRESULT RegistrationParseFromXml(
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Tag", &pRegistration->sczTag);
     ExitOnFailure(hr, "Failed to get @Tag.");
 
-    hr = ParseRelatedCodes(pRegistration, pixnBundle);
+    hr = BundlePackageEngineParseRelatedCodes(pixnBundle, &pRegistration->rgsczDetectCodes, &pRegistration->cDetectCodes, &pRegistration->rgsczUpgradeCodes, &pRegistration->cUpgradeCodes, &pRegistration->rgsczAddonCodes, &pRegistration->cAddonCodes, &pRegistration->rgsczPatchCodes, &pRegistration->cPatchCodes);
     ExitOnFailure(hr, "Failed to parse related bundles");
 
     // @Version
@@ -1391,87 +1387,6 @@ static HRESULT UpdateResumeMode(
 LExit:
     ReleaseStr(sczRunOnceCommandLine);
     ReleaseRegKey(hkRun);
-
-    return hr;
-}
-
-static HRESULT ParseRelatedCodes(
-    __in BURN_REGISTRATION* pRegistration,
-    __in IXMLDOMNode* pixnBundle
-    )
-{
-    HRESULT hr = S_OK;
-    IXMLDOMNodeList* pixnNodes = NULL;
-    IXMLDOMNode* pixnElement = NULL;
-    LPWSTR sczAction = NULL;
-    LPWSTR sczId = NULL;
-    DWORD cElements = 0;
-
-    hr = XmlSelectNodes(pixnBundle, L"RelatedBundle", &pixnNodes);
-    ExitOnFailure(hr, "Failed to get RelatedBundle nodes");
-
-    hr = pixnNodes->get_length((long*)&cElements);
-    ExitOnFailure(hr, "Failed to get RelatedBundle element count.");
-
-    for (DWORD i = 0; i < cElements; ++i)
-    {
-        hr = XmlNextElement(pixnNodes, &pixnElement, NULL);
-        ExitOnFailure(hr, "Failed to get next RelatedBundle element.");
-
-        hr = XmlGetAttributeEx(pixnElement, L"Action", &sczAction);
-        ExitOnFailure(hr, "Failed to get @Action.");
-
-        hr = XmlGetAttributeEx(pixnElement, L"Id", &sczId);
-        ExitOnFailure(hr, "Failed to get @Id.");
-
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Detect", -1))
-        {
-            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRegistration->rgsczDetectCodes), pRegistration->cDetectCodes + 1, sizeof(LPWSTR), 5);
-            ExitOnFailure(hr, "Failed to resize Detect code array in registration");
-
-            pRegistration->rgsczDetectCodes[pRegistration->cDetectCodes] = sczId;
-            sczId = NULL;
-            ++pRegistration->cDetectCodes;
-        }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Upgrade", -1))
-        {
-            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRegistration->rgsczUpgradeCodes), pRegistration->cUpgradeCodes + 1, sizeof(LPWSTR), 5);
-            ExitOnFailure(hr, "Failed to resize Upgrade code array in registration");
-
-            pRegistration->rgsczUpgradeCodes[pRegistration->cUpgradeCodes] = sczId;
-            sczId = NULL;
-            ++pRegistration->cUpgradeCodes;
-        }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Addon", -1))
-        {
-            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRegistration->rgsczAddonCodes), pRegistration->cAddonCodes + 1, sizeof(LPWSTR), 5);
-            ExitOnFailure(hr, "Failed to resize Addon code array in registration");
-
-            pRegistration->rgsczAddonCodes[pRegistration->cAddonCodes] = sczId;
-            sczId = NULL;
-            ++pRegistration->cAddonCodes;
-        }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Patch", -1))
-        {
-            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pRegistration->rgsczPatchCodes), pRegistration->cPatchCodes + 1, sizeof(LPWSTR), 5);
-            ExitOnFailure(hr, "Failed to resize Patch code array in registration");
-
-            pRegistration->rgsczPatchCodes[pRegistration->cPatchCodes] = sczId;
-            sczId = NULL;
-            ++pRegistration->cPatchCodes;
-        }
-        else
-        {
-            hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Invalid value for @Action: %ls", sczAction);
-        }
-    }
-
-LExit:
-    ReleaseObject(pixnNodes);
-    ReleaseObject(pixnElement);
-    ReleaseStr(sczAction);
-    ReleaseStr(sczId);
 
     return hr;
 }

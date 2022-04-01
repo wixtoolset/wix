@@ -12,6 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.InstallCommand), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.RepairCommand), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.UninstallCommand), IntermediateFieldType.String),
@@ -28,6 +29,7 @@ namespace WixToolset.Data.Symbols
     {
         Attributes,
         BundleId,
+        Version,
         InstallCommand,
         RepairCommand,
         UninstallCommand,
@@ -63,6 +65,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleBundlePackageSymbolFields.BundleId];
             set => this.Set((int)WixBundleBundlePackageSymbolFields.BundleId, value);
+        }
+
+        public string Version
+        {
+            get => (string)this.Fields[(int)WixBundleBundlePackageSymbolFields.Version];
+            set => this.Set((int)WixBundleBundlePackageSymbolFields.Version, value);
         }
 
         public string InstallCommand

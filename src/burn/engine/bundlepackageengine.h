@@ -13,11 +13,24 @@ HRESULT BundlePackageEngineParsePackageFromXml(
     __in IXMLDOMNode* pixnBundlePackage,
     __in BURN_PACKAGE* pPackage
     );
+HRESULT BundlePackageEngineParseRelatedCodes(
+    __in IXMLDOMNode* pixnBundle,
+    __in LPWSTR** prgsczDetectCodes,
+    __in DWORD* pcDetectCodes,
+    __in LPWSTR** prgsczUpgradeCodes,
+    __in DWORD* pcUpgradeCodes,
+    __in LPWSTR** prgsczAddonCodes,
+    __in DWORD* pcAddonCodes,
+    __in LPWSTR** prgsczPatchCodes,
+    __in DWORD* pcPatchCodes
+    );
 void BundlePackageEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     );
 HRESULT BundlePackageEngineDetectPackage(
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_USER_EXPERIENCE* pUserExperience
     );
 HRESULT BundlePackageEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage

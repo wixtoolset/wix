@@ -1182,6 +1182,20 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.I4)] BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation,
             [MarshalAs(UnmanagedType.I4)] ref BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION pAction
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.DetectRelatedBundlePackage"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnDetectRelatedBundlePackage(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.U4)] RelationType relationType,
+            [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
     }
 
     /// <summary>

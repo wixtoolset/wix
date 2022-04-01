@@ -2030,10 +2030,7 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class LaunchApprovedExeBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cancelRecommendation"></param>
+        /// <summary />
         public LaunchApprovedExeBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2046,27 +2043,18 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class LaunchApprovedExeCompleteEventArgs : StatusEventArgs
     {
-        private int processId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <param name="processId"></param>
+        /// <summary />
         public LaunchApprovedExeCompleteEventArgs(int hrStatus, int processId)
             : base(hrStatus)
         {
-            this.processId = processId;
+            this.ProcessId = processId;
         }
 
         /// <summary>
         /// Gets the ProcessId of the process that was launched.
         /// This is only valid if the status reports success.
         /// </summary>
-        public int ProcessId
-        {
-            get { return this.processId; }
-        }
+        public int ProcessId { get; private set; }
     }
 
     /// <summary>
@@ -2075,26 +2063,17 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class BeginMsiTransactionBeginEventArgs : CancellableHResultEventArgs
     {
-        private string transactionId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <param name="cancelRecommendation"></param>
+        /// <summary />
         public BeginMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.transactionId = transactionId;
+            this.TransactionId = transactionId;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
-        public string TransactionId
-        {
-            get { return this.transactionId; }
-        }
+        public string TransactionId { get; private set; }
     }
 
     /// <summary>
@@ -2103,26 +2082,17 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class BeginMsiTransactionCompleteEventArgs : StatusEventArgs
     {
-        private string transactionId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <param name="hrStatus"></param>
+        /// <summary />
         public BeginMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
-            this.transactionId = transactionId;
+            this.TransactionId = transactionId;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
-        public string TransactionId
-        {
-            get { return this.transactionId; }
-        }
+        public string TransactionId { get; private set; }
     }
 
     /// <summary>
@@ -2131,26 +2101,17 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CommitMsiTransactionBeginEventArgs : CancellableHResultEventArgs
     {
-        private string transactionId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <param name="cancelRecommendation"></param>
+        /// <summary />
         public CommitMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.transactionId = transactionId;
+            this.TransactionId = transactionId;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
-        public string TransactionId
-        {
-            get { return this.transactionId; }
-        }
+        public string TransactionId { get; private set; }
     }
 
     /// <summary>
@@ -2159,26 +2120,17 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CommitMsiTransactionCompleteEventArgs : StatusEventArgs
     {
-        private string transactionId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <param name="hrStatus"></param>
+        /// <summary />
         public CommitMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
-            this.transactionId = transactionId;
+            this.TransactionId = transactionId;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
-        public string TransactionId
-        {
-            get { return this.transactionId; }
-        }
+        public string TransactionId { get; private set; }
     }
 
     /// <summary>
@@ -2187,24 +2139,16 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class RollbackMsiTransactionBeginEventArgs : HResultEventArgs
     {
-        private string transactionId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionId"></param>
+        /// <summary />
         public RollbackMsiTransactionBeginEventArgs(string transactionId)
         {
-            this.transactionId = transactionId;
+            this.TransactionId = transactionId;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
-        public string TransactionId
-        {
-            get { return this.transactionId; }
-        }
+        public string TransactionId { get; private set; }
     }
 
     /// <summary>
@@ -2213,26 +2157,17 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class RollbackMsiTransactionCompleteEventArgs : StatusEventArgs
     {
-        private string transactionId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <param name="hrStatus"></param>
+        /// <summary />
         public RollbackMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
-            this.transactionId = transactionId;
+            this.TransactionId = transactionId;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
-        public string TransactionId
-        {
-            get { return this.transactionId; }
-        }
+        public string TransactionId { get; private set; }
     }
 
     /// <summary>
@@ -2523,5 +2458,48 @@ namespace WixToolset.Mba.Core
         /// Gets or sets the action to be performed. This is passed back to the engine.
         /// </summary>
         public BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION Action { get; set; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectRelatedBundlePackage"/>
+    /// </summary>
+    [Serializable]
+    public class DetectRelatedBundlePackageEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public DetectRelatedBundlePackageEventArgs(string packageId, string productCode, RelationType relationType, bool perMachine, string version, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.PackageId = packageId;
+            this.ProductCode = productCode;
+            this.RelationType = relationType;
+            this.PerMachine = perMachine;
+            this.Version = version;
+        }
+
+        /// <summary>
+        /// Gets the identity of the product's package detected.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the identity of the related bundle detected.
+        /// </summary>
+        public string ProductCode { get; private set; }
+
+        /// <summary>
+        /// Gets the relationship type of the related bundle.
+        /// </summary>
+        public RelationType RelationType { get; private set; }
+
+        /// <summary>
+        /// Gets whether the detected bundle is per machine.
+        /// </summary>
+        public bool PerMachine { get; private set; }
+
+        /// <summary>
+        /// Gets the version of the related bundle detected.
+        /// </summary>
+        public string Version { get; private set; }
     }
 }

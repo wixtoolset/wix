@@ -142,6 +142,7 @@ namespace WixToolset.Data
         WixBundlePackageCommandLine,
         WixBundlePackageExitCode,
         WixBundlePackageGroup,
+        WixBundlePackageRelatedBundle,
         WixBundlePatchTargetCode,
         WixBundlePayload,
         WixBundlePayloadGroup,
@@ -617,6 +618,9 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixBundlePackageGroup:
                     return SymbolDefinitions.WixBundlePackageGroup;
+
+                case SymbolDefinitionType.WixBundlePackageRelatedBundle:
+                    return SymbolDefinitions.WixBundlePackageRelatedBundle;
 
                 case SymbolDefinitionType.WixBundlePatchTargetCode:
                     return SymbolDefinitions.WixBundlePatchTargetCode;

@@ -887,6 +887,18 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnDetectRelatedBundlePackage(
+        __in_z LPCWSTR /*wzPackageId*/,
+        __in_z LPCWSTR /*wzBundleId*/,
+        __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
+        __in BOOL /*fPerMachine*/,
+        __in LPCWSTR /*wzVersion*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
 public: // IBAFunctions
     virtual STDMETHODIMP OnPlan(
         )

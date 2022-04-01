@@ -1489,6 +1489,9 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYDOWNGRADE:
             OnApplyDowngradeFallback(reinterpret_cast<BA_ONAPPLYDOWNGRADE_ARGS*>(pvArgs), reinterpret_cast<BA_ONAPPLYDOWNGRADE_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE:
+            OnDetectRelatedBundlePackageFallback(reinterpret_cast<BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS*>(pvResults));
+            break;
         default:
 #ifdef DEBUG
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
@@ -2176,6 +2179,14 @@ private: // privates
         )
     {
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONEXECUTEPROCESSCANCEL, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnDetectRelatedBundlePackageFallback(
+        __in BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS* pArgs,
+        __inout BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
 

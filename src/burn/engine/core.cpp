@@ -2121,7 +2121,7 @@ static HRESULT DetectPackage(
     switch (pPackage->type)
     {
     case BURN_PACKAGE_TYPE_BUNDLE:
-        hr = BundlePackageEngineDetectPackage(pPackage);
+        hr = BundlePackageEngineDetectPackage(pPackage, &pEngineState->registration, &pEngineState->userExperience);
         break;
 
     case BURN_PACKAGE_TYPE_EXE:
