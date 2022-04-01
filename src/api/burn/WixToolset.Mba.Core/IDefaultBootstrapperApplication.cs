@@ -36,15 +36,15 @@ namespace WixToolset.Mba.Core
 
         /// <summary>
         /// Fired when the engine has begun acquiring the payload or container.
-        /// The BA can change the source using <see cref="IEngine.SetLocalSource(string, string, string)"/>
-        /// or <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
+        /// The BA can change the source using <see cref="IEngine.SetLocalSource(String, String, String)"/>
+        /// or <see cref="IEngine.SetDownloadSource(String, String, String, String, String)"/>.
         /// </summary>
         event EventHandler<CacheAcquireBeginEventArgs> CacheAcquireBegin;
 
         /// <summary>
         /// Fired when the engine has completed the acquisition of the payload or container.
-        /// The BA can change the source using <see cref="IEngine.SetLocalSource(string, string, string)"/>
-        /// or <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
+        /// The BA can change the source using <see cref="IEngine.SetLocalSource(String, String, String)"/>
+        /// or <see cref="IEngine.SetDownloadSource(String, String, String, String, String)"/>.
         /// </summary>
         event EventHandler<CacheAcquireCompleteEventArgs> CacheAcquireComplete;
 
@@ -177,6 +177,11 @@ namespace WixToolset.Mba.Core
         /// Fired when a related bundle has been detected for a bundle.
         /// </summary>
         event EventHandler<DetectRelatedBundleEventArgs> DetectRelatedBundle;
+
+        /// <summary>
+        /// Fired when a related bundle has been detected for a bundle package.
+        /// </summary>
+        event EventHandler<DetectRelatedBundlePackageEventArgs> DetectRelatedBundlePackage;
 
         /// <summary>
         /// Fired when a related MSI package has been detected for a package.

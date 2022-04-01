@@ -102,6 +102,8 @@ namespace WixToolset.Core.Burn.Bundles
 
                 var version = registrationElement.GetAttribute("Version");
                 packagePayload.Version = version;
+                bundlePackage.Version = version;
+                this.Facade.PackageSymbol.Version = version;
 
                 if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
                 {
@@ -125,6 +127,8 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.ProcessPackages(document, namespaceManager);
 
+                this.ProcessRelatedBundles(document, namespaceManager);
+
                 // TODO: Add payloads?
             }
         }
@@ -147,6 +151,27 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             this.Facade.PackageSymbol.InstallSize = packageInstallSize;
+        }
+
+        private void ProcessRelatedBundles(XmlDocument document, XmlNamespaceManager namespaceManager)
+        {
+            foreach (XmlElement relatedBundleElement in document.SelectNodes("/burn:BurnManifest/burn:RelatedBundle", namespaceManager))
+            {
+                var id = relatedBundleElement.GetAttribute("Id");
+
+                if (!Enum.TryParse(relatedBundleElement.GetAttribute("Action"), out RelatedBundleActionType action))
+                {
+                    // TODO: warning
+                    continue;
+                }
+
+                this.Section.AddSymbol(new WixBundlePackageRelatedBundleSymbol
+                {
+                    PackageRef = this.Facade.PackageId,
+                    BundleId = id,
+                    Action = action,
+                });
+            }
         }
     }
 }

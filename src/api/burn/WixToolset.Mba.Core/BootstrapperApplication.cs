@@ -283,6 +283,9 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public event EventHandler<ExecuteProcessCancelEventArgs> ExecuteProcessCancel;
 
+        /// <inheritdoc/>
+        public event EventHandler<DetectRelatedBundlePackageEventArgs> DetectRelatedBundlePackage;
+
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
@@ -1385,6 +1388,19 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="DetectRelatedBundlePackage"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnDetectRelatedBundlePackage(DetectRelatedBundlePackageEventArgs args)
+        {
+            EventHandler<DetectRelatedBundlePackageEventArgs> handler = this.DetectRelatedBundlePackage;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
 
         int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
@@ -2141,6 +2157,15 @@ namespace WixToolset.Mba.Core
             this.OnExecuteProcessCancel(args);
 
             pAction = args.Action;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnDetectRelatedBundlePackage(string wzPackageId, string wzProductCode, RelationType relationType, bool fPerMachine, string wzVersion, ref bool fCancel)
+        {
+            DetectRelatedBundlePackageEventArgs args = new DetectRelatedBundlePackageEventArgs(wzPackageId, wzProductCode, relationType, fPerMachine, wzVersion, fCancel);
+            this.OnDetectRelatedBundlePackage(args);
+
+            fCancel = args.Cancel;
             return args.HResult;
         }
 

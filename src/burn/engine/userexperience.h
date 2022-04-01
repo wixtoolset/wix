@@ -298,6 +298,14 @@ BAAPI UserExperienceOnDetectRelatedBundle(
     __in VERUTIL_VERSION* pVersion,
     __in BOOL fMissingFromCache
     );
+BAAPI UserExperienceOnDetectRelatedBundlePackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzBundleId,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BOOL fPerMachine,
+    __in VERUTIL_VERSION* pVersion
+    );
 BAAPI UserExperienceOnDetectRelatedMsiPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,

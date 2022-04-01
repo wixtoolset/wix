@@ -25,6 +25,9 @@ void RelatedBundlesSortDetect(
 void RelatedBundlesSortPlan(
     __in BURN_RELATED_BUNDLES* pRelatedBundles
     );
+BOOTSTRAPPER_RELATION_TYPE RelatedBundleConvertRelationType(
+    __in BUNDLE_RELATION_TYPE relationType
+    );
 
 #if defined(__cplusplus)
 }

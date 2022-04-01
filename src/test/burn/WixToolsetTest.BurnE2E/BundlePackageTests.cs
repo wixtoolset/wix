@@ -45,7 +45,37 @@ namespace WixToolsetTest.BurnE2E
             // Source file should *not* be installed
             Assert.False(File.Exists(packageA32SourceCodeFilePath), $"PackageA payload should have been removed by uninstall from: {packageA32SourceCodeFilePath}");
             Assert.False(File.Exists(packageA64SourceCodeFilePath), $"PackageA_x64 payload should have been removed by uninstall from: {packageA64SourceCodeFilePath}");
+        }
 
+        [Fact]
+        public void CanInstallUpgradeBundlePackage()
+        {
+            var bundleAv1 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv1");
+            var bundleAv2 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv2");
+            var upgradeBundlePackageBundlev2 = this.CreateBundleInstaller("UpgradeBundlePackageBundlev2");
+
+            bundleAv1.Install();
+            bundleAv1.VerifyRegisteredAndInPackageCache();
+
+            upgradeBundlePackageBundlev2.Install();
+            upgradeBundlePackageBundlev2.VerifyRegisteredAndInPackageCache();
+            bundleAv2.VerifyRegisteredAndInPackageCache();
+            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
+
+        [Fact]
+        public void CanSkipObsoleteBundlePackage()
+        {
+            var bundleAv1 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv1");
+            var bundleAv2 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv2");
+            var upgradeBundlePackageBundlev1 = this.CreateBundleInstaller("UpgradeBundlePackageBundlev1");
+
+            bundleAv2.Install();
+            bundleAv2.VerifyRegisteredAndInPackageCache();
+
+            upgradeBundlePackageBundlev1.Install();
+            upgradeBundlePackageBundlev1.VerifyUnregisteredAndRemovedFromPackageCache();
+            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
         }
     }
 }

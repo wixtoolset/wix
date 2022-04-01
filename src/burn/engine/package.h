@@ -303,14 +303,23 @@ typedef struct _BURN_PACKAGE
         struct
         {
             LPWSTR sczBundleId;
+            VERUTIL_VERSION* pVersion;
             LPWSTR sczRegistrationKey;
             LPWSTR sczInstallArguments;
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
 
-            LPWSTR sczIgnoreDependencies;
-            LPCWSTR wzAncestors; // points directly into engine state.
-            LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
+            LPWSTR* rgsczDetectCodes;
+            DWORD cDetectCodes;
+
+            LPWSTR* rgsczUpgradeCodes;
+            DWORD cUpgradeCodes;
+
+            LPWSTR* rgsczAddonCodes;
+            DWORD cAddonCodes;
+
+            LPWSTR* rgsczPatchCodes;
+            DWORD cPatchCodes;
 
             BOOL fWin64;
             BOOL fSupportsBurnProtocol;
@@ -320,6 +329,10 @@ typedef struct _BURN_PACKAGE
 
             BURN_EXE_COMMAND_LINE_ARGUMENT* rgCommandLineArguments;
             DWORD cCommandLineArguments;
+
+            LPWSTR sczIgnoreDependencies;
+            LPCWSTR wzAncestors; // points directly into engine state.
+            LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
         } Bundle;
         struct
         {

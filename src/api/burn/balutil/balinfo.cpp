@@ -433,7 +433,11 @@ static HRESULT ParsePackagesFromXml(
         hr = XmlGetAttributeEx(pNode, L"PackageType", &scz);
         ExitOnFailure(hr, "Failed to get package type for package.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Exe", -1, scz, -1))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Bundle", -1, scz, -1))
+        {
+            prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_BUNDLE_CHAIN;
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Exe", -1, scz, -1))
         {
             prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_EXE;
         }

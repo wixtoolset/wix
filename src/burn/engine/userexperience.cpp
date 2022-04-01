@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 17, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 31, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -1237,6 +1237,40 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectRelatedBundle failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnDetectRelatedBundlePackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzBundleId,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BOOL fPerMachine,
+    __in VERUTIL_VERSION* pVersion
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS args = { };
+    BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.wzBundleId = wzBundleId;
+    args.relationType = relationType;
+    args.fPerMachine = fPerMachine;
+    args.wzVersion = pVersion->sczVersion;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE, &args, &results);
+    ExitOnFailure(hr, "BA OnDetectRelatedBundlePackage failed.");
 
     if (results.fCancel)
     {

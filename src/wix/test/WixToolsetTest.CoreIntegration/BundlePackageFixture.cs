@@ -95,7 +95,11 @@ namespace WixToolsetTest.CoreIntegration
                                                   .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    $"<BundlePackage Id='chain.exe' Cache='keep' CacheId='{chainBundleId}v1.0.0.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' BundleId='{chainBundleId}' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'><Provides Key='MyProviderKey,v1.0' Version='1.0.0.0' DisplayName='BurnBundle' Imported='yes' /><PayloadRef Id='chain.exe' /></BundlePackage>",
+                    $"<BundlePackage Id='chain.exe' Cache='keep' CacheId='{chainBundleId}v1.0.0.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' BundleId='{chainBundleId}' Version='1.0.0.0' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
+                    "<Provides Key='MyProviderKey,v1.0' Version='1.0.0.0' DisplayName='BurnBundle' Imported='yes' />" +
+                    "<RelatedBundle Id='{B94478B1-E1F3-4700-9CE8-6AA090854AEC}' Action='Upgrade' />" +
+                    "<PayloadRef Id='chain.exe' />" +
+                    "</BundlePackage>",
                 }, bundlePackages);
 
                 var registrations = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration")
@@ -108,6 +112,19 @@ namespace WixToolsetTest.CoreIntegration
                     "<Arp Register='yes' DisplayName='BundlePackageBundle' DisplayVersion='1.0.1.0' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
+
+                ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixPackageProperties", new List<string> { "DownloadSize", "PackageSize" } },
+                };
+                var packageElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties")
+                                                   .Cast<XmlElement>()
+                                                   .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                                   .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixPackageProperties Package='chain.exe' Vital='yes' DisplayName='BurnBundle' Description='BurnBundle' DownloadSize='*' PackageSize='*' InstalledSize='34' PackageType='Bundle' Permanent='no' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' Compressed='yes' Version='1.0.0.0' Cache='keep' />",
+                }, packageElements);
             }
         }
     }

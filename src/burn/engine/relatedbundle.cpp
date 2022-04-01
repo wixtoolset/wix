@@ -143,6 +143,30 @@ extern "C" void RelatedBundlesSortPlan(
     qsort_s(pRelatedBundles->rgpPlanSortedRelatedBundles, pRelatedBundles->cRelatedBundles, sizeof(BURN_RELATED_BUNDLE*), CompareRelatedBundlesPlan, NULL);
 }
 
+extern "C" BOOTSTRAPPER_RELATION_TYPE RelatedBundleConvertRelationType(
+    __in BUNDLE_RELATION_TYPE relationType
+    )
+{
+    switch (relationType)
+    {
+    case BUNDLE_RELATION_DETECT:
+        return BOOTSTRAPPER_RELATION_DETECT;
+    case BUNDLE_RELATION_UPGRADE:
+        return BOOTSTRAPPER_RELATION_UPGRADE;
+    case BUNDLE_RELATION_ADDON:
+        return BOOTSTRAPPER_RELATION_ADDON;
+    case BUNDLE_RELATION_PATCH:
+        return BOOTSTRAPPER_RELATION_PATCH;
+    case BUNDLE_RELATION_DEPENDENT_ADDON:
+        return BOOTSTRAPPER_RELATION_DEPENDENT_ADDON;
+    case BUNDLE_RELATION_DEPENDENT_PATCH:
+        return BOOTSTRAPPER_RELATION_DEPENDENT_PATCH;
+    default:
+        AssertSz(BUNDLE_RELATION_NONE == relationType, "Unknown BUNDLE_RELATION_TYPE");
+        return BOOTSTRAPPER_RELATION_NONE;
+    }
+}
+
 
 // internal helper functions
 
@@ -248,30 +272,6 @@ LExit:
     return result;
 }
 
-static BOOTSTRAPPER_RELATION_TYPE ConvertRelationType(
-    __in BUNDLE_RELATION_TYPE relationType
-    )
-{
-    switch (relationType)
-    {
-    case BUNDLE_RELATION_DETECT:
-        return BOOTSTRAPPER_RELATION_DETECT;
-    case BUNDLE_RELATION_UPGRADE:
-        return BOOTSTRAPPER_RELATION_UPGRADE;
-    case BUNDLE_RELATION_ADDON:
-        return BOOTSTRAPPER_RELATION_ADDON;
-    case BUNDLE_RELATION_PATCH:
-        return BOOTSTRAPPER_RELATION_PATCH;
-    case BUNDLE_RELATION_DEPENDENT_ADDON:
-        return BOOTSTRAPPER_RELATION_DEPENDENT_ADDON;
-    case BUNDLE_RELATION_DEPENDENT_PATCH:
-        return BOOTSTRAPPER_RELATION_DEPENDENT_PATCH;
-    default:
-        AssertSz(BUNDLE_RELATION_NONE == relationType, "Unknown BUNDLE_RELATION_TYPE");
-        return BOOTSTRAPPER_RELATION_NONE;
-    }
-}
-
 static HRESULT LoadIfRelatedBundle(
     __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
     __in BURN_REGISTRATION* pRegistration,
@@ -280,7 +280,7 @@ static HRESULT LoadIfRelatedBundle(
 {
     HRESULT hr = S_OK;
     BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
-    BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pBundle->relationType);
+    BOOTSTRAPPER_RELATION_TYPE relationType = RelatedBundleConvertRelationType(pBundle->relationType);
     BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
 
     // If we found our bundle id, it's not a related bundle.

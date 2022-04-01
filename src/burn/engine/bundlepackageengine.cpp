@@ -2,6 +2,18 @@
 
 #include "precomp.h"
 
+typedef struct _BUNDLE_QUERY_CONTEXT
+{
+    BURN_PACKAGE* pPackage;
+    BURN_USER_EXPERIENCE* pUserExperience;
+    BOOL fSelfFound;
+    BOOL fNewerFound;
+} BUNDLE_QUERY_CONTEXT;
+
+static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
+    __in_opt LPVOID pvContext
+    );
 static HRESULT ExecuteBundle(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
@@ -35,6 +47,18 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     hr = XmlGetAttributeEx(pixnBundlePackage, L"BundleId", &pPackage->Bundle.sczBundleId);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @BundleId.");
 
+    // @Version
+    hr = XmlGetAttributeEx(pixnBundlePackage, L"Version", &scz);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Version.");
+
+    hr = VerParseVersion(scz, 0, FALSE, &pPackage->Bundle.pVersion);
+    ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
+
+    if (pPackage->Bundle.pVersion->fInvalid)
+    {
+        LogId(REPORT_WARNING, MSG_MANIFEST_INVALID_VERSION, scz);
+    }
+
     // @InstallArguments
     hr = XmlGetAttributeEx(pixnBundlePackage, L"InstallArguments", &pPackage->Bundle.sczInstallArguments);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallArguments.");
@@ -55,6 +79,9 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     hr = XmlGetYesNoAttribute(pixnBundlePackage, L"Win64", &pPackage->Bundle.fWin64);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Win64.");
 
+    hr = BundlePackageEngineParseRelatedCodes(pixnBundlePackage, &pPackage->Bundle.rgsczDetectCodes, &pPackage->Bundle.cDetectCodes, &pPackage->Bundle.rgsczUpgradeCodes, &pPackage->Bundle.cUpgradeCodes, &pPackage->Bundle.rgsczAddonCodes, &pPackage->Bundle.cAddonCodes, &pPackage->Bundle.rgsczPatchCodes, &pPackage->Bundle.cPatchCodes);
+    ExitOnFailure(hr, "Failed to parse related codes.");
+
     hr = ExeEngineParseExitCodesFromXml(pixnBundlePackage, &pPackage->Bundle.rgExitCodes, &pPackage->Bundle.cExitCodes);
     ExitOnFailure(hr, "Failed to parse exit codes.");
 
@@ -70,11 +97,101 @@ LExit:
     return hr;
 }
 
+
+extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
+    __in IXMLDOMNode* pixnBundle,
+    __in LPWSTR** prgsczDetectCodes,
+    __in DWORD* pcDetectCodes,
+    __in LPWSTR** prgsczUpgradeCodes,
+    __in DWORD* pcUpgradeCodes,
+    __in LPWSTR** prgsczAddonCodes,
+    __in DWORD* pcAddonCodes,
+    __in LPWSTR** prgsczPatchCodes,
+    __in DWORD* pcPatchCodes
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMNodeList* pixnNodes = NULL;
+    IXMLDOMNode* pixnElement = NULL;
+    LPWSTR sczAction = NULL;
+    LPWSTR sczId = NULL;
+    DWORD cElements = 0;
+
+    hr = XmlSelectNodes(pixnBundle, L"RelatedBundle", &pixnNodes);
+    ExitOnFailure(hr, "Failed to get RelatedBundle nodes");
+
+    hr = pixnNodes->get_length((long*)&cElements);
+    ExitOnFailure(hr, "Failed to get RelatedBundle element count.");
+
+    for (DWORD i = 0; i < cElements; ++i)
+    {
+        hr = XmlNextElement(pixnNodes, &pixnElement, NULL);
+        ExitOnFailure(hr, "Failed to get next RelatedBundle element.");
+
+        hr = XmlGetAttributeEx(pixnElement, L"Action", &sczAction);
+        ExitOnFailure(hr, "Failed to get @Action.");
+
+        hr = XmlGetAttributeEx(pixnElement, L"Id", &sczId);
+        ExitOnFailure(hr, "Failed to get @Id.");
+
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Detect", -1))
+        {
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczDetectCodes), *pcDetectCodes, 1, sizeof(LPWSTR), 5);
+            ExitOnFailure(hr, "Failed to resize Detect code array");
+
+            *prgsczDetectCodes[*pcDetectCodes] = sczId;
+            sczId = NULL;
+            *pcDetectCodes += 1;
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Upgrade", -1))
+        {
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczUpgradeCodes), *pcUpgradeCodes, 1, sizeof(LPWSTR), 5);
+            ExitOnFailure(hr, "Failed to resize Upgrade code array");
+
+            *prgsczUpgradeCodes[*pcUpgradeCodes] = sczId;
+            sczId = NULL;
+            *pcUpgradeCodes += 1;
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Addon", -1))
+        {
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczAddonCodes), *pcAddonCodes, 1, sizeof(LPWSTR), 5);
+            ExitOnFailure(hr, "Failed to resize Addon code array");
+
+            *prgsczAddonCodes[*pcAddonCodes] = sczId;
+            sczId = NULL;
+            *pcAddonCodes += 1;
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Patch", -1))
+        {
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczPatchCodes), *pcPatchCodes, 1, sizeof(LPWSTR), 5);
+            ExitOnFailure(hr, "Failed to resize Patch code array");
+
+            *prgsczPatchCodes[*pcPatchCodes] = sczId;
+            sczId = NULL;
+            *pcPatchCodes += 1;
+        }
+        else
+        {
+            hr = E_INVALIDARG;
+            ExitOnFailure(hr, "Invalid value for @Action: %ls", sczAction);
+        }
+    }
+
+LExit:
+    ReleaseObject(pixnNodes);
+    ReleaseObject(pixnElement);
+    ReleaseStr(sczAction);
+    ReleaseStr(sczId);
+
+    return hr;
+}
+
 extern "C" void BundlePackageEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     )
 {
     ReleaseStr(pPackage->Bundle.sczBundleId);
+    ReleaseVerutilVersion(pPackage->Bundle.pVersion);
     ReleaseStr(pPackage->Bundle.sczRegistrationKey);
     ReleaseStr(pPackage->Bundle.sczInstallArguments);
     ReleaseStr(pPackage->Bundle.sczRepairArguments);
@@ -92,45 +209,95 @@ extern "C" void BundlePackageEnginePackageUninitialize(
         MemFree(pPackage->Bundle.rgCommandLineArguments);
     }
 
+    for (DWORD i = 0; i < pPackage->Bundle.cDetectCodes; ++i)
+    {
+        ReleaseStr(pPackage->Bundle.rgsczDetectCodes[i]);
+    }
+    ReleaseMem(pPackage->Bundle.rgsczDetectCodes);
+
+    for (DWORD i = 0; i < pPackage->Bundle.cUpgradeCodes; ++i)
+    {
+        ReleaseStr(pPackage->Bundle.rgsczUpgradeCodes[i]);
+    }
+    ReleaseMem(pPackage->Bundle.rgsczUpgradeCodes);
+
+    for (DWORD i = 0; i < pPackage->Bundle.cAddonCodes; ++i)
+    {
+        ReleaseStr(pPackage->Bundle.rgsczAddonCodes[i]);
+    }
+    ReleaseMem(pPackage->Bundle.rgsczAddonCodes);
+
+    for (DWORD i = 0; i < pPackage->Bundle.cPatchCodes; ++i)
+    {
+        ReleaseStr(pPackage->Bundle.rgsczPatchCodes[i]);
+    }
+    ReleaseMem(pPackage->Bundle.rgsczPatchCodes);
+
     // clear struct
     memset(&pPackage->Bundle, 0, sizeof(pPackage->Bundle));
 }
 
 extern "C" HRESULT BundlePackageEngineDetectPackage(
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_REGISTRATION* /*pRegistration*/,
+    __in BURN_USER_EXPERIENCE* pUserExperience
     )
 {
     HRESULT hr = S_OK;
-    HKEY hkRegistration = NULL;
-    DWORD dwInstalled = 0;
-    BOOL fDetected = FALSE;
-    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-    REG_KEY_BITNESS bitness = pPackage->Bundle.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT;
+    BUNDLE_QUERY_CONTEXT queryContext = { };
 
-    // TODO: detect all related bundles, so that the Obsolete state can be detected.
-    hr = RegOpenEx(hkRoot, pPackage->Bundle.sczRegistrationKey, KEY_QUERY_VALUE, bitness, &hkRegistration);
-    if (SUCCEEDED(hr))
+    queryContext.pPackage = pPackage;
+    queryContext.pUserExperience = pUserExperience;
+
+    hr = BundleQueryRelatedBundles(
+        BUNDLE_INSTALL_CONTEXT_MACHINE,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczDetectCodes),
+        pPackage->Bundle.cDetectCodes,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczUpgradeCodes),
+        pPackage->Bundle.cUpgradeCodes,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczAddonCodes),
+        pPackage->Bundle.cAddonCodes,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczPatchCodes),
+        pPackage->Bundle.cPatchCodes,
+        QueryRelatedBundlesCallback,
+        &queryContext);
+    ExitOnFailure(hr, "Failed to query per-machine related bundle packages.");
+
+    hr = BundleQueryRelatedBundles(
+        BUNDLE_INSTALL_CONTEXT_USER,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczDetectCodes),
+        pPackage->Bundle.cDetectCodes,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczUpgradeCodes),
+        pPackage->Bundle.cUpgradeCodes,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczAddonCodes),
+        pPackage->Bundle.cAddonCodes,
+        const_cast<LPCWSTR*>(pPackage->Bundle.rgsczPatchCodes),
+        pPackage->Bundle.cPatchCodes,
+        QueryRelatedBundlesCallback,
+        &queryContext);
+    ExitOnFailure(hr, "Failed to query per-user related bundle packages.");
+
+    if (queryContext.fNewerFound)
     {
-        hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, &dwInstalled);
+        pPackage->currentState = queryContext.fSelfFound ? BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED : BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE;
     }
-
-    // Not finding the key or value is okay.
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    else
     {
-        hr = S_OK;
+        pPackage->currentState = queryContext.fSelfFound ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
     }
-
-    fDetected = (1 == dwInstalled);
-
-    // update detect state
-    pPackage->currentState = fDetected ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
 
     if (pPackage->fCanAffectRegistration)
     {
         pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
 
-    ReleaseRegKey(hkRegistration);
+    // TODO: The bundle is registering itself as a dependent when installed as a chain package, which prevents us from uninstalling it.
+    //hr = DependencyDetectChainPackage(pPackage, pRegistration);
+    //ExitOnFailure(hr, "Failed to detect dependencies for BUNDLE package.");
+
+    // TODO: uninstalling compatible Bundles like MsiEngine supports?
+
+LExit:
     return hr;
 }
 
@@ -148,7 +315,8 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
     // execute action
     switch (pPackage->currentState)
     {
-    case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
+    case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
+    case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT:
@@ -173,6 +341,7 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
         }
         break;
 
+    case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
     case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
         switch (pPackage->requested)
         {
@@ -200,7 +369,8 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
     {
         switch (pPackage->currentState)
         {
-        case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
+        case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
             switch (pPackage->requested)
             {
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
@@ -218,6 +388,7 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
             }
             break;
 
+        case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
             switch (pPackage->requested)
             {
@@ -479,6 +650,66 @@ extern "C" void BundlePackageEngineUpdateInstallRegistrationState(
 
 LExit:
     return;
+}
+
+static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
+    __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
+    __in_opt LPVOID pvContext
+    )
+{
+    HRESULT hr = S_OK;
+    BUNDLE_QUERY_CALLBACK_RESULT result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
+    LPWSTR sczBundleVersion = NULL;
+    VERUTIL_VERSION* pVersion = NULL;
+    int nCompare = 0;
+    BUNDLE_QUERY_CONTEXT* pContext = reinterpret_cast<BUNDLE_QUERY_CONTEXT*>(pvContext);
+    BURN_PACKAGE* pPackage = pContext->pPackage;
+    BOOTSTRAPPER_RELATION_TYPE relationType = RelatedBundleConvertRelationType(pBundle->relationType);
+    BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
+
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleId, -1, pPackage->Bundle.sczBundleId, -1))
+    {
+        Assert(BOOTSTRAPPER_RELATION_UPGRADE == relationType);
+        Assert(pPackage->Bundle.fWin64 == (REG_KEY_64BIT == pBundle->regBitness));
+
+        pContext->fSelfFound = TRUE;
+    }
+
+    hr = RegReadString(pBundle->hkBundle, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, &sczBundleVersion);
+    ExitOnFailure(hr, "Failed to read version from registry for related bundle package: %ls", pBundle->wzBundleId);
+
+    hr = VerParseVersion(sczBundleVersion, 0, FALSE, &pVersion);
+    ExitOnFailure(hr, "Failed to parse related bundle package version: %ls", sczBundleVersion);
+
+    if (pVersion->fInvalid)
+    {
+        LogId(REPORT_WARNING, MSG_RELATED_PACKAGE_INVALID_VERSION, pBundle->wzBundleId, sczBundleVersion);
+    }
+
+    if (BOOTSTRAPPER_RELATION_UPGRADE == relationType)
+    {
+        hr = VerCompareParsedVersions(pPackage->Bundle.pVersion, pVersion, &nCompare);
+        ExitOnFailure(hr, "Failed to compare related bundle package version: %ls", pVersion->sczVersion);
+
+        if (nCompare < 0)
+        {
+            pContext->fNewerFound = TRUE;
+        }
+    }
+
+    result = BUNDLE_QUERY_CALLBACK_RESULT_CANCEL;
+
+    // Pass to BA.
+    hr = UserExperienceOnDetectRelatedBundlePackage(pContext->pUserExperience, pPackage->sczId, pBundle->wzBundleId, relationType, fPerMachine, pVersion);
+    ExitOnRootFailure(hr, "BA aborted detect related BUNDLE package.");
+
+    result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
+
+LExit:
+    ReleaseVerutilVersion(pVersion);
+    ReleaseStr(sczBundleVersion);
+
+    return result;
 }
 
 static HRESULT ExecuteBundle(

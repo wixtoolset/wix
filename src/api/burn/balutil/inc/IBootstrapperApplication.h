@@ -723,4 +723,14 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation,
         __inout BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION* pAction
         ) = 0;
+
+    // OnDetectRelatedBundlePackage - called when the engine detects a related bundle for a BundlePackage.
+    STDMETHOD(OnDetectRelatedBundlePackage)(
+        __in_z LPCWSTR wzPackageId,
+        __in_z LPCWSTR wzBundleId,
+        __in BOOTSTRAPPER_RELATION_TYPE relationType,
+        __in BOOL fPerMachine,
+        __in_z LPCWSTR wzVersion,
+        __inout BOOL* pfCancel
+        ) = 0;
 };

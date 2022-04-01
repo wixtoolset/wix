@@ -82,6 +82,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundlePackageCommandLine:
                     case SymbolDefinitionType.WixBundlePackageExitCode:
                     case SymbolDefinitionType.WixBundlePackageGroup:
+                    case SymbolDefinitionType.WixBundlePackageRelatedBundle:
                     case SymbolDefinitionType.WixBundlePatchTargetCode:
                     case SymbolDefinitionType.WixBundlePayload:
                     case SymbolDefinitionType.WixBundlePayloadGroup:
