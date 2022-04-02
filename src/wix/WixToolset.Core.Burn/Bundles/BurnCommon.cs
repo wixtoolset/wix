@@ -58,11 +58,32 @@ namespace WixToolset.Core.Burn.Bundles
         protected const uint IMAGE_NT_SIGNATURE = 0x00004550;
         protected const ulong IMAGE_SECTION_WIXBURN_NAME = 0x6E7275627869772E; // ".wixburn", as a qword.
 
+        public const ushort IMAGE_FILE_MACHINE_AM33 = 0x1D3;
         public const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
         public const ushort IMAGE_FILE_MACHINE_ARM = 0x1C0;
         public const ushort IMAGE_FILE_MACHINE_ARM64 = 0xAA64;
         public const ushort IMAGE_FILE_MACHINE_ARMNT = 0x1C4;
+        public const ushort IMAGE_FILE_MACHINE_EBC = 0xEBC;
         public const ushort IMAGE_FILE_MACHINE_I386 = 0x14C;
+        public const ushort IMAGE_FILE_MACHINE_IA64 = 0x200;
+        public const ushort IMAGE_FILE_MACHINE_LOONGARCH32 = 0x6232;
+        public const ushort IMAGE_FILE_MACHINE_LOONGARCH64 = 0x6264;
+        public const ushort IMAGE_FILE_MACHINE_M32R = 0x9041;
+        public const ushort IMAGE_FILE_MACHINE_MIPS16 = 0x266;
+        public const ushort IMAGE_FILE_MACHINE_MIPSFPU = 0x366;
+        public const ushort IMAGE_FILE_MACHINE_MIPSFPU16 = 0x466;
+        public const ushort IMAGE_FILE_MACHINE_POWERPC = 0x1F0;
+        public const ushort IMAGE_FILE_MACHINE_POWERPCFP = 0x1F1;
+        public const ushort IMAGE_FILE_MACHINE_R4000 = 0x166;
+        public const ushort IMAGE_FILE_MACHINE_RISCV32 = 0x5032;
+        public const ushort IMAGE_FILE_MACHINE_RISCV64 = 0x5064;
+        public const ushort IMAGE_FILE_MACHINE_RISCV128 = 0x5128;
+        public const ushort IMAGE_FILE_MACHINE_SH3 = 0x1A2;
+        public const ushort IMAGE_FILE_MACHINE_SH3DSP = 0x1A3;
+        public const ushort IMAGE_FILE_MACHINE_SH4 = 0x1A6;
+        public const ushort IMAGE_FILE_MACHINE_SH5 = 0x1A8;
+        public const ushort IMAGE_FILE_MACHINE_THUMB = 0x1C2;
+        public const ushort IMAGE_FILE_MACHINE_WCEMIPSV2 = 0x169;
 
         // The ".wixburn" section contains:
         //    0- 3:  magic number
