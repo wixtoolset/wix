@@ -102,7 +102,7 @@ namespace WixToolset.Core.Burn.Bundles
             var document = new XmlDocument();
             document.Load(manifestPath);
             var namespaceManager = new XmlNamespaceManager(document.NameTable);
-            namespaceManager.AddNamespace("burn", BurnCommon.BurnNamespace);
+            namespaceManager.AddNamespace("burn", document.DocumentElement.NamespaceURI);
             var uxPayloads = document.SelectNodes("/burn:BurnManifest/burn:UX/burn:Payload", namespaceManager);
             var payloads = document.SelectNodes("/burn:BurnManifest/burn:Payload", namespaceManager);
 

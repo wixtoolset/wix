@@ -3,6 +3,7 @@
 namespace WixToolsetTest.BurnE2E
 {
     using System.IO;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -61,6 +62,17 @@ namespace WixToolsetTest.BurnE2E
             upgradeBundlePackageBundlev2.VerifyRegisteredAndInPackageCache();
             bundleAv2.VerifyRegisteredAndInPackageCache();
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
+
+        [Fact]
+        public void CanInstallV3BundlePackage()
+        {
+            var v3BundlePackageBundle = this.CreateBundleInstaller("V3BundlePackageBundle");
+
+            var logPath = v3BundlePackageBundle.Install();
+            v3BundlePackageBundle.VerifyRegisteredAndInPackageCache();
+
+            Assert.True(LogVerifier.MessageInLogFile(logPath, "Applied execute package: v3bundle.exe, result: 0x0, restart: None"));
         }
 
         [Fact]

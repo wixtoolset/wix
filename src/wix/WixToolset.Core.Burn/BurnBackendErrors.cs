@@ -85,6 +85,11 @@ namespace WixToolset.Core.Burn
             return Message(null, Ids.UnsupportedRemotePackagePayload, "The first remote payload must be a supported package type of .exe or .msu. Use the -packageType switch to override the inferred extension: {0} from file: {1}", extension, path);
         }
 
+        public static Message InvalidBundleManifest(SourceLineNumber sourceLineNumbers, string bundleExecutable, string reason)
+        {
+            return Message(sourceLineNumbers, Ids.InvalidBundleManifest, "Unable to harvest bundle executable '{0}'. The manifest was invalid. {1}", bundleExecutable, reason);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -104,6 +109,7 @@ namespace WixToolset.Core.Burn
             IncompatibleWixBurnSection = 8009,
             UnsupportedRemotePackagePayload = 8010,
             FailedToAddIconOrSplashScreenToBundle = 8011,
+            InvalidBundleManifest = 8012,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }

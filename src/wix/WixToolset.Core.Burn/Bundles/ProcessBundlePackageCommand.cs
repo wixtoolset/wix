@@ -71,16 +71,37 @@ namespace WixToolset.Core.Burn.Bundles
 
                 switch (burnReader.MachineType)
                 {
+                    case BurnCommon.IMAGE_FILE_MACHINE_AM33:
                     case BurnCommon.IMAGE_FILE_MACHINE_ARM:
                     case BurnCommon.IMAGE_FILE_MACHINE_ARMNT:
                     case BurnCommon.IMAGE_FILE_MACHINE_I386:
+                    case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH32:
+                    case BurnCommon.IMAGE_FILE_MACHINE_M32R:
                         break;
                     case BurnCommon.IMAGE_FILE_MACHINE_AMD64:
                     case BurnCommon.IMAGE_FILE_MACHINE_ARM64:
+                    case BurnCommon.IMAGE_FILE_MACHINE_IA64:
+                    case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH64:
                         bundlePackage.Win64 = true;
                         break;
+                    case BurnCommon.IMAGE_FILE_MACHINE_EBC:
+                    case BurnCommon.IMAGE_FILE_MACHINE_MIPS16:
+                    case BurnCommon.IMAGE_FILE_MACHINE_MIPSFPU:
+                    case BurnCommon.IMAGE_FILE_MACHINE_MIPSFPU16:
+                    case BurnCommon.IMAGE_FILE_MACHINE_POWERPC:
+                    case BurnCommon.IMAGE_FILE_MACHINE_POWERPCFP:
+                    case BurnCommon.IMAGE_FILE_MACHINE_R4000:
+                    case BurnCommon.IMAGE_FILE_MACHINE_RISCV32:
+                    case BurnCommon.IMAGE_FILE_MACHINE_RISCV64:
+                    case BurnCommon.IMAGE_FILE_MACHINE_RISCV128:
+                    case BurnCommon.IMAGE_FILE_MACHINE_SH3:
+                    case BurnCommon.IMAGE_FILE_MACHINE_SH3DSP:
+                    case BurnCommon.IMAGE_FILE_MACHINE_SH4:
+                    case BurnCommon.IMAGE_FILE_MACHINE_SH5:
+                    case BurnCommon.IMAGE_FILE_MACHINE_THUMB:
+                    case BurnCommon.IMAGE_FILE_MACHINE_WCEMIPSV2:
                     default:
-                        Debug.Assert(false, "Unknown machine type");
+                        this.Messaging.Write(BurnBackendWarnings.UnknownCoffMachineType(packagePayload.SourceLineNumbers, sourcePath, burnReader.MachineType));
                         break;
                 }
 
@@ -90,46 +111,60 @@ namespace WixToolset.Core.Burn.Bundles
                 // This should be a safe assumption since we will need to add the protocol version to the section to support this harvesting.
                 bundlePackage.SupportsBurnProtocol = burnReader.Version == 2;
 
-                var document = new XmlDocument();
-                document.Load(Path.Combine(baFolderPath, "manifest.xml"));
-                var namespaceManager = new XmlNamespaceManager(document.NameTable);
-                namespaceManager.AddNamespace("burn", BurnCommon.BurnNamespace); // TODO: support v3 bundles
-                var registrationElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration", namespaceManager) as XmlElement;
-                var arpElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration/burn:Arp", namespaceManager) as XmlElement;
-
-                var perMachine = registrationElement.GetAttribute("PerMachine") == "yes";
-                this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
-
-                var version = registrationElement.GetAttribute("Version");
-                packagePayload.Version = version;
-                bundlePackage.Version = version;
-                this.Facade.PackageSymbol.Version = version;
-
-                if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
+                try
                 {
-                    this.Facade.PackageSymbol.CacheId = String.Format("{0}v{1}", bundlePackage.BundleId, version);
+                    var document = new XmlDocument();
+                    document.Load(Path.Combine(baFolderPath, "manifest.xml"));
+                    var namespaceManager = new XmlNamespaceManager(document.NameTable);
+
+                    if (document.DocumentElement.LocalName != "BurnManifest")
+                    {
+                        this.Messaging.Write(BurnBackendErrors.InvalidBundleManifest(packagePayload.SourceLineNumbers, sourcePath, $"Expected root element to be 'Manifest' but was '{document.DocumentElement.LocalName}'."));
+                        return;
+                    }
+
+                    namespaceManager.AddNamespace("burn", document.DocumentElement.NamespaceURI);
+                    var registrationElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration", namespaceManager) as XmlElement;
+                    var arpElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration/burn:Arp", namespaceManager) as XmlElement;
+
+                    var perMachine = registrationElement.GetAttribute("PerMachine") == "yes";
+                    this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
+
+                    var version = registrationElement.GetAttribute("Version");
+                    packagePayload.Version = version;
+                    bundlePackage.Version = version;
+                    this.Facade.PackageSymbol.Version = version;
+
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
+                    {
+                        this.Facade.PackageSymbol.CacheId = String.Format("{0}v{1}", bundlePackage.BundleId, version);
+                    }
+
+                    var providerKey = registrationElement.GetAttribute("ProviderKey");
+                    var depId = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", bundlePackage.Id.Id, providerKey));
+                    this.Section.AddSymbol(new WixDependencyProviderSymbol(packagePayload.SourceLineNumbers, depId)
+                    {
+                        ParentRef = bundlePackage.Id.Id,
+                        ProviderKey = providerKey,
+                        Version = version,
+                        Attributes = WixDependencyProviderAttributes.ProvidesAttributesImported,
+                    });
+
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
+                    {
+                        this.Facade.PackageSymbol.DisplayName = arpElement.GetAttribute("DisplayName");
+                    }
+
+                    this.ProcessPackages(document, namespaceManager);
+
+                    this.ProcessRelatedBundles(document, namespaceManager, packagePayload, sourcePath);
+
+                    // TODO: Add payloads?
                 }
-
-                var providerKey = registrationElement.GetAttribute("ProviderKey");
-                var depId = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", bundlePackage.Id.Id, providerKey));
-                this.Section.AddSymbol(new WixDependencyProviderSymbol(packagePayload.SourceLineNumbers, depId)
+                catch (Exception e)
                 {
-                    ParentRef = bundlePackage.Id.Id,
-                    ProviderKey = providerKey,
-                    Version = version,
-                    Attributes = WixDependencyProviderAttributes.ProvidesAttributesImported,
-                });
-
-                if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
-                {
-                    this.Facade.PackageSymbol.DisplayName = arpElement.GetAttribute("DisplayName");
+                    this.Messaging.Write(BurnBackendErrors.InvalidBundleManifest(packagePayload.SourceLineNumbers, sourcePath, e.ToString()));
                 }
-
-                this.ProcessPackages(document, namespaceManager);
-
-                this.ProcessRelatedBundles(document, namespaceManager);
-
-                // TODO: Add payloads?
             }
         }
 
@@ -153,15 +188,16 @@ namespace WixToolset.Core.Burn.Bundles
             this.Facade.PackageSymbol.InstallSize = packageInstallSize;
         }
 
-        private void ProcessRelatedBundles(XmlDocument document, XmlNamespaceManager namespaceManager)
+        private void ProcessRelatedBundles(XmlDocument document, XmlNamespaceManager namespaceManager, WixBundlePayloadSymbol packagePayload, string sourcePath)
         {
             foreach (XmlElement relatedBundleElement in document.SelectNodes("/burn:BurnManifest/burn:RelatedBundle", namespaceManager))
             {
                 var id = relatedBundleElement.GetAttribute("Id");
+                var actionValue = relatedBundleElement.GetAttribute("Action");
 
-                if (!Enum.TryParse(relatedBundleElement.GetAttribute("Action"), out RelatedBundleActionType action))
+                if (!Enum.TryParse(actionValue, out RelatedBundleActionType action))
                 {
-                    // TODO: warning
+                    this.Messaging.Write(BurnBackendWarnings.UnknownBundleRelationAction(packagePayload.SourceLineNumbers, sourcePath, actionValue));
                     continue;
                 }
 
