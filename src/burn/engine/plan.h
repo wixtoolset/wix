@@ -165,6 +165,7 @@ typedef struct _BURN_EXECUTE_ACTION
         {
             BURN_PACKAGE* pPackage;
             BOOTSTRAPPER_ACTION_STATE action;
+            LPWSTR sczParent;
             LPWSTR sczIgnoreDependencies;
             LPWSTR sczAncestors;
             LPWSTR sczEngineWorkingDirectory;

@@ -23,6 +23,7 @@ static HRESULT ExecuteBundle(
     __in BOOTSTRAPPER_ACTION_STATE action,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BURN_PACKAGE* pPackage,
+    __in_z_opt LPCWSTR wzParent,
     __in_z_opt LPCWSTR wzIgnoreDependencies,
     __in_z_opt LPCWSTR wzAncestors,
     __in_z_opt LPCWSTR wzEngineWorkingDirectory,
@@ -239,7 +240,7 @@ extern "C" void BundlePackageEnginePackageUninitialize(
 
 extern "C" HRESULT BundlePackageEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
-    __in BURN_REGISTRATION* /*pRegistration*/,
+    __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience
     )
 {
@@ -291,9 +292,8 @@ extern "C" HRESULT BundlePackageEngineDetectPackage(
         pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
 
-    // TODO: The bundle is registering itself as a dependent when installed as a chain package, which prevents us from uninstalling it.
-    //hr = DependencyDetectChainPackage(pPackage, pRegistration);
-    //ExitOnFailure(hr, "Failed to detect dependencies for BUNDLE package.");
+    hr = DependencyDetectChainPackage(pPackage, pRegistration);
+    ExitOnFailure(hr, "Failed to detect dependencies for BUNDLE package.");
 
     // TODO: uninstalling compatible Bundles like MsiEngine supports?
 
@@ -447,6 +447,9 @@ extern "C" HRESULT BundlePackageEnginePlanAddPackage(
         pAction->bundlePackage.pPackage = pPackage;
         pAction->bundlePackage.action = pPackage->rollback;
 
+        hr = StrAllocString(&pAction->bundlePackage.sczParent, pPlan->wzBundleId, 0);
+        ExitOnFailure(hr, "Failed to allocate the parent.");
+
         if (pPackage->Bundle.wzAncestors)
         {
             hr = StrAllocString(&pAction->bundlePackage.sczAncestors, pPackage->Bundle.wzAncestors, 0);
@@ -474,6 +477,9 @@ extern "C" HRESULT BundlePackageEnginePlanAddPackage(
         pAction->type = BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE;
         pAction->bundlePackage.pPackage = pPackage;
         pAction->bundlePackage.action = pPackage->execute;
+
+        hr = StrAllocString(&pAction->bundlePackage.sczParent, pPlan->wzBundleId, 0);
+        ExitOnFailure(hr, "Failed to allocate the parent.");
 
         if (pPackage->Bundle.wzAncestors)
         {
@@ -597,13 +603,14 @@ extern "C" HRESULT BundlePackageEngineExecutePackage(
     )
 {
     BOOTSTRAPPER_ACTION_STATE action = pExecuteAction->bundlePackage.action;
+    LPCWSTR wzParent = pExecuteAction->bundlePackage.sczParent;
     LPCWSTR wzIgnoreDependencies = pExecuteAction->bundlePackage.sczIgnoreDependencies;
     LPCWSTR wzAncestors = pExecuteAction->bundlePackage.sczAncestors;
     LPCWSTR wzEngineWorkingDirectory = pExecuteAction->bundlePackage.sczEngineWorkingDirectory;
     BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
     BURN_PACKAGE* pPackage = pExecuteAction->bundlePackage.pPackage;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
@@ -617,6 +624,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     )
 {
     BOOTSTRAPPER_ACTION_STATE action = pExecuteAction->relatedBundle.action;
+    LPCWSTR wzParent = NULL;
     LPCWSTR wzIgnoreDependencies = pExecuteAction->relatedBundle.sczIgnoreDependencies;
     LPCWSTR wzAncestors = pExecuteAction->relatedBundle.sczAncestors;
     LPCWSTR wzEngineWorkingDirectory = pExecuteAction->relatedBundle.sczEngineWorkingDirectory;
@@ -624,7 +632,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" void BundlePackageEngineUpdateInstallRegistrationState(
@@ -721,6 +729,7 @@ static HRESULT ExecuteBundle(
     __in BOOTSTRAPPER_ACTION_STATE action,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BURN_PACKAGE* pPackage,
+    __in_z_opt LPCWSTR wzParent,
     __in_z_opt LPCWSTR wzIgnoreDependencies,
     __in_z_opt LPCWSTR wzAncestors,
     __in_z_opt LPCWSTR wzEngineWorkingDirectory,
@@ -846,6 +855,15 @@ static HRESULT ExecuteBundle(
     {
         hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls", wzRelationTypeCommandLine);
         ExitOnFailure(hr, "Failed to append relation type argument.");
+    }
+
+    if (wzParent)
+    {
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls", BURN_COMMANDLINE_SWITCH_PARENT);
+        ExitOnFailure(hr, "Failed to append the parent switch to the command line.");
+
+        hr = AppAppendCommandLineArgument(&sczBaseCommand, wzParent);
+        ExitOnFailure(hr, "Failed to append the parent to the command line.");
     }
 
     // Add the list of dependencies to ignore, if any, to the burn command line.

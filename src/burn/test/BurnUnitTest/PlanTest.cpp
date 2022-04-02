@@ -399,7 +399,7 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_INSTALL);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_INSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", registerActions1, 1);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -407,7 +407,7 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageB");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageB", BOOTSTRAPPER_ACTION_STATE_INSTALL);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageB", BOOTSTRAPPER_ACTION_STATE_INSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageB", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", registerActions1, 1);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -420,14 +420,14 @@ namespace Bootstrapper
             dwExecuteCheckpointId = 2;
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", unregisterActions1, 1);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             dwExecuteCheckpointId += 1; // cache checkpoints
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageB", BOOTSTRAPPER_ACTION_STATE_UNINSTALL);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageB", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageB", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", unregisterActions1, 1);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -2799,13 +2799,15 @@ namespace Bootstrapper
             __in BOOL fRollback,
             __in DWORD dwIndex,
             __in LPCWSTR wzPackageId,
-            __in BOOTSTRAPPER_ACTION_STATE action
+            __in BOOTSTRAPPER_ACTION_STATE action,
+            __in LPCWSTR wzParent
             )
         {
             BURN_EXECUTE_ACTION* pAction = ValidateExecuteActionExists(pPlan, fRollback, dwIndex);
             Assert::Equal<DWORD>(BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE, pAction->type);
             NativeAssert::StringEqual(wzPackageId, pAction->bundlePackage.pPackage->sczId);
             Assert::Equal<DWORD>(action, pAction->bundlePackage.action);
+            NativeAssert::StringEqual(wzParent, pAction->bundlePackage.sczParent);
             Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
 
