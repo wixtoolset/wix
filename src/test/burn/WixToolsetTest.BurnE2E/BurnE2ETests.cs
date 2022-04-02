@@ -22,6 +22,11 @@ namespace WixToolsetTest.BurnE2E
             false;
 #endif
 
+        protected void AddBundleInstaller(BundleInstaller installer)
+        {
+            this.Installers.Push(installer);
+        }
+
         protected BundleInstaller CreateBundleInstaller(string name)
         {
             var installer = new BundleInstaller(this.TestContext, name);

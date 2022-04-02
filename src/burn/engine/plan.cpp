@@ -291,6 +291,13 @@ extern "C" void PlanUninitializeExecuteAction(
         ReleaseStr(pExecuteAction->relatedBundle.sczEngineWorkingDirectory);
         break;
 
+    case BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE:
+        ReleaseStr(pExecuteAction->bundlePackage.sczParent);
+        ReleaseStr(pExecuteAction->bundlePackage.sczIgnoreDependencies);
+        ReleaseStr(pExecuteAction->bundlePackage.sczAncestors);
+        ReleaseStr(pExecuteAction->bundlePackage.sczEngineWorkingDirectory);
+        break;
+
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
         ReleaseStr(pExecuteAction->exePackage.sczAncestors);
         ReleaseStr(pExecuteAction->exePackage.sczEngineWorkingDirectory);

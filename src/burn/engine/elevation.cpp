@@ -949,6 +949,9 @@ extern "C" HRESULT ElevationExecuteBundlePackage(
     hr = BuffWriteNumber(&pbData, &cbData, fRollback);
     ExitOnFailure(hr, "Failed to write rollback.");
 
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.sczParent);
+    ExitOnFailure(hr, "Failed to write the parent to the message buffer.");
+
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.sczIgnoreDependencies);
     ExitOnFailure(hr, "Failed to write the list of dependencies to ignore to the message buffer.");
 
@@ -2929,13 +2932,16 @@ static HRESULT OnExecuteBundlePackage(
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
-    ExitOnFailure(hr, "Failed to read EXE package id.");
+    ExitOnFailure(hr, "Failed to read BUNDLE package id.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.bundlePackage.action);
     ExitOnFailure(hr, "Failed to read action.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRollback);
     ExitOnFailure(hr, "Failed to read rollback.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &executeAction.bundlePackage.sczParent);
+    ExitOnFailure(hr, "Failed to read the parent.");
 
     hr = BuffReadString(pbData, cbData, &iData, &sczIgnoreDependencies);
     ExitOnFailure(hr, "Failed to read the list of dependencies to ignore.");

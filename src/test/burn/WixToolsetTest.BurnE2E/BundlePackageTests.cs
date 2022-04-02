@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.BurnE2E
 {
+    using System;
     using System.IO;
     using WixTestTools;
     using Xunit;
@@ -67,7 +68,12 @@ namespace WixToolsetTest.BurnE2E
         [Fact]
         public void CanInstallV3BundlePackage()
         {
+            var v3BundleName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Package Cache", "{215a70db-ab35-48c7-be51-d66eaac87177}", "CustomV3Theme");
+            var v3Bundle = new BundleInstaller(this.TestContext, v3BundleName);
+            this.AddBundleInstaller(v3Bundle);
             var v3BundlePackageBundle = this.CreateBundleInstaller("V3BundlePackageBundle");
+
+            Assert.False(File.Exists(v3Bundle.Bundle), "v3bundle.exe was already installed");
 
             var logPath = v3BundlePackageBundle.Install();
             v3BundlePackageBundle.VerifyRegisteredAndInPackageCache();
