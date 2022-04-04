@@ -95,7 +95,7 @@ typedef struct _BURN_SOFTWARE_TAGS
 typedef struct _BURN_REGISTRATION
 {
     BOOL fPerMachine;
-    BOOL fRegisterArp;
+    BOOL fForceSystemComponent;
     BOOL fDisableResume;
     BOOL fCached;
     BOOTSTRAPPER_REGISTRATION_TYPE detectedRegistrationType;
@@ -140,7 +140,6 @@ typedef struct _BURN_REGISTRATION
     LPWSTR sczContact;
     //DWORD64 qwEstimatedSize; // TODO: size should come from disk cost calculation
     BURN_REGISTRATION_MODIFY_TYPE modify;
-    BOOL fNoRemoveDefined;
     BOOL fNoRemove;
 
     BURN_SOFTWARE_TAGS softwareTags;

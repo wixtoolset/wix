@@ -169,10 +169,6 @@ extern "C" HRESULT RegistrationParseFromXml(
 
     if (fFoundXml)
     {
-        // @Register
-        hr = XmlGetYesNoAttribute(pixnArpNode, L"Register", &pRegistration->fRegisterArp);
-        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Register.");
-
         // @DisplayName
         hr = XmlGetAttributeEx(pixnArpNode, L"DisplayName", &pRegistration->sczDisplayName);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DisplayName.");
@@ -247,7 +243,12 @@ extern "C" HRESULT RegistrationParseFromXml(
 
         // @DisableRemove
         hr = XmlGetYesNoAttribute(pixnArpNode, L"DisableRemove", &pRegistration->fNoRemove);
-        ExitOnOptionalXmlQueryFailure(hr, pRegistration->fNoRemoveDefined, "Failed to get @DisableRemove.");
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DisableRemove.");
+    }
+
+    if (pRegistration->fNoRemove && BURN_REGISTRATION_MODIFY_ENABLED != pRegistration->modify)
+    {
+        pRegistration->fForceSystemComponent = TRUE;
     }
 
     hr = ParseSoftwareTagsFromXml(pixnRegistrationNode, &pRegistration->softwareTags.rgSoftwareTags, &pRegistration->softwareTags.cSoftwareTags);
@@ -759,14 +760,14 @@ extern "C" HRESULT RegistrationSessionBegin(
     }
 
     // NoRemove: should this be allowed?
-    if (pRegistration->fNoRemoveDefined)
+    if (pRegistration->fNoRemove)
     {
-        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_NO_REMOVE, (DWORD)pRegistration->fNoRemove);
+        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_NO_REMOVE, 1);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_NO_REMOVE);
     }
 
     // Conditionally hide the ARP entry.
-    if (!pRegistration->fRegisterArp)
+    if (pRegistration->fForceSystemComponent)
     {
         hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_SYSTEM_COMPONENT, 1);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_SYSTEM_COMPONENT);
