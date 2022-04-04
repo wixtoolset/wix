@@ -170,7 +170,7 @@ namespace WixToolset.Core.Burn.Bundles
                     this.SetPackageVisibility(systemComponent, msiPackage, msiPropertyNames);
 
                     // Unless the MSI or setup code overrides the default, set MSIFASTINSTALL for best performance.
-                    if (!String.IsNullOrEmpty(fastInstall))
+                    if (String.IsNullOrEmpty(fastInstall) && !msiPropertyNames.Contains("MSIFASTINSTALL"))
                     {
                         this.AddMsiProperty(msiPackage, "MSIFASTINSTALL", "7");
                     }
@@ -218,6 +218,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void SetPerMachineAppropriately(string allusers, WixBundleMsiPackageSymbol msiPackage, string sourcePath)
         {
+            // Can ignore ALLUSERS from MsiProperties because it is not allowed there.
             if (msiPackage.ForcePerMachine)
             {
                 if (YesNoDefaultType.No == this.Facade.PackageSymbol.PerMachine)
