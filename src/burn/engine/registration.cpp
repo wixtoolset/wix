@@ -767,7 +767,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     }
 
     // Conditionally hide the ARP entry.
-    if (pRegistration->fForceSystemComponent)
+    if (pRegistration->fForceSystemComponent || (dwRegistrationOptions & BURN_REGISTRATION_ACTION_OPERATIONS_ARP_SYSTEM_COMPONENT))
     {
         hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_SYSTEM_COMPONENT, 1);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_SYSTEM_COMPONENT);

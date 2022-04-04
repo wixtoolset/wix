@@ -123,6 +123,13 @@ namespace WixToolset.Core.Burn.Bundles
                         return;
                     }
 
+                    if (BurnCommon.BurnV3Namespace == document.DocumentElement.NamespaceURI && !this.Facade.PackageSymbol.Attributes.HasFlag(WixBundlePackageAttributes.Visible))
+                    {
+                        this.Messaging.Write(BurnBackendWarnings.HiddenBundleNotSupported(packagePayload.SourceLineNumbers, sourcePath));
+
+                        this.Facade.PackageSymbol.Attributes |= WixBundlePackageAttributes.Visible;
+                    }
+
                     namespaceManager.AddNamespace("burn", document.DocumentElement.NamespaceURI);
                     var registrationElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration", namespaceManager) as XmlElement;
                     var arpElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration/burn:Arp", namespaceManager) as XmlElement;

@@ -66,6 +66,8 @@ namespace WixTestTools
 
         public string Publisher { get; set; }
 
+        public int? SystemComponent { get; set; }
+
         public string QuietUninstallString { get; set; }
 
         public string QuietUninstallCommand { get; set; }
@@ -125,6 +127,7 @@ namespace WixTestTools
             registration.Installed = idKey.GetValue(REGISTRY_BUNDLE_INSTALLED) as int?;
             registration.ModifyPath = idKey.GetValue(REGISTRY_BUNDLE_MODIFY_PATH) as string;
             registration.Publisher = idKey.GetValue(REGISTRY_BUNDLE_PUBLISHER) as string;
+            registration.SystemComponent = idKey.GetValue(REGISTRY_BUNDLE_SYSTEM_COMPONENT) as int?;
             registration.UrlInfoAbout = idKey.GetValue(REGISTRY_BUNDLE_URL_INFO_ABOUT) as string;
             registration.UrlUpdateInfo = idKey.GetValue(REGISTRY_BUNDLE_URL_UPDATE_INFO) as string;
 

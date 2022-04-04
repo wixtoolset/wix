@@ -581,6 +581,11 @@ extern "C" HRESULT PlanRegistration(
         pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
     }
 
+    if (pPlan->pInternalCommand->fArpSystemComponent)
+    {
+        pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_ARP_SYSTEM_COMPONENT;
+    }
+
     if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pPlan->action)
     {
         // If our provider key was not owned by a different bundle,

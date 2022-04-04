@@ -5,6 +5,7 @@
     <BA>TestBA_x64</BA>
     <UpgradeCode>{B6CAE45D-A7E5-4302-9FCF-4D05632F9FD7}</UpgradeCode>
     <InstallerPlatform>x64</InstallerPlatform>
+    <SuppressSpecificWarnings>8506</SuppressSpecificWarnings>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />

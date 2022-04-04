@@ -36,6 +36,11 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.UnknownBundleRelationAction, "The manifest for the bundle '{0}' contains an unknown related bundle action '{1}'. It will be ignored.", bundleExecutable, action);
         }
 
+        public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string bundleExecutable)
+        {
+            return Message(sourceLineNumbers, Ids.HiddenBundleNotSupported, "The bundle '{0}' does not support hiding its ARP registration.", bundleExecutable);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -49,6 +54,7 @@ namespace WixToolset.Core.Burn
             FailedToExtractAttachedContainers = 8503,
             UnknownCoffMachineType = 8504,
             UnknownBundleRelationAction = 8505,
+            HiddenBundleNotSupported = 8506,
         } // last available is 8999. 9000 is VerboseMessages.
     }
 }

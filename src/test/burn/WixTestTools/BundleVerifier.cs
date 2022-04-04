@@ -87,9 +87,11 @@ namespace WixTestTools
             }
         }
 
-        public string VerifyRegisteredAndInPackageCache()
+        public string VerifyRegisteredAndInPackageCache(int? expectedSystemComponent = null)
         {
             Assert.True(this.TryGetRegistration(out var registration));
+
+            Assert.Equal(expectedSystemComponent, registration.SystemComponent);
 
             Assert.NotNull(registration.CachePath);
             Assert.True(File.Exists(registration.CachePath));

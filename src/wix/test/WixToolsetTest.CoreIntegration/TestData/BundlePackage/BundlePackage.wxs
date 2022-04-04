@@ -4,7 +4,7 @@
       <BootstrapperApplicationDll SourceFile="fakeba.dll" />
     </BootstrapperApplication>
     <Chain>
-      <BundlePackage SourceFile="chain.exe" />
+      <BundlePackage SourceFile="chain.exe" Visible="no" Permanent="yes" />
     </Chain>
   </Bundle>
 </Wix>

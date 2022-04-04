@@ -2106,7 +2106,7 @@ namespace WixToolset.Core
                             break;
                         case "Visible":
                             visible = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                            allowed = (packageType == WixBundlePackageType.Msi);
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Msi);
                             break;
                         case "Vital":
                             vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2212,7 +2212,14 @@ namespace WixToolset.Core
                 rollbackPathVariable = String.Concat("WixBundleRollbackLog_", id.Id);
             }
 
-            if (packageType == WixBundlePackageType.Exe)
+            if (packageType == WixBundlePackageType.Bundle)
+            {
+                if (permanent == YesNoType.Yes && visible == YesNoType.NotSet)
+                {
+                    visible = YesNoType.Yes;
+                }
+            }
+            else if (packageType == WixBundlePackageType.Exe)
             {
                 // Set default scope for EXEs and MSPs if not already set.
                 if (perMachine == YesNoDefaultType.NotSet)
