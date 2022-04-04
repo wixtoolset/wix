@@ -35,6 +35,7 @@ const LPCWSTR BURN_COMMANDLINE_SWITCH_ANCESTORS = L"burn.ancestors";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED = L"burn.filehandle.attached";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF = L"burn.filehandle.self";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN = L"burn.splash.screen";
+const LPCWSTR BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT = L"burn.system.component";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PREFIX = L"burn.";
 
 const LPCWSTR BURN_BUNDLE_LAYOUT_DIRECTORY = L"WixBundleLayoutDirectory";
@@ -95,6 +96,7 @@ typedef struct _BURN_ENGINE_COMMAND
 
     BURN_MODE mode;
     BURN_AU_PAUSE_ACTION automaticUpdates;
+    BOOL fArpSystemComponent;
     BOOL fDisableSystemRestore;
     BOOL fInitiallyElevated;
 

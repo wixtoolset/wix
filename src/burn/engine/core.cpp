@@ -1044,6 +1044,12 @@ static HRESULT CoreRecreateCommandLine(
         ExitOnFailure(hr, "Failed to append relation type to command-line.");
     }
 
+    if (pInternalCommand->fArpSystemComponent)
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT);
+        ExitOnFailure(hr, "Failed to append system component to command-line.");
+    }
+
     if (fPassthrough)
     {
         hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", BURN_COMMANDLINE_SWITCH_PASSTHROUGH);
@@ -1631,6 +1637,29 @@ extern "C" HRESULT CoreParseCommandLine(
                         hr = StrAllocString(&pInternalCommand->sczSourceProcessPath, wzParam + 1, 0);
                         ExitOnFailure(hr, "Failed to copy source process path.");
                     }
+                }
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT), BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT, lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT)))
+            {
+                // Get a pointer to the next character after the switch.
+                LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT)];
+
+                // Switch without an argument is allowed. An empty string means FALSE, everything else means TRUE.
+                if (L'\0' != wzParam[0])
+                {
+                    if (L'=' != wzParam[0])
+                    {
+                        fInvalidCommandLine = TRUE;
+                        TraceLog(E_INVALIDARG, "Invalid switch: %ls", argv[i]);
+                    }
+                    else
+                    {
+                        pInternalCommand->fArpSystemComponent = L'\0' != wzParam[1];
+                    }
+                }
+                else
+                {
+                    pInternalCommand->fArpSystemComponent = TRUE;
                 }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_EMBEDDED, -1))

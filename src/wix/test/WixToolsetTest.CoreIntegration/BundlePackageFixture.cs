@@ -24,14 +24,19 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var chainIntermediateFolder = Path.Combine(baseFolder, "obj", "Chain");
                 var parentIntermediateFolder = Path.Combine(baseFolder, "obj", "Parent");
+                var grandparentIntermediateFolder = Path.Combine(baseFolder, "obj", "Grandparent");
                 var binFolder = Path.Combine(baseFolder, "bin");
                 var chainBundlePath = Path.Combine(binFolder, "chain.exe");
                 var chainPdbPath = Path.Combine(binFolder, "chain.wixpdb");
                 var parentBundlePath = Path.Combine(binFolder, "parent.exe");
                 var parentPdbPath = Path.Combine(binFolder, "parent.wixpdb");
-                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var grandparentBundlePath = Path.Combine(binFolder, "grandparent.exe");
+                var grandparentPdbPath = Path.Combine(binFolder, "grandparent.wixpdb");
+                var parentBaFolderPath = Path.Combine(baseFolder, "parentba");
+                var grandparentBaFolderPath = Path.Combine(baseFolder, "grandparentba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
+                // chain.exe
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
@@ -57,6 +62,7 @@ namespace WixToolsetTest.CoreIntegration
                     chainBundleId = bundleSymbol.BundleId;
                 }
 
+                // parent.exe
                 result = WixRunner.Execute(new[]
                 {
                     "build",
@@ -82,7 +88,7 @@ namespace WixToolsetTest.CoreIntegration
                     parentBundleId = bundleSymbol.BundleId;
                 }
 
-                var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, baFolderPath, extractFolderPath);
+                var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, parentBaFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
@@ -95,7 +101,7 @@ namespace WixToolsetTest.CoreIntegration
                                                   .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    $"<BundlePackage Id='chain.exe' Cache='keep' CacheId='{chainBundleId}v1.0.0.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' BundleId='{chainBundleId}' Version='1.0.0.0' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
+                    $"<BundlePackage Id='chain.exe' Cache='keep' CacheId='{chainBundleId}v1.0.0.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' BundleId='{chainBundleId}' Version='1.0.0.0' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no' HideARP='yes'>" +
                     "<Provides Key='MyProviderKey,v1.0' Version='1.0.0.0' DisplayName='BurnBundle' Imported='yes' />" +
                     "<RelatedBundle Id='{B94478B1-E1F3-4700-9CE8-6AA090854AEC}' Action='Upgrade' />" +
                     "<PayloadRef Id='chain.exe' />" +
@@ -123,7 +129,77 @@ namespace WixToolsetTest.CoreIntegration
                                                    .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<WixPackageProperties Package='chain.exe' Vital='yes' DisplayName='BurnBundle' Description='BurnBundle' DownloadSize='*' PackageSize='*' InstalledSize='34' PackageType='Bundle' Permanent='no' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' Compressed='yes' Version='1.0.0.0' Cache='keep' />",
+                    "<WixPackageProperties Package='chain.exe' Vital='yes' DisplayName='BurnBundle' Description='BurnBundle' DownloadSize='*' PackageSize='*' InstalledSize='34' PackageType='Bundle' Permanent='yes' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' Compressed='yes' Version='1.0.0.0' Cache='keep' />",
+                }, packageElements);
+
+                // grandparent.exe
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundlePackage", "PermanentBundlePackage.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", binFolder,
+                    "-intermediateFolder", grandparentIntermediateFolder,
+                    "-o", grandparentBundlePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(grandparentBundlePath));
+
+                string grandparentBundleId;
+                using (var wixOutput = WixOutput.Read(grandparentPdbPath))
+                {
+
+                    var intermediate = Intermediate.Load(wixOutput);
+                    var section = intermediate.Sections.Single();
+
+                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+                    grandparentBundleId = bundleSymbol.BundleId;
+                }
+
+                var grandparentExtractResult = BundleExtractor.ExtractBAContainer(null, grandparentBundlePath, grandparentBaFolderPath, extractFolderPath);
+                grandparentExtractResult.AssertSuccess();
+
+                ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "BundlePackage", new List<string> { "Size" } },
+                };
+                bundlePackages = grandparentExtractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:BundlePackage")
+                                                         .Cast<XmlElement>()
+                                                         .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                                         .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    $"<BundlePackage Id='parent.exe' Cache='keep' CacheId='{parentBundleId}v1.0.1.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_parent.exe' RollbackLogPathVariable='WixBundleRollbackLog_parent.exe' BundleId='{parentBundleId}' Version='1.0.1.0' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
+                    $"<Provides Key='{parentBundleId}' Version='1.0.1.0' DisplayName='BundlePackageBundle' Imported='yes' />" +
+                    "<RelatedBundle Id='{4BE34BEE-CA23-488E-96A0-B15878E3654B}' Action='Upgrade' />" +
+                    "<PayloadRef Id='parent.exe' />" +
+                    "</BundlePackage>",
+                }, bundlePackages);
+
+                registrations = grandparentExtractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration")
+                                                        .Cast<XmlElement>()
+                                                        .Select(e => e.GetTestXml())
+                                                        .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    $"<Registration Id='{grandparentBundleId}' ExecutableName='grandparent.exe' PerMachine='yes' Tag='' Version='1.0.2.0' ProviderKey='{grandparentBundleId}'>" +
+                    "<Arp DisplayName='PermanentBundlePackageBundle' DisplayVersion='1.0.2.0' Publisher='Example Corporation' />" +
+                    "</Registration>"
+                }, registrations);
+
+                ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixPackageProperties", new List<string> { "DownloadSize", "PackageSize" } },
+                };
+                packageElements = grandparentExtractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties")
+                                                          .Cast<XmlElement>()
+                                                          .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                                          .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixPackageProperties Package='parent.exe' Vital='yes' DisplayName='BundlePackageBundle' Description='BundlePackageBundle' DownloadSize='*' PackageSize='*' InstalledSize='34' PackageType='Bundle' Permanent='yes' LogPathVariable='WixBundleLog_parent.exe' RollbackLogPathVariable='WixBundleRollbackLog_parent.exe' Compressed='yes' Version='1.0.1.0' Cache='keep' />",
                 }, packageElements);
             }
         }
@@ -136,6 +212,7 @@ namespace WixToolsetTest.CoreIntegration
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
+                var dotDataPath = Path.Combine(folder, ".Data");
                 var parentIntermediateFolder = Path.Combine(baseFolder, "obj", "Parent");
                 var binFolder = Path.Combine(baseFolder, "bin");
                 var parentBundlePath = Path.Combine(binFolder, "parent.exe");
@@ -144,17 +221,25 @@ namespace WixToolsetTest.CoreIntegration
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
                 string chainBundleId = "{215A70DB-AB35-48C7-BE51-D66EAAC87177}";
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(false, new[]
                 {
                     "build",
                     Path.Combine(folder, "BundlePackage", "V3BundlePackage.wxs"),
-                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", dotDataPath,
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", parentIntermediateFolder,
                     "-o", parentBundlePath,
                 });
 
                 result.AssertSuccess();
+
+                var warningMessages = result.Messages.Where(m => m.Level == MessageLevel.Warning)
+                                                     .Select(m => m.ToString().Replace(dotDataPath, "<dotDataPath>"))
+                                                     .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The bundle '<dotDataPath>\\v3bundle.exe' does not support hiding its ARP registration.",
+                }, warningMessages);
 
                 Assert.True(File.Exists(parentBundlePath));
 

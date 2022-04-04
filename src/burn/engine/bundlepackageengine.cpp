@@ -72,6 +72,10 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     hr = XmlGetAttributeEx(pixnBundlePackage, L"RepairArguments", &pPackage->Bundle.sczRepairArguments);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RepairArguments.");
 
+    // @HideARP
+    hr = XmlGetYesNoAttribute(pixnBundlePackage, L"HideARP", &pPackage->Bundle.fHideARP);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @HideARP.");
+
     // @SupportsBurnProtocol
     hr = XmlGetYesNoAttribute(pixnBundlePackage, L"SupportsBurnProtocol", &pPackage->Bundle.fSupportsBurnProtocol);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @SupportsBurnProtocol.");
@@ -868,6 +872,12 @@ static HRESULT ExecuteBundle(
 
         hr = AppAppendCommandLineArgument(&sczBaseCommand, wzParent);
         ExitOnFailure(hr, "Failed to append the parent to the command line.");
+    }
+
+    if (pPackage->Bundle.fHideARP)
+    {
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls", BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT);
+        ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT);
     }
 
     // Add the list of dependencies to ignore, if any, to the burn command line.

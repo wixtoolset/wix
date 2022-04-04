@@ -390,6 +390,11 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("RepairArguments", bundlePackage.RepairCommand);
                         writer.WriteAttributeString("SupportsBurnProtocol", bundlePackage.SupportsBurnProtocol ? "yes" : "no");
                         writer.WriteAttributeString("Win64", bundlePackage.Win64 ? "yes" : "no");
+
+                        if (!package.PackageSymbol.Attributes.HasFlag(WixBundlePackageAttributes.Visible))
+                        {
+                            writer.WriteAttributeString("HideARP", "yes");
+                        }
                     }
                     else if (package.SpecificPackageSymbol is WixBundleExePackageSymbol exePackage) // EXE
                     {

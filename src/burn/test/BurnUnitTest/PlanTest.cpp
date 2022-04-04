@@ -1232,6 +1232,8 @@ namespace Bootstrapper
             BURN_ENGINE_STATE* pEngineState = &engineState;
             BURN_PLAN* pPlan = &engineState.plan;
 
+            pEngineState->internalCommand.fArpSystemComponent = TRUE;
+
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsAbsent(pEngineState);
@@ -1249,7 +1251,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
-            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY | BURN_REGISTRATION_ACTION_OPERATIONS_ARP_SYSTEM_COMPONENT, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;

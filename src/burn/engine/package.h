@@ -321,6 +321,7 @@ typedef struct _BURN_PACKAGE
             LPWSTR* rgsczPatchCodes;
             DWORD cPatchCodes;
 
+            BOOL fHideARP;
             BOOL fWin64;
             BOOL fSupportsBurnProtocol;
 
