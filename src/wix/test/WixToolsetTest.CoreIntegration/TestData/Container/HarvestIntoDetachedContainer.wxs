@@ -2,7 +2,9 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <MsiPackage SourceFile="FirstX86.msi" />
+            <MsiPackage SourceFile="FirstX86.msi">
+                <MsiProperty Name="MSIFASTINSTALL" Value="1" />
+            </MsiPackage>
             <PackageGroupRef Id="FirstX64" />
         </PackageGroup>
         <PackageGroup Id="FirstX64">
