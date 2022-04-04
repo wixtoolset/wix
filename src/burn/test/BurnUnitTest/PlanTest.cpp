@@ -71,6 +71,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -231,6 +232,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -364,6 +366,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -479,6 +482,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -579,6 +583,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -698,6 +703,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -800,6 +806,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -894,6 +901,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -983,6 +991,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(TRUE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_NONE, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1058,6 +1067,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1147,6 +1157,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1238,6 +1249,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1344,6 +1356,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1423,6 +1436,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1518,6 +1532,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(TRUE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1588,6 +1603,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1672,6 +1688,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(TRUE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1767,6 +1784,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1861,6 +1879,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -1992,6 +2011,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -2108,6 +2128,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;
@@ -2203,6 +2224,7 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
             Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
             Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
 
             BOOL fRollback = FALSE;
             DWORD dwIndex = 0;

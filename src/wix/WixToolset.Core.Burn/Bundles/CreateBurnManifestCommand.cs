@@ -208,7 +208,6 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("ProviderKey", this.BundleSymbol.ProviderKey);
 
                 writer.WriteStartElement("Arp");
-                writer.WriteAttributeString("Register", (this.BundleSymbol.DisableModify || this.BundleSymbol.SingleChangeUninstallButton) && this.BundleSymbol.DisableRemove ? "no" : "yes"); // do not register if disabled modify and remove.
                 writer.WriteAttributeString("DisplayName", this.BundleSymbol.Name);
                 writer.WriteAttributeString("DisplayVersion", this.BundleSymbol.Version);
 
@@ -251,16 +250,16 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     writer.WriteAttributeString("DisableModify", "yes");
                 }
+                else if (this.BundleSymbol.SingleChangeUninstallButton)
+                {
+                    writer.WriteAttributeString("DisableModify", "button");
+                }
 
                 if (this.BundleSymbol.DisableRemove)
                 {
                     writer.WriteAttributeString("DisableRemove", "yes");
                 }
 
-                if (this.BundleSymbol.SingleChangeUninstallButton)
-                {
-                    writer.WriteAttributeString("DisableModify", "button");
-                }
                 writer.WriteEndElement(); // </Arp>
 
                 // Get update registration if specified.

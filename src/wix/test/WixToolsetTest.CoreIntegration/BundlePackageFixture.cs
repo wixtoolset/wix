@@ -109,7 +109,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new string[]
                 {
                     $"<Registration Id='{parentBundleId}' ExecutableName='parent.exe' PerMachine='yes' Tag='' Version='1.0.1.0' ProviderKey='{parentBundleId}'>" +
-                    "<Arp Register='yes' DisplayName='BundlePackageBundle' DisplayVersion='1.0.1.0' Publisher='Example Corporation' />" +
+                    "<Arp DisplayName='BundlePackageBundle' DisplayVersion='1.0.1.0' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
 
@@ -196,7 +196,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new string[]
                 {
                     $"<Registration Id='{parentBundleId}' ExecutableName='parent.exe' PerMachine='yes' Tag='' Version='1.1.1.1' ProviderKey='{parentBundleId}'>" +
-                    "<Arp Register='yes' DisplayName='V3BundlePackageBundle' DisplayVersion='1.1.1.1' Publisher='Example Corporation' />" +
+                    "<Arp DisplayName='V3BundlePackageBundle' DisplayVersion='1.1.1.1' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
 
