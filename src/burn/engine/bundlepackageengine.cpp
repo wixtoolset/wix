@@ -843,6 +843,10 @@ static HRESULT ExecuteBundle(
     {
         hr = StrAllocConcat(&sczBaseCommand, L" -quiet", 0);
         ExitOnFailure(hr, "Failed to append quiet argument.");
+
+        // Embedded bundles will disable system restore so might as well make non-embedded do it, too.
+        hr = StrAllocConcat(&sczBaseCommand, L" -disablesystemrestore", 0);
+        ExitOnFailure(hr, "Failed to append disable system restore.");
     }
 
     if (wzOperationCommandLine)
