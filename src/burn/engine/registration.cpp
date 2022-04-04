@@ -122,29 +122,26 @@ extern "C" HRESULT RegistrationParseFromXml(
     IXMLDOMNode* pixnArpNode = NULL;
     IXMLDOMNode* pixnUpdateNode = NULL;
     LPWSTR scz = NULL;
+    BOOL fFoundXml = FALSE;
 
     // select registration node
     hr = XmlSelectSingleNode(pixnBundle, L"Registration", &pixnRegistrationNode);
-    if (S_FALSE == hr)
-    {
-        hr = E_NOTFOUND;
-    }
-    ExitOnFailure(hr, "Failed to select registration node.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to select registration node.");
 
     // @Id
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Id", &pRegistration->sczId);
-    ExitOnFailure(hr, "Failed to get @Id.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
     // @Tag
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Tag", &pRegistration->sczTag);
-    ExitOnFailure(hr, "Failed to get @Tag.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Tag.");
 
     hr = BundlePackageEngineParseRelatedCodes(pixnBundle, &pRegistration->rgsczDetectCodes, &pRegistration->cDetectCodes, &pRegistration->rgsczUpgradeCodes, &pRegistration->cUpgradeCodes, &pRegistration->rgsczAddonCodes, &pRegistration->cAddonCodes, &pRegistration->rgsczPatchCodes, &pRegistration->cPatchCodes);
     ExitOnFailure(hr, "Failed to parse related bundles");
 
     // @Version
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Version", &scz);
-    ExitOnFailure(hr, "Failed to get @Version.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Version.");
 
     hr = VerParseVersion(scz, 0, FALSE, &pRegistration->pVersion);
     ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
@@ -156,106 +153,75 @@ extern "C" HRESULT RegistrationParseFromXml(
 
     // @ProviderKey
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"ProviderKey", &pRegistration->sczProviderKey);
-    ExitOnFailure(hr, "Failed to get @ProviderKey.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ProviderKey.");
 
     // @ExecutableName
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"ExecutableName", &pRegistration->sczExecutableName);
-    ExitOnFailure(hr, "Failed to get @ExecutableName.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ExecutableName.");
 
     // @PerMachine
     hr = XmlGetYesNoAttribute(pixnRegistrationNode, L"PerMachine", &pRegistration->fPerMachine);
-    ExitOnFailure(hr, "Failed to get @PerMachine.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @PerMachine.");
 
     // select ARP node
     hr = XmlSelectSingleNode(pixnRegistrationNode, L"Arp", &pixnArpNode);
-    if (S_FALSE != hr)
-    {
-        ExitOnFailure(hr, "Failed to select ARP node.");
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to select ARP node.");
 
+    if (fFoundXml)
+    {
         // @Register
         hr = XmlGetYesNoAttribute(pixnArpNode, L"Register", &pRegistration->fRegisterArp);
-        ExitOnFailure(hr, "Failed to get @Register.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Register.");
 
         // @DisplayName
         hr = XmlGetAttributeEx(pixnArpNode, L"DisplayName", &pRegistration->sczDisplayName);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @DisplayName.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DisplayName.");
 
         // @InProgressDisplayName
         hr = XmlGetAttributeEx(pixnArpNode, L"InProgressDisplayName", &pRegistration->sczInProgressDisplayName);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @InProgressDisplayName.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InProgressDisplayName.");
 
         // @DisplayVersion
         hr = XmlGetAttributeEx(pixnArpNode, L"DisplayVersion", &pRegistration->sczDisplayVersion);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @DisplayVersion.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DisplayVersion.");
 
         // @Publisher
         hr = XmlGetAttributeEx(pixnArpNode, L"Publisher", &pRegistration->sczPublisher);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Publisher.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Publisher.");
 
         // @HelpLink
         hr = XmlGetAttributeEx(pixnArpNode, L"HelpLink", &pRegistration->sczHelpLink);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @HelpLink.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @HelpLink.");
 
         // @HelpTelephone
         hr = XmlGetAttributeEx(pixnArpNode, L"HelpTelephone", &pRegistration->sczHelpTelephone);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @HelpTelephone.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @HelpTelephone.");
 
         // @AboutUrl
         hr = XmlGetAttributeEx(pixnArpNode, L"AboutUrl", &pRegistration->sczAboutUrl);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @AboutUrl.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @AboutUrl.");
 
         // @UpdateUrl
         hr = XmlGetAttributeEx(pixnArpNode, L"UpdateUrl", &pRegistration->sczUpdateUrl);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @UpdateUrl.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UpdateUrl.");
 
         // @ParentDisplayName
         hr = XmlGetAttributeEx(pixnArpNode, L"ParentDisplayName", &pRegistration->sczParentDisplayName);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @ParentDisplayName.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @ParentDisplayName.");
 
         // @Comments
         hr = XmlGetAttributeEx(pixnArpNode, L"Comments", &pRegistration->sczComments);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Comments.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Comments.");
 
         // @Contact
         hr = XmlGetAttributeEx(pixnArpNode, L"Contact", &pRegistration->sczContact);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Contact.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Contact.");
 
         // @DisableModify
         hr = XmlGetAttributeEx(pixnArpNode, L"DisableModify", &scz);
-        if (SUCCEEDED(hr))
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DisableModify.");
+
+        if (fFoundXml)
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"button", -1))
             {
@@ -271,24 +237,17 @@ extern "C" HRESULT RegistrationParseFromXml(
             }
             else
             {
-                hr = E_UNEXPECTED;
-                ExitOnRootFailure(hr, "Invalid modify disabled type: %ls", scz);
+                ExitWithRootFailure(hr, E_UNEXPECTED, "Invalid modify disabled type: %ls", scz);
             }
         }
-        else if (E_NOTFOUND == hr)
+        else
         {
             pRegistration->modify = BURN_REGISTRATION_MODIFY_ENABLED;
-            hr = S_OK;
         }
-        ExitOnFailure(hr, "Failed to get @DisableModify.");
 
         // @DisableRemove
         hr = XmlGetYesNoAttribute(pixnArpNode, L"DisableRemove", &pRegistration->fNoRemove);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @DisableRemove.");
-            pRegistration->fNoRemoveDefined = TRUE;
-        }
+        ExitOnOptionalXmlQueryFailure(hr, pRegistration->fNoRemoveDefined, "Failed to get @DisableRemove.");
     }
 
     hr = ParseSoftwareTagsFromXml(pixnRegistrationNode, &pRegistration->softwareTags.rgSoftwareTags, &pRegistration->softwareTags.cSoftwareTags);
@@ -296,37 +255,29 @@ extern "C" HRESULT RegistrationParseFromXml(
 
     // select Update node
     hr = XmlSelectSingleNode(pixnRegistrationNode, L"Update", &pixnUpdateNode);
-    if (S_FALSE != hr)
+    ExitOnOptionalXmlQueryFailure(hr, pRegistration->update.fRegisterUpdate, "Failed to select Update node.");
+
+    if (pRegistration->update.fRegisterUpdate)
     {
-        ExitOnFailure(hr, "Failed to select Update node.");
-
-        pRegistration->update.fRegisterUpdate = TRUE;
-
         // @Manufacturer
         hr = XmlGetAttributeEx(pixnUpdateNode, L"Manufacturer", &pRegistration->update.sczManufacturer);
-        ExitOnFailure(hr, "Failed to get @Manufacturer.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Manufacturer.");
 
         // @Department
         hr = XmlGetAttributeEx(pixnUpdateNode, L"Department", &pRegistration->update.sczDepartment);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Department.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Department.");
 
         // @ProductFamily
         hr = XmlGetAttributeEx(pixnUpdateNode, L"ProductFamily", &pRegistration->update.sczProductFamily);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @ProductFamily.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @ProductFamily.");
 
         // @Name
         hr = XmlGetAttributeEx(pixnUpdateNode, L"Name", &pRegistration->update.sczName);
-        ExitOnFailure(hr, "Failed to get @Name.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Name.");
 
         // @Classification
         hr = XmlGetAttributeEx(pixnUpdateNode, L"Classification", &pRegistration->update.sczClassification);
-        ExitOnFailure(hr, "Failed to get @Classification.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Classification.");
     }
 
     hr = SetPaths(pRegistration, pCache);
@@ -1164,19 +1115,19 @@ static HRESULT ParseSoftwareTagsFromXml(
             BURN_SOFTWARE_TAG* pSoftwareTag = &pSoftwareTags[i];
 
             hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
-            ExitOnFailure(hr, "Failed to get next node.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get next node.");
 
             hr = XmlGetAttributeEx(pixnNode, L"Filename", &pSoftwareTag->sczFilename);
-            ExitOnFailure(hr, "Failed to get @Filename.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Filename.");
 
             hr = XmlGetAttributeEx(pixnNode, L"Regid", &pSoftwareTag->sczRegid);
-            ExitOnFailure(hr, "Failed to get @Regid.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Regid.");
 
             hr = XmlGetAttributeEx(pixnNode, L"Path", &pSoftwareTag->sczPath);
-            ExitOnFailure(hr, "Failed to get @Path.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Path.");
 
             hr = XmlGetText(pixnNode, &bstrTagXml);
-            ExitOnFailure(hr, "Failed to get SoftwareTag text.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get SoftwareTag text.");
 
             hr = StrAnsiAllocString(&pSoftwareTag->sczTag, bstrTagXml, 0, CP_UTF8);
             ExitOnFailure(hr, "Failed to convert SoftwareTag text to UTF-8");
