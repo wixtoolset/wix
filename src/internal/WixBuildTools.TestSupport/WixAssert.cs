@@ -91,5 +91,52 @@ namespace WixBuildTools.TestSupport
                 return this.stringComparer.GetHashCode((string)obj);
             }
         }
+
+        // There appears to have been a bug in VC++, which might or might not have been partially
+        // or completely corrected. It was unable to disambiguate a call to:
+        //     Xunit::Assert::Throws(System::Type^, System::Action^)
+        // from a call to:
+        //     Xunit::Assert::Throws(System::Type^, System::Func<System::Object^>^)
+        // that implicitly ignores its return value.
+        //
+        // The ambiguity may have been reported by some versions of the compiler and not by others.
+        // Some versions of the compiler may not have emitted any code in this situation, making it
+        // appear that the test has passed when, in fact, it hasn't been run.
+        //
+        // This situation is not an issue for C#.
+        //
+        // The following method is used to isolate DUtilTests in order to overcome the above problem.
+
+        /// <summary>
+        /// This shim allows C++/CLR code to call the Xunit method with the same signature
+        /// without getting an ambiguous overload error.  If the specified test code
+        /// fails to generate an exception of the exact specified type, an assertion
+        /// exception is thrown. Otherwise, execution flow proceeds as normal.
+        /// </summary>
+        /// <typeparam name="T">The type name of the expected exception.</typeparam>
+        /// <param name="testCode">An Action delegate to run the test code.</param>
+        public static new void Throws<T>(System.Action testCode)
+            where T : System.Exception
+        {
+            Xunit.Assert.Throws<T>(testCode);
+        }
+
+        // This shim has been tested, but is not currently used anywhere. It was provided
+        // at the same time as the preceding shim because it involved the same overload
+        // resolution conflict.
+
+        /// <summary>
+        /// This shim allows C++/CLR code to call the Xunit method with the same signature
+        /// without getting an ambiguous overload error.  If the specified test code
+        /// fails to generate an exception of the exact specified type, an assertion
+        /// exception is thrown. Otherwise, execution flow proceeds as normal.
+        /// </summary>
+        /// <param name="exceptionType">The type object associated with exceptions of the expected type.</param>
+        /// <param name="testCode">An Action delegate to run the test code.</param>
+        /// <returns>An exception of a type other than the type specified, is such an exception is thrown.</returns>
+        public static new System.Exception Throws(System.Type exceptionType, System.Action testCode)
+        {
+            return Xunit.Assert.Throws(exceptionType, testCode);
+        }
     }
 }
