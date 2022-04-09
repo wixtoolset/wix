@@ -11,7 +11,7 @@ namespace DutilTests
     public ref class DUtil
     {
     public:
-        [Fact(Skip = "Flaky")]
+        [Fact]
         void DUtilTraceErrorSourceFiltersOnTraceLevel()
         {
             DutilInitialize(&DutilTestTraceError);
@@ -21,7 +21,8 @@ namespace DutilTests
             Dutil_TraceSetLevel(REPORT_DEBUG, FALSE);
 
             Action^ action = gcnew Action(this, &DUtil::CallDutilTraceErrorSource);
-            Assert::Throws<Exception^>(action);
+            // See the comments in WixBuildTools.WixAssert for details.
+            WixAssert::Throws<Exception^>(action);
 
             DutilUninitialize();
         }
