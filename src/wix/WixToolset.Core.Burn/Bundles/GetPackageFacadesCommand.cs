@@ -23,7 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        public IDictionary<string, PackageFacade> PackageFacades { get; private set; }
+        public PackageFacades PackageFacades { get; private set; }
 
         public void Execute()
         {
@@ -39,7 +39,7 @@ namespace WixToolset.Core.Burn.Bundles
             var mspPackagePayloads = this.Section.Symbols.OfType<WixBundleMspPackagePayloadSymbol>().ToDictionary(t => t.Id.Id);
             var msuPackagePayloads = this.Section.Symbols.OfType<WixBundleMsuPackagePayloadSymbol>().ToDictionary(t => t.Id.Id);
 
-            var facades = new Dictionary<string, PackageFacade>();
+            var facades = new PackageFacades();
 
             foreach (var package in this.ChainPackageSymbols)
             {
@@ -135,6 +135,7 @@ namespace WixToolset.Core.Burn.Bundles
                 if (packagePayload == null)
                 {
                     this.Messaging.Write(ErrorMessages.MissingPackagePayload(package.SourceLineNumbers, id, package.Type.ToString()));
+                    continue;
                 }
                 else
                 {
@@ -146,7 +147,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Bundle:
                         if (bundlePackages.TryGetValue(id, out var bundlePackage))
                         {
-                            facades.Add(id, new PackageFacade(package, bundlePackage));
+                            facades.Add(new PackageFacade(package, bundlePackage));
                         }
                         else
                         {
@@ -157,7 +158,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Exe:
                         if (exePackages.TryGetValue(id, out var exePackage))
                         {
-                            facades.Add(id, new PackageFacade(package, exePackage));
+                            facades.Add(new PackageFacade(package, exePackage));
                         }
                         else
                         {
@@ -168,7 +169,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Msi:
                         if (msiPackages.TryGetValue(id, out var msiPackage))
                         {
-                            facades.Add(id, new PackageFacade(package, msiPackage));
+                            facades.Add(new PackageFacade(package, msiPackage));
                         }
                         else
                         {
@@ -179,7 +180,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Msp:
                         if (mspPackages.TryGetValue(id, out var mspPackage))
                         {
-                            facades.Add(id, new PackageFacade(package, mspPackage));
+                            facades.Add(new PackageFacade(package, mspPackage));
                         }
                         else
                         {
@@ -190,7 +191,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Msu:
                         if (msuPackages.TryGetValue(id, out var msuPackage))
                         {
-                            facades.Add(id, new PackageFacade(package, msuPackage));
+                            facades.Add(new PackageFacade(package, msuPackage));
                         }
                         else
                         {

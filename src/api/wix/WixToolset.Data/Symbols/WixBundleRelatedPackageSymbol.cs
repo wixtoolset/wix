@@ -10,7 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundleRelatedPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.PackagePayloadRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.RelatedId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.MaxVersion), IntermediateFieldType.String),
@@ -27,7 +27,7 @@ namespace WixToolset.Data.Symbols
 
     public enum WixBundleRelatedPackageSymbolFields
     {
-        PackageRef,
+        PackagePayloadRef,
         RelatedId,
         MinVersion,
         MaxVersion,
@@ -57,10 +57,10 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixBundleRelatedPackageSymbolFields index] => this.Fields[(int)index];
 
-        public string PackageRef
+        public string PackagePayloadRef
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.PackageRef];
-            set => this.Set((int)WixBundleRelatedPackageSymbolFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.PackagePayloadRef];
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.PackagePayloadRef, value);
         }
 
         public string RelatedId

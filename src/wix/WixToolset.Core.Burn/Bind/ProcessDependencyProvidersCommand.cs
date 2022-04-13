@@ -12,11 +12,12 @@ namespace WixToolset.Core.Burn.Bind
 
     internal class ProcessDependencyProvidersCommand
     {
-        public ProcessDependencyProvidersCommand(IMessaging messaging, IntermediateSection section, IDictionary<string, PackageFacade> facades)
+        public ProcessDependencyProvidersCommand(IServiceProvider serviceProvider, IntermediateSection section, PackageFacades facades)
         {
-            this.Messaging = messaging;
-            this.Section = section;
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
 
+            this.Section = section;
             this.Facades = facades;
         }
 
@@ -24,9 +25,11 @@ namespace WixToolset.Core.Burn.Bind
 
         private IMessaging Messaging { get; }
 
+        private IBackendHelper BackendHelper { get; }
+
         private IntermediateSection Section { get; }
 
-        private IDictionary<string, PackageFacade> Facades { get; }
+        private PackageFacades Facades { get; }
 
         /// <summary>
         /// Sets the explicitly provided bundle provider key, if provided. And...
@@ -36,23 +39,29 @@ namespace WixToolset.Core.Burn.Bind
         /// </summary>
         public void Execute()
         {
+            this.ProcessHarvestedProviders();
+
             var dependencySymbols = this.Section.Symbols.OfType<WixDependencyProviderSymbol>();
 
             foreach (var dependency in dependencySymbols)
             {
                 // Sets the provider key for the bundle, if it is not set already.
-                if (String.IsNullOrEmpty(this.BundleProviderKey))
+                if (dependency.Bundle)
                 {
-                    if (dependency.Bundle)
+                    if (String.IsNullOrEmpty(this.BundleProviderKey))
                     {
                         this.BundleProviderKey = dependency.ProviderKey;
+                    }
+                    else
+                    {
+                        this.Messaging.Write(BurnBackendErrors.BundleMultipleProviders(dependency.SourceLineNumbers, dependency.ProviderKey, this.BundleProviderKey));
                     }
                 }
 
                 // Import any authored dependencies. These may merge with imported provides from MSI packages.
                 var packageId = dependency.ParentRef;
 
-                if (this.Facades.TryGetValue(packageId, out var facade))
+                if (this.Facades.TryGetFacadeByPackageId(packageId, out var facade))
                 {
                     if (String.IsNullOrEmpty(dependency.ProviderKey))
                     {
@@ -141,6 +150,32 @@ namespace WixToolset.Core.Burn.Bind
             }
 
             return dependencySymbolsByPackageId;
+        }
+
+        private void ProcessHarvestedProviders()
+        {
+            var harvestedDependencies = this.Section.Symbols.OfType<WixBundleHarvestedDependencyProviderSymbol>().ToList();
+            foreach (var harvestedDependency in harvestedDependencies)
+            {
+                if (!this.Facades.TryGetFacadesByPackagePayloadId(harvestedDependency.PackagePayloadRef, out var facades))
+                {
+                    this.Messaging.Write(ErrorMessages.IdentifierNotFound("Package.PayloadRef", harvestedDependency.PackagePayloadRef));
+                    continue;
+                }
+
+                foreach (var facade in facades)
+                {
+                    var depId = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", facade.PackageId, harvestedDependency.Id.Id));
+                    this.Section.AddSymbol(new WixDependencyProviderSymbol(harvestedDependency.SourceLineNumbers, depId)
+                    {
+                        ParentRef = facade.PackageId,
+                        ProviderKey = harvestedDependency.ProviderKey,
+                        Version = harvestedDependency.Version,
+                        DisplayName = harvestedDependency.DisplayName,
+                        Attributes = WixDependencyProviderAttributes.ProvidesAttributesImported | (WixDependencyProviderAttributes)harvestedDependency.ProviderAttributes,
+                    });
+                }
+            }
         }
     }
 }

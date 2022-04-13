@@ -10,7 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundleMsiFeature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureSymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureSymbolFields.PackagePayloadRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureSymbolFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureSymbolFields.Size), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureSymbolFields.Parent), IntermediateFieldType.String),
@@ -29,7 +29,7 @@ namespace WixToolset.Data.Symbols
 {
     public enum WixBundleMsiFeatureSymbolFields
     {
-        PackageRef,
+        PackagePayloadRef,
         Name,
         Size,
         Parent,
@@ -53,10 +53,10 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixBundleMsiFeatureSymbolFields index] => this.Fields[(int)index];
 
-        public string PackageRef
+        public string PackagePayloadRef
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureSymbolFields.PackageRef];
-            set => this.Set((int)WixBundleMsiFeatureSymbolFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundleMsiFeatureSymbolFields.PackagePayloadRef];
+            set => this.Set((int)WixBundleMsiFeatureSymbolFields.PackagePayloadRef, value);
         }
 
         public string Name

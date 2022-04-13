@@ -15,12 +15,12 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
-        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
+        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, PackageFacades packageFacades, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
             this.RollbackBoundaries = boundaries;
-            this.ChainPackages = chainPackages;
+            this.PackagesFacades = packageFacades;
             this.LastUXPayloadIndex = lastUXPayloadIndex;
             this.Payloads = payloadSymbols;
             this.PackagesPayloads = packagesPayloads;
@@ -34,7 +34,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IEnumerable<WixBundleRollbackBoundarySymbol> RollbackBoundaries { get; }
 
-        private IEnumerable<PackageFacade> ChainPackages { get; }
+        private PackageFacades PackagesFacades { get; }
 
         private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
 
@@ -141,7 +141,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void WritePackageInfo(XmlTextWriter writer)
         {
-            foreach (var package in this.ChainPackages)
+            foreach (var package in this.PackagesFacades.OrderedValues)
             {
                 if (!this.PackagesPayloads.TryGetValue(package.PackageId, out var payloads))
                 {
@@ -229,33 +229,46 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (var featureSymbol in featureSymbols)
             {
-                writer.WriteStartElement("WixPackageFeatureInfo");
-
-                writer.WriteAttributeString("Package", featureSymbol.PackageRef);
-                writer.WriteAttributeString("Feature", featureSymbol.Name);
-                writer.WriteAttributeString("Size", featureSymbol.Size.ToString(CultureInfo.InvariantCulture));
-
-                if (!String.IsNullOrEmpty(featureSymbol.Parent))
+                if (!this.PackagesFacades.TryGetFacadesByPackagePayloadId(featureSymbol.PackagePayloadRef, out var facades))
                 {
-                    writer.WriteAttributeString("Parent", featureSymbol.Parent);
+                    continue;
                 }
 
-                if (!String.IsNullOrEmpty(featureSymbol.Title))
+                foreach (var facade in facades)
                 {
-                    writer.WriteAttributeString("Title", featureSymbol.Title);
+                    if (!(facade.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage) || !msiPackage.EnableFeatureSelection)
+                    {
+                        continue;
+                    }
+
+                    writer.WriteStartElement("WixPackageFeatureInfo");
+
+                    writer.WriteAttributeString("Package", facade.PackageId);
+                    writer.WriteAttributeString("Feature", featureSymbol.Name);
+                    writer.WriteAttributeString("Size", featureSymbol.Size.ToString(CultureInfo.InvariantCulture));
+
+                    if (!String.IsNullOrEmpty(featureSymbol.Parent))
+                    {
+                        writer.WriteAttributeString("Parent", featureSymbol.Parent);
+                    }
+
+                    if (!String.IsNullOrEmpty(featureSymbol.Title))
+                    {
+                        writer.WriteAttributeString("Title", featureSymbol.Title);
+                    }
+
+                    if (!String.IsNullOrEmpty(featureSymbol.Description))
+                    {
+                        writer.WriteAttributeString("Description", featureSymbol.Description);
+                    }
+
+                    writer.WriteAttributeString("Display", featureSymbol.Display.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteAttributeString("Level", featureSymbol.Level.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteAttributeString("Directory", featureSymbol.Directory);
+                    writer.WriteAttributeString("Attributes", featureSymbol.Attributes.ToString(CultureInfo.InvariantCulture));
+
+                    writer.WriteEndElement();
                 }
-
-                if (!String.IsNullOrEmpty(featureSymbol.Description))
-                {
-                    writer.WriteAttributeString("Description", featureSymbol.Description);
-                }
-
-                writer.WriteAttributeString("Display", featureSymbol.Display.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("Level", featureSymbol.Level.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("Directory", featureSymbol.Directory);
-                writer.WriteAttributeString("Attributes", featureSymbol.Attributes.ToString(CultureInfo.InvariantCulture));
-
-                writer.WriteEndElement();
             }
         }
 

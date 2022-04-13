@@ -71,6 +71,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundleExePackagePayload:
                     case SymbolDefinitionType.WixBundleExtension:
                     case SymbolDefinitionType.WixBundleHarvestedBundlePackage:
+                    case SymbolDefinitionType.WixBundleHarvestedDependencyProvider:
                     case SymbolDefinitionType.WixBundleHarvestedMsiPackage:
                     case SymbolDefinitionType.WixBundleHarvestedMspPackage:
                     case SymbolDefinitionType.WixBundleMsiFeature:

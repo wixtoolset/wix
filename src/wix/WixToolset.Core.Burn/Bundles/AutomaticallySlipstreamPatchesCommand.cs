@@ -7,18 +7,22 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Services;
 
     internal class AutomaticallySlipstreamPatchesCommand
     {
-        public AutomaticallySlipstreamPatchesCommand(IntermediateSection section, ICollection<PackageFacade> packageFacades)
+        public AutomaticallySlipstreamPatchesCommand(IMessaging messaging, IntermediateSection section, PackageFacades packageFacades)
         {
+            this.Messaging = messaging;
             this.Section = section;
             this.PackageFacades = packageFacades;
         }
 
+        private IMessaging Messaging { get; }
+
         private IntermediateSection Section { get; }
 
-        private IEnumerable<PackageFacade> PackageFacades { get; }
+        private PackageFacades PackageFacades { get; }
 
         public void Execute()
         {
@@ -26,7 +30,7 @@ namespace WixToolset.Core.Burn.Bundles
             var targetsProductCode = new Dictionary<string, List<WixBundlePatchTargetCodeSymbol>>();
             var targetsUpgradeCode = new Dictionary<string, List<WixBundlePatchTargetCodeSymbol>>();
 
-            foreach (var facade in this.PackageFacades)
+            foreach (var facade in this.PackageFacades.Values)
             {
                 // Keep track of all MSI packages.
                 if (facade.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage)
@@ -37,7 +41,7 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     var patchTargetCodeSymbols = this.Section.Symbols
                         .OfType<WixBundlePatchTargetCodeSymbol>()
-                        .Where(r => r.PackageRef == facade.PackageId);
+                        .Where(r => r.PackagePayloadRef == facade.PackageSymbol.PayloadRef);
 
                     // Index target ProductCodes and UpgradeCodes for slipstreamed MSPs.
                     foreach (var symbol in patchTargetCodeSymbols)
@@ -89,22 +93,27 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private bool TryAddSlipstreamSymbol(HashSet<string> slipstreamMspIds, WixBundleMsiPackageSymbol msiPackage, WixBundlePatchTargetCodeSymbol patchTargetCode)
+        private void TryAddSlipstreamSymbol(HashSet<string> slipstreamMspIds, WixBundleMsiPackageSymbol msiPackage, WixBundlePatchTargetCodeSymbol patchTargetCode)
         {
-            var id = new Identifier(AccessModifier.Section, msiPackage.Id.Id, patchTargetCode.PackageRef);
-
-            if (slipstreamMspIds.Add(id.Id))
+            if (!this.PackageFacades.TryGetFacadesByPackagePayloadId(patchTargetCode.PackagePayloadRef, out var packageFacades))
             {
-                this.Section.AddSymbol(new WixBundleSlipstreamMspSymbol(patchTargetCode.SourceLineNumbers)
-                {
-                    TargetPackageRef = msiPackage.Id.Id,
-                    MspPackageRef = patchTargetCode.PackageRef,
-                });
-
-                return true;
+                this.Messaging.Write(ErrorMessages.IdentifierNotFound("Package.PayloadRef", patchTargetCode.PackagePayloadRef));
+                return;
             }
 
-            return false;
+            foreach (var packageFacade in packageFacades)
+            {
+                var id = new Identifier(AccessModifier.Section, msiPackage.Id.Id, packageFacade.PackageId);
+
+                if (slipstreamMspIds.Add(id.Id))
+                {
+                    this.Section.AddSymbol(new WixBundleSlipstreamMspSymbol(patchTargetCode.SourceLineNumbers)
+                    {
+                        TargetPackageRef = msiPackage.Id.Id,
+                        MspPackageRef = packageFacade.PackageId,
+                    });
+                }
+            }
         }
     }
 }

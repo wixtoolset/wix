@@ -53,7 +53,7 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var harvestedMspPackage = this.Section.Symbols.OfType<WixBundleHarvestedMspPackageSymbol>()
-                                                          .Where(h => h.Id == this.ChainPackage.Id)
+                                                          .Where(h => h.Id == this.PackagePayload.Id)
                                                           .SingleOrDefault();
 
             if (harvestedMspPackage == null)
@@ -123,7 +123,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return null;
             }
 
-            return this.Section.AddSymbol(new WixBundleHarvestedMspPackageSymbol(this.PackagePayload.SourceLineNumbers, this.ChainPackage.Id)
+            return this.Section.AddSymbol(new WixBundleHarvestedMspPackageSymbol(this.PackagePayload.SourceLineNumbers, this.PackagePayload.Id)
             {
                 PatchCode = patchCode,
                 DisplayName = displayName,
@@ -175,7 +175,7 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     var symbol = section.AddSymbol(new WixBundlePatchTargetCodeSymbol(sourceLineNumbers)
                     {
-                        PackageRef = id.Id,
+                        PackagePayloadRef = id.Id,
                         TargetCode = targetCode,
                         Attributes = 0,
                         Type = type,

@@ -3,7 +3,6 @@
 namespace WixToolset.Core.Burn.Bundles
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
@@ -11,12 +10,12 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class PerformBundleBackendValidationCommand
     {
-        public PerformBundleBackendValidationCommand(IMessaging messaging, IBurnBackendHelper burnBackendHelper, IntermediateSection section, IDictionary<string, PackageFacade> packageFacadesById)
+        public PerformBundleBackendValidationCommand(IMessaging messaging, IBurnBackendHelper burnBackendHelper, IntermediateSection section, PackageFacades packageFacades)
         {
             this.Messaging = messaging;
             this.BackendHelper = burnBackendHelper;
             this.Section = section;
-            this.PackageFacadesById = packageFacadesById;
+            this.PackageFacades = packageFacades;
         }
 
         private IMessaging Messaging { get; }
@@ -25,7 +24,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        private IDictionary<string, PackageFacade> PackageFacadesById { get; }
+        private PackageFacades PackageFacades { get; }
 
         public void Execute()
         {
@@ -53,7 +52,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
 
-            foreach (var packageFacade in this.PackageFacadesById.Values)
+            foreach (var packageFacade in this.PackageFacades.Values)
             {
                 if (packageFacade.SpecificPackageSymbol is WixBundleBundlePackageSymbol wixBundleBundlePackageSymbol)
                 {
