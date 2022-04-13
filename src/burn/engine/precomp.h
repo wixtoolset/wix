@@ -103,4 +103,5 @@
 #include "EngineForApplication.h"
 #include "EngineForExtension.h"
 #include "engine.messages.h"
+#include "engine.version.h"
 #include "engine.h"

@@ -109,6 +109,28 @@ namespace WixToolsetTest.CoreIntegration
                     var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BundleExtensionData.xml"), Encoding.UTF8);
                     Assert.Equal(extractedBextManifestData, bextManifestData);
 
+                    foreach (XmlAttribute attribute in extractResult.ManifestDocument.DocumentElement.Attributes)
+                    {
+                        switch (attribute.LocalName)
+                        {
+                            case "EngineVersion":
+                                Assert.Equal($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
+                                break;
+                            case "ProtocolVersion":
+                                Assert.Equal("1", attribute.Value);
+                                break;
+                            case "Win64":
+                                Assert.Equal("no", attribute.Value);
+                                break;
+                            case "xmlns":
+                                Assert.Equal("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
+                                break;
+                            default:
+                                Assert.False(true, $"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
+                                break;
+                        }
+                    }
+
                     var commandLineElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:CommandLine");
                     var commandLineElement = (XmlNode)Assert.Single(commandLineElements);
                     Assert.Equal("<CommandLine Variables='upperCase' />", commandLineElement.GetTestXml());
@@ -190,6 +212,28 @@ namespace WixToolsetTest.CoreIntegration
 
                 var extractResult = BundleExtractor.ExtractAllContainers(null, exePath, baFolderPath, attachedFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
+
+                foreach (XmlAttribute attribute in extractResult.ManifestDocument.DocumentElement.Attributes)
+                {
+                    switch (attribute.LocalName)
+                    {
+                        case "EngineVersion":
+                            Assert.Equal($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
+                            break;
+                        case "ProtocolVersion":
+                            Assert.Equal("1", attribute.Value);
+                            break;
+                        case "Win64":
+                            Assert.Equal("yes", attribute.Value);
+                            break;
+                        case "xmlns":
+                            Assert.Equal("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
+                            break;
+                        default:
+                            Assert.False(true, $"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
+                            break;
+                    }
+                }
             }
         }
 
