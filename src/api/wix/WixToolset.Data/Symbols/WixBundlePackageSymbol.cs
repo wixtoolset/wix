@@ -16,8 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.InstallCondition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Cache), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.CacheId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Vital), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.PerMachine), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.PerMachine), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.LogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RollbackLogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Size), IntermediateFieldType.LargeNumber),
@@ -28,7 +27,6 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RollbackBoundaryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RollbackBoundaryBackwardRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Win64), IntermediateFieldType.Bool),
             },
             typeof(WixBundlePackageSymbol));
     }
@@ -46,7 +44,6 @@ namespace WixToolset.Data.Symbols
         InstallCondition,
         Cache,
         CacheId,
-        Vital,
         PerMachine,
         LogPathVariable,
         RollbackLogPathVariable,
@@ -58,7 +55,6 @@ namespace WixToolset.Data.Symbols
         Description,
         RollbackBoundaryRef,
         RollbackBoundaryBackwardRef,
-        Win64,
     }
 
     /// <summary>
@@ -66,6 +62,7 @@ namespace WixToolset.Data.Symbols
     /// </summary>
     public enum WixBundlePackageType
     {
+        NotSet = -1,
         Bundle,
         Exe,
         Msi,
@@ -76,10 +73,11 @@ namespace WixToolset.Data.Symbols
     [Flags]
     public enum WixBundlePackageAttributes
     {
+        None = 0x0,
         Permanent = 0x1,
         Visible = 0x2,
-        PerMachine = 0x4,
-        Win64 = 0x8,
+        Win64 = 0x4,
+        Vital = 0x8,
     }
 
     public class WixBundlePackageSymbol : IntermediateSymbol
@@ -96,7 +94,15 @@ namespace WixToolset.Data.Symbols
 
         public WixBundlePackageType Type
         {
-            get => (WixBundlePackageType)Enum.Parse(typeof(WixBundlePackageType), (string)this.Fields[(int)WixBundlePackageSymbolFields.Type], true);
+            get
+            {
+                if (Enum.TryParse((string)this.Fields[(int)WixBundlePackageSymbolFields.Type], true, out WixBundlePackageType value))
+                {
+                    return value;
+                }
+
+                return WixBundlePackageType.NotSet;
+            }
             set => this.Set((int)WixBundlePackageSymbolFields.Type, value.ToString());
         }
 
@@ -130,16 +136,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePackageSymbolFields.CacheId, value);
         }
 
-        public bool? Vital
+        public bool? PerMachine
         {
-            get => (bool?)this.Fields[(int)WixBundlePackageSymbolFields.Vital];
-            set => this.Set((int)WixBundlePackageSymbolFields.Vital, value);
-        }
-
-        public YesNoDefaultType PerMachine
-        {
-            get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageSymbolFields.PerMachine], true, out YesNoDefaultType value) ? value : YesNoDefaultType.NotSet;
-            set => this.Set((int)WixBundlePackageSymbolFields.PerMachine, value.ToString().ToLowerInvariant());
+            get => (bool?)this.Fields[(int)WixBundlePackageSymbolFields.PerMachine];
+            set => this.Set((int)WixBundlePackageSymbolFields.PerMachine, value);
         }
 
         public string LogPathVariable
@@ -202,12 +202,68 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePackageSymbolFields.RollbackBoundaryBackwardRef, value);
         }
 
-        public bool Win64
+        public bool Permanent
         {
-            get => (bool)this.Fields[(int)WixBundlePackageSymbolFields.Win64];
-            set => this.Set((int)WixBundlePackageSymbolFields.Win64, value);
+            get { return this.Attributes.HasFlag(WixBundlePackageAttributes.Permanent); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundlePackageAttributes.Permanent;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundlePackageAttributes.Permanent;
+                }
+            }
         }
 
-        public bool Permanent => (this.Attributes & WixBundlePackageAttributes.Permanent) == WixBundlePackageAttributes.Permanent;
+        public bool Visible
+        {
+            get { return this.Attributes.HasFlag(WixBundlePackageAttributes.Visible); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundlePackageAttributes.Visible;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundlePackageAttributes.Visible;
+                }
+            }
+        }
+
+        public bool Win64
+        {
+            get { return this.Attributes.HasFlag(WixBundlePackageAttributes.Win64); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundlePackageAttributes.Win64;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundlePackageAttributes.Win64;
+                }
+            }
+        }
+
+        public bool Vital
+        {
+            get { return this.Attributes.HasFlag(WixBundlePackageAttributes.Vital); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundlePackageAttributes.Vital;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundlePackageAttributes.Vital;
+                }
+            }
+        }
     }
 }

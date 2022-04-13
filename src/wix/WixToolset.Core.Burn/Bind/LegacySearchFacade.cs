@@ -3,6 +3,7 @@
 namespace WixToolset.Core.Burn
 {
     using System;
+    using System.Diagnostics;
     using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -37,6 +38,8 @@ namespace WixToolset.Core.Burn
                 case WixRegistrySearchSymbol symbol:
                     this.WriteRegistrySearchXml(writer, symbol);
                     break;
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -53,17 +56,19 @@ namespace WixToolset.Core.Burn
                 writer.WriteAttributeString("ProductCode", searchSymbol.ProductCode);
             }
 
-            if (0 != (searchSymbol.Attributes & WixComponentSearchAttributes.KeyPath))
+            switch (searchSymbol.Type)
             {
-                writer.WriteAttributeString("Type", "keyPath");
-            }
-            else if (0 != (searchSymbol.Attributes & WixComponentSearchAttributes.State))
-            {
-                writer.WriteAttributeString("Type", "state");
-            }
-            else if (0 != (searchSymbol.Attributes & WixComponentSearchAttributes.WantDirectory))
-            {
-                writer.WriteAttributeString("Type", "directory");
+                case WixComponentSearchType.KeyPath:
+                    writer.WriteAttributeString("Type", "keyPath");
+                    break;
+                case WixComponentSearchType.State:
+                    writer.WriteAttributeString("Type", "state");
+                    break;
+                case WixComponentSearchType.WantDirectory:
+                    writer.WriteAttributeString("Type", "directory");
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
 
             writer.WriteEndElement();
@@ -71,24 +76,28 @@ namespace WixToolset.Core.Burn
 
         private void WriteFileSearchXml(XmlTextWriter writer, WixFileSearchSymbol searchSymbol)
         {
-            writer.WriteStartElement((0 == (searchSymbol.Attributes & WixFileSearchAttributes.IsDirectory)) ? "FileSearch" : "DirectorySearch");
+            writer.WriteStartElement(!searchSymbol.IsDirectory ? "FileSearch" : "DirectorySearch");
 
             base.WriteXml(writer);
 
             writer.WriteAttributeString("Path", searchSymbol.Path);
-            if (WixFileSearchAttributes.WantExists == (searchSymbol.Attributes & WixFileSearchAttributes.WantExists))
+
+            switch (searchSymbol.Type)
             {
-                writer.WriteAttributeString("Type", "exists");
+                case WixFileSearchType.Exists:
+                    writer.WriteAttributeString("Type", "exists");
+                    break;
+                case WixFileSearchType.Version:
+                    Debug.Assert(!searchSymbol.IsDirectory, "Version search type is invalid for DirectorySearch");
+                    writer.WriteAttributeString("Type", "version");
+                    break;
+                case WixFileSearchType.Path:
+                    writer.WriteAttributeString("Type", "path");
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
-            else if (WixFileSearchAttributes.WantVersion == (searchSymbol.Attributes & WixFileSearchAttributes.WantVersion))
-            {
-                // Can never get here for DirectorySearch.
-                writer.WriteAttributeString("Type", "version");
-            }
-            else
-            {
-                writer.WriteAttributeString("Type", "path");
-            }
+
             writer.WriteEndElement();
         }
 
@@ -98,7 +107,7 @@ namespace WixToolset.Core.Burn
 
             base.WriteXml(writer);
 
-            if (0 != (symbol.Attributes & WixProductSearchAttributes.UpgradeCode))
+            if (symbol.IsUpgradeCode)
             {
                 writer.WriteAttributeString("UpgradeCode", symbol.Guid);
             }
@@ -107,21 +116,22 @@ namespace WixToolset.Core.Burn
                 writer.WriteAttributeString("ProductCode", symbol.Guid);
             }
 
-            if (0 != (symbol.Attributes & WixProductSearchAttributes.Version))
+            switch (symbol.Type)
             {
-                writer.WriteAttributeString("Type", "version");
-            }
-            else if (0 != (symbol.Attributes & WixProductSearchAttributes.Language))
-            {
-                writer.WriteAttributeString("Type", "language");
-            }
-            else if (0 != (symbol.Attributes & WixProductSearchAttributes.State))
-            {
-                writer.WriteAttributeString("Type", "state");
-            }
-            else if (0 != (symbol.Attributes & WixProductSearchAttributes.Assignment))
-            {
-                writer.WriteAttributeString("Type", "assignment");
+                case WixProductSearchType.Version:
+                    writer.WriteAttributeString("Type", "version");
+                    break;
+                case WixProductSearchType.Language:
+                    writer.WriteAttributeString("Type", "language");
+                    break;
+                case WixProductSearchType.State:
+                    writer.WriteAttributeString("Type", "state");
+                    break;
+                case WixProductSearchType.Assignment:
+                    writer.WriteAttributeString("Type", "assignment");
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
 
             writer.WriteEndElement();
@@ -147,6 +157,8 @@ namespace WixToolset.Core.Burn
                 case RegistryRootType.Users:
                     writer.WriteAttributeString("Root", "HKU");
                     break;
+                default:
+                    throw new NotImplementedException();
             }
 
             writer.WriteAttributeString("Key", symbol.Key);
@@ -156,27 +168,32 @@ namespace WixToolset.Core.Burn
                 writer.WriteAttributeString("Value", symbol.Value);
             }
 
-            var existenceOnly = 0 != (symbol.Attributes & WixRegistrySearchAttributes.WantExists);
-
-            writer.WriteAttributeString("Type", existenceOnly ? "exists" : "value");
-
-            if (0 != (symbol.Attributes & WixRegistrySearchAttributes.Win64))
+            if (symbol.Win64)
             {
                 writer.WriteAttributeString("Win64", "yes");
             }
 
-            if (!existenceOnly)
+            switch (symbol.Type)
             {
-                if (0 != (symbol.Attributes & WixRegistrySearchAttributes.ExpandEnvironmentVariables))
-                {
-                    writer.WriteAttributeString("ExpandEnvironment", "yes");
-                }
+                case WixRegistrySearchType.Exists:
+                    writer.WriteAttributeString("Type", "exists");
+                    break;
+                case WixRegistrySearchType.Value:
+                    writer.WriteAttributeString("Type", "value");
 
-                // We *always* say this is VariableType="string". If we end up
-                // needing to be more specific, we will have to expand the "Format"
-                // attribute to allow "number" and "version".
+                    if (symbol.ExpandEnvironmentVariables)
+                    {
+                        writer.WriteAttributeString("ExpandEnvironment", "yes");
+                    }
 
-                writer.WriteAttributeString("VariableType", "string");
+                    // We *always* say this is VariableType="string".
+                    // If we end up needing to be more specific,
+                    // we will have to actually implement the "Format" attribute.
+                    writer.WriteAttributeString("VariableType", "string");
+
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
 
             writer.WriteEndElement();

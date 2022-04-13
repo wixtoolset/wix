@@ -40,7 +40,6 @@ namespace WixToolset.Data.Symbols
     {
         None = 0,
         SupportsBurnProtocol = 1,
-        Win64 = 2,
     }
 
     public class WixBundleBundlePackageSymbol : IntermediateSymbol
@@ -103,22 +102,6 @@ namespace WixToolset.Data.Symbols
                 else
                 {
                     this.Attributes &= ~WixBundleBundlePackageAttributes.SupportsBurnProtocol;
-                }
-            }
-        }
-
-        public bool Win64
-        {
-            get { return this.Attributes.HasFlag(WixBundleBundlePackageAttributes.Win64); }
-            set
-            {
-                if (value)
-                {
-                    this.Attributes |= WixBundleBundlePackageAttributes.Win64;
-                }
-                else
-                {
-                    this.Attributes &= ~WixBundleBundlePackageAttributes.Win64;
                 }
             }
         }

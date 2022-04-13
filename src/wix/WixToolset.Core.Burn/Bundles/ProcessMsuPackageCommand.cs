@@ -31,7 +31,7 @@ namespace WixToolset.Core.Burn.Bundles
                 this.Facade.PackageSymbol.CacheId = packagePayload.Hash;
             }
 
-            this.Facade.PackageSymbol.PerMachine = YesNoDefaultType.Yes; // MSUs are always per-machine.
+            this.Facade.PackageSymbol.PerMachine = true; // MSUs are always per-machine.
         }
     }
 }

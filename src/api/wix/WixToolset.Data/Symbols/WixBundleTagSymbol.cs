@@ -23,6 +23,8 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixBundleTagSymbolFields
     {
         Filename,
@@ -31,6 +33,12 @@ namespace WixToolset.Data.Symbols
         InstallPath,
         Attributes,
         Xml,
+    }
+
+    [Flags]
+    public enum WixBundleTagAttributes
+    {
+        None = 0x0,
     }
 
     public class WixBundleTagSymbol : IntermediateSymbol
@@ -69,10 +77,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleTagSymbolFields.InstallPath, value);
         }
 
-        public int Attributes
+        public WixBundleTagAttributes Attributes
         {
-            get => this.Fields[(int)WixBundleTagSymbolFields.Attributes].AsNumber();
-            set => this.Set((int)WixBundleTagSymbolFields.Attributes, value);
+            get => (WixBundleTagAttributes)this.Fields[(int)WixBundleTagSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundleTagSymbolFields.Attributes, (int)value);
         }
 
         public string Xml

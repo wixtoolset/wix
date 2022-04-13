@@ -97,7 +97,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void ProcessPatchXml(WixBundlePayloadSymbol packagePayload, WixBundleMspPackageSymbol mspPackage, string sourcePath)
         {
-            var uniqueTargetCodes = new HashSet<string>();
+            var uniqueTargetCodes = new Dictionary<string, WixBundlePatchTargetCodeSymbol>();
 
             var patchXml = Installer.ExtractPatchXml(sourcePath);
 
@@ -112,35 +112,42 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 // If this patch targets a product code, this is the best case.
                 var targetCodeElement = node.SelectSingleNode("p:TargetProductCode", nsmgr);
-                var attributes = WixBundlePatchTargetCodeAttributes.None;
+                WixBundlePatchTargetCodeType type;
 
                 if (ProcessMspPackageCommand.TargetsCode(targetCodeElement))
                 {
-                    attributes = WixBundlePatchTargetCodeAttributes.TargetsProductCode;
+                    type = WixBundlePatchTargetCodeType.ProductCode;
                 }
                 else // maybe targets an upgrade code?
                 {
                     targetCodeElement = node.SelectSingleNode("p:UpgradeCode", nsmgr);
                     if (ProcessMspPackageCommand.TargetsCode(targetCodeElement))
                     {
-                        attributes = WixBundlePatchTargetCodeAttributes.TargetsUpgradeCode;
+                        type = WixBundlePatchTargetCodeType.UpgradeCode;
                     }
                     else // this patch targets an unknown number of products
                     {
-                        mspPackage.Attributes |= WixBundleMspPackageAttributes.TargetUnspecified;
+                        type = WixBundlePatchTargetCodeType.Unspecified;
                     }
                 }
 
                 var targetCode = targetCodeElement.InnerText;
 
-                if (uniqueTargetCodes.Add(targetCode))
+                if (!uniqueTargetCodes.TryGetValue(targetCode, out var existing))
                 {
-                    this.Section.AddSymbol(new WixBundlePatchTargetCodeSymbol(packagePayload.SourceLineNumbers)
+                    var symbol = this.Section.AddSymbol(new WixBundlePatchTargetCodeSymbol(packagePayload.SourceLineNumbers)
                     {
                         PackageRef = packagePayload.Id.Id,
                         TargetCode = targetCode,
-                        Attributes = attributes
+                        Attributes = 0,
+                        Type = type,
                     });
+
+                    uniqueTargetCodes.Add(targetCode, symbol);
+                }
+                else if (type == WixBundlePatchTargetCodeType.Unspecified)
+                {
+                    existing.Type = type;
                 }
             }
 
@@ -178,6 +185,9 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private static bool TargetsCode(XmlNode node) => "true" == node?.Attributes["Validate"]?.Value;
+        private static bool TargetsCode(XmlNode node)
+        {
+            return "true" == node?.Attributes["Validate"]?.Value;
+        }
     }
 }

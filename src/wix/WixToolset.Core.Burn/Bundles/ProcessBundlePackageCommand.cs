@@ -82,7 +82,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case BurnCommon.IMAGE_FILE_MACHINE_ARM64:
                     case BurnCommon.IMAGE_FILE_MACHINE_IA64:
                     case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH64:
-                        bundlePackage.Win64 = true;
+                        this.Facade.PackageSymbol.Win64 = true;
                         break;
                     case BurnCommon.IMAGE_FILE_MACHINE_EBC:
                     case BurnCommon.IMAGE_FILE_MACHINE_MIPS16:
@@ -123,11 +123,11 @@ namespace WixToolset.Core.Burn.Bundles
                         return;
                     }
 
-                    if (BurnCommon.BurnV3Namespace == document.DocumentElement.NamespaceURI && !this.Facade.PackageSymbol.Attributes.HasFlag(WixBundlePackageAttributes.Visible))
+                    if (BurnCommon.BurnV3Namespace == document.DocumentElement.NamespaceURI && !this.Facade.PackageSymbol.Visible)
                     {
                         this.Messaging.Write(BurnBackendWarnings.HiddenBundleNotSupported(packagePayload.SourceLineNumbers, sourcePath));
 
-                        this.Facade.PackageSymbol.Attributes |= WixBundlePackageAttributes.Visible;
+                        this.Facade.PackageSymbol.Visible = true;
                     }
 
                     namespaceManager.AddNamespace("burn", document.DocumentElement.NamespaceURI);
@@ -135,7 +135,7 @@ namespace WixToolset.Core.Burn.Bundles
                     var arpElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration/burn:Arp", namespaceManager) as XmlElement;
 
                     var perMachine = registrationElement.GetAttribute("PerMachine") == "yes";
-                    this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
+                    this.Facade.PackageSymbol.PerMachine = perMachine;
 
                     var version = registrationElement.GetAttribute("Version");
                     packagePayload.Version = version;

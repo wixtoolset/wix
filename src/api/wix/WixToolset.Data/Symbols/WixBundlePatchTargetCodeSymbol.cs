@@ -13,6 +13,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.TargetCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.Type), IntermediateFieldType.Number),
             },
             typeof(WixBundlePatchTargetCodeSymbol));
     }
@@ -27,22 +28,31 @@ namespace WixToolset.Data.Symbols
         PackageRef,
         TargetCode,
         Attributes,
+        Type,
     }
 
     [Flags]
     public enum WixBundlePatchTargetCodeAttributes : int
     {
         None = 0,
+    }
+
+    public enum WixBundlePatchTargetCodeType
+    {
+        /// <summary>
+        /// The transform has no specific target.
+        /// </summary>
+        Unspecified,
 
         /// <summary>
         /// The transform targets a specific ProductCode.
         /// </summary>
-        TargetsProductCode = 1,
+        ProductCode,
 
         /// <summary>
         /// The transform targets a specific UpgradeCode.
         /// </summary>
-        TargetsUpgradeCode = 2,
+        UpgradeCode,
     }
 
     public class WixBundlePatchTargetCodeSymbol : IntermediateSymbol
@@ -75,8 +85,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.Attributes, (int)value);
         }
 
-        public bool TargetsProductCode => (this.Attributes & WixBundlePatchTargetCodeAttributes.TargetsProductCode) == WixBundlePatchTargetCodeAttributes.TargetsProductCode;
-
-        public bool TargetsUpgradeCode => (this.Attributes & WixBundlePatchTargetCodeAttributes.TargetsUpgradeCode) == WixBundlePatchTargetCodeAttributes.TargetsUpgradeCode;
+        public WixBundlePatchTargetCodeType Type
+        {
+            get => (WixBundlePatchTargetCodeType)this.Fields[(int)WixBundlePatchTargetCodeSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.Type, (int)value);
+        }
     }
 }

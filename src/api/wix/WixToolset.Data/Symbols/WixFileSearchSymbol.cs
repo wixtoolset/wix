@@ -19,6 +19,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MaxDate), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.Languages), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.Type), IntermediateFieldType.Number),
             },
             typeof(WixFileSearchSymbol));
     }
@@ -39,21 +40,27 @@ namespace WixToolset.Data.Symbols
         MaxDate,
         Languages,
         Attributes,
+        Type,
     }
 
     [Flags]
     public enum WixFileSearchAttributes
     {
-        Default = 0x001,
+        None = 0x000,
+        IsDirectory = 0x001,
         MinVersionInclusive = 0x002,
         MaxVersionInclusive = 0x004,
         MinSizeInclusive = 0x008,
         MaxSizeInclusive = 0x010,
         MinDateInclusive = 0x020,
         MaxDateInclusive = 0x040,
-        WantVersion = 0x080,
-        WantExists = 0x100,
-        IsDirectory = 0x200,
+    }
+
+    public enum WixFileSearchType
+    {
+        Path,
+        Version,
+        Exists,
     }
 
     public class WixFileSearchSymbol : IntermediateSymbol
@@ -120,6 +127,124 @@ namespace WixToolset.Data.Symbols
         {
             get => (WixFileSearchAttributes)this.Fields[(int)WixFileSearchSymbolFields.Attributes].AsNumber();
             set => this.Set((int)WixFileSearchSymbolFields.Attributes, (int)value);
+        }
+
+        public WixFileSearchType Type
+        {
+            get => (WixFileSearchType)this.Fields[(int)WixFileSearchSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixFileSearchSymbolFields.Type, (int)value);
+        }
+
+        public bool IsDirectory
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.IsDirectory); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.IsDirectory;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.IsDirectory;
+                }
+            }
+        }
+
+        public bool MinVersionInclusive
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.MinVersionInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.MinVersionInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.MinVersionInclusive;
+                }
+            }
+        }
+
+        public bool MaxVersionInclusive
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.MaxVersionInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.MaxVersionInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.MaxVersionInclusive;
+                }
+            }
+        }
+
+        public bool MinSizeInclusive
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.MinSizeInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.MinSizeInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.MinSizeInclusive;
+                }
+            }
+        }
+
+        public bool MaxSizeInclusive
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.MaxSizeInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.MaxSizeInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.MaxSizeInclusive;
+                }
+            }
+        }
+
+        public bool MinDateInclusive
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.MinDateInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.MinDateInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.MinDateInclusive;
+                }
+            }
+        }
+
+        public bool MaxDateInclusive
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.MaxDateInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.MaxDateInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.MaxDateInclusive;
+                }
+            }
         }
     }
 }

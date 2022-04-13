@@ -90,7 +90,21 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleExePackageSymbolFields.ExeProtocol, value);
         }
 
-        public bool IsBundle => this.Attributes.HasFlag(WixBundleExePackageAttributes.Bundle);
+        public bool IsBundle
+        {
+            get { return this.Attributes.HasFlag(WixBundleExePackageAttributes.Bundle); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleExePackageAttributes.Bundle;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleExePackageAttributes.Bundle;
+                }
+            }
+        }
 
         public bool Repairable => this.RepairCommand != null;
 

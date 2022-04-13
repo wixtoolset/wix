@@ -40,7 +40,8 @@ namespace WixToolset.Data.Symbols
     [Flags]
     public enum WixBundleMsiPackageAttributes
     {
-        EnableFeatureSelection = 0x4,
+        None = 0x0,
+        EnableFeatureSelection = 0x1,
         ForcePerMachine = 0x2,
     }
 
@@ -98,8 +99,36 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleMsiPackageSymbolFields.Manufacturer, value);
         }
 
-        public bool EnableFeatureSelection => (this.Attributes & WixBundleMsiPackageAttributes.EnableFeatureSelection) == WixBundleMsiPackageAttributes.EnableFeatureSelection;
+        public bool EnableFeatureSelection
+        {
+            get { return this.Attributes.HasFlag(WixBundleMsiPackageAttributes.EnableFeatureSelection); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleMsiPackageAttributes.EnableFeatureSelection;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleMsiPackageAttributes.EnableFeatureSelection;
+                }
+            }
+        }
 
-        public bool ForcePerMachine => (this.Attributes & WixBundleMsiPackageAttributes.ForcePerMachine) == WixBundleMsiPackageAttributes.ForcePerMachine;
+        public bool ForcePerMachine
+        {
+            get { return this.Attributes.HasFlag(WixBundleMsiPackageAttributes.ForcePerMachine); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleMsiPackageAttributes.ForcePerMachine;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleMsiPackageAttributes.ForcePerMachine;
+                }
+            }
+        }
     }
 }

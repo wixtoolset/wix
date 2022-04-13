@@ -34,6 +34,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.InProgressName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.CommandLineVariables), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.DisableModify), IntermediateFieldType.String),
             },
             typeof(WixBundleSymbol));
     }
@@ -69,22 +70,28 @@ namespace WixToolset.Data.Symbols
         ProviderKey,
         InProgressName,
         CommandLineVariables,
+        DisableModify,
     }
 
     [Flags]
     public enum WixBundleAttributes
     {
         None = 0x0,
-        DisableModify = 0x1,
-        DisableRemove = 0x2,
-        SingleChangeUninstallButton = 0x4,
-        PerMachine = 0x8,
+        DisableRemove = 0x1,
+        PerMachine = 0x2,
     }
 
     public enum WixBundleCommandLineVariables
     {
         UpperCase,
         CaseSensitive,
+    }
+
+    public enum WixBundleModifyType
+    {
+        Allowed = 0,
+        Disabled = 1,
+        SingleChangeUninstallButton = 2,
     }
 
     public class WixBundleSymbol : IntermediateSymbol
@@ -243,14 +250,52 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleSymbolFields.CommandLineVariables, (int)value);
         }
 
+        public WixBundleModifyType DisableModify
+        {
+            get
+            {
+                if (Enum.TryParse((string)this.Fields[(int)WixBundleSymbolFields.DisableModify], true, out WixBundleModifyType value))
+                {
+                    return value;
+                }
+
+                return WixBundleModifyType.Allowed;
+            }
+            set => this.Set((int)WixBundleSymbolFields.DisableModify, value.ToString().ToLowerInvariant());
+        }
+
         public PackagingType DefaultPackagingType => (this.Compressed.HasValue && !this.Compressed.Value) ? PackagingType.External : PackagingType.Embedded;
 
-        public bool DisableModify => (this.Attributes & WixBundleAttributes.DisableModify) == WixBundleAttributes.DisableModify;
+        public bool DisableRemove
+        {
+            get { return this.Attributes.HasFlag(WixBundleAttributes.DisableRemove); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleAttributes.DisableRemove;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleAttributes.DisableRemove;
+                }
+            }
+        }
 
-        public bool DisableRemove => (this.Attributes & WixBundleAttributes.DisableRemove) == WixBundleAttributes.DisableRemove;
-
-        public bool PerMachine => (this.Attributes & WixBundleAttributes.PerMachine) == WixBundleAttributes.PerMachine;
-
-        public bool SingleChangeUninstallButton => (this.Attributes & WixBundleAttributes.SingleChangeUninstallButton) == WixBundleAttributes.SingleChangeUninstallButton;
+        public bool PerMachine
+        {
+            get { return this.Attributes.HasFlag(WixBundleAttributes.PerMachine); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleAttributes.PerMachine;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleAttributes.PerMachine;
+                }
+            }
+        }
     }
 }

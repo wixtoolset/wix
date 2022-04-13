@@ -57,7 +57,7 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     if (this.PackageFacades.TryGetValue(groupSymbol.ChildId, out var facade))
                     {
-                        var insideMsiTransaction = lastRollbackBoundary.Transaction ?? false;
+                        var insideMsiTransaction = lastRollbackBoundary.Transaction;
 
                         if (null != pendingRollbackBoundary)
                         {

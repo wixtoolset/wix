@@ -4,7 +4,6 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -43,7 +42,7 @@ namespace WixToolset.Core.Burn.Bundles
                     // Index target ProductCodes and UpgradeCodes for slipstreamed MSPs.
                     foreach (var symbol in patchTargetCodeSymbols)
                     {
-                        if (symbol.TargetsProductCode)
+                        if (symbol.Type == WixBundlePatchTargetCodeType.ProductCode)
                         {
                             if (!targetsProductCode.TryGetValue(symbol.TargetCode, out var symbols))
                             {
@@ -53,13 +52,15 @@ namespace WixToolset.Core.Burn.Bundles
 
                             symbols.Add(symbol);
                         }
-                        else if (symbol.TargetsUpgradeCode)
+                        else if (symbol.Type == WixBundlePatchTargetCodeType.UpgradeCode)
                         {
                             if (!targetsUpgradeCode.TryGetValue(symbol.TargetCode, out var symbols))
                             {
                                 symbols = new List<WixBundlePatchTargetCodeSymbol>();
                                 targetsUpgradeCode.Add(symbol.TargetCode, symbols);
                             }
+
+                            symbols.Add(symbol);
                         }
                     }
                 }
@@ -74,9 +75,6 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     foreach (var symbol in symbols)
                     {
-                        Debug.Assert(symbol.TargetsProductCode);
-                        Debug.Assert(!symbol.TargetsUpgradeCode);
-
                         this.TryAddSlipstreamSymbol(slipstreamMspIds, msi, symbol);
                     }
                 }
@@ -85,13 +83,8 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     foreach (var symbol in symbols)
                     {
-                        Debug.Assert(!symbol.TargetsProductCode);
-                        Debug.Assert(symbol.TargetsUpgradeCode);
-
                         this.TryAddSlipstreamSymbol(slipstreamMspIds, msi, symbol);
                     }
-
-                    symbols = null;
                 }
             }
         }

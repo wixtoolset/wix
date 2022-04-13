@@ -66,6 +66,20 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixApprovedExeForElevationSymbolFields.Attributes, (int)value);
         }
 
-        public bool Win64 => (this.Attributes & WixApprovedExeForElevationAttributes.Win64) == WixApprovedExeForElevationAttributes.Win64;
+        public bool Win64
+        {
+            get { return this.Attributes.HasFlag(WixApprovedExeForElevationAttributes.Win64); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixApprovedExeForElevationAttributes.Win64;
+                }
+                else
+                {
+                    this.Attributes &= ~WixApprovedExeForElevationAttributes.Win64;
+                }
+            }
+        }
     }
 }

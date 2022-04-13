@@ -52,10 +52,52 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixChainSymbolFields.Attributes, (int)value);
         }
 
-        public bool DisableRollback => (this.Attributes & WixChainAttributes.DisableRollback) == WixChainAttributes.DisableRollback;
+        public bool DisableRollback
+        {
+            get { return this.Attributes.HasFlag(WixChainAttributes.DisableRollback); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixChainAttributes.DisableRollback;
+                }
+                else
+                {
+                    this.Attributes &= ~WixChainAttributes.DisableRollback;
+                }
+            }
+        }
 
-        public bool DisableSystemRestore => (this.Attributes & WixChainAttributes.DisableSystemRestore) == WixChainAttributes.DisableSystemRestore;
+        public bool DisableSystemRestore
+        {
+            get { return this.Attributes.HasFlag(WixChainAttributes.DisableSystemRestore); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixChainAttributes.DisableSystemRestore;
+                }
+                else
+                {
+                    this.Attributes &= ~WixChainAttributes.DisableSystemRestore;
+                }
+            }
+        }
 
-        public bool ParallelCache => (this.Attributes & WixChainAttributes.ParallelCache) == WixChainAttributes.ParallelCache;
+        public bool ParallelCache
+        {
+            get { return this.Attributes.HasFlag(WixChainAttributes.ParallelCache); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixChainAttributes.ParallelCache;
+                }
+                else
+                {
+                    this.Attributes &= ~WixChainAttributes.ParallelCache;
+                }
+            }
+        }
     }
 }

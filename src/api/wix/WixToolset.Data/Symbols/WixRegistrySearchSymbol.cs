@@ -14,6 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Type), IntermediateFieldType.Number),
             },
             typeof(WixRegistrySearchSymbol));
     }
@@ -29,17 +30,21 @@ namespace WixToolset.Data.Symbols
         Key,
         Value,
         Attributes,
+        Type,
     }
 
     [Flags]
     public enum WixRegistrySearchAttributes
     {
-        Raw = 0x01,
-        Compatible = 0x02,
-        ExpandEnvironmentVariables = 0x04,
-        WantValue = 0x08,
-        WantExists = 0x10,
-        Win64 = 0x20,
+        None = 0x0,
+        ExpandEnvironmentVariables = 0x01,
+        Win64 = 0x2,
+    }
+
+    public enum WixRegistrySearchType
+    {
+        Value,
+        Exists,
     }
 
     public class WixRegistrySearchSymbol : IntermediateSymbol
@@ -76,6 +81,44 @@ namespace WixToolset.Data.Symbols
         {
             get => (WixRegistrySearchAttributes)this.Fields[(int)WixRegistrySearchSymbolFields.Attributes].AsNumber();
             set => this.Set((int)WixRegistrySearchSymbolFields.Attributes, (int)value);
+        }
+
+        public WixRegistrySearchType Type
+        {
+            get => (WixRegistrySearchType)this.Fields[(int)WixRegistrySearchSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixRegistrySearchSymbolFields.Type, (int)value);
+        }
+
+        public bool ExpandEnvironmentVariables
+        {
+            get { return this.Attributes.HasFlag(WixRegistrySearchAttributes.ExpandEnvironmentVariables); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixRegistrySearchAttributes.ExpandEnvironmentVariables;
+                }
+                else
+                {
+                    this.Attributes &= ~WixRegistrySearchAttributes.ExpandEnvironmentVariables;
+                }
+            }
+        }
+
+        public bool Win64
+        {
+            get { return this.Attributes.HasFlag(WixRegistrySearchAttributes.Win64); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixRegistrySearchAttributes.Win64;
+                }
+                else
+                {
+                    this.Attributes &= ~WixRegistrySearchAttributes.Win64;
+                }
+            }
         }
     }
 }
