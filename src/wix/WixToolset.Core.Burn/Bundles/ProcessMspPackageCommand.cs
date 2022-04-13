@@ -53,7 +53,7 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var harvestedMspPackage = this.Section.Symbols.OfType<WixBundleHarvestedMspPackageSymbol>()
-                                                          .Where(h => h.Id == this.PackagePayload.Id)
+                                                          .Where(h => h.Id.Id == this.PackagePayload.Id.Id)
                                                           .SingleOrDefault();
 
             if (harvestedMspPackage == null)

@@ -2552,7 +2552,7 @@ namespace WixToolset.Core
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
             {
                 Id = defaultId,
-                IsRemoteAllowed = packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu,
+                IsRemoteAllowed = packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu,
             };
 
             // This list lets us evaluate extension attributes *after* all core attributes
@@ -2659,9 +2659,289 @@ namespace WixToolset.Core
                 this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
             }
 
-            this.Core.ParseForExtensionElements(node);
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    bool allowed;
+                    switch (child.Name.LocalName)
+                    {
+                        case "RemoteBundle":
+                            allowed = packageType == WixBundlePackageType.Bundle;
+
+                            if (allowed)
+                            {
+                                this.ParseRemoteBundleElement(child, compilerPayload.Id.Id);
+                            }
+
+                            break;
+                        default:
+                            allowed = false;
+                            break;
+                    }
+
+                    if (!allowed)
+                    {
+                        this.Core.UnexpectedElement(node, child);
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
 
             return compilerPayload;
+        }
+
+        private void ParseRemoteBundleElement(XElement node, string packagePayloadId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string bundleId = null;
+            string displayName = null;
+            string engineVersion = null;
+            long? installSize = null;
+            string manifestNamespace = null;
+            var perMachine = YesNoType.NotSet;
+            var protocolVersion = -1;
+            string providerKey = null;
+            string upgradeCode = null;
+            string version = null;
+            var win64 = YesNoType.NotSet;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "BundleId":
+                            bundleId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DisplayName":
+                            displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "EngineVersion":
+                            engineVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            break;
+                        case "InstallSize":
+                            installSize = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, Int64.MaxValue);
+                            break;
+                        case "ManifestNamespace":
+                            manifestNamespace = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "PerMachine":
+                            perMachine = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ProtocolVersion":
+                            protocolVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                            break;
+                        case "ProviderKey":
+                            providerKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UpgradeCode":
+                            upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Version":
+                            version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Win64":
+                            win64 = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (String.IsNullOrEmpty(bundleId))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BundleId"));
+            }
+
+            if (String.IsNullOrEmpty(manifestNamespace))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ManifestNamespace"));
+            }
+
+            if (perMachine == YesNoType.NotSet)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PerMachine"));
+            }
+
+            if (protocolVersion == -1)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProtocolVersion"));
+            }
+
+            if (String.IsNullOrEmpty(providerKey))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProviderKey"));
+            }
+
+            if (String.IsNullOrEmpty(upgradeCode))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpgradeCode"));
+            }
+
+            if (String.IsNullOrEmpty(version))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+            }
+
+            if (win64 == YesNoType.NotSet)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Win64"));
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                WixBundleHarvestedBundlePackageAttributes bundleAttributes = 0;
+                bundleAttributes |= (YesNoType.Yes == perMachine) ? WixBundleHarvestedBundlePackageAttributes.PerMachine : 0;
+                bundleAttributes |= (YesNoType.Yes == win64) ? WixBundleHarvestedBundlePackageAttributes.Win64 : 0;
+
+                var symbol = this.Core.AddSymbol(new WixBundleHarvestedBundlePackageSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, packagePayloadId))
+                {
+                    Attributes = bundleAttributes,
+                    BundleId = bundleId,
+                    DisplayName = displayName,
+                    EngineVersion = engineVersion,
+                    ManifestNamespace = manifestNamespace,
+                    ProtocolVersion = protocolVersion,
+                    Version = version,
+                });
+
+                if (installSize.HasValue)
+                {
+                    symbol.InstallSize = installSize.Value;
+                }
+
+                this.Core.AddSymbol(new WixBundlePackageRelatedBundleSymbol(sourceLineNumbers)
+                {
+                    PackagePayloadRef = packagePayloadId,
+                    BundleId = upgradeCode,
+                    Action = RelatedBundleActionType.Upgrade,
+                });
+
+                var depId = new Identifier(AccessModifier.Section, this.Core.CreateIdentifier("dep", packagePayloadId, providerKey));
+                this.Core.AddSymbol(new WixBundleHarvestedDependencyProviderSymbol(sourceLineNumbers, depId)
+                {
+                    PackagePayloadRef = packagePayloadId,
+                    ProviderKey = providerKey,
+                    Version = version,
+                });
+            }
+
+            var context = new Dictionary<string, string>
+            {
+                ["Id"] = packagePayloadId,
+            };
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "RemoteRelatedBundle":
+                            this.ParseRemoteRelatedBundleElement(child, packagePayloadId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
+        }
+
+        private void ParseRemoteRelatedBundleElement(XElement node, string payloadId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+            RelatedBundleActionType? actionType = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Action":
+                            var action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (action)
+                            {
+                                case "Detect":
+                                case "detect":
+                                    actionType = RelatedBundleActionType.Detect;
+                                    break;
+                                case "Upgrade":
+                                case "upgrade":
+                                    actionType = RelatedBundleActionType.Upgrade;
+                                    break;
+                                case "Addon":
+                                case "addon":
+                                    actionType = RelatedBundleActionType.Addon;
+                                    break;
+                                case "Patch":
+                                case "patch":
+                                    actionType = RelatedBundleActionType.Patch;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            if (!actionType.HasValue)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
+            }
+
+            var context = new Dictionary<string, string>
+            {
+                ["PayloadId"] = payloadId,
+            };
+
+            this.Core.ParseForExtensionElements(node, context);
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.AddSymbol(new WixBundlePackageRelatedBundleSymbol(sourceLineNumbers)
+                {
+                    PackagePayloadRef = payloadId,
+                    BundleId = id,
+                    Action = actionType.Value,
+                });
+            }
         }
 
         /// <summary>
