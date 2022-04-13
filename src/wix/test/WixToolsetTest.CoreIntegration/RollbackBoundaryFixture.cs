@@ -103,6 +103,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[]
                 {
                     "The RollbackBoundary 'Second' was discarded because it was not followed by a package. Without a package the rollback boundary doesn't do anything. Verify that the RollbackBoundary element is not followed by another RollbackBoundary and that the element is not at the end of the chain.",
+                    "Location of rollback boundary related to previous warning.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
 
                 Assert.True(File.Exists(exePath));
