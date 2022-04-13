@@ -10,6 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundlePayload,
             new[]
             {
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.SourceFile), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.DownloadUrl), IntermediateFieldType.String),
@@ -21,7 +22,6 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContainerRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContentFile), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.EmbeddedId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.LayoutOnly), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Packaging), IntermediateFieldType.Number),
@@ -39,6 +39,7 @@ namespace WixToolset.Data.Symbols
 
     public enum WixBundlePayloadSymbolFields
     {
+        Attributes,
         Name,
         SourceFile,
         DownloadUrl,
@@ -50,13 +51,19 @@ namespace WixToolset.Data.Symbols
         Version,
         Hash,
         ContainerRef,
-        ContentFile,
         EmbeddedId,
         LayoutOnly,
         Packaging,
         ParentPackagePayloadRef,
         CertificatePublicKey,
         CertificateThumbprint,
+    }
+
+    [Flags]
+    public enum WixBundlePayloadAttributes
+    {
+        None = 0x0,
+        ContentFile = 0x1,
     }
 
     public class WixBundlePayloadSymbol : IntermediateSymbol
@@ -70,6 +77,12 @@ namespace WixToolset.Data.Symbols
         }
 
         public IntermediateField this[WixBundlePayloadSymbolFields index] => this.Fields[(int)index];
+
+        public WixBundlePayloadAttributes Attributes
+        {
+            get => (WixBundlePayloadAttributes)this.Fields[(int)WixBundlePayloadSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundlePayloadSymbolFields.Attributes, (int)value);
+        }
 
         public string Name
         {
@@ -137,12 +150,6 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePayloadSymbolFields.ContainerRef, value);
         }
 
-        public bool ContentFile
-        {
-            get => (bool)this.Fields[(int)WixBundlePayloadSymbolFields.ContentFile];
-            set => this.Set((int)WixBundlePayloadSymbolFields.ContentFile, value);
-        }
-
         public string EmbeddedId
         {
             get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.EmbeddedId];
@@ -177,6 +184,22 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.CertificateThumbprint];
             set => this.Set((int)WixBundlePayloadSymbolFields.CertificateThumbprint, value);
+        }
+
+        public bool ContentFile
+        {
+            get { return this.Attributes.HasFlag(WixBundlePayloadAttributes.ContentFile); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundlePayloadAttributes.ContentFile;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundlePayloadAttributes.ContentFile;
+                }
+            }
         }
     }
 }

@@ -93,12 +93,68 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleRelatedPackageSymbolFields.Attributes, (int)value);
         }
 
-        public bool MinInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.MinInclusive) == WixBundleRelatedPackageAttributes.MinInclusive;
+        public bool MinInclusive
+        {
+            get { return this.Attributes.HasFlag(WixBundleRelatedPackageAttributes.MinInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleRelatedPackageAttributes.MinInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleRelatedPackageAttributes.MinInclusive;
+                }
+            }
+        }
 
-        public bool MaxInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.MaxInclusive) == WixBundleRelatedPackageAttributes.MaxInclusive;
+        public bool MaxInclusive
+        {
+            get { return this.Attributes.HasFlag(WixBundleRelatedPackageAttributes.MaxInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleRelatedPackageAttributes.MaxInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleRelatedPackageAttributes.MaxInclusive;
+                }
+            }
+        }
 
-        public bool OnlyDetect => (this.Attributes & WixBundleRelatedPackageAttributes.OnlyDetect) == WixBundleRelatedPackageAttributes.OnlyDetect;
+        public bool OnlyDetect
+        {
+            get { return this.Attributes.HasFlag(WixBundleRelatedPackageAttributes.OnlyDetect); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleRelatedPackageAttributes.OnlyDetect;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleRelatedPackageAttributes.OnlyDetect;
+                }
+            }
+        }
 
-        public bool LangInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.LangInclusive) == WixBundleRelatedPackageAttributes.LangInclusive;
+        public bool LangInclusive
+        {
+            get { return this.Attributes.HasFlag(WixBundleRelatedPackageAttributes.LangInclusive); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleRelatedPackageAttributes.LangInclusive;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleRelatedPackageAttributes.LangInclusive;
+                }
+            }
+        }
     }
 }

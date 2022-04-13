@@ -102,7 +102,7 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.ProviderKey = bundleSymbol.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
-            bundleSymbol.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
+            bundleSymbol.PerMachine = true; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
             this.NormalizeRelatedBundles(bundleSymbol, section);
 
@@ -608,11 +608,11 @@ namespace WixToolset.Core.Burn
 
             foreach (var facade in facades)
             {
-                if (bundleSymbol.PerMachine && YesNoDefaultType.No == facade.PackageSymbol.PerMachine)
+                if (bundleSymbol.PerMachine && facade.PackageSymbol.PerMachine.HasValue && !facade.PackageSymbol.PerMachine.Value)
                 {
                     this.Messaging.Write(VerboseMessages.SwitchingToPerUserPackage(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
 
-                    bundleSymbol.Attributes &= ~WixBundleAttributes.PerMachine;
+                    bundleSymbol.PerMachine = false;
                     break;
                 }
             }
@@ -620,15 +620,15 @@ namespace WixToolset.Core.Burn
             foreach (var facade in facades)
             {
                 // Update package scope from bundle scope if default.
-                if (YesNoDefaultType.Default == facade.PackageSymbol.PerMachine)
+                if (!facade.PackageSymbol.PerMachine.HasValue)
                 {
-                    facade.PackageSymbol.PerMachine = bundleSymbol.PerMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
+                    facade.PackageSymbol.PerMachine = bundleSymbol.PerMachine;
                 }
 
                 // We will only register packages in the same scope as the bundle. Warn if any packages with providers
                 // are in a different scope and not permanent (permanents typically don't need a ref-count).
                 if (!bundleSymbol.PerMachine &&
-                    YesNoDefaultType.Yes == facade.PackageSymbol.PerMachine &&
+                    facade.PackageSymbol.PerMachine.Value &&
                     !facade.PackageSymbol.Permanent &&
                     dependencySymbolsById.ContainsKey(facade.PackageId))
                 {

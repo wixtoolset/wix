@@ -443,7 +443,8 @@ namespace WixToolset.Util
             string after = null;
             string guid = null;
             string productCode = null;
-            var attributes = WixComponentSearchAttributes.KeyPath;
+            var attributes = WixComponentSearchAttributes.None;
+            var type = WixComponentSearchType.KeyPath;
 
             foreach (var attrib in element.Attributes())
             {
@@ -468,13 +469,13 @@ namespace WixToolset.Util
                             switch (result)
                             {
                                 case "directory":
-                                    attributes = WixComponentSearchAttributes.WantDirectory;
+                                    type = WixComponentSearchType.WantDirectory;
                                     break;
                                 case "keyPath":
-                                    attributes = WixComponentSearchAttributes.KeyPath;
+                                    type = WixComponentSearchType.KeyPath;
                                     break;
                                 case "state":
-                                    attributes = WixComponentSearchAttributes.State;
+                                    type = WixComponentSearchType.State;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "directory", "keyPath", "state"));
@@ -499,7 +500,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("wcs", variable, condition, after, guid, productCode, attributes.ToString());
+                id = this.ParseHelper.CreateIdentifier("wcs", variable, condition, after, guid, productCode, attributes.ToString(), type.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -513,6 +514,7 @@ namespace WixToolset.Util
                     Guid = guid,
                     ProductCode = productCode,
                     Attributes = attributes,
+                    Type = type,
                 });
             }
         }
@@ -983,6 +985,7 @@ namespace WixToolset.Util
             string after = null;
             string path = null;
             var attributes = WixFileSearchAttributes.IsDirectory;
+            var type = WixFileSearchType.Path;
 
             foreach (var attrib in element.Attributes())
             {
@@ -1004,7 +1007,7 @@ namespace WixToolset.Util
                             switch (result)
                             {
                                 case "exists":
-                                    attributes |= WixFileSearchAttributes.WantExists;
+                                    type = WixFileSearchType.Exists;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "exists"));
@@ -1029,7 +1032,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("wds", variable, condition, after, path, attributes.ToString());
+                id = this.ParseHelper.CreateIdentifier("wds", variable, condition, after, path, attributes.ToString(), type.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -1038,7 +1041,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixFileSearchRow(section, sourceLineNumbers, id, path, attributes);
+                this.CreateWixFileSearchRow(section, sourceLineNumbers, id, path, attributes, type);
             }
         }
 
@@ -1086,7 +1089,8 @@ namespace WixToolset.Util
             string condition = null;
             string after = null;
             string path = null;
-            var attributes = WixFileSearchAttributes.Default;
+            var attributes = WixFileSearchAttributes.None;
+            var type = WixFileSearchType.Path;
 
             foreach (var attrib in node.Attributes())
             {
@@ -1108,10 +1112,10 @@ namespace WixToolset.Util
                             switch (result)
                             {
                                 case "exists":
-                                    attributes |= WixFileSearchAttributes.WantExists;
+                                    type = WixFileSearchType.Exists;
                                     break;
                                 case "version":
-                                    attributes |= WixFileSearchAttributes.WantVersion;
+                                    type = WixFileSearchType.Version;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "exists", "version"));
@@ -1136,7 +1140,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("wfs", variable, condition, after, path, attributes.ToString());
+                id = this.ParseHelper.CreateIdentifier("wfs", variable, condition, after, path, attributes.ToString(), type.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
@@ -1145,7 +1149,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixFileSearchRow(section, sourceLineNumbers, id, path, attributes);
+                this.CreateWixFileSearchRow(section, sourceLineNumbers, id, path, attributes, type);
             }
         }
 
@@ -1156,12 +1160,14 @@ namespace WixToolset.Util
         /// <param name="id">Identifier of the search (key into the WixSearch table)</param>
         /// <param name="path">File/directory path to search for.</param>
         /// <param name="attributes"></param>
-        private void CreateWixFileSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string path, WixFileSearchAttributes attributes)
+        /// <param name="type"></param>
+        private void CreateWixFileSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string path, WixFileSearchAttributes attributes, WixFileSearchType type)
         {
             section.AddSymbol(new WixFileSearchSymbol(sourceLineNumbers, id)
             {
                 Path = path,
                 Attributes = attributes,
+                Type = type,
             });
         }
 
@@ -2545,7 +2551,8 @@ namespace WixToolset.Util
             string after = null;
             string productCode = null;
             string upgradeCode = null;
-            var attributes = WixProductSearchAttributes.Version;
+            var attributes = WixProductSearchAttributes.None;
+            var type = WixProductSearchType.Version;
 
             foreach (var attrib in element.Attributes())
             {
@@ -2570,16 +2577,16 @@ namespace WixToolset.Util
                             switch (result)
                             {
                                 case "version":
-                                    attributes = WixProductSearchAttributes.Version;
+                                    type = WixProductSearchType.Version;
                                     break;
                                 case "language":
-                                    attributes = WixProductSearchAttributes.Language;
+                                    type = WixProductSearchType.Language;
                                     break;
                                 case "state":
-                                    attributes = WixProductSearchAttributes.State;
+                                    type = WixProductSearchType.State;
                                     break;
                                 case "assignment":
-                                    attributes = WixProductSearchAttributes.Assignment;
+                                    type = WixProductSearchType.Assignment;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "version", "language", "state", "assignment"));
@@ -2607,9 +2614,21 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "UpgradeCode", "ProductCode"));
             }
 
+            string guid;
+            if (upgradeCode != null)
+            {
+                // set an additional flag if this is an upgrade code
+                attributes |= WixProductSearchAttributes.UpgradeCode;
+                guid = upgradeCode;
+            }
+            else
+            {
+                guid = productCode;
+            }
+
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("wps", variable, condition, after, productCode ?? upgradeCode, attributes.ToString());
+                id = this.ParseHelper.CreateIdentifier("wps", variable, condition, after, guid, attributes.ToString(), type.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -2618,16 +2637,11 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                // set an additional flag if this is an upgrade code
-                if (null != upgradeCode)
-                {
-                    attributes |= WixProductSearchAttributes.UpgradeCode;
-                }
-
                 section.AddSymbol(new WixProductSearchSymbol(sourceLineNumbers, id)
                 {
-                    Guid = productCode ?? upgradeCode,
+                    Guid = guid,
                     Attributes = attributes,
+                    Type = type,
                 });
             }
         }
@@ -2648,7 +2662,8 @@ namespace WixToolset.Util
             string value = null;
             var expand = YesNoType.NotSet;
             var win64 = this.Context.IsCurrentPlatform64Bit;
-            var attributes = WixRegistrySearchAttributes.Raw | WixRegistrySearchAttributes.WantValue;
+            var attributes = WixRegistrySearchAttributes.None;
+            var type = WixRegistrySearchType.Value;
 
             foreach (var attrib in element.Attributes())
             {
@@ -2692,30 +2707,15 @@ namespace WixToolset.Util
                         case "ExpandEnvironmentVariables":
                             expand = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
-                        case "Format":
-                            string format = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            switch (format)
-                            {
-                                case "raw":
-                                    attributes |= WixRegistrySearchAttributes.Raw;
-                                    break;
-                                case "compatible":
-                                    attributes |= WixRegistrySearchAttributes.Compatible;
-                                    break;
-                                default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, format, "raw", "compatible"));
-                                    break;
-                            }
-                            break;
                         case "Result":
                             var result = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (result)
                             {
                                 case "exists":
-                                    attributes |= WixRegistrySearchAttributes.WantExists;
+                                    type = WixRegistrySearchType.Exists;
                                     break;
                                 case "value":
-                                    attributes |= WixRegistrySearchAttributes.WantValue;
+                                    type = WixRegistrySearchType.Value;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "exists", "value"));
@@ -2743,14 +2743,9 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Key"));
             }
 
-            if (null == id)
-            {
-                id = this.ParseHelper.CreateIdentifier("wrs", variable, condition, after, root.ToString(), key, value, attributes.ToString());
-            }
-
             if (expand == YesNoType.Yes)
             {
-                if (0 != (attributes & WixRegistrySearchAttributes.WantExists))
+                if (type == WixRegistrySearchType.Exists)
                 {
                     this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "ExpandEnvironmentVariables", expand.ToString(), "Result", "exists"));
                 }
@@ -2761,6 +2756,11 @@ namespace WixToolset.Util
             if (win64)
             {
                 attributes |= WixRegistrySearchAttributes.Win64;
+            }
+
+            if (null == id)
+            {
+                id = this.ParseHelper.CreateIdentifier("wrs", variable, condition, after, root.ToString(), key, value, attributes.ToString(), type.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -2775,6 +2775,7 @@ namespace WixToolset.Util
                     Key = key,
                     Value = value,
                     Attributes = attributes,
+                    Type = type,
                 });
             }
         }

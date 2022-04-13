@@ -186,8 +186,8 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     writer.WriteStartElement("RollbackBoundary");
                     writer.WriteAttributeString("Id", rollbackBoundary.Id.Id);
-                    writer.WriteAttributeString("Vital", rollbackBoundary.Vital == false ? "no" : "yes");
-                    writer.WriteAttributeString("Transaction", rollbackBoundary.Transaction == true ? "yes" : "no");
+                    writer.WriteAttributeString("Vital", rollbackBoundary.Vital ? "yes" : "no");
+                    writer.WriteAttributeString("Transaction", rollbackBoundary.Transaction ? "yes" : "no");
 
                     if (!String.IsNullOrEmpty(rollbackBoundary.LogPathVariable))
                     {
@@ -246,13 +246,14 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("ParentDisplayName", this.BundleSymbol.ParentName);
                 }
 
-                if (this.BundleSymbol.DisableModify)
+                switch (this.BundleSymbol.DisableModify)
                 {
-                    writer.WriteAttributeString("DisableModify", "yes");
-                }
-                else if (this.BundleSymbol.SingleChangeUninstallButton)
-                {
-                    writer.WriteAttributeString("DisableModify", "button");
+                    case WixBundleModifyType.Disabled:
+                        writer.WriteAttributeString("DisableModify", "yes");
+                        break;
+                    case WixBundleModifyType.SingleChangeUninstallButton:
+                        writer.WriteAttributeString("DisableModify", "button");
+                        break;
                 }
 
                 if (this.BundleSymbol.DisableRemove)
@@ -352,9 +353,9 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("CacheId", package.PackageSymbol.CacheId);
                     writer.WriteAttributeString("InstallSize", Convert.ToString(package.PackageSymbol.InstallSize));
                     writer.WriteAttributeString("Size", Convert.ToString(package.PackageSymbol.Size));
-                    writer.WriteAttributeString("PerMachine", YesNoDefaultType.Yes == package.PackageSymbol.PerMachine ? "yes" : "no");
+                    writer.WriteAttributeString("PerMachine", package.PackageSymbol.PerMachine.HasValue && package.PackageSymbol.PerMachine.Value ? "yes" : "no");
                     writer.WriteAttributeString("Permanent", package.PackageSymbol.Permanent ? "yes" : "no");
-                    writer.WriteAttributeString("Vital", package.PackageSymbol.Vital == false ? "no" : "yes");
+                    writer.WriteAttributeString("Vital", package.PackageSymbol.Vital ? "yes" : "no");
 
                     if (null != package.PackageSymbol.RollbackBoundaryRef)
                     {
@@ -389,9 +390,9 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("UninstallArguments", bundlePackage.UninstallCommand);
                         writer.WriteAttributeString("RepairArguments", bundlePackage.RepairCommand);
                         writer.WriteAttributeString("SupportsBurnProtocol", bundlePackage.SupportsBurnProtocol ? "yes" : "no");
-                        writer.WriteAttributeString("Win64", bundlePackage.Win64 ? "yes" : "no");
+                        writer.WriteAttributeString("Win64", package.PackageSymbol.Win64 ? "yes" : "no");
 
-                        if (!package.PackageSymbol.Attributes.HasFlag(WixBundlePackageAttributes.Visible))
+                        if (!package.PackageSymbol.Visible)
                         {
                             writer.WriteAttributeString("HideARP", "yes");
                         }
@@ -434,15 +435,15 @@ namespace WixToolset.Core.Burn.Bundles
                         // product codes, add the patch list to the overall list.
                         if (null != targetCodes)
                         {
-                            if (!mspPackage.TargetUnspecified)
+                            foreach (var patchTargetCode in targetCodesByPatch[mspPackage.Id.Id])
                             {
-                                var patchTargetCodes = targetCodesByPatch[mspPackage.Id.Id];
+                                if (patchTargetCode.Type == WixBundlePatchTargetCodeType.Unspecified)
+                                {
+                                    targetCodes = null;
+                                    break;
+                                }
 
-                                targetCodes.AddRange(patchTargetCodes);
-                            }
-                            else // we have a patch that targets the world, so throw the whole list away.
-                            {
-                                targetCodes = null;
+                                targetCodes.Add(patchTargetCode);
                             }
                         }
                     }
@@ -611,9 +612,11 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     foreach (var targetCode in targetCodes)
                     {
+                        Debug.Assert(targetCode.Type == WixBundlePatchTargetCodeType.ProductCode || targetCode.Type == WixBundlePatchTargetCodeType.UpgradeCode);
+
                         writer.WriteStartElement("PatchTargetCode");
                         writer.WriteAttributeString("TargetCode", targetCode.TargetCode);
-                        writer.WriteAttributeString("Product", targetCode.TargetsProductCode ? "yes" : "no");
+                        writer.WriteAttributeString("Product", targetCode.Type == WixBundlePatchTargetCodeType.ProductCode ? "yes" : "no");
                         writer.WriteEndElement();
                     }
                 }

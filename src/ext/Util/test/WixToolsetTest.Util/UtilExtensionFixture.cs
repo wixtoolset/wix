@@ -242,7 +242,6 @@ namespace WixToolsetTest.Util
         [Fact]
         public void CanBuildBundleWithSearches()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData\BundleWithSearches");
             var rootFolder = TestData.Get();
             var wixext = Path.Combine(rootFolder, "WixToolset.Util.wixext.dll");
@@ -269,9 +268,7 @@ namespace WixToolsetTest.Util
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(bundlePath));
-#if TODO
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-#endif
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -293,7 +290,7 @@ namespace WixToolsetTest.Util
                 Assert.Equal("<RegistrySearch Id='RegistrySearchId' Variable='RegistrySearchVariable' " +
                     @"Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' Value='Release' Type='value' VariableType='string' />", utilSearches[3].GetTestXml());
                 Assert.Equal("<RegistrySearch Id='RegistrySearchId64' Variable='RegistrySearchVariable64' " +
-                    @"Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' Value='Release' Type='value' Win64='yes' VariableType='string' />", utilSearches[4].GetTestXml());
+                    @"Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' Value='Release' Win64='yes' Type='value' VariableType='string' />", utilSearches[4].GetTestXml());
             }
         }
 

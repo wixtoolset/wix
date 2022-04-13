@@ -19,10 +19,18 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixBundleUpdateSymbolFields
     {
         Location,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixBundleUpdateAttributes
+    {
+        None = 0x0,
     }
 
     public class WixBundleUpdateSymbol : IntermediateSymbol
@@ -43,10 +51,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleUpdateSymbolFields.Location, value);
         }
 
-        public int Attributes
+        public WixBundleUpdateAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixBundleUpdateSymbolFields.Attributes];
-            set => this.Set((int)WixBundleUpdateSymbolFields.Attributes, value);
+            get => (WixBundleUpdateAttributes)this.Fields[(int)WixBundleUpdateSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundleUpdateSymbolFields.Attributes, (int)value);
         }
     }
 }

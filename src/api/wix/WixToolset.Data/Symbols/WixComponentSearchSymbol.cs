@@ -13,6 +13,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.Guid), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.Type), IntermediateFieldType.Number),
             },
             typeof(WixComponentSearchSymbol));
     }
@@ -27,14 +28,20 @@ namespace WixToolset.Data.Symbols
         Guid,
         ProductCode,
         Attributes,
+        Type,
     }
 
     [Flags]
     public enum WixComponentSearchAttributes
     {
-        KeyPath = 0x1,
-        State = 0x2,
-        WantDirectory = 0x4,
+        None = 0x0,
+    }
+
+    public enum WixComponentSearchType
+    {
+        KeyPath,
+        State,
+        WantDirectory,
     }
 
     public class WixComponentSearchSymbol : IntermediateSymbol
@@ -65,6 +72,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (WixComponentSearchAttributes)this.Fields[(int)WixComponentSearchSymbolFields.Attributes].AsNumber();
             set => this.Set((int)WixComponentSearchSymbolFields.Attributes, (int)value);
+        }
+
+        public WixComponentSearchType Type
+        {
+            get => (WixComponentSearchType)this.Fields[(int)WixComponentSearchSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixComponentSearchSymbolFields.Type, (int)value);
         }
     }
 }

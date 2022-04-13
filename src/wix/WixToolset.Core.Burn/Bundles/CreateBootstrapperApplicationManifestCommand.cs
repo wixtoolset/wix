@@ -127,8 +127,8 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 writer.WriteStartElement("WixRollbackBoundary");
                 writer.WriteAttributeString("Id", rollbackBoundary.Id.Id);
-                writer.WriteAttributeString("Vital", rollbackBoundary.Vital == false ? "no" : "yes");
-                writer.WriteAttributeString("Transaction", rollbackBoundary.Transaction == true ? "yes" : "no");
+                writer.WriteAttributeString("Vital", rollbackBoundary.Vital ? "yes" : "no");
+                writer.WriteAttributeString("Transaction", rollbackBoundary.Transaction ? "yes" : "no");
 
                 if (!String.IsNullOrEmpty(rollbackBoundary.LogPathVariable))
                 {
@@ -155,7 +155,7 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteStartElement("WixPackageProperties");
 
                 writer.WriteAttributeString("Package", package.PackageId);
-                writer.WriteAttributeString("Vital", package.PackageSymbol.Vital == true ? "yes" : "no");
+                writer.WriteAttributeString("Vital", package.PackageSymbol.Vital ? "yes" : "no");
 
                 if (!String.IsNullOrEmpty(package.PackageSymbol.DisplayName))
                 {

@@ -34,8 +34,8 @@ namespace WixToolset.Data.Symbols
     [Flags]
     public enum WixBundleMspPackageAttributes
     {
-        Slipstream = 0x2,
-        TargetUnspecified = 0x4,
+        None = 0x0,
+        Slipstream = 0x1,
     }
 
     public class WixBundleMspPackageSymbol : IntermediateSymbol
@@ -74,8 +74,20 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleMspPackageSymbolFields.PatchXml, value);
         }
 
-        public bool Slipstream => (this.Attributes & WixBundleMspPackageAttributes.Slipstream) == WixBundleMspPackageAttributes.Slipstream;
-
-        public bool TargetUnspecified => (this.Attributes & WixBundleMspPackageAttributes.TargetUnspecified) == WixBundleMspPackageAttributes.TargetUnspecified;
+        public bool Slipstream
+        {
+            get { return this.Attributes.HasFlag(WixBundleMspPackageAttributes.Slipstream); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleMspPackageAttributes.Slipstream;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleMspPackageAttributes.Slipstream;
+                }
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -88,7 +89,7 @@ namespace WixToolset.Core.Burn.Bundles
                         // in MSI 4.5 and below, if this bit is 0, elevation is required.
                         var perMachine = (0 == (fileAndElevateFlags & 8));
 
-                        this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
+                        this.Facade.PackageSymbol.PerMachine = perMachine;
                         this.Facade.PackageSymbol.Win64 = this.IsWin64(packagePayload.SourceLineNumbers, sourcePath, platformsAndLanguages);
                     }
 
@@ -177,7 +178,7 @@ namespace WixToolset.Core.Burn.Bundles
                     this.CreateRelatedPackages(db);
 
                     // If feature selection is enabled, represent the Feature table in the manifest.
-                    if ((msiPackage.Attributes & WixBundleMsiPackageAttributes.EnableFeatureSelection) == WixBundleMsiPackageAttributes.EnableFeatureSelection)
+                    if (msiPackage.EnableFeatureSelection)
                     {
                         this.CreateMsiFeatures(db);
                     }
@@ -240,13 +241,16 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void SetPerMachineAppropriately(string allusers, WixBundleMsiPackageSymbol msiPackage, string sourcePath)
         {
+            Debug.Assert(this.Facade.PackageSymbol.PerMachine.HasValue);
+            var perMachine = this.Facade.PackageSymbol.PerMachine.Value;
+
             // Can ignore ALLUSERS from MsiProperties because it is not allowed there.
             if (msiPackage.ForcePerMachine)
             {
-                if (YesNoDefaultType.No == this.Facade.PackageSymbol.PerMachine)
+                if (!perMachine)
                 {
                     this.Messaging.Write(WarningMessages.PerUserButForcingPerMachine(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath));
-                    this.Facade.PackageSymbol.PerMachine = YesNoDefaultType.Yes; // ensure that we think the package is per-machine.
+                    this.Facade.PackageSymbol.PerMachine = true; // ensure that we think the package is per-machine.
                 }
 
                 // Force ALLUSERS=1 via the MSI command-line.
@@ -257,22 +261,22 @@ namespace WixToolset.Core.Burn.Bundles
                 if (String.IsNullOrEmpty(allusers))
                 {
                     // Not forced per-machine and no ALLUSERS property, flip back to per-user.
-                    if (YesNoDefaultType.Yes == this.Facade.PackageSymbol.PerMachine)
+                    if (perMachine)
                     {
                         this.Messaging.Write(WarningMessages.ImplicitlyPerUser(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath));
-                        this.Facade.PackageSymbol.PerMachine = YesNoDefaultType.No;
+                        this.Facade.PackageSymbol.PerMachine = false;
                     }
                 }
                 else if (allusers.Equals("1", StringComparison.Ordinal))
                 {
-                    if (YesNoDefaultType.No == this.Facade.PackageSymbol.PerMachine)
+                    if (!perMachine)
                     {
                         this.Messaging.Write(ErrorMessages.PerUserButAllUsersEquals1(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath));
                     }
                 }
                 else if (allusers.Equals("2", StringComparison.Ordinal))
                 {
-                    this.Messaging.Write(WarningMessages.DiscouragedAllUsersValue(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath, (YesNoDefaultType.Yes == this.Facade.PackageSymbol.PerMachine) ? "machine" : "user"));
+                    this.Messaging.Write(WarningMessages.DiscouragedAllUsersValue(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath, perMachine ? "machine" : "user"));
                 }
                 else
                 {
@@ -287,7 +291,7 @@ namespace WixToolset.Core.Burn.Bundles
             if (!msiPropertyNames.Contains("ARPSYSTEMCOMPONENT"))
             {
                 var alreadyVisible = String.IsNullOrEmpty(systemComponent);
-                var visible = (this.Facade.PackageSymbol.Attributes & WixBundlePackageAttributes.Visible) == WixBundlePackageAttributes.Visible;
+                var visible = this.Facade.PackageSymbol.Visible;
 
                 // If not already set to the correct visibility.
                 if (alreadyVisible != visible)

@@ -107,6 +107,7 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleMsiFeatureSymbolFields.Directory, value);
         }
 
+        // Passthrough for Attributes column of Feature table.
         public int Attributes
         {
             get => (int)this.Fields[(int)WixBundleMsiFeatureSymbolFields.Attributes];

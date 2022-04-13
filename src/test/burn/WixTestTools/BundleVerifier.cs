@@ -120,7 +120,7 @@ namespace WixTestTools
             var intermediate = Intermediate.Load(wixOutput);
             var section = intermediate.Sections.Single();
             var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
-            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == YesNoDefaultType.Yes);
+            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == true);
             if (Directory.Exists(cachePath))
             {
                 Directory.Delete(cachePath, true);
@@ -133,7 +133,7 @@ namespace WixTestTools
             var intermediate = Intermediate.Load(wixOutput);
             var section = intermediate.Sections.Single();
             var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
-            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == YesNoDefaultType.Yes);
+            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == true);
             Assert.Equal(cached, Directory.Exists(cachePath));
         }
 
@@ -144,7 +144,7 @@ namespace WixTestTools
             var section = intermediate.Sections.Single();
             var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
             var providerSymbol = section.Symbols.OfType<WixDependencyProviderSymbol>().Single(p => p.ParentRef == packageId);
-            var registryRoot = packageSymbol.PerMachine == YesNoDefaultType.Yes ? Registry.LocalMachine : Registry.CurrentUser;
+            var registryRoot = packageSymbol.PerMachine == true ? Registry.LocalMachine : Registry.CurrentUser;
             var subkeyPath = Path.Combine(DependencyRegistryRoot, providerSymbol.ProviderKey);
             using var registryKey = registryRoot.OpenSubKey(subkeyPath);
             if (registryKey != null)

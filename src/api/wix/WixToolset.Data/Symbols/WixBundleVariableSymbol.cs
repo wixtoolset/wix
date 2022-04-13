@@ -10,10 +10,9 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundleVariable,
             new[]
             {
+                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Type), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Hidden), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Persisted), IntermediateFieldType.Bool),
             },
             typeof(WixBundleVariableSymbol));
     }
@@ -25,10 +24,17 @@ namespace WixToolset.Data.Symbols
 
     public enum WixBundleVariableSymbolFields
     {
+        Attributes,
         Value,
         Type,
-        Hidden,
-        Persisted,
+    }
+
+    [Flags]
+    public enum WixBundleVariableAttributes
+    {
+        None = 0x0,
+        Hidden = 0x1,
+        Persisted = 0x2,
     }
 
     public enum WixBundleVariableType
@@ -52,6 +58,12 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixBundleVariableSymbolFields index] => this.Fields[(int)index];
 
+        public WixBundleVariableAttributes Attributes
+        {
+            get => (WixBundleVariableAttributes)this.Fields[(int)WixBundleVariableSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundleVariableSymbolFields.Attributes, (int)value);
+        }
+
         public string Value
         {
             get => (string)this.Fields[(int)WixBundleVariableSymbolFields.Value];
@@ -66,14 +78,34 @@ namespace WixToolset.Data.Symbols
 
         public bool Hidden
         {
-            get => (bool)this.Fields[(int)WixBundleVariableSymbolFields.Hidden];
-            set => this.Set((int)WixBundleVariableSymbolFields.Hidden, value);
+            get { return this.Attributes.HasFlag(WixBundleVariableAttributes.Hidden); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleVariableAttributes.Hidden;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleVariableAttributes.Hidden;
+                }
+            }
         }
 
         public bool Persisted
         {
-            get => (bool)this.Fields[(int)WixBundleVariableSymbolFields.Persisted];
-            set => this.Set((int)WixBundleVariableSymbolFields.Persisted, value);
+            get { return this.Attributes.HasFlag(WixBundleVariableAttributes.Persisted); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleVariableAttributes.Persisted;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleVariableAttributes.Persisted;
+                }
+            }
         }
     }
 }

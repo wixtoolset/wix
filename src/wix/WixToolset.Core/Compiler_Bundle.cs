@@ -117,6 +117,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string copyright = null;
             string aboutUrl = null;
+            var modifyType = WixBundleModifyType.Allowed;
             var compressed = YesNoDefaultType.Default;
             WixBundleAttributes attributes = 0;
             WixBundleCommandLineVariables commandLineVariables = WixBundleCommandLineVariables.UpperCase;
@@ -176,12 +177,13 @@ namespace WixToolset.Core
                             switch (value)
                             {
                                 case "button":
-                                    attributes |= WixBundleAttributes.SingleChangeUninstallButton;
+                                    modifyType = WixBundleModifyType.SingleChangeUninstallButton;
                                     break;
                                 case "yes":
-                                    attributes |= WixBundleAttributes.DisableModify;
+                                    modifyType = WixBundleModifyType.Disabled;
                                     break;
                                 case "no":
+                                    modifyType = WixBundleModifyType.Allowed;
                                     break;
                                 default:
                                     this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
@@ -415,6 +417,7 @@ namespace WixToolset.Core
                     UpgradeCode = upgradeCode,
                     Version = version,
                     Copyright = copyright,
+                    DisableModify = modifyType,
                     InProgressName = inProgressName,
                     Name = name,
                     Manufacturer = manufacturer,
@@ -2432,16 +2435,16 @@ namespace WixToolset.Core
                     DisplayName = displayName,
                     LogPathVariable = logPathVariable,
                     RollbackLogPathVariable = rollbackPathVariable,
+                    Vital = vital == YesNoType.Yes,
                 });
 
-                if (YesNoType.NotSet != vital)
+                if (perMachine == YesNoDefaultType.Yes)
                 {
-                    chainPackageSymbol.Vital = (vital == YesNoType.Yes);
+                    chainPackageSymbol.PerMachine = true;
                 }
-
-                if (YesNoDefaultType.NotSet != perMachine)
+                else if (perMachine == YesNoDefaultType.No)
                 {
-                    chainPackageSymbol.PerMachine = perMachine;
+                    chainPackageSymbol.PerMachine = false;
                 }
 
                 if (installSize.HasValue)
@@ -2918,21 +2921,15 @@ namespace WixToolset.Core
         {
             this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
-            var rollbackBoundary = this.Core.AddSymbol(new WixBundleRollbackBoundarySymbol(sourceLineNumbers, id));
-
-            if (YesNoType.NotSet != vital)
+            var rollbackBoundary = this.Core.AddSymbol(new WixBundleRollbackBoundarySymbol(sourceLineNumbers, id)
             {
-                rollbackBoundary.Vital = (vital == YesNoType.Yes);
-            }
+                Transaction = transaction == YesNoType.Yes,
+                Vital = vital == YesNoType.Yes,
+            });
 
-            if (YesNoType.NotSet != transaction)
+            if (logPathVariable != null)
             {
-                rollbackBoundary.Transaction = (transaction == YesNoType.Yes);
-
-                if (logPathVariable != null)
-                {
-                    rollbackBoundary.LogPathVariable = logPathVariable;
-                }
+                rollbackBoundary.LogPathVariable = logPathVariable;
             }
 
             this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, null);

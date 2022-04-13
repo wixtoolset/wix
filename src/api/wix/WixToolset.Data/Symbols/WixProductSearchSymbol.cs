@@ -12,6 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixProductSearchSymbolFields.Guid), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixProductSearchSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixProductSearchSymbolFields.Type), IntermediateFieldType.Number),
             },
             typeof(WixProductSearchSymbol));
     }
@@ -25,16 +26,26 @@ namespace WixToolset.Data.Symbols
     {
         Guid,
         Attributes,
+        Type,
     }
 
     [Flags]
     public enum WixProductSearchAttributes
     {
-        Version = 0x1,
-        Language = 0x2,
-        State = 0x4,
-        Assignment = 0x8,
-        UpgradeCode = 0x10,
+        None = 0x0,
+
+        /// <summary>
+        /// Guid contains the UpgradeCode. If not set, it contains the ProductCode.
+        /// </summary>
+        UpgradeCode = 0x1,
+    }
+
+    public enum WixProductSearchType
+    {
+        Version,
+        Language,
+        State,
+        Assignment,
     }
 
     public class WixProductSearchSymbol : IntermediateSymbol
@@ -59,6 +70,28 @@ namespace WixToolset.Data.Symbols
         {
             get => (WixProductSearchAttributes)this.Fields[(int)WixProductSearchSymbolFields.Attributes].AsNumber();
             set => this.Set((int)WixProductSearchSymbolFields.Attributes, (int)value);
+        }
+
+        public WixProductSearchType Type
+        {
+            get => (WixProductSearchType)this.Fields[(int)WixProductSearchSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixProductSearchSymbolFields.Type, (int)value);
+        }
+
+        public bool IsUpgradeCode
+        {
+            get { return this.Attributes.HasFlag(WixProductSearchAttributes.UpgradeCode); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixProductSearchAttributes.UpgradeCode;
+                }
+                else
+                {
+                    this.Attributes &= ~WixProductSearchAttributes.UpgradeCode;
+                }
+            }
         }
     }
 }
