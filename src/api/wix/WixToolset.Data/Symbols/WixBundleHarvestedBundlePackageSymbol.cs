@@ -12,6 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.EngineVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.ManifestNamespace), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.ProtocolVersion), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.Version), IntermediateFieldType.String),
@@ -30,6 +31,7 @@ namespace WixToolset.Data.Symbols
     {
         Attributes,
         BundleId,
+        EngineVersion,
         ManifestNamespace,
         ProtocolVersion,
         Version,
@@ -67,6 +69,12 @@ namespace WixToolset.Data.Symbols
         {
             get => this.Fields[(int)WixBundleHarvestedBundlePackageSymbolFields.BundleId].AsString();
             set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.BundleId, value);
+        }
+
+        public string EngineVersion
+        {
+            get => this.Fields[(int)WixBundleHarvestedBundlePackageSymbolFields.EngineVersion].AsString();
+            set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.EngineVersion, value);
         }
 
         public string ManifestNamespace

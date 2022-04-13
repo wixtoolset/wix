@@ -33,7 +33,7 @@ namespace Bootstrapper
 
             this->testDirectory = WixBuildTools::TestSupport::TestData::Get();
 
-            LogInitialize(::GetModuleHandleW(NULL));
+            LogInitialize(::GetModuleHandleW(L"BurnUnitTest.dll"));
 
             LogSetLevel(REPORT_DEBUG, FALSE);
 

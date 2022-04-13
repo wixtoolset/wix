@@ -71,6 +71,8 @@
 #include "splashscreen.h"
 #include "detect.h"
 
+#include "engine.version.h"
+
 #pragma managed
 #include <vcclr.h>
 

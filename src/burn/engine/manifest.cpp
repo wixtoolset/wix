@@ -7,6 +7,11 @@ static HRESULT ParseFromXml(
     __in IXMLDOMDocument* pixdDocument,
     __in BURN_ENGINE_STATE* pEngineState
     );
+#if DEBUG
+static void ValidateHarvestingAttributes(
+    __in IXMLDOMDocument* pixdDocument
+    );
+#endif
 
 // function definitions
 
@@ -42,6 +47,10 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
     // load xml document
     hr = XmlLoadDocumentFromBuffer(pbBuffer, cbBuffer, &pixdDocument);
     ExitOnFailure(hr, "Failed to load manifest as XML document.");
+
+#if DEBUG
+    ValidateHarvestingAttributes(pixdDocument);
+#endif
 
     hr = ParseFromXml(pixdDocument, pEngineState);
 
@@ -162,3 +171,44 @@ LExit:
     ReleaseObject(pixeBundle);
     return hr;
 }
+
+#if DEBUG
+static void ValidateHarvestingAttributes(
+    __in IXMLDOMDocument* pixdDocument
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMElement* pixeBundle = NULL;
+    LPWSTR sczEngineVersion = NULL;
+    DWORD dwProtocolVersion = 0;
+    BOOL fWin64 = FALSE;
+
+    hr = pixdDocument->get_documentElement(&pixeBundle);
+    ExitOnFailure(hr, "Failed to get document element.");
+
+    hr = XmlGetAttributeEx(pixeBundle, L"EngineVersion", &sczEngineVersion);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get BurnManifest/@EngineVersion attribute.");
+
+    hr = XmlGetAttributeUInt32(pixeBundle, L"ProtocolVersion", &dwProtocolVersion);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get BurnManifest/@ProtocolVersion attribute.");
+
+    hr = XmlGetYesNoAttribute(pixeBundle, L"Win64", &fWin64);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get BurnManifest/@Win64 attribute.");
+
+    Assert(CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczEngineVersion, -1, wzVerMajorMinorBuild, -1));
+
+    Assert(BURN_PROTOCOL_VERSION == dwProtocolVersion);
+
+#if !defined(_WIN64)
+    Assert(!fWin64);
+#else
+    Assert(fWin64);
+#endif
+
+LExit:
+    AssertSz(SUCCEEDED(hr), "Failed to get harvesting attributes.");
+
+    ReleaseStr(sczEngineVersion);
+    ReleaseObject(pixeBundle);
+}
+#endif

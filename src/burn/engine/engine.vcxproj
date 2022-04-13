@@ -35,13 +35,14 @@
     <TargetName>engine</TargetName>
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Burn</Description>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>..\..\api\burn\WixToolset.BootstrapperCore.Native\inc;$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>..\..\api\burn\WixToolset.BootstrapperCore.Native\inc;$(BurnGeneratedHeaderDirectory);$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ImportGroup Label="ExtensionSettings">
@@ -144,14 +145,15 @@
     <ClInclude Include="variant.h" />
   </ItemGroup>
 
-  <ItemGroup>
-    <CustomBuild Include="engine.mc">
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
       <Message>Compiling message file...</Message>
       <Command>mc.exe -h "$(IntDir)." -r "$(IntDir)." -A -c -z engine.messages "$(InputDir)engine.mc"
 rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
+      <Inputs>$(InputDir)engine.mc</Inputs>
       <Outputs>$(IntDir)engine.messages.h;$(IntDir)engine.messages.rc</Outputs>
-    </CustomBuild>
-  </ItemGroup>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
 
   <Target Name="SetWixVersion" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="ClCompile">
     <PropertyGroup>
@@ -160,14 +162,26 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <rup>$(GitBaseVersionPatch)</rup>
       <rpr>$(GitCommits)</rpr>
       <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
-      <wixver>rmj=$(rmj);rmm=$(rmm);rup=$(rup);rpr=$(rpr);szVerMajorMinorBuild="$(szVerMajorMinorBuild)"</wixver>
     </PropertyGroup>
 
     <ItemGroup>
-      <ClCompile>
-        <PreprocessorDefinitions>$(wixver);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      </ClCompile>
+      <BurnVersionLines Include="
+// &lt;auto-generated/&gt;
+#ifndef _VERSION_FILE_H_
+#define _VERSION_FILE_H_
+
+#define szVerMajorMinorBuild &quot;$(szVerMajorMinorBuild)&quot;
+#define wzVerMajorMinorBuild L&quot;$(szVerMajorMinorBuild)&quot;
+#define rmj	$(rmj)
+#define rmm	$(rmm)
+#define rup	$(rup)
+#define rpr	$(rpr)
+
+#endif
+"/>
     </ItemGroup>
+    
+    <WriteLinesToFile Overwrite="true" File="$(BurnGeneratedHeaderDirectory)engine.version.h" Lines="@(BurnVersionLines)" />
   </Target>
 
   <ItemGroup>

@@ -111,8 +111,10 @@ namespace WixToolset.Core.Burn.Bundles
         protected const uint BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0 = 52;
         protected const uint BURN_SECTION_MIN_SIZE = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0;
 
+        // Keep in sync with burn\engine\inc\engine.h
         protected const uint BURN_SECTION_MAGIC = 0x00f14300;
         protected const uint BURN_SECTION_VERSION = 0x00000002;
+        public const uint BURN_PROTOCOL_VERSION = 0x00000001;
 
         protected string fileExe;
         protected uint peOffset = UInt32.MaxValue;

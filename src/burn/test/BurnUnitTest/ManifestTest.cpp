@@ -30,7 +30,13 @@ namespace Bootstrapper
             try
             {
                 LPCSTR szDocument =
-                    "<Bundle>"
+                    "<BurnManifest EngineVersion='" szVerMajorMinorBuild "' ProtocolVersion='1' Win64='"
+#if !defined(_WIN64)
+                    "no"
+#else
+                    "yes"
+#endif
+                    "'>"
                     "    <UX UxDllPayloadId='ux.dll'>"
                     "        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     "    </UX>"
@@ -38,7 +44,7 @@ namespace Bootstrapper
                     "    <Variable Id='Variable1' Type='numeric' Value='1' Hidden='no' Persisted='no' />"
                     "    <RegistrySearch Id='Search1' Type='exists' Root='HKLM' Key='SOFTWARE\\Microsoft' Variable='Variable1' Condition='0' />"
                     "    <CommandLine Variables='upperCase' />"
-                    "</Bundle>";
+                    "</BurnManifest>";
 
                 hr = CacheInitialize(&engineState.cache, &engineState.internalCommand);
                 TestThrowOnFailure(hr, L"Failed initialize cache.");

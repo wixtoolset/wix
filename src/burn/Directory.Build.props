@@ -7,4 +7,8 @@
   </PropertyGroup>
 
   <Import Project="..\Directory.Build.props" />
+  
+  <PropertyGroup>
+    <BurnGeneratedHeaderDirectory>$(BaseIntermediateOutputPath)..\</BurnGeneratedHeaderDirectory>
+  </PropertyGroup>
 </Project>

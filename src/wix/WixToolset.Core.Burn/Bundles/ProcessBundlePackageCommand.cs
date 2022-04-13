@@ -72,7 +72,8 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.ChainPackage.Win64 = harvestedBundlePackage.Win64;
             this.BundlePackage.BundleId = Guid.Parse(harvestedBundlePackage.BundleId).ToString("B").ToUpperInvariant();
-            this.BundlePackage.SupportsBurnProtocol = harvestedBundlePackage.ProtocolVersion == 1; // Keep in sync with burn\engine\inc\engine.h
+            this.BundlePackage.EngineVersion = harvestedBundlePackage.EngineVersion;
+            this.BundlePackage.SupportsBurnProtocol = harvestedBundlePackage.ProtocolVersion == BurnCommon.BURN_PROTOCOL_VERSION;
 
             var supportsArpSystemComponent = BurnCommon.BurnV3Namespace != harvestedBundlePackage.ManifestNamespace;
             if (!supportsArpSystemComponent && !this.ChainPackage.Visible)
@@ -104,6 +105,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             bool win64;
             string bundleId;
+            string engineVersion;
             int protocolVersion;
             string manifestNamespace;
             bool perMachine;
@@ -133,49 +135,7 @@ namespace WixToolset.Core.Burn.Bundles
                     this.TrackedFiles.Add(this.BackendHelper.TrackFile(filePath, TrackedFileType.Temporary, sourceLineNumbers));
                 }
 
-                switch (burnReader.MachineType)
-                {
-                    case BurnCommon.IMAGE_FILE_MACHINE_AM33:
-                    case BurnCommon.IMAGE_FILE_MACHINE_ARM:
-                    case BurnCommon.IMAGE_FILE_MACHINE_ARMNT:
-                    case BurnCommon.IMAGE_FILE_MACHINE_I386:
-                    case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH32:
-                    case BurnCommon.IMAGE_FILE_MACHINE_M32R:
-                        win64 = false;
-                        break;
-                    case BurnCommon.IMAGE_FILE_MACHINE_AMD64:
-                    case BurnCommon.IMAGE_FILE_MACHINE_ARM64:
-                    case BurnCommon.IMAGE_FILE_MACHINE_IA64:
-                    case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH64:
-                        win64 = true;
-                        break;
-                    case BurnCommon.IMAGE_FILE_MACHINE_EBC:
-                    case BurnCommon.IMAGE_FILE_MACHINE_MIPS16:
-                    case BurnCommon.IMAGE_FILE_MACHINE_MIPSFPU:
-                    case BurnCommon.IMAGE_FILE_MACHINE_MIPSFPU16:
-                    case BurnCommon.IMAGE_FILE_MACHINE_POWERPC:
-                    case BurnCommon.IMAGE_FILE_MACHINE_POWERPCFP:
-                    case BurnCommon.IMAGE_FILE_MACHINE_R4000:
-                    case BurnCommon.IMAGE_FILE_MACHINE_RISCV32:
-                    case BurnCommon.IMAGE_FILE_MACHINE_RISCV64:
-                    case BurnCommon.IMAGE_FILE_MACHINE_RISCV128:
-                    case BurnCommon.IMAGE_FILE_MACHINE_SH3:
-                    case BurnCommon.IMAGE_FILE_MACHINE_SH3DSP:
-                    case BurnCommon.IMAGE_FILE_MACHINE_SH4:
-                    case BurnCommon.IMAGE_FILE_MACHINE_SH5:
-                    case BurnCommon.IMAGE_FILE_MACHINE_THUMB:
-                    case BurnCommon.IMAGE_FILE_MACHINE_WCEMIPSV2:
-                    default:
-                        win64 = false;
-                        this.Messaging.Write(BurnBackendWarnings.UnknownCoffMachineType(sourceLineNumbers, sourcePath, burnReader.MachineType));
-                        break;
-                }
-
                 bundleId = burnReader.BundleId.ToString("B").ToUpperInvariant();
-
-                // Assume that the .wixburn section version will change when the Burn protocol changes.
-                // This should be a safe assumption since we will need to add the protocol version to the section to support this harvesting.
-                protocolVersion = burnReader.Version == 2 ? 1 : 0;
 
                 try
                 {
@@ -188,6 +148,10 @@ namespace WixToolset.Core.Burn.Bundles
                         this.Messaging.Write(BurnBackendErrors.InvalidBundleManifest(sourceLineNumbers, sourcePath, $"Expected root element to be 'BurnManifest' but was '{document.DocumentElement.LocalName}'."));
                         return null;
                     }
+
+                    engineVersion = document.DocumentElement.GetAttribute("EngineVersion");
+                    protocolVersion = this.ProcessProtocolVersion(burnReader, document);
+                    win64 = this.ProcessWin64(burnReader, document, sourceLineNumbers, sourcePath);
 
                     manifestNamespace = document.DocumentElement.NamespaceURI;
 
@@ -227,6 +191,7 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 Win64 = win64,
                 BundleId = bundleId,
+                EngineVersion = engineVersion,
                 ManifestNamespace = manifestNamespace,
                 ProtocolVersion = protocolVersion,
                 PerMachine = perMachine,
@@ -234,6 +199,68 @@ namespace WixToolset.Core.Burn.Bundles
                 DisplayName = displayName,
                 InstallSize = installSize,
             });
+        }
+
+        private int ProcessProtocolVersion(BurnReader burnReader, XmlDocument document)
+        {
+            var protocolVersionValue = document.DocumentElement.GetAttribute("ProtocolVersion");
+
+            if (Int32.TryParse(protocolVersionValue, out var protocolVersion))
+            {
+                return protocolVersion;
+            }
+
+            // Assume that the .wixburn section version will change when the Burn protocol changes.
+            // This should be a safe assumption since only old bundles should be missing the ProtocolVersion from the manifest.
+            return burnReader.Version == 2 ? 1 : 0;
+        }
+
+        private bool ProcessWin64(BurnReader burnReader, XmlDocument document, SourceLineNumber sourceLineNumbers, string sourcePath)
+        {
+            var win64Value = document.DocumentElement.GetAttribute("Win64");
+
+            switch (win64Value)
+            {
+                case "yes":
+                    return true;
+                case "no":
+                    return false;
+            }
+
+            switch (burnReader.MachineType)
+            {
+                case BurnCommon.IMAGE_FILE_MACHINE_ARM:
+                case BurnCommon.IMAGE_FILE_MACHINE_ARMNT:
+                case BurnCommon.IMAGE_FILE_MACHINE_I386:
+                case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH32:
+                    return false;
+                case BurnCommon.IMAGE_FILE_MACHINE_AMD64:
+                case BurnCommon.IMAGE_FILE_MACHINE_ARM64:
+                case BurnCommon.IMAGE_FILE_MACHINE_IA64:
+                case BurnCommon.IMAGE_FILE_MACHINE_LOONGARCH64:
+                    return true;
+                case BurnCommon.IMAGE_FILE_MACHINE_AM33:
+                case BurnCommon.IMAGE_FILE_MACHINE_EBC:
+                case BurnCommon.IMAGE_FILE_MACHINE_M32R:
+                case BurnCommon.IMAGE_FILE_MACHINE_MIPS16:
+                case BurnCommon.IMAGE_FILE_MACHINE_MIPSFPU:
+                case BurnCommon.IMAGE_FILE_MACHINE_MIPSFPU16:
+                case BurnCommon.IMAGE_FILE_MACHINE_POWERPC:
+                case BurnCommon.IMAGE_FILE_MACHINE_POWERPCFP:
+                case BurnCommon.IMAGE_FILE_MACHINE_R4000:
+                case BurnCommon.IMAGE_FILE_MACHINE_RISCV32:
+                case BurnCommon.IMAGE_FILE_MACHINE_RISCV64:
+                case BurnCommon.IMAGE_FILE_MACHINE_RISCV128:
+                case BurnCommon.IMAGE_FILE_MACHINE_SH3:
+                case BurnCommon.IMAGE_FILE_MACHINE_SH3DSP:
+                case BurnCommon.IMAGE_FILE_MACHINE_SH4:
+                case BurnCommon.IMAGE_FILE_MACHINE_SH5:
+                case BurnCommon.IMAGE_FILE_MACHINE_THUMB:
+                case BurnCommon.IMAGE_FILE_MACHINE_WCEMIPSV2:
+                default:
+                    this.Messaging.Write(BurnBackendWarnings.UnknownCoffMachineType(sourceLineNumbers, sourcePath, burnReader.MachineType));
+                    return false;
+            }
         }
 
         private long ProcessPackages(XmlDocument document, XmlNamespaceManager namespaceManager)
