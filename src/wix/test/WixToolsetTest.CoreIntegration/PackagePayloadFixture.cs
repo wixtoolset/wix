@@ -5,12 +5,90 @@ namespace WixToolsetTest.CoreIntegration
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
 
     public class PackagePayloadFixture
     {
+        [Fact]
+        public void CanSpecifyMsiPackagePayloadInPayloadGroup()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackagePayload", "MsiPackagePayloadInPayloadGroup.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "ExePackage", new List<string> { "CacheId", "InstallSize", "Size" } },
+                };
+                var msiPackageElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage")
+                                                      .Cast<XmlElement>()
+                                                      .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                                      .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<MsiPackage Id='MsiWithFeatures' Cache='keep' CacheId='{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0_1' InstallSize='34' Size='32803' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_MsiWithFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithFeatures' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' Language='1033' Version='1.0.0.0' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}'>" +
+                    "<MsiFeature Id='ProductFeature' /><MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' /><MsiProperty Id='MSIFASTINSTALL' Value='7' /><Provides Key='{040011E1-F84C-4927-AD62-50A5EC19CA32}_v1.0.0.0' Version='1.0.0.0' DisplayName='MsiPackage' />" +
+                    "<RelatedPackage Id='{047730A5-30FE-4A62-A520-DA9381B8226A}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
+                    "<RelatedPackage Id='{047730A5-30FE-4A62-A520-DA9381B8226A}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
+                    "<PayloadRef Id='test.msi' /><PayloadRef Id='fhuZsOcBDTuIX8rF96kswqI6SnuI' /><PayloadRef Id='faf_OZ741BG7SJ6ZkcIvivZ2Yzo8' />" +
+                    "</MsiPackage>",
+
+                    "<MsiPackage Id='MsiWithoutFeatures' Cache='keep' CacheId='{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0_2' InstallSize='34' Size='32803' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_MsiWithoutFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithoutFeatures' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' Language='1033' Version='1.0.0.0' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}'>" +
+                    "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' /><MsiProperty Id='MSIFASTINSTALL' Value='7' /><Provides Key='{040011E1-F84C-4927-AD62-50A5EC19CA32}_v1.0.0.0' Version='1.0.0.0' DisplayName='MsiPackage' />" +
+                    "<RelatedPackage Id='{047730A5-30FE-4A62-A520-DA9381B8226A}' MaxVersion='1.0.0.0' MaxInclusive='no' OnlyDetect='no' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
+                    "<RelatedPackage Id='{047730A5-30FE-4A62-A520-DA9381B8226A}' MinVersion='1.0.0.0' MinInclusive='no' OnlyDetect='yes' LangInclusive='yes'><Language Id='1033' /></RelatedPackage>" +
+                    "<PayloadRef Id='test.msi' /><PayloadRef Id='fhuZsOcBDTuIX8rF96kswqI6SnuI' /><PayloadRef Id='faf_OZ741BG7SJ6ZkcIvivZ2Yzo8' />" +
+                    "</MsiPackage>",
+                }, msiPackageElements);
+
+                var packageElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties")
+                                                   .Cast<XmlElement>()
+                                                   .Select(e => e.GetTestXml())
+                                                   .ToArray();
+                WixAssert.CompareLineByLine(new []
+                {
+                    "<WixPackageProperties Package='MsiWithFeatures' Vital='yes' DisplayName='MsiPackage' DownloadSize='32803' PackageSize='32803' InstalledSize='34' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_MsiWithFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithFeatures' Compressed='yes' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}' Version='1.0.0.0' Cache='keep' />",
+                    "<WixPackageProperties Package='MsiWithoutFeatures' Vital='yes' DisplayName='MsiPackage' DownloadSize='32803' PackageSize='32803' InstalledSize='34' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_MsiWithoutFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithoutFeatures' Compressed='yes' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}' Version='1.0.0.0' Cache='keep' />",
+                }, packageElements);
+
+                var featureElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageFeatureInfo")
+                                                   .Cast<XmlElement>()
+                                                   .Select(e => e.GetTestXml())
+                                                   .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixPackageFeatureInfo Package='MsiWithFeatures' Feature='ProductFeature' Size='34' Display='2' Level='1' Directory='' Attributes='0' />",
+                }, featureElements);
+            }
+        }
+
         [Fact]
         public void CanSpecifyPackagePayloadInPayloadGroup()
         {

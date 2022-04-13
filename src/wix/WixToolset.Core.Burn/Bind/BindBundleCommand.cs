@@ -159,7 +159,7 @@ namespace WixToolset.Core.Burn
                 processedPayloads = new HashSet<string>(payloadSymbols.Keys);
             }
 
-            IDictionary<string, PackageFacade> facades;
+            PackageFacades facades;
             {
                 var command = new GetPackageFacadesCommand(this.Messaging, chainPackageSymbols, section);
                 command.Execute();
@@ -325,7 +325,7 @@ namespace WixToolset.Core.Burn
 
             // Determine patches to automatically slipstream.
             {
-                var command = new AutomaticallySlipstreamPatchesCommand(section, facades.Values);
+                var command = new AutomaticallySlipstreamPatchesCommand(this.Messaging, section, facades);
                 command.Execute();
             }
 
@@ -334,13 +334,11 @@ namespace WixToolset.Core.Burn
                 return;
             }
 
-            IEnumerable<PackageFacade> orderedFacades;
             IEnumerable<WixBundleRollbackBoundarySymbol> boundaries;
             {
                 var command = new OrderPackagesAndRollbackBoundariesCommand(this.Messaging, section, facades);
                 command.Execute();
 
-                orderedFacades = command.OrderedPackageFacades;
                 boundaries = command.UsedRollbackBoundaries;
             }
 
@@ -351,7 +349,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new ProcessDependencyProvidersCommand(this.Messaging, section, facades);
+                var command = new ProcessDependencyProvidersCommand(this.ServiceProvider, section, facades);
                 command.Execute();
 
                 if (!String.IsNullOrEmpty(command.BundleProviderKey))
@@ -361,7 +359,7 @@ namespace WixToolset.Core.Burn
             }
 
             // Update the bundle per-machine/per-user scope based on the chained packages.
-            this.ResolveBundleInstallScope(section, bundleSymbol, orderedFacades);
+            this.ResolveBundleInstallScope(section, bundleSymbol, facades.OrderedValues);
 
             var softwareTags = section.Symbols.OfType<WixBundleTagSymbol>().ToList();
             if (softwareTags.Any())
@@ -370,7 +368,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
             }
 
-            this.DetectDuplicateCacheIds(facades);
+            this.DetectDuplicateCacheIds(facades.Values);
 
             if (this.Messaging.EncounteredError)
             {
@@ -413,7 +411,7 @@ namespace WixToolset.Core.Burn
             // Generate the core-defined BA manifest tables...
             string baManifestPath;
             {
-                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, boundaries, orderedFacades, uxPayloadIndex, payloadSymbols, packagesPayloads, this.IntermediateFolder, this.InternalBurnBackendHelper);
+                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, boundaries, facades, uxPayloadIndex, payloadSymbols, packagesPayloads, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;
@@ -480,7 +478,7 @@ namespace WixToolset.Core.Burn
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, containers.Values, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, containers.Values, chainSymbol, facades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;
@@ -637,11 +635,11 @@ namespace WixToolset.Core.Burn
             }
         }
 
-        private void DetectDuplicateCacheIds(IDictionary<string, PackageFacade> facades)
+        private void DetectDuplicateCacheIds(IEnumerable<PackageFacade> facades)
         {
             var duplicateCacheIdDetector = new Dictionary<string, WixBundlePackageSymbol>();
 
-            foreach (var facade in facades.Values)
+            foreach (var facade in facades)
             {
                 if (duplicateCacheIdDetector.TryGetValue(facade.PackageSymbol.CacheId, out var collisionPackage))
                 {

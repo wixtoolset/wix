@@ -10,7 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundlePatchTargetCode,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.PackagePayloadRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.TargetCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.Type), IntermediateFieldType.Number),
@@ -25,7 +25,7 @@ namespace WixToolset.Data.Symbols
 
     public enum WixBundlePatchTargetCodeSymbolFields
     {
-        PackageRef,
+        PackagePayloadRef,
         TargetCode,
         Attributes,
         Type,
@@ -67,10 +67,10 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixBundlePatchTargetCodeSymbolFields index] => this.Fields[(int)index];
 
-        public string PackageRef
+        public string PackagePayloadRef
         {
-            get => (string)this.Fields[(int)WixBundlePatchTargetCodeSymbolFields.PackageRef];
-            set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundlePatchTargetCodeSymbolFields.PackagePayloadRef];
+            set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.PackagePayloadRef, value);
         }
 
         public string TargetCode

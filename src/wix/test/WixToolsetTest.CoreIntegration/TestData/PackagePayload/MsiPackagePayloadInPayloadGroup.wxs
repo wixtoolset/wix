@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <MsiPackage Id="MsiWithFeatures" CacheId="{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0_1" EnableFeatureSelection="yes">
+                <PayloadGroupRef Id="PackagePayloadGroup" />
+            </MsiPackage>
+            <MsiPackage Id="MsiWithoutFeatures" CacheId="{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0_2">
+                <PayloadGroupRef Id="PackagePayloadGroup" />
+            </MsiPackage>
+        </PackageGroup>
+    </Fragment>
+    <Fragment>
+        <PayloadGroup Id="PackagePayloadGroup">
+            <MsiPackagePayload SourceFile="test.msi" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

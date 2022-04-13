@@ -57,8 +57,8 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var harvestedBundlePackage = this.Section.Symbols.OfType<WixBundleHarvestedBundlePackageSymbol>()
-                                                          .Where(h => h.Id == this.ChainPackage.Id)
-                                                          .SingleOrDefault();
+                                                             .Where(h => h.Id == this.PackagePayload.Id)
+                                                             .SingleOrDefault();
 
             if (harvestedBundlePackage == null)
             {
@@ -200,13 +200,12 @@ namespace WixToolset.Core.Burn.Bundles
                     version = registrationElement.GetAttribute("Version");
 
                     var providerKey = registrationElement.GetAttribute("ProviderKey");
-                    var depId = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", this.PackageId, providerKey));
-                    this.Section.AddSymbol(new WixDependencyProviderSymbol(sourceLineNumbers, depId)
+                    var depId = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", this.PackagePayload.Id.Id, providerKey));
+                    this.Section.AddSymbol(new WixBundleHarvestedDependencyProviderSymbol(sourceLineNumbers, depId)
                     {
-                        ParentRef = this.PackageId,
+                        PackagePayloadRef = this.PackagePayload.Id.Id,
                         ProviderKey = providerKey,
                         Version = version,
-                        Attributes = WixDependencyProviderAttributes.ProvidesAttributesImported,
                     });
 
                     displayName = arpElement.GetAttribute("DisplayName");
@@ -224,7 +223,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
 
-            return this.Section.AddSymbol(new WixBundleHarvestedBundlePackageSymbol(this.PackagePayload.SourceLineNumbers, this.ChainPackage.Id)
+            return this.Section.AddSymbol(new WixBundleHarvestedBundlePackageSymbol(this.PackagePayload.SourceLineNumbers, this.PackagePayload.Id)
             {
                 Win64 = win64,
                 BundleId = bundleId,
@@ -274,7 +273,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.Section.AddSymbol(new WixBundlePackageRelatedBundleSymbol(sourceLineNumbers)
                 {
-                    PackageRef = this.PackageId,
+                    PackagePayloadRef = this.PackagePayload.Id.Id,
                     BundleId = id,
                     Action = action,
                 });

@@ -17,6 +17,11 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.BAContainerPayloadCollision2, "The location of the payload related to the previous error.");
         }
 
+        public static Message BundleMultipleProviders(SourceLineNumber sourceLineNumbers, string extraProviderKey, string originalProviderKey)
+        {
+            return Message(sourceLineNumbers, Ids.BundleMultipleProviders, "The bundle can only have a single dependency provider, but it has '{0}' and '{1}'.", originalProviderKey, extraProviderKey);
+        }
+
         public static Message DuplicateCacheIds(SourceLineNumber originalLineNumber, string cacheId, string packageId)
         {
             return Message(originalLineNumber, Ids.DuplicateCacheIds, "The CacheId '{0}' for package '{1}' is duplicated. Each package must have a unique CacheId.", cacheId, packageId);
@@ -110,6 +115,7 @@ namespace WixToolset.Core.Burn
             UnsupportedRemotePackagePayload = 8010,
             FailedToAddIconOrSplashScreenToBundle = 8011,
             InvalidBundleManifest = 8012,
+            BundleMultipleProviders = 8013,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }

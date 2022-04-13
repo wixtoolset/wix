@@ -65,7 +65,7 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var harvestedMsiPackage = this.Section.Symbols.OfType<WixBundleHarvestedMsiPackageSymbol>()
-                                                          .Where(h => h.Id == this.ChainPackage.Id)
+                                                          .Where(h => h.Id == this.PackagePayload.Id)
                                                           .SingleOrDefault();
 
             if (harvestedMsiPackage == null)
@@ -76,6 +76,17 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     return;
                 }
+            }
+
+            foreach (var childPayload in this.Section.Symbols.OfType<WixBundlePayloadSymbol>().Where(p => p.ParentPackagePayloadRef == this.PackagePayload.Id.Id).ToList())
+            {
+                this.Section.AddSymbol(new WixGroupSymbol(childPayload.SourceLineNumbers)
+                {
+                    ParentType = ComplexReferenceParentType.Package,
+                    ParentId = this.PackageId,
+                    ChildType = ComplexReferenceChildType.Payload,
+                    ChildId = childPayload.Id.Id,
+                });
             }
 
             this.ChainPackage.PerMachine = harvestedMsiPackage.PerMachine;
@@ -218,11 +229,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                     this.CreateRelatedPackages(db);
 
-                    // If feature selection is enabled, represent the Feature table in the manifest.
-                    if (this.MsiPackage.EnableFeatureSelection)
-                    {
-                        this.CreateMsiFeatures(db);
-                    }
+                    this.CreateMsiFeatures(db);
 
                     // Add all external cabinets as package payloads.
                     this.ImportExternalCabinetAsPayloads(db, payloadNames);
@@ -241,7 +248,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return null;
             }
 
-            return this.Section.AddSymbol(new WixBundleHarvestedMsiPackageSymbol(this.PackagePayload.SourceLineNumbers, this.ChainPackage.Id)
+            return this.Section.AddSymbol(new WixBundleHarvestedMsiPackageSymbol(this.PackagePayload.SourceLineNumbers, this.PackagePayload.Id)
             {
                 PerMachine = perMachine,
                 Win64 = win64,
@@ -379,7 +386,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                         this.Section.AddSymbol(new WixBundleRelatedPackageSymbol(this.PackagePayload.SourceLineNumbers)
                         {
-                            PackageRef = this.PackageId,
+                            PackagePayloadRef = this.PackagePayload.Id.Id,
                             RelatedId = record.GetString(1),
                             MinVersion = record.GetString(2),
                             MaxVersion = record.GetString(3),
@@ -425,9 +432,9 @@ namespace WixToolset.Core.Burn.Bundles
                                 }
                             }
 
-                            this.Section.AddSymbol(new WixBundleMsiFeatureSymbol(this.PackagePayload.SourceLineNumbers, new Identifier(AccessModifier.Section, this.PackageId, featureName))
+                            this.Section.AddSymbol(new WixBundleMsiFeatureSymbol(this.PackagePayload.SourceLineNumbers, new Identifier(AccessModifier.Section, this.PackagePayload.Id.Id, featureName))
                             {
-                                PackageRef = this.PackageId,
+                                PackagePayloadRef = this.PackagePayload.Id.Id,
                                 Name = featureName,
                                 Parent = allFeaturesResultRecord.GetString(2),
                                 Title = allFeaturesResultRecord.GetString(3),
@@ -467,14 +474,6 @@ namespace WixToolset.Core.Burn.Bundles
                             {
                                 var generatedId = this.BackendHelper.GenerateIdentifier("cab", this.PackagePayload.Id.Id, cabinet);
                                 var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, cabinet, "Cabinet", sourceLineNumbers);
-
-                                this.Section.AddSymbol(new WixGroupSymbol(sourceLineNumbers)
-                                {
-                                    ParentType = ComplexReferenceParentType.Package,
-                                    ParentId = this.PackageId,
-                                    ChildType = ComplexReferenceChildType.Payload,
-                                    ChildId = generatedId
-                                });
 
                                 this.Section.AddSymbol(new WixBundlePayloadSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                                 {
@@ -540,14 +539,6 @@ namespace WixToolset.Core.Burn.Bundles
                                 var generatedId = this.BackendHelper.GenerateIdentifier("f", this.PackagePayload.Id.Id, record.GetString(2));
                                 var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, fileSourcePath, "File", sourceLineNumbers);
 
-                                this.Section.AddSymbol(new WixGroupSymbol(sourceLineNumbers)
-                                {
-                                    ParentType = ComplexReferenceParentType.Package,
-                                    ParentId = this.PackageId,
-                                    ChildType = ComplexReferenceChildType.Payload,
-                                    ChildId = generatedId
-                                });
-
                                 this.Section.AddSymbol(new WixBundlePayloadSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                                 {
                                     Name = name,
@@ -594,16 +585,16 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     foreach (var record in view.Records)
                     {
-                        var id = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", this.PackageId, record.GetString(1)));
+                        var id = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", this.PackagePayload.Id.Id, record.GetString(1)));
 
                         // Import the provider key and attributes.
-                        this.Section.AddSymbol(new WixDependencyProviderSymbol(this.PackagePayload.SourceLineNumbers, id)
+                        this.Section.AddSymbol(new WixBundleHarvestedDependencyProviderSymbol(this.PackagePayload.SourceLineNumbers, id)
                         {
-                            ParentRef = this.PackageId,
+                            PackagePayloadRef = this.PackagePayload.Id.Id,
                             ProviderKey = record.GetString(2),
                             Version = record.GetString(3) ?? this.MsiPackage.ProductVersion,
                             DisplayName = record.GetString(4) ?? this.ChainPackage.DisplayName,
-                            Attributes = WixDependencyProviderAttributes.ProvidesAttributesImported | (WixDependencyProviderAttributes)record.GetInteger(5),
+                            ProviderAttributes = record.GetInteger(5),
                         });
                     }
                 }

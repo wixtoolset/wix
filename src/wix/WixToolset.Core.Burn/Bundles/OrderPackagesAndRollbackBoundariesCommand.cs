@@ -12,7 +12,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class OrderPackagesAndRollbackBoundariesCommand
     {
-        public OrderPackagesAndRollbackBoundariesCommand(IMessaging messaging, IntermediateSection section, IDictionary<string, PackageFacade> packageFacades)
+        public OrderPackagesAndRollbackBoundariesCommand(IMessaging messaging, IntermediateSection section, PackageFacades packageFacades)
         {
             this.Messaging = messaging;
             this.Section = section;
@@ -23,9 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        private IDictionary<string, PackageFacade> PackageFacades { get; }
-
-        public IEnumerable<PackageFacade> OrderedPackageFacades { get; private set; }
+        private PackageFacades PackageFacades { get; }
 
         public IEnumerable<WixBundleRollbackBoundarySymbol> UsedRollbackBoundaries { get; private set; }
 
@@ -34,7 +32,6 @@ namespace WixToolset.Core.Burn.Bundles
             var groupSymbols = this.Section.Symbols.OfType<WixGroupSymbol>().ToList();
             var boundariesById = this.Section.Symbols.OfType<WixBundleRollbackBoundarySymbol>().ToDictionary(b => b.Id.Id);
 
-            var orderedFacades = new List<PackageFacade>();
             var usedBoundaries = new List<WixBundleRollbackBoundarySymbol>();
 
             // Process the chain of packages to add them in the correct order
@@ -55,7 +52,7 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 if (ComplexReferenceChildType.Package == groupSymbol.ChildType && ComplexReferenceParentType.PackageGroup == groupSymbol.ParentType && BurnConstants.BundleChainPackageGroupId == groupSymbol.ParentId)
                 {
-                    if (this.PackageFacades.TryGetValue(groupSymbol.ChildId, out var facade))
+                    if (this.PackageFacades.TryGetFacadeByPackageId(groupSymbol.ChildId, out var facade))
                     {
                         var insideMsiTransaction = lastRollbackBoundary.Transaction;
 
@@ -102,7 +99,7 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                         }
 
-                        orderedFacades.Add(facade);
+                        this.PackageFacades.AddOrdered(facade);
                     }
                     else // must be a rollback boundary.
                     {
@@ -158,7 +155,7 @@ namespace WixToolset.Core.Burn.Bundles
             string previousRollbackBoundaryId = null;
             PackageFacade previousFacade = null;
 
-            foreach (var package in orderedFacades)
+            foreach (var package in this.PackageFacades.OrderedValues)
             {
                 if (null != package.PackageSymbol.RollbackBoundaryRef)
                 {
@@ -178,7 +175,6 @@ namespace WixToolset.Core.Burn.Bundles
                 previousFacade.PackageSymbol.RollbackBoundaryBackwardRef = previousRollbackBoundaryId;
             }
 
-            this.OrderedPackageFacades = orderedFacades;
             this.UsedRollbackBoundaries = usedBoundaries;
         }
     }

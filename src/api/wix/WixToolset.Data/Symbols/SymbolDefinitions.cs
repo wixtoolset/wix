@@ -131,6 +131,7 @@ namespace WixToolset.Data
         WixBundleExePackagePayload,
         WixBundleExtension,
         WixBundleHarvestedBundlePackage,
+        WixBundleHarvestedDependencyProvider,
         WixBundleHarvestedMsiPackage,
         WixBundleHarvestedMspPackage,
         WixBundleMsiFeature,
@@ -588,6 +589,9 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixBundleHarvestedBundlePackage:
                     return SymbolDefinitions.WixBundleHarvestedBundlePackage;
+
+                case SymbolDefinitionType.WixBundleHarvestedDependencyProvider:
+                    return SymbolDefinitions.WixBundleHarvestedDependencyProvider;
 
                 case SymbolDefinitionType.WixBundleHarvestedMsiPackage:
                     return SymbolDefinitions.WixBundleHarvestedMsiPackage;

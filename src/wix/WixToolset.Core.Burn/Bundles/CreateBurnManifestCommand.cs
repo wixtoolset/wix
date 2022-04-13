@@ -18,14 +18,14 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
+        public CreateBurnManifestCommand(string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, PackageFacades packageFacades, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
         {
             this.ExecutableName = executableName;
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
             this.Chain = chainSymbol;
             this.Containers = containers;
-            this.OrderedPackages = orderedPackages;
+            this.PackageFacades = packageFacades;
             this.RollbackBoundaries = boundaries;
             this.UXContainerPayloads = uxPayloads;
             this.Payloads = allPayloadsById;
@@ -46,7 +46,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IEnumerable<WixBundleRollbackBoundarySymbol> RollbackBoundaries { get; }
 
-        private IEnumerable<PackageFacade> OrderedPackages { get; }
+        private PackageFacades PackageFacades { get; }
 
         private IEnumerable<ISearchFacade> OrderedSearches { get; }
 
@@ -316,11 +316,11 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 // Index a few tables by package.
-                var targetCodesByPatch = this.Section.Symbols.OfType<WixBundlePatchTargetCodeSymbol>().ToLookup(r => r.PackageRef);
-                var msiFeaturesByPackage = this.Section.Symbols.OfType<WixBundleMsiFeatureSymbol>().ToLookup(r => r.PackageRef);
+                var targetCodesByPackagePayload = this.Section.Symbols.OfType<WixBundlePatchTargetCodeSymbol>().ToLookup(r => r.PackagePayloadRef);
+                var msiFeaturesByPackagePayload = this.Section.Symbols.OfType<WixBundleMsiFeatureSymbol>().ToLookup(r => r.PackagePayloadRef);
                 var msiPropertiesByPackage = this.Section.Symbols.OfType<WixBundleMsiPropertySymbol>().ToLookup(r => r.PackageRef);
-                var relatedBundlesByPackage = this.Section.Symbols.OfType<WixBundlePackageRelatedBundleSymbol>().ToLookup(r => r.PackageRef);
-                var relatedPackagesByPackage = this.Section.Symbols.OfType<WixBundleRelatedPackageSymbol>().ToLookup(r => r.PackageRef);
+                var relatedBundlesByPackagePayload = this.Section.Symbols.OfType<WixBundlePackageRelatedBundleSymbol>().ToLookup(r => r.PackagePayloadRef);
+                var relatedPackagesByPackagePayload = this.Section.Symbols.OfType<WixBundleRelatedPackageSymbol>().ToLookup(r => r.PackagePayloadRef);
                 var slipstreamMspsByPackage = this.Section.Symbols.OfType<WixBundleSlipstreamMspSymbol>().ToLookup(r => r.TargetPackageRef);
                 var exitCodesByPackage = this.Section.Symbols.OfType<WixBundlePackageExitCodeSymbol>().ToLookup(r => r.ChainPackageId);
                 var commandLinesByPackage = this.Section.Symbols.OfType<WixBundlePackageCommandLineSymbol>().ToLookup(r => r.WixBundlePackageRef);
@@ -331,8 +331,10 @@ namespace WixToolset.Core.Burn.Bundles
                 // Build up the list of target codes from all the MSPs in the chain.
                 var targetCodes = new List<WixBundlePatchTargetCodeSymbol>();
 
-                foreach (var package in this.OrderedPackages)
+                foreach (var package in this.PackageFacades.OrderedValues)
                 {
+                    var packagePayloadId = package.PackageSymbol.PayloadRef;
+
                     writer.WriteStartElement(String.Format(CultureInfo.InvariantCulture, "{0}Package", package.PackageSymbol.Type));
 
                     writer.WriteAttributeString("Id", package.PackageId);
@@ -425,6 +427,19 @@ namespace WixToolset.Core.Burn.Bundles
                         {
                             writer.WriteAttributeString("UpgradeCode", msiPackage.UpgradeCode);
                         }
+
+                        // If feature selection is enabled, represent the Feature table in the manifest.
+                        if (msiPackage.EnableFeatureSelection)
+                        {
+                            var packageMsiFeatures = msiFeaturesByPackagePayload[packagePayloadId];
+
+                            foreach (var feature in packageMsiFeatures)
+                            {
+                                writer.WriteStartElement("MsiFeature");
+                                writer.WriteAttributeString("Id", feature.Name);
+                                writer.WriteEndElement();
+                            }
+                        }
                     }
                     else if (package.SpecificPackageSymbol is WixBundleMspPackageSymbol mspPackage) // MSP
                     {
@@ -435,7 +450,7 @@ namespace WixToolset.Core.Burn.Bundles
                         // product codes, add the patch list to the overall list.
                         if (null != targetCodes)
                         {
-                            foreach (var patchTargetCode in targetCodesByPatch[mspPackage.Id.Id])
+                            foreach (var patchTargetCode in targetCodesByPackagePayload[packagePayloadId])
                             {
                                 if (patchTargetCode.Type == WixBundlePatchTargetCodeType.Unspecified)
                                 {
@@ -451,15 +466,6 @@ namespace WixToolset.Core.Burn.Bundles
                     {
                         writer.WriteAttributeString("DetectCondition", msuPackage.DetectCondition);
                         writer.WriteAttributeString("KB", msuPackage.MsuKB);
-                    }
-
-                    var packageMsiFeatures = msiFeaturesByPackage[package.PackageId];
-
-                    foreach (var feature in packageMsiFeatures)
-                    {
-                        writer.WriteStartElement("MsiFeature");
-                        writer.WriteAttributeString("Id", feature.Name);
-                        writer.WriteEndElement();
                     }
 
                     var packageMsiProperties = msiPropertiesByPackage[package.PackageId];
@@ -536,14 +542,14 @@ namespace WixToolset.Core.Burn.Bundles
 
                         if (dependency.Imported)
                         {
-                            // The package dependency was explicitly authored into the manifest.
+                            // The package dependency was harvested from the package.
                             writer.WriteAttributeString("Imported", "yes");
                         }
 
                         writer.WriteEndElement();
                     }
 
-                    var packageRelatedBundles = relatedBundlesByPackage[package.PackageId];
+                    var packageRelatedBundles = relatedBundlesByPackagePayload[packagePayloadId];
 
                     foreach (var relatedBundle in packageRelatedBundles)
                     {
@@ -553,7 +559,7 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteEndElement();
                     }
 
-                    var packageRelatedPackages = relatedPackagesByPackage[package.PackageId];
+                    var packageRelatedPackages = relatedPackagesByPackagePayload[packagePayloadId];
 
                     foreach (var related in packageRelatedPackages)
                     {
@@ -587,7 +593,6 @@ namespace WixToolset.Core.Burn.Bundles
                     }
 
                     // Write any contained Payloads with the PackagePayload being first
-                    var packagePayloadId = package.PackageSymbol.PayloadRef;
                     writer.WriteStartElement("PayloadRef");
                     writer.WriteAttributeString("Id", packagePayloadId);
                     writer.WriteEndElement();
