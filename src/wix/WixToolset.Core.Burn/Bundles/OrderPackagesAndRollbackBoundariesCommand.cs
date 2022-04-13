@@ -94,15 +94,14 @@ namespace WixToolset.Core.Burn.Bundles
                     {
                         // Discard the next rollback boundary if we have a previously defined boundary.
                         var nextRollbackBoundary = boundariesById[groupSymbol.ChildId];
-                        if (null != pendingRollbackBoundary)
+                        if (null != pendingRollbackBoundary && pendingRollbackBoundary.Id.Id != BurnConstants.BundleDefaultBoundaryId)
                         {
-                            if (pendingRollbackBoundary.Id.Id != BurnConstants.BundleDefaultBoundaryId)
-                            {
-                                this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
-                            }
+                            this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
                         }
-
-                        lastRollbackBoundary = pendingRollbackBoundary = nextRollbackBoundary;
+                        else
+                        {
+                            lastRollbackBoundary = pendingRollbackBoundary = nextRollbackBoundary;
+                        }
                     }
                 }
             }

@@ -94,6 +94,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundleVariable:
                     case SymbolDefinitionType.WixBuildInfo:
                     case SymbolDefinitionType.WixChain:
+                    case SymbolDefinitionType.WixChainItem:
                     case SymbolDefinitionType.WixComponentSearch:
                     case SymbolDefinitionType.WixDependencyProvider:
                     case SymbolDefinitionType.WixFileSearch:
@@ -114,10 +115,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixVariable:
                         break;
 
-                    // Symbols to investigate:
-                    case SymbolDefinitionType.WixChainItem:
-                        break;
-
+                    // All other symbols need to be processed.
                     case SymbolDefinitionType.WixBundleCustomData:
                         unknownSymbol = !this.IndexBundleCustomDataSymbol((WixBundleCustomDataSymbol)symbol, customDataById);
                         break;

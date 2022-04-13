@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="PreBundlePackages">
+            <RollbackBoundary Id="First" />
+        </PackageGroup>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="PreBundlePackages" />
+            <RollbackBoundary Id="Second" />
+            <MsiPackage SourceFile="test.msi" />
+        </PackageGroup>
+    </Fragment>
+</Wix>
