@@ -11,7 +11,40 @@ namespace WixToolsetTest.CoreIntegration
     public class RemotePayloadFixture
     {
         [Fact]
-        public void CanGetRemotePayload()
+        public void CanGetRemoteV3BundlePayload()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var outputFolder = fs.GetFolder();
+                var outFile = Path.Combine(outputFolder, "out.xml");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "burn", "remotepayload",
+                    Path.Combine(folder, ".Data", "v3bundle.exe"),
+                    "-downloadurl", "https://www.example.com/files/{0}",
+                    "-o", outFile,
+                    "-packagetype", "bundle",
+                });
+
+                result.AssertSuccess();
+
+                var elements = File.ReadAllLines(outFile);
+                elements = elements.Select(s => s.Replace("\"", "'")).ToArray();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<BundlePackagePayload Name='v3bundle.exe' ProductName='CustomV3Theme' Description='CustomV3Theme' DownloadUrl='https://www.example.com/files/v3bundle.exe' Hash='80739E7B8C31D75B4CDC48D60D74F5E481CB904212A3AE3FB0920365A163FBF32B0C5C175AB516D4124F107923E96200605DE1D560D362FEB47350FA727823B4' Size='648397' Version='1.0.0.0'>",
+                    "  <RemoteBundle BundleId='{215A70DB-AB35-48C7-BE51-D66EAAC87177}' DisplayName='CustomV3Theme' InstallSize='1135' ManifestNamespace='http://schemas.microsoft.com/wix/2008/Burn' PerMachine='yes' ProviderKey='{215a70db-ab35-48c7-be51-d66eaac87177}' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{2BF4C01F-C132-4E70-97AB-2BC68C7CCD10}' />",
+                    "</BundlePackagePayload>",
+                }, elements);
+            }
+        }
+
+        [Fact]
+        public void CanGetRemoteExePayload()
         {
             var folder = TestData.Get(@"TestData");
 

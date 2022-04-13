@@ -9,6 +9,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+    using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.Burn.Interfaces;
     using WixToolset.Core.Native;
     using WixToolset.Data;
@@ -17,15 +18,21 @@ namespace WixToolset.Core.Burn.CommandLine
 
     internal class RemotePayloadSubcommand : BurnSubcommandBase
     {
+        private static readonly XName BundlePackagePayloadName = "BundlePackagePayload";
         private static readonly XName ExePackagePayloadName = "ExePackagePayload";
         private static readonly XName MsuPackagePayloadName = "MsuPackagePayload";
         private static readonly XName PayloadName = "Payload";
+        private static readonly XName RemoteBundleName = "RemoteBundle";
+        private static readonly XName RemoteRelatedBundleName = "RemoteRelatedBundle";
 
         public RemotePayloadSubcommand(IServiceProvider serviceProvider)
         {
+            this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.PayloadHarvester = serviceProvider.GetService<IPayloadHarvester>();
         }
+
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -36,6 +43,8 @@ namespace WixToolset.Core.Burn.CommandLine
         private string DownloadUrl { get; set; }
 
         private List<string> InputPaths { get; } = new List<string>();
+
+        private string IntermediateFolder { get; set; }
 
         private string OutputPath { get; set; }
 
@@ -57,6 +66,11 @@ namespace WixToolset.Core.Burn.CommandLine
             // Reverse sort to ensure longest paths are matched first.
             this.BasePaths.Sort();
             this.BasePaths.Reverse();
+
+            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            {
+                this.IntermediateFolder = Path.GetTempPath();
+            }
 
             var elements = this.HarvestRemotePayloads(inputPaths);
 
@@ -96,6 +110,10 @@ namespace WixToolset.Core.Burn.CommandLine
                     case "du":
                     case "downloadurl":
                         this.DownloadUrl = parser.GetNextArgumentOrError(argument);
+                        return true;
+
+                    case "intermediatefolder":
+                        this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
 
                     case "packagetype":
@@ -174,7 +192,7 @@ namespace WixToolset.Core.Burn.CommandLine
                     continue;
                 }
 
-                var payloadSymbol = new WixBundlePayloadSymbol
+                var payloadSymbol = new WixBundlePayloadSymbol(null, new Identifier(AccessModifier.Section, "id"))
                 {
                     SourceFile = new IntermediateFieldPathValue { Path = path },
                 };
@@ -225,6 +243,62 @@ namespace WixToolset.Core.Burn.CommandLine
                     element.Add(new XAttribute("Version", payloadSymbol.Version));
                 }
 
+                if (element.Name == BundlePackagePayloadName)
+                {
+                    var command = new HarvestBundlePackageCommand(this.ServiceProvider, this.IntermediateFolder, payloadSymbol);
+                    command.Execute();
+
+                    if (!this.Messaging.EncounteredError)
+                    {
+                        var bundleElement = new XElement(RemoteBundleName);
+
+                        bundleElement.Add(new XAttribute("BundleId", command.HarvestedBundlePackage.BundleId));
+
+                        if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.DisplayName))
+                        {
+                            bundleElement.Add(new XAttribute("DisplayName", command.HarvestedBundlePackage.DisplayName));
+                        }
+
+                        if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.EngineVersion))
+                        {
+                            bundleElement.Add(new XAttribute("EngineVersion", command.HarvestedBundlePackage.EngineVersion));
+                        }
+
+                        bundleElement.Add(new XAttribute("InstallSize", command.HarvestedBundlePackage.InstallSize));
+                        bundleElement.Add(new XAttribute("ManifestNamespace", command.HarvestedBundlePackage.ManifestNamespace));
+                        bundleElement.Add(new XAttribute("PerMachine", command.HarvestedBundlePackage.PerMachine ? "yes" : "no"));
+                        bundleElement.Add(new XAttribute("ProviderKey", command.HarvestedDependencyProvider.ProviderKey));
+                        bundleElement.Add(new XAttribute("ProtocolVersion", command.HarvestedBundlePackage.ProtocolVersion));
+
+                        if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.Version))
+                        {
+                            bundleElement.Add(new XAttribute("Version", command.HarvestedBundlePackage.Version));
+                        }
+
+                        bundleElement.Add(new XAttribute("Win64", command.HarvestedBundlePackage.Win64 ? "yes" : "no"));
+
+                        var setUpgradeCode = false;
+                        foreach (var relatedBundle in command.RelatedBundles)
+                        {
+                            if (!setUpgradeCode && relatedBundle.Action == RelatedBundleActionType.Upgrade)
+                            {
+                                setUpgradeCode = true;
+                                bundleElement.Add(new XAttribute("UpgradeCode", relatedBundle.BundleId));
+                                continue;
+                            }
+
+                            var relatedBundleElement = new XElement(RemoteRelatedBundleName);
+
+                            relatedBundleElement.Add(new XAttribute("Id", relatedBundle.BundleId));
+                            relatedBundleElement.Add(new XAttribute("Action", relatedBundle.Action.ToString()));
+
+                            bundleElement.Add(relatedBundleElement);
+                        }
+
+                        element.Add(bundleElement);
+                    }
+                }
+
                 yield return element;
             }
         }
@@ -237,6 +311,9 @@ namespace WixToolset.Core.Burn.CommandLine
 
                 switch (extension.ToUpperInvariant())
                 {
+                    case "BUNDLE":
+                        return new XElement(BundlePackagePayloadName);
+
                     case "EXE":
                     case ".EXE":
                         return new XElement(ExePackagePayloadName);

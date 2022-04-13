@@ -574,7 +574,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithSubfolderContainer()
+        public void CanBuildWithSubfolderContainer()
         {
             var folder = TestData.Get(@"TestData");
 
