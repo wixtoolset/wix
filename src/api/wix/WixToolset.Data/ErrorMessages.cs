@@ -1494,9 +1494,24 @@ namespace WixToolset.Data
             return Message(null, Ids.MissingValidatorExtension, "The validator requires at least one extension. Add \"ValidatorExtension, Wix\" for the default implementation.");
         }
 
-        public static Message MsiTransactionX86BeforeX64(SourceLineNumber sourceLineNumbers)
+        public static Message MsiTransactionInvalidPackage(SourceLineNumber sourceLineNumbers, string packageId, string packageType)
         {
-            return Message(sourceLineNumbers, Ids.MsiTransactionX86BeforeX64, "MSI transactions must install all x64 packages before any x86 package.");
+            return Message(sourceLineNumbers, Ids.MsiTransactionInvalidPackage, "Invalid package '{0}' in MSI transaction. It is type '{1}' but must be Msi or Msp.", packageId, packageType);
+        }
+
+        public static Message MsiTransactionInvalidPackage2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionInvalidPackage2, "Location of rollback boundary related to previous error.");
+        }
+
+        public static Message MsiTransactionX86BeforeX64Package(SourceLineNumber sourceLineNumbers, string x64PackageId, string x86PackageId)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionX86BeforeX64Package, "Package '{0}' is x64 but Package '{1}' is x86. MSI transactions must install all x64 packages before any x86 package.", x64PackageId, x86PackageId);
+        }
+
+        public static Message MsiTransactionX86BeforeX64Package2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionX86BeforeX64Package2, "Location of x86 package related to previous error.");
         }
 
         public static Message MultipleEntrySections(SourceLineNumber sourceLineNumbers, string sectionName1, string sectionName2)
@@ -2672,7 +2687,7 @@ namespace WixToolset.Data
             InlineDirectorySyntaxRequiresPath = 387,
             InsecureBundleFilename = 388,
             PayloadMustBeRelativeToCache = 389,
-            MsiTransactionX86BeforeX64 = 390,
+            MsiTransactionX86BeforeX64Package = 390,
             NoSourceFiles = 391,
             WixiplSourceFileIsExclusive = 392,
             UnableToConvertFieldToNumber = 393,
@@ -2692,6 +2707,9 @@ namespace WixToolset.Data
             MissingPackagePayload = 407,
             ExpectedAttributeWithoutOtherAttributes = 408,
             InvalidBundleCondition = 409,
+            MsiTransactionX86BeforeX64Package2 = 410,
+            MsiTransactionInvalidPackage = 411,
+            MsiTransactionInvalidPackage2 = 412,
         }
     }
 }

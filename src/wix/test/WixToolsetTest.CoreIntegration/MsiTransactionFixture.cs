@@ -11,7 +11,34 @@ namespace WixToolsetTest.CoreIntegration
     public class MsiTransactionFixture
     {
         [Fact]
-        public void CantBuildX64AfterX86Bundle()
+        public void CannotBuildExePackageInMsiTransaction()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-sw1151", // this is expected for this test
+                    Path.Combine(folder, "MsiTransaction", "ExeInMsiTransactionBundle.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                Assert.Equal(412, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildX64AfterX86Bundle()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -36,7 +63,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.Equal(390, result.ExitCode);
+                Assert.Equal(410, result.ExitCode);
             }
         }
 

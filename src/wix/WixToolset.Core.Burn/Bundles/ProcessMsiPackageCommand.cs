@@ -87,10 +87,9 @@ namespace WixToolset.Core.Burn.Bundles
                         // "Elevated privileges are not required to install this package."
                         // in MSI 4.5 and below, if this bit is 0, elevation is required.
                         var perMachine = (0 == (fileAndElevateFlags & 8));
-                        var x64 = platformsAndLanguages.Contains("x64");
 
                         this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
-                        this.Facade.PackageSymbol.Win64 = x64;
+                        this.Facade.PackageSymbol.Win64 = this.IsWin64(packagePayload.SourceLineNumbers, sourcePath, platformsAndLanguages);
                     }
 
                     string packageName = null;
@@ -214,6 +213,29 @@ namespace WixToolset.Core.Burn.Bundles
                 .Select(p => p.Name);
 
             return new HashSet<string>(properties, StringComparer.Ordinal);
+        }
+
+        // https://docs.microsoft.com/en-us/windows/win32/msi/template-summary
+        private bool IsWin64(SourceLineNumber sourceLineNumbers, string sourcePath, string platformsAndLanguages)
+        {
+            var separatorIndex = platformsAndLanguages.IndexOf(';');
+            var platformValue = separatorIndex > 0 ? platformsAndLanguages.Substring(0, separatorIndex) : platformsAndLanguages;
+
+            switch (platformValue)
+            {
+                case "Arm64":
+                case "Intel64":
+                case "x64":
+                    return true;
+
+                case "Arm":
+                case "Intel":
+                    return false;
+
+                default:
+                    this.Messaging.Write(BurnBackendWarnings.UnknownMsiPackagePlatform(sourceLineNumbers, sourcePath, platformValue));
+                    return true;
+            }
         }
 
         private void SetPerMachineAppropriately(string allusers, WixBundleMsiPackageSymbol msiPackage, string sourcePath)

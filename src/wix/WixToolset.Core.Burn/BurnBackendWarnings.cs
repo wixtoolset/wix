@@ -26,9 +26,9 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.FailedToExtractAttachedContainers, "Failed to extract attached container. This most often happens when extracting a stripped bundle from the package cache, which is not supported.");
         }
 
-        public static Message UnknownCoffMachineType(SourceLineNumber sourceLineNumbers, string bundleExecutable, ushort machineType)
+        public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string bundleExecutable)
         {
-            return Message(sourceLineNumbers, Ids.UnknownCoffMachineType, "The bundle '{0}' has an unknown COFF machine type: {1}. It is assumed to be 32-bit.", bundleExecutable, machineType);
+            return Message(sourceLineNumbers, Ids.HiddenBundleNotSupported, "The bundle '{0}' does not support hiding its ARP registration.", bundleExecutable);
         }
 
         public static Message UnknownBundleRelationAction(SourceLineNumber sourceLineNumbers, string bundleExecutable, string action)
@@ -36,9 +36,14 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.UnknownBundleRelationAction, "The manifest for the bundle '{0}' contains an unknown related bundle action '{1}'. It will be ignored.", bundleExecutable, action);
         }
 
-        public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string bundleExecutable)
+        public static Message UnknownCoffMachineType(SourceLineNumber sourceLineNumbers, string bundleExecutable, ushort machineType)
         {
-            return Message(sourceLineNumbers, Ids.HiddenBundleNotSupported, "The bundle '{0}' does not support hiding its ARP registration.", bundleExecutable);
+            return Message(sourceLineNumbers, Ids.UnknownCoffMachineType, "The bundle '{0}' has an unknown COFF machine type: {1}. It is assumed to be 32-bit.", bundleExecutable, machineType);
+        }
+
+        public static Message UnknownMsiPackagePlatform(SourceLineNumber sourceLineNumbers, string msiPath, string platform)
+        {
+            return Message(sourceLineNumbers, Ids.UnknownMsiPackagePlatform, "The MsiPackage '{0}' has an unknown platform: '{1}'. It is assumed to be 64-bit.", msiPath, platform);
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
@@ -55,6 +60,7 @@ namespace WixToolset.Core.Burn
             UnknownCoffMachineType = 8504,
             UnknownBundleRelationAction = 8505,
             HiddenBundleNotSupported = 8506,
+            UnknownMsiPackagePlatform = 8507,
         } // last available is 8999. 9000 is VerboseMessages.
     }
 }

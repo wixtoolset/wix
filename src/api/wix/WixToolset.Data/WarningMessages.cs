@@ -222,6 +222,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DiscardedRollbackBoundary, "The RollbackBoundary '{0}' was discarded because it was not followed by a package. Without a package the rollback boundary doesn't do anything. Verify that the RollbackBoundary element is not followed by another RollbackBoundary and that the element is not at the end of the chain.", rollbackBoundaryId);
         }
 
+        public static Message DiscardedRollbackBoundary2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.DiscardedRollbackBoundary2, "Location of rollback boundary related to previous warning.");
+        }
+
         public static Message DiscouragedAllUsersValue(SourceLineNumber sourceLineNumbers, string path, string machineOrUser)
         {
             return Message(sourceLineNumbers, Ids.DiscouragedAllUsersValue, "Bundles require a package to be either per-machine or per-user. The MSI '{0}' ALLUSERS Property is set to '2' which may change from per-user to per-machine at install time. The Bundle will assume the package is per-{1} and will not work correctly if that changes. If possible, remove the Property with Id='ALLUSERS' and use Package/@InstallScope attribute instead.", path, machineOrUser);
@@ -821,6 +826,7 @@ namespace WixToolset.Data
             InvalidEnvironmentVariable = 1157,
             WindowsInstallerFileTooLarge = 1158,
             UnavailableBundleConditionVariable = 1159,
+            DiscardedRollbackBoundary2 = 1160,
         }
     }
 }
