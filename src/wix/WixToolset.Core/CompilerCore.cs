@@ -849,9 +849,10 @@ namespace WixToolset.Core
         /// Process all children of the element looking for extensions and erroring on the unexpected.
         /// </summary>
         /// <param name="element">Element to parse children.</param>
-        public void ParseForExtensionElements(XElement element)
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
+        public void ParseForExtensionElements(XElement element, IDictionary<string, string> context = null)
         {
-            this.parseHelper.ParseForExtensionElements(this.extensions.Values, this.intermediate, this.ActiveSection, element);
+            this.parseHelper.ParseForExtensionElements(this.extensions.Values, this.intermediate, this.ActiveSection, element, context);
         }
 
         /// <summary>

@@ -714,7 +714,7 @@ namespace WixToolset.Core.ExtensibilityServices
             return keyPath;
         }
 
-        public void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element)
+        public void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element, IDictionary<string, string> context = null)
         {
             var checkInnerText = false;
 
@@ -728,7 +728,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     }
                     else
                     {
-                        this.ParseExtensionElement(extensions, intermediate, section, element, childElement);
+                        this.ParseExtensionElement(extensions, intermediate, section, element, childElement, context);
                     }
                 }
                 else

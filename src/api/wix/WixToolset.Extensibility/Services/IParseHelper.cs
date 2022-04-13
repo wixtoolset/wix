@@ -422,7 +422,8 @@ namespace WixToolset.Extensibility.Services
         /// <param name="intermediate">Parent intermediate.</param>
         /// <param name="section">Parent section.</param>
         /// <param name="element">Element to parse children.</param>
-        void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element);
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
+        void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element, IDictionary<string, string> context = null);
 
         /// <summary>
         /// Schedules an action symbol.
