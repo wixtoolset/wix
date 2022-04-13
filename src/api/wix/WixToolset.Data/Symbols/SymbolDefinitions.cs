@@ -130,6 +130,9 @@ namespace WixToolset.Data
         WixBundleExePackage,
         WixBundleExePackagePayload,
         WixBundleExtension,
+        WixBundleHarvestedBundlePackage,
+        WixBundleHarvestedMsiPackage,
+        WixBundleHarvestedMspPackage,
         WixBundleMsiFeature,
         WixBundleMsiPackage,
         WixBundleMsiPackagePayload,
@@ -582,6 +585,15 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixBundleExePackagePayload:
                     return SymbolDefinitions.WixBundleExePackagePayload;
+
+                case SymbolDefinitionType.WixBundleHarvestedBundlePackage:
+                    return SymbolDefinitions.WixBundleHarvestedBundlePackage;
+
+                case SymbolDefinitionType.WixBundleHarvestedMsiPackage:
+                    return SymbolDefinitions.WixBundleHarvestedMsiPackage;
+
+                case SymbolDefinitionType.WixBundleHarvestedMspPackage:
+                    return SymbolDefinitions.WixBundleHarvestedMspPackage;
 
                 case SymbolDefinitionType.WixBundleMsiFeature:
                     return SymbolDefinitions.WixBundleMsiFeature;

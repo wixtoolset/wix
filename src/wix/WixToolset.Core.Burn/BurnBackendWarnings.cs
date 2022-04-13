@@ -26,9 +26,9 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.FailedToExtractAttachedContainers, "Failed to extract attached container. This most often happens when extracting a stripped bundle from the package cache, which is not supported.");
         }
 
-        public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string bundleExecutable)
+        public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string packageId)
         {
-            return Message(sourceLineNumbers, Ids.HiddenBundleNotSupported, "The bundle '{0}' does not support hiding its ARP registration.", bundleExecutable);
+            return Message(sourceLineNumbers, Ids.HiddenBundleNotSupported, "The BundlePackage '{0}' does not support hiding its ARP registration.", packageId);
         }
 
         public static Message UnknownBundleRelationAction(SourceLineNumber sourceLineNumbers, string bundleExecutable, string action)
