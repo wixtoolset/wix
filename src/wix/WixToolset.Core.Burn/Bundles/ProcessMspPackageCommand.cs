@@ -5,6 +5,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Xml;
     using WixToolset.Core.Native.Msi;
@@ -29,30 +30,71 @@ namespace WixToolset.Core.Burn.Bundles
         public ProcessMspPackageCommand(IMessaging messaging, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
             this.Messaging = messaging;
-
-            this.AuthoredPayloads = payloadSymbols;
             this.Section = section;
-            this.Facade = facade;
+
+            this.ChainPackage = facade.PackageSymbol;
+            this.MspPackage = (WixBundleMspPackageSymbol)facade.SpecificPackageSymbol;
+            this.PackagePayload = payloadSymbols[this.ChainPackage.PayloadRef];
         }
 
-        public IMessaging Messaging { get; }
+        private IMessaging Messaging { get; }
 
-        public Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { private get; set; }
+        private WixBundlePackageSymbol ChainPackage { get; }
 
-        public PackageFacade Facade { private get; set; }
+        private WixBundleMspPackageSymbol MspPackage { get; }
 
-        public IntermediateSection Section { get; }
+        private WixBundlePayloadSymbol PackagePayload { get; }
+
+        private IntermediateSection Section { get; }
 
         /// <summary>
         /// Processes the Msp packages to add properties and payloads from the Msp packages.
         /// </summary>
         public void Execute()
         {
-            var packagePayload = this.AuthoredPayloads[this.Facade.PackageSymbol.PayloadRef];
+            var harvestedMspPackage = this.Section.Symbols.OfType<WixBundleHarvestedMspPackageSymbol>()
+                                                          .Where(h => h.Id == this.ChainPackage.Id)
+                                                          .SingleOrDefault();
 
-            var mspPackage = (WixBundleMspPackageSymbol)this.Facade.SpecificPackageSymbol;
+            if (harvestedMspPackage == null)
+            {
+                harvestedMspPackage = this.HarvestPackage();
 
-            var sourcePath = packagePayload.SourceFile.Path;
+                if (harvestedMspPackage == null)
+                {
+                    return;
+                }
+            }
+
+            this.MspPackage.PatchCode = harvestedMspPackage.PatchCode;
+            this.MspPackage.Manufacturer = harvestedMspPackage.ManufacturerName;
+            this.MspPackage.PatchXml = harvestedMspPackage.PatchXml;
+
+            if (String.IsNullOrEmpty(this.ChainPackage.DisplayName))
+            {
+                this.ChainPackage.DisplayName = harvestedMspPackage.DisplayName;
+            }
+
+            if (String.IsNullOrEmpty(this.ChainPackage.Description))
+            {
+                this.ChainPackage.Description = harvestedMspPackage.Description;
+            }
+
+            if (String.IsNullOrEmpty(this.ChainPackage.CacheId))
+            {
+                this.ChainPackage.CacheId = this.MspPackage.PatchCode;
+            }
+        }
+
+        private WixBundleHarvestedMspPackageSymbol HarvestPackage()
+        {
+            string patchCode;
+            string displayName;
+            string description;
+            string manufacturerName;
+            string patchXml;
+
+            var sourcePath = this.PackagePayload.SourceFile.Path;
 
             try
             {
@@ -61,41 +103,37 @@ namespace WixToolset.Core.Burn.Bundles
                     // Read data out of the msp database...
                     using (var sumInfo = new SummaryInformation(db))
                     {
-                        var patchCode = sumInfo.GetProperty(SummaryInformation.Patch.PatchCode);
-                        mspPackage.PatchCode = patchCode.Substring(0, 38);
+                        var patchCodeValue = sumInfo.GetProperty(SummaryInformation.Patch.PatchCode);
+                        patchCode = patchCodeValue.Substring(0, 38);
                     }
 
                     using (var view = db.OpenView(PatchMetadataQuery))
                     {
-                        if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
-                        {
-                            this.Facade.PackageSymbol.DisplayName = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "DisplayName");
-                        }
-
-                        if (String.IsNullOrEmpty(this.Facade.PackageSymbol.Description))
-                        {
-                            this.Facade.PackageSymbol.Description = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "Description");
-                        }
-
-                        mspPackage.Manufacturer = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "ManufacturerName");
+                        displayName = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "DisplayName");
+                        description = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "Description");
+                        manufacturerName = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "ManufacturerName");
                     }
                 }
 
-                this.ProcessPatchXml(packagePayload, mspPackage, sourcePath);
+                patchXml = ProcessMspPackageCommand.ProcessPatchXml(sourcePath, this.Section, this.PackagePayload.SourceLineNumbers, this.PackagePayload.Id);
             }
             catch (MsiException e)
             {
-                this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(packagePayload.SourceLineNumbers, sourcePath, e.Message));
-                return;
+                this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(this.PackagePayload.SourceLineNumbers, sourcePath, e.Message));
+                return null;
             }
 
-            if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
+            return this.Section.AddSymbol(new WixBundleHarvestedMspPackageSymbol(this.PackagePayload.SourceLineNumbers, this.ChainPackage.Id)
             {
-                this.Facade.PackageSymbol.CacheId = mspPackage.PatchCode;
-            }
+                PatchCode = patchCode,
+                DisplayName = displayName,
+                Description = description,
+                ManufacturerName = manufacturerName,
+                PatchXml = patchXml,
+            });
         }
 
-        private void ProcessPatchXml(WixBundlePayloadSymbol packagePayload, WixBundleMspPackageSymbol mspPackage, string sourcePath)
+        private static string ProcessPatchXml(string sourcePath, IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id)
         {
             var uniqueTargetCodes = new Dictionary<string, WixBundlePatchTargetCodeSymbol>();
 
@@ -135,9 +173,9 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (!uniqueTargetCodes.TryGetValue(targetCode, out var existing))
                 {
-                    var symbol = this.Section.AddSymbol(new WixBundlePatchTargetCodeSymbol(packagePayload.SourceLineNumbers)
+                    var symbol = section.AddSymbol(new WixBundlePatchTargetCodeSymbol(sourceLineNumbers)
                     {
-                        PackageRef = packagePayload.Id.Id,
+                        PackageRef = id.Id,
                         TargetCode = targetCode,
                         Attributes = 0,
                         Type = type,
@@ -158,6 +196,8 @@ namespace WixToolset.Core.Burn.Bundles
                 root.RemoveChild(node);
             }
 
+            string compactPatchXml;
+
             // Save the XML as compact as possible.
             using (var writer = new StringWriter())
             {
@@ -166,8 +206,10 @@ namespace WixToolset.Core.Burn.Bundles
                     doc.WriteTo(xmlWriter);
                 }
 
-                mspPackage.PatchXml = writer.ToString();
+                compactPatchXml = writer.ToString();
             }
+
+            return compactPatchXml;
         }
 
         private static string GetPatchMetadataProperty(View view, string property)

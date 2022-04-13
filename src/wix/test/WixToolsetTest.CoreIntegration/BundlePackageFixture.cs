@@ -238,7 +238,7 @@ namespace WixToolsetTest.CoreIntegration
                                                      .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The bundle '<dotDataPath>\\v3bundle.exe' does not support hiding its ARP registration.",
+                    "The BundlePackage 'v3bundle.exe' does not support hiding its ARP registration.",
                 }, warningMessages);
 
                 Assert.True(File.Exists(parentBundlePath));
