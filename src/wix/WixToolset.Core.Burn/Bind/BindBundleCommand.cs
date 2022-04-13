@@ -182,6 +182,8 @@ namespace WixToolset.Core.Burn
                     {
                         var command = new ProcessBundlePackageCommand(this.ServiceProvider, section, facade, packagesPayloads[facade.PackageId], this.IntermediateFolder);
                         command.Execute();
+
+                        trackedFiles.AddRange(command.TrackedFiles);
                     }
                     break;
 

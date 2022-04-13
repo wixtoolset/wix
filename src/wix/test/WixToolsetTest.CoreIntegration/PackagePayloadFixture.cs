@@ -90,7 +90,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanSpecifyPackagePayloadInPayloadGroup()
+        public void CanSpecifyExePackagePayloadInPayloadGroup()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -135,7 +135,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanSpecifyPackagePayloadWithCertificate()
+        public void CanSpecifyExePackagePayloadWithCertificate()
         {
             var folder = TestData.Get(@"TestData", "PackagePayload");
 
