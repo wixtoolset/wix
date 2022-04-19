@@ -65,7 +65,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dutil" />
     <PackageReference Include="WixToolset.WcaUtil" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" />
     <PackageReference Include="GitInfo" />

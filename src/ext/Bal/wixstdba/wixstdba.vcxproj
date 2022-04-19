@@ -71,9 +71,7 @@ rc.exe -fo "$(OutDir)wixstdba.res" "$(IntDir)wixstdba.messages.rc"</Command>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dutil" />
     <PackageReference Include="WixToolset.BalUtil" />
-    <PackageReference Include="WixToolset.BootstrapperCore.Native" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
