@@ -35,11 +35,11 @@
   </ItemGroup>
 
   <Target Name="PublishCoreExamples">
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x86 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x64 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.SkipFDD)'==''" />
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x86 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"'
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x64 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.SkipSCD)'==''" />
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x86 -c $(Configuration) --self-contained true -p:PublishTrimmed=true -p:TrimMode=%(CoreMBAProject.TrimMode) "%(CoreMBAProject.Identity)"'
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x64 -c $(Configuration) --self-contained true -p:PublishTrimmed=true -p:TrimMode=%(CoreMBAProject.TrimMode) "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.TrimMode)'!=''" />
   </Target>
 

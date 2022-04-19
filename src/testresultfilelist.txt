@@ -4,6 +4,7 @@ build/logs/TestResults/BextUtilUnitTest.xunit2.xml
 build/logs/TestResults/BurnUnitTest32.xunit2.xml
 build/logs/TestResults/BurnUnitTest64.xunit2.xml
 build/logs/TestResults/DutilUnitTest.xunit2.xml
+build/logs/TestResults/WixToolsetTest.Bal.trx
 build/logs/TestResults/WixToolsetTest.BuildTasks.trx
 build/logs/TestResults/WixToolsetTest.BurnE2E.trx
 build/logs/TestResults/WixToolsetTest.Converters.trx
@@ -14,6 +15,7 @@ build/logs/TestResults/WixToolsetTest.Core.Native.trx
 build/logs/TestResults/WixToolsetTest.CoreIntegration.trx
 build/logs/TestResults/WixToolsetTest.Dnc.HostGenerator.trx
 build/logs/TestResults/WixToolsetTest.Heat.trx
+build/logs/TestResults/WixToolsetTest.ManagedHost.trx
 build/logs/TestResults/WixToolsetTest.Mba.Core.trx
 build/logs/TestResults/WixToolsetTest.Sdk.trx
 build/logs/TestResults/WixToolsetTest.WixE2ETests.trx

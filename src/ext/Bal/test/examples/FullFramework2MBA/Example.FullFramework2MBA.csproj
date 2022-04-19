@@ -7,7 +7,7 @@
     <AssemblyName>Example.FullFramework2MBA</AssemblyName>
     <RootNamespace>Example.FullFramework2MBA</RootNamespace>
     <DebugType>embedded</DebugType>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
