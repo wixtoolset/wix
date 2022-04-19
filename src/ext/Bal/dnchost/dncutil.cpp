@@ -2,6 +2,12 @@
 
 #include "precomp.h"
 
+#define DNC_ENTRY_TYPE "WixToolset.Dnc.Host.BootstrapperApplicationFactory"
+#define DNC_ENTRY_TYPEW L"WixToolset.Dnc.Host.BootstrapperApplicationFactory"
+#define DNC_STATIC_ENTRY_METHOD "CreateBAFactory"
+#define DNC_STATIC_ENTRY_METHODW L"CreateBAFactory"
+#define DNC_STATIC_ENTRY_DELEGATEW L"WixToolset.Dnc.Host.StaticEntryDelegate"
+
 // https://github.com/dotnet/runtime/blob/master/src/installer/corehost/error_codes.h
 #define InvalidArgFailure 0x80008081
 #define HostApiBufferTooSmall 0x80008098
@@ -74,19 +80,28 @@ LExit:
 HRESULT DnchostCreateFactory(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzBaFactoryAssemblyName,
-    __in LPCWSTR wzBaFactoryAssemblyPath,
+    __in LPCWSTR /*wzBaFactoryAssemblyPath*/,
     __out IBootstrapperApplicationFactory** ppAppFactory
     )
 {
     HRESULT hr = S_OK;
     PFNCREATEBAFACTORY pfnCreateBAFactory = NULL;
+    LPWSTR sczEntryType = NULL;
+    LPWSTR sczEntryDelegate = NULL;
+    LPSTR sczBaFactoryAssemblyName = NULL;
 
     if (pState->pfnGetFunctionPointer)
     {
+        hr = StrAllocFormatted(&sczEntryType, L"%ls,%ls", DNC_ENTRY_TYPEW, wzBaFactoryAssemblyName);
+        BalExitOnFailure(hr, "Failed to format entry type.");
+
+        hr = StrAllocFormatted(&sczEntryDelegate, L"%ls,%ls", DNC_STATIC_ENTRY_DELEGATEW, wzBaFactoryAssemblyName);
+        BalExitOnFailure(hr, "Failed to format entry delegate.");
+
         hr = pState->pfnGetFunctionPointer(
-            DNC_ENTRY_TYPEW,
+            sczEntryType,
             DNC_STATIC_ENTRY_METHODW,
-            DNC_STATIC_ENTRY_DELEGATEW,
+            sczEntryDelegate,
             NULL,
             NULL,
             reinterpret_cast<void**>(&pfnCreateBAFactory));
@@ -94,19 +109,26 @@ HRESULT DnchostCreateFactory(
     }
     else
     {
+        hr = StrAnsiAllocString(&sczBaFactoryAssemblyName, wzBaFactoryAssemblyName, 0, CP_UTF8);
+        BalExitOnFailure(hr, "Failed to convert assembly name to UTF8: %ls", wzBaFactoryAssemblyName);
+
         hr = pState->pfnCoreclrCreateDelegate(
             pState->pClrHandle,
             pState->dwDomainId,
-            DNC_ASSEMBLY_FULL_NAME,
+            sczBaFactoryAssemblyName,
             DNC_ENTRY_TYPE,
             DNC_STATIC_ENTRY_METHOD,
             reinterpret_cast<void**>(&pfnCreateBAFactory));
         BalExitOnFailure(hr, "Failed to create delegate in app domain.");
     }
 
-    *ppAppFactory = pfnCreateBAFactory(wzBaFactoryAssemblyName, wzBaFactoryAssemblyPath);
+    *ppAppFactory = pfnCreateBAFactory();
 
 LExit:
+    ReleaseStr(sczEntryType);
+    ReleaseStr(sczEntryDelegate);
+    ReleaseStr(sczBaFactoryAssemblyName);
+
     return hr;
 }
 
@@ -233,7 +255,7 @@ static HRESULT InitializeCoreClr(
     }
     else
     {
-        ExitOnFailure(hr, "HostfxrGetRuntimeDelegate failed");
+        BalExitOnFailure(hr, "HostfxrGetRuntimeDelegate failed");
     }
 
 LExit:
@@ -295,6 +317,8 @@ static HRESULT InitializeCoreClrPre5(
 
     for (DWORD i = 0; i < cDirectories; ++i)
     {
+        Assert(rgDirectories);
+
         hr = PathConcat(rgDirectories[i], L"coreclr.dll", &sczCoreClrPath);
         BalExitOnFailure(hr, "Failed to allocate path to coreclr.");
 
@@ -324,9 +348,9 @@ static HRESULT InitializeCoreClrPre5(
     BalExitOnFailure(hr, "Failed to start coreclr.");
 
 LExit:
-    MemFree(rgDirectories);
-    MemFree(rgPropertyValues);
-    MemFree(rgPropertyKeys);
+    ReleaseMem(rgDirectories);
+    ReleaseMem(rgPropertyValues);
+    ReleaseMem(rgPropertyKeys);
     ReleaseStr(sczCoreClrPath);
 
     return hr;

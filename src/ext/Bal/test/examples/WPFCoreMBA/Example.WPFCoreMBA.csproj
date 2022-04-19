@@ -3,22 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <IsDncBA>true</IsDncBA>
     <Description>WPF .NET Core MBA</Description>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" />
-  </ItemGroup>
-
-  <Target Name="GitVersion">
-    <PropertyGroup>
-      <GitBaseVersionMajor>42</GitBaseVersionMajor>
-      <GitBaseVersionMinor>42</GitBaseVersionMinor>
-      <GitBaseVersionPatch>42</GitBaseVersionPatch>
-      <GitCommits>42</GitCommits>
-      <GitSha>abc123def456</GitSha>
-    </PropertyGroup>
-  </Target>
 </Project>

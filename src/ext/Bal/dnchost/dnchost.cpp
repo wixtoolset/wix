@@ -154,9 +154,6 @@ static HRESULT LoadModulePaths(
     hr = PathGetDirectory(pState->sczModuleFullPath, &pState->sczAppBase);
     BalExitOnFailure(hr, "Failed to get the directory of the full process path.");
 
-    hr = PathConcat(pState->sczAppBase, DNC_ASSEMBLY_FILE_NAME, &pState->sczManagedHostPath);
-    BalExitOnFailure(hr, "Failed to create managed host path.");
-
 LExit:
     return hr;
 }
@@ -249,7 +246,7 @@ static HRESULT LoadRuntime(
     hr = DnchostLoadRuntime(
         &pState->hostfxrState,
         pState->sczModuleFullPath,
-        pState->sczManagedHostPath,
+        pState->sczBaFactoryAssemblyPath,
         pState->sczBaFactoryDepsJsonPath,
         pState->sczBaFactoryRuntimeConfigPath);
 

@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.ManagedHost
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -41,7 +42,7 @@ namespace WixToolsetTest.ManagedHost
         {
             var startInfo = new ProcessStartInfo(executablePath)
             {
-                Arguments = string.Join(' ', arguments),
+                Arguments = String.Join(' ', arguments),
                 CreateNoWindow = true,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,

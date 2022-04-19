@@ -21,6 +21,7 @@
     <PackageVersion Include="WixToolset.Extensibility" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Burn" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Dnc.HostGenerator" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Core" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Core.Burn" Version="{packageversion}" />
@@ -45,6 +46,10 @@
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.6.0" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.14.114" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="4.7.0" />
 

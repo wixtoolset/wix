@@ -1,24 +1,23 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata minClientVersion="4.0">
+  <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <authors>$authors$</authors>
-    <owners>$authors$</owners>
-    <icon>wix-white-bg.png</icon>
-    <license type="expression">MS-RL</license>
-    <projectUrl>$projectUrl$</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>$title$</title>
     <description>$description$</description>
+    <authors>$authors$</authors>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+        <dependency id="WixToolset.Mba.Core" version="[$version$,5)" />
+    </dependencies>
   </metadata>
 
   <files>
-    <file src="$projectFolder$\$id$.targets" target="build" />
-    <file src="$projectFolder$\..\..\..\internal\images\wix-white-bg.png" />
-
-    <file src="$id$.dll" target="tools" />
+    <file src="$id$.dll" target="analyzers/dotnet/cs" />
+    <file src="build\**\*" target="build" />
   </files>
 </package>

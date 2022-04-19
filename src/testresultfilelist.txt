@@ -12,6 +12,7 @@ build/logs/TestResults/WixToolsetTest.Core.trx
 build/logs/TestResults/WixToolsetTest.Core.Burn.trx
 build/logs/TestResults/WixToolsetTest.Core.Native.trx
 build/logs/TestResults/WixToolsetTest.CoreIntegration.trx
+build/logs/TestResults/WixToolsetTest.Dnc.HostGenerator.trx
 build/logs/TestResults/WixToolsetTest.Heat.trx
 build/logs/TestResults/WixToolsetTest.Mba.Core.trx
 build/logs/TestResults/WixToolsetTest.Sdk.trx

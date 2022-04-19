@@ -4,12 +4,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
     <Description>WiX Toolset MSBuild integration</Description>
     <PublishDir>$(OutputPath)publish\WixToolset.Sdk\</PublishDir>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <NuspecBasePath>$(PublishDir)</NuspecBasePath>
-    <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
   </PropertyGroup>
 
   <ItemGroup>

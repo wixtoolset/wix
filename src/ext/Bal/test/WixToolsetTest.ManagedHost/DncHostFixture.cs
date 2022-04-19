@@ -2,9 +2,7 @@
 
 namespace WixToolsetTest.ManagedHost
 {
-    using System.IO;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
     using Xunit;
 
     public class DncHostFixture
@@ -21,11 +19,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core FDD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("EarliestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "EarliestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -39,14 +39,17 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("EarliestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "EarliestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
+        [Fact]
         public void CanLoadTrimmedSCDEarliestCoreMBA()
         {
             using (var fs = new DisposableFileSystem())
@@ -56,11 +59,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("EarliestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "EarliestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -74,16 +79,19 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("EarliestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[4]);
-                Assert.Equal("Reloaded 1 time(s)", logMessages[5]); // dnchost doesn't currently support unloading
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[6]);
-                Assert.Equal("EarliestCoreBA", logMessages[7]);
-                Assert.Equal("Shutdown,Restart,0", logMessages[8]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "EarliestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Reloaded 1 time(s)", // dnchost doesn't currently support unloading
+                    "Creating BA thread to run asynchronously.",
+                    "EarliestCoreBA",
+                    "Shutdown,Restart,0",
+
+                }, result.Output.ToArray());
             }
         }
 
@@ -97,11 +105,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core FDD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("LatestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -115,16 +125,18 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core FDD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("LatestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
-                Assert.Equal("Loading .NET Core FDD bootstrapper application.", logMessages[4]);
-                Assert.Equal("Reloaded 1 time(s)", logMessages[5]); // dnchost doesn't currently support unloading
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[6]);
-                Assert.Equal("LatestCoreBA", logMessages[7]);
-                Assert.Equal("Shutdown,Restart,0", logMessages[8]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Reloaded 1 time(s)", // dnchost doesn't currently support unloading
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,Restart,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -138,11 +150,14 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
                 var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("LatestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
             }
         }
 
@@ -156,11 +171,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("LatestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -174,16 +191,18 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("LatestCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
-                Assert.Equal("Loading .NET Core SCD bootstrapper application.", logMessages[4]);
-                Assert.Equal("Reloaded 1 time(s)", logMessages[5]); // dnchost doesn't currently support unloading
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[6]);
-                Assert.Equal("LatestCoreBA", logMessages[7]);
-                Assert.Equal("Shutdown,Restart,0", logMessages[8]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                    "Loading .NET Core SCD bootstrapper application.",
+                    "Reloaded 1 time(s)", // dnchost doesn't currently support unloading
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,Restart,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -197,11 +216,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading .NET Core FDD bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("WPFCoreBA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "WPFCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
     }

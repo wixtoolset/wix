@@ -23,7 +23,6 @@ struct DNCSTATE
     HINSTANCE hInstance;
     LPWSTR sczModuleFullPath;
     LPWSTR sczAppBase;
-    LPWSTR sczManagedHostPath;
     LPWSTR sczBaFactoryAssemblyName;
     LPWSTR sczBaFactoryAssemblyPath;
     LPWSTR sczBaFactoryDepsJsonPath;
