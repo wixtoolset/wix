@@ -39,6 +39,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
+  <ItemDefinitionGroup Condition=" '$(Configuration)'=='Debug' ">
+    <ClCompile>
+      <!-- libnethost.lib is currently only available in Release mode, so can't use debug runtime -->
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
   <PropertyGroup>
     <NetHostPlatform>$(Platform)</NetHostPlatform>
     <NetHostPlatform Condition=" '$(NetHostPlatform)'=='Win32' ">x86</NetHostPlatform>
@@ -67,10 +74,8 @@
   </ItemGroup>
 
   <ItemDefinitionGroup>
-    <!-- <ClCompile>
-      <AdditionalIncludeDirectories>$(BaseOutputPath)obj;$(NetHostPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile> -->
     <Link>
+      <!-- libnethost.lib is currently compiled with /GL, so must use linker option /LTCG -->
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
