@@ -68,9 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.DUtil" />
     <PackageReference Include="WixToolset.BextUtil" />
-    <PackageReference Include="WixToolset.BootstrapperCore.Native" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />

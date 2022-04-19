@@ -60,9 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dutil" />
     <PackageReference Include="WixToolset.BalUtil" />
-    <PackageReference Include="WixToolset.BootstrapperCore.Native" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />

@@ -54,7 +54,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Native" />
-    <PackageReference Include="WixToolset.Dutil" />
     <PackageReference Include="WixToolset.WcaUtil" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" />
     <PackageReference Include="GitInfo" />
