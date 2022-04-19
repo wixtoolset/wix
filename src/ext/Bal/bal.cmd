@@ -29,9 +29,8 @@ dotnet test test\WixToolsetTest.Dnc.HostGenerator -c %_C% --nologo --no-build -l
 msbuild -p:Configuration=%_C% test\examples\examples.proj || exit /b
 
 :: Test
-dotnet test -c %_C% --no-build test\WixToolsetTest.Bal || exit /b
-:: https://github.com/wixtoolset/issues/issues/6651
-::dotnet test -c %_C% --no-build test\WixToolsetTest.ManagedHost || exit /b
+dotnet test test\WixToolsetTest.Bal -c %_C% --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Bal.trx" || exit /b
+dotnet test test\WixToolsetTest.ManagedHost -c %_C% --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.ManagedHost.trx" || exit /b
 
 :: Pack
 msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Bal.wixext.csproj || exit /b

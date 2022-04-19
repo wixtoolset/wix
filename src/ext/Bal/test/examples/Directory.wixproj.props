@@ -7,5 +7,6 @@
     <HarvestDirectoryAdditionalOptions>-generate payloadgroup</HarvestDirectoryAdditionalOptions>
     <OutputPath>$(OutputPath)examples\</OutputPath>
     <DefaultCompressionLevel>None</DefaultCompressionLevel>
+    <InstallerPlatform>x64</InstallerPlatform>
   </PropertyGroup>
 </Project>

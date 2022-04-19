@@ -2,16 +2,16 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
   <Fragment>
     <BootstrapperApplication>
-      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.deps.json" />
-      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
-      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.runtimeconfig.json" />
-      <Payload SourceFile="!(bindpath.dnc5x86)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.dnc5x86)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.dncx86)\TestBA.deps.json" />
+      <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
+      <Payload SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
+      <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
+      <Payload SourceFile="!(bindpath.dncx86)\WixToolset.Mba.Core.dll" />
       <bal:WixDotNetCoreBootstrapperApplicationHost />
     </BootstrapperApplication>
 
     <PackageGroup Id="TestBAdnc">
-      <PackageGroupRef Id="NetFx48WebAsPrereq" /> <!-- Yes, this is wrong but we don't have .NET 5 packages yet -->
+      <PackageGroupRef Id="NetFx48WebAsPrereq" /> <!-- Yes, this is wrong but we don't have .NET 6 packages yet -->
     </PackageGroup>
   </Fragment>
   <Fragment>

@@ -2,17 +2,17 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
   <Fragment>
     <BootstrapperApplication>
-      <Payload SourceFile="!(bindpath.dnc5x64)\WixToolset.WixBA.deps.json" />
-      <Payload SourceFile="!(bindpath.dnc5x64)\WixToolset.WixBA.dll" bal:BAFactoryAssembly="yes" />
-      <Payload SourceFile="!(bindpath.dnc5x64)\WixToolset.WixBA.runtimeconfig.json" />
-      <Payload SourceFile="!(bindpath.dnc5x64)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.dnc5x64)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.WixBA.deps.json" />
+      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.WixBA.dll" bal:BAFactoryAssembly="yes" />
+      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.WixBA.runtimeconfig.json" />
+      <Payload SourceFile="!(bindpath.dncx64)\mbanative.dll" />
+      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.Mba.Core.dll" />
       <Payload SourceFile='..\..\..\..\..\..\License.txt' />
       <bal:WixDotNetCoreBootstrapperApplicationHost />
     </BootstrapperApplication>
 
     <PackageGroup Id="WixBAdnc_x64">
-      <PackageGroupRef Id="NetFx48WebAsPrereq" /> <!-- Yes, this is wrong but we don't have .NET 5 packages yet -->
+      <PackageGroupRef Id="NetFx48WebAsPrereq" /> <!-- Yes, this is wrong but we don't have .NET 6 packages yet -->
     </PackageGroup>
   </Fragment>
 </Wix>

@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net35;net5.0-windows</TargetFrameworks>
+    <TargetFrameworks>net35;net6.0-windows</TargetFrameworks>
     <AssemblyName>TestBA</AssemblyName>
     <RootNamespace>WixToolset.Test.BA</RootNamespace>
     <DebugType>embedded</DebugType>

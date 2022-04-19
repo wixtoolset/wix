@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <Description>Full Framework v4 MBA</Description>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
