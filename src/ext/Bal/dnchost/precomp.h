@@ -20,7 +20,6 @@
 #include <IBootstrapperApplicationFactory.h>
 #include <balutil.h>
 
-#include <WixToolset.Dnc.Host.h>
 #define NETHOST_USE_AS_STATIC
 #include <nethost.h>
 #include <hostfxr.h>

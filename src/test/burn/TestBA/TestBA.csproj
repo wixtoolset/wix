@@ -21,4 +21,8 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Mba.Core" />
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)'!='.NETFramework' ">
+    <PackageReference Include="WixToolset.Dnc.HostGenerator" />
+  </ItemGroup>
 </Project>

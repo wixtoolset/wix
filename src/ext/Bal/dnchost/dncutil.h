@@ -1,10 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-typedef IBootstrapperApplicationFactory* (STDMETHODCALLTYPE* PFNCREATEBAFACTORY)(
-    __in LPCWSTR wzBaFactoryAssemblyName,
-    __in LPCWSTR wzBaFactoryAssemblyPath
-    );
+typedef IBootstrapperApplicationFactory* (STDMETHODCALLTYPE* PFNCREATEBAFACTORY)();
 
 struct HOSTFXR_STATE
 {

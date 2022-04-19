@@ -2,9 +2,7 @@
 
 namespace WixToolsetTest.ManagedHost
 {
-    using System.IO;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
     using Xunit;
 
     public class MbaHostFixture
@@ -21,11 +19,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading managed bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("FullFramework2BA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading managed bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "FullFramework2BA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -39,11 +39,13 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading managed bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("FullFramework4BA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading managed bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "FullFramework4BA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -57,15 +59,17 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading managed bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("FullFramework2BA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
-                Assert.Equal("Loading managed bootstrapper application.", logMessages[4]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[5]);
-                Assert.Equal("FullFramework2BA", logMessages[6]);
-                Assert.Equal("Shutdown,Restart,0", logMessages[7]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading managed bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "FullFramework2BA",
+                    "Shutdown,ReloadBootstrapper,0",
+                    "Loading managed bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "FullFramework2BA",
+                    "Shutdown,Restart,0",
+                }, result.Output.ToArray());
             }
         }
 
@@ -79,15 +83,17 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
-                var logMessages = result.Output;
-                Assert.Equal("Loading managed bootstrapper application.", logMessages[0]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[1]);
-                Assert.Equal("FullFramework4BA", logMessages[2]);
-                Assert.Equal("Shutdown,ReloadBootstrapper,0", logMessages[3]);
-                Assert.Equal("Loading managed bootstrapper application.", logMessages[4]);
-                Assert.Equal("Creating BA thread to run asynchronously.", logMessages[5]);
-                Assert.Equal("FullFramework4BA", logMessages[6]);
-                Assert.Equal("Shutdown,Restart,0", logMessages[7]);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading managed bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "FullFramework4BA",
+                    "Shutdown,ReloadBootstrapper,0",
+                    "Loading managed bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "FullFramework4BA",
+                    "Shutdown,Restart,0",
+                }, result.Output.ToArray());
             }
         }
     }

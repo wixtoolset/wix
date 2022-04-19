@@ -3,15 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <IsDncBA>true</IsDncBA>
     <Description>Earliest .NET Core MBA</Description>
   </PropertyGroup>
-
-  <ItemGroup>
-    <TrimmerRootAssembly Include="System.Runtime.Loader" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" />
-  </ItemGroup>
 </Project>

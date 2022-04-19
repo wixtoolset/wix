@@ -6,11 +6,6 @@
      Dnc.wxs - .NET Core BA resources.
     -->
     <Fragment>
-        <PayloadGroup Id="WixDotNetCoreBootstrapperApplicationHostManagedPayloads">
-            <Payload SourceFile="WixToolset.Dnc.Host.dll" />
-        </PayloadGroup>
-    </Fragment>
-    <Fragment>
         <PayloadGroup Id="DncPreqStandardPayloads">
             <Payload Name="mbapreq.thm" SourceFile="!(wix.DncPreqbaThemeXml=SourceDir\dncpreq.thm)" />
             <Payload Name="mbapreq.png" SourceFile="!(wix.DncPreqbaLogo=SourceDir\mbapreq.png)" />

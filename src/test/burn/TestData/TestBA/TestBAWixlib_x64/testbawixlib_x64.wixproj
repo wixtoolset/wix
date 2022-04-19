@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x64" BindName="net2x64" />
-    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net45\win-x64" BindName="net4x64" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net472\win-x64" BindName="net4x64" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net5.0-windows\win-x64" BindName="dnc5x64" />
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,6 @@
         <BootstrapperApplication Id="WixDotNetCoreBootstrapperApplicationHost$(var.Suffix)">
             <BootstrapperApplicationDll Id="WixDotNetCoreBootstrapperApplicationHost" SourceFile="!(bindpath.$(var.platform))\dnchost.dll" />
             <Payload SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" Name="dncpreq.dll" />
-            <PayloadGroupRef Id="WixDotNetCoreBootstrapperApplicationHostManagedPayloads" />
         </BootstrapperApplication>
     </Fragment>
 
