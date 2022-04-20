@@ -12,18 +12,19 @@ namespace WixToolsetTest.ManagedHost
     public class TestEngine
     {
         private static readonly string TestEngineFile = TestData.Get(@"..\x64\examples\Example.TestEngine\Example.TestEngine.exe");
+        private static readonly string TestEngineFileX86 = TestData.Get(@"..\x86\examples\Example.TestEngine\Example.TestEngine.exe");
 
-        public TestEngineResult RunReloadEngine(string bundleFilePath, string tempFolderPath)
+        public TestEngineResult RunReloadEngine(string bundleFilePath, string tempFolderPath, bool x86 = false)
         {
-            return this.RunTestEngine("reload", bundleFilePath, tempFolderPath);
+            return this.RunTestEngine("reload", bundleFilePath, tempFolderPath, x86);
         }
 
-        public TestEngineResult RunShutdownEngine(string bundleFilePath, string tempFolderPath)
+        public TestEngineResult RunShutdownEngine(string bundleFilePath, string tempFolderPath, bool x86 = false)
         {
-            return this.RunTestEngine("shutdown", bundleFilePath, tempFolderPath);
+            return this.RunTestEngine("shutdown", bundleFilePath, tempFolderPath, x86);
         }
 
-        private TestEngineResult RunTestEngine(string engineMode, string bundleFilePath, string tempFolderPath)
+        private TestEngineResult RunTestEngine(string engineMode, string bundleFilePath, string tempFolderPath, bool x86 = false)
         {
             var baFolderPath = Path.Combine(tempFolderPath, "ba");
             var extractFolderPath = Path.Combine(tempFolderPath, "extract");
@@ -35,7 +36,7 @@ namespace WixToolsetTest.ManagedHost
                 '"' + bundleFilePath + '"',
                 '"' + extractResult.GetBAFilePath(baFolderPath) + '"',
             };
-            return RunProcessCaptureOutput(TestEngineFile, args);
+            return RunProcessCaptureOutput(x86 ? TestEngineFileX86 : TestEngineFile, args);
         }
 
         private static TestEngineResult RunProcessCaptureOutput(string executablePath, string[] arguments = null, string workingFolder = null)
