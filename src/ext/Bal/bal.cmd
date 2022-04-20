@@ -22,6 +22,10 @@ msbuild -p:Configuration=%_C%;Platform=x86 mbahost\mbahost.vcxproj || exit /b
 msbuild -p:Configuration=%_C%;Platform=x64 mbahost\mbahost.vcxproj || exit /b
 msbuild -p:Configuration=%_C%;Platform=ARM64 mbahost\mbahost.vcxproj || exit /b
 
+msbuild -p:Configuration=%_C%;Platform=x86 test\examples\TestEngine\Example.TestEngine.vcxproj || exit /b
+msbuild -p:Configuration=%_C%;Platform=x64 test\examples\TestEngine\Example.TestEngine.vcxproj || exit /b
+msbuild -p:Configuration=%_C%;Platform=ARM64 test\examples\TestEngine\Example.TestEngine.vcxproj || exit /b
+
 msbuild -p:Configuration=%_C% || exit /b
 
 dotnet test test\WixToolsetTest.Dnc.HostGenerator -c %_C% --nologo --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Dnc.HostGenerator.trx" || exit /b

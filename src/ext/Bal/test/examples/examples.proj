@@ -25,6 +25,7 @@
     </CoreMBAProject>
     <CoreMBAProject Include="$(WPFCoreMBAProjectPath)">
       <PublishPath>$(MBAPublishPath)Example.WPFCoreMBA</PublishPath>
+      <SkipFDDx86>true</SkipFDDx86>
       <SkipSCD>true</SkipSCD>
     </CoreMBAProject>
     
@@ -35,6 +36,8 @@
   </ItemGroup>
 
   <Target Name="PublishCoreExamples">
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd-x86" -r win-x86 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
+          Condition="'%(CoreMBAProject.SkipFDDx86)'==''" />
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x64 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.SkipFDD)'==''" />
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x64 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"'

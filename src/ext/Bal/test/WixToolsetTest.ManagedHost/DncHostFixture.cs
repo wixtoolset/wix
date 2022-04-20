@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.ManagedHost
 {
+    using System;
     using WixBuildTools.TestSupport;
     using Xunit;
 
@@ -19,6 +20,29 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "EarliestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
+            }
+        }
+
+        [Fact(Skip = "Requires .NET Core 3.1 x86 runtime which might be missing")]
+        public void CanLoadFDDx86EarliestCoreMBA()
+        {
+            // https://github.com/microsoft/vstest/issues/3586
+            Environment.SetEnvironmentVariable("DOTNET_ROOT", null);
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = TestData.Get(bundleBasePath, "EarliestCoreBundleFDDx86.exe");
+                var testEngine = new TestEngine();
+
+                var result = testEngine.RunShutdownEngine(bundleFile, baseFolder, x86: true);
                 WixAssert.CompareLineByLine(new[]
                 {
                     "Loading .NET Core FDD bootstrapper application.",
@@ -105,6 +129,29 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Loading .NET Core FDD bootstrapper application.",
+                    "Creating BA thread to run asynchronously.",
+                    "LatestCoreBA",
+                    "Shutdown,ReloadBootstrapper,0",
+                }, result.Output.ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanLoadFDDx86LatestCoreMBA()
+        {
+            // https://github.com/microsoft/vstest/issues/3586
+            Environment.SetEnvironmentVariable("DOTNET_ROOT", null);
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = TestData.Get(bundleBasePath, "LatestCoreBundleFDDx86.exe");
+                var testEngine = new TestEngine();
+
+                var result = testEngine.RunShutdownEngine(bundleFile, baseFolder, x86: true);
                 WixAssert.CompareLineByLine(new[]
                 {
                     "Loading .NET Core FDD bootstrapper application.",

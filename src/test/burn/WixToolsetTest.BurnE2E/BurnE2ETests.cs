@@ -11,7 +11,11 @@ namespace WixToolsetTest.BurnE2E
     [Collection("BurnE2E")]
     public abstract class BurnE2ETests : WixTestBase, IDisposable
     {
-        protected BurnE2ETests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+        protected BurnE2ETests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+            // https://github.com/microsoft/vstest/issues/3586
+            Environment.SetEnvironmentVariable("DOTNET_ROOT", null);
+        }
 
         private Stack<IDisposable> Installers { get; } = new Stack<IDisposable>();
 
