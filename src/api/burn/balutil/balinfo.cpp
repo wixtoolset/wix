@@ -304,6 +304,7 @@ DAPI_(void) BalInfoUninitialize(
         ReleaseStr(pBundle->packages.rgPackages[i].sczUpgradeCode);
         ReleaseStr(pBundle->packages.rgPackages[i].sczVersion);
         ReleaseStr(pBundle->packages.rgPackages[i].sczInstallCondition);
+        ReleaseStr(pBundle->packages.rgPackages[i].sczRepairCondition);
         ReleaseStr(pBundle->packages.rgPackages[i].sczPrereqLicenseFile);
         ReleaseStr(pBundle->packages.rgPackages[i].sczPrereqLicenseUrl);
     }
@@ -482,6 +483,12 @@ static HRESULT ParsePackagesFromXml(
         if (E_NOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to get install condition for package.");
+        }
+
+        hr = XmlGetAttributeEx(pNode, L"RepairCondition", &prgPackages[iPackage].sczRepairCondition);
+        if (E_NOTFOUND != hr)
+        {
+            ExitOnFailure(hr, "Failed to get repair condition for package.");
         }
 
         hr = XmlGetAttributeEx(pNode, L"Cache", &scz);

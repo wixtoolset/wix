@@ -45,6 +45,11 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
+        string RepairCondition { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         bool Permanent { get; }
 
         /// <summary>

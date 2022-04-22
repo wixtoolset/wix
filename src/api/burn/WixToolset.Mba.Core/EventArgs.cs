@@ -783,13 +783,14 @@ namespace WixToolset.Mba.Core
     public class PlanPackageBeginEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public PlanPackageBeginEventArgs(string packageId, PackageState currentState, bool cached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, RequestState state, BOOTSTRAPPER_CACHE_TYPE cacheType, bool cancelRecommendation)
+        public PlanPackageBeginEventArgs(string packageId, PackageState currentState, bool cached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, RequestState state, BOOTSTRAPPER_CACHE_TYPE cacheType, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.CurrentState = currentState;
             this.Cached = cached;
             this.InstallCondition = installCondition;
+            this.RepairCondition = repairCondition;
             this.RecommendedState = recommendedState;
             this.RecommendedCacheType = recommendedCacheType;
             this.State = state;
@@ -815,6 +816,11 @@ namespace WixToolset.Mba.Core
         /// Gets the evaluated result of the package's install condition.
         /// </summary>
         public BOOTSTRAPPER_PACKAGE_CONDITION_RESULT InstallCondition { get; private set; }
+
+        /// <summary>
+        /// Gets the evaluated result of the package's repair condition.
+        /// </summary>
+        public BOOTSTRAPPER_PACKAGE_CONDITION_RESULT RepairCondition { get; private set; }
 
         /// <summary>
         /// Gets the recommended requested state for the package.

@@ -389,6 +389,11 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("InstallCondition", package.PackageSymbol.InstallCondition);
                     }
 
+                    if (!String.IsNullOrEmpty(package.PackageSymbol.RepairCondition))
+                    {
+                        writer.WriteAttributeString("RepairCondition", package.PackageSymbol.RepairCondition);
+                    }
+
                     if (package.SpecificPackageSymbol is WixBundleBundlePackageSymbol bundlePackage) // BUNDLE
                     {
                         writer.WriteAttributeString("BundleId", bundlePackage.BundleId);

@@ -347,6 +347,7 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+    __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __out BOOTSTRAPPER_REQUEST_STATE* pRequestState
     )
@@ -407,6 +408,10 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
             else if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE == currentState || BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == currentState)
             {
                 defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT <= defaultRequestState ? BOOTSTRAPPER_REQUEST_STATE_NONE : defaultRequestState;
+            }
+            else if (BOOTSTRAPPER_ACTION_REPAIR == action && BOOTSTRAPPER_PACKAGE_CONDITION_FALSE == repairCondition)
+            {
+                defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
             }
         }
 
@@ -905,7 +910,8 @@ static HRESULT InitializePackage(
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition = BOOTSTRAPPER_PACKAGE_CONDITION_DEFAULT;
-    BOOL fInstallCondition = FALSE;
+    BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition = BOOTSTRAPPER_PACKAGE_CONDITION_DEFAULT;
+    BOOL fEvaluatedCondition = FALSE;
     BOOL fBeginCalled = FALSE;
     BOOTSTRAPPER_RELATION_TYPE relationType = pPlan->pCommand->relationType;
 
@@ -927,20 +933,28 @@ static HRESULT InitializePackage(
 
     if (pPackage->sczInstallCondition && *pPackage->sczInstallCondition)
     {
-        hr = ConditionEvaluate(pVariables, pPackage->sczInstallCondition, &fInstallCondition);
+        hr = ConditionEvaluate(pVariables, pPackage->sczInstallCondition, &fEvaluatedCondition);
         ExitOnFailure(hr, "Failed to evaluate install condition.");
 
-        installCondition = fInstallCondition ? BOOTSTRAPPER_PACKAGE_CONDITION_TRUE : BOOTSTRAPPER_PACKAGE_CONDITION_FALSE;
+        installCondition = fEvaluatedCondition ? BOOTSTRAPPER_PACKAGE_CONDITION_TRUE : BOOTSTRAPPER_PACKAGE_CONDITION_FALSE;
+    }
+
+    if (pPackage->sczRepairCondition && *pPackage->sczRepairCondition)
+    {
+        hr = ConditionEvaluate(pVariables, pPackage->sczRepairCondition, &fEvaluatedCondition);
+        ExitOnFailure(hr, "Failed to evaluate repair condition.");
+
+        repairCondition = fEvaluatedCondition ? BOOTSTRAPPER_PACKAGE_CONDITION_TRUE : BOOTSTRAPPER_PACKAGE_CONDITION_FALSE;
     }
 
     // Remember the default requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
-    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, pPlan->action, installCondition, relationType, &pPackage->defaultRequested);
+    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, pPlan->action, installCondition, repairCondition, relationType, &pPackage->defaultRequested);
     ExitOnFailure(hr, "Failed to set default package state.");
 
     pPackage->requested = pPackage->defaultRequested;
     fBeginCalled = TRUE;
 
-    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, pPackage->fCached, installCondition, &pPackage->requested, &pPackage->cacheType);
+    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, pPackage->fCached, installCondition, repairCondition, &pPackage->requested, &pPackage->cacheType);
     ExitOnRootFailure(hr, "BA aborted plan package begin.");
 
     if (BURN_PACKAGE_TYPE_MSI == pPackage->type)

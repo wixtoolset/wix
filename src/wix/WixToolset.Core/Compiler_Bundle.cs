@@ -2003,6 +2003,7 @@ namespace WixToolset.Core
             };
             string after = null;
             string installCondition = null;
+            string repairCondition = null;
             var cache = BundleCacheType.Keep; // the default is to cache everything in tradeoff for stability over disk space.
             string cacheId = null;
             string description = null;
@@ -2060,6 +2061,10 @@ namespace WixToolset.Core
                             break;
                         case "InstallCondition":
                             installCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RepairCondition":
+                            repairCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            allowed = (packageType != WixBundlePackageType.Msu);
                             break;
                         case "Cache":
                             var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2262,6 +2267,11 @@ namespace WixToolset.Core
                     }
                 }
 
+                if (repairArguments == null && repairCondition != null)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "RepairArguments", "RepairCondition"));
+                }
+
                 // Validate the protocol if provided.
                 if (!String.IsNullOrEmpty(protocol))
                 {
@@ -2429,6 +2439,7 @@ namespace WixToolset.Core
                     Type = packageType,
                     Attributes = attributes,
                     InstallCondition = installCondition,
+                    RepairCondition = repairCondition,
                     Cache = cache,
                     CacheId = cacheId,
                     Description = description,

@@ -102,6 +102,9 @@ namespace WixToolset.Mba.Core
         public string InstallCondition { get; internal set; }
 
         /// <inheritdoc/>
+        public string RepairCondition { get; internal set; }
+
+        /// <inheritdoc/>
         public BOOTSTRAPPER_CACHE_TYPE CacheType { get; internal set; }
 
         /// <inheritdoc/>
@@ -173,6 +176,8 @@ namespace WixToolset.Mba.Core
                 package.Version = BootstrapperApplicationData.GetAttribute(node, "Version");
 
                 package.InstallCondition = BootstrapperApplicationData.GetAttribute(node, "InstallCondition");
+
+                package.RepairCondition = BootstrapperApplicationData.GetAttribute(node, "RepairCondition");
 
                 packagesById.Add(package.Id, package);
             }

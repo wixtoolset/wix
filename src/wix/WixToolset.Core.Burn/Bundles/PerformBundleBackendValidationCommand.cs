@@ -91,6 +91,11 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 this.BackendHelper.ValidateBundleCondition(symbol.SourceLineNumbers, elementName, "InstallCondition", symbol.InstallCondition, BundleConditionPhase.Plan);
             }
+
+            if (!String.IsNullOrEmpty(symbol.RepairCondition))
+            {
+                this.BackendHelper.ValidateBundleCondition(symbol.SourceLineNumbers, elementName, "RepairCondition", symbol.RepairCondition, BundleConditionPhase.Plan);
+            }
         }
 
         private void ValidateBundlePackage(WixBundleBundlePackageSymbol symbol, WixBundlePackageSymbol packageSymbol)

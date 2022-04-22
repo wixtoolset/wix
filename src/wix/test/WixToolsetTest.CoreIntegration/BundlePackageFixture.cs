@@ -354,7 +354,7 @@ namespace WixToolsetTest.CoreIntegration
                                                   .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    $"<BundlePackage Id='v3bundle.exe' Cache='keep' CacheId='{chainBundleId}v1.0.0.0' InstallSize='1135' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_v3bundle.exe' RollbackLogPathVariable='WixBundleRollbackLog_v3bundle.exe' BundleId='{chainBundleId}' Version='1.0.0.0' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
+                    $"<BundlePackage Id='v3bundle.exe' Cache='keep' CacheId='{chainBundleId}v1.0.0.0' InstallSize='1135' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_v3bundle.exe' RollbackLogPathVariable='WixBundleRollbackLog_v3bundle.exe' RepairCondition='0' BundleId='{chainBundleId}' Version='1.0.0.0' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
                     "<Provides Key='{215a70db-ab35-48c7-be51-d66eaac87177}' Version='1.0.0.0' DisplayName='CustomV3Theme' Imported='yes' />" +
                     "<RelatedBundle Id='{2BF4C01F-C132-4E70-97AB-2BC68C7CCD10}' Action='Upgrade' />" +
                     "<PayloadRef Id='v3bundle.exe' />" +
@@ -382,7 +382,7 @@ namespace WixToolsetTest.CoreIntegration
                                                    .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<WixPackageProperties Package='v3bundle.exe' Vital='yes' DisplayName='CustomV3Theme' Description='CustomV3Theme' DownloadSize='*' PackageSize='*' InstalledSize='1135' PackageType='Bundle' Permanent='no' LogPathVariable='WixBundleLog_v3bundle.exe' RollbackLogPathVariable='WixBundleRollbackLog_v3bundle.exe' Compressed='yes' Version='1.0.0.0' Cache='keep' />",
+                    "<WixPackageProperties Package='v3bundle.exe' Vital='yes' DisplayName='CustomV3Theme' Description='CustomV3Theme' DownloadSize='*' PackageSize='*' InstalledSize='1135' PackageType='Bundle' Permanent='no' LogPathVariable='WixBundleLog_v3bundle.exe' RollbackLogPathVariable='WixBundleRollbackLog_v3bundle.exe' Compressed='yes' Version='1.0.0.0' RepairCondition='0' Cache='keep' />",
                 }, packageElements);
             }
         }

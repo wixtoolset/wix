@@ -14,6 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.PayloadRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.InstallCondition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RepairCondition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Cache), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.CacheId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.PerMachine), IntermediateFieldType.Bool),
@@ -42,6 +43,7 @@ namespace WixToolset.Data.Symbols
         PayloadRef,
         Attributes,
         InstallCondition,
+        RepairCondition,
         Cache,
         CacheId,
         PerMachine,
@@ -122,6 +124,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundlePackageSymbolFields.InstallCondition];
             set => this.Set((int)WixBundlePackageSymbolFields.InstallCondition, value);
+        }
+
+        public string RepairCondition
+        {
+            get => (string)this.Fields[(int)WixBundlePackageSymbolFields.RepairCondition];
+            set => this.Set((int)WixBundlePackageSymbolFields.RepairCondition, value);
         }
 
         public BundleCacheType? Cache

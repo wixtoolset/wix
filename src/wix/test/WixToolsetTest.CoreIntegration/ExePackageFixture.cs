@@ -36,6 +36,30 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void ErrorWhenRepairConditionWithoutRepairArguments()
+        {
+            var folder = TestData.Get(@"TestData", "ExePackage");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "RepairConditionWithoutRepairArguments.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackage/@RepairArguments attribute is required to have a value when attribute RepairCondition is present.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(401, result.ExitCode);
+            }
+        }
+
+        [Fact]
         public void ErrorWhenRequireDetectCondition()
         {
             var folder = TestData.Get(@"TestData", "ExePackage");

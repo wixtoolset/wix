@@ -388,6 +388,7 @@ namespace Bootstrapper
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"1A"));
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"*"));
 
+                Assert::False(EvaluateFailureConditionHelper(&variables, L"0"));
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"1 == 1"));
             }
             finally

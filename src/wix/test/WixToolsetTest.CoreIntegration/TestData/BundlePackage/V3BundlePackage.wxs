@@ -4,7 +4,7 @@
       <BootstrapperApplicationDll SourceFile="fakeba.dll" />
     </BootstrapperApplication>
     <Chain>
-      <BundlePackage SourceFile="v3bundle.exe" />
+      <BundlePackage SourceFile="v3bundle.exe" RepairCondition="0" />
     </Chain>
   </Bundle>
 </Wix>

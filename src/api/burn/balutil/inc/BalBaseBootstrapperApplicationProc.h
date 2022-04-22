@@ -195,7 +195,7 @@ static HRESULT BalBaseBAProcOnPlanPackageBegin(
     __inout BA_ONPLANPACKAGEBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnPlanPackageBegin(pArgs->wzPackageId, pArgs->state, pArgs->fCached, pArgs->installCondition, pArgs->recommendedState, pArgs->recommendedCacheType, &pResults->requestedState, &pResults->requestedCacheType, &pResults->fCancel);
+    return pBA->OnPlanPackageBegin(pArgs->wzPackageId, pArgs->state, pArgs->fCached, pArgs->installCondition, pArgs->repairCondition, pArgs->recommendedState, pArgs->recommendedCacheType, &pResults->requestedState, &pResults->requestedCacheType, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnPlanCompatibleMsiPackageBegin(

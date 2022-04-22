@@ -49,6 +49,7 @@ typedef struct _BAL_INFO_PACKAGE
     LPWSTR sczUpgradeCode;
     LPWSTR sczVersion;
     LPWSTR sczInstallCondition;
+    LPWSTR sczRepairCondition;
     BOOTSTRAPPER_CACHE_TYPE cacheType;
     BOOL fPrereqPackage;
     LPWSTR sczPrereqLicenseFile;
