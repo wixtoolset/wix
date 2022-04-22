@@ -47,6 +47,11 @@ namespace WixToolsetTest.BurnE2E
             this.SetBurnTestValue("ExplicitlyElevateAndPlanFromOnElevateBegin", value);
         }
 
+        public void SetForceKeepRegistration(string value = "true")
+        {
+            this.SetBurnTestValue("ForceKeepRegistration", value);
+        }
+
         public void SetImmediatelyQuit(string value = "true")
         {
             this.SetBurnTestValue("ImmediatelyQuit", value);

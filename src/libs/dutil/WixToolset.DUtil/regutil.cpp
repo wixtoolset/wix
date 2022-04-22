@@ -107,10 +107,9 @@ DAPI_(HRESULT) RegCreate(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
 
-    er = vpfnRegCreateKeyExW(hkRoot, wzSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, dwAccess, NULL, phk, NULL);
-    RegExitOnWin32Error(er, hr, "Failed to create registry key.");
+    hr = RegCreateEx(hkRoot, wzSubKey, dwAccess, REG_KEY_DEFAULT, FALSE, NULL, phk, NULL);
+    RegExitOnFailure(hr, "Failed to create registry key.");
 
 LExit:
     return hr;

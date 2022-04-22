@@ -106,7 +106,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 14);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(107082ull, pPlan->qwEstimatedSize);
             Assert::Equal(522548ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -252,7 +251,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -392,7 +390,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(18575450ull, pPlan->qwEstimatedSize);
             Assert::Equal(78462280ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -503,7 +500,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(18575450ull, pPlan->qwEstimatedSize);
             Assert::Equal(52254105ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -595,7 +591,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -703,7 +698,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(35694ull, pPlan->qwEstimatedSize);
             Assert::Equal(168715ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -823,7 +817,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(35694ull, pPlan->qwEstimatedSize);
             Assert::Equal(168715ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -924,7 +917,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(1463267ull, pPlan->qwEstimatedSize);
             Assert::Equal(119695ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1021,7 +1013,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(33743ull, pPlan->qwEstimatedSize);
             Assert::Equal(168715ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1104,7 +1095,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1180,7 +1170,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1273,7 +1262,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(35694ull, pPlan->qwEstimatedSize);
             Assert::Equal(175674ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1371,7 +1359,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(35694ull, pPlan->qwEstimatedSize);
             Assert::Equal(168715ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1473,7 +1460,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1553,7 +1539,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1649,7 +1634,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1720,7 +1704,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1805,7 +1788,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -1906,7 +1888,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(56ull, pPlan->qwEstimatedSize);
             Assert::Equal(140ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -2005,7 +1986,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(3055111ull, pPlan->qwEstimatedSize);
             Assert::Equal(6130592ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -2128,7 +2108,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -2245,7 +2224,6 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
             Assert::Equal(0ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -2351,7 +2329,6 @@ namespace Bootstrapper
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 4);
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(2993671ull, pPlan->qwEstimatedSize);
             Assert::Equal(6048672ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
@@ -2450,6 +2427,8 @@ namespace Bootstrapper
             {
                 ReleaseStr(sczFilePath);
             }
+
+            pEngineState->section.qwBundleSize = 1234;
 
             hr = CoreInitializeConstants(pEngineState);
             NativeAssert::Succeeded(hr, "Failed to initialize core constants");

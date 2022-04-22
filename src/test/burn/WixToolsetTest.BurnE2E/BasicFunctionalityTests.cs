@@ -82,7 +82,8 @@ namespace WixToolsetTest.BurnE2E
 
             bundle.Install();
 
-            var cachedBundlePath = bundle.VerifyRegisteredAndInPackageCache();
+            var registration = bundle.VerifyRegisteredAndInPackageCache();
+            var cachedBundlePath = registration.CachePath;
 
             // Source file should be installed
             Assert.True(File.Exists(packageSourceCodeInstalled), $"Should have found {packageName} payload installed at: {packageSourceCodeInstalled}");

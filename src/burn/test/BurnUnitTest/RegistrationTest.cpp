@@ -60,6 +60,7 @@ namespace Bootstrapper
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
+            DWORD64 qwEstimatedSize = 1024;
 
             try
             {
@@ -103,7 +104,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to get current process path.");
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -114,7 +115,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // end session
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
@@ -158,6 +159,7 @@ namespace Bootstrapper
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
+            DWORD64 qwEstimatedSize = 1024;
             try
             {
                 this->testRegistry->SetUp();
@@ -204,7 +206,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -213,7 +215,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // complete registration
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was updated
@@ -226,7 +228,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
@@ -235,7 +237,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // delete registration
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
@@ -278,6 +280,7 @@ namespace Bootstrapper
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
+            DWORD64 qwEstimatedSize = 1024;
             try
             {
                 this->testRegistry->SetUp();
@@ -327,7 +330,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -335,7 +338,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // complete registration
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_REQUIRED, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_REQUIRED, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration variables were updated
@@ -355,7 +358,7 @@ namespace Bootstrapper
                 //
 
                 // delete registration
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
@@ -398,6 +401,7 @@ namespace Bootstrapper
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
+            DWORD64 qwEstimatedSize = 1024;
             try
             {
                 this->testRegistry->SetUp();
@@ -446,7 +450,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -454,7 +458,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // finish registration
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
@@ -479,7 +483,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
@@ -487,7 +491,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // delete registration
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // verify that registration was removed
@@ -533,6 +537,7 @@ namespace Bootstrapper
             BYTE* pbBuffer = NULL;
             SIZE_T cbBuffer = 0;
             DWORD dwRegistrationOptions = 0;
+            DWORD64 qwEstimatedSize = 1024;
             
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
@@ -586,7 +591,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to get current process path.");
 
                 // begin session
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 VariableSetNumericHelper(&variables, L"MyBurnVariable1", 42);
@@ -629,7 +634,7 @@ namespace Bootstrapper
                 NativeAssert::StringEqual(L"42", sczValue);
 
                 // end session
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
             }
             finally
@@ -673,6 +678,7 @@ namespace Bootstrapper
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             String^ cacheExePath = Path::Combine(cacheDirectory, gcnew String(L"setup.exe"));
             DWORD dwRegistrationOptions = 0;
+            DWORD64 qwEstimatedSize = 1024;
             try
             {
                 this->testRegistry->SetUp();
@@ -728,7 +734,7 @@ namespace Bootstrapper
                 Assert::Equal((int)BOOTSTRAPPER_RESUME_TYPE_NONE, (int)resumeType);
 
                 // begin session
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, 0, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 VariableSetNumericHelper(&variables, L"MyBurnVariable1", 42);
@@ -767,7 +773,7 @@ namespace Bootstrapper
                 Assert::Equal((int)BOOTSTRAPPER_RESUME_TYPE_INTERRUPTED, (int)resumeType);
 
                 // suspend session
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_SUSPEND, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_SUSPEND, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to suspend session.");
 
                 // verify that run key was removed
@@ -794,7 +800,7 @@ namespace Bootstrapper
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
                 // end session
-                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
+                hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
                 TestThrowOnFailure(hr, L"Failed to unregister bundle.");
 
                 // read resume type after session

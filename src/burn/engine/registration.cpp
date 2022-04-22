@@ -102,6 +102,10 @@ static HRESULT UpdateBundleNameRegistration(
     __in HKEY hkRegistration,
     __in BOOL fInProgressRegistration
     );
+static HRESULT UpdateEstimatedSize(
+    __in HKEY hkRegistration,
+    __in DWORD64 qwEstimatedSize
+    );
 static BOOL IsWuRebootPending();
 static BOOL IsRegistryRebootPending();
 
@@ -600,8 +604,8 @@ extern "C" HRESULT RegistrationSessionBegin(
     )
 {
     HRESULT hr = S_OK;
-    DWORD dwSize = 0;
     HKEY hkRegistration = NULL;
+    BOOL fCreated = FALSE;
     LPWSTR sczPublisher = NULL;
 
     AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
@@ -620,7 +624,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     }
 
     // create registration key
-    hr = RegCreate(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_WRITE, &hkRegistration);
+    hr = RegCreateEx(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_WRITE, REG_KEY_DEFAULT, FALSE, NULL, &hkRegistration, &fCreated);
     ExitOnFailure(hr, "Failed to create registration key.");
 
     // Write any ARP values and software tags.
@@ -797,22 +801,12 @@ extern "C" HRESULT RegistrationSessionBegin(
         ExitOnFailure(hr, "Failed to write update registration.");
     }
 
-    // Update estimated size.
-    qwEstimatedSize /= 1024; // Convert bytes to KB
-    if (0 < qwEstimatedSize)
+    // Only set estimated size here for the first time.
+    // It will always get updated at the end of the session.
+    if (fCreated)
     {
-        if (DWORD_MAX < qwEstimatedSize)
-        {
-            // ARP doesn't support QWORDs here
-            dwSize = DWORD_MAX;
-        }
-        else
-        {
-            dwSize = static_cast<DWORD>(qwEstimatedSize);
-        }
-
-        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_ESTIMATED_SIZE, dwSize);
-        ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_ESTIMATED_SIZE);
+        hr = UpdateEstimatedSize(hkRegistration, qwEstimatedSize);
+        ExitOnFailure(hr, "Failed to update estimated size.");
     }
 
     // Register the bundle dependency key.
@@ -879,6 +873,7 @@ extern "C" HRESULT RegistrationSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
+    __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
@@ -921,6 +916,9 @@ extern "C" HRESULT RegistrationSessionEnd(
         // update display name
         hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
         ExitOnFailure(hr, "Failed to update name and publisher.");
+
+        hr = UpdateEstimatedSize(hkRegistration, qwEstimatedSize);
+        ExitOnFailure(hr, "Failed to update estimated size.");
     }
 
     // Update resume mode.
@@ -1601,6 +1599,35 @@ static HRESULT UpdateBundleNameRegistration(
 LExit:
     ReleaseStr(sczDisplayName);
 
+    return hr;
+}
+
+static HRESULT UpdateEstimatedSize(
+    __in HKEY hkRegistration,
+    __in DWORD64 qwEstimatedSize
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwSize = 0;
+
+    qwEstimatedSize /= 1024; // Convert bytes to KB
+    if (0 < qwEstimatedSize)
+    {
+        if (DWORD_MAX < qwEstimatedSize)
+        {
+            // ARP doesn't support QWORDs here
+            dwSize = DWORD_MAX;
+        }
+        else
+        {
+            dwSize = static_cast<DWORD>(qwEstimatedSize);
+        }
+
+        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_ESTIMATED_SIZE, dwSize);
+        ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_ESTIMATED_SIZE);
+    }
+
+LExit:
     return hr;
 }
 

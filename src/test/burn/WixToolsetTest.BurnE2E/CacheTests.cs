@@ -162,14 +162,14 @@ namespace WixToolsetTest.BurnE2E
                 bundleA.Install(bundleACopiedPath);
             }
 
-            var bundlePackageCachePath = bundleA.VerifyRegisteredAndInPackageCache();
+            var bundlePackageRegistration = bundleA.VerifyRegisteredAndInPackageCache();
 
             packageA.VerifyInstalled(true);
             packageB.VerifyInstalled(false);
 
             testBAController.SetPackageRequestedState("PackageB", RequestState.Present);
 
-            var modifyLogPath = bundleA.Modify(bundlePackageCachePath);
+            var modifyLogPath = bundleA.Modify(bundlePackageRegistration.CachePath);
             bundleA.VerifyRegisteredAndInPackageCache();
 
             packageA.VerifyInstalled(true);
@@ -204,14 +204,14 @@ namespace WixToolsetTest.BurnE2E
 
                 bundleB.Install(bundleBCopiedPath);
 
-                var bundlePackageCachePath = bundleB.VerifyRegisteredAndInPackageCache();
+                var bundlePackageRegistration = bundleB.VerifyRegisteredAndInPackageCache();
 
                 packageA.VerifyInstalled(true);
                 packageB.VerifyInstalled(false);
 
                 testBAController.SetPackageRequestedState("PackageB", RequestState.Present);
 
-                bundleB.Modify(bundlePackageCachePath);
+                bundleB.Modify(bundlePackageRegistration.CachePath);
                 bundleB.VerifyRegisteredAndInPackageCache();
 
                 packageA.VerifyInstalled(true);

@@ -44,6 +44,7 @@ HRESULT ElevationSessionEnd(
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
     __in BOOL fDetectedForeignProviderKeyBundleId,
+    __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT ElevationSaveState(
