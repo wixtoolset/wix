@@ -182,6 +182,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in BOOTSTRAPPER_PACKAGE_STATE state,
         __in BOOL fCached,
         __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+        __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __in BOOTSTRAPPER_CACHE_TYPE recommendedCacheType,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,

@@ -2169,6 +2169,7 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
     __in BOOTSTRAPPER_PACKAGE_STATE state,
     __in BOOL fCached,
     __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+    __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
     __inout BOOTSTRAPPER_CACHE_TYPE* pRequestedCacheType
     )
@@ -2182,6 +2183,7 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
     args.state = state;
     args.fCached = fCached;
     args.installCondition = installCondition;
+    args.repairCondition = repairCondition;
     args.recommendedState = *pRequestedState;
     args.recommendedCacheType = *pRequestedCacheType;
 

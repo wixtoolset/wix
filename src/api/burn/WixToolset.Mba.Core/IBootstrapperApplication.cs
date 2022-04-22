@@ -314,6 +314,7 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] PackageState state,
             [MarshalAs(UnmanagedType.Bool)] bool fCached,
             [MarshalAs(UnmanagedType.U4)] BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+            [MarshalAs(UnmanagedType.U4)] BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
             [MarshalAs(UnmanagedType.U4)] BOOTSTRAPPER_CACHE_TYPE recommendedCacheType,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,

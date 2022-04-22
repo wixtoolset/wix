@@ -178,6 +178,10 @@ extern "C" HRESULT PackagesParseFromXml(
         hr = XmlGetAttributeEx(pixnNode, L"InstallCondition", &pPackage->sczInstallCondition);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallCondition.");
 
+        // @RepairCondition
+        hr = XmlGetAttributeEx(pixnNode, L"RepairCondition", &pPackage->sczRepairCondition);
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RepairCondition.");
+
         // @RollbackBoundaryForward
         hr = XmlGetAttributeEx(pixnNode, L"RollbackBoundaryForward", &scz);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RollbackBoundaryForward.");
@@ -362,6 +366,7 @@ extern "C" void PackageUninitialize(
     ReleaseStr(pPackage->sczLogPathVariable);
     ReleaseStr(pPackage->sczRollbackLogPathVariable);
     ReleaseStr(pPackage->sczInstallCondition);
+    ReleaseStr(pPackage->sczRepairCondition);
     ReleaseStr(pPackage->sczCacheId);
 
     if (pPackage->rgDependencyProviders)

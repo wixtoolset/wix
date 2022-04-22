@@ -425,6 +425,7 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_PACKAGE_STATE state,
         __in BOOL fCached,
         __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+        __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __in BOOTSTRAPPER_CACHE_TYPE recommendedCacheType,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState,
@@ -485,7 +486,7 @@ public: // IBootstrapperApplication
             }
         }
 
-        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, state, fCached, installCondition, recommendedState, recommendedCacheType, pRequestState, pRequestedCacheType, pfCancel);
+        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, state, fCached, installCondition, repairCondition, recommendedState, recommendedCacheType, pRequestState, pRequestedCacheType, pfCancel);
     }
 
 

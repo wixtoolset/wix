@@ -1598,9 +1598,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanPackageBegin(string wzPackageId, PackageState state, bool fCached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, ref RequestState pRequestedState, ref BOOTSTRAPPER_CACHE_TYPE pRequestedCacheType, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanPackageBegin(string wzPackageId, PackageState state, bool fCached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, ref RequestState pRequestedState, ref BOOTSTRAPPER_CACHE_TYPE pRequestedCacheType, ref bool fCancel)
         {
-            PlanPackageBeginEventArgs args = new PlanPackageBeginEventArgs(wzPackageId, state, fCached, installCondition, recommendedState, recommendedCacheType, pRequestedState, pRequestedCacheType, fCancel);
+            PlanPackageBeginEventArgs args = new PlanPackageBeginEventArgs(wzPackageId, state, fCached, installCondition, repairCondition, recommendedState, recommendedCacheType, pRequestedState, pRequestedCacheType, fCancel);
             this.OnPlanPackageBegin(args);
 
             pRequestedState = args.State;
