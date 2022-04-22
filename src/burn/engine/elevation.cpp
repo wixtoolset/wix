@@ -636,6 +636,7 @@ extern "C" HRESULT ElevationSessionEnd(
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
     __in BOOL fDetectedForeignProviderKeyBundleId,
+    __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
@@ -653,6 +654,9 @@ extern "C" HRESULT ElevationSessionEnd(
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleId);
     ExitOnFailure(hr, "Failed to write dependency registration action to message buffer.");
+
+    hr = BuffWriteNumber64(&pbData, &cbData, qwEstimatedSize);
+    ExitOnFailure(hr, "Failed to write estimated size to message buffer.");
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)registrationType);
     ExitOnFailure(hr, "Failed to write registration type to message buffer.");
@@ -2580,6 +2584,7 @@ static HRESULT OnSessionEnd(
     SIZE_T iData = 0;
     DWORD dwResumeMode = 0;
     DWORD dwRestart = 0;
+    DWORD64 qwEstimatedSize = 0;
     DWORD dwRegistrationType = 0;
 
     // Deserialize message data.
@@ -2592,11 +2597,14 @@ static HRESULT OnSessionEnd(
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleId);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
+    hr = BuffReadNumber64(pbData, cbData, &iData, &qwEstimatedSize);
+    ExitOnFailure(hr, "Failed to read estimated size.");
+
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationType);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     // suspend session in per-machine process
-    hr = RegistrationSessionEnd(pRegistration, pCache, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
+    hr = RegistrationSessionEnd(pRegistration, pCache, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to suspend registration session.");
 
 LExit:

@@ -42,7 +42,7 @@ namespace WixToolsetTest.BurnE2E
 
             bundleAv1.Install();
 
-            var bundleAv1CachedPath = bundleAv1.VerifyRegisteredAndInPackageCache();
+            var bundleAv1Registration = bundleAv1.VerifyRegisteredAndInPackageCache();
 
             // Source file should be installed
             Assert.True(File.Exists(packageASourceCodeInstalled), String.Concat("Should have found Package A payload installed at: ", packageASourceCodeInstalled));
@@ -51,7 +51,7 @@ namespace WixToolsetTest.BurnE2E
 
             bundleAv2.Install();
 
-            var bundleAv2CachedPath = bundleAv2.VerifyRegisteredAndInPackageCache();
+            var bundleAv2Registration = bundleAv2.VerifyRegisteredAndInPackageCache();
 
             // Source file should be upgraded
             Assert.True(File.Exists(packageDSourceCodeInstalled), String.Concat("Should have found Package D payload installed at: ", packageDSourceCodeInstalled));
@@ -61,7 +61,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(File.Exists(packageBv1SourceCodeInstalled), String.Concat("Package Bv1 payload should have been removed by upgrade uninstall from: ", packageBv1SourceCodeInstalled));
             Assert.False(File.Exists(packageASourceCodeInstalled), String.Concat("Package A payload should have been removed by upgrade uninstall from: ", packageASourceCodeInstalled));
 
-            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache(bundleAv1CachedPath);
+            bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache(bundleAv1Registration.CachePath);
 
             // Uninstall everything.
             bundleAv2.Uninstall();
@@ -71,7 +71,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(File.Exists(packageBv2SourceCodeInstalled), String.Concat("Package Bv2 payload should have been removed by uninstall from: ", packageBv2SourceCodeInstalled));
             Assert.False(File.Exists(packageCv2SourceCodeInstalled), String.Concat("Package Cv2 payload should have been removed by uninstall from: ", packageCv2SourceCodeInstalled));
 
-            bundleAv2.VerifyUnregisteredAndRemovedFromPackageCache(bundleAv2CachedPath);
+            bundleAv2.VerifyUnregisteredAndRemovedFromPackageCache(bundleAv2Registration.CachePath);
         }
 
         /// <summary>

@@ -79,7 +79,8 @@ static HRESULT WINAPI AuthenticationRequired(
 static void CalculateKeepRegistration(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BOOL fLog,
-    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType,
+    __inout DWORD64* pqwEstimatedSize
     );
 static HRESULT ExecuteDependentRegistrationActions(
     __in HANDLE hPipe,
@@ -422,8 +423,9 @@ extern "C" HRESULT ApplyRegister(
     HRESULT hr = S_OK;
     LPWSTR sczEngineWorkingPath = NULL;
     BOOTSTRAPPER_REGISTRATION_TYPE registrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+    DWORD64 qwEstimatedSize = 0;
 
-    CalculateKeepRegistration(pEngineState, FALSE, &registrationType);
+    CalculateKeepRegistration(pEngineState, FALSE, &registrationType, &qwEstimatedSize);
 
     hr = UserExperienceOnRegisterBegin(&pEngineState->userExperience, &registrationType);
     ExitOnRootFailure(hr, "BA aborted register begin.");
@@ -451,12 +453,12 @@ extern "C" HRESULT ApplyRegister(
         // begin new session
         if (pEngineState->registration.fPerMachine)
         {
-            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleId, pEngineState->plan.qwEstimatedSize, registrationType);
+            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleId, qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session in per-machine process.");
         }
         else
         {
-            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.qwEstimatedSize, registrationType);
+            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session.");
         }
     }
@@ -491,6 +493,7 @@ extern "C" HRESULT ApplyUnregister(
     BURN_RESUME_MODE resumeMode = BURN_RESUME_MODE_NONE;
     BOOTSTRAPPER_REGISTRATION_TYPE defaultRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
     BOOTSTRAPPER_REGISTRATION_TYPE registrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
+    DWORD64 qwEstimatedSize = 0;
 
     // Calculate special cases for the resume mode. If a restart has been initiated, that trumps all other
     // modes. If the user chose to suspend the install then we'll use that as the resume mode.
@@ -513,7 +516,7 @@ extern "C" HRESULT ApplyUnregister(
         defaultRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
     }
 
-    CalculateKeepRegistration(pEngineState, TRUE, &defaultRegistrationType);
+    CalculateKeepRegistration(pEngineState, TRUE, &defaultRegistrationType, &qwEstimatedSize);
 
     registrationType = defaultRegistrationType;
 
@@ -547,12 +550,12 @@ extern "C" HRESULT ApplyUnregister(
 
     if (pEngineState->registration.fPerMachine)
     {
-        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->registration.fDetectedForeignProviderKeyBundleId, registrationType);
+        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->registration.fDetectedForeignProviderKeyBundleId, qwEstimatedSize, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-machine process.");
     }
     else
     {
-        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->cache, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, registrationType);
+        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->cache, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, qwEstimatedSize, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-user process.");
     }
 
@@ -880,9 +883,12 @@ extern "C" void ApplyClean(
 static void CalculateKeepRegistration(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BOOL fLog,
-    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType,
+    __inout DWORD64* pqwEstimatedSize
     )
 {
+    DWORD64 qwEstimatedSize = pEngineState->section.qwBundleSize;
+
     if (fLog)
     {
         LogId(REPORT_STANDARD, MSG_POST_APPLY_CALCULATE_REGISTRATION);
@@ -911,15 +917,28 @@ static void CalculateKeepRegistration(
         {
             *pRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
-            if (!fLog)
+            if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
             {
-                break;
+                qwEstimatedSize += pPackage->qwSize;
             }
+
+            qwEstimatedSize += pPackage->qwInstallSize;
         }
-        else if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState && BOOTSTRAPPER_REGISTRATION_TYPE_NONE == *pRegistrationType)
+
+        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState)
         {
-            *pRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+            if (BOOTSTRAPPER_REGISTRATION_TYPE_NONE == *pRegistrationType)
+            {
+                *pRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+            }
+
+            qwEstimatedSize += pPackage->qwSize;
         }
+    }
+
+    if (pqwEstimatedSize)
+    {
+        *pqwEstimatedSize = qwEstimatedSize;
     }
 }
 

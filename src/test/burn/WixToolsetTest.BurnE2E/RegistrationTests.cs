@@ -3,6 +3,7 @@
 namespace WixToolsetTest.BurnE2E
 {
     using System;
+    using WixToolset.Mba.Core;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -11,8 +12,35 @@ namespace WixToolsetTest.BurnE2E
         public RegistrationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [Fact]
+        public void AllowsBAToKeepRegistration()
+        {
+            this.CreatePackageInstaller("PackageA");
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var testBAController = this.CreateTestBAController();
+
+            testBAController.SetPackageRequestedState("PackageA", RequestState.Absent);
+            testBAController.SetForceKeepRegistration();
+
+            bundleA.Install();
+            var initialRegistration = bundleA.VerifyRegisteredAndInPackageCache();
+
+            Assert.NotNull(initialRegistration.EstimatedSize);
+
+            testBAController.SetForceKeepRegistration(null);
+            testBAController.ResetPackageStates("PackageA");
+
+            bundleA.Install();
+            var finalRegistration = bundleA.VerifyRegisteredAndInPackageCache();
+
+            // Verifies https://github.com/wixtoolset/issues/issues/4039
+            Assert.NotNull(finalRegistration.EstimatedSize);
+            Assert.InRange(finalRegistration.EstimatedSize.Value, initialRegistration.EstimatedSize.Value + 1, Int32.MaxValue);
+        }
+
+        [Fact]
         public void AutomaticallyUncachesBundleWhenNotInstalled()
         {
+            this.CreatePackageInstaller("PackageA");
             var bundleA = this.CreateBundleInstaller("BundleA");
             var testBAController = this.CreateTestBAController();
 
@@ -40,6 +68,7 @@ namespace WixToolsetTest.BurnE2E
         [Fact]
         public void RegistersInARPIfPrecached()
         {
+            this.CreatePackageInstaller("PackageA");
             var bundleA = this.CreateBundleInstaller("BundleA");
 
             bundleA.ManuallyCache();

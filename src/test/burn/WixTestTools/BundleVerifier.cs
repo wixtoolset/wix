@@ -87,7 +87,7 @@ namespace WixTestTools
             }
         }
 
-        public string VerifyRegisteredAndInPackageCache(int? expectedSystemComponent = null)
+        public BundleRegistration VerifyRegisteredAndInPackageCache(int? expectedSystemComponent = null)
         {
             Assert.True(this.TryGetRegistration(out var registration));
 
@@ -99,7 +99,7 @@ namespace WixTestTools
             var expectedCachePath = this.GetExpectedCachedBundlePath();
             WixAssert.StringEqual(expectedCachePath, registration.CachePath, true);
 
-            return registration.CachePath;
+            return registration;
         }
 
         public void VerifyUnregisteredAndRemovedFromPackageCache()

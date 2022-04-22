@@ -1178,31 +1178,6 @@ extern "C" HRESULT PlanExecutePackage(
         pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     }
 
-    // Add the cache and install size to estimated size if it will be on the machine at the end of the install
-    if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested ||
-        fRequestedCache ||
-        (BOOTSTRAPPER_PACKAGE_STATE_PRESENT == pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_ABSENT < pPackage->requested)
-       )
-    {
-        // If the package will remain in the cache, add the package size to the estimated size
-        if (BOOTSTRAPPER_CACHE_TYPE_REMOVE < pPackage->cacheType)
-        {
-            pPlan->qwEstimatedSize += pPackage->qwSize;
-        }
-
-        // If the package will end up installed on the machine, add the install size to the estimated size.
-        if (BOOTSTRAPPER_REQUEST_STATE_CACHE < pPackage->requested)
-        {
-            // MSP packages get cached automatically by windows installer with any embedded cabs, so include that in the size as well
-            if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
-            {
-                pPlan->qwEstimatedSize += pPackage->qwSize;
-            }
-
-            pPlan->qwEstimatedSize += pPackage->qwInstallSize;
-        }
-    }
-
     // Add execute actions.
     switch (pPackage->type)
     {
@@ -3079,7 +3054,6 @@ extern "C" void PlanDump(
     LogStringLine(PlanDumpLevel, "     disallow-removal: %hs", LoggingTrueFalseToString(pPlan->fDisallowRemoval));
     LogStringLine(PlanDumpLevel, "     downgrade: %hs", LoggingTrueFalseToString(pPlan->fDowngrade));
     LogStringLine(PlanDumpLevel, "     registration options: %hs", LoggingRegistrationOptionsToString(pPlan->dwRegistrationOperations));
-    LogStringLine(PlanDumpLevel, "     estimated size: %llu", pPlan->qwEstimatedSize);
     if (pPlan->sczLayoutDirectory)
     {
         LogStringLine(PlanDumpLevel, "     layout directory: %ls", pPlan->sczLayoutDirectory);

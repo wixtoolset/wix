@@ -213,6 +213,7 @@ HRESULT RegistrationSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
+    __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT RegistrationSaveState(

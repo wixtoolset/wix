@@ -27,6 +27,7 @@ namespace WixToolset.Test.BA
 
         private string updateBundlePath;
 
+        private bool forceKeepRegistration;
         private bool immediatelyQuit;
         private bool quitAfterDetect;
         private bool explicitlyElevateAndPlanFromOnElevateBegin;
@@ -129,6 +130,12 @@ namespace WixToolset.Test.BA
             if (String.IsNullOrEmpty(explicitlyElevateAndPlanFromOnElevateBegin) || !Boolean.TryParse(explicitlyElevateAndPlanFromOnElevateBegin, out this.explicitlyElevateAndPlanFromOnElevateBegin))
             {
                 this.explicitlyElevateAndPlanFromOnElevateBegin = false;
+            }
+
+            string forceKeepRegistration = this.ReadPackageAction(null, "ForceKeepRegistration");
+            if (String.IsNullOrEmpty(forceKeepRegistration) || !Boolean.TryParse(forceKeepRegistration, out this.forceKeepRegistration))
+            {
+                this.forceKeepRegistration = false;
             }
 
             string quitAfterDetect = this.ReadPackageAction(null, "QuitAfterDetect");
@@ -531,6 +538,16 @@ namespace WixToolset.Test.BA
             args.Cancel = true;
 
             this.ShutdownUiThread();
+        }
+
+        protected override void OnUnregisterBegin(UnregisterBeginEventArgs args)
+        {
+            if (this.forceKeepRegistration && args.RegistrationType == RegistrationType.None)
+            {
+                args.RegistrationType = RegistrationType.InProgress;
+            }
+
+            this.Log("OnUnregisterBegin, default: {0}, requested: {1}", args.RecommendedRegistrationType, args.RegistrationType);
         }
 
         private void TestVariables()
