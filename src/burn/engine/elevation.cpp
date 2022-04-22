@@ -11,7 +11,6 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE,
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE,
     BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN,
-    BURN_ELEVATION_MESSAGE_TYPE_SESSION_RESUME,
     BURN_ELEVATION_MESSAGE_TYPE_SESSION_END,
     BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE,
     BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE,
@@ -190,12 +189,6 @@ static HRESULT OnApplyUninitialize(
     );
 static HRESULT OnSessionBegin(
     __in BURN_CACHE* pCache,
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables,
-    __in BYTE* pbData,
-    __in SIZE_T cbData
-    );
-static HRESULT OnSessionResume(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -575,48 +568,6 @@ extern "C" HRESULT ElevationSessionBegin(
 
     // send message
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN, pbData, cbData, NULL, NULL, &dwResult);
-    ExitOnFailure(hr, "Failed to send message to per-machine process.");
-
-    hr = (HRESULT)dwResult;
-
-LExit:
-    ReleaseBuffer(pbData);
-
-    return hr;
-}
-
-/*******************************************************************
- ElevationSessionResume - 
-
-*******************************************************************/
-extern "C" HRESULT ElevationSessionResume(
-    __in HANDLE hPipe,
-    __in_z LPCWSTR wzResumeCommandLine,
-    __in BOOL fDisableResume,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
-    )
-{
-    HRESULT hr = S_OK;
-    BYTE* pbData = NULL;
-    SIZE_T cbData = 0;
-    DWORD dwResult = 0;
-
-    // serialize message data
-    hr = BuffWriteString(&pbData, &cbData, wzResumeCommandLine);
-    ExitOnFailure(hr, "Failed to write resume command line to message buffer.");
-
-    hr = BuffWriteNumber(&pbData, &cbData, fDisableResume);
-    ExitOnFailure(hr, "Failed to write resume flag.");
-
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)registrationType);
-    ExitOnFailure(hr, "Failed to write registration type to message buffer.");
-
-    hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
-    ExitOnFailure(hr, "Failed to write variables.");
-
-    // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_RESUME, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -2174,10 +2125,6 @@ static HRESULT ProcessElevatedChildMessage(
         hrResult = OnSessionBegin(pContext->pCache, pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
-    case BURN_ELEVATION_MESSAGE_TYPE_SESSION_RESUME:
-        hrResult = OnSessionResume(pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
-        break;
-
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_END:
         hrResult = OnSessionEnd(pContext->pCache, pContext->pPackages, pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
@@ -2536,38 +2483,6 @@ static HRESULT OnSessionBegin(
 LExit:
     ReleaseStr(sczEngineWorkingPath);
 
-    return hr;
-}
-
-static HRESULT OnSessionResume(
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables,
-    __in BYTE* pbData,
-    __in SIZE_T cbData
-    )
-{
-    HRESULT hr = S_OK;
-    SIZE_T iData = 0;
-    DWORD dwRegistrationType = 0;
-
-    // Deserialize message data.
-    hr = BuffReadString(pbData, cbData, &iData, &pRegistration->sczResumeCommandLine);
-    ExitOnFailure(hr, "Failed to read resume command line.");
-
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDisableResume);
-    ExitOnFailure(hr, "Failed to read resume flag.");
-
-    hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationType);
-    ExitOnFailure(hr, "Failed to read dependency registration action.");
-
-    hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
-    ExitOnFailure(hr, "Failed to read variables.");
-
-    // resume session in per-machine process
-    hr = RegistrationSessionResume(pRegistration, pVariables, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
-    ExitOnFailure(hr, "Failed to resume registration session.");
-
-LExit:
     return hr;
 }
 

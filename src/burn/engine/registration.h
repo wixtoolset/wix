@@ -201,11 +201,6 @@ HRESULT RegistrationSessionBegin(
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
-HRESULT RegistrationSessionResume(
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
-    );
 HRESULT RegistrationSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_CACHE* pCache,

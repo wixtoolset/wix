@@ -115,12 +115,12 @@ namespace WixToolsetTest.BurnE2E
 
             // Repair bundle so it adds itself as a reference to itself.
             bundleAv1.Repair();
-            bundleAv1.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+            bundleAv1.VerifyRegisteredAndInPackageCache();
 
             upgradeBundlePackageBundlev1.Uninstall();
             upgradeBundlePackageBundlev1.VerifyUnregisteredAndRemovedFromPackageCache();
 
-            bundleAv1.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+            bundleAv1.VerifyRegisteredAndInPackageCache();
         }
 
         [Fact]

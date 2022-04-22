@@ -793,7 +793,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to deserialize variables.");
 
                 // write active resume mode
-                hr = RegistrationSessionResume(&registration, &variables, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &cache, &variables, dwRegistrationOptions, qwEstimatedSize, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to write active resume mode.");
 
                 // verify that run key was put back
