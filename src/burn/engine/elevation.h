@@ -32,13 +32,6 @@ HRESULT ElevationSessionBegin(
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
-HRESULT ElevationSessionResume(
-    __in HANDLE hPipe,
-    __in_z LPCWSTR wzResumeCommandLine,
-    __in BOOL fDisableResume,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
-    );
 HRESULT ElevationSessionEnd(
     __in HANDLE hPipe,
     __in BURN_RESUME_MODE resumeMode,

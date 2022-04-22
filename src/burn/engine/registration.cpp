@@ -607,6 +607,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     HKEY hkRegistration = NULL;
     BOOL fCreated = FALSE;
     LPWSTR sczPublisher = NULL;
+    DWORD er = ERROR_SUCCESS;
 
     AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
 
@@ -776,6 +777,15 @@ extern "C" HRESULT RegistrationSessionBegin(
         hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_SYSTEM_COMPONENT, 1);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_SYSTEM_COMPONENT);
     }
+    else
+    {
+        er = ::RegDeleteValueW(hkRegistration, REGISTRY_BUNDLE_SYSTEM_COMPONENT);
+        if (ERROR_FILE_NOT_FOUND == er || ERROR_PATH_NOT_FOUND == er)
+        {
+            er = ERROR_SUCCESS;
+        }
+        ExitOnWin32Error(er, hr, "Failed to delete %ls value.", REGISTRY_BUNDLE_SYSTEM_COMPONENT);
+    }
 
     // QuietUninstallString: [path to exe] /uninstall /quiet
     hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_QUIET_UNINSTALL_STRING, L"\"%ls\" /%ls /uninstall /quiet", pRegistration->sczCacheExecutablePath, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
@@ -822,40 +832,6 @@ extern "C" HRESULT RegistrationSessionBegin(
 
 LExit:
     ReleaseStr(sczPublisher);
-    ReleaseRegKey(hkRegistration);
-
-    return hr;
-}
-
-
-/*******************************************************************
- RegistrationSessionResume - Resumes a previous run session.
-
-*******************************************************************/
-extern "C" HRESULT RegistrationSessionResume(
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
-    )
-{
-    HRESULT hr = S_OK;
-    HKEY hkRegistration = NULL;
-
-    AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
-
-    // open registration key
-    hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_WRITE, &hkRegistration);
-    ExitOnFailure(hr, "Failed to open registration key.");
-
-    // update resume mode
-    hr = UpdateResumeMode(pRegistration, hkRegistration, BURN_RESUME_MODE_ACTIVE, registrationType, FALSE);
-    ExitOnFailure(hr, "Failed to update resume mode.");
-
-    // update display name
-    hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
-    ExitOnFailure(hr, "Failed to update name and publisher.");
-
-LExit:
     ReleaseRegKey(hkRegistration);
 
     return hr;
@@ -950,6 +926,7 @@ extern "C" HRESULT RegistrationSaveState(
     LPWSTR sczValueName = NULL;
     DWORD dwType = 0;
     DWORD dwNumberOfExistingValues = 0;
+    DWORD er = ERROR_SUCCESS;
 
 
     // write data to file
@@ -989,8 +966,8 @@ extern "C" HRESULT RegistrationSaveState(
 
         ExitOnFailure(hr, "Failed to enumerate value %u", i);
 
-        hr = RegDeleteValue(hkRegistration, sczValueName);
-        ExitOnFailure(hr, "Failed to delete registration variable value.");
+        er = ::RegDeleteValueW(hkRegistration, sczValueName);
+        ExitOnWin32Error(er, hr, "Failed to delete registration variable value.");
     }
 
     // Write variables.
@@ -1313,7 +1290,7 @@ static HRESULT UpdateResumeMode(
         }
         else
         {
-            ExitOnWin32Error(er, hr, "Failed to open run key.");
+            ExitOnFailure(hr, "Failed to open run key.");
 
             er = ::RegDeleteValueW(hkRun, pRegistration->sczId);
             if (ERROR_FILE_NOT_FOUND == er)

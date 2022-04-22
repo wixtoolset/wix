@@ -430,37 +430,18 @@ extern "C" HRESULT ApplyRegister(
     hr = UserExperienceOnRegisterBegin(&pEngineState->userExperience, &registrationType);
     ExitOnRootFailure(hr, "BA aborted register begin.");
 
-    // If we have a resume mode that suggests the bundle is on the machine.
-    if (BOOTSTRAPPER_RESUME_TYPE_REBOOT <= pEngineState->command.resumeType)
-    {
-        // resume previous session
-        if (pEngineState->registration.fPerMachine)
-        {
-            hr = ElevationSessionResume(pEngineState->companionConnection.hPipe, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, registrationType);
-            ExitOnFailure(hr, "Failed to resume registration session in per-machine process.");
-        }
-        else
-        {
-            hr = RegistrationSessionResume(&pEngineState->registration, &pEngineState->variables, registrationType);
-            ExitOnFailure(hr, "Failed to resume registration session.");
-        }
-    }
-    else // need to complete registration on the machine.
-    {
-        hr = CacheCalculateBundleWorkingPath(pEngineState->plan.pCache, pEngineState->registration.sczExecutableName, &sczEngineWorkingPath);
-        ExitOnFailure(hr, "Failed to calculate working path for engine.");
+    hr = CacheCalculateBundleWorkingPath(pEngineState->plan.pCache, pEngineState->registration.sczExecutableName, &sczEngineWorkingPath);
+    ExitOnFailure(hr, "Failed to calculate working path for engine.");
 
-        // begin new session
-        if (pEngineState->registration.fPerMachine)
-        {
-            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleId, qwEstimatedSize, registrationType);
-            ExitOnFailure(hr, "Failed to begin registration session in per-machine process.");
-        }
-        else
-        {
-            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, qwEstimatedSize, registrationType);
-            ExitOnFailure(hr, "Failed to begin registration session.");
-        }
+    if (pEngineState->registration.fPerMachine)
+    {
+        hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleId, qwEstimatedSize, registrationType);
+        ExitOnFailure(hr, "Failed to begin registration session in per-machine process.");
+    }
+    else
+    {
+        hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, qwEstimatedSize, registrationType);
+        ExitOnFailure(hr, "Failed to begin registration session.");
     }
 
     // Apply any registration actions.
