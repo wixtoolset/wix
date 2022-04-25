@@ -309,6 +309,7 @@ namespace WixToolset.Core
 
             var chainSeen = false;
             var logSeen = false;
+            var updateSeen = false;
 
             foreach (var child in node.Elements())
             {
@@ -386,7 +387,13 @@ namespace WixToolset.Core
                             this.ParseBundleTagElement(child);
                             break;
                         case "Update":
+                            if (updateSeen)
+                            {
+                                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Update"));
+                            }
                             this.ParseUpdateElement(child);
+                            updateSeen = true;
                             break;
                         case "Variable":
                             this.ParseVariableElement(child);
@@ -2670,6 +2677,8 @@ namespace WixToolset.Core
                 this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
             }
 
+            var remoteBundleSeen = false;
+
             foreach (var child in node.Elements())
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
@@ -2682,7 +2691,13 @@ namespace WixToolset.Core
 
                             if (allowed)
                             {
+                                if (remoteBundleSeen)
+                                {
+                                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "RemoteBundle"));
+                                }
                                 this.ParseRemoteBundleElement(child, compilerPayload.Id.Id);
+                                remoteBundleSeen = true;
                             }
 
                             break;
@@ -2700,6 +2715,12 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionElement(node, child, context);
                 }
+            }
+
+            var isLocal = !String.IsNullOrEmpty(compilerPayload.SourceFile);
+            if (packageType == WixBundlePackageType.Bundle && !isLocal && !remoteBundleSeen)
+            {
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "RemoteBundle"));
             }
 
             return compilerPayload;
