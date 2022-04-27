@@ -54,6 +54,7 @@ namespace WixToolset.Data.Symbols
         MaxSizeInclusive = 0x010,
         MinDateInclusive = 0x020,
         MaxDateInclusive = 0x040,
+        DisableFileRedirection = 0x080,
     }
 
     public enum WixFileSearchType
@@ -243,6 +244,22 @@ namespace WixToolset.Data.Symbols
                 else
                 {
                     this.Attributes &= ~WixFileSearchAttributes.MaxDateInclusive;
+                }
+            }
+        }
+
+        public bool DisableFileRedirection
+        {
+            get { return this.Attributes.HasFlag(WixFileSearchAttributes.DisableFileRedirection); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixFileSearchAttributes.DisableFileRedirection;
+                }
+                else
+                {
+                    this.Attributes &= ~WixFileSearchAttributes.DisableFileRedirection;
                 }
             }
         }

@@ -88,6 +88,7 @@ typedef struct _BURN_SEARCH
         {
             BURN_FILE_SEARCH_TYPE Type;
             LPWSTR sczPath;
+            BOOL fDisableFileRedirection;
         } FileSearch;
         struct
         {

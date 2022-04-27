@@ -139,6 +139,10 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Path", &pSearch->FileSearch.sczPath);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Path.");
 
+            // @DisableFileRedirection
+            hr = XmlGetYesNoAttribute(pixnNode, L"DisableFileRedirection", &pSearch->FileSearch.fDisableFileRedirection);
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get DisableFileRedirection attribute.");
+
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
@@ -557,6 +561,49 @@ extern "C" void SearchesUninitialize(
 
 // internal function definitions
 
+#if !defined(_WIN64)
+
+typedef struct _BURN_FILE_SEARCH
+{
+    BURN_SEARCH* pSearch;
+    PROC_FILESYSTEMREDIRECTION pfsr;
+} BURN_FILE_SEARCH;
+
+static HRESULT FileSystemSearchStart(
+    __in BURN_FILE_SEARCH* pFileSearch
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pFileSearch->pSearch->FileSearch.fDisableFileRedirection)
+    {
+        hr = ProcDisableWowFileSystemRedirection(&pFileSearch->pfsr);
+        if (hr == E_NOTIMPL)
+        {
+            hr = S_FALSE;
+        }
+        ExitOnFailure(hr, "Failed to disable file system redirection.");
+    }
+
+LExit:
+    return hr;
+}
+
+static void FileSystemSearchEnd(
+    __in BURN_FILE_SEARCH* pFileSearch
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = ProcRevertWowFileSystemRedirection(&pFileSearch->pfsr);
+    ExitOnFailure(hr, "Failed to revert file system redirection.");
+
+LExit:
+    return;
+}
+
+#endif
+
 static HRESULT DirectorySearchExists(
     __in BURN_SEARCH* pSearch,
     __in BURN_VARIABLES* pVariables
@@ -565,6 +612,15 @@ static HRESULT DirectorySearchExists(
     HRESULT hr = S_OK;
     LPWSTR sczPath = NULL;
     BOOL fExists = FALSE;
+
+#if !defined(_WIN64)
+    BURN_FILE_SEARCH bfs = { };
+
+    bfs.pSearch = pSearch;
+
+    hr = FileSystemSearchStart(&bfs);
+    ExitOnFailure(hr, "Failed to initialize file search.");
+#endif
 
     // format path
     hr = VariableFormatString(pVariables, pSearch->DirectorySearch.sczPath, &sczPath, NULL);
@@ -593,6 +649,10 @@ static HRESULT DirectorySearchExists(
     ExitOnFailure(hr, "Failed to set variable.");
 
 LExit:
+#if !defined(_WIN64)
+    FileSystemSearchEnd(&bfs);
+#endif
+
     StrSecureZeroFreeString(sczPath);
 
     return hr;
@@ -605,6 +665,15 @@ static HRESULT DirectorySearchPath(
 {
     HRESULT hr = S_OK;
     LPWSTR sczPath = NULL;
+
+#if !defined(_WIN64)
+    BURN_FILE_SEARCH bfs = { };
+
+    bfs.pSearch = pSearch;
+
+    hr = FileSystemSearchStart(&bfs);
+    ExitOnFailure(hr, "Failed to initialize file search.");
+#endif
 
     // format path
     hr = VariableFormatString(pVariables, pSearch->DirectorySearch.sczPath, &sczPath, NULL);
@@ -634,6 +703,10 @@ static HRESULT DirectorySearchPath(
     ExitOnFailure(hr, "Failed while searching directory search: %ls, for path: %ls", pSearch->sczKey, sczPath);
 
 LExit:
+#if !defined(_WIN64)
+    FileSystemSearchEnd(&bfs);
+#endif
+
     StrSecureZeroFreeString(sczPath);
 
     return hr;
@@ -648,6 +721,15 @@ static HRESULT FileSearchExists(
     DWORD er = ERROR_SUCCESS;
     LPWSTR sczPath = NULL;
     BOOL fExists = FALSE;
+
+#if !defined(_WIN64)
+    BURN_FILE_SEARCH bfs = { };
+
+    bfs.pSearch = pSearch;
+
+    hr = FileSystemSearchStart(&bfs);
+    ExitOnFailure(hr, "Failed to initialize file search.");
+#endif
 
     // format path
     hr = VariableFormatString(pVariables, pSearch->FileSearch.sczPath, &sczPath, NULL);
@@ -665,7 +747,7 @@ static HRESULT FileSearchExists(
         }
         else
         {
-            ExitOnWin32Error(er, hr, "Failed get to file attributes. '%ls'", pSearch->DirectorySearch.sczPath);
+            ExitOnWin32Error(er, hr, "Failed get to file attributes. '%ls'", pSearch->FileSearch.sczPath);
         }
     }
     else if (FILE_ATTRIBUTE_DIRECTORY != (dwAttributes & FILE_ATTRIBUTE_DIRECTORY))
@@ -678,6 +760,10 @@ static HRESULT FileSearchExists(
     ExitOnFailure(hr, "Failed to set variable.");
 
 LExit:
+#if !defined(_WIN64)
+    FileSystemSearchEnd(&bfs);
+#endif
+
     StrSecureZeroFreeString(sczPath);
     return hr;
 }
@@ -691,6 +777,15 @@ static HRESULT FileSearchVersion(
     ULARGE_INTEGER uliVersion = { };
     LPWSTR sczPath = NULL;
     VERUTIL_VERSION* pVersion = NULL;
+
+#if !defined(_WIN64)
+    BURN_FILE_SEARCH bfs = { };
+
+    bfs.pSearch = pSearch;
+
+    hr = FileSystemSearchStart(&bfs);
+    ExitOnFailure(hr, "Failed to initialize file search.");
+#endif
 
     // format path
     hr = VariableFormatString(pVariables, pSearch->FileSearch.sczPath, &sczPath, NULL);
@@ -714,6 +809,10 @@ static HRESULT FileSearchVersion(
     ExitOnFailure(hr, "Failed to set variable.");
 
 LExit:
+#if !defined(_WIN64)
+    FileSystemSearchEnd(&bfs);
+#endif
+
     StrSecureZeroFreeString(sczPath);
     ReleaseVerutilVersion(pVersion);
     return hr;
@@ -726,6 +825,15 @@ static HRESULT FileSearchPath(
 {
     HRESULT hr = S_OK;
     LPWSTR sczPath = NULL;
+
+#if !defined(_WIN64)
+    BURN_FILE_SEARCH bfs = { };
+
+    bfs.pSearch = pSearch;
+
+    hr = FileSystemSearchStart(&bfs);
+    ExitOnFailure(hr, "Failed to initialize file search.");
+#endif
 
     // format path
     hr = VariableFormatString(pVariables, pSearch->FileSearch.sczPath, &sczPath, NULL);
@@ -755,6 +863,10 @@ static HRESULT FileSearchPath(
     ExitOnFailure(hr, "Failed while searching file search: %ls, for path: %ls", pSearch->sczKey, sczPath);
 
 LExit:
+#if !defined(_WIN64)
+    FileSystemSearchEnd(&bfs);
+#endif
+
     StrSecureZeroFreeString(sczPath);
 
     return hr;
