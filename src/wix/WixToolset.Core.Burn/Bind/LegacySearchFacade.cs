@@ -98,6 +98,11 @@ namespace WixToolset.Core.Burn
                     throw new NotImplementedException();
             }
 
+            if (searchSymbol.DisableFileRedirection)
+            {
+                writer.WriteAttributeString("DisableFileRedirection", "yes");
+            }
+
             writer.WriteEndElement();
         }
 

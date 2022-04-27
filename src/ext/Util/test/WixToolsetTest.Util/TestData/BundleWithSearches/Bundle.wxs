@@ -7,6 +7,7 @@
         <util:RegistrySearchRef Id="RegistrySearchId" />
         <util:RegistrySearchRef Id="RegistrySearchId64" />
         <util:ProductSearchRef Id="ProductSearchId" />
+        <util:DirectorySearchRef Id="DirectorySearchId" />
         <util:FileSearchRef Id="FileSearchId" />
         <util:WindowsFeatureSearchRef Id="DetectSHA2SupportId" />
 
@@ -40,6 +41,10 @@
 
     <Fragment>
         <util:ProductSearch Id="ProductSearchId" Variable="ProductSearchVariable" UpgradeCode="738D02BF-E231-4370-8209-E9FD4E1BE2A1" Condition="1 &amp; 2 &lt; 3" Result="version" />
+    </Fragment>
+
+    <Fragment>
+        <util:DirectorySearch Id="DirectorySearchId" Variable="DirectorySearchVariable" Path="%windir%\System32" Result="exists" DisableFileRedirection="yes" />
     </Fragment>
 
     <Fragment>

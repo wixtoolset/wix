@@ -129,6 +129,9 @@ namespace Bootstrapper
                     L"    <FileSearch Id='Search1' Type='exists' Path='[File1]' Variable='Variable1' />"
                     L"    <FileSearch Id='Search2' Type='exists' Path='[File2]' Variable='Variable2' />"
                     L"    <FileSearch Id='Search3' Type='version' Path='[File2]' Variable='Variable3' />"
+                    L"    <FileSearch Id='Search4' Type='exists' Path='[SystemFolder]\\consent.exe' Variable='Variable4' />"
+                    L"    <FileSearch Id='Search5' Type='exists' Path='[System64Folder]\\consent.exe' Variable='Variable5' DisableFileRedirection='no' />"
+                    L"    <FileSearch Id='Search6' Type='exists' Path='[System64Folder]\\consent.exe' Variable='Variable6' DisableFileRedirection='yes' />"
                     L"</Bundle>";
 
                 // load XML document
@@ -145,6 +148,15 @@ namespace Bootstrapper
                 Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable1"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable2"));
                 Assert::Equal<String^>(gcnew String(pVersion->sczVersion), VariableGetVersionHelper(&variables, L"Variable3"));
+
+                // Assume that consent.exe continues to only exist in 64-bit system folder.
+                Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable4"));
+#if !defined(_WIN64)
+                Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable5"));
+#else
+                Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable5"));
+#endif
+                Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable6"));
             }
             finally
             {

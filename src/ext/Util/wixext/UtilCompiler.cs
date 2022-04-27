@@ -999,6 +999,12 @@ namespace WixToolset.Util
                         case "After":
                             this.ParseCommonSearchAttributes(sourceLineNumbers, attrib, ref id, ref variable, ref condition, ref after);
                             break;
+                        case "DisableFileRedirection":
+                            if (this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes)
+                            {
+                                attributes |= WixFileSearchAttributes.DisableFileRedirection;
+                            }
+                            break;
                         case "Path":
                             path = this.ParseHelper.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
                             break;
@@ -1103,6 +1109,12 @@ namespace WixToolset.Util
                         case "Condition":
                         case "After":
                             this.ParseCommonSearchAttributes(sourceLineNumbers, attrib, ref id, ref variable, ref condition, ref after);
+                            break;
+                        case "DisableFileRedirection":
+                            if (this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes)
+                            {
+                                attributes |= WixFileSearchAttributes.DisableFileRedirection;
+                            }
                             break;
                         case "Path":
                             path = this.ParseHelper.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
