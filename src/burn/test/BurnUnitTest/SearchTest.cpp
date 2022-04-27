@@ -97,7 +97,7 @@ namespace Bootstrapper
             }
         }
 
-        [Fact(Skip = "Currently fails")]
+        [Fact]
         void FileSearchTest()
         {
             HRESULT hr = S_OK;
