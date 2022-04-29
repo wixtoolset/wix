@@ -1,0 +1,24 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <util:Group Id="ADMIN" Name="Administrators" />
+        <util:Group Id="POWER_USER" Name="Power Users" />
+
+        <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
+            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
+
+            <util:User Id="TEST_USER4" Name="existinguser" Password="test123!@#" LogonAsService="yes" FailIfExists="yes" RemoveOnUninstall="yes">
+                <util:GroupRef Id="ADMIN" />
+                <util:GroupRef Id="POWER_USER" />
+            </util:User>
+        </Component>
+    </Fragment>
+</Wix>

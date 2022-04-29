@@ -11,6 +11,7 @@
 @if not "%RuntimeTestsEnabled%"=="true" echo Build integration tests %_C%
 @if "%RuntimeTestsEnabled%"=="true" set _T=test&echo Run integration tests %_C%
 
+@call msi\test_msi.cmd %_C% %_T% || exit /b
 @call burn\test_burn.cmd %_C% %_T% || exit /b
 
 msbuild -t:Restore dtf\DtfE2ETests.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\dtfe2etests.binlog || exit /b
