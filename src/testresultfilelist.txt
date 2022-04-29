@@ -17,5 +17,6 @@ build/logs/TestResults/WixToolsetTest.Dnc.HostGenerator.trx
 build/logs/TestResults/WixToolsetTest.Heat.trx
 build/logs/TestResults/WixToolsetTest.ManagedHost.trx
 build/logs/TestResults/WixToolsetTest.Mba.Core.trx
+build/logs/TestResults/WixToolsetTest.MsiE2E.trx
 build/logs/TestResults/WixToolsetTest.Sdk.trx
 build/logs/TestResults/WixToolsetTest.WixE2ETests.trx
