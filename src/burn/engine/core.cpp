@@ -681,6 +681,8 @@ extern "C" HRESULT CoreApply(
     hr = ApplyLock(FALSE, &hLock);
     ExitOnFailure(hr, "Another per-user setup is already executing.");
 
+    pEngineState->plan.fApplying = TRUE;
+
     // Initialize only after getting a lock.
     fApplyInitialize = TRUE;
     ApplyInitialize();
@@ -813,6 +815,8 @@ LExit:
     {
         ApplyUninitialize();
     }
+
+    pEngineState->plan.fApplying = FALSE;
 
     if (hLock)
     {

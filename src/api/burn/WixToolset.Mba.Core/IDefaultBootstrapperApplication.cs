@@ -419,22 +419,6 @@ namespace WixToolset.Mba.Core
         event EventHandler<SystemRestorePointCompleteEventArgs> SystemRestorePointComplete;
 
         /// <summary>
-        /// Fired when the system is shutting down or user is logging off.
-        /// </summary>
-        /// <remarks>
-        /// <para>To prevent shutting down or logging off, set <see cref="CancellableHResultEventArgs.Cancel"/> to
-        /// true; otherwise, set it to false.</para>
-        /// <para>By default setup will prevent shutting down or logging off between
-        /// <see cref="IDefaultBootstrapperApplication.ApplyBegin"/> and <see cref="IDefaultBootstrapperApplication.ApplyComplete"/>.
-        /// Derivatives can change this behavior by handling <see cref="IDefaultBootstrapperApplication.SystemShutdown"/>.</para>
-        /// <para>If <see cref="SystemShutdownEventArgs.Reasons"/> contains <see cref="EndSessionReasons.Critical"/>
-        /// the bootstrapper cannot prevent the shutdown and only has a few seconds to save state or perform any other
-        /// critical operations before being closed by the operating system.</para>
-        /// <para>This event may be fired on a different thread.</para>
-        /// </remarks>
-        event EventHandler<SystemShutdownEventArgs> SystemShutdown;
-
-        /// <summary>
         /// Fired when the engine unregisters the bundle.
         /// </summary>
         event EventHandler<UnregisterBeginEventArgs> UnregisterBegin;

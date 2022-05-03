@@ -583,11 +583,6 @@ BAAPI UserExperienceOnSystemRestorePointComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus
     );
-BAAPI UserExperienceOnSystemShutdown(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in DWORD dwEndSession,
-    __inout BOOL* pfCancel
-    );
 BAAPI UserExperienceOnUnregisterBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType

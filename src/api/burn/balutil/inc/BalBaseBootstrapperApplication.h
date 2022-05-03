@@ -94,19 +94,6 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnSystemShutdown(
-        __in DWORD dwEndSession,
-        __inout BOOL* pfCancel
-        )
-    {
-        HRESULT hr = S_OK;
-
-        // Allow requests to shut down when critical or not applying.
-        *pfCancel = !(ENDSESSION_CRITICAL & dwEndSession || !m_fApplying);
-
-        return hr;
-    }
-
     virtual STDMETHODIMP OnDetectBegin(
         __in BOOL /*fCached*/,
         __in BOOTSTRAPPER_REGISTRATION_TYPE /*registrationType*/,
@@ -406,8 +393,6 @@ public: // IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-        m_fApplying = TRUE;
-
         m_dwProgressPercentage = 0;
         m_dwOverallProgressPercentage = 0;
 
@@ -859,8 +844,6 @@ public: // IBootstrapperApplication
             *pAction = BOOTSTRAPPER_APPLYCOMPLETE_ACTION_RESTART;
         }
 
-        m_fApplying = FALSE;
-
         return hr;
     }
 
@@ -1183,7 +1166,6 @@ protected:
         ::InitializeCriticalSection(&m_csCanceled);
         m_fCanceled = FALSE;
         m_BalInfoCommand = { };
-        m_fApplying = FALSE;
         m_fRollingBack = FALSE;
 
         m_dwProgressPercentage = 0;
@@ -1212,7 +1194,6 @@ private:
     BOOTSTRAPPER_DISPLAY m_display;
     IBootstrapperEngine* m_pEngine;
 
-    BOOL m_fApplying;
     BOOL m_fRollingBack;
 
     DWORD m_dwProgressPercentage;

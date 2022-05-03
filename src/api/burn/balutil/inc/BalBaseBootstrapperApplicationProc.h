@@ -63,15 +63,6 @@ static HRESULT BalBaseBAProcOnShutdown(
     return pBA->OnShutdown(&pResults->action);
 }
 
-static HRESULT BalBaseBAProcOnSystemShutdown(
-    __in IBootstrapperApplication* pBA,
-    __in BA_ONSYSTEMSHUTDOWN_ARGS* pArgs,
-    __inout BA_ONSYSTEMSHUTDOWN_RESULTS* pResults
-    )
-{
-    return pBA->OnSystemShutdown(pArgs->dwEndSession, &pResults->fCancel);
-}
-
 static HRESULT BalBaseBAProcOnDetectForwardCompatibleBundle(
     __in IBootstrapperApplication* pBA,
     __in BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_ARGS* pArgs,
@@ -802,9 +793,6 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSHUTDOWN:
             hr = BalBaseBAProcOnShutdown(pBA, reinterpret_cast<BA_ONSHUTDOWN_ARGS*>(pvArgs), reinterpret_cast<BA_ONSHUTDOWN_RESULTS*>(pvResults));
-            break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMSHUTDOWN:
-            hr = BalBaseBAProcOnSystemShutdown(pBA, reinterpret_cast<BA_ONSYSTEMSHUTDOWN_ARGS*>(pvArgs), reinterpret_cast<BA_ONSYSTEMSHUTDOWN_RESULTS*>(pvResults));
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTFORWARDCOMPATIBLEBUNDLE:
             hr = BalBaseBAProcOnDetectForwardCompatibleBundle(pBA, reinterpret_cast<BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS*>(pvResults));
