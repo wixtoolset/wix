@@ -18,6 +18,7 @@ struct UITHREAD_INFO
 {
     BOOL fElevatedEngine;
     BURN_USER_EXPERIENCE* pUserExperience;
+    BOOL* pfCriticalShutdownInitiated;
 };
 
 
@@ -132,6 +133,7 @@ static DWORD WINAPI ThreadProc(
 
     info.fElevatedEngine = fElevatedEngine;
     info.pUserExperience = &pEngineState->userExperience;
+    info.pfCriticalShutdownInitiated = &pEngineState->fCriticalShutdownInitiated;
 
     // Create the window to handle reboots without activating it.
     hWnd = ::CreateWindowExW(WS_EX_NOACTIVATE, wc.lpszClassName, NULL, WS_POPUP, 0, 0, 0, 0, HWND_DESKTOP, NULL, pContext->hInstance, &info);
@@ -207,6 +209,8 @@ static LRESULT CALLBACK WndProc(
             // TODO: There's a race condition here where the BA may not have been loaded, or already was unloaded.
             UserExperienceOnSystemShutdown(pInfo->pUserExperience, dwEndSession, &fCancel);
         }
+
+        *pInfo->pfCriticalShutdownInitiated |= fCritical;
 
         fRet = !fCancel;
         LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN, LoggingBoolToString(fCritical), LoggingBoolToString(pInfo->fElevatedEngine), LoggingBoolToString(fRet));
