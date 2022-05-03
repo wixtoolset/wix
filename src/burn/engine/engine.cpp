@@ -33,7 +33,7 @@ static HRESULT RunEmbedded(
     __in BURN_ENGINE_STATE* pEngineState
     );
 static HRESULT RunRunOnce(
-    __in const BURN_REGISTRATION* pRegistration,
+    __in BURN_ENGINE_STATE* pEngineState,
     __in int nCmdShow
     );
 static HRESULT RunApplication(
@@ -221,7 +221,7 @@ extern "C" HRESULT EngineRun(
         break;
 
     case BURN_MODE_RUNONCE:
-        hr = RunRunOnce(&engineState.registration, nCmdShow);
+        hr = RunRunOnce(&engineState, nCmdShow);
         ExitOnFailure(hr, "Failed to run RunOnce mode.");
         break;
 
@@ -703,7 +703,7 @@ LExit:
 }
 
 static HRESULT RunRunOnce(
-    __in const BURN_REGISTRATION* pRegistration,
+    __in BURN_ENGINE_STATE* pEngineState,
     __in int nCmdShow
     )
 {
@@ -712,7 +712,11 @@ static HRESULT RunRunOnce(
     LPWSTR sczBurnPath = NULL;
     HANDLE hProcess = NULL;
 
-    hr = RegistrationGetResumeCommandLine(pRegistration, &sczNewCommandLine);
+    // Initialize logging.
+    hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
+    ExitOnFailure(hr, "Failed to open run once log.");
+
+    hr = RegistrationGetResumeCommandLine(&pEngineState->registration, &sczNewCommandLine);
     ExitOnFailure(hr, "Unable to get resume command line from the registry");
 
     // and re-launch

@@ -1753,13 +1753,16 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1))
             {
-                if (BURN_MODE_UNKNOWN != pInternalCommand->mode)
+                switch (pInternalCommand->mode)
                 {
+                case BURN_MODE_UNKNOWN: __fallthrough;
+                case BURN_MODE_NORMAL:
+                    pInternalCommand->mode = BURN_MODE_RUNONCE;
+                    break;
+                default:
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
-
-                pInternalCommand->mode = BURN_MODE_RUNONCE;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES), BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES)))
             {
