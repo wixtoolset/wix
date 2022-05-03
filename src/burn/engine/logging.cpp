@@ -39,7 +39,17 @@ extern "C" HRESULT LoggingOpen(
     HRESULT hr = S_OK;
     LPWSTR sczLoggingBaseFolder = NULL;
     LPWSTR sczPrefixFormatted = NULL;
-    LPCWSTR wzPostfix = BURN_MODE_UNTRUSTED == pInternalCommand->mode ? L".cleanroom" : NULL;
+    LPCWSTR wzPostfix = NULL;
+
+    switch (pInternalCommand->mode)
+    {
+    case BURN_MODE_UNTRUSTED:
+        wzPostfix = L".cleanroom";
+        break;
+    case BURN_MODE_RUNONCE:
+        wzPostfix = L".runonce";
+        break;
+    }
 
     hr = InitializeLogging(pLog, pInternalCommand);
     ExitOnFailure(hr, "Failed to initialize logging.");
