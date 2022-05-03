@@ -17,8 +17,7 @@ struct UITHREAD_CONTEXT
 struct UITHREAD_INFO
 {
     BOOL fElevatedEngine;
-    BURN_USER_EXPERIENCE* pUserExperience;
-    BOOL* pfCriticalShutdownInitiated;
+    BURN_ENGINE_STATE* pEngineState;
 };
 
 
@@ -132,8 +131,7 @@ static DWORD WINAPI ThreadProc(
     fRegistered = TRUE;
 
     info.fElevatedEngine = fElevatedEngine;
-    info.pUserExperience = &pEngineState->userExperience;
-    info.pfCriticalShutdownInitiated = &pEngineState->fCriticalShutdownInitiated;
+    info.pEngineState = pEngineState;
 
     // Create the window to handle reboots without activating it.
     hWnd = ::CreateWindowExW(WS_EX_NOACTIVATE, wc.lpszClassName, NULL, WS_POPUP, 0, 0, 0, 0, HWND_DESKTOP, NULL, pContext->hInstance, &info);
@@ -196,21 +194,17 @@ static LRESULT CALLBACK WndProc(
         {
         DWORD dwEndSession = static_cast<DWORD>(lParam);
         BOOL fCritical = ENDSESSION_CRITICAL & dwEndSession;
-        BOOL fCancel = TRUE;
+        BOOL fCancel = FALSE;
         BOOL fRet = FALSE;
 
-        // Always block shutdown in the elevated process, but ask the BA in the non-elevated.
+        // Always block shutdown during apply.
         UITHREAD_INFO* pInfo = reinterpret_cast<UITHREAD_INFO*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
-        if (!pInfo->fElevatedEngine)
+        if (pInfo->pEngineState->plan.fApplying)
         {
-            // TODO: instead of recommending canceling all non-critical shutdowns, maybe we should only recommend cancel
-            //       when the engine is doing work?
-            fCancel = !fCritical;
-            // TODO: There's a race condition here where the BA may not have been loaded, or already was unloaded.
-            UserExperienceOnSystemShutdown(pInfo->pUserExperience, dwEndSession, &fCancel);
+            fCancel = TRUE;
         }
 
-        *pInfo->pfCriticalShutdownInitiated |= fCritical;
+        pInfo->pEngineState->fCriticalShutdownInitiated |= fCritical;
 
         fRet = !fCancel;
         LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN, LoggingBoolToString(fCritical), LoggingBoolToString(pInfo->fElevatedEngine), LoggingBoolToString(fRet));

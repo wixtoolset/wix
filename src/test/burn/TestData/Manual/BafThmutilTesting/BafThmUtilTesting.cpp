@@ -88,6 +88,56 @@ public: // IBAFunctions
         return hr;
     }
 
+    virtual STDMETHODIMP WndProc(
+        __in HWND hWnd,
+        __in UINT uMsg,
+        __in WPARAM /*wParam*/,
+        __in LPARAM lParam,
+        __inout BOOL* pfProcessed,
+        __inout LRESULT* plResult
+        )
+    {
+        switch (uMsg)
+        {
+        case WM_QUERYENDSESSION:
+            if (BOOTSTRAPPER_DISPLAY_FULL <= m_command.display)
+            {
+                DWORD dwEndSession = static_cast<DWORD>(lParam);
+                if (ENDSESSION_CRITICAL & dwEndSession)
+                {
+                    // Return false to get the WM_ENDSESSION message so that critical shutdowns can be delayed.
+                    *plResult = FALSE;
+                    *pfProcessed = TRUE;
+                }
+            }
+            break;
+        case WM_ENDSESSION:
+            if (BOOTSTRAPPER_DISPLAY_FULL <= m_command.display)
+            {
+                ::MessageBoxW(hWnd, L"WM_ENDSESSION", L"BAFunctions WndProc", MB_OK);
+            }
+            break;
+        }
+        return S_OK;
+    }
+
+public: //IBootstrapperApplication
+    virtual STDMETHODIMP OnExecuteBegin(
+        __in DWORD /*cExecutingPackages*/,
+        __inout BOOL* pfCancel
+        )
+    {
+        if (BOOTSTRAPPER_DISPLAY_FULL <= m_command.display)
+        {
+            if (IDCANCEL == ::MessageBoxW(m_hwndParent, L"Shutdown requests should be denied right now.", L"OnExecuteBegin", MB_OKCANCEL))
+            {
+                *pfCancel = TRUE;
+            }
+        }
+
+        return S_OK;
+    }
+
 private:
     HRESULT OnShowTheme()
     {
@@ -137,6 +187,8 @@ private:
         POINT ptCursor = { };
 
         ThemeInitializeWindowClass(m_pBafTheme, &wc, CBafThmUtilTesting::TestingWndProc, m_hModule, BAFTHMUTILTESTING_WINDOW_CLASS);
+
+        Assert(wc.lpszClassName);
 
         // If the theme did not provide an icon, try using the icon from the bundle engine.
         if (!wc.hIcon)

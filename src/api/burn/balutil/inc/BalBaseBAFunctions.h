@@ -98,14 +98,6 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnSystemShutdown(
-        __in DWORD /*dwEndSession*/,
-        __inout BOOL* /*pfCancel*/
-        )
-    {
-        return S_OK;
-    }
-
     virtual STDMETHODIMP OnDetectBegin(
         __in BOOL /*fCached*/,
         __in BOOTSTRAPPER_REGISTRATION_TYPE /*registrationType*/,

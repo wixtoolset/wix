@@ -180,7 +180,8 @@ HRESULT ElevationChildPumpMessages(
     __out HANDLE* phLock,
     __out BOOL* pfDisabledAutomaticUpdates,
     __out DWORD* pdwChildExitCode,
-    __out BOOL* pfRestart
+    __out BOOL* pfRestart,
+    __out BOOL* pfApplying
     );
 HRESULT ElevationChildResumeAutomaticUpdates();
 

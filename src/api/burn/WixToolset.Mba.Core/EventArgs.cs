@@ -217,32 +217,6 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Event arguments for <see cref="IDefaultBootstrapperApplication.SystemShutdown"/>
-    /// </summary>
-    [Serializable]
-    public class SystemShutdownEventArgs : CancellableHResultEventArgs
-    {
-        /// <summary />
-        public SystemShutdownEventArgs(EndSessionReasons reasons, bool cancelRecommendation)
-            : base(cancelRecommendation)
-        {
-            this.Reasons = reasons;
-        }
-
-        /// <summary>
-        /// Gets the reason the application is requested to close or being closed.
-        /// </summary>
-        /// <remarks>
-        /// <para>To prevent shutting down or logging off, set <see cref="CancellableHResultEventArgs.Cancel"/> to
-        /// true; otherwise, set it to false.</para>
-        /// <para>If <see cref="SystemShutdownEventArgs.Reasons"/> contains <see cref="EndSessionReasons.Critical"/>
-        /// the bootstrapper cannot prevent the shutdown and only has a few seconds to save state or perform any other
-        /// critical operations before being closed by the operating system.</para>
-        /// </remarks>
-        public EndSessionReasons Reasons { get; private set; }
-    }
-
-    /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectBegin"/>
     /// </summary>
     [Serializable]

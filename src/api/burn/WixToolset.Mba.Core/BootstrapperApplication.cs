@@ -22,15 +22,12 @@ namespace WixToolset.Mba.Core
         /// </summary>
         protected readonly IEngine engine;
 
-        private bool applying;
-
         /// <summary>
         /// Creates a new instance of the <see cref="BootstrapperApplication"/> class.
         /// </summary>
         protected BootstrapperApplication(IEngine engine)
         {
             this.engine = engine;
-            this.applying = false;
             this.asyncExecution = true;
         }
 
@@ -39,9 +36,6 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<ShutdownEventArgs> Shutdown;
-
-        /// <inheritdoc/>
-        public event EventHandler<SystemShutdownEventArgs> SystemShutdown;
 
         /// <inheritdoc/>
         public event EventHandler<DetectBeginEventArgs> DetectBegin;
@@ -328,25 +322,6 @@ namespace WixToolset.Mba.Core
             if (null != handler)
             {
                 handler(this, args);
-            }
-        }
-
-        /// <summary>
-        /// Called by the engine, raises the <see cref="SystemShutdown"/> event.
-        /// </summary>
-        /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnSystemShutdown(SystemShutdownEventArgs args)
-        {
-            EventHandler<SystemShutdownEventArgs> handler = this.SystemShutdown;
-            if (null != handler)
-            {
-                handler(this, args);
-            }
-            else if (null != args)
-            {
-                // Allow requests to shut down when critical or not applying.
-                bool critical = EndSessionReasons.Critical == (EndSessionReasons.Critical & args.Reasons);
-                args.Cancel = !critical && this.applying;
             }
         }
 
@@ -1433,15 +1408,6 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnSystemShutdown(EndSessionReasons dwEndSession, ref bool fCancel)
-        {
-            SystemShutdownEventArgs args = new SystemShutdownEventArgs(dwEndSession, fCancel);
-            this.OnSystemShutdown(args);
-
-            fCancel = args.Cancel;
-            return args.HResult;
-        }
-
         int IBootstrapperApplication.OnDetectBegin(bool fCached, RegistrationType registrationType, int cPackages, ref bool fCancel)
         {
             DetectBeginEventArgs args = new DetectBeginEventArgs(fCached, registrationType, cPackages, fCancel);
@@ -1693,8 +1659,6 @@ namespace WixToolset.Mba.Core
 
         int IBootstrapperApplication.OnApplyBegin(int dwPhaseCount, ref bool fCancel)
         {
-            this.applying = true;
-
             ApplyBeginEventArgs args = new ApplyBeginEventArgs(dwPhaseCount, fCancel);
             this.OnApplyBegin(args);
 
@@ -1948,8 +1912,6 @@ namespace WixToolset.Mba.Core
         {
             ApplyCompleteEventArgs args = new ApplyCompleteEventArgs(hrStatus, restart, recommendation, pAction);
             this.OnApplyComplete(args);
-
-            this.applying = false;
 
             pAction = args.Action;
             return args.HResult;

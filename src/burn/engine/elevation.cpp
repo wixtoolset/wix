@@ -94,6 +94,7 @@ typedef struct _BURN_ELEVATION_CHILD_MESSAGE_CONTEXT
     HANDLE hPipe;
     HANDLE* phLock;
     BOOL* pfDisabledAutomaticUpdates;
+    BOOL* pfApplying;
     BURN_APPROVED_EXES* pApprovedExes;
     BURN_CACHE* pCache;
     BURN_CONTAINERS* pContainers;
@@ -176,6 +177,7 @@ static HRESULT OnApplyInitialize(
     __in BURN_PACKAGES* pPackages,
     __in HANDLE* phLock,
     __in BOOL* pfDisabledWindowsUpdate,
+    __in BOOL* pfApplying,
     __in BYTE* pbData,
     __in SIZE_T cbData
     );
@@ -185,7 +187,8 @@ static HRESULT ElevatedProcessDetect(
     __in BURN_PACKAGES* pPackages
     );
 static HRESULT OnApplyUninitialize(
-    __in HANDLE* phLock
+    __in HANDLE* phLock,
+    __in BOOL* pfApplying
     );
 static HRESULT OnSessionBegin(
     __in BURN_CACHE* pCache,
@@ -1538,7 +1541,8 @@ extern "C" HRESULT ElevationChildPumpMessages(
     __out HANDLE* phLock,
     __out BOOL* pfDisabledAutomaticUpdates,
     __out DWORD* pdwChildExitCode,
-    __out BOOL* pfRestart
+    __out BOOL* pfRestart,
+    __out BOOL* pfApplying
     )
 {
     HRESULT hr = S_OK;
@@ -1561,6 +1565,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
     context.hPipe = hPipe;
     context.phLock = phLock;
     context.pfDisabledAutomaticUpdates = pfDisabledAutomaticUpdates;
+    context.pfApplying = pfApplying;
     context.pApprovedExes = pApprovedExes;
     context.pCache = pCache;
     context.pContainers = pContainers;
@@ -2114,11 +2119,11 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE:
-        hrResult = OnApplyInitialize(pContext->hPipe, pContext->pVariables, pContext->pRegistration, pContext->pPackages, pContext->phLock, pContext->pfDisabledAutomaticUpdates, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnApplyInitialize(pContext->hPipe, pContext->pVariables, pContext->pRegistration, pContext->pPackages, pContext->phLock, pContext->pfDisabledAutomaticUpdates, pContext->pfApplying, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE:
-        hrResult = OnApplyUninitialize(pContext->phLock);
+        hrResult = OnApplyUninitialize(pContext->phLock, pContext->pfApplying);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN:
@@ -2267,6 +2272,7 @@ static HRESULT OnApplyInitialize(
     __in BURN_PACKAGES* pPackages,
     __in HANDLE* phLock,
     __in BOOL* pfDisabledWindowsUpdate,
+    __in BOOL* pfApplying,
     __in BYTE* pbData,
     __in SIZE_T cbData
     )
@@ -2295,6 +2301,8 @@ static HRESULT OnApplyInitialize(
     // Initialize.
     hr = ApplyLock(TRUE, phLock);
     ExitOnFailure(hr, "Failed to acquire lock due to setup in other session.");
+
+    *pfApplying = TRUE;
 
     // Detect.
     hr = ElevatedProcessDetect(pRegistration, pVariables, pPackages);
@@ -2419,12 +2427,15 @@ LExit:
 }
 
 static HRESULT OnApplyUninitialize(
-    __in HANDLE* phLock
+    __in HANDLE* phLock,
+    __in BOOL* pfApplying
     )
 {
     Assert(phLock);
 
     // TODO: end system restore point.
+
+    *pfApplying = FALSE;
 
     if (*phLock)
     {

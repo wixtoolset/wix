@@ -33,12 +33,6 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOTSTRAPPER_SHUTDOWN_ACTION* pAction
         ) = 0;
 
-    // OnSystemShutdown - called when the operating system is instructed to shutdown the machine.
-    STDMETHOD(OnSystemShutdown)(
-        __in DWORD dwEndSession,
-        __inout BOOL* pfCancel
-        ) = 0;
-
     // OnDetectBegin - called when the engine begins detection.
     STDMETHOD(OnDetectBegin)(
         __in BOOL fCached,

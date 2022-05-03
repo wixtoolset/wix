@@ -2631,31 +2631,6 @@ LExit:
     return hr;
 }
 
-EXTERN_C BAAPI UserExperienceOnSystemShutdown(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in DWORD dwEndSession,
-    __inout BOOL* pfCancel
-    )
-{
-    HRESULT hr = S_OK;
-    BA_ONSYSTEMSHUTDOWN_ARGS args = { };
-    BA_ONSYSTEMSHUTDOWN_RESULTS results = { };
-
-    args.cbSize = sizeof(args);
-    args.dwEndSession = dwEndSession;
-
-    results.cbSize = sizeof(results);
-    results.fCancel = *pfCancel;
-
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMSHUTDOWN, &args, &results);
-    ExitOnFailure(hr, "BA OnSystemShutdown failed.");
-    
-    *pfCancel = results.fCancel;
-
-LExit:
-    return hr;
-}
-
 EXTERN_C BAAPI UserExperienceOnUnregisterBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType

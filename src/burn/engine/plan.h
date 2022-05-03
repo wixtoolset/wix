@@ -264,6 +264,7 @@ typedef struct _BURN_PLAN
     LPWSTR sczLayoutDirectory;
     BOOL fPlanPackageCacheRollback;
     BOOL fDowngrade;
+    BOOL fApplying;
 
     DWORD64 qwCacheSizeTotal;
 

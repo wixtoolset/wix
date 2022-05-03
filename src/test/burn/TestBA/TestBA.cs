@@ -531,15 +531,6 @@ namespace WixToolset.Test.BA
             this.ShutdownUiThread();
         }
 
-        protected override void OnSystemShutdown(SystemShutdownEventArgs args)
-        {
-            // Always prevent shutdown.
-            this.Log("Disallowed system request to shut down the bootstrapper application.");
-            args.Cancel = true;
-
-            this.ShutdownUiThread();
-        }
-
         protected override void OnUnregisterBegin(UnregisterBeginEventArgs args)
         {
             if (this.forceKeepRegistration && args.RegistrationType == RegistrationType.None)

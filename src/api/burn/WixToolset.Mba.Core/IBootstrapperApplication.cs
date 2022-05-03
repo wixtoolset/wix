@@ -51,19 +51,6 @@ namespace WixToolset.Mba.Core
         int OnShutdown(ref BOOTSTRAPPER_SHUTDOWN_ACTION action);
 
         /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.SystemShutdown"/>.
-        /// </summary>
-        /// <param name="dwEndSession"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
-        [PreserveSig]
-        [return: MarshalAs(UnmanagedType.I4)]
-        int OnSystemShutdown(
-            [MarshalAs(UnmanagedType.U4)] EndSessionReasons dwEndSession,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
-            );
-
-        /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectBegin"/>.
         /// </summary>
         [PreserveSig]
