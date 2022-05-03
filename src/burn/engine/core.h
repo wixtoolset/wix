@@ -159,7 +159,9 @@ typedef struct _BURN_ENGINE_STATE
     BURN_PIPE_CONNECTION companionConnection;
     BURN_PIPE_CONNECTION embeddedConnection;
 
+    BOOL fCriticalShutdownInitiated;
     BURN_RESUME_MODE resumeMode;
+    LPCWSTR wzRestartInitiatedPackageId;
 
     BURN_ENGINE_COMMAND internalCommand;
 } BURN_ENGINE_STATE;

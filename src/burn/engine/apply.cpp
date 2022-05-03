@@ -329,8 +329,7 @@ static HRESULT ReportOverallProgressTicks(
     __in BURN_APPLY_CONTEXT* pApplyContext
     );
 static HRESULT ExecutePackageComplete(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_VARIABLES* pVariables,
+    __in BURN_ENGINE_STATE* pEngineState,
     __in LPCWSTR wzPackageId,
     __in BOOL fPackageVital,
     __in BOOL fAbandonedProcess,
@@ -2400,8 +2399,6 @@ static HRESULT DoExecuteAction(
             ExitOnFailure(hr, "Failed to execute dependency action.");
             break;
 
-            break;
-
         case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START: __fallthrough;
         case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_END:
             *ppCheckpoint = NULL;
@@ -2653,7 +2650,7 @@ LExit:
     if (fBeginCalled)
     {
         pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2778,7 +2775,7 @@ LExit:
     if (fBeginCalled)
     {
         pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2858,7 +2855,7 @@ LExit:
     if (fBeginCalled)
     {
         pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2923,7 +2920,7 @@ LExit:
     if (fBeginCalled)
     {
         Assert(!pContext->fAbandonedProcess);
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pPackage->sczId, pPackage->fVital, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2997,7 +2994,7 @@ LExit:
     if (fBeginCalled)
     {
         Assert(!pContext->fAbandonedProcess);
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pPackage->sczId, pPackage->fVital, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -3078,7 +3075,7 @@ LExit:
     if (fBeginCalled)
     {
         pPackage->fAbandonedProcess = pContext->fAbandonedProcess;
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pPackage->sczId, pPackage->fVital, pPackage->fAbandonedProcess, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -3398,7 +3395,7 @@ LExit:
     if (fBeginCalled)
     {
         Assert(!pContext->fAbandonedProcess);
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pContext->wzExecutingPackageId, FALSE, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(pEngineState, pContext->wzExecutingPackageId, FALSE, FALSE, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -3574,8 +3571,7 @@ static HRESULT ReportOverallProgressTicks(
 }
 
 static HRESULT ExecutePackageComplete(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_VARIABLES* pVariables,
+    __in BURN_ENGINE_STATE* pEngineState,
     __in LPCWSTR wzPackageId,
     __in BOOL fPackageVital,
     __in BOOL fAbandonedProcess,
@@ -3589,6 +3585,13 @@ static HRESULT ExecutePackageComplete(
 {
     HRESULT hr = FAILED(hrOverall) ? hrOverall : hrExecute; // if the overall function failed use that otherwise use the execution result.
     BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION executePackageCompleteAction = FAILED(hrOverall) || SUCCEEDED(hrExecute) || fPackageVital ? BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_IGNORE;
+    BURN_USER_EXPERIENCE* pUX = &pEngineState->userExperience;
+    BURN_VARIABLES* pVariables = &pEngineState->variables;
+
+    if (pEngineState->fCriticalShutdownInitiated)
+    {
+        *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
+    }
 
     // Send package execute complete to BA.
     UserExperienceOnExecutePackageComplete(pUX, wzPackageId, hr, *pRestart, &executePackageCompleteAction);
@@ -3596,12 +3599,15 @@ static HRESULT ExecutePackageComplete(
     {
         *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
     }
-    *pfRetry = (FAILED(hrExecute) && BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RETRY == executePackageCompleteAction && !fAbandonedProcess); // allow retry only on failures.
+    *pfRetry = (BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RETRY == executePackageCompleteAction &&
+                FAILED(hrExecute) && !fAbandonedProcess && BOOTSTRAPPER_APPLY_RESTART_INITIATED != *pRestart); // allow retry only on non-fatal failures.
     *pfSuspend = (BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_SUSPEND == executePackageCompleteAction);
 
     // Remember this package as the package that initiated the forced restart.
-    if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart)
+    if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart && !pEngineState->wzRestartInitiatedPackageId)
     {
+        pEngineState->wzRestartInitiatedPackageId = wzPackageId;
+
         // Best effort to set the forced restart package variable.
         VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, wzPackageId, TRUE, FALSE);
     }
