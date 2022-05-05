@@ -180,7 +180,7 @@ namespace WixToolset.Core.Burn
                 {
                     case WixBundlePackageType.Bundle:
                     {
-                        var command = new ProcessBundlePackageCommand(this.ServiceProvider, section, facade, packagesPayloads[facade.PackageId], this.IntermediateFolder);
+                        var command = new ProcessBundlePackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, packagesPayloads[facade.PackageId], this.IntermediateFolder);
                         command.Execute();
 
                         trackedFiles.AddRange(command.TrackedFiles);

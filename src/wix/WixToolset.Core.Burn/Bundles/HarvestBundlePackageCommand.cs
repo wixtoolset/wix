@@ -5,35 +5,47 @@ namespace WixToolset.Core.Burn.Bundles
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Text;
+    using System.Linq;
     using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class HarvestBundlePackageCommand
     {
-        public HarvestBundlePackageCommand(IServiceProvider serviceProvider, string intermediateFolder, WixBundlePayloadSymbol payloadSymbol)
+        public HarvestBundlePackageCommand(IServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, string intermediateFolder, WixBundlePayloadSymbol payloadSymbol, WixBundleBundlePackagePayloadSymbol packagePayloadSymbol, Dictionary<string, WixBundlePayloadSymbol> packagePayloadsById)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
+            this.BackendExtensions = backendExtensions;
             this.IntermediateFolder = intermediateFolder;
 
             this.PackagePayload = payloadSymbol;
+            this.BundlePackagePayload = packagePayloadSymbol;
+            this.PackagePayloadsById = packagePayloadsById;
         }
 
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
 
+        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
+
         private string IntermediateFolder { get; }
 
         private WixBundlePayloadSymbol PackagePayload { get; }
 
+        private WixBundleBundlePackagePayloadSymbol BundlePackagePayload { get; }
+
+        private Dictionary<string, WixBundlePayloadSymbol> PackagePayloadsById { get; }
+
         public WixBundleHarvestedBundlePackageSymbol HarvestedBundlePackage { get; private set; }
 
         public WixBundleHarvestedDependencyProviderSymbol HarvestedDependencyProvider { get; private set; }
+
+        public List<WixBundlePayloadSymbol> Payloads { get; } = new List<WixBundlePayloadSymbol>();
 
         public List<WixBundlePackageRelatedBundleSymbol> RelatedBundles { get; } = new List<WixBundlePackageRelatedBundleSymbol>();
 
@@ -114,9 +126,9 @@ namespace WixToolset.Core.Burn.Bundles
 
                     installSize = this.ProcessPackages(document, namespaceManager);
 
-                    this.ProcessRelatedBundles(document, namespaceManager, sourcePath);
+                    this.ProcessPayloads(document, namespaceManager, this.BundlePackagePayload.PayloadGeneration);
 
-                    // TODO: Add payloads?
+                    this.ProcessRelatedBundles(document, namespaceManager, sourcePath);
                 }
                 catch (Exception e)
                 {
@@ -221,6 +233,158 @@ namespace WixToolset.Core.Burn.Bundles
             return packageInstallSize;
         }
 
+        private void ProcessPayloads(XmlDocument document, XmlNamespaceManager namespaceManager, BundlePackagePayloadGenerationType payloadGenerationType)
+        {
+            if (payloadGenerationType == BundlePackagePayloadGenerationType.None)
+            {
+                return;
+            }
+
+            var payloadNames = new HashSet<string>(this.PackagePayloadsById.Values.Select(p => p.Name), StringComparer.OrdinalIgnoreCase);
+
+            var containersById = new Dictionary<string, ManifestContainer>();
+
+            foreach (XmlElement containerElement in document.SelectNodes("/burn:BurnManifest/burn:Container", namespaceManager))
+            {
+                var container = new ManifestContainer();
+                container.Attached = containerElement.GetAttribute("Attached") == "yes";
+                container.DownloadUrl = containerElement.GetAttribute("DownloadUrl");
+                container.FilePath = containerElement.GetAttribute("FilePath");
+                container.Id = containerElement.GetAttribute("Id");
+                containersById.Add(container.Id, container);
+
+                if (container.Attached)
+                {
+                    continue;
+                }
+
+                switch (payloadGenerationType)
+                {
+                    case BundlePackagePayloadGenerationType.ExternalWithoutDownloadUrl:
+                        if (!String.IsNullOrEmpty(container.DownloadUrl))
+                        {
+                            continue;
+                        }
+                        break;
+                }
+
+                // If we didn't find the Payload as an existing child of the package, we need to
+                // add it.  We expect the file to exist on-disk in the same relative location as
+                // the bundle expects to find it...
+                container.IncludedAsPayload = true;
+                var containerName = container.FilePath;
+                var containerFullName = Path.Combine(Path.GetDirectoryName(this.PackagePayload.Name), containerName);
+
+                if (!payloadNames.Contains(containerFullName))
+                {
+                    var generatedId = this.BackendHelper.GenerateIdentifier("hcp", this.PackagePayload.Id.Id, containerName);
+                    var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, containerName, "Container", this.PackagePayload.SourceLineNumbers);
+
+                    this.Payloads.Add(new WixBundlePayloadSymbol(this.PackagePayload.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
+                    {
+                        Name = containerFullName,
+                        SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
+                        Compressed = this.PackagePayload.Compressed,
+                        UnresolvedSourceFile = containerFullName,
+                        ContainerRef = this.PackagePayload.ContainerRef,
+                        DownloadUrl = this.PackagePayload.DownloadUrl,
+                        Packaging = this.PackagePayload.Packaging,
+                        ParentPackagePayloadRef = this.PackagePayload.Id.Id,
+                    });
+                }
+            }
+
+            foreach (XmlElement payloadElement in document.SelectNodes("/burn:BurnManifest/burn:Payload", namespaceManager))
+            {
+                var payload = new ManifestPayload();
+                payload.Container = payloadElement.GetAttribute("Container");
+                payload.DownloadUrl = payloadElement.GetAttribute("DownloadUrl");
+                payload.FilePath = payloadElement.GetAttribute("FilePath");
+                payload.Id = payloadElement.GetAttribute("Id");
+
+                if (payload.Container == null || !containersById.TryGetValue(payload.Container, out var container))
+                {
+                    container = null;
+                }
+
+                if (container != null && container.IncludedAsPayload)
+                {
+                    // Don't include payload if it's in a container that's already included.
+                    continue;
+                }
+
+                switch (payloadGenerationType)
+                {
+                    case BundlePackagePayloadGenerationType.ExternalWithoutDownloadUrl:
+                        if (container != null || !String.IsNullOrEmpty(payload.DownloadUrl))
+                        {
+                            continue;
+                        }
+                        break;
+                    case BundlePackagePayloadGenerationType.External:
+                        if (container != null)
+                        {
+                            continue;
+                        }
+                        break;
+                }
+
+                // If we didn't find the Payload as an existing child of the package, we need to
+                // add it.  We expect the file to exist on-disk in the same relative location as
+                // the bundle expects to find it...
+                var payloadName = payload.FilePath;
+                var payloadFullName = Path.Combine(Path.GetDirectoryName(this.PackagePayload.Name), payloadName);
+
+                if (!payloadNames.Contains(payloadFullName))
+                {
+                    var generatedId = this.BackendHelper.GenerateIdentifier("hpp", this.PackagePayload.Id.Id, payloadName);
+                    var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, payloadName, "Payload", this.PackagePayload.SourceLineNumbers);
+
+                    this.Payloads.Add(new WixBundlePayloadSymbol(this.PackagePayload.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
+                    {
+                        Name = payloadFullName,
+                        SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
+                        Compressed = this.PackagePayload.Compressed,
+                        UnresolvedSourceFile = payloadFullName,
+                        ContainerRef = this.PackagePayload.ContainerRef,
+                        DownloadUrl = this.PackagePayload.DownloadUrl,
+                        Packaging = this.PackagePayload.Packaging,
+                        ParentPackagePayloadRef = this.PackagePayload.Id.Id,
+                    });
+                }
+            }
+        }
+
+        private string ResolveRelatedFile(string resolvedSource, string unresolvedSource, string relatedSource, string type, SourceLineNumber sourceLineNumbers)
+        {
+            var checkedPaths = new List<string>();
+
+            foreach (var extension in this.BackendExtensions)
+            {
+                var resolved = extension.ResolveRelatedFile(unresolvedSource, relatedSource, type, sourceLineNumbers);
+
+                if (resolved?.CheckedPaths != null)
+                {
+                    checkedPaths.AddRange(resolved.CheckedPaths);
+                }
+
+                if (!String.IsNullOrEmpty(resolved?.Path))
+                {
+                    return resolved?.Path;
+                }
+            }
+
+            var resolvedPath = Path.Combine(Path.GetDirectoryName(resolvedSource), relatedSource);
+
+            if (!File.Exists(resolvedPath))
+            {
+                checkedPaths.Add(resolvedPath);
+                this.Messaging.Write(ErrorMessages.FileNotFound(sourceLineNumbers, resolvedPath, type, checkedPaths));
+            }
+
+            return resolvedPath;
+        }
+
         private void ProcessRelatedBundles(XmlDocument document, XmlNamespaceManager namespaceManager, string sourcePath)
         {
             var sourceLineNumbers = this.PackagePayload.SourceLineNumbers;
@@ -243,6 +407,24 @@ namespace WixToolset.Core.Burn.Bundles
                     Action = action,
                 });
             }
+        }
+
+        private class ManifestContainer
+        {
+            public bool Attached { get; set; }
+            public string DownloadUrl { get; set; }
+            public string FilePath { get; set; }
+            public string Id { get; set; }
+
+            public bool IncludedAsPayload { get; set; }
+        }
+
+        private class ManifestPayload
+        {
+            public string Container { get; set; }
+            public string DownloadUrl { get; set; }
+            public string FilePath { get; set; }
+            public string Id { get; set; }
         }
     }
 }

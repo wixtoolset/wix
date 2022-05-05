@@ -67,6 +67,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(folder, "BundlePackage", "BundlePackage.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", binFolder,
                     "-intermediateFolder", parentIntermediateFolder,
@@ -105,6 +106,7 @@ namespace WixToolsetTest.CoreIntegration
                     "<Provides Key='MyProviderKey,v1.0' Version='1.0.0.0' DisplayName='BurnBundle' Imported='yes' />" +
                     "<RelatedBundle Id='{B94478B1-E1F3-4700-9CE8-6AA090854AEC}' Action='Upgrade' />" +
                     "<PayloadRef Id='chain.exe' />" +
+                    "<PayloadRef Id='payP6wZpeHEAZbDUQPEKeCpQ_9bN.4' />" +
                     "</BundlePackage>",
                 }, bundlePackages);
 
@@ -129,7 +131,7 @@ namespace WixToolsetTest.CoreIntegration
                                                    .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<WixPackageProperties Package='chain.exe' Vital='yes' DisplayName='BurnBundle' Description='BurnBundle' DownloadSize='*' PackageSize='*' InstalledSize='34' PackageType='Bundle' Permanent='yes' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' Compressed='yes' Version='1.0.0.0' Cache='keep' />",
+                    "<WixPackageProperties Package='chain.exe' Vital='yes' DisplayName='BurnBundle' Description='BurnBundle' DownloadSize='*' PackageSize='*' InstalledSize='34' PackageType='Bundle' Permanent='yes' LogPathVariable='WixBundleLog_chain.exe' RollbackLogPathVariable='WixBundleRollbackLog_chain.exe' Compressed='no' Version='1.0.0.0' Cache='keep' />",
                 }, packageElements);
 
                 // grandparent.exe
@@ -177,6 +179,20 @@ namespace WixToolsetTest.CoreIntegration
                     "<PayloadRef Id='parent.exe' />" +
                     "</BundlePackage>",
                 }, bundlePackages);
+
+                ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "Payload", new List<string> { "FileSize", "Hash" } },
+                };
+                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                            .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Payload Id='payP6wZpeHEAZbDUQPEKeCpQ_9bN.4' FilePath='signed_cab1.cab' FileSize='*' Hash='*' Packaging='external' SourcePath='signed_cab1.cab' />",
+                    "<Payload Id='chain.exe' FilePath='chain.exe' FileSize='*' Hash='*' Packaging='external' SourcePath='chain.exe' />",
+                }, payloads);
 
                 registrations = grandparentExtractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration")
                                                         .Cast<XmlElement>()

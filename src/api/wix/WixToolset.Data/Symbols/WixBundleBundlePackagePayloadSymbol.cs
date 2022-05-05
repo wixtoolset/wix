@@ -10,6 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundleBundlePackagePayload,
             new IntermediateFieldDefinition[]
             {
+                new IntermediateFieldDefinition(nameof(WixBundleBundlePackagePayloadSymbolFields.PayloadGeneration), IntermediateFieldType.Number),
             },
             typeof(WixBundleBundlePackagePayloadSymbol));
     }
@@ -19,6 +20,15 @@ namespace WixToolset.Data.Symbols
 {
     public enum WixBundleBundlePackagePayloadSymbolFields
     {
+        PayloadGeneration,
+    }
+
+    public enum BundlePackagePayloadGenerationType
+    {
+        None,
+        ExternalWithoutDownloadUrl,
+        External,
+        All,
     }
 
     public class WixBundleBundlePackagePayloadSymbol : IntermediateSymbol
@@ -32,5 +42,11 @@ namespace WixToolset.Data.Symbols
         }
 
         public IntermediateField this[WixBundleBundlePackagePayloadSymbolFields index] => this.Fields[(int)index];
+
+        public BundlePackagePayloadGenerationType PayloadGeneration
+        {
+            get => (BundlePackagePayloadGenerationType)this.Fields[(int)WixBundleBundlePackagePayloadSymbolFields.PayloadGeneration].AsNumber();
+            set => this.Set((int)WixBundleBundlePackagePayloadSymbolFields.PayloadGeneration, (int)value);
+        }
     }
 }
