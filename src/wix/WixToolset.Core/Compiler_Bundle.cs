@@ -1555,12 +1555,8 @@ namespace WixToolset.Core
 
                     if (packageType.HasValue)
                     {
-                        var compilerPayload = this.ParsePackagePayloadElement(null, child, packageType.Value, null);
-                        var payloadSymbol = compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.PayloadGroup, id?.Id);
-                        if (payloadSymbol != null)
-                        {
-                            this.CreatePackagePayloadSymbol(payloadSymbol.SourceLineNumbers, packageType.Value, payloadSymbol.Id, ComplexReferenceParentType.PayloadGroup, id);
-                        }
+                        var compilerPackagePayload = this.ParsePackagePayloadElement(null, child, packageType.Value, null);
+                        compilerPackagePayload.CreatePackagePayloadSymbol(ComplexReferenceParentType.PayloadGroup, id?.Id);
                     }
                 }
                 else
@@ -2030,7 +2026,7 @@ namespace WixToolset.Core
             string msuKB = null;
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
-            CompilerPayload childPackageCompilerPayload = null;
+            CompilerPackagePayload childCompilerPackagePayload = null;
             var bundle = YesNoType.NotSet;
             var slipstream = YesNoType.NotSet;
             var hasPayloadInfo = false;
@@ -2192,7 +2188,7 @@ namespace WixToolset.Core
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
 
-                if (childPackageCompilerPayload != null)
+                if (childCompilerPackagePayload != null)
                 {
                     this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                 }
@@ -2201,12 +2197,12 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "SourceFile", "Name", "DownloadUrl", "Compressed"));
                 }
 
-                childPackageCompilerPayload = this.ParsePackagePayloadElement(childSourceLineNumbers, child, packageType, compilerPayload.Id);
+                childCompilerPackagePayload = this.ParsePackagePayloadElement(childSourceLineNumbers, child, packageType, compilerPayload.Id);
             }
 
-            if (compilerPayload.Id == null && childPackageCompilerPayload != null)
+            if (compilerPayload.Id == null && childCompilerPackagePayload != null)
             {
-                compilerPayload.Id = childPackageCompilerPayload.Id;
+                compilerPayload.Id = childCompilerPackagePayload.CompilerPayload.Id;
             }
 
             compilerPayload.FinishCompilingPackage();
@@ -2427,13 +2423,8 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var packageCompilerPayload = childPackageCompilerPayload ?? (hasPayloadInfo ? compilerPayload : null);
-                if (packageCompilerPayload != null)
-                {
-                    var payload = packageCompilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Package, id.Id);
-
-                    this.CreatePackagePayloadSymbol(sourceLineNumbers, packageType, payload.Id, ComplexReferenceParentType.Package, id);
-                }
+                var compilerPackagePayload = childCompilerPackagePayload ?? (hasPayloadInfo ? new CompilerPackagePayload(compilerPayload, packageType) : null);
+                compilerPackagePayload?.CreatePackagePayloadSymbol(ComplexReferenceParentType.Package, id.Id);
 
                 this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
@@ -2536,35 +2527,7 @@ namespace WixToolset.Core
             return id.Id;
         }
 
-        private void CreatePackagePayloadSymbol(SourceLineNumber sourceLineNumbers, WixBundlePackageType packageType, Identifier payloadId, ComplexReferenceParentType parentType, Identifier parentId)
-        {
-            switch (packageType)
-            {
-                case WixBundlePackageType.Bundle:
-                    this.Core.AddSymbol(new WixBundleBundlePackagePayloadSymbol(sourceLineNumbers, payloadId));
-                    break;
-
-                case WixBundlePackageType.Exe:
-                    this.Core.AddSymbol(new WixBundleExePackagePayloadSymbol(sourceLineNumbers, payloadId));
-                    break;
-
-                case WixBundlePackageType.Msi:
-                    this.Core.AddSymbol(new WixBundleMsiPackagePayloadSymbol(sourceLineNumbers, payloadId));
-                    break;
-
-                case WixBundlePackageType.Msp:
-                    this.Core.AddSymbol(new WixBundleMspPackagePayloadSymbol(sourceLineNumbers, payloadId));
-                    break;
-
-                case WixBundlePackageType.Msu:
-                    this.Core.AddSymbol(new WixBundleMsuPackagePayloadSymbol(sourceLineNumbers, payloadId));
-                    break;
-            }
-
-            this.Core.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PackagePayload, payloadId?.Id, ComplexReferenceChildType.Unknown, null);
-        }
-
-        private CompilerPayload ParsePackagePayloadElement(SourceLineNumber sourceLineNumbers, XElement node, WixBundlePackageType packageType, Identifier defaultId)
+        private CompilerPackagePayload ParsePackagePayloadElement(SourceLineNumber sourceLineNumbers, XElement node, WixBundlePackageType packageType, Identifier defaultId)
         {
             sourceLineNumbers = sourceLineNumbers ?? Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
@@ -2572,6 +2535,7 @@ namespace WixToolset.Core
                 Id = defaultId,
                 IsRemoteAllowed = packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu,
             };
+            var compilerPackagePayload = new CompilerPackagePayload(compilerPayload, packageType);
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
@@ -2626,6 +2590,9 @@ namespace WixToolset.Core
                             {
                                 compilerPayload.ParseHash(attrib);
                             }
+                            break;
+                        case "PayloadGeneration":
+                            allowed = compilerPackagePayload.ParsePayloadGeneration(attrib);
                             break;
                         case "ProductName":
                             allowed = compilerPayload.IsRemoteAllowed;
@@ -2691,11 +2658,18 @@ namespace WixToolset.Core
 
                             if (allowed)
                             {
+                                if (compilerPackagePayload.PayloadGenerationType.HasValue)
+                                {
+                                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                    this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(childSourceLineNumbers, node.Name.LocalName, "RemoteBundle", "PayloadGeneration"));
+                                }
+
                                 if (remoteBundleSeen)
                                 {
                                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
                                     this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "RemoteBundle"));
                                 }
+
                                 this.ParseRemoteBundleElement(child, compilerPayload.Id.Id);
                                 remoteBundleSeen = true;
                             }
@@ -2723,7 +2697,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "RemoteBundle"));
             }
 
-            return compilerPayload;
+            return compilerPackagePayload;
         }
 
         private void ParseRemoteBundleElement(XElement node, string packagePayloadId)

@@ -8,12 +8,13 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class PackageFacade
     {
-        public PackageFacade(WixBundlePackageSymbol packageSymbol, IntermediateSymbol specificPackageSymbol)
+        public PackageFacade(WixBundlePackageSymbol packageSymbol, IntermediateSymbol specificPackageSymbol, IntermediateSymbol specificPackagePayloadSymbol)
         {
             Debug.Assert(packageSymbol.Id.Id == specificPackageSymbol.Id.Id);
 
             this.PackageSymbol = packageSymbol;
             this.SpecificPackageSymbol = specificPackageSymbol;
+            this.SpecificPackagePayloadSymbol = specificPackagePayloadSymbol;
         }
 
         public string PackageId => this.PackageSymbol.Id.Id;
@@ -21,5 +22,7 @@ namespace WixToolset.Core.Burn.Bundles
         public WixBundlePackageSymbol PackageSymbol { get; }
 
         public IntermediateSymbol SpecificPackageSymbol { get; }
+
+        public IntermediateSymbol SpecificPackagePayloadSymbol { get; }
     }
 }

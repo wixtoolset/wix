@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.Burn.Bundles
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
@@ -147,7 +148,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Bundle:
                         if (bundlePackages.TryGetValue(id, out var bundlePackage))
                         {
-                            facades.Add(new PackageFacade(package, bundlePackage));
+                            facades.Add(new PackageFacade(package, bundlePackage, packagePayload));
                         }
                         else
                         {
@@ -158,7 +159,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Exe:
                         if (exePackages.TryGetValue(id, out var exePackage))
                         {
-                            facades.Add(new PackageFacade(package, exePackage));
+                            facades.Add(new PackageFacade(package, exePackage, packagePayload));
                         }
                         else
                         {
@@ -169,7 +170,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Msi:
                         if (msiPackages.TryGetValue(id, out var msiPackage))
                         {
-                            facades.Add(new PackageFacade(package, msiPackage));
+                            facades.Add(new PackageFacade(package, msiPackage, packagePayload));
                         }
                         else
                         {
@@ -180,7 +181,7 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Msp:
                         if (mspPackages.TryGetValue(id, out var mspPackage))
                         {
-                            facades.Add(new PackageFacade(package, mspPackage));
+                            facades.Add(new PackageFacade(package, mspPackage, packagePayload));
                         }
                         else
                         {
@@ -191,13 +192,16 @@ namespace WixToolset.Core.Burn.Bundles
                     case WixBundlePackageType.Msu:
                         if (msuPackages.TryGetValue(id, out var msuPackage))
                         {
-                            facades.Add(new PackageFacade(package, msuPackage));
+                            facades.Add(new PackageFacade(package, msuPackage, packagePayload));
                         }
                         else
                         {
                             this.Messaging.Write(ErrorMessages.IdentifierNotFound("WixBundleMsuPackage", id));
                         }
                         break;
+
+                    default:
+                        throw new NotImplementedException();
                 }
             }
 

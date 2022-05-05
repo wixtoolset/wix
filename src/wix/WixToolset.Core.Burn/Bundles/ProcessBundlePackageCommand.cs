@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -15,16 +16,18 @@ namespace WixToolset.Core.Burn.Bundles
     /// </summary>
     internal class ProcessBundlePackageCommand
     {
-        public ProcessBundlePackageCommand(IServiceProvider serviceProvider, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> packagePayloads, string intermediateFolder)
+        public ProcessBundlePackageCommand(IServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> packagePayloads, string intermediateFolder)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.BackendExtensions = backendExtensions;
             this.PackagePayloads = packagePayloads;
             this.Section = section;
             this.IntermediateFolder = intermediateFolder;
 
             this.ChainPackage = facade.PackageSymbol;
             this.BundlePackage = (WixBundleBundlePackageSymbol)facade.SpecificPackageSymbol;
+            this.BundlePackagePayload = (WixBundleBundlePackagePayloadSymbol)facade.SpecificPackagePayloadSymbol;
             this.PackagePayload = packagePayloads[this.ChainPackage.PayloadRef];
         }
 
@@ -32,11 +35,15 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IMessaging Messaging { get; }
 
+        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
+
         private Dictionary<string, WixBundlePayloadSymbol> PackagePayloads { get; }
 
         private WixBundlePackageSymbol ChainPackage { get; }
 
         private WixBundleBundlePackageSymbol BundlePackage { get; }
+
+        private WixBundleBundlePackagePayloadSymbol BundlePackagePayload { get; }
 
         private string PackageId => this.ChainPackage.Id.Id;
 
@@ -100,7 +107,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private WixBundleHarvestedBundlePackageSymbol HarvestPackage()
         {
-            var command = new HarvestBundlePackageCommand(this.ServiceProvider, this.IntermediateFolder, this.PackagePayload);
+            var command = new HarvestBundlePackageCommand(this.ServiceProvider, this.BackendExtensions, this.IntermediateFolder, this.PackagePayload, this.BundlePackagePayload, this.PackagePayloads);
             command.Execute();
 
             this.TrackedFiles.AddRange(command.TrackedFiles);
@@ -111,6 +118,11 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Section.AddSymbol(command.HarvestedBundlePackage);
             this.Section.AddSymbol(command.HarvestedDependencyProvider);
+
+            foreach (var payload in command.Payloads)
+            {
+                this.Section.AddSymbol(payload);
+            }
 
             foreach (var relatedBundle in command.RelatedBundles)
             {

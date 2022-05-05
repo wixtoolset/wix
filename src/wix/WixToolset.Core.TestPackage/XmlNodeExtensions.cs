@@ -13,6 +13,17 @@ namespace WixToolset.Core.TestPackage
     public static class XmlNodeExtensions
     {
         /// <summary>
+        /// Adds root element around XML then returns it using single quotes and stripping all namespaces.
+        /// </summary>
+        /// <param name="xmlFragment"></param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
+        public static string GetFragmentTestXml(this string xmlFragment, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
+        {
+            return $"<root>{xmlFragment}</root>".GetTestXml(ignoredAttributesByElementName);
+        }
+
+        /// <summary>
         /// Returns the node's outer XML using single quotes and stripping all namespaces.
         /// </summary>
         /// <param name="node"></param>

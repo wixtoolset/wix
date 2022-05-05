@@ -11,8 +11,6 @@ namespace WixToolset.Core
 
     internal class CompilerPayload
     {
-        public string Version { get; set; }
-
         public CompilerPayload(CompilerCore core, SourceLineNumber sourceLineNumbers, XElement element)
         {
             this.Core = core;
@@ -20,11 +18,11 @@ namespace WixToolset.Core
             this.SourceLineNumbers = sourceLineNumbers;
         }
 
-        private CompilerCore Core { get; }
+        public CompilerCore Core { get; }
 
-        private XElement Element { get; }
+        public XElement Element { get; }
 
-        private SourceLineNumber SourceLineNumbers { get; }
+        public SourceLineNumber SourceLineNumbers { get; }
 
         public YesNoDefaultType Compressed { get; set; } = YesNoDefaultType.Default;
 
@@ -51,6 +49,8 @@ namespace WixToolset.Core
         public long? Size { get; set; }
 
         public string SourceFile { get; set; }
+
+        public string Version { get; set; }
 
         private void CalculateAndVerifyFields()
         {

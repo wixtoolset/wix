@@ -14,6 +14,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     internal class RemotePayloadSubcommand : BurnSubcommandBase
@@ -30,6 +31,9 @@ namespace WixToolset.Core.Burn.CommandLine
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.PayloadHarvester = serviceProvider.GetService<IPayloadHarvester>();
+            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+
+            this.BackendExtensions = extensionManager.GetServices<IBurnBackendBinderExtension>();
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -37,6 +41,8 @@ namespace WixToolset.Core.Burn.CommandLine
         private IMessaging Messaging { get; }
 
         private IPayloadHarvester PayloadHarvester { get; }
+
+        private IReadOnlyCollection<IBurnBackendBinderExtension> BackendExtensions { get; }
 
         private List<string> BasePaths { get; } = new List<string>();
 
@@ -49,6 +55,8 @@ namespace WixToolset.Core.Burn.CommandLine
         private string OutputPath { get; set; }
 
         private WixBundlePackageType? PackageType { get; set; }
+
+        private BundlePackagePayloadGenerationType BundlePayloadGeneration { get; set; } = BundlePackagePayloadGenerationType.ExternalWithoutDownloadUrl;
 
         private bool Recurse { get; set; }
 
@@ -106,6 +114,15 @@ namespace WixToolset.Core.Burn.CommandLine
                     case "basepath":
                         this.BasePaths.Add(parser.GetNextArgumentAsDirectoryOrError(argument));
                         return true;
+
+                    case "bundlepayloadgeneration":
+                        var bundlePayloadGenerationValue = parser.GetNextArgumentOrError(argument);
+                        if (Enum.TryParse<BundlePackagePayloadGenerationType>(bundlePayloadGenerationValue, ignoreCase: true, out var bundlePayloadGeneration))
+                        {
+                            this.BundlePayloadGeneration = bundlePayloadGeneration;
+                            return true;
+                        }
+                        break;
 
                     case "du":
                     case "downloadurl":
@@ -175,152 +192,74 @@ namespace WixToolset.Core.Burn.CommandLine
         private IEnumerable<XElement> HarvestRemotePayloads(IEnumerable<string> paths)
         {
             var first = true;
-            var hashes = new Dictionary<string, CertificateHashes>();
-
-            if (this.UseCertificate)
-            {
-                hashes = CertificateHashes.Read(paths).Where(c => !String.IsNullOrEmpty(c.PublicKey) && !String.IsNullOrEmpty(c.Thumbprint) && c.Exception is null).ToDictionary(c => c.Path);
-            }
+            var hashes = this.GetHashes(paths);
 
             foreach (var path in paths)
             {
-                var element = this.CreateRemotePayloadElement(path, first);
+                var harvestedFile = this.HarvestFile(path, first, hashes);
                 first = false;
 
-                if (element == null)
+                if (harvestedFile == null)
                 {
                     continue;
                 }
 
-                var payloadSymbol = new WixBundlePayloadSymbol(null, new Identifier(AccessModifier.Section, "id"))
+                if (harvestedFile.PackagePayloads.Any())
                 {
-                    SourceFile = new IntermediateFieldPathValue { Path = path },
-                };
+                    var packageHashes = this.GetHashes(harvestedFile.PackagePayloads.Select(x => x.SourceFile.Path));
 
-                this.PayloadHarvester.HarvestStandardInformation(payloadSymbol);
-
-                element.Add(new XAttribute("Name", Path.GetFileName(path)));
-
-                if (!String.IsNullOrEmpty(payloadSymbol.DisplayName))
-                {
-                    element.Add(new XAttribute("ProductName", payloadSymbol.DisplayName));
-                }
-
-                if (!String.IsNullOrEmpty(payloadSymbol.Description))
-                {
-                    element.Add(new XAttribute("Description", payloadSymbol.Description));
-                }
-
-                if (!String.IsNullOrEmpty(this.DownloadUrl))
-                {
-                    var filename = this.GetRelativeFileName(payloadSymbol.SourceFile.Path);
-                    var formattedUrl = String.Format(this.DownloadUrl, filename);
-
-                    if (Uri.TryCreate(formattedUrl, UriKind.Absolute, out var url))
+                    foreach (var payloadSymbol in harvestedFile.PackagePayloads)
                     {
-                        element.Add(new XAttribute("DownloadUrl", url.AbsoluteUri));
+                        var harvestedPackageFile = this.HarvestFile(payloadSymbol.SourceFile.Path, false, packageHashes);
+                        yield return harvestedPackageFile.Element;
                     }
                 }
 
-                if (hashes.TryGetValue(path, out var certificateHashes))
-                {
-                    element.Add(new XAttribute("CertificatePublicKey", certificateHashes.PublicKey));
-                    element.Add(new XAttribute("CertificateThumbprint", certificateHashes.Thumbprint));
-                }
-
-                if (!String.IsNullOrEmpty(payloadSymbol.Hash))
-                {
-                    element.Add(new XAttribute("Hash", payloadSymbol.Hash));
-                }
-
-                if (payloadSymbol.FileSize.HasValue)
-                {
-                    element.Add(new XAttribute("Size", payloadSymbol.FileSize.Value));
-                }
-
-                if (!String.IsNullOrEmpty(payloadSymbol.Version))
-                {
-                    element.Add(new XAttribute("Version", payloadSymbol.Version));
-                }
-
-                if (element.Name == BundlePackagePayloadName)
-                {
-                    var command = new HarvestBundlePackageCommand(this.ServiceProvider, this.IntermediateFolder, payloadSymbol);
-                    command.Execute();
-
-                    if (!this.Messaging.EncounteredError)
-                    {
-                        var bundleElement = new XElement(RemoteBundleName);
-
-                        bundleElement.Add(new XAttribute("BundleId", command.HarvestedBundlePackage.BundleId));
-
-                        if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.DisplayName))
-                        {
-                            bundleElement.Add(new XAttribute("DisplayName", command.HarvestedBundlePackage.DisplayName));
-                        }
-
-                        if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.EngineVersion))
-                        {
-                            bundleElement.Add(new XAttribute("EngineVersion", command.HarvestedBundlePackage.EngineVersion));
-                        }
-
-                        bundleElement.Add(new XAttribute("InstallSize", command.HarvestedBundlePackage.InstallSize));
-                        bundleElement.Add(new XAttribute("ManifestNamespace", command.HarvestedBundlePackage.ManifestNamespace));
-                        bundleElement.Add(new XAttribute("PerMachine", command.HarvestedBundlePackage.PerMachine ? "yes" : "no"));
-                        bundleElement.Add(new XAttribute("ProviderKey", command.HarvestedDependencyProvider.ProviderKey));
-                        bundleElement.Add(new XAttribute("ProtocolVersion", command.HarvestedBundlePackage.ProtocolVersion));
-
-                        if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.Version))
-                        {
-                            bundleElement.Add(new XAttribute("Version", command.HarvestedBundlePackage.Version));
-                        }
-
-                        bundleElement.Add(new XAttribute("Win64", command.HarvestedBundlePackage.Win64 ? "yes" : "no"));
-
-                        var setUpgradeCode = false;
-                        foreach (var relatedBundle in command.RelatedBundles)
-                        {
-                            if (!setUpgradeCode && relatedBundle.Action == RelatedBundleActionType.Upgrade)
-                            {
-                                setUpgradeCode = true;
-                                bundleElement.Add(new XAttribute("UpgradeCode", relatedBundle.BundleId));
-                                continue;
-                            }
-
-                            var relatedBundleElement = new XElement(RemoteRelatedBundleName);
-
-                            relatedBundleElement.Add(new XAttribute("Id", relatedBundle.BundleId));
-                            relatedBundleElement.Add(new XAttribute("Action", relatedBundle.Action.ToString()));
-
-                            bundleElement.Add(relatedBundleElement);
-                        }
-
-                        element.Add(bundleElement);
-                    }
-                }
-
-                yield return element;
+                yield return harvestedFile.Element;
             }
         }
 
-        private XElement CreateRemotePayloadElement(string path, bool firstHarvest)
+        private Dictionary<string, CertificateHashes> GetHashes(IEnumerable<string> paths)
         {
-            if (firstHarvest)
+            var hashes = new Dictionary<string, CertificateHashes>();
+
+            if (this.UseCertificate)
+            {
+                hashes = CertificateHashes.Read(paths)
+                                          .Where(c => !String.IsNullOrEmpty(c.PublicKey) && !String.IsNullOrEmpty(c.Thumbprint) && c.Exception is null)
+                                          .ToDictionary(c => c.Path);
+            }
+
+            return hashes;
+        }
+
+        private HarvestedFile HarvestFile(string path, bool isPackage, Dictionary<string, CertificateHashes> hashes)
+        {
+            XElement element;
+            WixBundlePackageType? packageType = null;
+
+            if (isPackage)
             {
                 var extension = this.PackageType.HasValue ? this.PackageType.ToString() : Path.GetExtension(path);
 
                 switch (extension.ToUpperInvariant())
                 {
                     case "BUNDLE":
-                        return new XElement(BundlePackagePayloadName);
+                        packageType = WixBundlePackageType.Bundle;
+                        element = new XElement(BundlePackagePayloadName);
+                        break;
 
                     case "EXE":
                     case ".EXE":
-                        return new XElement(ExePackagePayloadName);
+                        packageType = WixBundlePackageType.Exe;
+                        element = new XElement(ExePackagePayloadName);
+                        break;
 
                     case "MSU":
                     case ".MSU":
-                        return new XElement(MsuPackagePayloadName);
+                        packageType = WixBundlePackageType.Msu;
+                        element = new XElement(MsuPackagePayloadName);
+                        break;
 
                     default:
                         this.Messaging.Write(BurnBackendErrors.UnsupportedRemotePackagePayload(extension, path));
@@ -329,8 +268,75 @@ namespace WixToolset.Core.Burn.CommandLine
             }
             else
             {
-                return new XElement(PayloadName);
+                element = new XElement(PayloadName);
             }
+
+            var payloadSymbol = new WixBundlePayloadSymbol(null, new Identifier(AccessModifier.Section, "id"))
+            {
+                SourceFile = new IntermediateFieldPathValue { Path = path },
+                Name = Path.GetFileName(path),
+            };
+
+            this.PayloadHarvester.HarvestStandardInformation(payloadSymbol);
+
+            element.Add(new XAttribute("Name", payloadSymbol.Name));
+
+            if (!String.IsNullOrEmpty(payloadSymbol.DisplayName))
+            {
+                element.Add(new XAttribute("ProductName", payloadSymbol.DisplayName));
+            }
+
+            if (!String.IsNullOrEmpty(payloadSymbol.Description))
+            {
+                element.Add(new XAttribute("Description", payloadSymbol.Description));
+            }
+
+            if (!String.IsNullOrEmpty(this.DownloadUrl))
+            {
+                var filename = this.GetRelativeFileName(payloadSymbol.SourceFile.Path);
+                var formattedUrl = String.Format(this.DownloadUrl, filename);
+
+                if (Uri.TryCreate(formattedUrl, UriKind.Absolute, out var url))
+                {
+                    element.Add(new XAttribute("DownloadUrl", url.AbsoluteUri));
+                }
+            }
+
+            if (hashes.TryGetValue(path, out var certificateHashes))
+            {
+                element.Add(new XAttribute("CertificatePublicKey", certificateHashes.PublicKey));
+                element.Add(new XAttribute("CertificateThumbprint", certificateHashes.Thumbprint));
+            }
+
+            if (!String.IsNullOrEmpty(payloadSymbol.Hash))
+            {
+                element.Add(new XAttribute("Hash", payloadSymbol.Hash));
+            }
+
+            if (payloadSymbol.FileSize.HasValue)
+            {
+                element.Add(new XAttribute("Size", payloadSymbol.FileSize.Value));
+            }
+
+            if (!String.IsNullOrEmpty(payloadSymbol.Version))
+            {
+                element.Add(new XAttribute("Version", payloadSymbol.Version));
+            }
+
+            var harvestedFile = new HarvestedFile
+            {
+                Element = element,
+                PayloadSymbol = payloadSymbol,
+            };
+
+            switch (packageType)
+            {
+                case WixBundlePackageType.Bundle:
+                    this.HarvestBundle(harvestedFile);
+                    break;
+            }
+
+            return harvestedFile;
         }
 
         private string GetRelativeFileName(string path)
@@ -344,6 +350,76 @@ namespace WixToolset.Core.Burn.CommandLine
             }
 
             return Path.GetFileName(path); 
+        }
+
+        private void HarvestBundle(HarvestedFile harvestedFile)
+        {
+            var packagePayloadSymbol = new WixBundleBundlePackagePayloadSymbol(null, new Identifier(AccessModifier.Section, harvestedFile.PayloadSymbol.Id.Id))
+            {
+                PayloadGeneration = this.BundlePayloadGeneration,
+            };
+
+            var command = new HarvestBundlePackageCommand(this.ServiceProvider, this.BackendExtensions, this.IntermediateFolder, harvestedFile.PayloadSymbol, packagePayloadSymbol, new Dictionary<string, WixBundlePayloadSymbol>());
+            command.Execute();
+
+            if (!this.Messaging.EncounteredError)
+            {
+                var bundleElement = new XElement(RemoteBundleName);
+
+                bundleElement.Add(new XAttribute("BundleId", command.HarvestedBundlePackage.BundleId));
+
+                if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.DisplayName))
+                {
+                    bundleElement.Add(new XAttribute("DisplayName", command.HarvestedBundlePackage.DisplayName));
+                }
+
+                if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.EngineVersion))
+                {
+                    bundleElement.Add(new XAttribute("EngineVersion", command.HarvestedBundlePackage.EngineVersion));
+                }
+
+                bundleElement.Add(new XAttribute("InstallSize", command.HarvestedBundlePackage.InstallSize));
+                bundleElement.Add(new XAttribute("ManifestNamespace", command.HarvestedBundlePackage.ManifestNamespace));
+                bundleElement.Add(new XAttribute("PerMachine", command.HarvestedBundlePackage.PerMachine ? "yes" : "no"));
+                bundleElement.Add(new XAttribute("ProviderKey", command.HarvestedDependencyProvider.ProviderKey));
+                bundleElement.Add(new XAttribute("ProtocolVersion", command.HarvestedBundlePackage.ProtocolVersion));
+
+                if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.Version))
+                {
+                    bundleElement.Add(new XAttribute("Version", command.HarvestedBundlePackage.Version));
+                }
+
+                bundleElement.Add(new XAttribute("Win64", command.HarvestedBundlePackage.Win64 ? "yes" : "no"));
+
+                var setUpgradeCode = false;
+                foreach (var relatedBundle in command.RelatedBundles)
+                {
+                    if (!setUpgradeCode && relatedBundle.Action == RelatedBundleActionType.Upgrade)
+                    {
+                        setUpgradeCode = true;
+                        bundleElement.Add(new XAttribute("UpgradeCode", relatedBundle.BundleId));
+                        continue;
+                    }
+
+                    var relatedBundleElement = new XElement(RemoteRelatedBundleName);
+
+                    relatedBundleElement.Add(new XAttribute("Id", relatedBundle.BundleId));
+                    relatedBundleElement.Add(new XAttribute("Action", relatedBundle.Action.ToString()));
+
+                    bundleElement.Add(relatedBundleElement);
+                }
+
+                harvestedFile.PackagePayloads.AddRange(command.Payloads);
+
+                harvestedFile.Element.Add(bundleElement);
+            }
+        }
+
+        private class HarvestedFile
+        {
+            public XElement Element { get; set; }
+            public WixBundlePayloadSymbol PayloadSymbol { get; set; }
+            public List<WixBundlePayloadSymbol> PackagePayloads { get; } = new List<WixBundlePayloadSymbol>();
         }
     }
 }
