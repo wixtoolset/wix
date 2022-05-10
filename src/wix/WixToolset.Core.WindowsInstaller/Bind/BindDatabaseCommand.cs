@@ -298,6 +298,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            // Now that delayed fields are processed, validate the package/module version.
+            this.VerifyVersion(packageSymbol, moduleSymbol);
+
             // Process dependency references.
             if (SectionType.Product == section.Type || SectionType.Module == section.Type)
             {
@@ -535,6 +538,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             result.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, data);
 
             return result;
+        }
+
+        private void VerifyVersion(WixPackageSymbol packageSymbol, WixModuleSymbol moduleSymbol)
+        {
+            if (packageSymbol != null)
+            {
+                if (!this.WindowsInstallerBackendHelper.IsValidMsiProductVersion(packageSymbol.Version))
+                {
+                    this.Messaging.Write(ErrorMessages.InvalidProductVersion(packageSymbol.SourceLineNumbers, packageSymbol.Version));
+                }
+            }
+            else if (moduleSymbol != null)
+            {
+                if (!this.WindowsInstallerBackendHelper.IsValidFourPartVersion(moduleSymbol.Version))
+                {
+                    this.Messaging.Write(WindowsInstallerBackendErrors.InvalidModuleVersion(moduleSymbol.SourceLineNumbers, moduleSymbol.Version));
+                }
+            }
         }
 
         private int CalculateCodepage(WixPackageSymbol packageSymbol, WixModuleSymbol moduleSymbol, WixPatchSymbol patchSymbol)

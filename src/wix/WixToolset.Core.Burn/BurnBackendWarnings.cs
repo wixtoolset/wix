@@ -16,6 +16,11 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.AttachedContainerPayloadCollision2, "The location of the payload related to the previous error.");
         }
 
+        public static Message CannotParseBundleVersionAsFourPartVersion(SourceLineNumber originalLineNumber, string version)
+        {
+            return Message(originalLineNumber, Ids.CannotParseBundleVersionAsFourPartVersion, "The Bundle/@Version was not be able to be used as a four-part version. A valid four-part version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", version);
+        }
+
         public static Message EmptyContainer(SourceLineNumber sourceLineNumbers, string containerId)
         {
             return Message(sourceLineNumbers, Ids.EmptyContainer, "The Container '{0}' is being ignored because it doesn't have any payloads.", containerId);
@@ -61,6 +66,7 @@ namespace WixToolset.Core.Burn
             UnknownBundleRelationAction = 8505,
             HiddenBundleNotSupported = 8506,
             UnknownMsiPackagePlatform = 8507,
+            CannotParseBundleVersionAsFourPartVersion = 8508,
         } // last available is 8999. 9000 is VerboseMessages.
     }
 }

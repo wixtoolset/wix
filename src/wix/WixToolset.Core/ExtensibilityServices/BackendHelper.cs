@@ -95,6 +95,16 @@ namespace WixToolset.Core.ExtensibilityServices
             return Common.IsValidFourPartVersion(version);
         }
 
+        public bool IsValidMsiProductVersion(string version)
+        {
+            return Common.IsValidMsiProductVersion(version);
+        }
+
+        public bool IsValidWixVersion(string version)
+        {
+            return WixVersion.TryParse(version, out _);
+        }
+
         public bool IsValidIdentifier(string id)
         {
             return Common.IsIdentifier(id);

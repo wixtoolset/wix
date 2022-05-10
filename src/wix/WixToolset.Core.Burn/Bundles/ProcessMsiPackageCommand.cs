@@ -118,30 +118,9 @@ namespace WixToolset.Core.Burn.Bundles
                 this.ChainPackage.Version = this.MsiPackage.ProductVersion;
             }
 
-            if (!this.BackendHelper.IsValidFourPartVersion(this.MsiPackage.ProductVersion))
+            if (!this.BackendHelper.IsValidMsiProductVersion(this.MsiPackage.ProductVersion))
             {
-                // not a proper .NET version (e.g., five fields); can we get a valid four-part version number?
-                string version = null;
-                var versionParts = this.MsiPackage.ProductVersion.Split('.');
-                var count = versionParts.Length;
-                if (0 < count)
-                {
-                    version = versionParts[0];
-                    for (var i = 1; i < 4 && i < count; ++i)
-                    {
-                        version = String.Concat(version, ".", versionParts[i]);
-                    }
-                }
-
-                if (!String.IsNullOrEmpty(version) && this.BackendHelper.IsValidFourPartVersion(version))
-                {
-                    this.Messaging.Write(WarningMessages.VersionTruncated(this.PackagePayload.SourceLineNumbers, this.MsiPackage.ProductVersion, this.PackageId, version));
-                    this.MsiPackage.ProductVersion = version;
-                }
-                else
-                {
-                    this.Messaging.Write(ErrorMessages.InvalidProductVersion(this.PackagePayload.SourceLineNumbers, this.MsiPackage.ProductVersion, this.PackageId));
-                }
+                this.Messaging.Write(WarningMessages.InvalidMsiProductVersion(this.PackagePayload.SourceLineNumbers, this.MsiPackage.ProductVersion, this.PackageId));
             }
 
             this.SetPerMachineAppropriately(harvestedMsiPackage.AllUsers);

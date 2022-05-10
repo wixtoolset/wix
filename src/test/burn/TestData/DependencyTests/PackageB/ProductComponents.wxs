@@ -11,7 +11,7 @@
     <Component Id="FileComponent2" Guid="A1866388-65B4-4215-A8FB-9A7AADBE4E8E" Directory="INSTALLFOLDER">
       <File Source="$(sys.SOURCEFILEPATH)" />
       <Provides>
-        <Requires ProviderKey="WiX.$(var.TestGroupName).A,v1.0" Minimum="1.0.0.0" IncludeMinimum="yes" dep:Enforce="yes" />
+        <Requires ProviderKey="WiX.$(var.TestGroupName).A,v1.0" Minimum="1.0.0-alpha.420" IncludeMinimum="yes" dep:Enforce="yes" />
       </Provides>
     </Component>
   </Fragment>

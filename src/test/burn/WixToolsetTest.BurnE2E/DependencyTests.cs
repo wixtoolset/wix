@@ -1086,5 +1086,24 @@ namespace WixToolsetTest.BurnE2E
             packageA.UninstallProduct();
             packageA.VerifyInstalled(false);
         }
+
+        [Fact]
+        public void CannotInstallWhenDependencyUnsatisfied()
+        {
+            var packageA = this.CreatePackageInstaller("PackageAv1");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleB = this.CreateBundleInstaller("BundleB");
+            var testBAController = this.CreateTestBAController();
+
+            packageA.VerifyInstalled(false);
+            packageB.VerifyInstalled(false);
+
+            // Prevent install of PackageA to cause PackageB's enforced dependency
+            // to fail the install.
+            testBAController.SetPackageRequestedState("PackageA", RequestState.None);
+
+            var bundleBInstallLogFilePath = bundleB.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
+            Assert.True(LogVerifier.MessageInLogFileRegex(bundleBInstallLogFilePath, @"Applied execute package: PackageB, result: 0x80070643, restart: None"));
+        }
     }
 }

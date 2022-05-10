@@ -590,6 +590,7 @@ DAPI_(HRESULT) RegReadVersion(
     {
         ExitFunction1(hr = E_FILENOTFOUND);
     }
+
     if (REG_SZ == dwType || REG_EXPAND_SZ == dwType)
     {
         hr = RegReadString(hk, wzName, &sczVersion);
@@ -613,6 +614,58 @@ LExit:
 
     return hr;
 }
+
+
+DAPI_(HRESULT) RegReadWixVersion(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __out VERUTIL_VERSION** ppVersion
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
+    DWORD dwType = 0;
+    DWORD cb = 0;
+    DWORD64 dw64Version = 0;
+    LPWSTR sczVersion = NULL;
+    VERUTIL_VERSION* pVersion = NULL;
+
+    cb = sizeof(DWORD64);
+    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(&dw64Version), &cb);
+    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    {
+        ExitFunction1(hr = E_FILENOTFOUND);
+    }
+
+    if (REG_SZ == dwType || REG_EXPAND_SZ == dwType)
+    {
+        hr = RegReadString(hk, wzName, &sczVersion);
+        RegExitOnFailure(hr, "Failed to read registry version as string.");
+
+        hr = VerParseVersion(sczVersion, 0, FALSE, &pVersion);
+        RegExitOnFailure(hr, "Failed to convert registry string to version.");
+    }
+    else if (REG_QWORD == dwType)
+    {
+        hr = VerVersionFromQword(dw64Version, &pVersion);
+        RegExitOnFailure(hr, "Failed to convert registry string to version.");
+    }
+    else // unexpected data type
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
+        RegExitOnRootFailure(hr, "Error reading version registry value due to unexpected data type: %u", dwType);
+    }
+
+    *ppVersion = pVersion;
+    pVersion = NULL;
+
+LExit:
+    ReleaseVerutilVersion(pVersion);
+    ReleaseStr(sczVersion);
+
+    return hr;
+}
+
 
 DAPI_(HRESULT) RegReadNone(
     __in HKEY hk,

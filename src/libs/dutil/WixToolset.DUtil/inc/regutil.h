@@ -1,6 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#include "verutil.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,6 +259,16 @@ HRESULT DAPI RegReadVersion(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __out DWORD64* pdw64Version
+    );
+
+/********************************************************************
+ RegReadWixVersion - reads a registry key value as a WiX version.
+
+*********************************************************************/
+HRESULT DAPI RegReadWixVersion(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __out VERUTIL_VERSION** ppVersion
     );
 
 /********************************************************************
