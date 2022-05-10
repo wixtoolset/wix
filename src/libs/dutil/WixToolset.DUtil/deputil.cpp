@@ -121,9 +121,10 @@ DAPI_(HRESULT) DepCheckDependency(
     HRESULT hr = S_OK;
     LPWSTR sczKey = NULL;
     HKEY hkKey = NULL;
-    DWORD64 dw64Version = 0;
-    DWORD64 dw64MinVersion = 0;
-    DWORD64 dw64MaxVersion = 0;
+    VERUTIL_VERSION* pVersion = NULL;
+    VERUTIL_VERSION* pMinVersion = NULL;
+    VERUTIL_VERSION* pMaxVersion = NULL;
+    int nResult = 0;
     BOOL fAllowEqual = FALSE;
     LPWSTR sczName = NULL;
 
@@ -138,7 +139,7 @@ DAPI_(HRESULT) DepCheckDependency(
         DepExitOnFailure(hr, "Failed to open the registry key for dependency \"%ls\".", wzProviderKey);
 
         // If there are no registry values, consider the key orphaned and treat it as missing.
-        hr = RegReadVersion(hkKey, vcszVersionValue, &dw64Version);
+        hr = RegReadWixVersion(hkKey, vcszVersionValue, &pVersion);
         if (E_FILENOTFOUND != hr)
         {
             DepExitOnFailure(hr, "Failed to read the %ls registry value for dependency \"%ls\".", vcszVersionValue, wzProviderKey);
@@ -171,11 +172,15 @@ DAPI_(HRESULT) DepCheckDependency(
     {
         if (*wzMinVersion)
         {
-            hr = FileVersionFromStringEx(wzMinVersion, 0, &dw64MinVersion);
-            DepExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMinVersion);
+            hr = VerParseVersion(wzMinVersion, 0, FALSE, &pMinVersion);
+            DepExitOnFailure(hr, "Failed to get the min version number from \"%ls\".", wzMinVersion);
+
+            hr = VerCompareParsedVersions(pVersion, pMinVersion, &nResult);
+            DepExitOnFailure(hr, "Failed to compare dependency with min version \"%ls\".", wzMinVersion);
 
             fAllowEqual = iAttributes & RequiresAttributesMinVersionInclusive;
-            if (!(fAllowEqual && dw64MinVersion <= dw64Version || dw64MinVersion < dw64Version))
+            //  !(fAllowEqual && pMinVersion <= pVersion || pMinVersion < pVersion))
+            if (!(fAllowEqual && 0 <= nResult || 0 < nResult))
             {
                 hr = DictKeyExists(sdDependencies, wzProviderKey);
                 if (E_NOTFOUND != hr)
@@ -205,11 +210,15 @@ DAPI_(HRESULT) DepCheckDependency(
     {
         if (*wzMaxVersion)
         {
-            hr = FileVersionFromStringEx(wzMaxVersion, 0, &dw64MaxVersion);
-            DepExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMaxVersion);
+            hr = VerParseVersion(wzMaxVersion, 0, FALSE, &pMaxVersion);
+            DepExitOnFailure(hr, "Failed to get the max version number from \"%ls\".", wzMaxVersion);
+
+            hr = VerCompareParsedVersions(pMaxVersion, pVersion, &nResult);
+            DepExitOnFailure(hr, "Failed to compare dependency with max version \"%ls\".", wzMaxVersion);
 
             fAllowEqual = iAttributes & RequiresAttributesMaxVersionInclusive;
-            if (!(fAllowEqual && dw64Version <= dw64MaxVersion || dw64Version < dw64MaxVersion))
+            //  !(fAllowEqual && pVersion <= pMaxVersion || pVersion < pMaxVersion)
+            if (!(fAllowEqual && 0 <= nResult || 0 < nResult))
             {
                 hr = DictKeyExists(sdDependencies, wzProviderKey);
                 if (E_NOTFOUND != hr)
@@ -235,6 +244,9 @@ DAPI_(HRESULT) DepCheckDependency(
     }
 
 LExit:
+    ReleaseVerutilVersion(pMaxVersion);
+    ReleaseVerutilVersion(pMinVersion);
+    ReleaseVerutilVersion(pVersion);
     ReleaseStr(sczName);
     ReleaseRegKey(hkKey);
     ReleaseStr(sczKey);

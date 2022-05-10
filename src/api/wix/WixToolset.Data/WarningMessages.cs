@@ -367,9 +367,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidHigherInstallerVersionInModule, "Merge module '{0}' has an installer version of {1} which is greater than the product's installer version of {2}. Merging a module with a higher installer version than the product it is being merged into can result in invalid values in the resulting msi. You must set the Package/@InstallerVersion attribute to {1} or greater to merge this merge module into your product.", moduleId, moduleInstallerVersion, productInstallerVersion);
         }
 
-        public static Message InvalidModuleOrBundleVersion(SourceLineNumber sourceLineNumbers, string moduleOrBundle, string version)
+        public static Message InvalidFourPartVersion(SourceLineNumber sourceLineNumbers, string elementName, string version)
         {
-            return Message(sourceLineNumbers, Ids.InvalidModuleOrBundleVersion, "Invalid {0}/@Version '{1}'. {0} version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", moduleOrBundle, version);
+            return Message(sourceLineNumbers, Ids.InvalidFourPartVersion, "Invalid {0}/@Version '{1}'. {0} version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", elementName, version);
         }
 
         public static Message InvalidRemoveFile(SourceLineNumber sourceLineNumbers, string file, string component)
@@ -663,9 +663,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.VariableDeclarationCollision, "The variable '{0}' with value '{1}' was previously declared with value '{2}'.", variableName, variableValue, variableCollidingValue);
         }
 
-        public static Message VersionTruncated(SourceLineNumber sourceLineNumbers, string originalVersion, string package, string truncatedVersion)
+        public static Message InvalidMsiProductVersion(SourceLineNumber sourceLineNumbers, string version, string package)
         {
-            return Message(sourceLineNumbers, Ids.VersionTruncated, "Product version {0} in package '{1}' is not valid per the MSI SDK and cannot be represented in a bundle. It has been truncated to {2}.", originalVersion, package, truncatedVersion);
+            return Message(sourceLineNumbers, Ids.InvalidMsiProductVersion, "Invalid product version '{0}' in MSI package '{1}'. Product version should have a major version less than 256, a minor version less than 256, and a build version less than 65536. The bundle may incorrectly detect upgrades of this package.", version, package);
         }
 
         public static Message CollidingModularizationTypes(string tableName, string columnName, string foreignTableName, int foreignColumnNumber, string modularizationType, string foreignModularizationType)
@@ -764,7 +764,7 @@ namespace WixToolset.Data
             DeprecatedPackageCompressedAttribute = 1087,
             DeprecatedQuestionMarksGuid = 1090,
             PackageCodeSet = 1091,
-            InvalidModuleOrBundleVersion = 1093,
+            InvalidFourPartVersion = 1093,
             InvalidRemoveFile = 1095,
             PreprocessorWarning = 1096,
             UpdateOfNonKeyPathFile = 1097,
@@ -816,7 +816,7 @@ namespace WixToolset.Data
             AllChangesIncludedInPatch = 1145,
             RelatedAttributeConditionallyIgnored = 1146,
             BackslashTerminateInlineDirectorySyntax = 1147,
-            VersionTruncated = 1148,
+            InvalidMsiProductVersion = 1148,
             ServiceConfigFamilyNotSupported = 1149,
             SymbolNotTranslatedToOutput = 1150,
             MsiTransactionLimitations = 1151,

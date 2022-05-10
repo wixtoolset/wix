@@ -105,12 +105,8 @@ namespace WixToolset.Core
                     case "UpgradeCode":
                         upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
                         break;
-                    case "Version": // if the attribute is valid version, use the attribute value as is (so "1.0000.01.01" would *not* get translated to "1.0.1.1").
-                        var verifiedVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        if (!String.IsNullOrEmpty(verifiedVersion))
-                        {
-                            version = attrib.Value;
-                        }
+                    case "Version":
+                        version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -146,10 +142,6 @@ namespace WixToolset.Core
             if (null == version)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
-            }
-            else if (!CompilerCore.IsValidProductVersion(version))
-            {
-                this.Core.Write(ErrorMessages.InvalidProductVersion(sourceLineNumbers, version));
             }
 
             if (compressed != YesNoDefaultType.No)

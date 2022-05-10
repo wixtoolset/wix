@@ -1076,7 +1076,7 @@ namespace WixToolset.Data
 
         public static Message IllegalVersionValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalVersionValue, "The {0}/@{1} attribute's value, '{2}', is not a valid version.  Legal version values should look like 'x.x.x.x' where x is an integer from 0 to 65534.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalVersionValue, "The {0}/@{1} attribute's value, '{2}', is not a valid version. Specify a four-part version or semantic version, such as '#.#.#.#' or '#.#.#-label.#'.", elementName, attributeName, value);
         }
 
         public static Message IllegalWarningIdAsError(string warningId)
@@ -1279,9 +1279,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidMergeLanguage, "The Merge element '{0}' specified an invalid language '{1}'.  Verify that localization tokens are being properly resolved to a numeric LCID.", mergeId, mergeLanguage);
         }
 
-        public static Message InvalidModuleOrBundleVersion(SourceLineNumber sourceLineNumbers, string moduleOrBundle, string version)
+        public static Message InvalidFourPartVersion(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string version)
         {
-            return Message(sourceLineNumbers, Ids.InvalidModuleOrBundleVersion, "Invalid {0}/@Version '{1}'. {0} version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", moduleOrBundle, version);
+            return Message(sourceLineNumbers, Ids.InvalidFourPartVersion, "Invalid {0}/@Version '{1}'. {0} version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", elementName, version);
         }
 
         public static Message InvalidPlatformValue(SourceLineNumber sourceLineNumbers, string value)
@@ -2678,7 +2678,7 @@ namespace WixToolset.Data
             SplitCabinetNameCollision = 377,
             SplitCabinetInsertionFailed = 378,
             InvalidPreprocessorFunctionAutoVersion = 379,
-            InvalidModuleOrBundleVersion = 380,
+            InvalidFourPartVersion = 380,
             UnsupportedPlatformForElement = 381,
             MissingMedia = 382,
             IllegalYesNoAlwaysValue = 384,

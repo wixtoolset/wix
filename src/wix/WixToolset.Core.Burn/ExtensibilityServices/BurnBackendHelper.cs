@@ -104,6 +104,16 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             return this.backendHelper.IsValidIdentifier(id);
         }
 
+        public bool IsValidMsiProductVersion(string version)
+        {
+            return this.backendHelper.IsValidMsiProductVersion(version);
+        }
+
+        public bool IsValidWixVersion(string version)
+        {
+            return this.backendHelper.IsValidWixVersion(version);
+        }
+
         public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)
         {
             return this.backendHelper.IsValidLongFilename(filename, allowWildcards, allowRelative);

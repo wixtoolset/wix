@@ -1033,6 +1033,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddUpgradeSymbol(UpgradeSymbol symbol)
         {
+            if (!String.IsNullOrEmpty(symbol.VersionMin) && !this.BackendHelper.IsValidMsiProductVersion(symbol.VersionMin))
+            {
+                this.Messaging.Write(ErrorMessages.InvalidProductVersion(symbol.SourceLineNumbers, symbol.VersionMin));
+            }
+
+            if (!String.IsNullOrEmpty(symbol.VersionMax) && !this.BackendHelper.IsValidMsiProductVersion(symbol.VersionMax))
+            {
+                this.Messaging.Write(ErrorMessages.InvalidProductVersion(symbol.SourceLineNumbers, symbol.VersionMax));
+            }
+
             var row = (UpgradeRow)this.CreateRow(symbol, "Upgrade");
             row.UpgradeCode = symbol.UpgradeCode;
             row.VersionMin = symbol.VersionMin;

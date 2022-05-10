@@ -52,16 +52,27 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
             if (null != versionInfo)
             {
-                // Use the fixed version info block for the file since the resource text may not be a dotted quad.
-                var version = new Version(versionInfo.ProductMajorPart, versionInfo.ProductMinorPart, versionInfo.ProductBuildPart, versionInfo.ProductPrivatePart);
+                var version = versionInfo.ProductVersion;
 
-                if (PayloadHarvester.EmptyVersion != version)
+                if (String.IsNullOrEmpty(version))
                 {
-                    payload.Version = version.ToString();
+                    version = versionInfo.FileVersion;
+                }
+
+                if (String.IsNullOrEmpty(version))
+                {
+                    // Fallback to fixed version info block for the file.
+                    var fixedVersion = new Version(versionInfo.ProductMajorPart, versionInfo.ProductMinorPart, versionInfo.ProductBuildPart, versionInfo.ProductPrivatePart);
+
+                    if (PayloadHarvester.EmptyVersion != fixedVersion)
+                    {
+                        version = fixedVersion.ToString();
+                    }
                 }
 
                 payload.Description = versionInfo.FileDescription;
                 payload.DisplayName = versionInfo.ProductName;
+                payload.Version = version;
             }
         }
     }

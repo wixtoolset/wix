@@ -71,11 +71,11 @@ namespace WixToolset.Core.Burn.Bundles
             FileSystem.CopyFile(stubFile, bundleTempPath, allowHardlink: false);
             File.SetAttributes(bundleTempPath, FileAttributes.Normal);
 
-            var windowsAssemblyVersion = GetWindowsAssemblyVersion(this.BundleSymbol);
+            var fourPartVersion = this.GetFourPartVersion(this.BundleSymbol);
 
-            var applicationManifestData = GenerateApplicationManifest(this.BundleSymbol, this.BootstrapperApplicationDllSymbol, this.OutputPath, windowsAssemblyVersion);
+            var applicationManifestData = GenerateApplicationManifest(this.BundleSymbol, this.BootstrapperApplicationDllSymbol, this.OutputPath, fourPartVersion);
 
-            UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleSymbol, windowsAssemblyVersion, applicationManifestData);
+            this.UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleSymbol, fourPartVersion, applicationManifestData);
 
             // Update the .wixburn section to point to at the UX and attached container(s) then attach the containers
             // if they should be attached.
@@ -242,24 +242,37 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private static Version GetWindowsAssemblyVersion(WixBundleSymbol bundleSymbol)
+        private Version GetFourPartVersion(WixBundleSymbol bundleSymbol)
         {
-            // Ensure the bundle info provides a full four part version.
-            var fourPartVersion = new Version(bundleSymbol.Version);
-            var major = (fourPartVersion.Major < 0) ? 0 : fourPartVersion.Major;
-            var minor = (fourPartVersion.Minor < 0) ? 0 : fourPartVersion.Minor;
-            var build = (fourPartVersion.Build < 0) ? 0 : fourPartVersion.Build;
-            var revision = (fourPartVersion.Revision < 0) ? 0 : fourPartVersion.Revision;
+            // Ensure the bundle info provides a full four-part version.
+
+            if (!WixVersion.TryParse(bundleSymbol.Version, out var wixVersion))
+            {
+                // Display an error message indicating that we will require a four-part version number
+                // not just a WixVersion.
+                this.Messaging.Write(ErrorMessages.IllegalVersionValue(bundleSymbol.SourceLineNumbers, "Bundle", "Version", bundleSymbol.Version));
+                return new Version(0, 0);
+            }
+
+            var major = wixVersion.Major ?? 0;
+            var minor = wixVersion.Minor ?? 0;
+            var build = wixVersion.Patch ?? 0;
+            var revision = wixVersion.Revision ?? 0;
 
             if (UInt16.MaxValue < major || UInt16.MaxValue < minor || UInt16.MaxValue < build || UInt16.MaxValue < revision)
             {
-                throw new WixException(ErrorMessages.InvalidModuleOrBundleVersion(bundleSymbol.SourceLineNumbers, "Bundle", bundleSymbol.Version));
+                major = Math.Max(major, UInt16.MaxValue);
+                minor = Math.Max(minor, UInt16.MaxValue);
+                build = Math.Max(build, UInt16.MaxValue);
+                revision = Math.Max(revision, UInt16.MaxValue);
+
+                this.Messaging.Write(BurnBackendWarnings.CannotParseBundleVersionAsFourPartVersion(bundleSymbol.SourceLineNumbers, bundleSymbol.Version));
             }
 
-            return new Version(major, minor, build, revision);
+            return new Version((int)major, (int)minor, (int)build, (int)revision);
         }
 
-        private void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo, Version windowsAssemblyVersion, byte[] applicationManifestData)
+        private void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo, Version fourPartVersion, byte[] applicationManifestData)
         {
             const int burnLocale = 1033;
             var resources = new ResourceCollection();
@@ -268,8 +281,8 @@ namespace WixToolset.Core.Burn.Bundles
             version.Load(bundleTempPath);
             resources.Add(version);
 
-            version.FileVersion = windowsAssemblyVersion;
-            version.ProductVersion = windowsAssemblyVersion;
+            version.FileVersion = fourPartVersion;
+            version.ProductVersion = fourPartVersion;
 
             var strings = version[burnLocale] ?? version.Add(burnLocale);
             strings["LegalCopyright"] = bundleInfo.Copyright;

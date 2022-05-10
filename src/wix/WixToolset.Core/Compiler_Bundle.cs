@@ -246,10 +246,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
-            else if (!CompilerCore.IsValidModuleOrBundleVersion(version))
-            {
-                this.Core.Write(WarningMessages.InvalidModuleOrBundleVersion(sourceLineNumbers, "Bundle", version));
-            }
 
             if (String.IsNullOrEmpty(upgradeCode))
             {

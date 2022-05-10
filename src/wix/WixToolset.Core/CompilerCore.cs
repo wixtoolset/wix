@@ -221,27 +221,7 @@ namespace WixToolset.Core
         /// <returns>True if version is a valid product version</returns>
         public static bool IsValidProductVersion(string version)
         {
-            if (!Common.IsValidBinderVariable(version))
-            {
-                Version ver = new Version(version);
-
-                if (255 < ver.Major || 255 < ver.Minor || 65535 < ver.Build)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Verifies the given string is a valid module or bundle version.
-        /// </summary>
-        /// <param name="version">The version to verify.</param>
-        /// <returns>True if version is a valid module or bundle version.</returns>
-        public static bool IsValidModuleOrBundleVersion(string version)
-        {
-            return Common.IsValidFourPartVersion(version);
+            return Common.IsValidBinderVariable(version) || Common.IsValidMsiProductVersion(version);
         }
 
         /// <summary>

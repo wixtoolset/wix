@@ -104,11 +104,25 @@ namespace WixToolset.Extensibility.Services
         bool IsValidBinderVariable(string variable);
 
         /// <summary>
-        /// Verifies the given string is a valid 4-part version module or bundle version.
+        /// Verifies the given string is a valid 4-part version.
         /// </summary>
         /// <param name="version">The version to verify.</param>
-        /// <returns>True if version is a valid module or bundle version.</returns>
+        /// <returns>True if version is a valid 4-part version.</returns>
         bool IsValidFourPartVersion(string version);
+
+        /// <summary>
+        /// Verifies the given string is a valid MSI product version.
+        /// </summary>
+        /// <param name="version">The MSI product version to verify.</param>
+        /// <returns>True if version is a valid MSI product version</returns>
+        bool IsValidMsiProductVersion(string version);
+
+        /// <summary>
+        /// Verifies the given string is a valid WiX version.
+        /// </summary>
+        /// <param name="version">The version to verify.</param>
+        /// <returns>True if version is a valid WiX version.</returns>
+        bool IsValidWixVersion(string version);
 
         /// <summary>
         /// Determines if value is a valid identifier.

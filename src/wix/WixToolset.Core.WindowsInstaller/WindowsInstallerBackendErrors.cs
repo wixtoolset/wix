@@ -14,6 +14,11 @@ namespace WixToolset.Core.WindowsInstaller
             return Message(sourceLineNumbers, Ids.CannotLoadWixoutAsTransform, "Could not load wixout file as a transform{1}", additionalDetail);
         }
 
+        public static Message InvalidModuleVersion(SourceLineNumber originalLineNumber, string version)
+        {
+            return Message(originalLineNumber, Ids.InvalidModuleVersion, "The Module/@Version was not be able to be used as a four-part version. A valid four-part version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", version);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -22,6 +27,7 @@ namespace WixToolset.Core.WindowsInstaller
         public enum Ids
         {
             CannotLoadWixoutAsTransform = 7500,
+            InvalidModuleVersion = 7501,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }
