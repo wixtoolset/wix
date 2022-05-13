@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include <WixToolset.Mba.Host.h> // includes the generated assembly name macros.
 
 static const DWORD NET452_RELEASE = 379893;
 
@@ -14,26 +13,16 @@ extern "C" typedef HRESULT (WINAPI *PFN_CORBINDTOCURRENTRUNTIME)(
     __out LPVOID *ppv
     );
 
-extern "C" typedef HRESULT(WINAPI *PFN_MBAPREQ_BOOTSTRAPPER_APPLICATION_CREATE)(
-    __in HRESULT hrHostInitialization,
-    __in IBootstrapperEngine* pEngine,
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
-    );
-
-static HINSTANCE vhInstance = NULL;
-static ICorRuntimeHost *vpCLRHost = NULL;
-static _AppDomain *vpAppDomain = NULL;
-static HMODULE vhMbapreqModule = NULL;
+static MBASTATE vstate = { };
 
 
 // internal function declarations
 
 static HRESULT GetAppDomain(
-    __out _AppDomain** ppAppDomain
+    __in MBASTATE* pState
     );
-static HRESULT GetAppBase(
-    __out LPWSTR* psczAppBase
+static HRESULT LoadModulePaths(
+    __in MBASTATE* pState
     );
 static HRESULT CheckSupportedFrameworks(
     __in LPCWSTR wzConfigPath
@@ -43,9 +32,8 @@ static HRESULT UpdateSupportedRuntime(
     __in IXMLDOMNode* pixnSupportedFramework,
     __out BOOL* pfUpdatedManifest
     );
-static HRESULT GetCLRHost(
-    __in LPCWSTR wzConfigPath,
-    __out ICorRuntimeHost** ppCLRHost
+static HRESULT LoadRuntime(
+    __in MBASTATE* pState
     );
 static HRESULT CreateManagedBootstrapperApplication(
     __in _AppDomain* pAppDomain,
@@ -57,7 +45,7 @@ static HRESULT CreateManagedBootstrapperApplicationFactory(
     __out IBootstrapperApplicationFactory** ppAppFactory
     );
 static HRESULT CreatePrerequisiteBA(
-    __in HRESULT hrHostInitialization,
+    __in MBASTATE* pState,
     __in IBootstrapperEngine* pEngine,
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
     __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
@@ -78,11 +66,11 @@ extern "C" BOOL WINAPI DllMain(
     {
     case DLL_PROCESS_ATTACH:
         ::DisableThreadLibraryCalls(hInstance);
-        vhInstance = hInstance;
+        vstate.hInstance = hInstance;
         break;
 
     case DLL_PROCESS_DETACH:
-        vhInstance = NULL;
+        vstate.hInstance = NULL;
         break;
     }
 
@@ -96,18 +84,39 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     )
 {
     HRESULT hr = S_OK; 
-    HRESULT hrHostInitialization = S_OK;
     IBootstrapperEngine* pEngine = NULL;
+
+    if (vstate.fStoppedRuntime)
+    {
+        BalExitWithRootFailure(hr, E_INVALIDSTATE, "Reloaded mbahost after stopping .NET runtime.");
+    }
 
     hr = BalInitializeFromCreateArgs(pArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
 
-    hr = GetAppDomain(&vpAppDomain);
-    if (SUCCEEDED(hr))
+    if (!vstate.fInitialized)
     {
+        hr = LoadModulePaths(&vstate);
+        BalExitOnFailure(hr, "Failed to load the module paths.");
+
+        vstate.fInitialized = TRUE;
+    }
+
+    if (!vstate.fInitializedRuntime)
+    {
+        hr = LoadRuntime(&vstate);
+
+        vstate.fInitializedRuntime = SUCCEEDED(hr);
+    }
+
+    if (vstate.fInitializedRuntime)
+    {
+        hr = GetAppDomain(&vstate);
+        BalExitOnFailure(hr, "Failed to create the AppDomain for the managed bootstrapper application.");
+
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading managed bootstrapper application.");
 
-        hr = CreateManagedBootstrapperApplication(vpAppDomain, pArgs, pResults);
+        hr = CreateManagedBootstrapperApplication(vstate.pAppDomain, pArgs, pResults);
         BalExitOnFailure(hr, "Failed to create the managed bootstrapper application.");
     }
     else // fallback to the prerequisite BA.
@@ -115,16 +124,22 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
         if (E_MBAHOST_NET452_ON_WIN7RTM == hr)
         {
             BalLogError(hr, "The Burn engine cannot run with an MBA under the .NET 4 CLR on Windows 7 RTM with .NET 4.5.2 (or greater) installed.");
-            hrHostInitialization = hr;
+            vstate.prereqData.hrHostInitialization = hr;
+        }
+        else if (vstate.prereqData.fCompleted)
+        {
+            hr = E_PREREQBA_INFINITE_LOOP;
+            BalLogError(hr, "The prerequisites were already installed. The bootstrapper application will not be reloaded to prevent an infinite loop.");
+            vstate.prereqData.hrHostInitialization = hr;
         }
         else
         {
-            hrHostInitialization = S_OK;
+            vstate.prereqData.hrHostInitialization = S_OK;
         }
 
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application because managed host could not be loaded, error: 0x%08x.", hr);
 
-        hr = CreatePrerequisiteBA(hrHostInitialization, pEngine, pArgs, pResults);
+        hr = CreatePrerequisiteBA(&vstate, pEngine, pArgs, pResults);
         BalExitOnFailure(hr, "Failed to create the pre-requisite bootstrapper application.");
     }
 
@@ -134,73 +149,65 @@ LExit:
     return hr;
 }
 
-extern "C" void WINAPI BootstrapperApplicationDestroy()
+extern "C" void WINAPI BootstrapperApplicationDestroy(
+    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
+    __in BOOTSTRAPPER_DESTROY_RESULTS* pResults
+    )
 {
-    if (vpAppDomain)
+    BOOTSTRAPPER_DESTROY_RESULTS childResults = { };
+
+    if (vstate.pAppDomain)
     {
-        HRESULT hr = vpCLRHost->UnloadDomain(vpAppDomain);
+        HRESULT hr = vstate.pCLRHost->UnloadDomain(vstate.pAppDomain);
         if (FAILED(hr))
         {
             BalLogError(hr, "Failed to unload app domain.");
         }
 
-        vpAppDomain->Release();
+        vstate.pAppDomain->Release();
+        vstate.pAppDomain = NULL;
     }
 
-    if (vpCLRHost)
+    // pCLRHost can only be stopped once per process.
+    if (vstate.pCLRHost && !pArgs->fReload)
     {
-        vpCLRHost->Stop();
-        vpCLRHost->Release();
+        vstate.pCLRHost->Stop();
+        vstate.pCLRHost->Release();
+        vstate.pCLRHost = NULL;
+        vstate.fStoppedRuntime = TRUE;
     }
 
-    if (vhMbapreqModule)
+    if (vstate.hMbapreqModule)
     {
-        PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = reinterpret_cast<PFN_BOOTSTRAPPER_APPLICATION_DESTROY>(::GetProcAddress(vhMbapreqModule, "MbaPrereqBootstrapperApplicationDestroy"));
+        PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = reinterpret_cast<PFN_BOOTSTRAPPER_APPLICATION_DESTROY>(::GetProcAddress(vstate.hMbapreqModule, "PrereqBootstrapperApplicationDestroy"));
         if (pfnDestroy)
         {
-            (*pfnDestroy)();
+            (*pfnDestroy)(pArgs, &childResults);
         }
 
-        ::FreeLibrary(vhMbapreqModule);
-        vhMbapreqModule = NULL;
+        ::FreeLibrary(vstate.hMbapreqModule);
+        vstate.hMbapreqModule = NULL;
     }
 
     BalUninitialize();
+
+    // Need to keep track of state between reloads.
+    pResults->fDisableUnloading = TRUE;
 }
 
 // Gets the custom AppDomain for loading managed BA.
 static HRESULT GetAppDomain(
-    __out _AppDomain **ppAppDomain
+    __in MBASTATE* pState
     )
 {
     HRESULT hr = S_OK;
-    ICorRuntimeHost *pCLRHost = NULL;
     IUnknown *pUnk = NULL;
-    LPWSTR sczAppBase = NULL;
-    LPWSTR sczConfigPath = NULL;
-    IAppDomainSetup *pAppDomainSetup;
+    IAppDomainSetup* pAppDomainSetup = NULL;
     BSTR bstrAppBase = NULL;
     BSTR bstrConfigPath = NULL;
 
-    hr = GetAppBase(&sczAppBase);
-    ExitOnFailure(hr, "Failed to get the host base path.");
-
-    hr = PathConcat(sczAppBase, MBA_CONFIG_FILE_NAME, &sczConfigPath);
-    ExitOnFailure(hr, "Failed to get the full path to the application configuration file.");
-
-    // Check that the supported framework is installed.
-    hr = CheckSupportedFrameworks(sczConfigPath);
-    ExitOnFailure(hr, "Failed to find supported framework.");
-
-    // Load the CLR.
-    hr = GetCLRHost(sczConfigPath, &pCLRHost);
-    ExitOnFailure(hr, "Failed to create the CLR host.");
-
-    hr = pCLRHost->Start();
-    ExitOnRootFailure(hr, "Failed to start the CLR host.");
-
     // Create the setup information for a new AppDomain to set the app base and config.
-    hr = pCLRHost->CreateDomainSetup(&pUnk);
+    hr = pState->pCLRHost->CreateDomainSetup(&pUnk);
     ExitOnRootFailure(hr, "Failed to create the AppDomainSetup object.");
 
     hr = pUnk->QueryInterface(__uuidof(IAppDomainSetup), reinterpret_cast<LPVOID*>(&pAppDomainSetup));
@@ -208,48 +215,48 @@ static HRESULT GetAppDomain(
     ReleaseNullObject(pUnk);
 
     // Set properties on the AppDomainSetup object.
-    bstrAppBase = ::SysAllocString(sczAppBase);
+    bstrAppBase = ::SysAllocString(pState->sczAppBase);
     ExitOnNull(bstrAppBase, hr, E_OUTOFMEMORY, "Failed to allocate the application base path for the AppDomainSetup.");
 
     hr = pAppDomainSetup->put_ApplicationBase(bstrAppBase);
     ExitOnRootFailure(hr, "Failed to set the application base path for the AppDomainSetup.");
 
-    bstrConfigPath = ::SysAllocString(sczConfigPath);
+    bstrConfigPath = ::SysAllocString(pState->sczConfigPath);
     ExitOnNull(bstrConfigPath, hr, E_OUTOFMEMORY, "Failed to allocate the application configuration file for the AppDomainSetup.");
 
     hr = pAppDomainSetup->put_ConfigurationFile(bstrConfigPath);
     ExitOnRootFailure(hr, "Failed to set the configuration file path for the AppDomainSetup.");
 
     // Create the AppDomain to load the factory type.
-    hr = pCLRHost->CreateDomainEx(L"MBA", pAppDomainSetup, NULL, &pUnk);
+    hr = pState->pCLRHost->CreateDomainEx(L"MBA", pAppDomainSetup, NULL, &pUnk);
     ExitOnRootFailure(hr, "Failed to create the MBA AppDomain.");
 
-    hr = pUnk->QueryInterface(__uuidof(_AppDomain), reinterpret_cast<LPVOID*>(ppAppDomain));
+    hr = pUnk->QueryInterface(__uuidof(_AppDomain), reinterpret_cast<LPVOID*>(&pState->pAppDomain));
     ExitOnRootFailure(hr, "Failed to query for the _AppDomain interface.");
 
 LExit:
     ReleaseBSTR(bstrConfigPath);
     ReleaseBSTR(bstrAppBase);
-    ReleaseStr(sczConfigPath);
-    ReleaseStr(sczAppBase);
     ReleaseNullObject(pUnk);
-    ReleaseNullObject(pCLRHost);
 
     return hr;
 }
 
-static HRESULT GetAppBase(
-    __out LPWSTR *psczAppBase
+static HRESULT LoadModulePaths(
+    __in MBASTATE* pState
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczFullPath = NULL;
 
-    hr = PathForCurrentProcess(&sczFullPath, vhInstance);
+    hr = PathForCurrentProcess(&sczFullPath, pState->hInstance);
     ExitOnFailure(hr, "Failed to get the full host path.");
 
-    hr = PathGetDirectory(sczFullPath, psczAppBase);
+    hr = PathGetDirectory(sczFullPath, &pState->sczAppBase);
     ExitOnFailure(hr, "Failed to get the directory of the full process path.");
+
+    hr = PathConcat(pState->sczAppBase, MBA_CONFIG_FILE_NAME, &pState->sczConfigPath);
+    ExitOnFailure(hr, "Failed to get the full path to the application configuration file.");
 
 LExit:
     ReleaseStr(sczFullPath);
@@ -390,9 +397,8 @@ LExit:
 }
 
 // Gets the CLR host and caches it.
-static HRESULT GetCLRHost(
-    __in LPCWSTR wzConfigPath,
-    __out ICorRuntimeHost **ppCLRHost
+static HRESULT LoadRuntime(
+    __in MBASTATE* pState
     )
 {
     HRESULT hr = S_OK;
@@ -411,84 +417,81 @@ static HRESULT GetCLRHost(
     // Always set the error mode because we will always restore it below.
     uiMode = ::SetErrorMode(0);
 
+    // Check that the supported framework is installed.
+    hr = CheckSupportedFrameworks(pState->sczConfigPath);
+    ExitOnFailure(hr, "Failed to find supported framework.");
+
     // Cache the CLR host to be shutdown later. This can occur on a different thread.
-    if (!vpCLRHost)
+    // Disable message boxes from being displayed on error and blocking execution.
+    ::SetErrorMode(uiMode | SEM_FAILCRITICALERRORS);
+
+    hr = LoadSystemLibrary(L"mscoree.dll", &hModule);
+    ExitOnFailure(hr, "Failed to load mscoree.dll");
+
+    pfnCLRCreateInstance = reinterpret_cast<CLRCreateInstanceFnPtr>(::GetProcAddress(hModule, "CLRCreateInstance"));
+
+    if (pfnCLRCreateInstance)
     {
-        // Disable message boxes from being displayed on error and blocking execution.
-        ::SetErrorMode(uiMode | SEM_FAILCRITICALERRORS);
-
-        hr = LoadSystemLibrary(L"mscoree.dll", &hModule);
-        ExitOnFailure(hr, "Failed to load mscoree.dll");
-
-        pfnCLRCreateInstance = reinterpret_cast<CLRCreateInstanceFnPtr>(::GetProcAddress(hModule, "CLRCreateInstance"));
-        
-        if (pfnCLRCreateInstance)
+        hr = pfnCLRCreateInstance(CLSID_CLRMetaHostPolicy, IID_ICLRMetaHostPolicy, reinterpret_cast<LPVOID*>(&pCLRMetaHostPolicy));
+        if (E_NOTIMPL != hr)
         {
-            hr = pfnCLRCreateInstance(CLSID_CLRMetaHostPolicy, IID_ICLRMetaHostPolicy, reinterpret_cast<LPVOID*>(&pCLRMetaHostPolicy));
-            if (E_NOTIMPL != hr)
-            {
-                ExitOnRootFailure(hr, "Failed to create instance of ICLRMetaHostPolicy.");
+            ExitOnRootFailure(hr, "Failed to create instance of ICLRMetaHostPolicy.");
 
-                fFallbackToCorBindToCurrentRuntime = FALSE;
-            }
-        }
-
-        if (fFallbackToCorBindToCurrentRuntime)
-        {
-            pfnCorBindToCurrentRuntime = reinterpret_cast<PFN_CORBINDTOCURRENTRUNTIME>(::GetProcAddress(hModule, "CorBindToCurrentRuntime"));
-            ExitOnNullWithLastError(pfnCorBindToCurrentRuntime, hr, "Failed to get procedure address for CorBindToCurrentRuntime.");
-
-            hr = pfnCorBindToCurrentRuntime(wzConfigPath, CLSID_CorRuntimeHost, IID_ICorRuntimeHost, reinterpret_cast<LPVOID*>(&vpCLRHost));
-            ExitOnRootFailure(hr, "Failed to create the CLR host using the application configuration file path.");
-        }
-        else
-        {
-
-            hr = SHCreateStreamOnFileEx(wzConfigPath, STGM_READ | STGM_SHARE_DENY_WRITE, 0, FALSE, NULL, &pCfgStream);
-            ExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", wzConfigPath);
-
-            hr = pCLRMetaHostPolicy->GetRequestedRuntime(METAHOST_POLICY_HIGHCOMPAT, NULL, pCfgStream, NULL, &cchVersion, NULL, NULL, &dwConfigFlags, IID_ICLRRuntimeInfo, reinterpret_cast<LPVOID*>(&pCLRRuntimeInfo));
-            ExitOnRootFailure(hr, "Failed to get the CLR runtime info using the application configuration file path.");
-
-            // .NET 4 RTM had a bug where it wouldn't set pcchVersion if pwzVersion was NULL.
-            if (!cchVersion)
-            {
-                hr = pCLRRuntimeInfo->GetVersionString(NULL, &cchVersion);
-                if (HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER) != hr)
-                {
-                    ExitOnFailure(hr, "Failed to get the length of the CLR version string.");
-                }
-            }
-
-            hr = StrAlloc(&pwzVersion, cchVersion);
-            ExitOnFailure(hr, "Failed to allocate the CLR version string.");
-
-            hr = pCLRRuntimeInfo->GetVersionString(pwzVersion, &cchVersion);
-            ExitOnFailure(hr, "Failed to get the CLR version string.");
-
-            if (CSTR_EQUAL == CompareString(LOCALE_NEUTRAL, 0, L"v4.0.30319", -1, pwzVersion, cchVersion))
-            {
-                hr = VerifyNET4RuntimeIsSupported();
-                ExitOnFailure(hr, "Found unsupported .NET 4 Runtime.");
-            }
-
-            if (METAHOST_CONFIG_FLAGS_LEGACY_V2_ACTIVATION_POLICY_TRUE == (METAHOST_CONFIG_FLAGS_LEGACY_V2_ACTIVATION_POLICY_MASK & dwConfigFlags))
-            {
-                hr = pCLRRuntimeInfo->BindAsLegacyV2Runtime();
-                ExitOnRootFailure(hr, "Failed to bind as legacy V2 runtime.");
-            }
-
-            hr = pCLRRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_ICorRuntimeHost, reinterpret_cast<LPVOID*>(&vpCLRHost));
-            ExitOnRootFailure(hr, "Failed to get instance of ICorRuntimeHost.");
-
-            // TODO: use ICLRRuntimeHost instead of ICorRuntimeHost on .NET 4 since the former is faster and the latter is deprecated
-            //hr = pCLRRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost, reinterpret_cast<LPVOID*>(&pCLRRuntimeHost));
-            //ExitOnRootFailure(hr, "Failed to get instance of ICLRRuntimeHost.");
+            fFallbackToCorBindToCurrentRuntime = FALSE;
         }
     }
 
-    vpCLRHost->AddRef();
-    *ppCLRHost = vpCLRHost;
+    if (fFallbackToCorBindToCurrentRuntime)
+    {
+        pfnCorBindToCurrentRuntime = reinterpret_cast<PFN_CORBINDTOCURRENTRUNTIME>(::GetProcAddress(hModule, "CorBindToCurrentRuntime"));
+        ExitOnNullWithLastError(pfnCorBindToCurrentRuntime, hr, "Failed to get procedure address for CorBindToCurrentRuntime.");
+
+        hr = pfnCorBindToCurrentRuntime(pState->sczConfigPath, CLSID_CorRuntimeHost, IID_ICorRuntimeHost, reinterpret_cast<LPVOID*>(&pState->pCLRHost));
+        ExitOnRootFailure(hr, "Failed to create the CLR host using the application configuration file path.");
+    }
+    else
+    {
+
+        hr = SHCreateStreamOnFileEx(pState->sczConfigPath, STGM_READ | STGM_SHARE_DENY_WRITE, 0, FALSE, NULL, &pCfgStream);
+        ExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", pState->sczConfigPath);
+
+        hr = pCLRMetaHostPolicy->GetRequestedRuntime(METAHOST_POLICY_HIGHCOMPAT, NULL, pCfgStream, NULL, &cchVersion, NULL, NULL, &dwConfigFlags, IID_ICLRRuntimeInfo, reinterpret_cast<LPVOID*>(&pCLRRuntimeInfo));
+        ExitOnRootFailure(hr, "Failed to get the CLR runtime info using the application configuration file path.");
+
+        // .NET 4 RTM had a bug where it wouldn't set pcchVersion if pwzVersion was NULL.
+        if (!cchVersion)
+        {
+            hr = pCLRRuntimeInfo->GetVersionString(NULL, &cchVersion);
+            if (HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER) != hr)
+            {
+                ExitOnFailure(hr, "Failed to get the length of the CLR version string.");
+            }
+        }
+
+        hr = StrAlloc(&pwzVersion, cchVersion);
+        ExitOnFailure(hr, "Failed to allocate the CLR version string.");
+
+        hr = pCLRRuntimeInfo->GetVersionString(pwzVersion, &cchVersion);
+        ExitOnFailure(hr, "Failed to get the CLR version string.");
+
+        if (CSTR_EQUAL == CompareString(LOCALE_NEUTRAL, 0, L"v4.0.30319", -1, pwzVersion, cchVersion))
+        {
+            hr = VerifyNET4RuntimeIsSupported();
+            ExitOnFailure(hr, "Found unsupported .NET 4 Runtime.");
+        }
+
+        if (METAHOST_CONFIG_FLAGS_LEGACY_V2_ACTIVATION_POLICY_TRUE == (METAHOST_CONFIG_FLAGS_LEGACY_V2_ACTIVATION_POLICY_MASK & dwConfigFlags))
+        {
+            hr = pCLRRuntimeInfo->BindAsLegacyV2Runtime();
+            ExitOnRootFailure(hr, "Failed to bind as legacy V2 runtime.");
+        }
+
+        hr = pCLRRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_ICorRuntimeHost, reinterpret_cast<LPVOID*>(&pState->pCLRHost));
+        ExitOnRootFailure(hr, "Failed to get instance of ICorRuntimeHost.");
+    }
+
+    hr = pState->pCLRHost->Start();
+    ExitOnRootFailure(hr, "Failed to start the CLR host.");
 
 LExit:
     ReleaseStr(pwzVersion);
@@ -569,7 +572,7 @@ LExit:
 }
 
 static HRESULT CreatePrerequisiteBA(
-    __in HRESULT hrHostInitialization,
+    __in MBASTATE* pState,
     __in IBootstrapperEngine* pEngine,
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
     __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
@@ -579,19 +582,19 @@ static HRESULT CreatePrerequisiteBA(
     LPWSTR sczMbapreqPath = NULL;
     HMODULE hModule = NULL;
 
-    hr = PathRelativeToModule(&sczMbapreqPath, L"mbapreq.dll", vhInstance);
-    ExitOnFailure(hr, "Failed to get path to pre-requisite BA.");
+    hr = PathConcat(pState->sczAppBase, L"mbapreq.dll", &sczMbapreqPath);
+    BalExitOnFailure(hr, "Failed to get path to pre-requisite BA.");
 
-    hModule = ::LoadLibraryW(sczMbapreqPath);
+    hModule = ::LoadLibraryExW(sczMbapreqPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     ExitOnNullWithLastError(hModule, hr, "Failed to load pre-requisite BA DLL.");
 
-    PFN_MBAPREQ_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = reinterpret_cast<PFN_MBAPREQ_BOOTSTRAPPER_APPLICATION_CREATE>(::GetProcAddress(hModule, "MbaPrereqBootstrapperApplicationCreate"));
-    ExitOnNullWithLastError(pfnCreate, hr, "Failed to get MbaPrereqBootstrapperApplicationCreate entry-point from: %ls", sczMbapreqPath);
+    PFN_PREQ_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = reinterpret_cast<PFN_PREQ_BOOTSTRAPPER_APPLICATION_CREATE>(::GetProcAddress(hModule, "PrereqBootstrapperApplicationCreate"));
+    ExitOnNullWithLastError(pfnCreate, hr, "Failed to get PrereqBootstrapperApplicationCreate entry-point from: %ls", sczMbapreqPath);
 
-    hr = pfnCreate(hrHostInitialization, pEngine, pArgs, pResults);
+    hr = pfnCreate(&pState->prereqData, pEngine, pArgs, pResults);
     ExitOnFailure(hr, "Failed to create prequisite bootstrapper app.");
 
-    vhMbapreqModule = hModule;
+    pState->hMbapreqModule = hModule;
     hModule = NULL;
 
 LExit:

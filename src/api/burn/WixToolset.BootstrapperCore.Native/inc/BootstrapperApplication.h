@@ -1494,7 +1494,22 @@ extern "C" typedef HRESULT(WINAPI *PFN_BOOTSTRAPPER_APPLICATION_PROC)(
     __in_opt LPVOID pvContext
     );
 
-extern "C" typedef void (WINAPI *PFN_BOOTSTRAPPER_APPLICATION_DESTROY)();
+struct BOOTSTRAPPER_DESTROY_ARGS
+{
+    DWORD cbSize;
+    BOOL fReload;
+};
+
+struct BOOTSTRAPPER_DESTROY_RESULTS
+{
+    DWORD cbSize;
+    BOOL fDisableUnloading; // indicates the BA dll must not be unloaded after BootstrapperApplicationDestroy.
+};
+
+extern "C" typedef void (WINAPI *PFN_BOOTSTRAPPER_APPLICATION_DESTROY)(
+    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
+    __inout BOOTSTRAPPER_DESTROY_RESULTS* pResults
+    );
 
 
 
@@ -1512,7 +1527,6 @@ struct BOOTSTRAPPER_CREATE_RESULTS
     DWORD cbSize;
     PFN_BOOTSTRAPPER_APPLICATION_PROC pfnBootstrapperApplicationProc;
     LPVOID pvBootstrapperApplicationProcContext;
-    BOOL fDisableUnloading; // indicates the BA dll must not be unloaded after BootstrapperApplicationDestroy.
 };
 
 extern "C" typedef HRESULT(WINAPI *PFN_BOOTSTRAPPER_APPLICATION_CREATE)(

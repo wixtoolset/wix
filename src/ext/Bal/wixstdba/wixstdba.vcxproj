@@ -52,6 +52,7 @@
     <ClCompile Include="wixstdba.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\preqba.h" />
     <ClInclude Include="precomp.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

@@ -50,7 +50,7 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     hr = BalInitializeFromCreateArgs(pArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
 
-    hr = CreateBootstrapperApplication(vhInstance, FALSE, S_OK, pEngine, pArgs, pResults, &vpApplication);
+    hr = CreateBootstrapperApplication(vhInstance, NULL, pEngine, pArgs, pResults, &vpApplication);
     BalExitOnFailure(hr, "Failed to create bootstrapper application interface.");
 
 LExit:
@@ -60,16 +60,24 @@ LExit:
 }
 
 
-extern "C" void WINAPI BootstrapperApplicationDestroy()
+extern "C" void WINAPI BootstrapperApplicationDestroy(
+    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
+    __in BOOTSTRAPPER_DESTROY_RESULTS* pResults
+    )
 {
+    if (vpApplication)
+    {
+        DestroyBootstrapperApplication(vpApplication, pArgs, pResults);
+    }
+
     ReleaseNullObject(vpApplication);
     BalUninitialize();
     DutilUninitialize();
 }
 
 
-extern "C" HRESULT WINAPI DncPrereqBootstrapperApplicationCreate(
-    __in HRESULT hrHostInitialization,
+extern "C" HRESULT WINAPI PrereqBootstrapperApplicationCreate(
+    __in_opt PREQBA_DATA* pPrereqData,
     __in IBootstrapperEngine* pEngine,
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
     __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
@@ -81,48 +89,20 @@ extern "C" HRESULT WINAPI DncPrereqBootstrapperApplicationCreate(
 
     BalInitialize(pEngine);
 
-    hr = CreateBootstrapperApplication(vhInstance, TRUE, hrHostInitialization, pEngine, pArgs, pResults, &vpApplication);
-    BalExitOnFailure(hr, "Failed to create .NET Core prerequisite bootstrapper application interface.");
+    hr = CreateBootstrapperApplication(vhInstance, pPrereqData, pEngine, pArgs, pResults, &vpApplication);
+    BalExitOnFailure(hr, "Failed to create prerequisite bootstrapper application interface.");
 
 LExit:
     return hr;
 }
 
 
-extern "C" void WINAPI DncPrereqBootstrapperApplicationDestroy()
-{
-    ReleaseNullObject(vpApplication);
-    BalUninitialize();
-    DutilUninitialize();
-}
-
-
-extern "C" HRESULT WINAPI MbaPrereqBootstrapperApplicationCreate(
-    __in HRESULT hrHostInitialization,
-    __in IBootstrapperEngine* pEngine,
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+extern "C" void WINAPI PrereqBootstrapperApplicationDestroy(
+    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
+    __in BOOTSTRAPPER_DESTROY_RESULTS* pResults
     )
 {
-    HRESULT hr = S_OK;
-
-    DutilInitialize(&WixstdbaTraceError);
-
-    BalInitialize(pEngine);
-
-    hr = CreateBootstrapperApplication(vhInstance, TRUE, hrHostInitialization, pEngine, pArgs, pResults, &vpApplication);
-    BalExitOnFailure(hr, "Failed to create managed prerequisite bootstrapper application interface.");
-
-LExit:
-    return hr;
-}
-
-
-extern "C" void WINAPI MbaPrereqBootstrapperApplicationDestroy()
-{
-    ReleaseNullObject(vpApplication);
-    BalUninitialize();
-    DutilUninitialize();
+    BootstrapperApplicationDestroy(pArgs, pResults);
 }
 
 static void CALLBACK WixstdbaTraceError(

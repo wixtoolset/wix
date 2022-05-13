@@ -122,7 +122,6 @@ extern "C" HRESULT UserExperienceLoad(
 
     pUserExperience->pfnBAProc = results.pfnBootstrapperApplicationProc;
     pUserExperience->pvBAProcContext = results.pvBootstrapperApplicationProcContext;
-    pUserExperience->fDisableUnloading = results.fDisableUnloading;
 
 LExit:
     return hr;
@@ -133,10 +132,18 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT UserExperienceUnload(
-    __in BURN_USER_EXPERIENCE* pUserExperience
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOL fReload
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_DESTROY_ARGS args = { };
+    BOOTSTRAPPER_DESTROY_RESULTS results = { };
+
+    args.cbSize = sizeof(BOOTSTRAPPER_DESTROY_ARGS);
+    args.fReload = fReload;
+
+    results.cbSize = sizeof(BOOTSTRAPPER_DESTROY_RESULTS);
 
     if (pUserExperience->hUXModule)
     {
@@ -144,11 +151,11 @@ extern "C" HRESULT UserExperienceUnload(
         PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = (PFN_BOOTSTRAPPER_APPLICATION_DESTROY)::GetProcAddress(pUserExperience->hUXModule, "BootstrapperApplicationDestroy");
         if (pfnDestroy)
         {
-            pfnDestroy();
+            pfnDestroy(&args, &results);
         }
 
         // Free BA DLL if it supports it.
-        if (!pUserExperience->fDisableUnloading && !::FreeLibrary(pUserExperience->hUXModule))
+        if (!results.fDisableUnloading && !::FreeLibrary(pUserExperience->hUXModule))
         {
             hr = HRESULT_FROM_WIN32(::GetLastError());
             TraceError(hr, "Failed to unload BA DLL.");

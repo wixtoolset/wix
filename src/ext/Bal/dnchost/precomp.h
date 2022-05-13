@@ -25,6 +25,8 @@
 #include <hostfxr.h>
 #include <coreclr_delegates.h>
 
+#include <preqba.h>
+
 #include "coreclrhost.h"
 #include "dncutil.h"
 #include "dnchost.h"

@@ -179,7 +179,14 @@ namespace WixToolset.WixBA
             Threading.Dispatcher.Run();
 
             this.PostTelemetry();
-            this.Engine.Quit(WixBA.Model.Result);
+
+            var exitCode = WixBA.Model.Result;
+            if ((exitCode & 0xFFFF0000) == unchecked(0x80070000))
+            {
+                exitCode &= 0xFFFF; // return plain old Win32 error, not HRESULT.
+            }
+
+            this.Engine.Quit(exitCode);
         }
 
         private void PostTelemetry()

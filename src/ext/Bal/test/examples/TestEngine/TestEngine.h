@@ -44,7 +44,9 @@ public:
         __in DWORD dwExitCode
         );
 
-    void UnloadBA();
+    void UnloadBA(
+        __in BOOL fReload
+        );
 
 private:
     HRESULT BAEngineLog(

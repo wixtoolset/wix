@@ -28,7 +28,7 @@ HRESULT RunWaitForQuitEngine(
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
 
-    pTestEngine->UnloadBA();
+    pTestEngine->UnloadBA(FALSE);
 
 LExit:
     return hr;

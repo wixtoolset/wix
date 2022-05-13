@@ -4,7 +4,5 @@
 EXPORTS
     BootstrapperApplicationCreate
     BootstrapperApplicationDestroy
-    DncPrereqBootstrapperApplicationCreate
-    DncPrereqBootstrapperApplicationDestroy
-    MbaPrereqBootstrapperApplicationCreate
-    MbaPrereqBootstrapperApplicationDestroy
+    PrereqBootstrapperApplicationCreate
+    PrereqBootstrapperApplicationDestroy
