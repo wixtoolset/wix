@@ -17,7 +17,7 @@ namespace WixToolsetTest.BurnE2E
         private const string V100 = "1.0.0.0";
         private const string V101 = "1.0.1.0";
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallBundleWithSlipstreamedPatchThenRemoveIt()
         {
             var testRegistryValue = "PackageA";
@@ -45,7 +45,7 @@ namespace WixToolsetTest.BurnE2E
         /// BundleOnlyPatchA in uninstalled which should do nothing since BundleA has a dependency on it.
         /// Bundle is installed which should remove everything.
         /// </summary>
-        [Fact]
+        [RuntimeFact]
         public void ReferenceCountsSlipstreamedPatch()
         {
             var testRegistryValue = "PackageA";
@@ -78,13 +78,13 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6350")]
+        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6350")]
         public void CanInstallBundleWithSlipstreamedPatchThenRepairIt()
         {
             this.InstallBundleWithSlipstreamedPatchThenRepairIt(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6350")]
+        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6350")]
         public void CanInstallReversedBundleWithSlipstreamedPatchThenRepairIt()
         {
             this.InstallBundleWithSlipstreamedPatchThenRepairIt(true);
@@ -121,13 +121,13 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallSlipstreamedPatchThroughForcedRepair()
         {
             this.InstallSlipstreamedPatchThroughForcedRepair(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallSlipstreamedPatchThroughReversedForcedRepair()
         {
             this.InstallSlipstreamedPatchThroughForcedRepair(true);
@@ -177,7 +177,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanUninstallSlipstreamedPatchAlone()
         {
             var testRegistryValue = "PackageA";
@@ -207,7 +207,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanModifyToUninstallPackageWithSlipstreamedPatch()
         {
             var testRegistryValue = "PackageA";
@@ -244,7 +244,7 @@ namespace WixToolsetTest.BurnE2E
             packageBv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void UninstallsPackageWithSlipstreamedPatchDuringRollback()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -266,7 +266,7 @@ namespace WixToolsetTest.BurnE2E
             packageBv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6402")]
+        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6402")]
         public void CanAutomaticallyPredetermineSlipstreamPatchesAtBuildTime()
         {
             var testRegistryValueA = "PackageA";
@@ -300,7 +300,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallSlipstreamedPatchWithPackageDuringMajorUpgrade()
         {
             var testRegistryValue = "PackageA";
@@ -327,7 +327,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void RespectsSlipstreamedPatchInstallCondition()
         {
             var testRegistryValue = "PackageA";

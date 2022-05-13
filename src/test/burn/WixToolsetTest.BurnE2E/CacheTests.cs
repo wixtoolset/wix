@@ -15,7 +15,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public CacheTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        private bool Is5GBFileAvailable()
+        private void SkipIf5GBFileUnavailable()
         {
             // Recreate the 5GB payload to avoid having to copy it to the VM to run the tests.
             const long FiveGB = 5_368_709_120;
@@ -27,8 +27,7 @@ namespace WixToolsetTest.BurnE2E
             var drive = new DriveInfo(targetFilePath.Substring(0, 1));
             if (drive.AvailableFreeSpace < FiveGB + OneGB)
             {
-                Console.WriteLine($"Skipping {this.TestContext.TestName} because there is not enough disk space available to run the test.");
-                return false;
+                WixAssert.Skip($"Skipping {this.TestContext.TestName} because there is not enough disk space available to run the test.");
             }
 
             if (!File.Exists(targetFilePath))
@@ -40,17 +39,12 @@ namespace WixToolsetTest.BurnE2E
                 };
                 testTool.Run(true);
             }
-
-            return true;
         }
 
-        [Fact]
+        [LongRuntimeFact]
         public void CanCache5GBFile()
         {
-            if (!this.Is5GBFileAvailable())
-            {
-                return;
-            }
+            this.SkipIf5GBFileUnavailable();
 
             var packageA = this.CreatePackageInstaller("PackageA");
             var bundleC = this.CreateBundleInstaller("BundleC");
@@ -65,10 +59,7 @@ namespace WixToolsetTest.BurnE2E
 
         private string Cache5GBFileFromDownload(bool disableRangeRequests)
         {
-            if (!this.Is5GBFileAvailable())
-            {
-                return null;
-            }
+            this.SkipIf5GBFileUnavailable();
 
             var packageA = this.CreatePackageInstaller("PackageA");
             var bundleC = this.CreateBundleInstaller("BundleC");
@@ -100,33 +91,25 @@ namespace WixToolsetTest.BurnE2E
             return installLogPath;
         }
 
-        [Fact]
+        [LongRuntimeFact]
         public void CanCache5GBFileFromDownloadWithRangeRequestSupport()
         {
             var logPath = this.Cache5GBFileFromDownload(false);
-            if (logPath == null)
-            {
-                return;
-            }
 
             Assert.False(LogVerifier.MessageInLogFile(logPath, "Range request not supported for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
             Assert.False(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
         }
 
-        [Fact]
+        [LongRuntimeFact]
         public void CanCache5GBFileFromDownloadWithoutRangeRequestSupport()
         {
             var logPath = this.Cache5GBFileFromDownload(true);
-            if (logPath == null)
-            {
-                return;
-            }
 
             Assert.True(LogVerifier.MessageInLogFile(logPath, "Range request not supported for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
             Assert.False(LogVerifier.MessageInLogFile(logPath, "Content-Length not returned for URL: http://localhost:9999/e2e/BundleC/fivegb.file"));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanDownloadPayloadsFromMissingAttachedContainer()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -178,7 +161,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(modifyLogPath, "Ignoring failure to get size and time for URL: http://localhost:9999/e2e/BundleA/PackageB.msi (error 0x80070002)"));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanFindAttachedContainerFromRenamedBundle()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

@@ -21,6 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit.assert" />
+    <PackageReference Include="xunit" />
   </ItemGroup>
 </Project>

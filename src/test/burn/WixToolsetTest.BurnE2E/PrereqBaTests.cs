@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -18,7 +19,7 @@ namespace WixToolsetTest.BurnE2E
         ///   The preqba doesn't infinitely reload itself after failing to load the managed BA.
         ///   The engine automatically uninstalls the bundle since only permanent packages were installed.
         /// </summary>
-        [Fact]
+        [RuntimeFact]
         public void DncPreqBaDetectsInfiniteLoop()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -49,7 +50,7 @@ namespace WixToolsetTest.BurnE2E
         ///   The preqba doesn't infinitely reload itself after failing to load the managed BA.
         ///   The engine automatically uninstalls the bundle since only permanent packages were installed.
         /// </summary>
-        [Fact]
+        [RuntimeFact]
         public void MbaPreqBaDetectsInfiniteLoop()
         {
             var packageB = this.CreatePackageInstaller("PackageB");

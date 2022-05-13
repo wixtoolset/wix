@@ -5,6 +5,7 @@ namespace WixToolsetTest.BurnE2E
     using System;
     using System.IO;
     using System.Xml;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -12,7 +13,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public PatchTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanRunDetectMultipleTimesWithPatches()
         {
             var testBAController = this.CreateTestBAController();
@@ -21,7 +22,7 @@ namespace WixToolsetTest.BurnE2E
             this.CanInstallBundleWithPatchThenRemoveIt();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallBundleWithPatchThenRemoveIt()
         {
             var originalVersion = "1.0.0.0";
@@ -55,7 +56,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6675")]
+        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6675")]
         public void CanPatchSwidTag()
         {
             var originalVersion = "1.0.0.0";
@@ -84,7 +85,7 @@ namespace WixToolsetTest.BurnE2E
             VerifySwidTagVersion(packageTagName, null);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallBundleWithPatchesTargetingSingleProductThenRemoveIt()
         {
             var originalVersion = "1.0.0.0";

@@ -14,7 +14,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public VariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanHideHiddenVariables()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -32,7 +32,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(LogVerifier.MessageInLogFile(logFilePath, "supersecretkey"));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanSupportCaseSensitiveVariables()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

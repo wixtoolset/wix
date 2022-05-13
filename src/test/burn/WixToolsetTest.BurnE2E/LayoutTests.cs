@@ -5,6 +5,7 @@ namespace WixToolsetTest.BurnE2E
     using System.Collections.Generic;
     using System.IO;
     using WixBuildTools.TestSupport;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -12,7 +13,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public LayoutTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanLayoutBundleInPlaceWithMissingPayloads()
         {
             var bundleA = this.CreateBundleInstaller("BundleA");
@@ -41,7 +42,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(File.Exists(Path.Combine(layoutDirectory, "BundleA.wxs")));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanLayoutBundleToNewDirectory()
         {
             var bundleA = this.CreateBundleInstaller("BundleA");

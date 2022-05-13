@@ -6,6 +6,7 @@ namespace WixBuildTools.TestSupport
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
+    using WixBuildTools.TestSupport.XunitExtensions;
     using Xunit;
 
     public class WixAssert : Assert
@@ -39,6 +40,16 @@ namespace WixBuildTools.TestSupport
             var actualDoc = XDocument.Load(actualPath, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo);
 
             CompareXml(expectedDoc, actualDoc);
+        }
+
+        /// <summary>
+        /// Dynamically skips the test.
+        /// Requires that the test was marked with a fact attribute derived from <see cref="WixBuildTools.TestSupport.XunitExtensions.SkippableFactAttribute" />
+        /// or <see cref="WixBuildTools.TestSupport.XunitExtensions.SkippableTheoryAttribute" />
+        /// </summary>
+        public static void Skip(string message)
+        {
+            throw new SkipTestException(message);
         }
 
         public static void Succeeded(int hr, string format, params object[] formatArgs)

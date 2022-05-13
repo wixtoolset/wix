@@ -17,7 +17,7 @@ namespace WixToolsetTest.BurnE2E
         private const string V100 = "1.0.0.0";
         private const string V200 = "2.0.0.0";
 
-        [Fact]
+        [RuntimeFact]
         public void CanIgnoreBundleDependentForUnsafeUninstall()
         {
             string providerId = BundleAProviderId;
@@ -49,7 +49,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanTrack1ForwardCompatibleDependentThroughMajorUpgrade()
         {
             string providerId = BundleAProviderId;
@@ -105,7 +105,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanTrack1ForwardCompatibleDependentThroughMajorUpgradeWithParentNone()
         {
             string providerId = BundleAProviderId;
@@ -151,7 +151,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanTrack2ForwardCompatibleDependentsThroughMajorUpgrade()
         {
             string providerId = BundleAProviderId;
@@ -233,7 +233,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanTrack2ForwardCompatibleDependentsThroughMajorUpgradePerUser()
         {
             string providerId = BundleCProviderId;
@@ -315,7 +315,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanTrack2ForwardCompatibleDependentsThroughMajorUpgradeWithParent()
         {
             string providerId = BundleAProviderId;
@@ -401,7 +401,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanUninstallForwardCompatibleWithBundlesUninstalledInFifoOrder()
         {
             string providerId = BundleAProviderId;
@@ -449,7 +449,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(BundleRegistration.TryGetDependencyProviderValue(providerId, "Version", out _));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanUninstallForwardCompatibleWithBundlesUninstalledInReverseOrder()
         {
             string providerId = BundleAProviderId;

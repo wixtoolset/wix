@@ -12,7 +12,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public MsiTransactionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanUpgradeBundleWithMsiTransaction()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -82,7 +82,7 @@ namespace WixToolsetTest.BurnE2E
         ///     package F fails
         ///     Thus, rolling back the transaction should reinstall package Bv1
         /// </summary>
-        [Fact]
+        [RuntimeFact]
         public void CanRelyOnMsiTransactionRollback()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

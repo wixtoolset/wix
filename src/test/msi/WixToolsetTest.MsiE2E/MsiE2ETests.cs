@@ -38,7 +38,7 @@ namespace WixToolsetTest.MsiE2E
     }
 
     [CollectionDefinition("MsiE2E", DisableParallelization = true)]
-    public class MsiE2ECollectionDefinition : ICollectionFixture<MsiE2EFixture>
+    public class MsiE2ECollectionDefinition
     {
     }
 }

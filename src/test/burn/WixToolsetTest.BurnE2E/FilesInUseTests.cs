@@ -4,14 +4,13 @@ namespace WixToolsetTest.BurnE2E
 {
     using System.IO;
     using WixTestTools;
-    using Xunit;
     using Xunit.Abstractions;
 
     public class FilesInUseTests : BurnE2ETests
     {
         public FilesInUseTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelInstallAfterRetryingLockedFile()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

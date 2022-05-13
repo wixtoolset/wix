@@ -73,7 +73,7 @@ namespace WixToolsetTest.BurnE2E
     }
 
     [CollectionDefinition("BurnE2E", DisableParallelization = true)]
-    public class BurnE2ECollectionDefinition : ICollectionFixture<BurnE2EFixture>
+    public class BurnE2ECollectionDefinition
     {
     }
 }

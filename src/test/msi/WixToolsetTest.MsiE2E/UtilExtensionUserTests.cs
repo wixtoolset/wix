@@ -15,7 +15,7 @@ namespace WixToolsetTest.MsiE2E
         const string TempUsername = "USERNAME";
 
         // Verify that the users specified in the authoring are created as expected.
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallUsers()
         {
             var arguments = new string[]
@@ -49,7 +49,7 @@ namespace WixToolsetTest.MsiE2E
         }
 
         // Verify the rollback action reverts all Users changes.
-        [Fact]
+        [RuntimeFact]
         public void CanRollbackUsers()
         {
             var arguments = new string[]
@@ -74,7 +74,7 @@ namespace WixToolsetTest.MsiE2E
         }
 
         // Verify that the users specified in the authoring are created as expected on repair.
-        [Fact(Skip = "Test demonstrates failure")]
+        [RuntimeFact(Skip = "Test demonstrates failure")]
         public void CanRepairUsers()
         {
             var arguments = new string[]
@@ -113,7 +113,7 @@ namespace WixToolsetTest.MsiE2E
         }
 
         // Verify that Installation fails if FailIfExisits is set.
-        [Fact]
+        [RuntimeFact]
         public void FailsIfUserExists()
         {
             var productFailIfExists = this.CreatePackageInstaller("ProductFailIfExists");
@@ -139,7 +139,7 @@ namespace WixToolsetTest.MsiE2E
         }
 
         // Verify that a user cannot be created on a domain on which you dont have create user permission.
-        [Fact]
+        [RuntimeFact]
         public void FailsIfRestrictedDomain()
         {
             var productRestrictedDomain = this.CreatePackageInstaller("ProductRestrictedDomain");
@@ -151,7 +151,7 @@ namespace WixToolsetTest.MsiE2E
         }
 
         // Verify that adding a user to a non-existent group does not fail the install when non-vital.
-        [Fact]
+        [RuntimeFact]
         public void IgnoresMissingGroupWhenNonVital()
         {
             var productNonVitalGroup = this.CreatePackageInstaller("ProductNonVitalUserGroup");

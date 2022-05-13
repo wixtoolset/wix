@@ -12,7 +12,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public UpgradeRelatedBundleTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void ReinstallsOlderBundleAfterFailure()
         {
             var packageAv2 = this.CreatePackageInstaller("PackageAv2");
@@ -39,7 +39,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv3.VerifyInstalled(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void ReportsRelatedBundleMissingFromCache()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -60,7 +60,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv2InstallLogFilePath, @"Detected related bundle: \{[0-9A-Za-z\-]{36}\}, type: Upgrade, scope: PerMachine, version: 1\.0\.0\.0, cached: No"));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void Bundle64UpgradesBundle32()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -79,7 +79,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv2x64InstallLogFilePath, @"Detected related package: \{[0-9A-Za-z\-]{36}\}, scope: PerMachine, version: 1.0.0.0, language: 1033 operation: MajorUpgrade"));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void Bundle32UpgradesBundle64()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");

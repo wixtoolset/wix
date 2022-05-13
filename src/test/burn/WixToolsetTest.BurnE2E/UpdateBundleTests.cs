@@ -6,6 +6,7 @@ namespace WixToolsetTest.BurnE2E
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -13,7 +14,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public UpdateBundleTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanLaunchUpdateBundleFromLocalSourceInsteadOfInstall()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -39,7 +40,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv2.VerifyInstalled(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanLaunchUpdateBundleFromLocalSourceInsteadOfModify()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -71,7 +72,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv2.VerifyInstalled(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void ForwardsArgumentsToUpdateBundle()
         {
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
@@ -107,7 +108,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
         // Installs bundle Bv1.0 then tries to update to latest version during modify (but no server exists).
-        [Fact]
+        [RuntimeFact]
         public void CanCheckUpdateServerDuringModifyAndDoNothingWhenServerIsntResponsive()
         {
             var packageB = this.CreatePackageInstaller("PackageBv1");
@@ -133,7 +134,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
         // Installs bundle Bv1.0 then tries to update to latest version during modify (server exists, no feed).
-        [Fact]
+        [RuntimeFact]
         public void CanCheckUpdateServerDuringModifyAndDoNothingWhenFeedIsMissing()
         {
             var packageB = this.CreatePackageInstaller("PackageBv1");
@@ -162,7 +163,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
         // Installs bundle Bv1.0 then tries to update to latest version during modify (server exists, v1.0 feed).
-        [Fact]
+        [RuntimeFact]
         public void CanCheckUpdateServerDuringModifyAndDoNothingWhenAlreadyLatestVersion()
         {
             var packageB = this.CreatePackageInstaller("PackageBv1");
@@ -195,7 +196,7 @@ namespace WixToolsetTest.BurnE2E
         }
 
         // Installs bundle Bv1.0 then does an update to bundle Bv2.0 during modify (server exists, v2.0 feed).
-        [Fact]
+        [RuntimeFact]
         public void CanLaunchUpdateBundleFromDownloadInsteadOfModify()
         {
             var packageBv1 = this.CreatePackageInstaller("PackageBv1");

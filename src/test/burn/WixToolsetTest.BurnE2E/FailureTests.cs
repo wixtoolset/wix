@@ -12,7 +12,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public FailureTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelExePackageAndAbandonIt()
         {
             var bundleD = this.CreateBundleInstaller("BundleD");
@@ -29,7 +29,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(LogVerifier.MessageInLogFile(logPath, "TestRegistryValue: Rollback, ExeA, Version"));
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelExePackageAndWaitUntilItCompletes()
         {
             var bundleD = this.CreateBundleInstaller("BundleD");
@@ -50,7 +50,7 @@ namespace WixToolsetTest.BurnE2E
             bundleD.VerifyExeTestRegistryRootDeleted("ExeA");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelMsiPackageVeryEarly()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -68,7 +68,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelMsiPackageVeryLate()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -86,7 +86,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelMsiPackageInOnProgress()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -104,7 +104,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanCancelExecuteWhileCaching()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -128,7 +128,7 @@ namespace WixToolsetTest.BurnE2E
         /// PackageA is not compressed in the bundle and has a Name different from the source file. The Name points to a file that does not exist.
         /// BundleC should be able to install successfully by ignoring the missing PackageA and installing PackageB.
         /// </summary>
-        [Fact]
+        [RuntimeFact]
         public void CanInstallWhenMissingNonVitalPackage()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
