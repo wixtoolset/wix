@@ -85,7 +85,7 @@ DAPI_(HRESULT) BextGetBundleExtensionDataNode(
 
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &sczId);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczId, -1, wzExtensionId, -1))
         {

@@ -123,29 +123,21 @@ DAPI_(HRESULT) BalInfoParseFromXml(
 {
     HRESULT hr = S_OK;
     IXMLDOMNode* pNode = NULL;
+    BOOL fXmlFound = FALSE;
 
     hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixBundleProperties", &pNode);
-    ExitOnFailure(hr, "Failed to select bundle information.");
+    BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to select bundle information.");
 
-    if (S_OK == hr)
+    if (fXmlFound)
     {
         hr = XmlGetYesNoAttribute(pNode, L"PerMachine", &pBundle->fPerMachine);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to read bundle information per-machine.");
-        }
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read bundle information per-machine.");
 
         hr = XmlGetAttributeEx(pNode, L"DisplayName", &pBundle->sczName);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to read bundle information display name.");
-        }
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read bundle information display name.");
 
         hr = XmlGetAttributeEx(pNode, L"LogPathVariable", &pBundle->sczLogVariable);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to read bundle information log path variable.");
-        }
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read bundle information log path variable.");
     }
 
     hr = ParseOverridableVariablesFromXml(&pBundle->overridableVariables, pixdManifest);
@@ -192,7 +184,7 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
         break;
 
     default:
-        ExitOnFailure(hr = E_INVALIDARG, "Unknown related bundle type: %u", relationType);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Unknown related bundle type: %u", relationType);
     }
 
     // Check to see if the bundle is already in the list of packages.
@@ -403,6 +395,7 @@ static HRESULT ParsePackagesFromXml(
     BAL_INFO_PACKAGE* prgPackages = NULL;
     DWORD cPackages = 0;
     LPWSTR scz = NULL;
+    BOOL fXmlFound = FALSE;
 
     hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixPackageProperties", &pNodeList);
     ExitOnFailure(hr, "Failed to select all packages.");
@@ -417,22 +410,16 @@ static HRESULT ParsePackagesFromXml(
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
     {
         hr = XmlGetAttributeEx(pNode, L"Package", &prgPackages[iPackage].sczId);
-        ExitOnFailure(hr, "Failed to get package identifier for package.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get package identifier for package.");
 
         hr = XmlGetAttributeEx(pNode, L"DisplayName", &prgPackages[iPackage].sczDisplayName);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get display name for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get display name for package.");
 
         hr = XmlGetAttributeEx(pNode, L"Description", &prgPackages[iPackage].sczDescription);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get description for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get description for package.");
 
         hr = XmlGetAttributeEx(pNode, L"PackageType", &scz);
-        ExitOnFailure(hr, "Failed to get package type for package.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get package type for package.");
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Bundle", -1, scz, -1))
         {
@@ -456,43 +443,28 @@ static HRESULT ParsePackagesFromXml(
         }
 
         hr = XmlGetYesNoAttribute(pNode, L"Permanent", &prgPackages[iPackage].fPermanent);
-        ExitOnFailure(hr, "Failed to get permanent setting for package.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get permanent setting for package.");
 
         hr = XmlGetYesNoAttribute(pNode, L"Vital", &prgPackages[iPackage].fVital);
-        ExitOnFailure(hr, "Failed to get vital setting for package.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get vital setting for package.");
 
         hr = XmlGetAttributeEx(pNode, L"ProductCode", &prgPackages[iPackage].sczProductCode);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get product code for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get product code for package.");
 
         hr = XmlGetAttributeEx(pNode, L"UpgradeCode", &prgPackages[iPackage].sczUpgradeCode);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get upgrade code for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get upgrade code for package.");
 
         hr = XmlGetAttributeEx(pNode, L"Version", &prgPackages[iPackage].sczVersion);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get version for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get version for package.");
 
         hr = XmlGetAttributeEx(pNode, L"InstallCondition", &prgPackages[iPackage].sczInstallCondition);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get install condition for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get install condition for package.");
 
         hr = XmlGetAttributeEx(pNode, L"RepairCondition", &prgPackages[iPackage].sczRepairCondition);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get repair condition for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get repair condition for package.");
 
         hr = XmlGetAttributeEx(pNode, L"Cache", &scz);
-        ExitOnFailure(hr, "Failed to get cache type for package.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get cache type for package.");
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"remove", -1))
         {
@@ -541,6 +513,7 @@ static HRESULT ParseBalPackageInfoFromXml(
     IXMLDOMNode* pNode = NULL;
     LPWSTR scz = NULL;
     BAL_INFO_PACKAGE* pPackage = NULL;
+    BOOL fXmlFound = FALSE;
 
     hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixBalPackageInfo", &pNodeList);
     ExitOnFailure(hr, "Failed to select all packages.");
@@ -548,16 +521,13 @@ static HRESULT ParseBalPackageInfoFromXml(
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
     {
         hr = XmlGetAttributeEx(pNode, L"PackageId", &scz);
-        ExitOnFailure(hr, "Failed to get package identifier for WixBalPackageInfo.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get package identifier for WixBalPackageInfo.");
 
         hr = BalInfoFindPackageById(pPackages, scz, &pPackage);
         ExitOnFailure(hr, "Failed to find package specified in WixBalPackageInfo: %ls", scz);
 
         hr = XmlGetAttributeEx(pNode, L"DisplayInternalUICondition", &pPackage->sczDisplayInternalUICondition);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get DisplayInternalUICondition setting for package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get DisplayInternalUICondition setting for package.");
 
         ReleaseNullObject(pNode);
     }
@@ -569,7 +539,7 @@ static HRESULT ParseBalPackageInfoFromXml(
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
     {
         hr = XmlGetAttributeEx(pNode, L"PackageId", &scz);
-        ExitOnFailure(hr, "Failed to get package identifier for WixMbaPrereqInformation.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get package identifier for WixMbaPrereqInformation.");
 
         hr = BalInfoFindPackageById(pPackages, scz, &pPackage);
         ExitOnFailure(hr, "Failed to find package specified in WixMbaPrereqInformation: %ls", scz);
@@ -577,16 +547,10 @@ static HRESULT ParseBalPackageInfoFromXml(
         pPackage->fPrereqPackage = TRUE;
 
         hr = XmlGetAttributeEx(pNode, L"LicenseFile", &pPackage->sczPrereqLicenseFile);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get LicenseFile setting for prereq package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get LicenseFile setting for prereq package.");
 
         hr = XmlGetAttributeEx(pNode, L"LicenseUrl", &pPackage->sczPrereqLicenseUrl);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get LicenseUrl setting for prereq package.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get LicenseUrl setting for prereq package.");
 
         ReleaseNullObject(pNode);
     }
@@ -619,15 +583,11 @@ static HRESULT ParseOverridableVariablesFromXml(
     BAL_INFO_OVERRIDABLE_VARIABLE* pOverridableVariable = NULL;
 
     hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/CommandLine", &pCommandLineNode);
-    if (S_FALSE == hr)
-    {
-        hr = E_NOTFOUND;
-    }
-    ExitOnFailure(hr, "Failed to select command line information.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to select command line information.");
 
     // @Variables
     hr = XmlGetAttributeEx(pCommandLineNode, L"Variables", &scz);
-    ExitOnFailure(hr, "Failed to get command line variable type.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get command line variable type.");
 
     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"upperCase", -1))
     {
@@ -639,16 +599,11 @@ static HRESULT ParseOverridableVariablesFromXml(
     }
     else
     {
-        hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Invalid value for CommandLine/@Variables: %ls", scz);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for CommandLine/@Variables: %ls", scz);
     }
 
     // Get the list of variables users can override on the command line.
     hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixStdbaOverridableVariable", &pNodes);
-    if (S_FALSE == hr)
-    {
-        ExitFunction1(hr = S_OK);
-    }
     ExitOnFailure(hr, "Failed to select overridable variable nodes.");
 
     hr = pNodes->get_length(reinterpret_cast<long*>(&pOverridableVariables->cVariables));
@@ -671,7 +626,7 @@ static HRESULT ParseOverridableVariablesFromXml(
 
             // @Name
             hr = XmlGetAttributeEx(pNode, L"Name", &pOverridableVariable->sczName);
-            ExitOnFailure(hr, "Failed to get name for overridable variable.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get name for overridable variable.");
 
             hr = DictAddValue(pOverridableVariables->sdVariables, pOverridableVariable);
             ExitOnFailure(hr, "Failed to add \"%ls\" to the string dictionary.", pOverridableVariable->sczName);

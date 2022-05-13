@@ -290,7 +290,7 @@ static HRESULT CheckSupportedFrameworks(
         while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
         {
             hr = XmlGetAttributeEx(pNode, L"version", &sczSupportedFrameworkVersion);
-            ExitOnFailure(hr, "Failed to get supportedFramework/@version.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get supportedFramework/@version.");
 
             hr = StrAllocFormatted(&sczFrameworkRegistryKey, L"SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\%ls", sczSupportedFrameworkVersion);
             ExitOnFailure(hr, "Failed to allocate path to supported framework Install registry key.");
@@ -351,27 +351,23 @@ static HRESULT UpdateSupportedRuntime(
     LPWSTR sczSupportedRuntimeVersion = NULL;
     IXMLDOMNode* pixnStartup = NULL;
     IXMLDOMNode* pixnSupportedRuntime = NULL;
+    BOOL fXmlFound = FALSE;
 
     *pfUpdatedManifest = FALSE;
 
     // If the runtime version attribute is not specified, don't update the manifest.
     hr = XmlGetAttributeEx(pixnSupportedFramework, L"runtimeVersion", &sczSupportedRuntimeVersion);
-    if (E_NOTFOUND == hr)
+    ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get supportedFramework/@runtimeVersion.");
+
+    if (!fXmlFound)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to get supportedFramework/@runtimeVersion.");
 
     // Get the startup element. Fail if we can't find it since it'll be necessary to load the
     // correct runtime.
     hr = XmlSelectSingleNode(pixdManifest, L"/configuration/startup", &pixnStartup);
-    ExitOnFailure(hr, "Failed to get startup element.");
-
-    if (S_FALSE == hr)
-    {
-        hr = E_NOTFOUND;
-        ExitOnRootFailure(hr, "Failed to find startup element in bootstrapper application config.");
-    }
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get startup element.");
 
     // Remove any pre-existing supported runtimes because they'll just get in the way and create our new one.
     hr = XmlRemoveChildren(pixnStartup, L"supportedRuntime");
