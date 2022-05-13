@@ -42,7 +42,9 @@
           Inputs="global.json.pp"
           Outputs="$(GlobalJsonPath)">
     <PropertyGroup>
+      <!-- https://github.com/NuGet/Home/issues/11784
       <GlobaJsonTextHeader>/* DO NOT MODIFY! Auto-generated from internal\SetBuildNumber\global.json.pp */</GlobaJsonTextHeader>
+      -->
       <GlobalJsonText>$([System.IO.File]::ReadAllText(global.json.pp))</GlobalJsonText>
       <GlobalJsonText>$(GlobalJsonText.Replace('{apiversion}', $(ApiVersion)))</GlobalJsonText>
       <GlobalJsonText>$(GlobalJsonText.Replace('{fileversion}', $(FileVersion)))</GlobalJsonText>
