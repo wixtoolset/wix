@@ -27,6 +27,20 @@ namespace WixTestTools
         public string TestName { get; }
 
         /// <summary>
+        /// Runs the bundle asking for help.
+        /// </summary>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string Help(int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            var newArgumentList = new List<string>();
+            newArgumentList.Add("-help");
+            newArgumentList.AddRange(arguments);
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.Custom, newArgumentList.ToArray());
+        }
+
+        /// <summary>
         /// Installs the bundle with optional arguments.
         /// </summary>
         /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>

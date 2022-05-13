@@ -117,6 +117,7 @@ namespace WixToolset.Bal
 
             switch (parentElement.Name.LocalName)
             {
+                case "BundlePackage":
                 case "ExePackage":
                 case "MsiPackage":
                 case "MspPackage":
@@ -216,7 +217,7 @@ namespace WixToolset.Bal
                             case "PrereqPackage":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
                                 {
-                                    if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
+                                    if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out _))
                                     {
                                         prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
                                         {
@@ -703,6 +704,7 @@ namespace WixToolset.Bal
         private void ParseWixManagedBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            bool alwaysInstallPrereqs = false;
             string logoFile = null;
             string themeFile = null;
             string localizationFile = null;
@@ -714,6 +716,9 @@ namespace WixToolset.Bal
                 {
                     switch (attrib.Name.LocalName)
                     {
+                        case "AlwaysInstallPrereqs":
+                            alwaysInstallPrereqs = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes;
+                            break;
                         case "LogoFile":
                             logoFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -792,6 +797,14 @@ namespace WixToolset.Bal
                 }
 
                 this.CreateBARef(section, sourceLineNumbers, node, baId);
+
+                if (alwaysInstallPrereqs)
+                {
+                    section.AddSymbol(new WixMbaPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixMbaPrereqOptions"))
+                    {
+                        AlwaysInstallPrereqs = 1,
+                    });
+                }
             }
         }
 
@@ -802,6 +815,7 @@ namespace WixToolset.Bal
         private void ParseWixDotNetCoreBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            bool alwaysInstallPrereqs = false;
             string logoFile = null;
             string themeFile = null;
             string localizationFile = null;
@@ -814,6 +828,9 @@ namespace WixToolset.Bal
                 {
                     switch (attrib.Name.LocalName)
                     {
+                        case "AlwaysInstallPrereqs":
+                            alwaysInstallPrereqs = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes;
+                            break;
                         case "LogoFile":
                             logoFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -903,6 +920,14 @@ namespace WixToolset.Bal
                 }
 
                 this.CreateBARef(section, sourceLineNumbers, node, baId);
+
+                if (alwaysInstallPrereqs)
+                {
+                    section.AddSymbol(new WixMbaPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixMbaPrereqOptions"))
+                    {
+                        AlwaysInstallPrereqs = 1,
+                    });
+                }
             }
         }
 

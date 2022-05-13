@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+    <Bundle Name="AlwaysInstallPrereqsBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{36E9E102-E0E4-4A91-941D-6681A49216E6}">
+        <BootstrapperApplication>
+            <bal:WixManagedBootstrapperApplicationHost AlwaysInstallPrereqs="yes" />
+        </BootstrapperApplication>
+        <Chain>
+            <ExePackage bal:PrereqPackage="yes" Permanent="yes" DetectCondition="none" SourceFile="runtimes\win-x86\native\wixnative.exe" />
+        </Chain>
+    </Bundle>
+</Wix>

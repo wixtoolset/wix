@@ -146,6 +146,13 @@ namespace WixToolset.Test.BA
 
             this.wait.WaitOne();
 
+            if (this.action == LaunchAction.Help)
+            {
+                this.Log("This is a BA for automated testing");
+                this.Engine.Quit(0);
+                return;
+            }
+
             this.redetectRemaining = redetectCount;
             for (int i = -1; i < redetectCount; i++)
             {

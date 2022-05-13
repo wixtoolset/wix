@@ -2,18 +2,16 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
-    <BA>BrokenMba</BA>
-    <UpgradeCode>{157A1FBA-3825-4AAA-B13D-F45435A79D64}</UpgradeCode>
+    <BA>DncAlwaysPrereq</BA>
+    <UpgradeCode>{2F61ECD8-C28B-4FF9-9609-0E9633716CF9}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x86" BindName="net2x86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net6.0-windows\win-x86" BindName="dncx86" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PackageB\PackageB.wixproj" />
-    <ProjectReference Include="..\PackageC\PackageC.wixproj" />
     <ProjectReference Include="..\PrereqBaf\PrereqBaf.vcxproj" />
     <ProjectReference Include="..\ReplaceConfig\ReplaceConfig.vcxproj" />
   </ItemGroup>

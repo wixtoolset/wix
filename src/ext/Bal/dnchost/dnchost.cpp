@@ -76,6 +76,16 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
         vstate.fInitialized = TRUE;
     }
 
+    if (vstate.prereqData.fAlwaysInstallPrereqs && !vstate.prereqData.fCompleted)
+    {
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application since it's configured to always run before loading the runtime.");
+
+        hr = CreatePrerequisiteBA(&vstate, pEngine, pArgs, pResults);
+        BalExitOnFailure(hr, "Failed to create the pre-requisite bootstrapper application.");
+
+        ExitFunction();
+    }
+
     if (!vstate.fInitializedRuntime)
     {
         hr = LoadRuntime(&vstate);
@@ -213,6 +223,15 @@ static HRESULT LoadDncConfiguration(
 
     hr = StrAllocConcat(&pState->sczBaFactoryRuntimeConfigPath, L".runtimeconfig.json", 0);
     BalExitOnFailure(hr, "Failed to concat extension to runtime config path.");
+
+    hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixMbaPrereqOptions", &pixnHost);
+    BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find WixMbaPrereqOptions element in bootstrapper application config.");
+
+    if (fXmlFound)
+    {
+        hr = XmlGetAttributeNumber(pixnHost, L"AlwaysInstallPrereqs", reinterpret_cast<DWORD*>(&pState->prereqData.fAlwaysInstallPrereqs));
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get AlwaysInstallPrereqs value.");
+    }
 
     pState->type = DNCHOSTTYPE_FDD;
 
