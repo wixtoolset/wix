@@ -24,6 +24,10 @@ static HRESULT GetAppDomain(
 static HRESULT LoadModulePaths(
     __in MBASTATE* pState
     );
+static HRESULT LoadMbaConfiguration(
+    __in MBASTATE* pState,
+    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs
+    );
 static HRESULT CheckSupportedFrameworks(
     __in LPCWSTR wzConfigPath
     );
@@ -96,10 +100,26 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
 
     if (!vstate.fInitialized)
     {
+        hr = XmlInitialize();
+        BalExitOnFailure(hr, "Failed to initialize XML.");
+
         hr = LoadModulePaths(&vstate);
         BalExitOnFailure(hr, "Failed to load the module paths.");
 
+        hr = LoadMbaConfiguration(&vstate, pArgs);
+        BalExitOnFailure(hr, "Failed to get the mba configuration.");
+
         vstate.fInitialized = TRUE;
+    }
+
+    if (vstate.prereqData.fAlwaysInstallPrereqs && !vstate.prereqData.fCompleted)
+    {
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application since it's configured to always run before loading the runtime.");
+
+        hr = CreatePrerequisiteBA(&vstate, pEngine, pArgs, pResults);
+        BalExitOnFailure(hr, "Failed to create the pre-requisite bootstrapper application.");
+
+        ExitFunction();
     }
 
     if (!vstate.fInitializedRuntime)
@@ -264,6 +284,35 @@ LExit:
     return hr;
 }
 
+static HRESULT LoadMbaConfiguration(
+    __in MBASTATE* pState,
+    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMDocument* pixdManifest = NULL;
+    IXMLDOMNode* pixnHost = NULL;
+    BOOL fXmlFound = FALSE;
+
+    hr = XmlLoadDocumentFromFile(pArgs->pCommand->wzBootstrapperApplicationDataPath, &pixdManifest);
+    BalExitOnFailure(hr, "Failed to load BalManifest '%ls'", pArgs->pCommand->wzBootstrapperApplicationDataPath);
+
+    hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixMbaPrereqOptions", &pixnHost);
+    BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find WixMbaPrereqOptions element in bootstrapper application config.");
+
+    if (fXmlFound)
+    {
+        hr = XmlGetAttributeNumber(pixnHost, L"AlwaysInstallPrereqs", reinterpret_cast<DWORD*>(&pState->prereqData.fAlwaysInstallPrereqs));
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get AlwaysInstallPrereqs value.");
+    }
+
+LExit:
+    ReleaseObject(pixnHost);
+    ReleaseObject(pixdManifest);
+
+    return hr;
+}
+
 // Checks whether at least one of required supported frameworks is installed via the NETFX registry keys.
 static HRESULT CheckSupportedFrameworks(
     __in LPCWSTR wzConfigPath
@@ -279,9 +328,6 @@ static HRESULT CheckSupportedFrameworks(
     HKEY hkFramework = NULL;
     DWORD dwFrameworkInstalled = 0;
     BOOL fUpdatedManifest = FALSE;
-
-    hr = XmlInitialize();
-    ExitOnFailure(hr, "Failed to initialize XML.");
 
     hr = XmlLoadDocumentFromFile(wzConfigPath, &pixdManifest);
     ExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", wzConfigPath);
@@ -341,8 +387,6 @@ LExit:
     ReleaseObject(pNode);
     ReleaseObject(pNodeList);
     ReleaseObject(pixdManifest);
-
-    XmlUninitialize();
 
     return hr;
 }

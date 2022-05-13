@@ -5,6 +5,7 @@
 struct PREQBA_DATA
 {
     HRESULT hrHostInitialization;
+    BOOL fAlwaysInstallPrereqs;
     BOOL fCompleted;
 };
 

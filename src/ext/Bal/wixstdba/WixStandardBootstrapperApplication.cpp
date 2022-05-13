@@ -30,6 +30,8 @@ enum WIXSTDBA_STATE
     WIXSTDBA_STATE_HELP,
     WIXSTDBA_STATE_DETECTING,
     WIXSTDBA_STATE_DETECTED,
+    WIXSTDBA_STATE_PLANNING_PREREQS,
+    WIXSTDBA_STATE_PLANNED_PREREQS,
     WIXSTDBA_STATE_PLANNING,
     WIXSTDBA_STATE_PLANNED,
     WIXSTDBA_STATE_APPLYING,
@@ -49,6 +51,7 @@ enum WM_WIXSTDBA
     WM_WIXSTDBA_APPLY_PACKAGES,
     WM_WIXSTDBA_CHANGE_STATE,
     WM_WIXSTDBA_SHOW_FAILURE,
+    WM_WIXSTDBA_PLAN_PREREQS,
 };
 
 // This enum must be kept in the same order as the vrgwzPageNames array.
@@ -217,9 +220,11 @@ public: // IBootstrapperApplication
                     : "A restart is required by the prerequisites but the user delayed it. The bootstrapper application will be reloaded after the computer is restarted.");
             }
         }
-        else if (m_fPrereqInstalled)
+        else if (m_fPrereqInstalled || m_fPrereqSkipped)
         {
-            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "The prerequisites were successfully installed. The bootstrapper application will be reloaded.");
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, m_fPrereqInstalled
+                ? "The prerequisites were successfully installed. The bootstrapper application will be reloaded."
+                : "The prerequisites were already installed. The bootstrapper application will be reloaded.");
             *pAction = BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER;
             m_pPrereqData->fCompleted = TRUE;
         }
@@ -275,13 +280,16 @@ public: // IBootstrapperApplication
             hr = S_OK;
         }
 
-        // If the UI should be visible, display it now and hide the splash screen
-        if (BOOTSTRAPPER_DISPLAY_NONE < m_command.display)
+        if (!m_fPreplanPrereqs)
         {
-            ::ShowWindow(m_pTheme->hwndParent, SW_SHOW);
-        }
+            // If the UI should be visible, display it now and hide the splash screen
+            if (BOOTSTRAPPER_DISPLAY_NONE < m_command.display)
+            {
+                ::ShowWindow(m_pTheme->hwndParent, SW_SHOW);
+            }
 
-        m_pEngine->CloseSplashScreen();
+            m_pEngine->CloseSplashScreen();
+        }
 
         return __super::OnDetectBegin(fCached, registrationType, cPackages, pfCancel);
     }
@@ -331,21 +339,34 @@ public: // IBootstrapperApplication
         if (fEvaluateConditions)
         {
             hrStatus = EvaluateConditions();
-
-            if (FAILED(hrStatus))
-            {
-                fSkipToPlan = FALSE;
-            }
         }
 
         SetState(WIXSTDBA_STATE_DETECTED, hrStatus);
 
-        if (fSkipToPlan)
+        if (SUCCEEDED(hrStatus))
         {
-            ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PACKAGES, 0, m_command.action);
+            if (m_fPreplanPrereqs)
+            {
+                ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PREREQS, 0, BOOTSTRAPPER_ACTION_INSTALL);
+            }
+            else if (fSkipToPlan)
+            {
+                ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PACKAGES, 0, m_command.action);
+            }
         }
 
         return hr;
+    }
+
+
+    virtual STDMETHODIMP OnPlanBegin(
+        __in DWORD cPackages,
+        __in BOOL* pfCancel
+        )
+    {
+        m_fPrereqPackagePlanned = FALSE;
+
+        return __super::OnPlanBegin(cPackages, pfCancel);
     }
 
 
@@ -484,24 +505,97 @@ public: // IBootstrapperApplication
     }
 
 
+    virtual STDMETHODIMP OnPlannedPackage(
+        __in_z LPCWSTR wzPackageId,
+        __in BOOTSTRAPPER_ACTION_STATE execute,
+        __in BOOTSTRAPPER_ACTION_STATE rollback,
+        __in BOOL fPlannedCache,
+        __in BOOL fPlannedUncache
+        )
+    {
+        if (m_fPrereq && BOOTSTRAPPER_ACTION_STATE_NONE != execute)
+        {
+            m_fPrereqPackagePlanned = TRUE;
+        }
+
+        return __super::OnPlannedPackage(wzPackageId, execute, rollback, fPlannedCache, fPlannedUncache);
+    }
+
+
     virtual STDMETHODIMP OnPlanComplete(
         __in HRESULT hrStatus
         )
     {
         HRESULT hr = S_OK;
+        BOOL fPlannedPrereqs = WIXSTDBA_STATE_PLANNING_PREREQS == m_state;
+        WIXSTDBA_STATE completedState = WIXSTDBA_STATE_PLANNED;
+        BOOL fApply = TRUE;
 
-        SetState(WIXSTDBA_STATE_PLANNED, hrStatus);
+        if (fPlannedPrereqs)
+        {
+            if (SUCCEEDED(hrStatus) && !m_fPrereqPackagePlanned)
+            {
+                // Nothing to do, so close and let the parent BA take over.
+                m_fPrereqSkipped = TRUE;
+                SetState(WIXSTDBA_STATE_APPLIED, S_OK);
+                ExitFunction();
+            }
+            else if (BOOTSTRAPPER_ACTION_HELP == m_command.action)
+            {
+                // If prereq packages were planned then the managed BA probably can't be loaded, so show the help from this BA.
 
-        if (SUCCEEDED(hrStatus))
+                // Need to force the state change since normally moving backwards is prevented.
+                ::PostMessageW(m_hWnd, WM_WIXSTDBA_CHANGE_STATE, 0, WIXSTDBA_STATE_HELP);
+
+                ::PostMessageW(m_hWnd, WM_WIXSTDBA_SHOW_HELP, 0, 0);                
+
+                ExitFunction();
+            }
+
+            completedState = WIXSTDBA_STATE_PLANNED_PREREQS;
+        }
+
+        SetState(completedState, hrStatus);
+
+        if (FAILED(hrStatus))
+        {
+            ExitFunction();
+        }
+
+        if (fPlannedPrereqs)
+        {
+            // If the UI should be visible, display it now and hide the splash screen
+            if (BOOTSTRAPPER_DISPLAY_NONE < m_command.display)
+            {
+                ::ShowWindow(m_pTheme->hwndParent, SW_SHOW);
+            }
+
+            m_pEngine->CloseSplashScreen();
+
+            fApply = BOOTSTRAPPER_DISPLAY_FULL > m_command.display ||
+                     BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType;
+        }
+
+        if (fApply)
         {
             ::PostMessageW(m_hWnd, WM_WIXSTDBA_APPLY_PACKAGES, 0, 0);
         }
 
+    LExit:
+        return hr;
+    }
+
+
+    virtual STDMETHODIMP OnApplyBegin(
+        __in DWORD dwPhaseCount,
+        __in BOOL* pfCancel
+        )
+    {
         m_fStartedExecution = FALSE;
         m_dwCalculatedCacheProgress = 0;
         m_dwCalculatedExecuteProgress = 0;
 
-        return hr;
+        return __super::OnApplyBegin(dwPhaseCount, pfCancel);
     }
 
 
@@ -2149,6 +2243,7 @@ private:
         BOOL fRet = FALSE;
         MSG msg = { };
         DWORD dwQuit = 0;
+        WM_WIXSTDBA firstAction = WM_WIXSTDBA_DETECT_PACKAGES;
 
         // Initialize COM and theme.
         hr = ::CoInitialize(NULL);
@@ -2169,14 +2264,20 @@ private:
         if (FAILED(pThis->m_hrFinal))
         {
             pThis->SetState(WIXSTDBA_STATE_FAILED, hr);
-            ::PostMessageW(pThis->m_hWnd, WM_WIXSTDBA_SHOW_FAILURE, 0, 0);
+            firstAction = WM_WIXSTDBA_SHOW_FAILURE;
         }
         else
         {
             // Okay, we're ready for packages now.
             pThis->SetState(WIXSTDBA_STATE_INITIALIZED, hr);
-            ::PostMessageW(pThis->m_hWnd, BOOTSTRAPPER_ACTION_HELP == pThis->m_command.action ? WM_WIXSTDBA_SHOW_HELP : WM_WIXSTDBA_DETECT_PACKAGES, 0, 0);
+
+            if (!pThis->m_fPreplanPrereqs && BOOTSTRAPPER_ACTION_HELP == pThis->m_command.action)
+            {
+                firstAction = WM_WIXSTDBA_SHOW_HELP;
+            }
         }
+
+        ::PostMessageW(pThis->m_hWnd, firstAction, 0, 0);
 
         // message pump
         while (0 != (fRet = ::GetMessageW(&msg, NULL, 0, 0)))
@@ -2647,7 +2748,7 @@ private:
 
         // Calculate the window style based on the theme style and command display value.
         dwWindowStyle = m_pTheme->dwStyle;
-        if (BOOTSTRAPPER_DISPLAY_NONE >= m_command.display)
+        if (BOOTSTRAPPER_DISPLAY_NONE >= m_command.display || m_fPreplanPrereqs)
         {
             dwWindowStyle &= ~WS_VISIBLE;
         }
@@ -2848,6 +2949,10 @@ private:
 
         case WM_WIXSTDBA_SHOW_FAILURE:
             pBA->OnShowFailure();
+            return 0;
+
+        case WM_WIXSTDBA_PLAN_PREREQS:
+            pBA->OnPlanPrereqs(static_cast<BOOTSTRAPPER_ACTION>(lParam));
             return 0;
 
         case WM_THMUTIL_CONTROL_WM_COMMAND:
@@ -3136,6 +3241,30 @@ private:
         if (FAILED(hr))
         {
             SetState(WIXSTDBA_STATE_PLANNING, hr);
+        }
+    }
+
+
+    //
+    // OnPlanPrereqs - preplan the packages to see if the preqba can be skipped.
+    //
+    void OnPlanPrereqs(
+        __in BOOTSTRAPPER_ACTION action
+        )
+    {
+        HRESULT hr = S_OK;
+
+        m_plannedAction = action;
+
+        SetState(WIXSTDBA_STATE_PLANNING_PREREQS, hr);
+
+        hr = m_pEngine->Plan(action);
+        BalExitOnFailure(hr, "Failed to start planning prereq packages.");
+
+    LExit:
+        if (FAILED(hr))
+        {
+            SetState(WIXSTDBA_STATE_PLANNING_PREREQS, hr);
         }
     }
 
@@ -3838,6 +3967,8 @@ LExit:
                 break;
 
             case WIXSTDBA_STATE_DETECTED: __fallthrough;
+            case WIXSTDBA_STATE_PLANNING_PREREQS: __fallthrough;
+            case WIXSTDBA_STATE_PLANNED_PREREQS: __fallthrough;
             case WIXSTDBA_STATE_PLANNING: __fallthrough;
             case WIXSTDBA_STATE_PLANNED: __fallthrough;
             case WIXSTDBA_STATE_APPLYING: __fallthrough;
@@ -3874,6 +4005,8 @@ LExit:
                 break;
 
             case WIXSTDBA_STATE_DETECTED:
+            case WIXSTDBA_STATE_PLANNING_PREREQS: __fallthrough;
+            case WIXSTDBA_STATE_PLANNED_PREREQS: __fallthrough;
                 switch (m_command.action)
                 {
                 case BOOTSTRAPPER_ACTION_INSTALL:
@@ -4124,7 +4257,10 @@ public:
 
         m_pPrereqData = pPrereqData;
         m_fPrereq = NULL != pPrereqData;
+        m_fPreplanPrereqs = m_fPrereq && m_pPrereqData->fAlwaysInstallPrereqs;
+        m_fPrereqPackagePlanned = FALSE;
         m_fPrereqInstalled = FALSE;
+        m_fPrereqSkipped = FALSE;
 
         pEngine->AddRef();
         m_pEngine = pEngine;
@@ -4405,7 +4541,10 @@ private:
 
     PREQBA_DATA* m_pPrereqData;
     BOOL m_fPrereq;
+    BOOL m_fPreplanPrereqs;
+    BOOL m_fPrereqPackagePlanned;
     BOOL m_fPrereqInstalled;
+    BOOL m_fPrereqSkipped;
 
     ITaskbarList3* m_pTaskbarList;
     UINT m_uTaskbarButtonCreatedMessage;

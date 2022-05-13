@@ -107,7 +107,41 @@ namespace WixToolsetTest.Bal
         }
 
         [Fact]
-        public void CantBuildUsingMBAWithNoPrereqs()
+        public void CanBuildUsingMBAWithAlwaysInstallPrereqs()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\MBA");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "AlwaysInstallPrereqsBundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundleFile,
+                });
+
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var wixMbaPrereqOptionsElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixMbaPrereqOptions");
+                var wixMbaPrereqOptions = (XmlNode)Assert.Single(wixMbaPrereqOptionsElements);
+                Assert.Equal("<WixMbaPrereqOptions AlwaysInstallPrereqs='1' />", wixMbaPrereqOptions.GetTestXml());
+            }
+        }
+
+        [Fact]
+        public void CannotBuildUsingMBAWithNoPrereqs()
         {
             using (var fs = new DisposableFileSystem())
             {
@@ -133,7 +167,7 @@ namespace WixToolsetTest.Bal
         }
 
         [Fact]
-        public void CantBuildUsingOverridableWrongCase()
+        public void CannotBuildUsingOverridableWrongCase()
         {
             using (var fs = new DisposableFileSystem())
             {

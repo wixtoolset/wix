@@ -24,6 +24,7 @@ namespace WixToolset.Bal
             BalSymbolDefinitions.WixMbaPrereqInformation,
             BalSymbolDefinitions.WixStdbaOptions,
             BalSymbolDefinitions.WixStdbaOverridableVariable,
+            BalSymbolDefinitions.WixMbaPrereqOptions,
         };
 
         protected override IReadOnlyCollection<IntermediateSymbolDefinition> SymbolDefinitions => BurnSymbolDefinitions;

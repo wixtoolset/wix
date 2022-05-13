@@ -3,7 +3,7 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenDnc">
+    <BootstrapperApplication Id="BrokenDncAlwaysPrereq">
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.deps.json" />
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
       <Payload Name="good.runtimeconfig.json" SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
@@ -11,7 +11,7 @@
       <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.dncx86)\WixToolset.Mba.Core.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
-      <bal:WixDotNetCoreBootstrapperApplicationHost />
+      <bal:WixDotNetCoreBootstrapperApplicationHost AlwaysInstallPrereqs="yes" />
     </BootstrapperApplication>
   </Fragment>
 

@@ -16,6 +16,7 @@ namespace WixToolset.Bal
         WixMbaPrereqInformation,
         WixStdbaOptions,
         WixStdbaOverridableVariable,
+        WixMbaPrereqOptions,
     }
 
     public static partial class BalSymbolDefinitions
@@ -60,6 +61,9 @@ namespace WixToolset.Bal
                 case BalSymbolDefinitionType.WixStdbaOverridableVariable:
                     return BalSymbolDefinitions.WixStdbaOverridableVariable;
 
+                case BalSymbolDefinitionType.WixMbaPrereqOptions:
+                    return BalSymbolDefinitions.WixMbaPrereqOptions;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
@@ -75,6 +79,7 @@ namespace WixToolset.Bal
             WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaOverridableVariable.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixMbaPrereqOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
         }
     }
 }

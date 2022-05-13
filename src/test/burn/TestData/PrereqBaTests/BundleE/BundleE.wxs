@@ -3,28 +3,24 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenDnc">
+    <BootstrapperApplication Id="DncAlwaysPrereq">
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.deps.json" />
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
-      <Payload Name="good.runtimeconfig.json" SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
-      <Payload Name="TestBA.runtimeconfig.json" SourceFile="bad.runtimeconfig.json" />
+      <Payload SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.dncx86)\WixToolset.Mba.Core.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
-      <bal:WixDotNetCoreBootstrapperApplicationHost />
+      <bal:WixDotNetCoreBootstrapperApplicationHost AlwaysInstallPrereqs="yes" />
     </BootstrapperApplication>
   </Fragment>
 
   <Fragment>
     <util:FileSearch Variable="GoodConfigPresent" Path="[BARuntimeDirectory]\good.runtimeconfig.json" Result="exists" />
-    <Variable Name="CAUSEINFINITELOOP" bal:Overridable="yes" />
 
     <PackageGroup Id="BundlePackages">
       <ExePackage SourceFile="$(var.ReplaceConfig.TargetPath)" bal:PrereqPackage="yes"
-                  Permanent="yes" DetectCondition="NOT GoodConfigPresent OR CAUSEINFINITELOOP = 1"
+                  Permanent="yes" DetectCondition="NOT GoodConfigPresent"
                   InstallArguments="&quot;[BARuntimeDirectory]TestBA.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]good.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]bad.runtimeconfig.json&quot;" />
-      <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
-      <MsiPackage Id="PackageC" SourceFile="$(var.PackageC.TargetPath)" Cache="force" />
     </PackageGroup>
   </Fragment>
 </Wix>

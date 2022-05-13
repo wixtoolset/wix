@@ -1,0 +1,10 @@
+{
+  "runtimeOptions": {
+    "tfm": "net5.5",
+    "rollForward": "Disable",
+    "framework": {
+      "name": "Microsoft.WindowsDesktop.App",
+      "version": "5.5.0"
+    }
+  }
+}
