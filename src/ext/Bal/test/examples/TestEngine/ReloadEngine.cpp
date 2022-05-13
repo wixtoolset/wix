@@ -31,7 +31,7 @@ HRESULT RunReloadEngine(
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
 
-    pTestEngine->UnloadBA();
+    pTestEngine->UnloadBA(TRUE);
 
     hr = pTestEngine->LoadBA(wzBAFilePath);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to load BA.");
@@ -48,7 +48,7 @@ HRESULT RunReloadEngine(
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
 
-    pTestEngine->UnloadBA();
+    pTestEngine->UnloadBA(FALSE);
 
 LExit:
     return hr;

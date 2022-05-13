@@ -50,7 +50,7 @@
     <NetHostPlatform>$(Platform)</NetHostPlatform>
     <NetHostPlatform Condition=" '$(NetHostPlatform)'=='Win32' ">x86</NetHostPlatform>
     <NetHostPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetAppHost.6.0.4\runtimes\win-$(NetHostPlatform)\native\</NetHostPath>
-    <ProjectAdditionalIncludeDirectories>$(BaseOutputPath)obj;$(NetHostPath)</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>$(BaseOutputPath)obj;$(NetHostPath);..\wixstdba\inc</ProjectAdditionalIncludeDirectories>
     <ProjectAdditionalLinkLibraries>shlwapi.lib;$(NetHostPath)libnethost.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 

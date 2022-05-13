@@ -12,6 +12,8 @@ namespace WixToolsetTest.BurnE2E
     {
         public PrereqBaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
+        const int E_PREREQBA_INFINITE_LOOP = -2_114_714_646;
+
         /// <summary>
         /// This bundle purposely provides a .runtimeconfig.json file that requires a version of .NET Core that doesn't exist,
         /// with an MSI package to represent the prerequisite package.
@@ -32,7 +34,7 @@ namespace WixToolsetTest.BurnE2E
             // Source file should *not* be installed
             Assert.False(File.Exists(packageASourceCodeInstalled), $"Package A payload should not be there on test start: {packageASourceCodeInstalled}");
 
-            bundleA.Install();
+            bundleA.Install(E_PREREQBA_INFINITE_LOOP);
 
             // Part of the test is Install actually completing.
 
@@ -63,7 +65,7 @@ namespace WixToolsetTest.BurnE2E
             // Source file should *not* be installed
             Assert.False(File.Exists(packageBSourceCodeInstalled), $"Package B payload should not be there on test start: {packageBSourceCodeInstalled}");
 
-            bundleB.Install();
+            bundleB.Install(E_PREREQBA_INFINITE_LOOP);
 
             // Part of the test is Install actually completing.
 

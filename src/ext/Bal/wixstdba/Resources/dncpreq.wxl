@@ -29,5 +29,6 @@
   <String Id="FailureRestartButton">&amp;Restart</String>
   <String Id="FailureCloseButton">&amp;Close</String>
   <String Id="SCDRUNTIMEFAILUREErrorMessage">[WixBundleName] cannot run on this machine. Install the latest updates and/or the latest OS to run in a supported environment.</String>
+  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Core runtime even though all of the prerequisites are installed.</String>
   <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>

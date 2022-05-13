@@ -40,6 +40,8 @@ LExit:
 }
 
 extern "C" void WINAPI BAFunctionsDestroy(
+    __in const BA_FUNCTIONS_DESTROY_ARGS* /*pArgs*/,
+    __inout BA_FUNCTIONS_DESTROY_RESULTS* /*pResults*/
     )
 {
     BalUninitialize();

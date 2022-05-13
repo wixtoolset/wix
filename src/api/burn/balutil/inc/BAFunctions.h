@@ -126,6 +126,18 @@ struct BA_FUNCTIONS_CREATE_RESULTS
     LPVOID pvBAFunctionsProcContext;
 };
 
+struct BA_FUNCTIONS_DESTROY_ARGS
+{
+    DWORD cbSize;
+    BOOL fReload;
+};
+
+struct BA_FUNCTIONS_DESTROY_RESULTS
+{
+    DWORD cbSize;
+    BOOL fDisableUnloading; // indicates the BAFunctions dll must not be unloaded after BAFunctionsDestroy.
+};
+
 struct BA_FUNCTIONS_ONTHEMECONTROLLOADED_ARGS
 {
     DWORD cbSize;
@@ -218,7 +230,10 @@ typedef HRESULT(WINAPI *PFN_BA_FUNCTIONS_CREATE)(
     __inout BA_FUNCTIONS_CREATE_RESULTS* pResults
     );
 
-typedef void (WINAPI *PFN_BA_FUNCTIONS_DESTROY)();
+typedef void (WINAPI *PFN_BA_FUNCTIONS_DESTROY)(
+    __in const BA_FUNCTIONS_DESTROY_ARGS* pArgs,
+    __inout BA_FUNCTIONS_DESTROY_RESULTS* pResults
+    );
 
 #ifdef __cplusplus
 }

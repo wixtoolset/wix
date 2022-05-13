@@ -16,10 +16,15 @@
 #include <strutil.h>
 #include <xmlutil.h>
 
-#include "BootstrapperEngine.h"
-#include "BootstrapperApplication.h"
-#include "IBootstrapperEngine.h"
-#include "IBootstrapperApplication.h"
-#include "IBootstrapperApplicationFactory.h"
+#include <BootstrapperEngine.h>
+#include <BootstrapperApplication.h>
+#include <IBootstrapperEngine.h>
+#include <IBootstrapperApplication.h>
+#include <IBootstrapperApplicationFactory.h>
 
-#include "balutil.h"
+#include <balutil.h>
+
+#include <preqba.h>
+#include <WixToolset.Mba.Host.h> // includes the generated assembly name macros.
+
+#include "mbahost.h"

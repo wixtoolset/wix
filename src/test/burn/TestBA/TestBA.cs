@@ -171,7 +171,13 @@ namespace WixToolset.Test.BA
                 this.dummyWindow.Dispose();
             }
 
-            this.Engine.Quit(this.result & 0xFFFF); // return plain old Win32 error, not HRESULT.
+            var exitCode = this.result;
+            if ((exitCode & 0xFFFF0000) == unchecked(0x80070000))
+            {
+                exitCode &= 0xFFFF; // return plain old Win32 error, not HRESULT.
+            }
+
+            this.Engine.Quit(exitCode);
         }
 
         protected override void OnDetectUpdateBegin(DetectUpdateBeginEventArgs args)

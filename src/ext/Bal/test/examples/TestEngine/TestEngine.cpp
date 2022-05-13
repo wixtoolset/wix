@@ -147,10 +147,18 @@ HRESULT TestEngine::SimulateQuit(
     return BAEngineQuit(&args, &results);
 }
 
-void TestEngine::UnloadBA()
+void TestEngine::UnloadBA(
+    __in BOOL fReload
+    )
 {
     PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = NULL;
-    BOOL fDisableUnloading = m_pCreateResults && m_pCreateResults->fDisableUnloading;
+    BOOTSTRAPPER_DESTROY_ARGS args = { };
+    BOOTSTRAPPER_DESTROY_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.fReload = fReload;
+
+    results.cbSize = sizeof(results);
 
     ReleaseNullMem(m_pCreateResults);
 
@@ -158,12 +166,12 @@ void TestEngine::UnloadBA()
 
     if (pfnDestroy)
     {
-        pfnDestroy();
+        pfnDestroy(&args, &results);
     }
 
     if (m_hBAModule)
     {
-        if (!fDisableUnloading)
+        if (!results.fDisableUnloading)
         {
             ::FreeLibrary(m_hBAModule);
         }

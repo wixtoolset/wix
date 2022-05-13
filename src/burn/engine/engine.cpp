@@ -796,7 +796,7 @@ LExit:
         else if (BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER == shutdownAction)
         {
             LogId(REPORT_STANDARD, MSG_BA_REQUESTED_RELOAD);
-            *pfReloadApp = TRUE;
+            *pfReloadApp = SUCCEEDED(hr);
         }
         else if (BOOTSTRAPPER_SHUTDOWN_ACTION_SKIP_CLEANUP == shutdownAction)
         {
@@ -806,7 +806,7 @@ LExit:
     }
 
     // Unload BA.
-    UserExperienceUnload(&pEngineState->userExperience);
+    UserExperienceUnload(&pEngineState->userExperience, *pfReloadApp);
 
     return hr;
 }

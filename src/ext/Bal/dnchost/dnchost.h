@@ -9,13 +9,6 @@ enum DNCHOSTTYPE
     DNCHOSTTYPE_SCD,
 };
 
-extern "C" typedef HRESULT(WINAPI* PFN_DNCPREQ_BOOTSTRAPPER_APPLICATION_CREATE)(
-    __in HRESULT hrHostInitialization,
-    __in IBootstrapperEngine* pEngine,
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
-    );
-
 struct DNCSTATE
 {
     BOOL fInitialized;
@@ -31,4 +24,5 @@ struct DNCSTATE
     HOSTFXR_STATE hostfxrState;
     IBootstrapperApplicationFactory* pAppFactory;
     HMODULE hMbapreqModule;
+    PREQBA_DATA prereqData;
 };
