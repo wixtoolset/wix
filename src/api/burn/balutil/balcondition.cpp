@@ -35,10 +35,10 @@ DAPI_(HRESULT) BalConditionsParseFromXml(
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
     {
         hr = XmlGetAttributeEx(pNode, L"Condition", &prgConditions[iCondition].sczCondition);
-        ExitOnFailure(hr, "Failed to get condition for condition.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get condition for condition.");
 
         hr = XmlGetAttributeEx(pNode, L"Message", &prgConditions[iCondition].sczMessage);
-        ExitOnFailure(hr, "Failed to get message for condition.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get message for condition.");
 
         if (pWixLoc && prgConditions[iCondition].sczMessage && *prgConditions[iCondition].sczMessage)
         {

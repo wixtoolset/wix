@@ -168,21 +168,16 @@ static HRESULT LoadDncConfiguration(
     IXMLDOMNode* pixnHost = NULL;
     LPWSTR sczPayloadName = NULL;
     DWORD dwBool = 0;
+    BOOL fXmlFound = FALSE;
 
     hr = XmlLoadDocumentFromFile(pArgs->pCommand->wzBootstrapperApplicationDataPath, &pixdManifest);
     BalExitOnFailure(hr, "Failed to load BalManifest '%ls'", pArgs->pCommand->wzBootstrapperApplicationDataPath);
 
     hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixBalBAFactoryAssembly", &pixnHost);
-    BalExitOnFailure(hr, "Failed to get WixBalBAFactoryAssembly element.");
-
-    if (S_FALSE == hr)
-    {
-        hr = E_NOTFOUND;
-        BalExitOnRootFailure(hr, "Failed to find WixBalBAFactoryAssembly element in bootstrapper application config.");
-    }
+    BalExitOnRequiredXmlQueryFailure(hr, "Failed to get WixBalBAFactoryAssembly element.");
 
     hr = XmlGetAttributeEx(pixnHost, L"FilePath", &sczPayloadName);
-    BalExitOnFailure(hr, "Failed to get WixBalBAFactoryAssembly/@FilePath.");
+    BalExitOnRequiredXmlQueryFailure(hr, "Failed to get WixBalBAFactoryAssembly/@FilePath.");
 
     hr = PathConcat(pArgs->pCommand->wzBootstrapperWorkingFolder, sczPayloadName, &pState->sczBaFactoryAssemblyPath);
     BalExitOnFailure(hr, "Failed to create BaFactoryAssemblyPath.");
@@ -212,22 +207,20 @@ static HRESULT LoadDncConfiguration(
     pState->type = DNCHOSTTYPE_FDD;
 
     hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixDncOptions", &pixnHost);
-    if (S_FALSE == hr)
+    BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find WixDncOptions element in bootstrapper application config.");
+
+    if (!fXmlFound)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    BalExitOnFailure(hr, "Failed to find WixDncOptions element in bootstrapper application config.");
 
     hr = XmlGetAttributeNumber(pixnHost, L"SelfContainedDeployment", &dwBool);
-    if (S_FALSE == hr)
-    {
-        hr = S_OK;
-    }
-    else if (SUCCEEDED(hr) && dwBool)
+    BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get SelfContainedDeployment value.");
+
+    if (fXmlFound && dwBool)
     {
         pState->type = DNCHOSTTYPE_SCD;
     }
-    BalExitOnFailure(hr, "Failed to get SelfContainedDeployment value.");
 
 LExit:
     ReleaseStr(sczPayloadName);

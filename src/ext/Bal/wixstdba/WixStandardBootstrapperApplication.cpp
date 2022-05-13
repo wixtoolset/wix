@@ -2603,95 +2603,70 @@ private:
         HRESULT hr = S_OK;
         IXMLDOMNode* pNode = NULL;
         DWORD dwBool = 0;
+        BOOL fXmlFound = FALSE;
 
         hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixStdbaInformation", &pNode);
-        if (S_FALSE == hr)
-        {
-            hr = E_INVALIDARG;
-        }
-        BalExitOnFailure(hr, "BootstrapperApplication.xml manifest is missing wixstdba information.");
+        BalExitOnRequiredXmlQueryFailure(hr, "BootstrapperApplication.xml manifest is missing wixstdba information.");
 
         hr = XmlGetAttributeEx(pNode, L"LicenseFile", &m_sczLicenseFile);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        BalExitOnFailure(hr, "Failed to get license file.");
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get license file.");
 
         hr = XmlGetAttributeEx(pNode, L"LicenseUrl", &m_sczLicenseUrl);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        BalExitOnFailure(hr, "Failed to get license URL.");
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get license URL.");
 
         ReleaseObject(pNode);
 
         hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixStdbaOptions", &pNode);
-        if (S_FALSE == hr)
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read wixstdba options from BootstrapperApplication.xml manifest.");
+
+        if (!fXmlFound)
         {
-            ExitFunction1(hr = S_OK);
+            ExitFunction();
         }
-        BalExitOnFailure(hr, "Failed to read wixstdba options from BootstrapperApplication.xml manifest.");
 
         hr = XmlGetAttributeNumber(pNode, L"SuppressOptionsUI", &dwBool);
-        if (S_FALSE == hr)
-        {
-            hr = S_OK;
-        }
-        else if (SUCCEEDED(hr) && dwBool)
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get SuppressOptionsUI value.");
+
+        if (fXmlFound && dwBool)
         {
             hr = BalSetNumericVariable(WIXSTDBA_VARIABLE_SUPPRESS_OPTIONS_UI, 1);
             BalExitOnFailure(hr, "Failed to set '%ls' variable.", WIXSTDBA_VARIABLE_SUPPRESS_OPTIONS_UI);
         }
-        BalExitOnFailure(hr, "Failed to get SuppressOptionsUI value.");
 
         dwBool = 0;
         hr = XmlGetAttributeNumber(pNode, L"SuppressDowngradeFailure", &dwBool);
-        if (S_FALSE == hr)
-        {
-            hr = S_OK;
-        }
-        else if (SUCCEEDED(hr))
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get SuppressDowngradeFailure value.");
+
+        if (fXmlFound)
         {
             m_fSuppressDowngradeFailure = 0 < dwBool;
         }
-        BalExitOnFailure(hr, "Failed to get SuppressDowngradeFailure value.");
 
         dwBool = 0;
         hr = XmlGetAttributeNumber(pNode, L"SuppressRepair", &dwBool);
-        if (S_FALSE == hr)
-        {
-            hr = S_OK;
-        }
-        else if (SUCCEEDED(hr))
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get SuppressRepair value.");
+
+        if (fXmlFound)
         {
             m_fSuppressRepair = 0 < dwBool;
         }
-        BalExitOnFailure(hr, "Failed to get SuppressRepair value.");
 
         hr = XmlGetAttributeNumber(pNode, L"ShowVersion", &dwBool);
-        if (S_FALSE == hr)
-        {
-            hr = S_OK;
-        }
-        else if (SUCCEEDED(hr) && dwBool)
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get ShowVersion value.");
+
+        if (fXmlFound && dwBool)
         {
             hr = BalSetNumericVariable(WIXSTDBA_VARIABLE_SHOW_VERSION, 1);
             BalExitOnFailure(hr, "Failed to set '%ls' variable.", WIXSTDBA_VARIABLE_SHOW_VERSION);
         }
-        BalExitOnFailure(hr, "Failed to get ShowVersion value.");
 
         hr = XmlGetAttributeNumber(pNode, L"SupportCacheOnly", &dwBool);
-        if (S_FALSE == hr)
-        {
-            hr = S_OK;
-        }
-        else if (SUCCEEDED(hr))
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get SupportCacheOnly value.");
+
+        if (fXmlFound)
         {
             m_fSupportCacheOnly = 0 < dwBool;
         }
-        BalExitOnFailure(hr, "Failed to get SupportCacheOnly value.");
 
     LExit:
         ReleaseObject(pNode);
@@ -4149,17 +4124,18 @@ LExit:
         LPWSTR sczBafPath = NULL;
         BA_FUNCTIONS_CREATE_ARGS bafCreateArgs = { };
         BA_FUNCTIONS_CREATE_RESULTS bafCreateResults = { };
+        BOOL fXmlFound = FALSE;
 
         hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixBalBAFunctions", &pBAFunctionsNode);
-        BalExitOnFailure(hr, "Failed to read WixBalBAFunctions node from BootstrapperApplicationData.xml.");
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read WixBalBAFunctions node from BootstrapperApplicationData.xml.");
 
-        if (S_FALSE == hr)
+        if (!fXmlFound)
         {
             ExitFunction();
         }
 
         hr = XmlGetAttributeEx(pBAFunctionsNode, L"FilePath", &sczBafName);
-        BalExitOnFailure(hr, "Failed to get BAFunctions FilePath.");
+        BalExitOnRequiredXmlQueryFailure(hr, "Failed to get BAFunctions FilePath.");
 
         hr = PathRelativeToModule(&sczBafPath, sczBafName, m_hModule);
         BalExitOnFailure(hr, "Failed to get path to BAFunctions DLL.");
