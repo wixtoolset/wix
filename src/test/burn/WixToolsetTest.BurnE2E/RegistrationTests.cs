@@ -3,6 +3,7 @@
 namespace WixToolsetTest.BurnE2E
 {
     using System;
+    using WixTestTools;
     using WixToolset.Mba.Core;
     using Xunit;
     using Xunit.Abstractions;
@@ -11,7 +12,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public RegistrationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void AllowsBAToKeepRegistration()
         {
             this.CreatePackageInstaller("PackageA");
@@ -37,7 +38,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.InRange(finalRegistration.EstimatedSize.Value, initialRegistration.EstimatedSize.Value + 1, Int32.MaxValue);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void AutomaticallyUncachesBundleWhenNotInstalled()
         {
             this.CreatePackageInstaller("PackageA");
@@ -53,19 +54,19 @@ namespace WixToolsetTest.BurnE2E
             bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void AutomaticallyUninstallsBundleWithoutBADoingApply()
         {
             this.InstallBundleThenManuallyUninstallPackageAndRemovePackageFromCacheThenRunAndQuitWithoutApply(true);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void AutomaticallyUninstallsBundleWithoutBADoingDetect()
         {
             this.InstallBundleThenManuallyUninstallPackageAndRemovePackageFromCacheThenRunAndQuitWithoutApply(false);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void RegistersInARPIfPrecached()
         {
             this.CreatePackageInstaller("PackageA");

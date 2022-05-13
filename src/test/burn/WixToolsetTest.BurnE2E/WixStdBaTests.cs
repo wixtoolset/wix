@@ -3,14 +3,13 @@
 namespace WixToolsetTest.BurnE2E
 {
     using WixTestTools;
-    using Xunit;
     using Xunit.Abstractions;
 
     public class WixStdBaTests : BurnE2ETests
     {
         public WixStdBaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void ExitsWithErrorWhenDowngradingWithoutSuppression()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -31,7 +30,7 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(true);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void ExitsWithoutErrorWhenDowngradingWithSuppression()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

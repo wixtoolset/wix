@@ -2,14 +2,14 @@
 
 namespace WixToolsetTest.BurnE2E
 {
-    using Xunit;
+    using WixTestTools;
     using Xunit.Abstractions;
 
     public class ContainerTests : BurnE2ETests
     {
         public ContainerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanSupportMultipleAttachedContainers()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

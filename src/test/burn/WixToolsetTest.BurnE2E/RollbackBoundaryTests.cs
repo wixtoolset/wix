@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -22,7 +23,7 @@ namespace WixToolsetTest.BurnE2E
         ///     install package B
         ///     unregister since no non-permanent packages should be installed or cached.
         /// </summary>
-        [Fact]
+        [RuntimeFact]
         public void NonVitalRollbackBoundarySkipsToNextRollbackBoundary()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

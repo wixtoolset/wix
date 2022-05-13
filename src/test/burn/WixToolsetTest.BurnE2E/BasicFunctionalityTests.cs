@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -11,59 +12,59 @@ namespace WixToolsetTest.BurnE2E
     {
         public BasicFunctionalityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x86_wixstdba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA", "BundleA");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x86_testba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA", "BundleB");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x86_dnctestba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA", "BundleC");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x86_wixba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA", "BundleD");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x64_wixstdba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleA_x64");
         }
 
 #if DEBUG
-        [Fact(Skip = "0xc0000005 during shutdown from tiptsf.dll")]
+        [RuntimeFact(Skip = "0xc0000005 during shutdown from tiptsf.dll")]
 #else
-        [Fact]
+        [RuntimeFact]
 #endif
         public void CanInstallAndUninstallSimplePerUserBundle_x64_wixstdba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageApu_x64", "BundleApu_x64", "PackagePerUser.wxs");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x64_testba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleB_x64");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x64_dnctestba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleC_x64");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallSimpleBundle_x64_dncwixba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleD_x64");

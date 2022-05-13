@@ -12,7 +12,7 @@ namespace WixToolsetTest.BurnE2E
     {
         public BundlePackageTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallAndUninstallBundlePackages()
         {
             var packageA = this.CreatePackageInstaller(@"..\BasicFunctionalityTests\PackageA");
@@ -49,7 +49,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.False(File.Exists(packageA64SourceCodeFilePath), $"PackageA_x64 payload should have been removed by uninstall from: {packageA64SourceCodeFilePath}");
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallUpgradeBundlePackage()
         {
             var bundleAv1 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv1");
@@ -65,7 +65,7 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanInstallV3BundlePackage()
         {
             var v3BundleId = "{215a70db-ab35-48c7-be51-d66eaac87177}";
@@ -85,7 +85,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.Null(v3Registration.SystemComponent);
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanLeaveBundlePackageVisible()
         {
             var bundleAv1 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv1");
@@ -103,7 +103,7 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.VerifyRegisteredAndInPackageCache();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanReferenceCountBundlePackage()
         {
             var bundleAv1 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv1");
@@ -123,7 +123,7 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.VerifyRegisteredAndInPackageCache();
         }
 
-        [Fact]
+        [RuntimeFact]
         public void CanSkipObsoleteBundlePackage()
         {
             var bundleAv1 = this.CreateBundleInstaller(@"..\UpgradeRelatedBundleTests\BundleAv1");
