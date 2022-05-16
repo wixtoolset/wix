@@ -68,6 +68,10 @@ namespace WixToolset.Mba.Core
             public IntPtr rgReleaseLabels;
             public IntPtr cchMetadataOffset;
             public bool fInvalid;
+            public bool fHasMajor;
+            public bool fHasMinor;
+            public bool fHasPatch;
+            public bool fHasRevision;
         }
 
         internal static string VersionStringFromOffset(IntPtr wzVersion, IntPtr cchOffset, int? cchLength = null)

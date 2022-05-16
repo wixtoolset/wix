@@ -28,6 +28,10 @@ typedef struct _VERUTIL_VERSION
     VERUTIL_VERSION_RELEASE_LABEL* rgReleaseLabels;
     SIZE_T cchMetadataOffset;
     BOOL fInvalid;
+    BOOL fHasMajor;
+    BOOL fHasMinor;
+    BOOL fHasPatch;
+    BOOL fHasRevision;
 } VERUTIL_VERSION;
 
 /*******************************************************************

@@ -22,22 +22,42 @@ namespace WixToolset.Data
         /// <summary>
         /// Gets or sets the major version.
         /// </summary>
-        public uint? Major { get; set; }
+        public uint Major { get; set; }
 
         /// <summary>
         /// Gets or sets the minor version.
         /// </summary>
-        public uint? Minor { get; set; }
+        public uint Minor { get; set; }
 
         /// <summary>
         /// Gets or sets the patch version.
         /// </summary>
-        public uint? Patch { get; set; }
+        public uint Patch { get; set; }
 
         /// <summary>
         /// Gets or sets the revision version.
         /// </summary>
-        public uint? Revision { get; set; }
+        public uint Revision { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the major version was defined.
+        /// </summary>
+        public bool HasMajor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the whether the minor version was defined.
+        /// </summary>
+        public bool HasMinor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the whether the patch version was defined.
+        /// </summary>
+        public bool HasPatch { get; set; }
+
+        /// <summary>
+        /// Gets or sets the whether the revision version was defined.
+        /// </summary>
+        public bool HasRevision { get; set; }
 
         /// <summary>
         /// Gets or sets the labels in the version.
@@ -143,15 +163,19 @@ namespace WixToolset.Data
                 {
                     case 0:
                         version.Major = part;
+                        version.HasMajor = true;
                         break;
                     case 1:
                         version.Minor = part;
+                        version.HasMinor = true;
                         break;
                     case 2:
                         version.Patch = part;
+                        version.HasPatch = true;
                         break;
                     case 3:
                         version.Revision = part;
+                        version.HasRevision = true;
                         break;
                 }
 
@@ -264,6 +288,7 @@ namespace WixToolset.Data
 
             if (invalid)
             {
+                version = null;
                 return false;
             }
 

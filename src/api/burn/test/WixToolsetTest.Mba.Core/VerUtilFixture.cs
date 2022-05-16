@@ -57,6 +57,10 @@ namespace WixToolsetTest.Mba.Core
             Assert.Empty(parsedVersion.ReleaseLabels);
             Assert.Equal("", parsedVersion.Metadata);
             Assert.False(parsedVersion.IsInvalid);
+            Assert.True(parsedVersion.HasMajor);
+            Assert.True(parsedVersion.HasMinor);
+            Assert.True(parsedVersion.HasPatch);
+            Assert.True(parsedVersion.HasRevision);
         }
 
         [Fact]
@@ -74,6 +78,10 @@ namespace WixToolsetTest.Mba.Core
             Assert.Equal(5, parsedVersion.ReleaseLabels.Length);
             Assert.Equal("+abc123", parsedVersion.Metadata);
             Assert.True(parsedVersion.IsInvalid);
+            Assert.True(parsedVersion.HasMajor);
+            Assert.True(parsedVersion.HasMinor);
+            Assert.True(parsedVersion.HasPatch);
+            Assert.True(parsedVersion.HasRevision);
 
             Assert.Equal("a", parsedVersion.ReleaseLabels[0].Label);
             Assert.False(parsedVersion.ReleaseLabels[0].IsNumeric);

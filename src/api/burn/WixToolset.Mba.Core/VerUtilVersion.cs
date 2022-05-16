@@ -25,6 +25,10 @@ namespace WixToolset.Mba.Core
             this.ReleaseLabels = new VerUtilVersionReleaseLabel[version.cReleaseLabels];
             this.Metadata = VerUtil.VersionStringFromOffset(version.sczVersion, version.cchMetadataOffset);
             this.IsInvalid = version.fInvalid;
+            this.HasMajor = version.fHasMajor;
+            this.HasMinor = version.fHasMinor;
+            this.HasPatch = version.fHasPatch;
+            this.HasRevision = version.fHasRevision;
 
             for (var i = 0; i < version.cReleaseLabels; ++i)
             {
@@ -79,6 +83,26 @@ namespace WixToolset.Mba.Core
         /// Whether the version conformed to the spec.
         /// </summary>
         public bool IsInvalid { get; private set; }
+
+        /// <summary>
+        /// Whether the Major part was specified.
+        /// </summary>
+        public bool HasMajor { get; private set; }
+
+        /// <summary>
+        /// Whether the Minor part was specified.
+        /// </summary>
+        public bool HasMinor { get; private set; }
+
+        /// <summary>
+        /// Whether the Patch part was specified.
+        /// </summary>
+        public bool HasPatch { get; private set; }
+
+        /// <summary>
+        /// Whether the Revision part was specified.
+        /// </summary>
+        public bool HasRevision { get; private set; }
 
         /// <inheritdoc/>
         public void Dispose()

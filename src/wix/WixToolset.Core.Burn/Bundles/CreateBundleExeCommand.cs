@@ -254,10 +254,10 @@ namespace WixToolset.Core.Burn.Bundles
                 return new Version(0, 0);
             }
 
-            var major = wixVersion.Major ?? 0;
-            var minor = wixVersion.Minor ?? 0;
-            var build = wixVersion.Patch ?? 0;
-            var revision = wixVersion.Revision ?? 0;
+            var major = wixVersion.Major;
+            var minor = wixVersion.Minor;
+            var build = wixVersion.Patch;
+            var revision = wixVersion.Revision;
 
             if (UInt16.MaxValue < major || UInt16.MaxValue < minor || UInt16.MaxValue < build || UInt16.MaxValue < revision)
             {
@@ -369,7 +369,7 @@ namespace WixToolset.Core.Burn.Bundles
             public BURN_SPLASH_SCREEN_TYPE Type;
 
             [MarshalAs(UnmanagedType.U2)]
-            public UInt16 ResourceId;
+            public ushort ResourceId;
 
             public byte[] ToBytes()
             {
