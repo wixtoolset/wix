@@ -49,6 +49,7 @@ namespace WixToolsetTest.Mba.Core
 
             using var parsedVersion = VerUtil.VersionFromQword(qwVersion);
             Assert.Equal("100.200.300.400", parsedVersion.Version);
+            Assert.Equal('\0', parsedVersion.Prefix);
             Assert.Equal(100u, parsedVersion.Major);
             Assert.Equal(200u, parsedVersion.Minor);
             Assert.Equal(300u, parsedVersion.Patch);
@@ -65,6 +66,7 @@ namespace WixToolsetTest.Mba.Core
 
             using var parsedVersion = VerUtil.ParseVersion(version, strict: false);
             Assert.Equal(version, parsedVersion.Version);
+            Assert.Equal('\0', parsedVersion.Prefix);
             Assert.Equal(1u, parsedVersion.Major);
             Assert.Equal(2u, parsedVersion.Minor);
             Assert.Equal(3u, parsedVersion.Patch);

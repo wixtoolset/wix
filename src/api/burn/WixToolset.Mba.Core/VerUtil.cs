@@ -59,6 +59,7 @@ namespace WixToolset.Mba.Core
         internal struct VersionStruct
         {
             public IntPtr sczVersion;
+            public char chPrefix;
             public uint dwMajor;
             public uint dwMinor;
             public uint dwPatch;

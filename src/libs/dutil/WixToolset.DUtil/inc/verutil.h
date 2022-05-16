@@ -19,6 +19,7 @@ typedef struct _VERUTIL_VERSION_RELEASE_LABEL
 typedef struct _VERUTIL_VERSION
 {
     LPWSTR sczVersion;
+    WCHAR chPrefix;
     DWORD dwMajor;
     DWORD dwMinor;
     DWORD dwPatch;
