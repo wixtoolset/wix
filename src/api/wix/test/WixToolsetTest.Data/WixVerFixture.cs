@@ -11,13 +11,15 @@ namespace WixToolsetTest.Data
         [Fact]
         public void CannotParseEmptyStringAsVersion()
         {
-            Assert.False(WixVersion.TryParse(String.Empty, out var _));
+            Assert.False(WixVersion.TryParse(String.Empty, out var version));
+            Assert.Null(version);
         }
 
         [Fact]
         public void CannotParseInvalidStringAsVersion()
         {
-            Assert.False(WixVersion.TryParse("invalid", out var _));
+            Assert.False(WixVersion.TryParse("invalid", out var version));
+            Assert.Null(version);
         }
 
         [Fact]
@@ -29,6 +31,10 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)2, version.Minor);
             Assert.Equal((uint)3, version.Patch);
             Assert.Equal((uint)4, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.True(version.HasRevision);
             Assert.Null(version.Labels);
             Assert.Null(version.Metadata);
         }
@@ -41,7 +47,11 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)1, version.Major);
             Assert.Equal((uint)2, version.Minor);
             Assert.Equal((uint)3, version.Patch);
-            Assert.Null(version.Revision);
+            Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.False(version.HasRevision);
             Assert.Null(version.Labels);
             Assert.Null(version.Metadata);
         }
@@ -55,6 +65,10 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)2, version.Minor);
             Assert.Equal((uint)3, version.Patch);
             Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.True(version.HasRevision);
             Assert.Null(version.Labels);
             Assert.Null(version.Metadata);
         }
@@ -66,8 +80,12 @@ namespace WixToolsetTest.Data
             Assert.Null(version.Prefix);
             Assert.Equal((uint)1, version.Major);
             Assert.Equal((uint)2, version.Minor);
-            Assert.Null(version.Patch);
-            Assert.Null(version.Revision);
+            Assert.Equal((uint)0, version.Patch);
+            Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.False(version.HasPatch);
+            Assert.False(version.HasRevision);
             Assert.Equal("19", version.Labels[0].Label);
             Assert.Equal((uint)19, version.Labels[0].Numeric);
             Assert.Null(version.Metadata);
@@ -80,8 +98,12 @@ namespace WixToolsetTest.Data
             Assert.Null(version.Prefix);
             Assert.Equal((uint)1, version.Major);
             Assert.Equal((uint)2, version.Minor);
-            Assert.Null(version.Patch);
-            Assert.Null(version.Revision);
+            Assert.Equal((uint)0, version.Patch);
+            Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.False(version.HasPatch);
+            Assert.False(version.HasRevision);
             Assert.Equal("2", version.Labels[0].Label);
             Assert.Equal((uint)2, version.Labels[0].Numeric);
             Assert.Equal("0", version.Labels[1].Label);
@@ -97,6 +119,11 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)0, version.Major);
             Assert.Equal((uint)0, version.Minor);
             Assert.Equal((uint)1, version.Patch);
+            Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.False(version.HasRevision);
             Assert.Equal("a", version.Labels[0].Label);
             Assert.Null(version.Labels[0].Numeric);
             Assert.Null(version.Metadata);
@@ -109,8 +136,12 @@ namespace WixToolsetTest.Data
             Assert.Null(version.Prefix);
             Assert.Equal((uint)0, version.Major);
             Assert.Equal((uint)1, version.Minor);
-            Assert.Null(version.Patch);
-            Assert.Null(version.Revision);
+            Assert.Equal((uint)0, version.Patch);
+            Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.False(version.HasPatch);
+            Assert.False(version.HasRevision);
             Assert.Equal("a", version.Labels[0].Label);
             Assert.Null(version.Labels[0].Numeric);
             Assert.Equal("000", version.Labels[1].Label);
@@ -126,7 +157,11 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)1, version.Major);
             Assert.Equal((uint)2, version.Minor);
             Assert.Equal((uint)3, version.Patch);
-            Assert.Null(version.Revision);
+            Assert.Equal((uint)0, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.False(version.HasRevision);
             Assert.Null(version.Labels);
             Assert.Equal("abcd", version.Metadata);
         }
@@ -134,8 +169,10 @@ namespace WixToolsetTest.Data
         [Fact]
         public void CannotParseUnexpectedContentAsMetadata()
         {
-            Assert.False(WixVersion.TryParse("1.2.3.abcd", out var _));
-            Assert.False(WixVersion.TryParse("1.2.3.-abcd", out var _));
+            Assert.False(WixVersion.TryParse("1.2.3.abcd", out var version));
+            Assert.Null(version);
+            Assert.False(WixVersion.TryParse("1.2.3.-abcd", out version));
+            Assert.Null(version);
         }
 
         [Fact]
@@ -147,6 +184,10 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)20, version.Minor);
             Assert.Equal((uint)30, version.Patch);
             Assert.Equal((uint)40, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.True(version.HasRevision);
             Assert.Null(version.Labels);
             Assert.Null(version.Metadata);
 
@@ -156,6 +197,10 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)200, version2.Minor);
             Assert.Equal((uint)300, version2.Patch);
             Assert.Equal((uint)400, version2.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.True(version.HasRevision);
             Assert.Null(version2.Labels);
             Assert.Null(version2.Metadata);
         }
@@ -169,6 +214,10 @@ namespace WixToolsetTest.Data
             Assert.Equal(4294967295, version.Minor);
             Assert.Equal(4294967295, version.Patch);
             Assert.Equal(4294967295, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.True(version.HasRevision);
             Assert.Null(version.Labels);
             Assert.Null(version.Metadata);
         }
@@ -176,7 +225,8 @@ namespace WixToolsetTest.Data
         [Fact]
         public void CannotParseTooLargeNumbers()
         {
-            Assert.False(WixVersion.TryParse("4294967296.4294967296.4294967296.4294967296", out var _));
+            Assert.False(WixVersion.TryParse("4294967296.4294967296.4294967296.4294967296", out var version));
+            Assert.Null(version);
         }
 
         [Fact]
@@ -188,6 +238,10 @@ namespace WixToolsetTest.Data
             Assert.Equal((uint)2, version.Minor);
             Assert.Equal((uint)3, version.Patch);
             Assert.Equal((uint)4, version.Revision);
+            Assert.True(version.HasMajor);
+            Assert.True(version.HasMinor);
+            Assert.True(version.HasPatch);
+            Assert.True(version.HasRevision);
             Assert.Equal("a", version.Labels[0].Label);
             Assert.Null(version.Labels[0].Numeric);
             Assert.Equal("b", version.Labels[1].Label);

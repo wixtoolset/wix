@@ -196,9 +196,13 @@ DAPI_(HRESULT) VerCopyVersion(
 
     pCopy->chPrefix = pSource->chPrefix;
     pCopy->dwMajor = pSource->dwMajor;
+    pCopy->fHasMajor = pSource->fHasMajor;
     pCopy->dwMinor = pSource->dwMinor;
+    pCopy->fHasMinor = pSource->fHasMinor;
     pCopy->dwPatch = pSource->dwPatch;
+    pCopy->fHasPatch = pSource->fHasPatch;
     pCopy->dwRevision = pSource->dwRevision;
+    pCopy->fHasRevision = pSource->fHasRevision;
 
     if (pSource->cReleaseLabels)
     {
@@ -370,15 +374,19 @@ DAPI_(HRESULT) VerParseVersion(
         {
         case 0:
             pVersion->dwMajor = uPart;
+            pVersion->fHasMajor = TRUE;
             break;
         case 1:
             pVersion->dwMinor = uPart;
+            pVersion->fHasMinor = TRUE;
             break;
         case 2:
             pVersion->dwPatch = uPart;
+            pVersion->fHasPatch = TRUE;
             break;
         case 3:
             pVersion->dwRevision = uPart;
+            pVersion->fHasRevision = TRUE;
             break;
         }
 
@@ -548,6 +556,11 @@ DAPI_(HRESULT) VerVersionFromQword(
     pVersion->dwMinor = (WORD)(qwVersion >> 32 & 0xffff);
     pVersion->dwPatch = (WORD)(qwVersion >> 16 & 0xffff);
     pVersion->dwRevision = (WORD)(qwVersion & 0xffff);
+
+    pVersion->fHasMajor = TRUE;
+    pVersion->fHasMinor = TRUE;
+    pVersion->fHasPatch = TRUE;
+    pVersion->fHasRevision = TRUE;
 
     hr = StrAllocFormatted(&pVersion->sczVersion, L"%lu.%lu.%lu.%lu", pVersion->dwMajor, pVersion->dwMinor, pVersion->dwPatch, pVersion->dwRevision);
     ExitOnFailure(hr, "Failed to allocate and format the version string.");
