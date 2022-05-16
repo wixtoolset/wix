@@ -34,6 +34,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion3);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
@@ -43,6 +44,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion2->dwPatch);
@@ -52,6 +54,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion3, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion3->dwPatch);
@@ -89,6 +92,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion2);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion1->dwPatch);
@@ -109,6 +113,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
@@ -170,6 +175,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion6);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion1->dwPatch);
@@ -179,6 +185,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
@@ -188,6 +195,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion3, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion3->dwPatch);
@@ -197,6 +205,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion4, pVersion4->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion4->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion4->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion4->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion4->dwPatch);
@@ -206,6 +215,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion4->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion5, pVersion5->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion5->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion5->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion5->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion5->dwPatch);
@@ -221,6 +231,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion5->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion6, pVersion6->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion6->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion6->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion6->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion6->dwPatch);
@@ -273,6 +284,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion3);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(1, pVersion1->dwPatch);
@@ -287,6 +299,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
@@ -302,6 +315,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion3, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion3->dwPatch);
@@ -355,6 +369,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion4);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(1, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion1->dwPatch);
@@ -374,6 +389,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(1, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
@@ -393,6 +409,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion3, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(1, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion3->dwPatch);
@@ -416,6 +433,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion4, pVersion4->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion4->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion4->dwMajor);
                 Assert::Equal<DWORD>(1, pVersion4->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion4->dwPatch);
@@ -473,6 +491,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion3);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
@@ -482,6 +501,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion2->dwPatch);
@@ -491,6 +511,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion3, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion3->dwPatch);
@@ -518,9 +539,13 @@ namespace DutilTests
             VERUTIL_VERSION* pVersion1 = NULL;
             VERUTIL_VERSION* pVersion2 = NULL;
             VERUTIL_VERSION* pVersion3 = NULL;
+            VERUTIL_VERSION* pVersion4 = NULL;
+            VERUTIL_VERSION* pVersion5 = NULL;
             LPCWSTR wzVersion1 = L"10.20.30.40";
             LPCWSTR wzVersion2 = L"v10.20.30.40";
             LPCWSTR wzVersion3 = L"V10.20.30.40";
+            LPCWSTR wzVersion4 = L"v10.20.30.40-abc";
+            LPCWSTR wzVersion5 = L"vvv";
 
             try
             {
@@ -533,7 +558,14 @@ namespace DutilTests
                 hr = VerParseVersion(wzVersion3, 0, FALSE, &pVersion3);
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion3);
 
+                hr = VerParseVersion(wzVersion4, 0, FALSE, &pVersion4);
+                NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion4);
+
+                hr = VerParseVersion(wzVersion5, 0, FALSE, &pVersion5);
+                NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion5);
+
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(20, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(30, pVersion1->dwPatch);
@@ -543,6 +575,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'v', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(20, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(30, pVersion2->dwPatch);
@@ -552,6 +585,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'V', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(10, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(20, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(30, pVersion3->dwPatch);
@@ -560,14 +594,42 @@ namespace DutilTests
                 Assert::Equal<DWORD>(11, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
 
+                NativeAssert::StringEqual(L"10.20.30.40-abc", pVersion4->sczVersion);
+                Assert::Equal<WCHAR>(L'v', pVersion4->chPrefix);
+                Assert::Equal<DWORD>(10, pVersion4->dwMajor);
+                Assert::Equal<DWORD>(20, pVersion4->dwMinor);
+                Assert::Equal<DWORD>(30, pVersion4->dwPatch);
+                Assert::Equal<DWORD>(40, pVersion4->dwRevision);
+                Assert::Equal<DWORD>(1, pVersion4->cReleaseLabels);
+
+                Assert::Equal<BOOL>(FALSE, pVersion4->rgReleaseLabels[0].fNumeric);
+                Assert::Equal<DWORD>(3, pVersion4->rgReleaseLabels[0].cchLabel);
+                Assert::Equal<DWORD>(12, pVersion4->rgReleaseLabels[0].cchLabelOffset);
+
+                Assert::Equal<DWORD>(15, pVersion4->cchMetadataOffset);
+                Assert::Equal<BOOL>(FALSE, pVersion4->fInvalid);
+
+                NativeAssert::StringEqual(wzVersion5, pVersion5->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion5->chPrefix);
+                Assert::Equal<DWORD>(0, pVersion5->dwMajor);
+                Assert::Equal<DWORD>(0, pVersion5->dwMinor);
+                Assert::Equal<DWORD>(0, pVersion5->dwPatch);
+                Assert::Equal<DWORD>(0, pVersion5->dwRevision);
+                Assert::Equal<DWORD>(0, pVersion5->cReleaseLabels);
+                Assert::Equal<DWORD>(0, pVersion5->cchMetadataOffset);
+                Assert::Equal<BOOL>(TRUE, pVersion5->fInvalid);
+
                 TestVerutilCompareParsedVersions(pVersion1, pVersion2, 0);
                 TestVerutilCompareParsedVersions(pVersion1, pVersion3, 0);
+                TestVerutilCompareParsedVersions(pVersion1, pVersion4, 1);
             }
             finally
             {
                 ReleaseVerutilVersion(pVersion1);
                 ReleaseVerutilVersion(pVersion2);
                 ReleaseVerutilVersion(pVersion3);
+                ReleaseVerutilVersion(pVersion4);
+                ReleaseVerutilVersion(pVersion5);
             }
         }
 
@@ -589,6 +651,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion2);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(4294967295, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(4294967295, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(4294967295, pVersion1->dwPatch);
@@ -598,6 +661,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
@@ -633,6 +697,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion2);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
@@ -642,6 +707,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion2->dwPatch);
@@ -674,6 +740,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "VerParseVersion failed");
 
                 NativeAssert::StringEqual(wzVersion, pSource->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pSource->chPrefix);
                 Assert::Equal<DWORD>(1, pSource->dwMajor);
                 Assert::Equal<DWORD>(2, pSource->dwMinor);
                 Assert::Equal<DWORD>(3, pSource->dwPatch);
@@ -688,6 +755,7 @@ namespace DutilTests
 
                 Assert::False(pSource == pCopy);
                 Assert::False(pSource->sczVersion == pCopy->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pCopy->chPrefix);
 
                 hr = VerCompareParsedVersions(pSource, pCopy, &nResult);
                 NativeAssert::Succeeded(hr, "VerCompareParsedVersions failed");
@@ -705,7 +773,7 @@ namespace DutilTests
         void VerCopyVersionCopiesPrereleaseVersion()
         {
             HRESULT hr = S_OK;
-            LPCWSTR wzVersion = L"1.2.3.4-a.b.c.d.5.+abc123";
+            LPCWSTR wzVersion = L"v1.2.3.4-a.b.c.d.5.+abc123";
             VERUTIL_VERSION* pSource = NULL;
             VERUTIL_VERSION* pCopy = NULL;
             int nResult = 0;
@@ -715,7 +783,8 @@ namespace DutilTests
                 hr = VerParseVersion(wzVersion, 0, FALSE, &pSource);
                 NativeAssert::Succeeded(hr, "VerParseVersion failed");
 
-                NativeAssert::StringEqual(wzVersion, pSource->sczVersion);
+                NativeAssert::StringEqual(L"1.2.3.4-a.b.c.d.5.+abc123", pSource->sczVersion);
+                Assert::Equal<WCHAR>(L'v', pSource->chPrefix);
                 Assert::Equal<DWORD>(1, pSource->dwMajor);
                 Assert::Equal<DWORD>(2, pSource->dwMinor);
                 Assert::Equal<DWORD>(3, pSource->dwPatch);
@@ -752,6 +821,7 @@ namespace DutilTests
                 Assert::False(pSource == pCopy);
                 Assert::False(pSource->sczVersion == pCopy->sczVersion);
                 Assert::False(pSource->rgReleaseLabels == pCopy->rgReleaseLabels);
+                Assert::Equal<WCHAR>(L'v', pCopy->chPrefix);
 
                 hr = VerCompareParsedVersions(pSource, pCopy, &nResult);
                 NativeAssert::Succeeded(hr, "VerCompareParsedVersions failed");
@@ -808,6 +878,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to parse version '{0}'", wzVersion7);
 
                 NativeAssert::StringEqual(wzVersion1, pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(0, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion1->dwPatch);
@@ -817,6 +888,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion1->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion2, pVersion2->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion2->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion2->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion2->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
@@ -826,6 +898,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion3, pVersion3->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion3->chPrefix);
                 Assert::Equal<DWORD>(2, pVersion3->dwMajor);
                 Assert::Equal<DWORD>(1, pVersion3->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion3->dwPatch);
@@ -835,6 +908,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion3->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion4, pVersion4->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion4->chPrefix);
                 Assert::Equal<DWORD>(3, pVersion4->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion4->dwMinor);
                 Assert::Equal<DWORD>(1, pVersion4->dwPatch);
@@ -844,6 +918,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion4->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion5, pVersion5->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion5->chPrefix);
                 Assert::Equal<DWORD>(4, pVersion5->dwMajor);
                 Assert::Equal<DWORD>(3, pVersion5->dwMinor);
                 Assert::Equal<DWORD>(2, pVersion5->dwPatch);
@@ -853,6 +928,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion5->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion6, pVersion6->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion6->chPrefix);
                 Assert::Equal<DWORD>(5, pVersion6->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion6->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion6->dwPatch);
@@ -862,6 +938,7 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion6->fInvalid);
 
                 NativeAssert::StringEqual(wzVersion7, pVersion7->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion7->chPrefix);
                 Assert::Equal<DWORD>(6, pVersion7->dwMajor);
                 Assert::Equal<DWORD>(0, pVersion7->dwMinor);
                 Assert::Equal<DWORD>(0, pVersion7->dwPatch);
@@ -899,6 +976,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "VerVersionFromQword failed");
 
                 NativeAssert::StringEqual(L"1.2.3.4", pVersion1->sczVersion);
+                Assert::Equal<WCHAR>(L'\0', pVersion1->chPrefix);
                 Assert::Equal<DWORD>(1, pVersion1->dwMajor);
                 Assert::Equal<DWORD>(2, pVersion1->dwMinor);
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);

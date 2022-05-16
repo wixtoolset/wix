@@ -559,6 +559,7 @@ namespace Bootstrapper
                     L"    <Variable Id='MyBurnVariable2' Type='string' Value='foo' Hidden='no' Persisted='yes' />"
                     L"    <Variable Id='MyBurnVariable3' Type='version' Value='v1.1-alpha' Hidden='no' Persisted='yes' />"
                     L"    <Variable Id='MyBurnVariable4' Type='string' Value='foo' Hidden='no' Persisted='no' />"
+                    L"    <Variable Id='MyBurnVariable5' Type='version' Hidden='no' Persisted='yes' />"
                     L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
@@ -597,6 +598,7 @@ namespace Bootstrapper
                 VariableSetNumericHelper(&variables, L"MyBurnVariable1", 42);
                 VariableSetStringHelper(&variables, L"MyBurnVariable2", L"bar", FALSE);
                 VariableSetVersionHelper(&variables, L"MyBurnVariable3", L"v1.0-beta");
+                VariableSetVersionHelper(&variables, L"MyBurnVariable5", L"vvv");
 
                 hr = VariableSerialize(&variables, TRUE, &pbBuffer, &cbBuffer);
                 TestThrowOnFailure(hr, "Failed to serialize variables.");
@@ -616,6 +618,7 @@ namespace Bootstrapper
                 this->ValidateVariableKey(L"MyBurnVariable1", gcnew String(L"42"));
                 this->ValidateVariableKey(L"MyBurnVariable2", gcnew String(L"bar"));
                 this->ValidateVariableKey(L"MyBurnVariable3", gcnew String(L"1.0-beta"));
+                this->ValidateVariableKey(L"MyBurnVariable5", gcnew String(L"vvv"));
                 this->ValidateVariableKeyEmpty(L"WixBundleForcedRestartPackage");
 
                 hr = StrAlloc(&sczRelatedBundleId, MAX_GUID_CHARS + 1);

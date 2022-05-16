@@ -194,6 +194,7 @@ DAPI_(HRESULT) VerCopyVersion(
     hr = StrAllocString(&pCopy->sczVersion, pSource->sczVersion, 0);
     VerExitOnFailure(hr, "Failed to copy Verutil version string '%ls'.", pSource->sczVersion);
 
+    pCopy->chPrefix = pSource->chPrefix;
     pCopy->dwMajor = pSource->dwMajor;
     pCopy->dwMinor = pSource->dwMinor;
     pCopy->dwPatch = pSource->dwPatch;
@@ -251,6 +252,7 @@ DAPI_(HRESULT) VerParseVersion(
 {
     HRESULT hr = S_OK;
     VERUTIL_VERSION* pVersion = NULL;
+    LPCWSTR wzString = NULL;
     LPCWSTR wzEnd = NULL;
     LPCWSTR wzPartBegin = NULL;
     LPCWSTR wzPartEnd = NULL;
@@ -277,22 +279,22 @@ DAPI_(HRESULT) VerParseVersion(
         VerExitOnRootFailure(hr = E_INVALIDARG, "Version string is too long: %Iu", cchVersion);
     }
 
-    if (L'v' == *wzVersion || L'V' == *wzVersion)
-    {
-        ++wzVersion;
-        --cchVersion;
-    }
-
     pVersion = reinterpret_cast<VERUTIL_VERSION*>(MemAlloc(sizeof(VERUTIL_VERSION), TRUE));
     VerExitOnNull(pVersion, hr, E_OUTOFMEMORY, "Failed to allocate memory for Verutil version '%ls'.", wzVersion);
 
-    hr = StrAllocString(&pVersion->sczVersion, wzVersion, cchVersion);
-    VerExitOnFailure(hr, "Failed to copy Verutil version string '%ls'.", wzVersion);
+    wzString = wzVersion;
 
-    wzVersion = wzPartBegin = wzPartEnd = pVersion->sczVersion;
+    if (L'v' == *wzString || L'V' == *wzString)
+    {
+        pVersion->chPrefix = *wzString;
+        ++wzString;
+        --cchVersion;
+    }
+
+    wzPartBegin = wzPartEnd = wzString;
 
     // Save end pointer.
-    wzEnd = wzVersion + cchVersion;
+    wzEnd = wzString + cchVersion;
 
     // Parse version number
     while (wzPartBegin < wzEnd)
@@ -473,7 +475,7 @@ DAPI_(HRESULT) VerParseVersion(
             pReleaseLabel->dwValue = uLabel;
         }
 
-        pReleaseLabel->cchLabelOffset = wzPartBegin - pVersion->sczVersion;
+        pReleaseLabel->cchLabelOffset = wzPartBegin - wzString;
         pReleaseLabel->cchLabel = cchLabel;
 
         if (fTrailingDot)
@@ -507,8 +509,19 @@ DAPI_(HRESULT) VerParseVersion(
         ExitFunction1(hr = E_INVALIDARG);
     }
 
-    pVersion->cchMetadataOffset = min(wzPartBegin, wzEnd) - pVersion->sczVersion;
+    pVersion->cchMetadataOffset = min(wzPartBegin, wzEnd) - wzString;
     pVersion->fInvalid = fInvalid;
+
+    // If the whole string was invalid, then don't clip off the prefix.
+    if (!pVersion->cchMetadataOffset && pVersion->chPrefix)
+    {
+        pVersion->chPrefix = '\0';
+        wzString = wzVersion;
+        ++cchVersion;
+    }
+
+    hr = StrAllocString(&pVersion->sczVersion, wzString, cchVersion);
+    VerExitOnFailure(hr, "Failed to copy Verutil version string '%ls'.", wzVersion);
 
     *ppVersion = pVersion;
     pVersion = NULL;

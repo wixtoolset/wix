@@ -17,6 +17,7 @@ namespace WixToolset.Mba.Core
             var pVersion = handle.DangerousGetHandle();
             var version = (VerUtil.VersionStruct)Marshal.PtrToStructure(pVersion, typeof(VerUtil.VersionStruct));
             this.Version = Marshal.PtrToStringUni(version.sczVersion);
+            this.Prefix = version.chPrefix;
             this.Major = version.dwMajor;
             this.Minor = version.dwMinor;
             this.Patch = version.dwPatch;
@@ -37,6 +38,11 @@ namespace WixToolset.Mba.Core
         /// String version, which would have stripped the leading 'v'.
         /// </summary>
         public string Version { get; private set; }
+
+        /// <summary>
+        /// Prefix character that was stripped from <c>Version</c>, or the null character if there was no prefix.
+        /// </summary>
+        public char Prefix { get; private set; }
 
         /// <summary>
         /// For version A.B.C.D, Major is A. It is 0 if not specified.
