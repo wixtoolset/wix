@@ -38,8 +38,7 @@ Visual Studio 2022 (17.0.4 or higher, NOT the preview release) with the followin
 ##### To build the WiX toolset:
  * Start a VS2022 'Developer Command Prompt'
  * Change directory to the root of the cloned repository
- * Issue the command 'build clean' (NB - The build is stateful so it is always good practice to do the clean before building)
- * Issue the command 'build' (or 'build release' if you want to create a release version)
+ * Issue the command `devbuild` (or `devbuild release` if you want to create a release version)
 
  ##### Executing your newly built WiX toolset
  * 'build\wix\Debug\publish\wix\wix --help' (Of course changing Debug to Release if you built in Release mode)
@@ -53,7 +52,4 @@ Visual Studio 2022 (17.0.4 or higher, NOT the preview release) with the followin
  * If the develop branch has changed since you created your new branch rebase to the current development branch.
  * If needed (ie, you squashed or rebased), do a force push of your branch
  * Create a PR with your branch against the WiX4 repository.
-
-
-
-
+ 
