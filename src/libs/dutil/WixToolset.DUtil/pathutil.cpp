@@ -20,6 +20,10 @@
 
 #define PATH_GOOD_ENOUGH 64
 
+static BOOL IsValidDriveChar(
+    __in WCHAR wc
+    );
+
 
 DAPI_(LPWSTR) PathFile(
     __in_z LPCWSTR wzPath
@@ -272,29 +276,30 @@ DAPI_(HRESULT) PathPrefix(
 
     HRESULT hr = S_OK;
     LPWSTR wzFullPath = *psczFullPath;
+    BOOL fFullyQualified = FALSE;
+    BOOL fHasPrefix = FALSE;
     SIZE_T cbFullPath = 0;
 
-    if (((L'a' <= wzFullPath[0] && L'z' >= wzFullPath[0]) ||
-         (L'A' <= wzFullPath[0] && L'Z' >= wzFullPath[0])) &&
-        L':' == wzFullPath[1] &&
-        L'\\' == wzFullPath[2]) // normal path
+    fFullyQualified = PathIsFullyQualified(wzFullPath, &fHasPrefix);
+    if (fHasPrefix)
+    {
+        ExitFunction();
+    }
+
+    if (fFullyQualified && L':' == wzFullPath[1]) // normal path
     {
         hr = StrAllocPrefix(psczFullPath, L"\\\\?\\", 4);
         PathExitOnFailure(hr, "Failed to add prefix to file path.");
     }
-    else if (L'\\' == wzFullPath[0] && L'\\' == wzFullPath[1]) // UNC
+    else if (fFullyQualified && L'\\' == wzFullPath[1]) // UNC
     {
-        // ensure that we're not already prefixed
-        if (!(L'?' == wzFullPath[2] && L'\\' == wzFullPath[3]))
-        {
-            hr = StrSize(*psczFullPath, &cbFullPath);
-            PathExitOnFailure(hr, "Failed to get size of full path.");
+        hr = StrSize(*psczFullPath, &cbFullPath);
+        PathExitOnFailure(hr, "Failed to get size of full path.");
 
-            memmove_s(wzFullPath, cbFullPath, wzFullPath + 1, cbFullPath - sizeof(WCHAR));
+        memmove_s(wzFullPath, cbFullPath, wzFullPath + 1, cbFullPath - sizeof(WCHAR));
 
-            hr = StrAllocPrefix(psczFullPath, L"\\\\?\\UNC", 7);
-            PathExitOnFailure(hr, "Failed to add prefix to UNC path.");
-        }
+        hr = StrAllocPrefix(psczFullPath, L"\\\\?\\UNC", 7);
+        PathExitOnFailure(hr, "Failed to add prefix to UNC path.");
     }
     else
     {
@@ -814,11 +819,66 @@ LExit:
 }
 
 
-DAPI_(BOOL) PathIsAbsolute(
+DAPI_(BOOL) PathIsFullyQualified(
+    __in_z LPCWSTR wzPath,
+    __out_opt BOOL* pfHasLongPathPrefix
+    )
+{
+    BOOL fFullyQualified = FALSE;
+    BOOL fHasLongPathPrefix = FALSE;
+
+    if (!wzPath || !wzPath[0] || !wzPath[1])
+    {
+        // There is no way to specify a fully qualified path with one character (or less).
+        ExitFunction();
+    }
+
+    if (L'\\' != wzPath[0])
+    {
+        // The only way to specify a fully qualified path that doesn't begin with a slash
+        // is the drive, colon, slash format (C:\).
+        if (IsValidDriveChar(wzPath[0]) &&
+            L':' == wzPath[1] &&
+            L'\\' == wzPath[2])
+        {
+            fFullyQualified = TRUE;
+        }
+
+        ExitFunction();
+    }
+
+    // Non-drive fully qualified paths must start with \\ or \?.
+    // \??\ is an archaic form of \\?\.
+    if (L'?' != wzPath[1] && L'\\' != wzPath[1])
+    {
+        ExitFunction();
+    }
+
+    fFullyQualified = TRUE;
+
+    if (L'?' == wzPath[2] && L'\\' == wzPath[3])
+    {
+        fHasLongPathPrefix = TRUE;
+    }
+
+
+LExit:
+    if (pfHasLongPathPrefix)
+    {
+        *pfHasLongPathPrefix = fHasLongPathPrefix;
+    }
+
+    return fFullyQualified;
+}
+
+
+DAPI_(BOOL) PathIsRooted(
     __in_z LPCWSTR wzPath
     )
 {
-    return wzPath && wzPath[0] && wzPath[1] && (wzPath[0] == L'\\') || (wzPath[1] == L':');
+    return wzPath &&
+        (wzPath[0] == L'\\' ||
+        IsValidDriveChar(wzPath[0]) && wzPath[1] == L':');
 }
 
 
@@ -847,7 +907,7 @@ DAPI_(HRESULT) PathConcatCch(
         hr = StrAllocString(psczCombined, wzPath1, cchPath1);
         PathExitOnFailure(hr, "Failed to copy just path1 to output.");
     }
-    else if (!wzPath1 || !*wzPath1 || PathIsAbsolute(wzPath2))
+    else if (!wzPath1 || !*wzPath1 || PathIsRooted(wzPath2))
     {
         hr = StrAllocString(psczCombined, wzPath2, cchPath2);
         PathExitOnFailure(hr, "Failed to copy just path2 to output.");
@@ -1001,4 +1061,12 @@ LExit:
     ReleaseStr(sczPathCopy);
 
     return hr;
+}
+
+static BOOL IsValidDriveChar(
+    __in WCHAR wc
+    )
+{
+    return L'a' <= wc && L'z' >= wc ||
+           L'A' <= wc && L'Z' >= wc;
 }

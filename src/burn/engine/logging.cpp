@@ -140,7 +140,7 @@ extern "C" HRESULT LoggingOpen(
             LPCWSTR wzPrefix = sczPrefixFormatted;
 
             // Best effort to open default logging.
-            if (PathIsAbsolute(sczPrefixFormatted))
+            if (PathIsRooted(sczPrefixFormatted))
             {
                 hr = PathGetDirectory(sczPrefixFormatted, &sczLoggingBaseFolder);
                 ExitOnFailure(hr, "Failed to get parent directory from '%ls'.", sczPrefixFormatted);

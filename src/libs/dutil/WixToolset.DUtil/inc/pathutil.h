@@ -166,10 +166,23 @@ DAPI_(HRESULT) PathGetKnownFolder(
     );
 
 /*******************************************************************
- PathIsAbsolute - returns true if the path is absolute; false 
-    otherwise.
+ PathIsFullyQualified - returns true if the path is fully qualified; false otherwise.
+    Note that some rooted paths like C:dir are not fully qualified.
+    For example, these are all fully qualified: C:\dir, \\server\share, \\?\C:\dir.
+    For example, these are not fully qualified: C:dir, C:, \dir, dir, dir\subdir.
 *******************************************************************/
-DAPI_(BOOL) PathIsAbsolute(
+DAPI_(BOOL) PathIsFullyQualified(
+    __in_z LPCWSTR wzPath,
+    __out_opt BOOL* pfHasLongPathPrefix
+    );
+
+/*******************************************************************
+ PathIsRooted - returns true if the path is rooted; false otherwise.
+    Note that some rooted paths like C:dir are not fully qualified.
+    For example, these are all rooted: C:\dir, C:dir, C:, \dir, \\server\share, \\?\C:\dir.
+    For example, these are not rooted: dir, dir\subdir.
+*******************************************************************/
+DAPI_(BOOL) PathIsRooted(
     __in_z LPCWSTR wzPath
     );
 

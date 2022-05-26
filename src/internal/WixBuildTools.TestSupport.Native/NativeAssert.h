@@ -64,6 +64,27 @@ namespace TestSupport {
             WixAssert::Succeeded(hr, gcnew String(zFormat), formatArgs);
         }
 
+        static void SpecificReturnCode(HRESULT hrExpected, HRESULT hr, LPCSTR zFormat, LPCSTR zArg, ... array<LPCSTR>^ zArgs)
+        {
+            array<Object^>^ formatArgs = gcnew array<Object^, 1>(zArgs->Length + 1);
+            formatArgs[0] = NativeAssert::LPSTRToString(zArg);
+            for (int i = 0; i < zArgs->Length; ++i)
+            {
+                formatArgs[i + 1] = NativeAssert::LPSTRToString(zArgs[i]);
+            }
+            WixAssert::SpecificReturnCode(hrExpected, hr, gcnew String(zFormat), formatArgs);
+        }
+
+        static void SpecificReturnCode(HRESULT hrExpected, HRESULT hr, LPCSTR zFormat, ... array<LPCWSTR>^ wzArgs)
+        {
+            array<Object^>^ formatArgs = gcnew array<Object^, 1>(wzArgs->Length);
+            for (int i = 0; i < wzArgs->Length; ++i)
+            {
+                formatArgs[i] = NativeAssert::LPWSTRToString(wzArgs[i]);
+            }
+            WixAssert::SpecificReturnCode(hrExpected, hr, gcnew String(zFormat), formatArgs);
+        }
+
         static void ValidReturnCode(HRESULT hr, ... array<HRESULT>^ validReturnCodes)
         {
             Assert::Contains(hr, (IEnumerable<HRESULT>^)validReturnCodes);

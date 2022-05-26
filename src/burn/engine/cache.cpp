@@ -563,7 +563,7 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     fPreferSourcePathLocation = !pCache->fRunningFromCache || FAILED(hr);
     fTryLastFolder = SUCCEEDED(hr) && sczLastSourceFolder && *sczLastSourceFolder && CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pCache->sczSourceProcessFolder, -1, sczLastSourceFolder, -1);
     fTryRelativePath = CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzSourcePath, -1, wzRelativePath, -1);
-    fSourceIsAbsolute = PathIsAbsolute(wzSourcePath);
+    fSourceIsAbsolute = PathIsRooted(wzSourcePath);
 
     // If the source path provided is a full path, try that first.
     if (fSourceIsAbsolute)

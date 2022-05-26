@@ -52,6 +52,14 @@ namespace WixBuildTools.TestSupport
             throw new SkipTestException(message);
         }
 
+        public static void SpecificReturnCode(int hrExpected, int hr, string format, params object[] formatArgs)
+        {
+            if (hrExpected != hr)
+            {
+                throw new SpecificReturnCodeException(hr, String.Format(format, formatArgs));
+            }
+        }
+
         public static void Succeeded(int hr, string format, params object[] formatArgs)
         {
             if (0 > hr)
