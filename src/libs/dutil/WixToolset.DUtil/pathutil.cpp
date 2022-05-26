@@ -875,64 +875,6 @@ LExit:
 }
 
 
-DAPI_(HRESULT) PathEnsureQuoted(
-    __inout LPWSTR* ppszPath,
-    __in BOOL fDirectory
-    )
-{
-    Assert(ppszPath && *ppszPath);
-
-    HRESULT hr = S_OK;
-    size_t cchPath = 0;
-
-    hr = ::StringCchLengthW(*ppszPath, STRSAFE_MAX_CCH, &cchPath);
-    PathExitOnFailure(hr, "Failed to get the length of the path.");
-
-    // Handle simple special cases.
-    if (0 == cchPath || (1 == cchPath && L'"' == (*ppszPath)[0]))
-    {
-        hr = StrAllocString(ppszPath, L"\"\"", 2);
-        PathExitOnFailure(hr, "Failed to allocate a quoted empty string.");
-
-        ExitFunction();
-    }
-
-    if (L'"' != (*ppszPath)[0])
-    {
-        hr = StrAllocPrefix(ppszPath, L"\"", 1);
-        PathExitOnFailure(hr, "Failed to allocate an opening quote.");
-
-        // Add a char for the opening quote.
-        ++cchPath;
-    }
-
-    if (L'"' != (*ppszPath)[cchPath - 1])
-    {
-        hr = StrAllocConcat(ppszPath, L"\"", 1);
-        PathExitOnFailure(hr, "Failed to allocate a closing quote.");
-
-        // Add a char for the closing quote.
-        ++cchPath;
-    }
-
-    if (fDirectory)
-    {
-        if (L'\\' != (*ppszPath)[cchPath - 2])
-        {
-            // Change the last char to a backslash and re-append the closing quote.
-            (*ppszPath)[cchPath - 1] = L'\\';
-
-            hr = StrAllocConcat(ppszPath, L"\"", 1);
-            PathExitOnFailure(hr, "Failed to allocate another closing quote after the backslash.");
-        }
-    }
-
-LExit:
-
-    return hr;
-}
-
-
 DAPI_(HRESULT) PathCompare(
     __in_z LPCWSTR wzPath1,
     __in_z LPCWSTR wzPath2,
