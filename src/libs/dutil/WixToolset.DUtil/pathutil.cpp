@@ -20,6 +20,9 @@
 
 #define PATH_GOOD_ENOUGH 64
 
+static BOOL IsPathSeparatorChar(
+    __in WCHAR wc
+    );
 static BOOL IsValidDriveChar(
     __in WCHAR wc
     );
@@ -41,7 +44,7 @@ DAPI_(LPWSTR) PathFile(
         //     \ => Windows path
         //     / => unix and URL path
         //     : => relative path from mapped root
-        if (L'\\' == *wz || L'/' == *wz || (L':' == *wz && wz == wzPath + 1))
+        if (IsPathSeparatorChar(*wz) || (L':' == *wz && wz == wzPath + 1))
         {
             wzFile = wz + 1;
         }
@@ -64,7 +67,7 @@ DAPI_(LPCWSTR) PathExtension(
     LPCWSTR wzExtension = NULL;
     for (LPCWSTR wz = wzPath; *wz; ++wz)
     {
-        if (L'\\' == *wz || L'/' == *wz || L':' == *wz)
+        if (IsPathSeparatorChar(*wz) || L':' == *wz)
         {
             wzExtension = NULL;
         }
@@ -84,7 +87,8 @@ DAPI_(HRESULT) PathGetDirectory(
     )
 {
     HRESULT hr = S_OK;
-    size_t cchDirectory = SIZE_T_MAX;
+    LPCWSTR wzRemaining = NULL;
+    SIZE_T cchDirectory = 0;
 
     for (LPCWSTR wz = wzPath; *wz; ++wz)
     {
@@ -92,17 +96,19 @@ DAPI_(HRESULT) PathGetDirectory(
         //     \ => Windows path
         //     / => unix and URL path
         //     : => relative path from mapped root
-        if (L'\\' == *wz || L'/' == *wz || (L':' == *wz && wz == wzPath + 1))
+        if (IsPathSeparatorChar(*wz) || (L':' == *wz && wz == wzPath + 1))
         {
-            cchDirectory = static_cast<size_t>(wz - wzPath) + 1;
+            wzRemaining = wz;
         }
     }
 
-    if (SIZE_T_MAX == cchDirectory)
+    if (!wzRemaining)
     {
         // we were given just a file name, so there's no directory available
-        return S_FALSE;
+        ExitFunction1(hr = S_FALSE);
     }
+
+    cchDirectory = static_cast<SIZE_T>(wzRemaining - wzPath) + 1;
 
     hr = StrAllocString(psczDirectory, wzPath, cchDirectory);
     PathExitOnFailure(hr, "Failed to copy directory.");
@@ -122,7 +128,7 @@ DAPI_(HRESULT) PathGetParentPath(
 
     for (LPCWSTR wz = wzPath; *wz; ++wz)
     {
-        if (wz[1] && (L'\\' == *wz || L'/' == *wz))
+        if (IsPathSeparatorChar(*wz) && wz[1])
         {
             wzParent = wz;
         }
@@ -291,12 +297,13 @@ DAPI_(HRESULT) PathPrefix(
         hr = StrAllocPrefix(psczFullPath, L"\\\\?\\", 4);
         PathExitOnFailure(hr, "Failed to add prefix to file path.");
     }
-    else if (fFullyQualified && L'\\' == wzFullPath[1]) // UNC
+    else if (fFullyQualified && IsPathSeparatorChar(wzFullPath[1])) // UNC
     {
         hr = StrSize(*psczFullPath, &cbFullPath);
         PathExitOnFailure(hr, "Failed to get size of full path.");
 
         memmove_s(wzFullPath, cbFullPath, wzFullPath + 1, cbFullPath - sizeof(WCHAR));
+        wzFullPath[0] = L'\\';
 
         hr = StrAllocPrefix(psczFullPath, L"\\\\?\\UNC", 7);
         PathExitOnFailure(hr, "Failed to add prefix to UNC path.");
@@ -312,6 +319,90 @@ LExit:
 }
 
 
+DAPI_(HRESULT) PathFixedNormalizeSlashes(
+    __inout_z LPWSTR wzPath
+    )
+{
+    HRESULT hr = S_OK;
+    size_t cchLength = 0;
+    BOOL fAllowDoubleSlash = FALSE;
+    SIZE_T iSource = 0;
+    SIZE_T jDestination = 0;
+
+    hr = ::StringCchLengthW(wzPath, STRSAFE_MAX_CCH, &cchLength);
+    PathExitOnFailure(hr, "Failed to get length of path.");
+
+    if (1 < cchLength && IsPathSeparatorChar(wzPath[0]))
+    {
+        if (IsPathSeparatorChar(wzPath[1]))
+        {
+            // \\?\\a\ is not equivalent to \\?\a\ and \\server\\a\ is not equivalent to \\server\a\.
+            fAllowDoubleSlash = TRUE;
+            wzPath[0] = '\\';
+            wzPath[1] = '\\';
+            iSource = 2;
+            jDestination = 2;
+        }
+        else if (2 < cchLength && L'?' == wzPath[1] && L'?' == wzPath[2])
+        {
+            // \??\\a\ is not equivalent to \??\a\.
+            fAllowDoubleSlash = TRUE;
+            wzPath[0] = '\\';
+            wzPath[1] = '?';
+            wzPath[2] = '?';
+            iSource = 3;
+            jDestination = 3;
+        }
+    }
+
+    for (; iSource < cchLength; ++iSource)
+    {
+        if (IsPathSeparatorChar(wzPath[iSource]))
+        {
+            if (fAllowDoubleSlash)
+            {
+                fAllowDoubleSlash = FALSE;
+            }
+            else if (IsPathSeparatorChar(wzPath[iSource + 1]))
+            {
+                // Skip consecutive slashes.
+                continue;
+            }
+
+            wzPath[jDestination] = '\\';
+        }
+        else
+        {
+            wzPath[jDestination] = wzPath[iSource];
+        }
+
+        ++jDestination;
+    }
+
+    for (; jDestination < cchLength; ++jDestination)
+    {
+        wzPath[jDestination] = '\0';
+    }
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(void) PathFixedReplaceForwardSlashes(
+    __inout_z LPWSTR wzPath
+    )
+{
+    for (LPWSTR wz = wzPath; *wz; ++wz)
+    {
+        if (L'/' == *wz)
+        {
+            *wz = L'\\';
+        }
+    }
+}
+
+
 DAPI_(HRESULT) PathFixedBackslashTerminate(
     __inout_ecount_z(cchPath) LPWSTR wzPath,
     __in SIZE_T cchPath
@@ -320,17 +411,28 @@ DAPI_(HRESULT) PathFixedBackslashTerminate(
     HRESULT hr = S_OK;
     size_t cchLength = 0;
 
+    if (!cchPath)
+    {
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER));
+    }
+
     hr = ::StringCchLengthW(wzPath, cchPath, &cchLength);
     PathExitOnFailure(hr, "Failed to get length of path.");
 
-    if (cchLength >= cchPath)
+    LPWSTR wzLast = wzPath + (cchLength - 1);
+    if (cchLength && L'/' == wzLast[0])
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+        wzLast[0] = L'\\';
     }
-    else if (L'\\' != wzPath[cchLength - 1])
+    else if (!cchLength || L'\\' != wzLast[0])
     {
-        wzPath[cchLength] = L'\\';
-        wzPath[cchLength + 1] = L'\0';
+        if (cchLength + 2 > cchPath)
+        {
+            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER));
+        }
+
+        wzLast[1] = L'\\';
+        wzLast[2] = L'\0';
     }
 
 LExit:
@@ -339,10 +441,10 @@ LExit:
 
 
 DAPI_(HRESULT) PathBackslashTerminate(
-    __inout LPWSTR* psczPath
+    __inout_z LPWSTR* psczPath
     )
 {
-    Assert(psczPath && *psczPath);
+    Assert(psczPath);
 
     HRESULT hr = S_OK;
     SIZE_T cchPath = 0;
@@ -354,7 +456,12 @@ DAPI_(HRESULT) PathBackslashTerminate(
     hr = ::StringCchLengthW(*psczPath, cchPath, &cchLength);
     PathExitOnFailure(hr, "Failed to get length of path.");
 
-    if (L'\\' != (*psczPath)[cchLength - 1])
+    LPWSTR wzLast = *psczPath + (cchLength - 1);
+    if (cchLength && L'/' == wzLast[0])
+    {
+        wzLast[0] = L'\\';
+    }
+    else if (!cchLength || L'\\' != wzLast[0])
     {
         hr = StrAllocConcat(psczPath, L"\\", 1);
         PathExitOnFailure(hr, "Failed to concat backslash onto string.");
@@ -833,13 +940,13 @@ DAPI_(BOOL) PathIsFullyQualified(
         ExitFunction();
     }
 
-    if (L'\\' != wzPath[0])
+    if (!IsPathSeparatorChar(wzPath[0]))
     {
         // The only way to specify a fully qualified path that doesn't begin with a slash
         // is the drive, colon, slash format (C:\).
         if (IsValidDriveChar(wzPath[0]) &&
             L':' == wzPath[1] &&
-            L'\\' == wzPath[2])
+            IsPathSeparatorChar(wzPath[2]))
         {
             fFullyQualified = TRUE;
         }
@@ -849,14 +956,14 @@ DAPI_(BOOL) PathIsFullyQualified(
 
     // Non-drive fully qualified paths must start with \\ or \?.
     // \??\ is an archaic form of \\?\.
-    if (L'?' != wzPath[1] && L'\\' != wzPath[1])
+    if (L'?' != wzPath[1] && !IsPathSeparatorChar(wzPath[1]))
     {
         ExitFunction();
     }
 
     fFullyQualified = TRUE;
 
-    if (L'?' == wzPath[2] && L'\\' == wzPath[3])
+    if (L'?' == wzPath[2] && IsPathSeparatorChar(wzPath[3]))
     {
         fHasLongPathPrefix = TRUE;
     }
@@ -877,7 +984,7 @@ DAPI_(BOOL) PathIsRooted(
     )
 {
     return wzPath &&
-        (wzPath[0] == L'\\' ||
+        (IsPathSeparatorChar(wzPath[0]) ||
         IsValidDriveChar(wzPath[0]) && wzPath[1] == L':');
 }
 
@@ -1008,20 +1115,25 @@ DAPI_(HRESULT) PathGetHierarchyArray(
 
     for (size_t i = 0; i < cchPath; ++i)
     {
-        if (wzPath[i] == L'\\')
+        if (IsPathSeparatorChar(wzPath[i]))
         {
             ++cArraySpacesNeeded;
         }
     }
 
-    if (wzPath[cchPath - 1] != L'\\')
+    if (!IsPathSeparatorChar(wzPath[cchPath - 1]))
     {
         ++cArraySpacesNeeded;
     }
 
     // If it's a UNC path, cut off the first three paths, 2 because it starts with a double backslash, and another because the first ("\\servername\") isn't a path.
-    if (wzPath[0] == L'\\' && wzPath[1] == L'\\')
+    if (IsPathSeparatorChar(wzPath[0]) && IsPathSeparatorChar(wzPath[1]))
     {
+        if (3 > cArraySpacesNeeded)
+        {
+            ExitFunction1(hr = E_INVALIDARG);
+        }
+
         cArraySpacesNeeded -= 3;
     }
 
@@ -1042,7 +1154,7 @@ DAPI_(HRESULT) PathGetHierarchyArray(
         DWORD cchPathCopy = lstrlenW(sczPathCopy);
 
         // If it ends in a backslash, it's a directory path, so cut off everything the last backslash before we get the directory portion of the path
-        if (wzPath[cchPathCopy - 1] == L'\\')
+        if (IsPathSeparatorChar(wzPath[cchPathCopy - 1]))
         {
             sczPathCopy[cchPathCopy - 1] = L'\0';
         }
@@ -1061,6 +1173,13 @@ LExit:
     ReleaseStr(sczPathCopy);
 
     return hr;
+}
+
+static BOOL IsPathSeparatorChar(
+    __in WCHAR wc
+    )
+{
+    return L'/' == wc || L'\\' == wc;
 }
 
 static BOOL IsValidDriveChar(

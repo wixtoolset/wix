@@ -6,7 +6,17 @@
 extern "C" {
 #endif
 
-typedef enum PATH_EXPAND
+typedef enum _PATH_CANONICALIZE
+{
+    // Always prefix fully qualified paths with the long path prefix (\\?\).
+    PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX = 0x0001,
+    // Always terminate the path with \.
+    PATH_CANONICALIZE_BACKSLASH_TERMINATE = 0x0002,
+    // Don't collapse . or .. in the \\server\share portion of a UNC path.
+    PATH_CANONICALIZE_KEEP_UNC_ROOT = 0x0004,
+} PATH_CANONICALIZE;
+
+typedef enum _PATH_EXPAND
 {
     PATH_EXPAND_ENVIRONMENT = 0x0001,
     PATH_EXPAND_FULLPATH    = 0x0002,
@@ -29,7 +39,9 @@ DAPI_(LPCWSTR) PathExtension(
     );
 
 /*******************************************************************
- PathGetDirectory - extracts the directory from a path.
+ PathGetDirectory - extracts the directory from a path including the directory separator.
+                    This means calling the function again with the previous result returns the same result.
+                    Returns S_FALSE if the path only contains a file name.
 ********************************************************************/
 DAPI_(HRESULT) PathGetDirectory(
     __in_z LPCWSTR wzPath,
@@ -38,6 +50,7 @@ DAPI_(HRESULT) PathGetDirectory(
 
 /*******************************************************************
 PathGetParentPath - extracts the parent directory from a full path.
+                    *psczDirectory is NULL if the path only contains a file name.
 ********************************************************************/
 DAPI_(HRESULT) PathGetParentPath(
     __in_z LPCWSTR wzPath,
@@ -63,6 +76,21 @@ DAPI_(HRESULT) PathPrefix(
     );
 
 /*******************************************************************
+ PathFixedNormalizeSlashes - replaces all / with \ and
+    removes redundant consecutive slashes.
+********************************************************************/
+DAPI_(HRESULT) PathFixedNormalizeSlashes(
+    __inout_z LPWSTR wzPath
+    );
+
+/*******************************************************************
+ PathFixedReplaceForwardSlashes - replaces all / with \
+********************************************************************/
+DAPI_(void) PathFixedReplaceForwardSlashes(
+    __inout_z LPWSTR wzPath
+    );
+
+/*******************************************************************
  PathFixedBackslashTerminate - appends a \ if path does not have it
                                  already, but fails if the buffer is
                                  insufficient.
@@ -77,7 +105,7 @@ DAPI_(HRESULT) PathFixedBackslashTerminate(
                                  already.
 ********************************************************************/
 DAPI_(HRESULT) PathBackslashTerminate(
-    __inout LPWSTR* psczPath
+    __inout_z LPWSTR* psczPath
     );
 
 /*******************************************************************
@@ -168,7 +196,7 @@ DAPI_(HRESULT) PathGetKnownFolder(
 /*******************************************************************
  PathIsFullyQualified - returns true if the path is fully qualified; false otherwise.
     Note that some rooted paths like C:dir are not fully qualified.
-    For example, these are all fully qualified: C:\dir, \\server\share, \\?\C:\dir.
+    For example, these are all fully qualified: C:\dir, C:/dir, \\server\share, \\?\C:\dir.
     For example, these are not fully qualified: C:dir, C:, \dir, dir, dir\subdir.
 *******************************************************************/
 DAPI_(BOOL) PathIsFullyQualified(
@@ -179,7 +207,7 @@ DAPI_(BOOL) PathIsFullyQualified(
 /*******************************************************************
  PathIsRooted - returns true if the path is rooted; false otherwise.
     Note that some rooted paths like C:dir are not fully qualified.
-    For example, these are all rooted: C:\dir, C:dir, C:, \dir, \\server\share, \\?\C:\dir.
+    For example, these are all rooted: C:\dir, C:/dir, C:dir, C:, \dir, \\server\share, \\?\C:\dir.
     For example, these are not rooted: dir, dir\subdir.
 *******************************************************************/
 DAPI_(BOOL) PathIsRooted(
@@ -240,7 +268,7 @@ DAPI_(HRESULT) PathGetHierarchyArray(
     );
 
 /*******************************************************************
-  PathCanonicalizePath - wrapper around PathCanonicalizeW.
+ PathCanonicalizePath - wrapper around PathCanonicalizeW.
 *******************************************************************/
 DAPI_(HRESULT) PathCanonicalizePath(
     __in_z LPCWSTR wzPath,
@@ -248,8 +276,20 @@ DAPI_(HRESULT) PathCanonicalizePath(
     );
 
 /*******************************************************************
-PathDirectoryContainsPath - checks if wzPath is located inside
-                            wzDirectory.
+ PathCanonicalizeForComparison - canonicalizes the path based on the given flags.
+    . and .. directories are collapsed.
+    All / are replaced with \.
+    All redundant consecutive slashes are replaced with a single \.
+*******************************************************************/
+DAPI_(HRESULT) PathCanonicalizeForComparison(
+    __in_z LPCWSTR wzPath,
+    __in DWORD dwCanonicalizeFlags,
+    __deref_out_z LPWSTR* psczCanonicalized
+    );
+
+/*******************************************************************
+ PathDirectoryContainsPath - checks if wzPath is located inside wzDirectory.
+    wzDirectory must be a fully qualified path.
 *******************************************************************/
 DAPI_(HRESULT) PathDirectoryContainsPath(
     __in_z LPCWSTR wzDirectory,

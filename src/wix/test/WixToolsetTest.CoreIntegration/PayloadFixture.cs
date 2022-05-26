@@ -84,7 +84,7 @@ namespace WixToolsetTest.CoreIntegration
                                                         ? field.AsNullableNumber()?.ToString()
                                                         : field?.AsString())
                                                 .ToList();
-                Assert.Equal(@"c\d.exe", fields[(int)WixBundlePayloadSymbolFields.Name]);
+                Assert.Equal(@"c\d\e\f.exe", fields[(int)WixBundlePayloadSymbolFields.Name]);
             }
         }
 

@@ -40,7 +40,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\..\WixToolset.DUtil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;shlwapi.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
