@@ -15,6 +15,7 @@ extern "C" HRESULT ContainersParseFromXml(
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
     LPWSTR scz = NULL;
+    BOOL fXmlFound = FALSE;
 
     // select container nodes
     hr = XmlSelectNodes(pixnBundle, L"Container", &pixnNodes);
@@ -48,26 +49,20 @@ extern "C" HRESULT ContainersParseFromXml(
 
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &pContainer->sczId);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
         // @Attached
         hr = XmlGetYesNoAttribute(pixnNode, L"Attached", &pContainer->fAttached);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Attached.");
-        }
-
-        // @AttachedIndex
-        hr = XmlGetAttributeNumber(pixnNode, L"AttachedIndex", &pContainer->dwAttachedIndex);
-        if (E_NOTFOUND != hr || pContainer->fAttached) // if it is an attached container it must have an index
-        {
-            ExitOnFailure(hr, "Failed to get @AttachedIndex.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Attached.");
 
         // Attached containers are always found attached to the current process, so use the current proccess's
         // name instead of what may be in the manifest.
         if (pContainer->fAttached)
         {
+            // @AttachedIndex
+            hr = XmlGetAttributeNumber(pixnNode, L"AttachedIndex", &pContainer->dwAttachedIndex);
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @AttachedIndex.");
+
             hr = PathForCurrentProcess(&scz, NULL);
             ExitOnFailure(hr, "Failed to get path to current process for attached container.");
 
@@ -80,7 +75,7 @@ extern "C" HRESULT ContainersParseFromXml(
         {
             // @FilePath
             hr = XmlGetAttributeEx(pixnNode, L"FilePath", &pContainer->sczFilePath);
-            ExitOnFailure(hr, "Failed to get @FilePath.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @FilePath.");
         }
 
         // The source path starts as the file path.
@@ -89,28 +84,25 @@ extern "C" HRESULT ContainersParseFromXml(
 
         // @DownloadUrl
         hr = XmlGetAttributeEx(pixnNode, L"DownloadUrl", &pContainer->downloadSource.sczUrl);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @DownloadUrl.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @DownloadUrl.");
 
         // @Hash
         hr = XmlGetAttributeEx(pixnNode, L"Hash", &pContainer->sczHash);
-        ExitOnFailure(hr, "Failed to get @Hash.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Hash.");
 
         hr = StrAllocHexDecode(pContainer->sczHash, &pContainer->pbHash, &pContainer->cbHash);
         ExitOnFailure(hr, "Failed to hex decode the Container/@Hash.");
 
         // @FileSize
         hr = XmlGetAttributeEx(pixnNode, L"FileSize", &scz);
-        ExitOnFailure(hr, "Failed to get @FileSize.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @FileSize.");
 
         hr = StrStringToUInt64(scz, 0, &pContainer->qwFileSize);
         ExitOnFailure(hr, "Failed to parse @FileSize.");
 
         if (!pContainer->qwFileSize)
         {
-            ExitOnRootFailure(hr = E_INVALIDDATA, "File size is required when verifying by hash for container: %ls", pContainer->sczId);
+            ExitWithRootFailure(hr, E_INVALIDDATA, "File size is required when verifying by hash for container: %ls", pContainer->sczId);
         }
 
         pContainer->verification = BURN_CONTAINER_VERIFICATION_HASH;

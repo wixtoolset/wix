@@ -23,6 +23,7 @@ extern "C" HRESULT PayloadsParseFromXml(
     BOOL fChainPayload = pContainers && pLayoutPayloads; // These are required when parsing chain payloads.
     BOOL fValidFileSize = FALSE;
     size_t cByteOffset = fChainPayload ? offsetof(BURN_PAYLOAD, sczKey) : offsetof(BURN_PAYLOAD, sczSourcePath);
+    BOOL fXmlFound = FALSE;
 
     // select payload nodes
     hr = XmlSelectNodes(pixnBundle, L"Payload", &pixnNodes);
@@ -58,15 +59,15 @@ extern "C" HRESULT PayloadsParseFromXml(
 
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &pPayload->sczKey);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
         // @FilePath
         hr = XmlGetAttributeEx(pixnNode, L"FilePath", &pPayload->sczFilePath);
-        ExitOnFailure(hr, "Failed to get @FilePath.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @FilePath.");
 
         // @SourcePath
         hr = XmlGetAttributeEx(pixnNode, L"SourcePath", &pPayload->sczSourcePath);
-        ExitOnFailure(hr, "Failed to get @SourcePath.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @SourcePath.");
 
         if (!fChainPayload)
         {
@@ -77,7 +78,7 @@ extern "C" HRESULT PayloadsParseFromXml(
         {
             // @Packaging
             hr = XmlGetAttributeEx(pixnNode, L"Packaging", &scz);
-            ExitOnFailure(hr, "Failed to get @Packaging.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Packaging.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"embedded", -1))
             {
@@ -89,43 +90,40 @@ extern "C" HRESULT PayloadsParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Packaging: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Packaging: %ls", scz);
             }
 
             // @Container
             hr = XmlGetAttributeEx(pixnNode, L"Container", &scz);
-            if (E_NOTFOUND != hr || BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging)
-            {
-                ExitOnFailure(hr, "Failed to get @Container.");
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Container.");
 
+            if (fXmlFound)
+            {
                 // find container
                 hr = ContainerFindById(pContainers, scz, &pPayload->pContainer);
-                ExitOnFailure(hr, "Failed to to find container: %ls", scz);
+                ExitOnFailure(hr, "Failed to find container: %ls", scz);
 
                 pPayload->pContainer->cParsedPayloads += 1;
+            }
+            else if (BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging)
+            {
+                ExitWithRootFailure(hr, E_NOTFOUND, "@Container is required for embedded payload.");
             }
 
             // @LayoutOnly
             hr = XmlGetYesNoAttribute(pixnNode, L"LayoutOnly", &pPayload->fLayoutOnly);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @LayoutOnly.");
-            }
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @LayoutOnly.");
 
             // @DownloadUrl
             hr = XmlGetAttributeEx(pixnNode, L"DownloadUrl", &pPayload->downloadSource.sczUrl);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @DownloadUrl.");
-            }
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @DownloadUrl.");
 
             // @FileSize
             hr = XmlGetAttributeEx(pixnNode, L"FileSize", &scz);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @FileSize.");
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @FileSize.");
 
+            if (fXmlFound)
+            {
                 hr = StrStringToUInt64(scz, 0, &pPayload->qwFileSize);
                 ExitOnFailure(hr, "Failed to parse @FileSize.");
 
@@ -134,10 +132,10 @@ extern "C" HRESULT PayloadsParseFromXml(
 
             // @CertificateAuthorityKeyIdentifier
             hr = XmlGetAttributeEx(pixnNode, L"CertificateRootPublicKeyIdentifier", &scz);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @CertificateRootPublicKeyIdentifier.");
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @CertificateRootPublicKeyIdentifier.");
 
+            if (fXmlFound)
+            {
                 hr = StrAllocHexDecode(scz, &pPayload->pbCertificateRootPublicKeyIdentifier, &pPayload->cbCertificateRootPublicKeyIdentifier);
                 ExitOnFailure(hr, "Failed to hex decode @CertificateRootPublicKeyIdentifier.");
 
@@ -146,20 +144,20 @@ extern "C" HRESULT PayloadsParseFromXml(
 
             // @CertificateThumbprint
             hr = XmlGetAttributeEx(pixnNode, L"CertificateRootThumbprint", &scz);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @CertificateRootThumbprint.");
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @CertificateRootThumbprint.");
 
+            if (fXmlFound)
+            {
                 hr = StrAllocHexDecode(scz, &pPayload->pbCertificateRootThumbprint, &pPayload->cbCertificateRootThumbprint);
                 ExitOnFailure(hr, "Failed to hex decode @CertificateRootThumbprint.");
             }
 
             // @Hash
             hr = XmlGetAttributeEx(pixnNode, L"Hash", &scz);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @Hash.");
+            ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Hash.");
 
+            if (fXmlFound)
+            {
                 hr = StrAllocHexDecode(scz, &pPayload->pbHash, &pPayload->cbHash);
                 ExitOnFailure(hr, "Failed to hex decode the Payload/@Hash.");
 
@@ -171,11 +169,11 @@ extern "C" HRESULT PayloadsParseFromXml(
 
             if (BURN_PAYLOAD_VERIFICATION_NONE == pPayload->verification)
             {
-                ExitOnRootFailure(hr = E_INVALIDDATA, "There was no verification information for payload: %ls", pPayload->sczKey);
+                ExitWithRootFailure(hr, E_INVALIDDATA, "There was no verification information for payload: %ls", pPayload->sczKey);
             }
             else if (BURN_PAYLOAD_VERIFICATION_HASH == pPayload->verification && !fValidFileSize)
             {
-                ExitOnRootFailure(hr = E_INVALIDDATA, "File size is required when verifying by hash for payload: %ls", pPayload->sczKey);
+                ExitWithRootFailure(hr, E_INVALIDDATA, "File size is required when verifying by hash for payload: %ls", pPayload->sczKey);
             }
 
             if (pPayload->fLayoutOnly)
@@ -321,8 +319,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
         // if the payload has not been acquired
         if (BURN_PAYLOAD_STATE_ACQUIRED > pPayload->state)
         {
-            hr = E_INVALIDDATA;
-            ExitOnRootFailure(hr, "Payload was not found in container: %ls", pPayload->sczKey);
+            ExitWithRootFailure(hr, E_INVALIDDATA, "Payload was not found in container: %ls", pPayload->sczKey);
         }
     }
 
