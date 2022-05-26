@@ -18,6 +18,7 @@ namespace WixToolsetTest.Dnc.HostGenerator
     {
         static readonly MetadataReference MbaCoreAssembly = MetadataReference.CreateFromFile(typeof(BootstrapperApplicationFactoryAttribute).Assembly.Location);
 
+        // https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#unit-testing-of-generators
         [Fact]
         public async Task FailsBuildWhenMissingAttribute()
         {
@@ -42,6 +43,7 @@ namespace Test
                 TestState = 
                 {
                     Sources = { code },
+                    ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
                     AdditionalReferences = { MbaCoreAssembly },
                     ExpectedDiagnostics =
                     {
@@ -80,6 +82,7 @@ namespace Test
                     {
                         (typeof(DncHostGenerator), "WixToolset.Dnc.Host.g.cs", SourceText.From(generated, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                     },
+                    ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
                     AdditionalReferences = { MbaCoreAssembly },
                 },
             }.RunAsync();
