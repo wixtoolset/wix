@@ -4,6 +4,7 @@
 
 #include <windows.h>
 #include <msiquery.h>
+#include <strsafe.h>
 
 #include "wcautil.h"
 #include "fileutil.h"

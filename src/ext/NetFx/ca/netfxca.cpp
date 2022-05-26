@@ -280,6 +280,64 @@ LExit:
     return hr;
 }
 
+// This has netfxca specific functionality, like turning " into "" and leaving an unescaped \ at the end of a directory.
+static HRESULT PathEnsureQuoted(
+    __inout LPWSTR* ppszPath,
+    __in BOOL fDirectory
+    )
+{
+    Assert(ppszPath && *ppszPath);
+
+    HRESULT hr = S_OK;
+    size_t cchPath = 0;
+
+    hr = ::StringCchLengthW(*ppszPath, STRSAFE_MAX_CCH, &cchPath);
+    ExitOnFailure(hr, "Failed to get the length of the path.");
+
+    // Handle simple special cases.
+    if (0 == cchPath || (1 == cchPath && L'"' == (*ppszPath)[0]))
+    {
+        hr = StrAllocString(ppszPath, L"\"\"", 2);
+        ExitOnFailure(hr, "Failed to allocate a quoted empty string.");
+
+        ExitFunction();
+    }
+
+    if (L'"' != (*ppszPath)[0])
+    {
+        hr = StrAllocPrefix(ppszPath, L"\"", 1);
+        ExitOnFailure(hr, "Failed to allocate an opening quote.");
+
+        // Add a char for the opening quote.
+        ++cchPath;
+    }
+
+    if (L'"' != (*ppszPath)[cchPath - 1])
+    {
+        hr = StrAllocConcat(ppszPath, L"\"", 1);
+        ExitOnFailure(hr, "Failed to allocate a closing quote.");
+
+        // Add a char for the closing quote.
+        ++cchPath;
+    }
+
+    if (fDirectory)
+    {
+        if (L'\\' != (*ppszPath)[cchPath - 2])
+        {
+            // Change the last char to a backslash and re-append the closing quote.
+            (*ppszPath)[cchPath - 1] = L'\\';
+
+            hr = StrAllocConcat(ppszPath, L"\"", 1);
+            ExitOnFailure(hr, "Failed to allocate another closing quote after the backslash.");
+        }
+    }
+
+LExit:
+
+    return hr;
+}
+
 static HRESULT CreateInstallCommand(
     __out LPWSTR* ppwzCommandLine,
     __in LPCWSTR pwzNgenPath,

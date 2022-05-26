@@ -196,16 +196,6 @@ DAPI_(HRESULT) PathConcatCch(
     );
 
 /*******************************************************************
- PathEnsureQuoted - ensures that a path is quoted; optionally,
-     this function also terminates a directory with a backslash
-     if it is not already.
-*******************************************************************/
-DAPI_(HRESULT) PathEnsureQuoted(
-    __inout LPWSTR* ppszPath,
-    __in BOOL fDirectory
-    );
-
-/*******************************************************************
  PathCompare - compares the fully expanded path of the two paths using
                ::CompareStringW().
 *******************************************************************/
