@@ -237,6 +237,17 @@ DAPI_(HRESULT) PathConcatCch(
     );
 
 /*******************************************************************
+ PathConcatRelativeToBase - canonicalizes a relative path before
+    concatenating it to the base path to ensure the resulting path
+    is inside the base path.
+*******************************************************************/
+DAPI_(HRESULT) PathConcatRelativeToBase(
+    __in LPCWSTR wzBase,
+    __in_opt LPCWSTR wzRelative,
+    __deref_out_z LPWSTR* psczCombined
+    );
+
+/*******************************************************************
  PathCompare - compares the fully expanded path of the two paths using
                ::CompareStringW().
 *******************************************************************/

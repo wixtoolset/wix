@@ -294,7 +294,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
         ExitOnFailure(hr, "Failed to find embedded payload: %ls", sczStreamName);
 
         // make file path
-        hr = PathConcat(wzTargetDir, pPayload->sczFilePath, &pPayload->sczLocalFilePath);
+        hr = PathConcatRelativeToBase(wzTargetDir, pPayload->sczFilePath, &pPayload->sczLocalFilePath);
         ExitOnFailure(hr, "Failed to concat file paths.");
 
         // extract file

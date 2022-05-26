@@ -199,7 +199,7 @@ static HRESULT LoadDncConfiguration(
     hr = XmlGetAttributeEx(pixnHost, L"FilePath", &sczPayloadName);
     BalExitOnRequiredXmlQueryFailure(hr, "Failed to get WixBalBAFactoryAssembly/@FilePath.");
 
-    hr = PathConcat(pArgs->pCommand->wzBootstrapperWorkingFolder, sczPayloadName, &pState->sczBaFactoryAssemblyPath);
+    hr = PathConcatRelativeToBase(pArgs->pCommand->wzBootstrapperWorkingFolder, sczPayloadName, &pState->sczBaFactoryAssemblyPath);
     BalExitOnFailure(hr, "Failed to create BaFactoryAssemblyPath.");
 
     LPCWSTR wzFileName = PathFile(pState->sczBaFactoryAssemblyPath);

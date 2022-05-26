@@ -361,16 +361,32 @@ extern "C" HRESULT ExeEngineExecutePackage(
     BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
 
-    // get cached executable path
-    hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
-    ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
+    if (pPackage->Exe.fPseudoPackage && BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE != pPackagePayload->verification)
+    {
+        if (!PathIsFullyQualified(pPackagePayload->sczFilePath, NULL))
+        {
+            ExitWithRootFailure(hr, E_INVALIDSTATE, "Pseudo ExePackages must have a fully qualified target path.");
+        }
+
+        hr = StrAllocString(&sczExecutablePath, pPackagePayload->sczFilePath, 0);
+        ExitOnFailure(hr, "Failed to build executable path.");
+
+        hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get cached path for pseudo-package: %ls", pPackage->sczId);
+    }
+    else
+    {
+        // get cached executable path
+        hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
+
+        hr = PathConcatRelativeToBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
+        ExitOnFailure(hr, "Failed to build executable path.");
+    }
 
     // Best effort to set the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
     VariableSetNumeric(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, pExecuteAction->exePackage.action, TRUE);
-
-    hr = PathConcat(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
-    ExitOnFailure(hr, "Failed to build executable path.");
 
     // pick arguments
     switch (pExecuteAction->exePackage.action)

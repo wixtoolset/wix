@@ -131,6 +131,46 @@ LExit:
     return hr;
 }
 
+DAPI_(HRESULT) PathConcatRelativeToBase(
+    __in LPCWSTR wzBase,
+    __in_opt LPCWSTR wzRelative,
+    __deref_out_z LPWSTR* psczCombined
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCanonicalizedRelative = NULL;
+
+    if (!wzBase || !*wzBase)
+    {
+        PathExitWithRootFailure(hr, E_INVALIDARG, "wzBase is required.");
+    }
+
+    if (PathIsRooted(wzRelative))
+    {
+        PathExitWithRootFailure(hr, E_INVALIDARG, "wzRelative cannot be rooted.");
+    }
+
+    hr = StrAllocString(psczCombined, wzBase, 0);
+    PathExitOnFailure(hr, "Failed to copy base to output.");
+
+    if (wzRelative && *wzRelative)
+    {
+        hr = PathBackslashTerminate(psczCombined);
+        PathExitOnFailure(hr, "Failed to backslashify.");
+
+        hr = PathCanonicalizeForComparison(wzRelative, 0, &sczCanonicalizedRelative);
+        PathExitOnFailure(hr, "Failed to canonicalize wzRelative.");
+
+        hr = StrAllocConcat(psczCombined, sczCanonicalizedRelative, 0);
+        PathExitOnFailure(hr, "Failed to append relative to output.");
+    }
+
+LExit:
+    ReleaseStr(sczCanonicalizedRelative);
+
+    return hr;
+}
+
 DAPI_(HRESULT) PathDirectoryContainsPath(
     __in_z LPCWSTR wzDirectory,
     __in_z LPCWSTR wzPath

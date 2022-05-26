@@ -23,6 +23,7 @@ static HRESULT ExecuteBundle(
     __in BOOTSTRAPPER_ACTION_STATE action,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BURN_PACKAGE* pPackage,
+    __in BOOL fPseudoPackage,
     __in_z_opt LPCWSTR wzParent,
     __in_z_opt LPCWSTR wzIgnoreDependencies,
     __in_z_opt LPCWSTR wzAncestors,
@@ -614,7 +615,7 @@ extern "C" HRESULT BundlePackageEngineExecutePackage(
     BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
     BURN_PACKAGE* pPackage = pExecuteAction->bundlePackage.pPackage;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, FALSE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
@@ -636,7 +637,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, TRUE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" void BundlePackageEngineUpdateInstallRegistrationState(
@@ -733,6 +734,7 @@ static HRESULT ExecuteBundle(
     __in BOOTSTRAPPER_ACTION_STATE action,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BURN_PACKAGE* pPackage,
+    __in BOOL fPseudoPackage,
     __in_z_opt LPCWSTR wzParent,
     __in_z_opt LPCWSTR wzIgnoreDependencies,
     __in_z_opt LPCWSTR wzAncestors,
@@ -759,16 +761,32 @@ static HRESULT ExecuteBundle(
     LPCWSTR wzOperationCommandLine = NULL;
     BOOL fRunEmbedded = pPackage->Bundle.fSupportsBurnProtocol;
 
-    // get cached executable path
-    hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
-    ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
+    if (fPseudoPackage)
+    {
+        if (!PathIsFullyQualified(pPackagePayload->sczFilePath, NULL))
+        {
+            ExitWithRootFailure(hr, E_INVALIDSTATE, "Related bundles must have a fully qualified target path.");
+        }
+
+        hr = StrAllocString(&sczExecutablePath, pPackagePayload->sczFilePath, 0);
+        ExitOnFailure(hr, "Failed to build executable path.");
+
+        hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get cached path for related bundle: %ls", pPackage->sczId);
+    }
+    else
+    {
+        // get cached executable path
+        hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
+
+        hr = PathConcatRelativeToBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
+        ExitOnFailure(hr, "Failed to build executable path.");
+    }
 
     // Best effort to set the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
     VariableSetNumeric(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, action, TRUE);
-
-    hr = PathConcat(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
-    ExitOnFailure(hr, "Failed to build executable path.");
 
     // pick arguments
     switch (action)
