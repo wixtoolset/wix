@@ -109,5 +109,204 @@ namespace DutilTests
                 ReleaseStrArray(rgsczPaths, cPaths);
             }
         }
+
+        [Fact]
+        void PathPrefixTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[12] =
+            {
+                L"\\\\", L"\\\\?\\UNC\\",
+                L"C:\\\\foo2", L"\\\\?\\C:\\\\foo2",
+                L"\\\\a\\b\\", L"\\\\?\\UNC\\a\\b\\",
+                L"\\\\?\\UNC\\test\\unc\\path\\to\\something", L"\\\\?\\UNC\\test\\unc\\path\\to\\something",
+                L"\\\\?\\C:\\foo\\bar.txt", L"\\\\?\\C:\\foo\\bar.txt",
+                L"\\??\\C:\\foo\\bar.txt", L"\\??\\C:\\foo\\bar.txt",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths) / 2; i += 2)
+                {
+                    hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
+                    NativeAssert::Succeeded(hr, "Failed to copy string");
+
+                    hr = PathPrefix(&sczPath);
+                    NativeAssert::Succeeded(hr, "PathPrefix: {0}", rgwzPaths[i]);
+                    NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathPrefixFailureTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[8] =
+            {
+                L"\\",
+                L"C:",
+                L"C:foo.txt",
+                L"",
+                L"\\?",
+                L"\\dir",
+                L"dir",
+                L"dir\\subdir",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+                {
+                    hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
+                    NativeAssert::Succeeded(hr, "Failed to copy string");
+
+                    hr = PathPrefix(&sczPath);
+                    NativeAssert::SpecificReturnCode(E_INVALIDARG, hr, "PathPrefix: {0}, {1}", rgwzPaths[i], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathIsRootedAndFullyQualifiedTest()
+        {
+            LPCWSTR rgwzPaths[15] =
+            {
+                L"\\\\",
+                L"\\\\\\",
+                L"C:\\",
+                L"C:\\\\",
+                L"C:\\foo1",
+                L"C:\\\\foo2",
+                L"\\\\test\\unc\\path\\to\\something",
+                L"\\\\a\\b\\c\\d\\e",
+                L"\\\\a\\b\\",
+                L"\\\\a\\b",
+                L"\\\\test\\unc",
+                L"\\\\Server",
+                L"\\\\Server\\Foo.txt",
+                L"\\\\Server\\Share\\Foo.txt",
+                L"\\\\Server\\Share\\Test\\Foo.txt",
+            };
+
+            for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+            {
+                ValidateFullyQualifiedPath(rgwzPaths[i], TRUE, FALSE);
+                ValidateRootedPath(rgwzPaths[i], TRUE);
+            }
+        }
+
+        [Fact]
+        void PathIsRootedAndFullyQualifiedWithPrefixTest()
+        {
+            LPCWSTR rgwzPaths[6] =
+            {
+                L"\\\\?\\UNC\\test\\unc\\path\\to\\something",
+                L"\\\\?\\UNC\\test\\unc",
+                L"\\\\?\\UNC\\a\\b1",
+                L"\\\\?\\UNC\\a\\b2\\",
+                L"\\\\?\\C:\\foo\\bar.txt",
+                L"\\??\\C:\\foo\\bar.txt",
+            };
+
+            for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+            {
+                ValidateFullyQualifiedPath(rgwzPaths[i], TRUE, TRUE);
+                ValidateRootedPath(rgwzPaths[i], TRUE);
+            }
+        }
+
+        [Fact]
+        void PathIsRootedButNotFullyQualifiedTest()
+        {
+            LPCWSTR rgwzPaths[7] =
+            {
+                L"\\",
+                L"a:",
+                L"A:",
+                L"z:",
+                L"Z:",
+                L"C:foo.txt",
+                L"\\dir",
+            };
+
+            for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+            {
+                ValidateFullyQualifiedPath(rgwzPaths[i], FALSE, FALSE);
+                ValidateRootedPath(rgwzPaths[i], TRUE);
+            }
+        }
+
+        [Fact]
+        void PathIsNotRootedAndNotFullyQualifiedTest()
+        {
+            LPCWSTR rgwzPaths[9] =
+            {
+                NULL,
+                L"",
+                L"dir",
+                L"dir\\subdir",
+                L"@:\\foo",  // 064 = @     065 = A
+                L"[:\\\\",   // 091 = [     090 = Z
+                L"`:\\foo ", // 096 = `     097 = a
+                L"{:\\\\",   // 123 = {     122 = z
+                L"[:",
+            };
+
+            for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+            {
+                ValidateFullyQualifiedPath(rgwzPaths[i], FALSE, FALSE);
+                ValidateRootedPath(rgwzPaths[i], FALSE);
+            }
+        }
+
+        void ValidateFullyQualifiedPath(LPCWSTR wzPath, BOOL fExpected, BOOL fExpectedHasPrefix)
+        {
+            BOOL fHasLongPathPrefix = FALSE;
+            BOOL fRooted = PathIsFullyQualified(wzPath, &fHasLongPathPrefix);
+            String^ message = String::Format("IsFullyQualified: {0}", gcnew String(wzPath));
+            if (fExpected)
+            {
+                Assert::True(fRooted, message);
+            }
+            else
+            {
+                Assert::False(fRooted, message);
+            }
+
+            message = String::Format("HasLongPathPrefix: {0}", gcnew String(wzPath));
+            if (fExpectedHasPrefix)
+            {
+                Assert::True(fHasLongPathPrefix, message);
+            }
+            else
+            {
+                Assert::False(fHasLongPathPrefix, message);
+            }
+        }
+
+        void ValidateRootedPath(LPCWSTR wzPath, BOOL fExpected)
+        {
+            BOOL fRooted = PathIsRooted(wzPath);
+            String^ message = String::Format("IsRooted: {0}", gcnew String(wzPath));
+            if (fExpected)
+            {
+                Assert::True(fRooted, message);
+            }
+            else
+            {
+                Assert::False(fRooted, message);
+            }
+        }
     };
 }
