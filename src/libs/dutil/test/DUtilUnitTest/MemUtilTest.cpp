@@ -23,7 +23,7 @@ namespace DutilTests
         void MemUtilAppendTest()
         {
             HRESULT hr = S_OK;
-            DWORD dwSize;
+            SIZE_T cbSize = 0;
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
 
@@ -65,8 +65,11 @@ namespace DutilTests
                 // and make sure it doesn't grow since we already have enough space
                 hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&rgValues), cValues, sizeof(ArrayValue), 5);
                 NativeAssert::Succeeded(hr, "Failed to ensure array size matches what it should already be");
-                dwSize = MemSize(rgValues);
-                if (dwSize != 6 * sizeof(ArrayValue))
+
+                hr = MemSizeChecked(rgValues, &cbSize);
+                NativeAssert::Succeeded(hr, "Failed to get current array size");
+
+                if (cbSize != 6 * sizeof(ArrayValue))
                 {
                     hr = E_FAIL;
                     ExitOnFailure(hr, "MemEnsureArraySize is growing an array that is already big enough!");

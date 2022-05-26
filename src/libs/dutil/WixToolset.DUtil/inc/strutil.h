@@ -139,11 +139,15 @@ HRESULT DAPI StrAllocFromError(
 
 HRESULT DAPI StrMaxLength(
     __in LPCVOID p,
-    __out SIZE_T* pcbch
+    __out SIZE_T* pcch
+    );
+HRESULT DAPI StrMaxLengthAnsi(
+    __in LPCVOID p,
+    __out SIZE_T* pcch
     );
 HRESULT DAPI StrSize(
     __in LPCVOID p,
-    __out SIZE_T* pcbb
+    __out SIZE_T* pcb
     );
 
 HRESULT DAPI StrFree(

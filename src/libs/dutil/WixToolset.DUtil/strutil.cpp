@@ -390,13 +390,8 @@ static HRESULT AllocStringHelper(
 
     if (*ppwz)
     {
-        cch = MemSize(*ppwz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(WCHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLength(*ppwz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
     }
 
     if (0 == cchSource && wzSource)
@@ -447,13 +442,8 @@ extern "C" HRESULT DAPI StrAnsiAllocString(
 
     if (*ppsz)
     {
-        cch = MemSize(*ppsz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(CHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLengthAnsi(*ppsz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
     }
 
     if (0 == cchSource)
@@ -527,13 +517,8 @@ extern "C" HRESULT DAPI StrAllocStringAnsi(
 
     if (*ppwz)
     {
-        cch = MemSize(*ppwz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(WCHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLength(*ppwz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
     }
 
     if (0 == cchSource)
@@ -605,13 +590,8 @@ HRESULT DAPI StrAnsiAllocStringAnsi(
 
     if (*ppsz)
     {
-        cch = MemSize(*ppsz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnRootFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(CHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLengthAnsi(*ppsz, &cch);
+        StrExitOnRootFailure(hr, "failed to get size of destination string");
     }
 
     if (0 == cchSource && szSource)
@@ -664,13 +644,8 @@ extern "C" HRESULT DAPI StrAllocPrefix(
 
     if (*ppwz)
     {
-        cch = MemSize(*ppwz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(WCHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLength(*ppwz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
 
         hr = ::StringCchLengthW(*ppwz, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
         StrExitOnFailure(hr, "Failed to calculate length of string");
@@ -770,13 +745,8 @@ static HRESULT AllocConcatHelper(
 
     if (*ppwz)
     {
-        cch = MemSize(*ppwz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(WCHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLength(*ppwz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
 
         hr = ::StringCchLengthW(*ppwz, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
         StrExitOnFailure(hr, "Failed to calculate length of string");
@@ -833,13 +803,8 @@ extern "C" HRESULT DAPI StrAnsiAllocConcat(
 
     if (*ppz)
     {
-        cch = MemSize(*ppz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(CHAR);  // convert the count in bytes to count in characters
+        hr = StrMaxLengthAnsi(*ppz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
 
 #pragma prefast(push)
 #pragma prefast(disable:25068)
@@ -1085,12 +1050,8 @@ static HRESULT AllocFormattedArgsHelper(
 
     if (*ppwz)
     {
-        cbOriginal = MemSize(*ppwz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cbOriginal)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnRootFailure(hr, "failed to get size of destination string");
-        }
+        hr = StrSize(*ppwz, &cbOriginal);
+        StrExitOnFailure(hr, "failed to get size of destination string");
 
         cch = cbOriginal / sizeof(WCHAR);  //convert the count in bytes to count in characters
 
@@ -1161,19 +1122,14 @@ extern "C" HRESULT DAPI StrAnsiAllocFormattedArgs(
     Assert(ppsz && szFormat && *szFormat);
 
     HRESULT hr = S_OK;
-    SIZE_T cch = *ppsz ? MemSize(*ppsz) / sizeof(CHAR) : 0;
+    SIZE_T cch = 0;
     LPSTR pszOriginal = NULL;
     size_t cchOriginal = 0;
 
     if (*ppsz)
     {
-        cch = MemSize(*ppsz);  // get the count in bytes so we can check if it failed (returns -1)
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnRootFailure(hr, "failed to get size of destination string");
-        }
-        cch /= sizeof(CHAR);  //convert the count in bytes to count in characters
+        hr = StrMaxLengthAnsi(*ppsz, &cch);
+        StrExitOnFailure(hr, "failed to get size of destination string");
 
         hr = ::StringCchLengthA(*ppsz, STRSAFE_MAX_CCH, &cchOriginal);
         StrExitOnRootFailure(hr, "failed to get length of original string");
@@ -1280,13 +1236,42 @@ extern "C" HRESULT DAPI StrMaxLength(
 
     if (p)
     {
-        *pcch = MemSize(p);   // get size of entire buffer
-        if (-1 == *pcch)
-        {
-            ExitFunction1(hr = E_FAIL);
-        }
+        hr = StrSize(p, pcch);
+        StrExitOnFailure(hr, "Failed to get size of string buffer.");
 
         *pcch /= sizeof(WCHAR);   // reduce to count of characters
+    }
+    else
+    {
+        *pcch = 0;
+    }
+    Assert(S_OK == hr);
+
+LExit:
+    return hr;
+}
+
+
+/********************************************************************
+StrMaxLengthAnsi - returns maximum number of characters that can be stored in dynamic string p
+
+NOTE:  assumes non-Unicode string
+********************************************************************/
+extern "C" HRESULT DAPI StrMaxLengthAnsi(
+    __in LPCVOID p,
+    __out SIZE_T* pcch
+    )
+{
+    Assert(pcch);
+
+    HRESULT hr = S_OK;
+
+    if (p)
+    {
+        hr = StrSize(p, pcch);
+        StrExitOnFailure(hr, "Failed to get size of string buffer.");
+
+        *pcch /= sizeof(CHAR);   // reduce to count of characters
     }
     else
     {
@@ -1310,15 +1295,7 @@ extern "C" HRESULT DAPI StrSize(
 {
     Assert(p && pcb);
 
-    HRESULT hr = S_OK;
-
-    *pcb = MemSize(p);
-    if (-1 == *pcb)
-    {
-        hr = E_FAIL;
-    }
-
-    return hr;
+    return MemSizeChecked(p, pcb);
 }
 
 /********************************************************************
@@ -2786,22 +2763,16 @@ extern "C" DAPI_(HRESULT) StrSecureZeroString(
     )
 {
     HRESULT hr = S_OK;
-    SIZE_T cch;
+    SIZE_T cb = 0;
 
     if (pwz)
     {
-        cch = MemSize(pwz);
-        if (-1 == cch)
-        {
-            hr = E_INVALIDARG;
-            StrExitOnFailure(hr, "Failed to get size of string");
-        }
-        else
-        {
-            SecureZeroMemory(pwz, cch);
-        }
+        hr = StrSize(pwz, &cb);
+        StrExitOnFailure(hr, "Failed to get size of string");
+
+        SecureZeroMemory(pwz, cb);
     }
-    
+
 LExit:
     return hr;
 }
