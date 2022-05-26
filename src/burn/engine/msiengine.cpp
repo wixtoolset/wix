@@ -1236,7 +1236,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
         // Best effort to set the execute package cache folder variable.
         VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
-        hr = PathConcat(sczCachedDirectory, pPackagePayload->sczFilePath, &sczMsiPath);
+        hr = PathConcatRelativeToBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczMsiPath);
         ExitOnFailure(hr, "Failed to build MSI path.");
     }
 
@@ -2195,7 +2195,7 @@ static HRESULT ConcatPatchProperty(
                 hr = CacheGetCompletedPath(pCache, pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
                 ExitOnFailure(hr, "Failed to get cached path for MSP package: %ls", pMspPackage->sczId);
 
-                hr = PathConcat(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);
+                hr = PathConcatRelativeToBase(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);
                 ExitOnFailure(hr, "Failed to build MSP path.");
 
                 if (!sczPatches)

@@ -1149,7 +1149,7 @@ static HRESULT SetPaths(
     ExitOnFailure(hr, "Failed to build cache directory.");
 
     // build cached executable path
-    hr = PathConcat(sczCacheDirectory, pRegistration->sczExecutableName, &pRegistration->sczCacheExecutablePath);
+    hr = PathConcatRelativeToBase(sczCacheDirectory, pRegistration->sczExecutableName, &pRegistration->sczCacheExecutablePath);
     ExitOnFailure(hr, "Failed to build cached executable path.");
 
     // build state file path
@@ -1367,7 +1367,7 @@ static HRESULT WriteSoftwareTags(
         hr = PathConcat(sczRootFolder, SWIDTAG_FOLDER, &sczTagFolder);
         ExitOnFailure(hr, "Failed to allocate regid folder path.");
 
-        hr = PathConcat(sczTagFolder, pSoftwareTag->sczFilename, &sczPath);
+        hr = PathConcatRelativeToBase(sczTagFolder, pSoftwareTag->sczFilename, &sczPath);
         ExitOnFailure(hr, "Failed to allocate regid file path.");
 
         hr = DirEnsureExists(sczTagFolder, NULL);
@@ -1405,7 +1405,7 @@ static HRESULT RemoveSoftwareTags(
         hr = PathConcat(sczRootFolder, SWIDTAG_FOLDER, &sczTagFolder);
         ExitOnFailure(hr, "Failed to allocate regid folder path.");
 
-        hr = PathConcat(sczTagFolder, pSoftwareTag->sczFilename, &sczPath);
+        hr = PathConcatRelativeToBase(sczTagFolder, pSoftwareTag->sczFilename, &sczPath);
         ExitOnFailure(hr, "Failed to allocate regid file path.");
 
         // Best effort to delete the software tag file and the regid folder.

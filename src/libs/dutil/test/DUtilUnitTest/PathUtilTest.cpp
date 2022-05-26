@@ -221,6 +221,113 @@ namespace DutilTests
         }
 
         [Fact]
+        void PathConcatTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[54] =
+            {
+                L"a", NULL, L"a",
+                L"a", L"", L"a",
+                L"C:\\", L"a", L"C:\\a",
+                L"\\a", L"b", L"\\a\\b",
+                L"a", L"b", L"a\\b",
+                L"C:\\", L"..\\a", L"C:\\..\\a",
+                L"C:\\a", L"..\\b", L"C:\\a\\..\\b",
+                L"\\\\server\\share", L"..\\a", L"\\\\server\\share\\..\\a",
+                L"\\\\server\\share\\a", L"..\\b", L"\\\\server\\share\\a\\..\\b",
+                NULL, L"b", L"b",
+                L"", L"b", L"b",
+                L"a", L"\\b", L"\\b",
+                L"a", L"b:", L"b:",
+                L"a", L"b:\\", L"b:\\",
+                L"a", L"\\\\?\\b", L"\\\\?\\b",
+                L"a", L"\\\\?\\UNC\\b", L"\\\\?\\UNC\\b",
+                L"a", L"\\b", L"\\b",
+                L"a", L"\\\\", L"\\\\",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 3)
+                {
+                    hr = PathConcat(rgwzPaths[i], rgwzPaths[i + 1], &sczPath);
+                    NativeAssert::Succeeded(hr, "PathConcat: {0}, {1}", rgwzPaths[i], rgwzPaths[i + 1]);
+                    NativeAssert::StringEqual(rgwzPaths[i + 2], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathConcatRelativeToBaseTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[27] =
+            {
+                L"a", NULL, L"a",
+                L"a", L"", L"a",
+                L"C:\\", L"a", L"C:\\a",
+                L"\\a", L"b", L"\\a\\b",
+                L"a", L"b", L"a\\b",
+                L"C:\\", L"..\\a", L"C:\\a",
+                L"C:\\a", L"..\\b", L"C:\\a\\b",
+                L"\\\\server\\share", L"..\\a", L"\\\\server\\share\\a",
+                L"\\\\server\\share\\a", L"..\\b", L"\\\\server\\share\\a\\b",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 3)
+                {
+                    hr = PathConcatRelativeToBase(rgwzPaths[i], rgwzPaths[i + 1], &sczPath);
+                    NativeAssert::Succeeded(hr, "PathConcatRelativeToBase: {0}, {1}", rgwzPaths[i], rgwzPaths[i + 1]);
+                    NativeAssert::StringEqual(rgwzPaths[i + 2], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathConcatRelativeToBaseFailureTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[18] =
+            {
+                NULL, L"b",
+                L"", L"b",
+                L"a", L"\\b",
+                L"a", L"b:",
+                L"a", L"b:\\",
+                L"a", L"\\\\?\\b",
+                L"a", L"\\\\?\\UNC\\b",
+                L"a", L"\\b",
+                L"a", L"\\\\",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 2)
+                {
+                    hr = PathConcatRelativeToBase(rgwzPaths[i], rgwzPaths[i + 1], &sczPath);
+                    NativeAssert::SpecificReturnCode(hr, E_INVALIDARG, "PathConcatRelativeToBase: {0}, {1}", rgwzPaths[i], rgwzPaths[i + 1]);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
         void PathDirectoryContainsPathTest()
         {
             HRESULT hr = S_OK;
