@@ -12,6 +12,39 @@ namespace DutilTests
     {
     public:
         [Fact]
+        void PathGetDirectoryTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[18] =
+            {
+                L"C:\\a\\b", L"C:\\a\\",
+                L"C:\\a", L"C:\\",
+                L"C:\\", L"C:\\",
+                L"\"C:\\a\\b\\c\"", L"\"C:\\a\\b\\",
+                L"\"C:\\a\\b\\\"c", L"\"C:\\a\\b\\",
+                L"\"C:\\a\\b\"\\c", L"\"C:\\a\\b\"\\",
+                L"\"C:\\a\\\"b\\c", L"\"C:\\a\\\"b\\",
+                L"C:\\a\"\\\"b\\c", L"C:\\a\"\\\"b\\",
+                L"C:\\a\"\\b\\c\"", L"C:\\a\"\\b\\",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 2)
+                {
+                    hr = PathGetDirectory(rgwzPaths[i], &sczPath);
+                    NativeAssert::Succeeded(hr, "PathGetDirectory: {0}", rgwzPaths[i]);
+                    NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
         void PathGetHierarchyArrayTest()
         {
             HRESULT hr = S_OK;
