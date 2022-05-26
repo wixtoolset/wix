@@ -1189,6 +1189,7 @@ DAPI_(HRESULT) ThemeShowPageEx(
     BOOL fSaveEditboxes = FALSE;
     THEME_SAVEDVARIABLE* pSavedVariable = NULL;
     THEME_PAGE* pPage = ThemeGetPage(pTheme, dwPage);
+    SIZE_T cb = 0;
 
     if (pPage)
     {
@@ -1219,9 +1220,9 @@ DAPI_(HRESULT) ThemeShowPageEx(
             if (THEME_SHOW_PAGE_REASON_REFRESH != reason)
             {
                 pPage->cSavedVariables = 0;
-                if (pPage->rgSavedVariables)
+                if (pPage->rgSavedVariables && SUCCEEDED(MemSizeChecked(pPage->rgSavedVariables, &cb)))
                 {
-                    SecureZeroMemory(pPage->rgSavedVariables, MemSize(pPage->rgSavedVariables));
+                    SecureZeroMemory(pPage->rgSavedVariables, cb);
                 }
             }
 
@@ -1238,7 +1239,11 @@ DAPI_(HRESULT) ThemeShowPageEx(
                 hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pPage->rgSavedVariables), pPage->cControlIndices, sizeof(THEME_SAVEDVARIABLE), pPage->cControlIndices);
                 ThmExitOnFailure(hr, "Failed to allocate memory for saved variables.");
 
-                SecureZeroMemory(pPage->rgSavedVariables, MemSize(pPage->rgSavedVariables));
+                if (SUCCEEDED(MemSizeChecked(pPage->rgSavedVariables, &cb)))
+                {
+                    SecureZeroMemory(pPage->rgSavedVariables, cb);
+                }
+
                 pPage->cSavedVariables = pPage->cControlIndices;
 
                 // Save the variables in the loop below.

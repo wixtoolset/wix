@@ -508,10 +508,14 @@ static HRESULT EnsureBufferSize(
 {
     HRESULT hr = S_OK;
     SIZE_T cbTarget = ((cbSize / BUFFER_INCREMENT) + 1) * BUFFER_INCREMENT;
+    SIZE_T cbCurrent = 0;
 
     if (*ppbBuffer)
     {
-        if (MemSize(*ppbBuffer) < cbTarget)
+        hr = MemSizeChecked(*ppbBuffer, &cbCurrent);
+        BuffExitOnFailure(hr, "Failed to get current buffer size.");
+
+        if (cbCurrent < cbTarget)
         {
             LPVOID pv = MemReAlloc(*ppbBuffer, cbTarget, TRUE);
             BuffExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate buffer.");

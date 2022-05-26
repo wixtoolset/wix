@@ -9,6 +9,7 @@
 #define MemExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
 #define MemExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
 #define MemExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_MEMUTIL, x, e, s, __VA_ARGS__)
 #define MemExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
 #define MemExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_MEMUTIL, p, x, e, s, __VA_ARGS__)
 #define MemExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_MEMUTIL, p, x, s, __VA_ARGS__)
@@ -74,6 +75,7 @@ extern "C" HRESULT DAPI MemReAllocSecure(
     HRESULT hr = S_OK;
     DWORD dwFlags = HEAP_REALLOC_IN_PLACE_ONLY;
     LPVOID pvNew = NULL;
+    SIZE_T cb = 0;
 
     dwFlags |= fZero ? HEAP_ZERO_MEMORY : 0;
     pvNew = ::HeapReAlloc(::GetProcessHeap(), dwFlags, pv, cbSize);
@@ -82,18 +84,16 @@ extern "C" HRESULT DAPI MemReAllocSecure(
         pvNew = MemAlloc(cbSize, fZero);
         if (pvNew)
         {
-            const SIZE_T cbCurrent = MemSize(pv);
-            if (-1 == cbCurrent)
-            {
-                MemExitOnRootFailure(hr = E_INVALIDARG, "Failed to get memory size");
-            }
+            hr = MemSizeChecked(pv, &cb);
+            MemExitOnFailure(hr, "Failed to get current memory size.");
+
+            const SIZE_T cbCurrent = cb;
 
             // HeapReAlloc may allocate more memory than requested.
-            const SIZE_T cbNew = MemSize(pvNew);
-            if (-1 == cbNew)
-            {
-                MemExitOnRootFailure(hr = E_INVALIDARG, "Failed to get memory size");
-            }
+            hr = MemSizeChecked(pvNew, &cb);
+            MemExitOnFailure(hr, "Failed to get new memory size.");
+
+            const SIZE_T cbNew = cb;
 
             cbSize = cbNew;
             if (cbSize > cbCurrent)
@@ -149,7 +149,10 @@ extern "C" HRESULT DAPI MemReAllocArray(
 
     if (*ppvArray)
     {
-        SIZE_T cbCurrent = MemSize(*ppvArray);
+        SIZE_T cbCurrent = 0;
+        hr = MemSizeChecked(*ppvArray, &cbCurrent);
+        MemExitOnFailure(hr, "Failed to get current memory size.");
+
         if (cbCurrent < cbNew)
         {
             pvNew = MemReAlloc(*ppvArray, cbNew, TRUE);
@@ -192,7 +195,11 @@ extern "C" HRESULT DAPI MemEnsureArraySize(
     if (*ppvArray)
     {
         SIZE_T cbUsed = cArray * cbArrayType;
-        SIZE_T cbCurrent = MemSize(*ppvArray);
+        SIZE_T cbCurrent = 0;
+
+        hr = MemSizeChecked(*ppvArray, &cbCurrent);
+        MemExitOnFailure(hr, "Failed to get current memory size.");
+
         if (cbCurrent < cbUsed)
         {
             pvNew = MemReAlloc(*ppvArray, cbNew, TRUE);
@@ -354,4 +361,24 @@ extern "C" SIZE_T DAPI MemSize(
 {
 //    AssertSz(vfMemInitialized, "MemInitialize() not called, this would normally crash");
     return ::HeapSize(::GetProcessHeap(), 0, pv);
+}
+
+
+extern "C" HRESULT DAPI MemSizeChecked(
+    __in LPCVOID pv,
+    __out SIZE_T* pcb
+    )
+{
+    HRESULT hr = S_OK;
+
+//    AssertSz(vfMemInitialized, "MemInitialize() not called, this would normally crash");
+    *pcb = MemSize(pv);
+
+    if (-1 == *pcb)
+    {
+        MemExitWithRootFailure(hr, E_INVALIDARG, "Failed to get memory size");
+    }
+
+LExit:
+    return hr;
 }

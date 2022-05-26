@@ -80,6 +80,10 @@ HRESULT DAPI MemFree(
 SIZE_T DAPI MemSize(
     __in LPCVOID pv
     );
+HRESULT DAPI MemSizeChecked(
+    __in LPCVOID pv,
+    __out SIZE_T* pcb
+    );
 
 #ifdef __cplusplus
 }

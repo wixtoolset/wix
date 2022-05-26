@@ -300,7 +300,10 @@ extern "C" HRESULT DAPI MetaGetValue(
     }
     else  // set the size of the data to the actual size of the memory
     {
-        SIZE_T cb = MemSize(pmr->pbMDData);
+        SIZE_T cb = 0;
+        hr = MemSizeChecked(pmr->pbMDData, &cb);
+        MetaExitOnFailure(hr, "failed to get metabase size");
+
         if (cb > DWORD_MAX)
         {
             MetaExitOnRootFailure(hr = E_INVALIDSTATE, "metabase data is too large: %Iu", cb);
