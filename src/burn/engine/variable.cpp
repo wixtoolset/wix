@@ -1969,7 +1969,7 @@ static HRESULT InitializeVariableSystemFolder(
 {
     HRESULT hr = S_OK;
     BOOL f64 = (BOOL)dwpData;
-    WCHAR wzSystemFolder[MAX_PATH] = { };
+    WCHAR wzSystemFolder[MAX_PATH + 2] = { };
 
 #if !defined(_WIN64)
     BOOL fIsWow64 = FALSE;
