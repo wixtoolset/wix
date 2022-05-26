@@ -100,12 +100,6 @@ DAPI_(HRESULT) PathGetDirectory(
         return S_FALSE;
     }
 
-    if (wzPath[0] == L'\"')
-    {
-        ++wzPath;
-        --cchDirectory;
-    }
-
     hr = StrAllocString(psczDirectory, wzPath, cchDirectory);
     PathExitOnFailure(hr, "Failed to copy directory.");
 
