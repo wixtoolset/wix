@@ -19,6 +19,9 @@ namespace WixToolset.Core.Burn.CommandLine
 
     internal class RemotePayloadSubcommand : BurnSubcommandBase
     {
+        private static readonly XName BundlePackageName = "BundlePackage";
+        private static readonly XName ExePackageName = "ExePackage";
+        private static readonly XName MsuPackageName = "MsuPackage";
         private static readonly XName BundlePackagePayloadName = "BundlePackagePayload";
         private static readonly XName ExePackagePayloadName = "ExePackagePayload";
         private static readonly XName MsuPackagePayloadName = "MsuPackagePayload";
@@ -80,7 +83,7 @@ namespace WixToolset.Core.Burn.CommandLine
                 this.IntermediateFolder = Path.GetTempPath();
             }
 
-            var elements = this.HarvestRemotePayloads(inputPaths);
+            var element = this.HarvestPackageElement(inputPaths);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -89,14 +92,11 @@ namespace WixToolset.Core.Burn.CommandLine
                     var outputFolder = Path.GetDirectoryName(this.OutputPath);
                     Directory.CreateDirectory(outputFolder);
 
-                    File.WriteAllLines(this.OutputPath, elements.Select(e => e.ToString()));
+                    File.WriteAllText(this.OutputPath, element.ToString());
                 }
                 else
                 {
-                    foreach (var element in elements)
-                    {
-                        Console.WriteLine(element);
-                    }
+                    Console.WriteLine(element.ToString());
                 }
             }
 
@@ -189,10 +189,51 @@ namespace WixToolset.Core.Burn.CommandLine
             return result.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        private IEnumerable<XElement> HarvestRemotePayloads(IEnumerable<string> paths)
+        private XElement HarvestPackageElement(IEnumerable<string> paths)
+        {
+            var harvestedFiles = this.HarvestRemotePayloads(paths).ToList();
+
+            XElement element;
+
+            switch (harvestedFiles[0].PackageType)
+            {
+                case WixBundlePackageType.Bundle:
+                    element = new XElement(BundlePackageName);
+                    break;
+
+                case WixBundlePackageType.Exe:
+                    element = new XElement(ExePackageName);
+                    break;
+
+                case WixBundlePackageType.Msu:
+                    element = new XElement(MsuPackageName);
+                    break;
+
+                default:
+                    return null;
+            }
+
+            var packagePayloadFile = harvestedFiles.FirstOrDefault();
+
+            if (packagePayloadFile != null)
+            {
+                if (packagePayloadFile.Element.Attribute("CertificateThumbprint") != null)
+                {
+                    var cacheId = CacheIdGenerator.GenerateCacheIdFromPayloadHashAndThumbprint(packagePayloadFile.PayloadSymbol);
+
+                    element.Add(new XAttribute("CacheId", cacheId));
+                }
+
+                element.Add(harvestedFiles.Select(h => h.Element));
+            }
+
+            return element;
+        }
+
+        private IEnumerable<HarvestedFile> HarvestRemotePayloads(IEnumerable<string> paths)
         {
             var first = true;
-            var hashes = this.GetHashes(paths);
+            var hashes = this.GetCertificateHashes(paths);
 
             foreach (var path in paths)
             {
@@ -204,22 +245,22 @@ namespace WixToolset.Core.Burn.CommandLine
                     continue;
                 }
 
+                yield return harvestedFile;
+
                 if (harvestedFile.PackagePayloads.Any())
                 {
-                    var packageHashes = this.GetHashes(harvestedFile.PackagePayloads.Select(x => x.SourceFile.Path));
+                    var packageCertificateHashes = this.GetCertificateHashes(harvestedFile.PackagePayloads.Select(x => x.SourceFile.Path));
 
                     foreach (var payloadSymbol in harvestedFile.PackagePayloads)
                     {
-                        var harvestedPackageFile = this.HarvestFile(payloadSymbol.SourceFile.Path, false, packageHashes);
-                        yield return harvestedPackageFile.Element;
+                        var harvestedPackageFile = this.HarvestFile(payloadSymbol.SourceFile.Path, false, packageCertificateHashes);
+                        yield return harvestedPackageFile;
                     }
                 }
-
-                yield return harvestedFile.Element;
             }
         }
 
-        private Dictionary<string, CertificateHashes> GetHashes(IEnumerable<string> paths)
+        private Dictionary<string, CertificateHashes> GetCertificateHashes(IEnumerable<string> paths)
         {
             var hashes = new Dictionary<string, CertificateHashes>();
 
@@ -233,7 +274,7 @@ namespace WixToolset.Core.Burn.CommandLine
             return hashes;
         }
 
-        private HarvestedFile HarvestFile(string path, bool isPackage, Dictionary<string, CertificateHashes> hashes)
+        private HarvestedFile HarvestFile(string path, bool isPackage, Dictionary<string, CertificateHashes> certificateHashes)
         {
             XElement element;
             WixBundlePackageType? packageType = null;
@@ -274,7 +315,7 @@ namespace WixToolset.Core.Burn.CommandLine
             var payloadSymbol = new WixBundlePayloadSymbol(null, new Identifier(AccessModifier.Section, "id"))
             {
                 SourceFile = new IntermediateFieldPathValue { Path = path },
-                Name = Path.GetFileName(path),
+                Name = this.GetRelativeFileName(path),
             };
 
             this.PayloadHarvester.HarvestStandardInformation(payloadSymbol);
@@ -293,22 +334,18 @@ namespace WixToolset.Core.Burn.CommandLine
 
             if (!String.IsNullOrEmpty(this.DownloadUrl))
             {
-                var filename = this.GetRelativeFileName(payloadSymbol.SourceFile.Path);
-                var formattedUrl = String.Format(this.DownloadUrl, filename);
-
-                if (Uri.TryCreate(formattedUrl, UriKind.Absolute, out var url))
-                {
-                    element.Add(new XAttribute("DownloadUrl", url.AbsoluteUri));
-                }
+                element.Add(new XAttribute("DownloadUrl", this.DownloadUrl));
             }
 
-            if (hashes.TryGetValue(path, out var certificateHashes))
+            if (certificateHashes.TryGetValue(path, out var certificateHashForPath))
             {
-                element.Add(new XAttribute("CertificatePublicKey", certificateHashes.PublicKey));
-                element.Add(new XAttribute("CertificateThumbprint", certificateHashes.Thumbprint));
-            }
+                payloadSymbol.CertificatePublicKey = certificateHashForPath.PublicKey;
+                payloadSymbol.CertificateThumbprint = certificateHashForPath.Thumbprint;
 
-            if (!String.IsNullOrEmpty(payloadSymbol.Hash))
+                element.Add(new XAttribute("CertificatePublicKey", payloadSymbol.CertificatePublicKey));
+                element.Add(new XAttribute("CertificateThumbprint", payloadSymbol.CertificateThumbprint));
+            }
+            else if (!String.IsNullOrEmpty(payloadSymbol.Hash))
             {
                 element.Add(new XAttribute("Hash", payloadSymbol.Hash));
             }
@@ -326,6 +363,7 @@ namespace WixToolset.Core.Burn.CommandLine
             var harvestedFile = new HarvestedFile
             {
                 Element = element,
+                PackageType = packageType,
                 PayloadSymbol = payloadSymbol,
             };
 
@@ -418,7 +456,11 @@ namespace WixToolset.Core.Burn.CommandLine
         private class HarvestedFile
         {
             public XElement Element { get; set; }
+
+            public WixBundlePackageType? PackageType { get; internal set; }
+
             public WixBundlePayloadSymbol PayloadSymbol { get; set; }
+
             public List<WixBundlePayloadSymbol> PackagePayloads { get; } = new List<WixBundlePayloadSymbol>();
         }
     }

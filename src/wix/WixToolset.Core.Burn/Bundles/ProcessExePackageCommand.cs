@@ -4,18 +4,23 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
+    using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Initializes package state from the Exe contents.
     /// </summary>
     internal class ProcessExePackageCommand
     {
-        public ProcessExePackageCommand(PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
+        public ProcessExePackageCommand(IMessaging messaging, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
-            this.AuthoredPayloads = payloadSymbols;
+            this.Messaging = messaging;
             this.Facade = facade;
+            this.AuthoredPayloads = payloadSymbols;
         }
+
+        public IMessaging Messaging { get; }
 
         public Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { get; }
 
@@ -30,7 +35,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
             {
-                this.Facade.PackageSymbol.CacheId = packagePayload.Hash;
+                this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateCacheIdFromPackagePayloadHash(this.Messaging, packagePayload, "ExePackage");
             }
 
             this.Facade.PackageSymbol.Version = packagePayload.Version;

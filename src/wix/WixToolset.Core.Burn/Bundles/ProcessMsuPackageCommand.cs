@@ -6,17 +6,21 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Processes the Msu packages to add properties and payloads from the Msu packages.
     /// </summary>
     internal class ProcessMsuPackageCommand
     {
-        public ProcessMsuPackageCommand(PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
+        public ProcessMsuPackageCommand(IMessaging messaging, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
-            this.AuthoredPayloads = payloadSymbols;
+            this.Messaging = messaging;
             this.Facade = facade;
+            this.AuthoredPayloads = payloadSymbols;
         }
+
+        public IMessaging Messaging { get; }
 
         public Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { private get; set; }
 
@@ -28,7 +32,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
             {
-                this.Facade.PackageSymbol.CacheId = packagePayload.Hash;
+                this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateCacheIdFromPackagePayloadHash(this.Messaging, packagePayload, "MsuPackage");
             }
 
             this.Facade.PackageSymbol.PerMachine = true; // MSUs are always per-machine.

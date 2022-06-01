@@ -29,8 +29,8 @@
     <WixVariable Id="NetFx462WebPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx462WebId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462WebDetectCondition)" InstallCondition="!(wix.NetFx462WebInstallCondition)" Id="$(var.NetFx462WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog" Cache="remove">
-        <ExePackagePayload Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe" DownloadUrl="$(var.NetFx462WebLink)" ProductName="Microsoft .NET Framework 4.6.2" Description="Microsoft .NET Framework 4.6.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Hash="D944304952F35B6F49CDA0C6364B55CCB4DF92B134634E594B0496A346B496D3AB709655292595A5D86D44C86C81F19926F84EFF7B87608740B39C12441920A3" Size="1404536" Version="4.6.1590.0" />
+      <ExePackage CacheId="$(var.NetFx462WebId)_ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462WebDetectCondition)" InstallCondition="!(wix.NetFx462WebInstallCondition)" Id="$(var.NetFx462WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog" Cache="remove">
+        <ExePackagePayload Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe" DownloadUrl="$(var.NetFx462WebLink)" ProductName="Microsoft .NET Framework 4.6.2" Description="Microsoft .NET Framework 4.6.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Size="1404536" Version="4.6.1590.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
@@ -51,8 +51,8 @@
     <WixVariable Id="NetFx462RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx462RedistId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462RedistDetectCondition)" InstallCondition="!(wix.NetFx462RedistInstallCondition)" Id="$(var.NetFx462RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog">
-        <ExePackagePayload Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx462RedistLink)" ProductName="Microsoft .NET Framework 4.6.2" Description="Microsoft .NET Framework 4.6.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Hash="045F1AB9AC0126D01494F933EF10DD81B2CC71E1C23A7F2871F06EBAE7A0538467A21ADB461FBFB5EB394BF80A850FF4DCA5EEFDEC17CC3714082018ED372F7A" Size="62000832" Version="4.6.1590.0" />
+      <ExePackage CacheId="$(var.NetFx462RedistId)_ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462RedistDetectCondition)" InstallCondition="!(wix.NetFx462RedistInstallCondition)" Id="$(var.NetFx462RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog">
+        <ExePackagePayload Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx462RedistLink)" ProductName="Microsoft .NET Framework 4.6.2" Description="Microsoft .NET Framework 4.6.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Size="62000832" Version="4.6.1590.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>

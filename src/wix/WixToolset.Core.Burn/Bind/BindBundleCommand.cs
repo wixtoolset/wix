@@ -189,7 +189,7 @@ namespace WixToolset.Core.Burn
 
                     case WixBundlePackageType.Exe:
                     {
-                        var command = new ProcessExePackageCommand(facade, payloadSymbols);
+                        var command = new ProcessExePackageCommand(this.Messaging, facade, payloadSymbols);
                         command.Execute();
                     }
                     break;
@@ -210,7 +210,7 @@ namespace WixToolset.Core.Burn
 
                     case WixBundlePackageType.Msu:
                     {
-                        var command = new ProcessMsuPackageCommand(facade, payloadSymbols);
+                        var command = new ProcessMsuPackageCommand(this.Messaging, facade, payloadSymbols);
                         command.Execute();
                     }
                     break;
