@@ -14,6 +14,16 @@ namespace WixToolset.Core.WindowsInstaller
             return Message(sourceLineNumbers, Ids.CannotLoadWixoutAsTransform, "Could not load wixout file as a transform{1}", additionalDetail);
         }
 
+        internal static Message ExceededMaximumAllowedComponentsInMsi(int maximumAllowedComponentsInMsi, int componentCount)
+        {
+            return Message(null, Ids.ExceededMaximumAllowedComponentsInMsi, "Maximum number of Components allowed in an MSI was exceeded. An MSI cannot contain more than {0} Components. The MSI contains {1} Components.", maximumAllowedComponentsInMsi, componentCount);
+        }
+
+        internal static Message ExceededMaximumAllowedFeatureDepthInMsi(SourceLineNumber sourceLineNumbers, int maximumAllowedFeatureDepthInMsi, string featureId, int featureDepth)
+        {
+            return Message(sourceLineNumbers, Ids.ExceededMaximumAllowedFeatureDepthInMsi, "Maximum depth of the Feature tree allowed in an MSI was exceeded. An MSI does not support a Feature tree with depth greater than {0}. The Feature '{1}' is at depth {2}.", maximumAllowedFeatureDepthInMsi, featureId, featureDepth);
+        }
+
         public static Message InvalidModuleVersion(SourceLineNumber originalLineNumber, string version)
         {
             return Message(originalLineNumber, Ids.InvalidModuleVersion, "The Module/@Version was not be able to be used as a four-part version. A valid four-part version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", version);
@@ -28,6 +38,8 @@ namespace WixToolset.Core.WindowsInstaller
         {
             CannotLoadWixoutAsTransform = 7500,
             InvalidModuleVersion = 7501,
+            ExceededMaximumAllowedComponentsInMsi = 7502,
+            ExceededMaximumAllowedFeatureDepthInMsi = 7503,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }

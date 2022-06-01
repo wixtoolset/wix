@@ -1,0 +1,50 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="PackageWithExcessiveFeatureDepth" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="12E4699F-E774-4D05-8A01-5BDD41BBA127">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <Feature Id="Depth1">
+            <Feature Id="Depth2">
+                <Feature Id="Depth3">
+                    <Feature Id="Depth4">
+                        <Feature Id="Depth5">
+                            <Feature Id="Depth6">
+                                <Feature Id="Depth7">
+                                    <Feature Id="Depth8">
+                                        <Feature Id="Depth9">
+                                            <Feature Id="Depth10">
+                                                <Feature Id="Depth11">
+                                                    <Feature Id="Depth12">
+                                                        <Feature Id="Depth13">
+                                                            <Feature Id="Depth14">
+                                                                <Feature Id="Depth15">
+                                                                    <Feature Id="Depth16">
+                                                                        <Feature Id="Depth17">
+                                                                            <Component Directory="INSTALLFOLDER">
+                                                                                <File Source="test.txt" />
+                                                                            </Component>
+                                                                        </Feature>
+                                                                    </Feature>
+                                                                </Feature>
+                                                            </Feature>
+                                                        </Feature>
+                                                    </Feature>
+                                                </Feature>
+                                            </Feature>
+                                        </Feature>
+                                    </Feature>
+                                </Feature>
+                            </Feature>
+                        </Feature>
+                    </Feature>
+                </Feature>
+            </Feature>
+        </Feature>
+    </Package>
+
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFiles6432Folder">
+            <Directory Id="INSTALLFOLDER" Name="PackageMissingFeatureComponentMapping" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>
