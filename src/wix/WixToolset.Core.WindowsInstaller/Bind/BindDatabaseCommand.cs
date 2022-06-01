@@ -345,6 +345,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
+            if (SectionType.Product == section.Type)
+            {
+                var command = new ValidateWindowsInstallerProductConstraints(this.Messaging, section);
+                command.Execute();
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+            }
+
             // Set generated component guids and validate all guids.
             {
                 var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);

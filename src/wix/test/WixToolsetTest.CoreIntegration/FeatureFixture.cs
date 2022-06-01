@@ -32,11 +32,44 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath
                 });
 
+                Assert.Equal(267, result.ExitCode);
+
                 var errors = result.Messages.Where(m => m.Level == MessageLevel.Error);
                 Assert.Equal(new[]
                 {
                     267
                 }, errors.Select(e => e.Id).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CannotBuildMsiWithTooLargeFeatureDepth()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Feature", "PackageWithExcessiveFeatureDepth.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                Assert.Equal(7503, result.ExitCode);
+
+                var errors = result.Messages.Where(m => m.Level == MessageLevel.Error);
+                Assert.Equal(new[]
+                {
+                    7503
+                }, errors.Select(e => e.Id).ToArray());
+                Assert.Equal("Maximum depth of the Feature tree allowed in an MSI was exceeded. An MSI does not support a Feature tree with depth greater than 16. The Feature 'Depth17' is at depth 17.", errors.Single().ToString());
             }
         }
     }
