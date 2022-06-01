@@ -29,8 +29,8 @@
     <WixVariable Id="NetFx48WebPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx48WebId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx48WebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx48WebDetectCondition)" InstallCondition="!(wix.NetFx48WebInstallCondition)" Id="$(var.NetFx48WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx48WebLog" Cache="remove">
-        <ExePackagePayload Name="!(wix.NetFx48WebPackageDirectory)ndp48-web.exe" DownloadUrl="$(var.NetFx48WebLink)" ProductName="Microsoft .NET Framework 4.8" Description="Microsoft .NET Framework 4.8 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Hash="642721C60D52051C7F3434D8710FE3406A7CFE10B2B39E90EA847719ED1697D7C614F2DF44AD50412B1DF8C98DD78FDC57CA1D047D28C81AC158092E5FB18040" Size="1439328" Version="4.8.4115.0" />
+      <ExePackage CacheId="$(var.NetFx48WebId)_ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" InstallArguments="/q /norestart /log &quot;[NetFx48WebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx48WebDetectCondition)" InstallCondition="!(wix.NetFx48WebInstallCondition)" Id="$(var.NetFx48WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx48WebLog" Cache="remove">
+        <ExePackagePayload Name="!(wix.NetFx48WebPackageDirectory)ndp48-web.exe" DownloadUrl="$(var.NetFx48WebLink)" ProductName="Microsoft .NET Framework 4.8" Description="Microsoft .NET Framework 4.8 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Size="1439328" Version="4.8.4115.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
@@ -51,8 +51,8 @@
     <WixVariable Id="NetFx48RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx48RedistId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx48RedistLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx48RedistDetectCondition)" InstallCondition="!(wix.NetFx48RedistInstallCondition)" Id="$(var.NetFx48RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx48RedistLog" Cache="remove">
-        <ExePackagePayload Name="!(wix.NetFx48RedistPackageDirectory)ndp48-x86-x64-allos-enu.exe" DownloadUrl="$(var.NetFx48RedistLink)" ProductName="Microsoft .NET Framework 4.8" Description="Microsoft .NET Framework 4.8 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Hash="FFB6C226AF4E5C8FFA7210D5115701883ABF12A8B1CBAE6E08122FB94DD93763468BFF5B00060EABEF19C147B0A4D8063DDE318D2B928CE397C58F7949736C5F" Size="121307088" Version="4.8.4115.0" />
+      <ExePackage CacheId="$(var.NetFx48RedistId)_ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" InstallArguments="/q /norestart /log &quot;[NetFx48RedistLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx48RedistDetectCondition)" InstallCondition="!(wix.NetFx48RedistInstallCondition)" Id="$(var.NetFx48RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx48RedistLog" Cache="remove">
+        <ExePackagePayload Name="!(wix.NetFx48RedistPackageDirectory)ndp48-x86-x64-allos-enu.exe" DownloadUrl="$(var.NetFx48RedistLink)" ProductName="Microsoft .NET Framework 4.8" Description="Microsoft .NET Framework 4.8 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Size="121307088" Version="4.8.4115.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>

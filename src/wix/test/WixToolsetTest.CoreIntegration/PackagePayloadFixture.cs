@@ -336,8 +336,9 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[]
                 {
                     "The ExePackagePayload/@CertificatePublicKey attribute was not found; it is required when attribute CertificateThumbprint is specified.",
+                    "The ExePackagePayload/@Hash attribute cannot be specified when attribute CertificateThumbprint is present."
                 }, result.Messages.Select(m => m.ToString()).ToArray());
-                Assert.Equal(10, result.ExitCode);
+                Assert.Equal(35, result.ExitCode);
             }
         }
 

@@ -145,18 +145,11 @@ namespace WixToolset.Core
                         this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "SourceFile"));
                     }
 
-                    if (!this.Size.HasValue)
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "SourceFile"));
-                    }
-
-                    if (String.IsNullOrEmpty(this.Hash))
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
-                    }
-
+                    // If remote payload is being verified by a certificate.
                     if (!String.IsNullOrEmpty(this.CertificatePublicKey) || !String.IsNullOrEmpty(this.CertificateThumbprint))
                     {
+                        var oneOfCertificateAttributeNames = !String.IsNullOrEmpty(this.CertificatePublicKey) ? "CertificatePublicKey" : "CertificateThumbprint";
+
                         if (String.IsNullOrEmpty(this.CertificateThumbprint))
                         {
                             this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "CertificateThumbprint", "CertificatePublicKey"));
@@ -164,6 +157,23 @@ namespace WixToolset.Core
                         else if (String.IsNullOrEmpty(this.CertificatePublicKey))
                         {
                             this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "CertificatePublicKey", "CertificateThumbprint"));
+                        }
+
+                        if (!String.IsNullOrEmpty(this.Hash))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", oneOfCertificateAttributeNames));
+                        }
+                    }
+                    else // payload is being verified by hash.
+                    {
+                        if (String.IsNullOrEmpty(this.Hash))
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
+                        }
+
+                        if (!this.Size.HasValue)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "SourceFile"));
                         }
                     }
 

@@ -3,7 +3,7 @@
     <Fragment>
         <PackageGroup Id="BundlePackages">
             <ExePackage Id="SpecifiedSourceFileAndHash" Permanent="yes" DetectCondition="none">
-                <ExePackagePayload CertificatePublicKey="abcd" Hash="123" DownloadUrl="https://example.com/" Name="fake.exe" Size="100" />
+                <ExePackagePayload CertificatePublicKey="abcd" DownloadUrl="https://example.com/" Name="fake.exe" Size="100" />
             </ExePackage>
         </PackageGroup>
     </Fragment>
