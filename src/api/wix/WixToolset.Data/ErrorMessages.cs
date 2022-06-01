@@ -70,7 +70,7 @@ namespace WixToolset.Data
 
         public static Message BothUpgradeCodesRequired()
         {
-            return Message(null, Ids.BothUpgradeCodesRequired, "Both the target and updated product authoring must define the Product/@UpgradeCode attribute if the transform validates the UpgradeCode (default). Either define the Product/@UpgradeCode attribute in both the target and updated authoring, or set the Validate/@UpgradeCode attribute to 'no' in the patch authoring.");
+            return Message(null, Ids.BothUpgradeCodesRequired, "Both the target and updated package authoring must define the Package/@UpgradeCode attribute if the transform validates the UpgradeCode (default). Either define the Package/@UpgradeCode attribute in both the target and updated authoring, or set the Validate/@UpgradeCode attribute to 'no' in the patch authoring.");
         }
 
         public static Message BundleTooNew(string bundleExecutable, long bundleVersion)
@@ -886,12 +886,12 @@ namespace WixToolset.Data
 
         public static Message IllegalCodepage(int codepage)
         {
-            return Message(null, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Product/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+            return Message(null, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
         public static Message IllegalCodepage(SourceLineNumber sourceLineNumbers, int codepage)
         {
-            return Message(sourceLineNumbers, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Product/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+            return Message(sourceLineNumbers, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
         public static Message IllegalCodepageAttribute(SourceLineNumber sourceLineNumbers, string codepage, string elementName, string attributeName)
@@ -1346,7 +1346,7 @@ namespace WixToolset.Data
 
         public static Message InvalidStringForCodepage(SourceLineNumber sourceLineNumbers, string codepage)
         {
-            return Message(sourceLineNumbers, Ids.InvalidStringForCodepage, "A string was provided with characters that are not available in the specified database code page '{0}'. Either change these characters to ones that exist in the database's code page, or update the database's code page by modifying one of the following attributes: Product/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+            return Message(sourceLineNumbers, Ids.InvalidStringForCodepage, "A string was provided with characters that are not available in the specified database code page '{0}'. Either change these characters to ones that exist in the database's code page, or update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
         public static Message InvalidStubExe(string filename)
@@ -1466,7 +1466,7 @@ namespace WixToolset.Data
 
         public static Message MissingEntrySection()
         {
-            return Message(null, Ids.MissingEntrySection, "Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.");
+            return Message(null, Ids.MissingEntrySection, "Could not find entry section in provided list of intermediates. Supported entry section types are: Package, Bundle, Patch, PatchCreation, Module.");
         }
 
         public static Message MissingEntrySection(string sectionType)
@@ -1626,7 +1626,7 @@ namespace WixToolset.Data
 
         public static Message OrphanedComponent(SourceLineNumber sourceLineNumbers, string componentName)
         {
-            return Message(sourceLineNumbers, Ids.OrphanedComponent, "Found orphaned Component '{0}'.  If this is a Product, every Component must have at least one parent Feature.  To include a Component in a Module, you must include it directly as a Component element of the Module element or indirectly via ComponentRef, ComponentGroup, or ComponentGroupRef elements.", componentName);
+            return Message(sourceLineNumbers, Ids.OrphanedComponent, "Found orphaned Component '{0}'.  If this is a Package, every Component must have at least one parent Feature.  To include a Component in a Module, you must include it directly as a Component element of the Module element or indirectly via ComponentRef, ComponentGroup, or ComponentGroupRef elements.", componentName);
         }
 
         public static Message OutputCodepageMismatch(SourceLineNumber sourceLineNumbers, int beforeCodepage, int afterCodepage)
@@ -1746,7 +1746,7 @@ namespace WixToolset.Data
 
         public static Message ProductCodeInvalidForTransform(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.ProductCodeInvalidForTransform, "The value '*' is not valid for the ProductCode when used in a transform or in a patch. Copy the ProductCode from your target product MSI into the Product/@Id attribute value for your product authoring.");
+            return Message(sourceLineNumbers, Ids.ProductCodeInvalidForTransform, "The value '*' is not valid for the ProductCode when used in a transform or in a patch. Copy the ProductCode from your target product MSI into the Package/@Id attribute value for your product authoring.");
         }
 
         public static Message ProgIdNestedTooDeep(SourceLineNumber sourceLineNumbers)
@@ -2226,7 +2226,7 @@ namespace WixToolset.Data
 
         public static Message ValidationFailedToOpenDatabase()
         {
-            return Message(null, Ids.ValidationFailedToOpenDatabase, "Failed to open the database. During validation, this most commonly happens when attempting to open a database using an unsupported code page or a file that is not a valid Windows Installer database. Please use a different code page in Module/@Codepage, Package/@SummaryCodepage, Product/@Codepage, or WixLocalization/@Codepage; or make sure you provide the path to a valid Windows Installer database.");
+            return Message(null, Ids.ValidationFailedToOpenDatabase, "Failed to open the database. During validation, this most commonly happens when attempting to open a database using an unsupported code page or a file that is not a valid Windows Installer database. Please use a different code page in Module/@Codepage, Package/@SummaryCodepage, Package/@Codepage, or WixLocalization/@Codepage; or make sure you provide the path to a valid Windows Installer database.");
         }
 
         public static Message ValueAndMaskMustBeSameLength(SourceLineNumber sourceLineNumbers)

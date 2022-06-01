@@ -82,7 +82,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void MissingEntrySectionDetectedProduct()
+        public void MissingEntrySectionDetectedPackage()
         {
             var folder = TestData.Get(@"TestData\OverridableActions");
 
@@ -133,7 +133,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
                 catch (WixException we)
                 {
-                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
+                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Supported entry section types are: Package, Bundle, Patch, PatchCreation, Module.", we.Message);
                     return;
                 }
 
@@ -163,7 +163,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
                 catch (WixException we)
                 {
-                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
+                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Supported entry section types are: Package, Bundle, Patch, PatchCreation, Module.", we.Message);
                     return;
                 }
 
