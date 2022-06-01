@@ -2329,7 +2329,7 @@ namespace WixToolset.Core
                 rollbackPathVariable = String.Concat("WixBundleRollbackLog_", id.Id);
             }
 
-            if (packageType == WixBundlePackageType.Bundle)
+            if (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Msi)
             {
                 if (permanent == YesNoType.Yes && visible == YesNoType.NotSet)
                 {
