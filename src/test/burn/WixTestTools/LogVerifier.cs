@@ -14,7 +14,7 @@ namespace WixTestTools
     public class LogVerifier
     {
         // Member Variables
-        private string logFile;
+        private readonly string logFile;
 
         /// <summary>
         /// Prevent creation of LogVerifier without log file
@@ -29,12 +29,16 @@ namespace WixTestTools
         public LogVerifier(string fileName)
         {
             if (null == fileName)
+            {
                 throw new ArgumentNullException("fileName");
+            }
 
             if (!File.Exists(fileName))
+            {
                 throw new ArgumentException(String.Format(@"File doesn't exist:{0}", fileName), "fileName");
+            }
 
-            logFile = fileName;
+            this.logFile = fileName;
         }
 
         /// <summary>
@@ -55,8 +59,8 @@ namespace WixTestTools
         /// <returns>True if a match is found, False otherwise.</returns>
         public bool LineByLine(Regex regex)
         {
-            string line = string.Empty;
-            StreamReader sr = new StreamReader(logFile);
+            string line;
+            StreamReader sr = new StreamReader(this.logFile);
 
             // Read from a file stream line by line.
             while ((line = sr.ReadLine()) != null)
@@ -82,7 +86,7 @@ namespace WixTestTools
         /// <returns>True if a match is found, False otherwise.</returns>
         public bool LineByLine(string regex)
         {
-            return LineByLine(new Regex(regex));
+            return this.LineByLine(new Regex(regex));
         }
 
 
@@ -115,7 +119,7 @@ namespace WixTestTools
         /// <returns>The number of matches</returns>
         public int EntireFileAtOnce(string regex)
         {
-            return EntireFileAtOnce(new Regex(regex, RegexOptions.Multiline));
+            return this.EntireFileAtOnce(new Regex(regex, RegexOptions.Multiline));
         }
 
         /// <summary>
@@ -127,9 +131,13 @@ namespace WixTestTools
         public int EntireFileAtOnce(string regex, bool ignoreCase)
         {
             if (!ignoreCase)
-                return EntireFileAtOnce(new Regex(regex, RegexOptions.Multiline));
+            {
+                return this.EntireFileAtOnce(new Regex(regex, RegexOptions.Multiline));
+            }
             else
-                return EntireFileAtOnce(new Regex(regex, RegexOptions.Multiline | RegexOptions.IgnoreCase));
+            {
+                return this.EntireFileAtOnce(new Regex(regex, RegexOptions.Multiline | RegexOptions.IgnoreCase));
+            }
         }
 
         /// <summary>
@@ -139,7 +147,7 @@ namespace WixTestTools
         /// <param name="ignoreCase">Perform case insensitive match</param>
         public void AssertTextInLog(string regex, bool ignoreCase)
         {
-            Assert.True(EntireFileAtOncestr(regex),
+            Assert.True(this.EntireFileAtOncestr(regex),
                 String.Format("The log does not contain a match to the regular expression \"{0}\" ", regex));
         }
 
@@ -150,7 +158,7 @@ namespace WixTestTools
         /// <param name="ignoreCase">Perform case insensitive match</param>
         public void AssertTextInLog(Regex regex, bool ignoreCase)
         {
-            Assert.True(EntireFileAtOnce(regex) >= 1,
+            Assert.True(this.EntireFileAtOnce(regex) >= 1,
                 String.Format("The log does not contain a match to the regular expression \"{0}\" ", regex.ToString()));
         }
 
@@ -161,7 +169,7 @@ namespace WixTestTools
         /// <param name="ignoreCase">Perform case insensitive match</param>
         public void AssertTextInLog(string regex)
         {
-            AssertTextInLog(regex, true);
+            this.AssertTextInLog(regex, true);
         }
 
         /// <summary>
@@ -171,7 +179,7 @@ namespace WixTestTools
         /// <param name="ignoreCase">Perform case insensitive match</param>
         public void AssertTextInLog(Regex regex)
         {
-            AssertTextInLog(regex, true);
+            this.AssertTextInLog(regex, true);
         }
 
 
@@ -182,7 +190,7 @@ namespace WixTestTools
         /// <param name="ignoreCase">Perform case insensitive match</param>
         public void AssertTextNotInLog(Regex regex, bool ignoreCase)
         {
-            Assert.True(EntireFileAtOnce(regex) < 1,
+            Assert.True(this.EntireFileAtOnce(regex) < 1,
                 String.Format("The log contain a match to the regular expression \"{0}\" ", regex.ToString()));
         }
 
@@ -193,7 +201,7 @@ namespace WixTestTools
         /// <param name="ignoreCase">Perform case insensitive match</param>
         public void AssertTextNotInLog(string regex, bool ignoreCase)
         {
-            Assert.False(EntireFileAtOncestr(regex),
+            Assert.False(this.EntireFileAtOncestr(regex),
                 String.Format("The log does not contain a match to the regular expression \"{0}\" ", regex));
         }
 
