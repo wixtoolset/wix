@@ -162,6 +162,25 @@ LExit:
     return hr;
 }
 
+DAPI_(HRESULT) PathConcatRelativeToFullyQualifiedBase(
+    __in LPCWSTR wzBase,
+    __in_opt LPCWSTR wzRelative,
+    __deref_out_z LPWSTR* psczCombined
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!PathIsFullyQualified(wzBase))
+    {
+        PathExitWithRootFailure(hr, E_INVALIDARG, "wzBase must be fully qualified: %ls.", wzBase);
+    }
+
+    hr = PathConcatRelativeToBase(wzBase, wzRelative, psczCombined);
+
+LExit:
+    return hr;
+}
+
 DAPI_(HRESULT) PathCompareCanonicalized(
     __in_z LPCWSTR wzPath1,
     __in_z LPCWSTR wzPath2,

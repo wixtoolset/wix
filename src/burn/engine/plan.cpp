@@ -432,23 +432,27 @@ extern "C" HRESULT PlanLayoutBundle(
 {
     HRESULT hr = S_OK;
     BURN_CACHE_ACTION* pCacheAction = NULL;
+    LPWSTR sczLayoutDirectory = NULL;
     LPWSTR sczExecutablePath = NULL;
 
     // Get the layout directory.
-    hr = VariableGetString(pVariables, BURN_BUNDLE_LAYOUT_DIRECTORY, &pPlan->sczLayoutDirectory);
+    hr = VariableGetString(pVariables, BURN_BUNDLE_LAYOUT_DIRECTORY, &sczLayoutDirectory);
     if (E_NOTFOUND == hr) // if not set, use the current directory as the layout directory.
     {
-        hr = VariableGetString(pVariables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, &pPlan->sczLayoutDirectory);
+        hr = VariableGetString(pVariables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, &sczLayoutDirectory);
         if (E_NOTFOUND == hr) // if not set, use the current directory as the layout directory.
         {
             hr = PathForCurrentProcess(&sczExecutablePath, NULL);
             ExitOnFailure(hr, "Failed to get path for current executing process as layout directory.");
 
-            hr = PathGetDirectory(sczExecutablePath, &pPlan->sczLayoutDirectory);
+            hr = PathGetDirectory(sczExecutablePath, &sczLayoutDirectory);
             ExitOnFailure(hr, "Failed to get executing process as layout directory.");
         }
     }
     ExitOnFailure(hr, "Failed to get bundle layout directory property.");
+
+    hr = PathGetFullPathName(sczLayoutDirectory, &pPlan->sczLayoutDirectory, NULL, NULL);
+    ExitOnFailure(hr, "Failed to ensure layout directory is fully qualified.");
 
     hr = PathBackslashTerminate(&pPlan->sczLayoutDirectory);
     ExitOnFailure(hr, "Failed to ensure layout directory is backslash terminated.");
@@ -478,6 +482,7 @@ extern "C" HRESULT PlanLayoutBundle(
 
 LExit:
     ReleaseStr(sczExecutablePath);
+    ReleaseStr(sczLayoutDirectory);
 
     return hr;
 }

@@ -613,7 +613,7 @@ extern "C" HRESULT MspEngineExecutePackage(
             // Best effort to set the execute package cache folder variable.
             VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
-            hr = PathConcatRelativeToBase(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);
+            hr = PathConcatRelativeToFullyQualifiedBase(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);
             ExitOnFailure(hr, "Failed to build MSP path.");
 
             wzAppend = sczMspPath;

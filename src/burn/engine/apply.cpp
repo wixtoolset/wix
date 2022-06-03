@@ -1371,7 +1371,7 @@ static HRESULT LayoutBundle(
         ExitOnFailure(hr, "Failed to get path to bundle to layout.");
     }
 
-    hr = PathConcatRelativeToBase(pContext->wzLayoutDirectory, wzExecutableName, &sczDestinationPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(pContext->wzLayoutDirectory, wzExecutableName, &sczDestinationPath);
     ExitOnFailure(hr, "Failed to concat layout path for bundle.");
 
     // If the destination path is the currently running bundle, bail.

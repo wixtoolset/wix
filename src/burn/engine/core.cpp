@@ -2211,7 +2211,7 @@ static HRESULT DetectPackagePayloadsCached(
             {
                 BURN_PAYLOAD* pPayload = pPackage->payloads.rgItems[i].pPayload;
 
-                hr = PathConcatRelativeToBase(sczCachePath, pPayload->sczFilePath, &sczPayloadCachePath);
+                hr = PathConcatRelativeToFullyQualifiedBase(sczCachePath, pPayload->sczFilePath, &sczPayloadCachePath);
                 ExitOnFailure(hr, "Failed to concat payload cache path.");
 
                 if (FileExistsEx(sczPayloadCachePath, NULL))

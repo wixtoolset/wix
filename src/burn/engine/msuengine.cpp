@@ -320,7 +320,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
         // Best effort to set the execute package cache folder variable.
         VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
-        hr = PathConcatRelativeToBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczMsuPath);
+        hr = PathConcatRelativeToFullyQualifiedBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczMsuPath);
         ExitOnFailure(hr, "Failed to build MSU path.");
 
         // format command

@@ -780,7 +780,7 @@ static HRESULT ExecuteBundle(
         hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
         ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
-        hr = PathConcatRelativeToBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
+        hr = PathConcatRelativeToFullyQualifiedBase(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
         ExitOnFailure(hr, "Failed to build executable path.");
     }
 
