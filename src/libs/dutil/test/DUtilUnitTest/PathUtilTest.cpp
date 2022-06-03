@@ -800,6 +800,34 @@ namespace DutilTests
         }
 
         [Fact]
+        void PathGetSystemTempPathsTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR* rgsczPaths = NULL;
+            DWORD cPaths = 0;
+            DWORD cPathsOriginal = 0;
+
+            try
+            {
+                hr = PathGetSystemTempPaths(&rgsczPaths, &cPaths);
+                NativeAssert::Succeeded(hr, "PathGetSystemTempPaths failed.");
+
+                Assert::InRange<DWORD>(cPaths, 1, 3);
+                WixAssert::StringEqual(Environment::ExpandEnvironmentVariables("%windir%\\temp\\"), gcnew String(rgsczPaths[cPaths - 1]), true);
+
+                cPathsOriginal = cPaths;
+
+                hr = PathGetSystemTempPaths(&rgsczPaths, &cPaths);
+                NativeAssert::Succeeded(hr, "PathGetSystemTempPaths failed.");
+                Assert::Equal(cPathsOriginal * 2, cPaths);
+            }
+            finally
+            {
+                ReleaseStrArray(rgsczPaths, cPaths);
+            }
+        }
+
+        [Fact]
         void PathNormalizeSlashesFixedTest()
         {
             HRESULT hr = S_OK;

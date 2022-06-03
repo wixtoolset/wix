@@ -97,6 +97,7 @@ extern "C" HRESULT EngineRun(
     LPWSTR sczExePath = NULL;
     BOOL fRunUntrusted = FALSE;
     BOOL fRunNormal = FALSE;
+    BOOL fRunRunOnce = FALSE;
     BOOL fRestart = FALSE;
 
     BURN_ENGINE_STATE engineState = { };
@@ -221,6 +222,8 @@ extern "C" HRESULT EngineRun(
         break;
 
     case BURN_MODE_RUNONCE:
+        fRunRunOnce = TRUE;
+
         hr = RunRunOnce(&engineState, nCmdShow);
         ExitOnFailure(hr, "Failed to run RunOnce mode.");
         break;
@@ -302,6 +305,10 @@ LExit:
     else if (fRunUntrusted)
     {
         LogId(REPORT_STANDARD, MSG_EXITING_CLEAN_ROOM, FAILED(hr) ? (int)hr : *pdwExitCode);
+    }
+    else if (fRunRunOnce)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING_RUN_ONCE, FAILED(hr) ? (int)hr : *pdwExitCode);
     }
 
     if (fLogInitialized)

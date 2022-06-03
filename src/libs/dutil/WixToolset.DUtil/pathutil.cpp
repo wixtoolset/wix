@@ -923,12 +923,14 @@ LExit:
 }
 
 
-DAPI_(HRESULT) PathGetSystemTempPath(
-    __out_z LPWSTR* psczSystemTempPath
+DAPI_(HRESULT) PathGetSystemTempPaths(
+    __inout_z LPWSTR** prgsczSystemTempPaths,
+    __inout DWORD* pcSystemTempPaths
     )
 {
     HRESULT hr = S_OK;
     HKEY hKey = NULL;
+    LPWSTR sczTemp = NULL;
     WCHAR wzTempPath[MAX_PATH + 1] = { };
     DWORD cch = 0;
 
@@ -940,26 +942,36 @@ DAPI_(HRESULT) PathGetSystemTempPath(
 
         // Follow documented precedence rules for TMP/TEMP from ::GetTempPath.
         // TODO: values will be expanded with the current environment variables instead of the system environment variables.
-        hr = RegReadString(hKey, L"TMP", psczSystemTempPath);
+        hr = RegReadString(hKey, L"TMP", &sczTemp);
         if (E_FILENOTFOUND != hr)
         {
             PathExitOnFailure(hr, "Failed to get system TMP value.");
 
-            hr = PathBackslashTerminate(psczSystemTempPath);
+            hr = PathBackslashTerminate(&sczTemp);
             PathExitOnFailure(hr, "Failed to backslash terminate system TMP value.");
 
-            ExitFunction();
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczSystemTempPaths), *pcSystemTempPaths, 1, sizeof(LPWSTR), 3);
+            PathExitOnFailure(hr, "Failed to ensure array size for system TMP value.");
+
+            (*prgsczSystemTempPaths)[*pcSystemTempPaths] = sczTemp;
+            sczTemp = NULL;
+            *pcSystemTempPaths += 1;
         }
 
-        hr = RegReadString(hKey, L"TEMP", psczSystemTempPath);
+        hr = RegReadString(hKey, L"TEMP", &sczTemp);
         if (E_FILENOTFOUND != hr)
         {
             PathExitOnFailure(hr, "Failed to get system TEMP value.");
 
-            hr = PathBackslashTerminate(psczSystemTempPath);
+            hr = PathBackslashTerminate(&sczTemp);
             PathExitOnFailure(hr, "Failed to backslash terminate system TEMP value.");
 
-            ExitFunction();
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczSystemTempPaths), *pcSystemTempPaths, 1, sizeof(LPWSTR), 2);
+            PathExitOnFailure(hr, "Failed to ensure array size for system TEMP value.");
+
+            (*prgsczSystemTempPaths)[*pcSystemTempPaths] = sczTemp;
+            sczTemp = NULL;
+            *pcSystemTempPaths += 1;
         }
     }
 
@@ -973,11 +985,19 @@ DAPI_(HRESULT) PathGetSystemTempPath(
         PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Windows directory path too long.");
     }
 
-    hr = PathConcat(wzTempPath, L"TEMP\\", psczSystemTempPath);
+    hr = PathConcat(wzTempPath, L"TEMP\\", &sczTemp);
     PathExitOnFailure(hr, "Failed to concat Temp directory on Windows directory path.");
+
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczSystemTempPaths), *pcSystemTempPaths, 1, sizeof(LPWSTR), 1);
+    PathExitOnFailure(hr, "Failed to ensure array size for Windows\\TEMP value.");
+
+    (*prgsczSystemTempPaths)[*pcSystemTempPaths] = sczTemp;
+    sczTemp = NULL;
+    *pcSystemTempPaths += 1;
 
 LExit:
     ReleaseRegKey(hKey);
+    ReleaseStr(sczTemp);
 
     return hr;
 }

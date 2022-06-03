@@ -205,11 +205,12 @@ DAPI_(HRESULT) PathGetTempPath(
     );
 
 /*******************************************************************
- PathGetSystemTempPath - returns the path to the system temp folder
-    that is backslash terminated.
+ PathGetSystemTempPaths - returns the paths to system temp folders
+    that are backslash terminated with higher preference first.
 *******************************************************************/
-DAPI_(HRESULT) PathGetSystemTempPath(
-    __out_z LPWSTR* psczSystemTempPath
+DAPI_(HRESULT) PathGetSystemTempPaths(
+    __inout_z LPWSTR** prgsczSystemTempPaths,
+    __inout DWORD* pcSystemTempPaths
     );
 
 /*******************************************************************
