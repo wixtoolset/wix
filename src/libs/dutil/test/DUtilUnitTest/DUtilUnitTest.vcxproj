@@ -61,6 +61,7 @@
       <!-- Warnings from referencing netstandard dlls -->
       <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="RegUtilTest.cpp" />
     <ClCompile Include="SceUtilTest.cpp" Condition=" Exists('$(SqlCESdkIncludePath)') " />
     <ClCompile Include="StrUtilTest.cpp" />
     <ClCompile Include="UriUtilTest.cpp" />

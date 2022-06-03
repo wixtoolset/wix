@@ -99,6 +99,15 @@ typedef LSTATUS (APIENTRY *PFN_REGDELETEVALUEW)(
     __in HKEY hKey,
     __in_opt LPCWSTR lpValueName
     );
+typedef LSTATUS(APIENTRY *PFN_REGGETVALUEW)(
+    __in HKEY hkey,
+    __in_opt LPCWSTR lpSubKey,
+    __in_opt LPCWSTR lpValue,
+    __in DWORD dwFlags,
+    __out_opt LPDWORD pdwType,
+    __out_bcount_part_opt(*pcbData, *pcbData) __out_data_source(REGISTRY) PVOID pvData,
+    __inout_opt LPDWORD pcbData
+    );
 
 /********************************************************************
  RegInitialize - initializes regutil
@@ -126,8 +135,16 @@ void DAPI RegFunctionOverride(
     __in_opt PFN_REGQUERYINFOKEYW pfnRegQueryInfoKeyW,
     __in_opt PFN_REGQUERYVALUEEXW pfnRegQueryValueExW,
     __in_opt PFN_REGSETVALUEEXW pfnRegSetValueExW,
-    __in_opt PFN_REGDELETEVALUEW pfnRegDeleteValueW
+    __in_opt PFN_REGDELETEVALUEW pfnRegDeleteValueW,
+    __in_opt PFN_REGGETVALUEW pfnRegGetValueW
     );
+
+/********************************************************************
+ RegFunctionForceFallback - ignore functions only available in newer versions of Windows.
+                            Typically used for unit testing.
+
+*********************************************************************/
+void DAPI RegFunctionForceFallback();
 
 /********************************************************************
  RegCreate - creates a registry key.
@@ -220,6 +237,20 @@ HRESULT DAPI RegGetType(
      );
 
 /********************************************************************
+ RegReadBinary - reads a registry key value.
+     If fExpand is TRUE and the value is REG_EXPAND_SZ then it will be expanded.
+ NOTE: caller is responsible for freeing *ppbBuffer
+*********************************************************************/
+HRESULT DAPI RegReadValue(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __in BOOL fExpand,
+    __deref_out_bcount_opt(*pcbBuffer) BYTE** ppbBuffer,
+    __inout SIZE_T* pcbBuffer,
+    __out DWORD* pdwType
+    );
+
+/********************************************************************
  RegReadBinary - reads a registry key binary value.
  NOTE: caller is responsible for freeing *ppbBuffer
 *********************************************************************/
@@ -237,6 +268,17 @@ HRESULT DAPI RegReadBinary(
 HRESULT DAPI RegReadString(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
+    __deref_out_z LPWSTR* psczValue
+    );
+
+/********************************************************************
+ RegReadUnexpandedString - reads a registry key value as a string without expanding it.
+
+*********************************************************************/
+HRESULT DAPI RegReadUnexpandedString(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __inout BOOL* pfNeedsExpansion,
     __deref_out_z LPWSTR* psczValue
     );
 

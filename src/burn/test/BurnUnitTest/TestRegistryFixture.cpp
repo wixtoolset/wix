@@ -186,7 +186,7 @@ namespace WixBuildTools
         void TestRegistryFixture::SetUp()
         {
             // set mock API's
-            RegFunctionOverride(TestRegistryFixture_RegCreateKeyExW, TestRegistryFixture_RegOpenKeyExW, TestRegistryFixture_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
+            RegFunctionOverride(TestRegistryFixture_RegCreateKeyExW, TestRegistryFixture_RegOpenKeyExW, TestRegistryFixture_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
             Registry::CurrentUser->CreateSubKey(TEST_REGISTRY_FIXTURE_HKCU_PATH);
             Registry::CurrentUser->CreateSubKey(TEST_REGISTRY_FIXTURE_HKCU32_PATH);
@@ -198,7 +198,7 @@ namespace WixBuildTools
         {
             Registry::CurrentUser->DeleteSubKeyTree(this->rootPath, false);
 
-            RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+            RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         }
 
         String^ TestRegistryFixture::GetDirectHkcuPath(REG_KEY_BITNESS bitness, ... array<String^>^ paths)
