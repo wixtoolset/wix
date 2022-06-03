@@ -66,6 +66,7 @@
       <DisableSpecificWarnings>4091;4458</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="eseutil.cpp" />
+    <ClCompile Include="file2utl.cpp" />
     <ClCompile Include="fileutil.cpp" />
     <ClCompile Include="gdiputil.cpp" />
     <ClCompile Include="guidutil.cpp" />

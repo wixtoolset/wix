@@ -151,6 +151,10 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"\\\\otherdir\\unc.exe", sczCanonicalized);
 
+                hr = PathCanonicalizeForComparison(L"\\??\\UNC\\server\\share\\dir", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\?\\UNC\\server\\share\\dir", sczCanonicalized);
+
                 hr = PathCanonicalizeForComparison(L"\\\\?\\UNC\\server\\share\\..\\..\\otherdir\\unc.exe", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"\\\\?\\UNC\\server\\share\\otherdir\\unc.exe", sczCanonicalized);
@@ -200,6 +204,10 @@ namespace DutilTests
                 NativeAssert::StringEqual(L"C:\\validlongpath.exe", sczCanonicalized);
 
                 hr = PathCanonicalizeForComparison(L"\\\\?\\test\\..\\invalidlongpath.exe", 0, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\?\\invalidlongpath.exe", sczCanonicalized);
+
+                hr = PathCanonicalizeForComparison(L"\\??\\test\\..\\invalidlongpath.exe", 0, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"\\\\?\\invalidlongpath.exe", sczCanonicalized);
 
@@ -255,6 +263,67 @@ namespace DutilTests
                     hr = PathConcat(rgwzPaths[i], rgwzPaths[i + 1], &sczPath);
                     NativeAssert::Succeeded(hr, "PathConcat: {0}, {1}", rgwzPaths[i], rgwzPaths[i + 1]);
                     NativeAssert::StringEqual(rgwzPaths[i + 2], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathCompareCanonicalizeEqualTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            BOOL fEqual = FALSE;
+            LPCWSTR rgwzPaths[14] =
+            {
+                L"C:\\simplepath", L"C:\\simplepath",
+                L"\\\\server\\share\\dir\\dir2\\..\\otherdir\\unc.exe", L"\\\\server\\share\\dir\\otherdir\\unc.exe",
+                L"\\\\server\\share\\..\\..\\otherdir\\unc.exe", L"\\\\server\\share\\otherdir\\unc.exe",
+                L"\\\\?\\UNC\\server\\share\\..\\..\\otherdir\\unc.exe", L"\\\\?\\UNC\\server\\share\\otherdir\\unc.exe",
+                L"C:\\dir\\subdir\\..\\..\\..\\otherdir\\pastroot.exe", L"C:\\otherdir\\pastroot.exe",
+                L"\\\\?\\C:\\dir\\subdir\\..\\..\\..\\otherdir\\pastroot.exe", L"C:\\..\\otherdir\\pastroot.exe",
+                L"\\??\\C:\\dir", L"\\\\?\\C:\\dir",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 2)
+                {
+                    hr = PathCompareCanonicalized(rgwzPaths[i], rgwzPaths[i + 1], &fEqual);
+                    NativeAssert::Succeeded(hr, "PathCompareCanonicalized: {0}, {1}", rgwzPaths[i], rgwzPaths[i + 1]);
+                    Assert::True(fEqual, String::Format("PathCompareCanonicalized: {0}, {1}", gcnew String(rgwzPaths[i]), gcnew String(rgwzPaths[i + 1])));
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathCompareCanonicalizeNotEqualTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            BOOL fEqual = FALSE;
+            LPCWSTR rgwzPaths[8] =
+            {
+                L"C:\\simplepath", L"D:\\simplepath",
+                L"\\\\.\\share\\otherdir\\unc.exe", L"\\\\share\\otherdir\\unc.exe",
+                L"\\\\server\\.\\otherdir\\unc.exe", L"\\\\server\\otherdir\\unc.exe",
+                L"\\\\server\\\\otherdir\\unc.exe", L"\\\\server\\otherdir\\unc.exe",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 2)
+                {
+                    hr = PathCompareCanonicalized(rgwzPaths[i], rgwzPaths[i + 1], &fEqual);
+                    NativeAssert::Succeeded(hr, "PathCompareCanonicalized: {0}, {1}", rgwzPaths[i], rgwzPaths[i + 1]);
+                    Assert::False(fEqual, String::Format("PathCompareCanonicalized: {0}, {1}", gcnew String(rgwzPaths[i]), gcnew String(rgwzPaths[i + 1])));
                 }
             }
             finally

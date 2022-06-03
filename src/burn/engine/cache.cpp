@@ -170,7 +170,7 @@ extern "C" HRESULT CacheInitialize(
 
     HRESULT hr = S_OK;
     LPWSTR sczAppData = NULL;
-    int nCompare = 0;
+    BOOL fPathEqual = FALSE;
 
     // Cache paths are initialized once so they cannot be changed while the engine is caching payloads.
     // Always construct the default machine package cache path so we can determine if we're redirected.
@@ -199,10 +199,10 @@ extern "C" HRESULT CacheInitialize(
         ExitOnFailure(hr, "Failed to copy default package cache directory to current package cache directory.");
     }
 
-    hr = PathCompare(pCache->sczDefaultMachinePackageCache, pCache->sczCurrentMachinePackageCache, &nCompare);
+    hr = PathCompareCanonicalized(pCache->sczDefaultMachinePackageCache, pCache->sczCurrentMachinePackageCache, &fPathEqual);
     ExitOnFailure(hr, "Failed to compare default and current package cache directories.");
 
-    pCache->fCustomMachinePackageCache = CSTR_EQUAL != nCompare;
+    pCache->fCustomMachinePackageCache = !fPathEqual;
 
 
     hr = PathGetKnownFolder(CSIDL_LOCAL_APPDATA, &sczAppData);
@@ -241,7 +241,7 @@ extern "C" HRESULT CacheInitializeSources(
     LPWSTR sczCompletedPath = NULL;
     LPWSTR sczOriginalSource = NULL;
     LPWSTR sczOriginalSourceFolder = NULL;
-    int nCompare = 0;
+    BOOL fPathEqual = FALSE;
     LPCWSTR wzSourceProcessPath = pInternalCommand->sczSourceProcessPath;
 
     hr = PathForCurrentProcess(&sczCurrentPath, NULL);
@@ -254,10 +254,10 @@ extern "C" HRESULT CacheInitializeSources(
     hr = PathConcatRelativeToBase(sczCompletedFolder, pRegistration->sczExecutableName, &sczCompletedPath);
     ExitOnFailure(hr, "Failed to combine working path with engine file name.");
 
-    hr = PathCompare(sczCurrentPath, sczCompletedPath, &nCompare);
+    hr = PathCompareCanonicalized(sczCurrentPath, sczCompletedPath, &fPathEqual);
     ExitOnFailure(hr, "Failed to compare current path for bundle: %ls", sczCurrentPath);
 
-    pCache->fRunningFromCache = (CSTR_EQUAL == nCompare);
+    pCache->fRunningFromCache = fPathEqual;
 
     // If a source process path was not provided (e.g. we are not being
     // run in a clean room) then use the current process path as the
@@ -959,7 +959,7 @@ extern "C" HRESULT CacheCompleteBundle(
     )
 {
     HRESULT hr = S_OK;
-    int nCompare = 0;
+    BOOL fPathEqual = FALSE;
     LPWSTR sczTargetDirectory = NULL;
     LPWSTR sczTargetPath = NULL;
     LPWSTR sczSourceDirectory = NULL;
@@ -976,10 +976,10 @@ extern "C" HRESULT CacheCompleteBundle(
 
     // If the bundle is running out of the package cache then we don't need to copy it there
     // (and don't want to since it'll be in use) so bail.
-    hr = PathCompare(wzSourceBundlePath, sczTargetPath, &nCompare);
+    hr = PathCompareCanonicalized(wzSourceBundlePath, sczTargetPath, &fPathEqual);
     ExitOnFailure(hr, "Failed to compare completed cache path for bundle: %ls", wzSourceBundlePath);
 
-    if (CSTR_EQUAL == nCompare)
+    if (fPathEqual)
     {
         ExitFunction();
     }

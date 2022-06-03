@@ -69,6 +69,9 @@
     <ClCompile Include="eseutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="file2utl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="fileutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
