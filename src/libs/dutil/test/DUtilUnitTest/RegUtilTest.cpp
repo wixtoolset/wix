@@ -208,6 +208,49 @@ namespace DutilTests
         }
 
         [Fact]
+        void RegUtilExpandLongStringValueTest()
+        {
+            this->ExpandLongStringValueTest();
+        }
+
+        [Fact]
+        void RegUtilExpandLongStringValueFallbackTest()
+        {
+            RegFunctionForceFallback();
+            this->ExpandLongStringValueTest();
+        }
+
+        void ExpandLongStringValueTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczValue = NULL;
+            LPCWSTR wzValue = L"%TEMP%;%PATH%;C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789";
+            String^ expandedValue = Environment::ExpandEnvironmentVariables(gcnew String(wzValue));
+
+            try
+            {
+                this->CreateBaseKey();
+
+                hr = RegWriteExpandString(hkBase, L"ExpandString", wzValue);
+                NativeAssert::Succeeded(hr, "Failed to write expand string value.");
+
+                hr = RegReadString(hkBase, L"ExpandString", &sczValue);
+                NativeAssert::Succeeded(hr, "Failed to read expand string value.");
+                WixAssert::StringEqual(expandedValue, gcnew String(sczValue), false);
+
+                ReleaseNullStr(sczValue);
+
+                hr = RegReadString(hkBase, L"ExpandString", &sczValue);
+                NativeAssert::Succeeded(hr, "Failed to read expand string value.");
+                WixAssert::StringEqual(expandedValue, gcnew String(sczValue), false);
+            }
+            finally
+            {
+                ReleaseStr(sczValue);
+            }
+        }
+
+        [Fact]
         void RegUtilNotExpandStringValueTest()
         {
             this->NotExpandStringValueTest();

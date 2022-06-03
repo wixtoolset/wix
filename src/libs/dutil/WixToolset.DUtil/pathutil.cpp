@@ -181,10 +181,8 @@ DAPI_(HRESULT) PathExpand(
     Assert(wzRelativePath);
 
     HRESULT hr = S_OK;
-    DWORD cch = 0;
     LPWSTR sczExpandedPath = NULL;
     SIZE_T cchWritten = 0;
-    DWORD cchExpandedPath = 0;
     LPWSTR sczFullPath = NULL;
     DWORD dwPrefixFlags = 0;
 
@@ -193,35 +191,8 @@ DAPI_(HRESULT) PathExpand(
     //
     if (dwResolveFlags & PATH_EXPAND_ENVIRONMENT)
     {
-        cchExpandedPath = PATH_GOOD_ENOUGH;
-
-        hr = StrAlloc(&sczExpandedPath, cchExpandedPath);
-        PathExitOnFailure(hr, "Failed to allocate space for expanded path.");
-
-        cch = ::ExpandEnvironmentStringsW(wzRelativePath, sczExpandedPath, cchExpandedPath);
-        if (0 == cch)
-        {
-            PathExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
-        }
-        else if (cchExpandedPath < cch)
-        {
-            cchExpandedPath = cch;
-            hr = StrAlloc(&sczExpandedPath, cchExpandedPath);
-            PathExitOnFailure(hr, "Failed to re-allocate more space for expanded path.");
-
-            cch = ::ExpandEnvironmentStringsW(wzRelativePath, sczExpandedPath, cchExpandedPath);
-            if (0 == cch)
-            {
-                PathExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
-            }
-            else if (cchExpandedPath < cch)
-            {
-                hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-                PathExitOnRootFailure(hr, "Failed to allocate buffer for expanded path.");
-            }
-        }
-
-        cchWritten = cch;
+        hr = EnvExpandEnvironmentStrings(wzRelativePath, &sczExpandedPath, &cchWritten);
+        PathExitOnFailure(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
     }
 
     //

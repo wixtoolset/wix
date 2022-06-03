@@ -52,6 +52,7 @@
 #include "cabutil.h"
 #include "conutil.h"
 #include "cryputil.h"
+#include "envutil.h"
 #include "eseutil.h"
 #include "dirutil.h"
 #include "dlutil.h"
