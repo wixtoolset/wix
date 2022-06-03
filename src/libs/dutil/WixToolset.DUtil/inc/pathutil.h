@@ -299,6 +299,16 @@ DAPI_(HRESULT) PathConcatRelativeToBase(
     );
 
 /*******************************************************************
+ PathConcatRelativeToFullyQualifiedBase - ensures the base path is
+    fully qualified and then calls PathConcatRelativeToBase.
+*******************************************************************/
+DAPI_(HRESULT) PathConcatRelativeToFullyQualifiedBase(
+    __in LPCWSTR wzBase,
+    __in_opt LPCWSTR wzRelative,
+    __deref_out_z LPWSTR* psczCombined
+    );
+
+/*******************************************************************
  PathCompareCanonicalized - canonicalizes the two paths using PathCanonicalizeForComparison
     which does not resolve relative paths into fully qualified paths.
     The strings are then compared using ::CompareStringW().

@@ -188,13 +188,18 @@ extern "C" HRESULT CacheInitialize(
     hr = PolcReadString(POLICY_BURN_REGISTRY_PATH, L"PackageCache", NULL, &pCache->sczCurrentMachinePackageCache);
     ExitOnFailure(hr, "Failed to read PackageCache policy directory.");
 
-    if (pCache->sczCurrentMachinePackageCache)
+    if (pCache->sczCurrentMachinePackageCache && PathIsFullyQualified(pCache->sczCurrentMachinePackageCache))
     {
         hr = PathBackslashTerminate(&pCache->sczCurrentMachinePackageCache);
         ExitOnFailure(hr, "Failed to backslash terminate redirected per-machine package cache directory name.");
     }
     else
     {
+        if (pCache->sczCurrentMachinePackageCache)
+        {
+            LogErrorId(E_INVALIDARG, MSG_INVALID_POLICY_MACHINE_PACKAGE_CACHE, pCache->sczCurrentMachinePackageCache, NULL, NULL);
+        }
+
         hr = StrAllocString(&pCache->sczCurrentMachinePackageCache, pCache->sczDefaultMachinePackageCache, 0);
         ExitOnFailure(hr, "Failed to copy default package cache directory to current package cache directory.");
     }
@@ -251,7 +256,7 @@ extern "C" HRESULT CacheInitializeSources(
     hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczId, &sczCompletedFolder);
     ExitOnFailure(hr, "Failed to get completed path for bundle.");
 
-    hr = PathConcatRelativeToBase(sczCompletedFolder, pRegistration->sczExecutableName, &sczCompletedPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczCompletedFolder, pRegistration->sczExecutableName, &sczCompletedPath);
     ExitOnFailure(hr, "Failed to combine working path with engine file name.");
 
     hr = PathCompareCanonicalized(sczCurrentPath, sczCompletedPath, &fPathEqual);
@@ -342,15 +347,16 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
     {
         for (DWORD i = 0; i < pCache->cPotentialBaseWorkingFolders; ++i)
         {
-            hr = PathConcatRelativeToBase(pCache->rgsczPotentialBaseWorkingFolders[i], pCache->wzGuid, &sczPotential);
-            ExitOnFailure(hr, "Failed to append random guid on to potential path for working folder.");
-
-            hr = DirEnsureExists(sczPotential, NULL);
+            hr = PathConcatRelativeToFullyQualifiedBase(pCache->rgsczPotentialBaseWorkingFolders[i], pCache->wzGuid, &sczPotential);
             if (SUCCEEDED(hr))
             {
-                pCache->sczBaseWorkingFolder = sczPotential;
-                sczPotential = NULL;
-                break;
+                hr = DirEnsureExists(sczPotential, NULL);
+                if (SUCCEEDED(hr))
+                {
+                    pCache->sczBaseWorkingFolder = sczPotential;
+                    sczPotential = NULL;
+                    break;
+                }
             }
 
             LogErrorId(hr, MSG_INVALID_BASE_WORKING_FOLDER, sczPotential, NULL, NULL);
@@ -414,7 +420,7 @@ extern "C" HRESULT CacheCalculateBundleLayoutWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcatRelativeToBase(pCache->sczAcquisitionFolder, wzBundleId, psczWorkingPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(pCache->sczAcquisitionFolder, wzBundleId, psczWorkingPath);
     ExitOnFailure(hr, "Failed to append bundle id for bundle layout working path.");
 
 LExit:
@@ -431,7 +437,7 @@ extern "C" HRESULT CacheCalculatePayloadWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcatRelativeToBase(pCache->sczAcquisitionFolder, pPayload->sczKey, psczWorkingPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(pCache->sczAcquisitionFolder, pPayload->sczKey, psczWorkingPath);
     ExitOnFailure(hr, "Failed to append Id as payload unverified path.");
 
 LExit:
@@ -448,7 +454,7 @@ extern "C" HRESULT CacheCalculateContainerWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcatRelativeToBase(pCache->sczAcquisitionFolder, pContainer->sczHash, psczWorkingPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(pCache->sczAcquisitionFolder, pContainer->sczHash, psczWorkingPath);
     ExitOnFailure(hr, "Failed to append hash as container unverified path.");
 
 LExit:
@@ -503,7 +509,7 @@ extern "C" HRESULT CacheGetCompletedPath(
     // GetRootPath returns S_FALSE if the package cache is redirected elsewhere.
     fRedirected = S_FALSE == hr;
 
-    hr = PathConcatRelativeToBase(sczRootPath, wzCacheId, &sczCurrentCompletedPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczRootPath, wzCacheId, &sczCurrentCompletedPath);
     ExitOnFailure(hr, "Failed to construct cache path.");
 
     hr = PathBackslashTerminate(&sczCurrentCompletedPath);
@@ -516,7 +522,7 @@ extern "C" HRESULT CacheGetCompletedPath(
         hr = GetRootPath(pCache, fPerMachine, FALSE, &sczRootPath);
         ExitOnFailure(hr, "Failed to get old %hs package cache root directory.", fPerMachine ? "per-machine" : "per-user");
 
-        hr = PathConcatRelativeToBase(sczRootPath, wzCacheId, &sczDefaultCompletedPath);
+        hr = PathConcatRelativeToFullyQualifiedBase(sczRootPath, wzCacheId, &sczDefaultCompletedPath);
         ExitOnFailure(hr, "Failed to construct cache path.");
 
         hr = PathBackslashTerminate(&sczDefaultCompletedPath);
@@ -957,7 +963,7 @@ extern "C" HRESULT CacheLayoutBundle(
     HRESULT hr = S_OK;
     LPWSTR sczTargetPath = NULL;
 
-    hr = PathConcatRelativeToBase(wzLayoutDirectory, wzExecutableName, &sczTargetPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(wzLayoutDirectory, wzExecutableName, &sczTargetPath);
     ExitOnFailure(hr, "Failed to combine completed path with engine file name for layout.");
 
     LogStringLine(REPORT_STANDARD, "Layout bundle from: '%ls' to: '%ls'", wzSourceBundlePath, sczTargetPath);
@@ -992,7 +998,7 @@ extern "C" HRESULT CacheCompleteBundle(
     hr = CreateCompletedPath(pCache, fPerMachine, wzBundleId, NULL, &sczTargetDirectory);
     ExitOnFailure(hr, "Failed to create completed cache path for bundle.");
 
-    hr = PathConcatRelativeToBase(sczTargetDirectory, wzExecutableName, &sczTargetPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczTargetDirectory, wzExecutableName, &sczTargetPath);
     ExitOnFailure(hr, "Failed to combine completed path with engine file name.");
 
     // We can't just use wzExecutablePath because we needed to call CreateCompletedPath to ensure that the destination was secured.
@@ -1045,7 +1051,7 @@ extern "C" HRESULT CacheLayoutContainer(
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
 
-    hr = PathConcatRelativeToBase(wzLayoutDirectory, pContainer->sczFilePath, &sczCachedPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(wzLayoutDirectory, pContainer->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
     hr = VerifyThenTransferContainer(pContainer, sczCachedPath, wzUnverifiedContainerPath, fMove, pfnCacheMessageHandler, pfnProgress, pContext);
@@ -1070,7 +1076,7 @@ extern "C" HRESULT CacheLayoutPayload(
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
 
-    hr = PathConcatRelativeToBase(wzLayoutDirectory, pPayload->sczFilePath, &sczCachedPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(wzLayoutDirectory, pPayload->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
     hr = VerifyThenTransferPayload(pPayload, sczCachedPath, wzUnverifiedPayloadPath, fMove, pfnCacheMessageHandler, pfnProgress, pContext);
@@ -1165,7 +1171,7 @@ extern "C" HRESULT CacheVerifyContainer(
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
 
-    hr = PathConcatRelativeToBase(wzCachedDirectory, pContainer->sczFilePath, &sczCachedPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(wzCachedDirectory, pContainer->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
     hr = VerifyFileAgainstContainer(pContainer, sczCachedPath, TRUE, BURN_CACHE_STEP_HASH_TO_SKIP_ACQUIRE, pfnCacheMessageHandler, pfnProgress, pContext);
@@ -1187,7 +1193,7 @@ extern "C" HRESULT CacheVerifyPayload(
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
 
-    hr = PathConcatRelativeToBase(wzCachedDirectory, pPayload->sczFilePath, &sczCachedPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(wzCachedDirectory, pPayload->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
     hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE, BURN_CACHE_STEP_HASH_TO_SKIP_ACQUIRE, pfnCacheMessageHandler, pfnProgress, pContext);
@@ -1478,7 +1484,7 @@ static HRESULT CalculateWorkingFolders(
     pCache->wzGuid[GUID_STRING_LENGTH - 1] = L'\\';
     pCache->wzGuid[GUID_STRING_LENGTH] = L'\0';
 
-    hr = PathConcatRelativeToBase(sczBaseAcquisitionPath, pCache->wzGuid, &pCache->sczAcquisitionFolder);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczBaseAcquisitionPath, pCache->wzGuid, &pCache->sczAcquisitionFolder);
     ExitOnFailure(hr, "Failed to append random guid on to temp path for acquisition folder.");
 
 LExit:
@@ -1626,7 +1632,7 @@ static HRESULT CreateCompletedPath(
     else
     {
         // Get the cache completed file path.
-        hr = PathConcatRelativeToBase(sczCacheDirectory, wzFilePath, &sczCacheFile);
+        hr = PathConcatRelativeToFullyQualifiedBase(sczCacheDirectory, wzFilePath, &sczCacheFile);
         ExitOnFailure(hr, "Failed to construct cache file.");
 
         // Don't reset permissions here. The payload's package must reset its cache folder when it starts caching.
@@ -1664,7 +1670,7 @@ static HRESULT CreateUnverifiedPath(
         pCache->fUnverifiedCacheFolderCreated = TRUE;
     }
 
-    hr = PathConcatRelativeToBase(sczUnverifiedCacheFolder, wzPayloadId, psczUnverifiedPayloadPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczUnverifiedCacheFolder, wzPayloadId, psczUnverifiedPayloadPath);
     ExitOnFailure(hr, "Failed to concat payload id to unverified folder path.");
 
 LExit:
@@ -2085,13 +2091,13 @@ static HRESULT CopyEngineToWorkingFolder(
     hr = CacheEnsureBaseWorkingFolder(pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working path to copy engine.");
 
-    hr = PathConcatRelativeToBase(sczWorkingFolder, wzWorkingFolderName, &sczTargetDirectory);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczWorkingFolder, wzWorkingFolderName, &sczTargetDirectory);
     ExitOnFailure(hr, "Failed to calculate the bundle working folder target name.");
 
     hr = DirEnsureExists(sczTargetDirectory, NULL);
     ExitOnFailure(hr, "Failed create bundle working folder.");
 
-    hr = PathConcatRelativeToBase(sczTargetDirectory, wzExecutableName, &sczTargetPath);
+    hr = PathConcatRelativeToFullyQualifiedBase(sczTargetDirectory, wzExecutableName, &sczTargetPath);
     ExitOnFailure(hr, "Failed to combine working path with engine file name.");
 
     // Copy the engine without any attached containers to the working path.

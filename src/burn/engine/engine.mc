@@ -163,6 +163,13 @@ Language=English
 Failed to use folder as base working folder: %2!ls!, encountered error: %1!ls!.
 .
 
+MessageId=20
+Severity=Warning
+SymbolicName=MSG_INVALID_POLICY_MACHINE_PACKAGE_CACHE
+Language=English
+Failed to use folder as machine package cache: %2!ls!, encountered error: %1!ls!.
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
