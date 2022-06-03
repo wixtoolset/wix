@@ -117,6 +117,7 @@ extern "C" HRESULT DAPI LogOpen(
 {
     HRESULT hr = S_OK;
     BOOL fEnteredCriticalSection = FALSE;
+    LPWSTR sczCombined = NULL;
     LPWSTR sczLogDirectory = NULL;
 
     ::EnterCriticalSection(&LogUtil_csLog);
@@ -129,8 +130,19 @@ extern "C" HRESULT DAPI LogOpen(
     }
     else
     {
-        hr = PathConcat(wzDirectory, wzLog, &LogUtil_sczLogPath);
+        hr = PathConcat(wzDirectory, wzLog, &sczCombined);
         LoguExitOnFailure(hr, "Failed to combine the log path.");
+
+        if (!PathIsFullyQualified(sczCombined, NULL))
+        {
+            hr = PathExpand(&LogUtil_sczLogPath, sczCombined, PATH_EXPAND_FULLPATH);
+            LoguExitOnFailure(hr, "Failed to expand the log path.");
+        }
+        else
+        {
+            LogUtil_sczLogPath = sczCombined;
+            sczCombined = NULL;
+        }
 
         hr = PathGetDirectory(LogUtil_sczLogPath, &sczLogDirectory);
         LoguExitOnFailure(hr, "Failed to get log directory.");
@@ -176,6 +188,7 @@ LExit:
         ::LeaveCriticalSection(&LogUtil_csLog);
     }
 
+    ReleaseStr(sczCombined);
     ReleaseStr(sczLogDirectory);
 
     return hr;

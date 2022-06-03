@@ -1419,7 +1419,7 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 ++i;
 
-                hr = StrAllocString(&pInternalCommand->sczLogFile, argv[i], 0);
+                hr = PathExpand(&pInternalCommand->sczLogFile, argv[i], PATH_EXPAND_FULLPATH);
                 ExitOnFailure(hr, "Failed to copy log file path.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"?", -1) ||
@@ -1516,7 +1516,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 }
 
                 ++i;
-                hr = StrAllocString(&pInternalCommand->sczOriginalSource, argv[i], 0);
+                hr = PathExpand(&pInternalCommand->sczOriginalSource, argv[i], PATH_EXPAND_FULLPATH);
                 ExitOnFailure(hr, "Failed to copy last used source.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT, -1))
@@ -1547,7 +1547,7 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 ++i;
 
-                hr = StrAllocString(&pInternalCommand->sczLogFile, argv[i], 0);
+                hr = PathExpand(&pInternalCommand->sczLogFile, argv[i], PATH_EXPAND_FULLPATH);
                 ExitOnFailure(hr, "Failed to copy append log file path.");
 
                 pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_APPEND;
@@ -1638,7 +1638,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     }
                     else if (L'\0' != wzParam[1])
                     {
-                        hr = StrAllocString(&pInternalCommand->sczSourceProcessPath, wzParam + 1, 0);
+                        hr = PathExpand(&pInternalCommand->sczSourceProcessPath, wzParam + 1, PATH_EXPAND_FULLPATH);
                         ExitOnFailure(hr, "Failed to copy source process path.");
                     }
                 }
@@ -1807,16 +1807,10 @@ extern "C" HRESULT CoreParseCommandLine(
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Invalid switch: %ls", argv[i]);
                 }
-                else if (L'\0' == wzParam[1])
-                {
-                    // Need to grab the current directory here since this is passed on to other processes.
-                    hr = DirGetCurrent(&pInternalCommand->sczEngineWorkingDirectory);
-                    ExitOnFailure(hr, "Failed to get current directory for custom working directory.");
-                }
                 else
                 {
-                    hr = StrAllocString(&pInternalCommand->sczEngineWorkingDirectory, wzParam + 1, 0);
-                    ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+                    hr = PathExpand(&pInternalCommand->sczEngineWorkingDirectory, wzParam + 1, PATH_EXPAND_FULLPATH);
+                    ExitOnFailure(hr, "Failed to store the custom working directory.");
                 }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)))

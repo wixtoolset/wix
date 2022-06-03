@@ -157,11 +157,12 @@ DAPI_(HRESULT) PathExpand(
     __in DWORD dwResolveFlags
     )
 {
-    Assert(wzRelativePath && *wzRelativePath);
+    Assert(wzRelativePath);
 
     HRESULT hr = S_OK;
     DWORD cch = 0;
     LPWSTR sczExpandedPath = NULL;
+    SIZE_T cchWritten = 0;
     DWORD cchExpandedPath = 0;
     SIZE_T cbSize = 0;
 
@@ -221,37 +222,12 @@ DAPI_(HRESULT) PathExpand(
     //
     if (dwResolveFlags & PATH_EXPAND_FULLPATH)
     {
-        LPWSTR wzFileName = NULL;
         LPCWSTR wzPath = sczExpandedPath ? sczExpandedPath : wzRelativePath;
-        DWORD cchFullPath = max(PATH_GOOD_ENOUGH, cchExpandedPath);
 
-        hr = StrAlloc(&sczFullPath, cchFullPath);
-        PathExitOnFailure(hr, "Failed to allocate space for full path.");
+        hr = PathGetFullPathName(wzPath, &sczFullPath, NULL, &cchWritten);
+        PathExitOnFailure(hr, "Failed to get full path for string: %ls", wzPath);
 
-        cch = ::GetFullPathNameW(wzPath, cchFullPath, sczFullPath, &wzFileName);
-        if (0 == cch)
-        {
-            PathExitWithLastError(hr, "Failed to get full path for string: %ls", wzPath);
-        }
-        else if (cchFullPath < cch)
-        {
-            cchFullPath = cch < MAX_PATH ? cch : cch + 7; // ensure space for "\\?\UNC" prefix if needed
-            hr = StrAlloc(&sczFullPath, cchFullPath);
-            PathExitOnFailure(hr, "Failed to re-allocate more space for full path.");
-
-            cch = ::GetFullPathNameW(wzPath, cchFullPath, sczFullPath, &wzFileName);
-            if (0 == cch)
-            {
-                PathExitWithLastError(hr, "Failed to get full path for string: %ls", wzPath);
-            }
-            else if (cchFullPath < cch)
-            {
-                hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-                PathExitOnRootFailure(hr, "Failed to allocate buffer for full path.");
-            }
-        }
-
-        if (MAX_PATH < cch)
+        if (MAX_PATH < cchWritten)
         {
             hr = PathPrefix(&sczFullPath);
             PathExitOnFailure(hr, "Failed to prefix long path after expanding.");
@@ -263,13 +239,81 @@ DAPI_(HRESULT) PathExpand(
         sczExpandedPath = NULL;
     }
 
-    hr = StrAllocString(psczFullPath, sczFullPath? sczFullPath : wzRelativePath, 0);
+    hr = StrAllocString(psczFullPath, sczFullPath ? sczFullPath : wzRelativePath, 0);
     PathExitOnFailure(hr, "Failed to copy relative path into full path.");
 
 LExit:
     ReleaseStr(sczFullPath);
     ReleaseStr(sczExpandedPath);
 
+    return hr;
+}
+
+
+DAPI_(HRESULT) PathGetFullPathName(
+    __in_z LPCWSTR wzPath,
+    __deref_out_z LPWSTR* psczFullPath,
+    __inout_z_opt LPCWSTR* pwzFileName,
+    __out_opt SIZE_T* pcch
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cchMax = 0;
+    DWORD cchBuffer = 0;
+    DWORD cch = 0;
+    DWORD dwAttempts = 0;
+    const DWORD dwMaxAttempts = 10;
+
+    if (!wzPath || !*wzPath)
+    {
+        hr = DirGetCurrent(psczFullPath, pcch);
+        PathExitOnFailure(hr, "Failed to get current directory.");
+
+        ExitFunction();
+    }
+
+    if (*psczFullPath)
+    {
+        hr = StrMaxLength(*psczFullPath, &cchMax);
+        PathExitOnFailure(hr, "Failed to get max length of input buffer.");
+
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
+    }
+    else
+    {
+        cchBuffer = MAX_PATH + 1;
+
+        hr = StrAlloc(psczFullPath, cchBuffer);
+        PathExitOnFailure(hr, "Failed to allocate space for full path.");
+    }
+
+    for (; dwAttempts < dwMaxAttempts; ++dwAttempts)
+    {
+        cch = ::GetFullPathNameW(wzPath, cchBuffer, *psczFullPath, const_cast<LPWSTR*>(pwzFileName));
+        PathExitOnNullWithLastError(cch, hr, "Failed to get full path for string: %ls", wzPath);
+
+        if (cch < cchBuffer)
+        {
+            break;
+        }
+
+        hr = StrAlloc(psczFullPath, cch);
+        PathExitOnFailure(hr, "Failed to reallocate space for full path.");
+
+        cchBuffer = cch;
+    }
+
+    if (dwMaxAttempts == dwAttempts)
+    {
+        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "GetFullPathNameW results never converged.");
+    }
+
+    if (pcch)
+    {
+        *pcch = cch;
+    }
+
+LExit:
     return hr;
 }
 

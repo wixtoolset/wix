@@ -68,6 +68,16 @@ DAPI_(HRESULT) PathExpand(
     );
 
 /*******************************************************************
+ PathGetFullPathName - wrapper around GetFullPathNameW.
+*******************************************************************/
+DAPI_(HRESULT) PathGetFullPathName(
+    __in_z LPCWSTR wzPath,
+    __deref_out_z LPWSTR* psczFullPath,
+    __inout_z_opt LPCWSTR* pwzFileName,
+    __out_opt SIZE_T* pcch
+    );
+
+/*******************************************************************
  PathPrefix - prefixes a full path with \\?\ or \\?\UNC as
               appropriate.
 ********************************************************************/

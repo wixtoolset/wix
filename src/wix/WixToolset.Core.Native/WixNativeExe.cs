@@ -36,6 +36,7 @@ namespace WixToolset.Core.Native
 
             var wixNativeInfo = new ProcessStartInfo(PathToWixNativeExe, this.commandLine)
             {
+                WorkingDirectory = Environment.CurrentDirectory,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,

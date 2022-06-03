@@ -9,10 +9,10 @@ static void __stdcall CabNamesCallback(__in_z LPWSTR wzFirstCabName, __in_z LPWS
 HRESULT SmartCabCommand(
     __in int argc,
     __in_ecount(argc) LPWSTR argv[]
-)
+    )
 {
     HRESULT hr = E_INVALIDARG;
-    LPCWSTR wzCabPath = NULL;
+    LPWSTR sczCabPath = NULL;
     LPCWSTR wzCabName = NULL;
     LPWSTR sczCabDir = NULL;
     UINT uiFileCount = 0;
@@ -27,11 +27,13 @@ HRESULT SmartCabCommand(
     }
     else
     {
-        wzCabPath = argv[0];
-        wzCabName = PathFile(wzCabPath);
+        hr = PathExpand(&sczCabPath, argv[0], PATH_EXPAND_FULLPATH);
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Could not expand path: %ls", argv[0]);
 
-        hr = PathGetDirectory(wzCabPath, &sczCabDir);
-        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Could not parse directory from path: %ls", wzCabPath);
+        wzCabName = PathFile(sczCabPath);
+
+        hr = PathGetDirectory(sczCabPath, &sczCabDir);
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Could not parse directory from path: %ls", sczCabPath);
 
         if (argc > 1)
         {
@@ -62,7 +64,7 @@ HRESULT SmartCabCommand(
     }
 
     hr = CabCBegin(wzCabName, sczCabDir, uiFileCount, uiMaxSize, uiMaxThresh, ct, &hCab);
-    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to initialize cabinet: %ls", wzCabPath);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to initialize cabinet: %ls", sczCabPath);
 
     if (uiFileCount > 0)
     {
@@ -70,12 +72,12 @@ HRESULT SmartCabCommand(
         ExitOnFailure(hr, "failed to read stdin preamble before smartcabbing");
 
         hr = CompressFiles(hCab);
-        ExitOnFailure(hr, "failed to compress files into cabinet: %ls", wzCabPath);
+        ExitOnFailure(hr, "failed to compress files into cabinet: %ls", sczCabPath);
     }
 
     hr = CabCFinish(hCab, CabNamesCallback);
     hCab = NULL; // once finish is called, the handle is invalid.
-    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to compress cabinet: %ls", wzCabPath);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to compress cabinet: %ls", sczCabPath);
 
 
 LExit:
@@ -84,6 +86,7 @@ LExit:
         CabCCancel(hCab);
     }
     ReleaseStr(sczCabDir);
+    ReleaseStr(sczCabPath);
 
     return hr;
 }
@@ -91,7 +94,7 @@ LExit:
 
 static HRESULT CompressFiles(
     __in HANDLE hCab
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczLine = NULL;
@@ -157,7 +160,7 @@ static void __stdcall CabNamesCallback(
     __in_z LPWSTR wzFirstCabName,
     __in_z LPWSTR wzNewCabName,
     __in_z LPWSTR wzFileToken
-)
+    )
 {
     ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls\t%ls\t%ls", wzFirstCabName, wzNewCabName, wzFileToken);
 }

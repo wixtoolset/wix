@@ -503,7 +503,7 @@ extern "C" HRESULT DAPI CabCFinish(
             }
             else
             {
-                LPCWSTR pwzTemp = FileFromPath(fileInfo.wzSourcePath);
+                LPCWSTR pwzTemp = PathFile(fileInfo.wzSourcePath);
                 hr = StrAnsiAllocString(&pszFileToken, pwzTemp, 0, CP_ACP);
                 CabcExitOnFailure(hr, "failed to convert file name to ANSI: %ls", pwzTemp);
             }
@@ -538,7 +538,7 @@ extern "C" HRESULT DAPI CabCFinish(
             }
             else
             {
-                LPCWSTR pwzTemp = FileFromPath(fileInfo.wzSourcePath);
+                LPCWSTR pwzTemp = PathFile(fileInfo.wzSourcePath);
                 hr = StrAnsiAllocString(&pszFileToken, pwzTemp, 0, CP_ACP);
                 CabcExitOnFailure(hr, "failed to convert duplicate file name to ANSI: %ls", pwzTemp);
             }
@@ -1386,7 +1386,7 @@ static __callback BOOL DIAMONDAPI CabCGetNextCabinet(
     if (pccab->iCab == 1)
     {
         pcd->wzFirstCabinetName[0] = '\0';
-        LPCWSTR pwzCabinetName = FileFromPath(pcd->wzCabinetPath);
+        LPCWSTR pwzCabinetName = PathFile(pcd->wzCabinetPath);
         size_t len = wcsnlen(pwzCabinetName, sizeof(pwzCabinetName));
         if (len > 4)
         {
@@ -1439,7 +1439,7 @@ static __callback BOOL DIAMONDAPI CabCGetNextCabinet(
         else
         {
             LPCWSTR wzSourcePath = pcd->prgFiles[0].pwzSourcePath;
-            pwzFileToken = FileFromPath(wzSourcePath);
+            pwzFileToken = PathFile(wzSourcePath);
         }
 
         // The call back to Binder to Add File Transfer for new Cab and add new Cab to Media table

@@ -84,9 +84,6 @@ extern "C" HRESULT LoggingOpen(
     {
         DWORD cRetry = 0;
 
-        hr = DirGetCurrent(&sczLoggingBaseFolder);
-        ExitOnFailure(hr, "Failed to get current directory.");
-
         // Try pretty hard to open the log file when appending.
         do
         {
@@ -95,7 +92,7 @@ extern "C" HRESULT LoggingOpen(
                 ::Sleep(LOG_OPEN_RETRY_WAIT);
             }
 
-            hr = LogOpen(sczLoggingBaseFolder, pLog->sczPath, NULL, NULL, pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_APPEND, FALSE, &pLog->sczPath);
+            hr = LogOpen(NULL, pLog->sczPath, NULL, NULL, pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_APPEND, FALSE, &pLog->sczPath);
             if (pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_APPEND && HRESULT_FROM_WIN32(ERROR_SHARING_VIOLATION) == hr)
             {
                 ++cRetry;

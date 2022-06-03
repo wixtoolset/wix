@@ -106,7 +106,7 @@ static HANDLE OpenFileWithRetry(
     __in LPCWSTR wzPath,
     __in DWORD dwDesiredAccess,
     __in DWORD dwCreationDisposition
-)
+    )
 {
     HANDLE hFile = INVALID_HANDLE_VALUE;
 
@@ -286,7 +286,7 @@ static HRESULT DAPI CabOperation(
     //
     // split the cabinet full path into directory and filename and convert to multi-byte (ick!)
     //
-    pwz = FileFromPath(sczCabinet);
+    pwz = PathFile(sczCabinet);
     CabExitOnNull(pwz, hr, E_INVALIDARG, "failed to process cabinet path: %ls", wzCabinet);
 
     if (!::WideCharToMultiByte(CP_UTF8, 0, pwz, -1, szCabFile, countof(szCabFile), NULL, NULL))
