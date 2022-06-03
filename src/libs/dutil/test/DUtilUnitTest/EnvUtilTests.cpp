@@ -3,8 +3,10 @@
 #include "precomp.h"
 
 using namespace System;
+using namespace System::Collections;
 using namespace Xunit;
 using namespace WixBuildTools::TestSupport;
+using namespace WixBuildTools::TestSupport::XunitExtensions;
 
 namespace DutilTests
 {
@@ -40,6 +42,49 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to expand long multiple string.");
                 WixAssert::StringEqual(expandedLongMultipleString, gcnew String(sczExpanded), false);
                 NativeAssert::Equal<SIZE_T>(expandedLongMultipleString->Length + 1, cchExpanded);
+            }
+            finally
+            {
+                ReleaseStr(sczExpanded);
+            }
+        }
+
+        [SkippableFact]
+        void EnvExpandEnvironmentStringsForUserTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczExpanded = NULL;
+            SIZE_T cchExpanded = 0;
+            String^ variableName = nullptr;
+            String^ variableValue = nullptr;
+
+            // Find a system environment variable that doesn't have variables in its value;
+            for each (DictionaryEntry^ entry in Environment::GetEnvironmentVariables(EnvironmentVariableTarget::Machine))
+            {
+                variableValue = (String^)entry->Value;
+                if (variableValue->Contains("%"))
+                {
+                    continue;
+                }
+
+                variableName = (String^)entry->Key;
+                break;
+            }
+
+            if (nullptr == variableName)
+            {
+                WixAssert::Skip("No suitable system environment variables");
+            }
+
+            pin_ptr<const wchar_t> wzUnexpanded = PtrToStringChars("%" + variableName + "%_%USERNAME%");
+            String^ expandedValue = variableValue + "_SYSTEM";
+
+            try
+            {
+                hr = EnvExpandEnvironmentStringsForUser(NULL, wzUnexpanded, &sczExpanded, &cchExpanded);
+                NativeAssert::Succeeded(hr, "Failed to expand %ls.", wzUnexpanded);
+                WixAssert::StringEqual(expandedValue, gcnew String(sczExpanded), false);
+                NativeAssert::Equal<SIZE_T>(expandedValue->Length + 1, cchExpanded);
             }
             finally
             {

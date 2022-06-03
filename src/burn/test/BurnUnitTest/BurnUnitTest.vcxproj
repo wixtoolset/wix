@@ -40,7 +40,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>$(ProjectAdditionalIncludeDirectories);$(BurnGeneratedHeaderDirectory);..\..\engine;..\..\..\api\burn\WixToolset.BootstrapperCore.Native\inc;..\..\..\libs\dutil\WixToolset.Dutil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib;engine.res</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;userenv.lib;wininet.lib;wintrust.lib;$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib;engine.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>

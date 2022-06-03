@@ -31,6 +31,7 @@
 #include <certutil.h>
 #include <cryputil.h>
 #include <dirutil.h>
+#include <envutil.h>
 #include <fileutil.h>
 #include <guidutil.h>
 #include <logutil.h>

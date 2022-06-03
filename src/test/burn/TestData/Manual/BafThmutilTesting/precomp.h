@@ -16,12 +16,15 @@
 #include <stdlib.h>
 #include <strsafe.h>
 #include <CommCtrl.h>
+#include <sddl.h>
 
 #include "dutil.h"
 #include "dictutil.h"
 #include "fileutil.h"
 #include "locutil.h"
+#include "memutil.h"
 #include "pathutil.h"
+#include "procutil.h"
 #include "strutil.h"
 #include "thmutil.h"
 #include "regutil.h"

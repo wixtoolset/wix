@@ -246,3 +246,41 @@ LExit:
     ReleaseStr(sczCanonicalizedDirectory);
     return hr;
 }
+
+
+DAPI_(HRESULT) PathSystemWindowsSubdirectory(
+    __in_z_opt LPCWSTR wzSubdirectory,
+    __out_z LPWSTR* psczFullPath
+    )
+{
+    HRESULT hr = S_OK;
+    WCHAR wzTempPath[MAX_PATH + 1] = { };
+    DWORD cch = 0;
+
+    cch = ::GetSystemWindowsDirectoryW(wzTempPath, countof(wzTempPath));
+    if (!cch)
+    {
+        PathExitWithLastError(hr, "Failed to get Windows directory path.");
+    }
+    else if (cch >= countof(wzTempPath))
+    {
+        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Windows directory path too long.");
+    }
+
+    if (wzSubdirectory)
+    {
+        hr = PathConcatRelativeToBase(wzTempPath, wzSubdirectory, psczFullPath);
+        PathExitOnFailure(hr, "Failed to concat subdirectory on Windows directory path.");
+    }
+    else
+    {
+        hr = StrAllocString(psczFullPath, wzTempPath, 0);
+        PathExitOnFailure(hr, "Failed to copy Windows directory path.");
+    }
+
+    hr = PathBackslashTerminate(psczFullPath);
+    PathExitOnFailure(hr, "Failed to terminate Windows directory path with backslash.");
+
+LExit:
+    return hr;
+}

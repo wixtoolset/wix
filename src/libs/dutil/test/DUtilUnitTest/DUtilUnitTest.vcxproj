@@ -40,7 +40,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\..\WixToolset.DUtil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;shlwapi.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;shlwapi.lib;urlmon.lib;userenv.lib;wininet.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,6 +57,7 @@
     <ClCompile Include="MemUtilTest.cpp" />
     <ClCompile Include="MonUtilTest.cpp" />
     <ClCompile Include="PathUtilTest.cpp" />
+    <ClCompile Include="ProcUtilTest.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <!-- Warnings from referencing netstandard dlls -->

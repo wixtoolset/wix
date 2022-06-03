@@ -34,6 +34,20 @@ HRESULT DAPI PolcReadString(
     __deref_out_z LPWSTR* pscz
     );
 
+/********************************************************************
+PolcReadUnexpandedString - reads a string from policy, without expanding it.
+
+NOTE: S_FALSE returned if policy not set.
+NOTE: out is set to default on S_FALSE or any error.
+********************************************************************/
+HRESULT DAPI PolcReadUnexpandedString(
+    __in_z LPCWSTR wzPolicyPath,
+    __in_z LPCWSTR wzPolicyName,
+    __in_z_opt LPCWSTR wzDefault,
+    __inout BOOL* pfNeedsExpansion,
+    __deref_out_z LPWSTR* pscz
+    );
+
 #ifdef __cplusplus
 }
 #endif

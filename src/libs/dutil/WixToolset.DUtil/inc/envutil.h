@@ -16,6 +16,17 @@ HRESULT DAPI EnvExpandEnvironmentStrings(
     __out_opt SIZE_T* pcchExpanded
     );
 
+/********************************************************************
+ EnvExpandEnvironmentStringsForUser - Wrapper for ::ExpandEnvironmentStringsForUser.
+
+ *******************************************************************/
+HRESULT DAPI EnvExpandEnvironmentStringsForUser(
+    __in_opt HANDLE hToken,
+    __in LPCWSTR wzSource,
+    __out LPWSTR* psczExpanded,
+    __out_opt SIZE_T* pcchExpanded
+    );
+
 #ifdef __cplusplus
 }
 #endif

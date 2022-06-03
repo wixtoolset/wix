@@ -16,6 +16,7 @@ extern "C" {
 #define BalExitOnNullSource(d, p, x, e, f, ...) if (NULL == p) { x = e; BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BalExitOnNullWithLastErrorSource(d, p, x, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BalExitWithLastErrorSource(d, x, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BalExitOnWin32ErrorSource(d, e, x, f, ...) if (ERROR_SUCCESS != e) { x = HRESULT_FROM_WIN32(e); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BalExitOnOptionalXmlQueryFailureSource(d, x, b, f, ...) { { if (S_FALSE == x || E_NOTFOUND == x) { b = FALSE; x = S_OK; } else { b = SUCCEEDED(x); } }; BalExitOnRootFailureSource(d, x, f, __VA_ARGS__); }
 #define BalExitOnRequiredXmlQueryFailureSource(d, x, f, ...) { if (S_FALSE == x) { x = E_NOTFOUND; } BalExitOnRootFailureSource(d, x, f, __VA_ARGS__); }
 
@@ -26,6 +27,7 @@ extern "C" {
 #define BalExitOnNull(p, x, e, f, ...) BalExitOnNullSource(DUTIL_SOURCE_DEFAULT, p, x, e, f, __VA_ARGS__)
 #define BalExitOnNullWithLastError(p, x, f, ...) BalExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, f, __VA_ARGS__)
 #define BalExitWithLastError(x, f, ...) BalExitWithLastErrorSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
+#define BalExitOnWin32Error(e, x, f, ...) BalExitOnWin32ErrorSource(DUTIL_SOURCE_DEFAULT, e, x, f, __VA_ARGS__)
 #define BalExitOnOptionalXmlQueryFailure(x, b, f, ...) BalExitOnOptionalXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, b, f, __VA_ARGS__)
 #define BalExitOnRequiredXmlQueryFailure(x, f, ...) BalExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
 

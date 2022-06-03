@@ -18,6 +18,16 @@ HRESULT DAPI ProcElevated(
     __out BOOL* pfElevated
     );
 
+HRESULT DAPI ProcSystem(
+    __in HANDLE hProcess,
+    __out BOOL* pfSystem
+    );
+
+HRESULT DAPI ProcTokenUser(
+    __in HANDLE hProcess,
+    __out TOKEN_USER** ppTokenUser
+    );
+
 HRESULT DAPI ProcWow64(
     __in HANDLE hProcess,
     __out BOOL* pfWow64

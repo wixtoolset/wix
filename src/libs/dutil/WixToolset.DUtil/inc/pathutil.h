@@ -205,6 +205,15 @@ DAPI_(HRESULT) PathGetTempPath(
     );
 
 /*******************************************************************
+ PathSystemWindowsSubdirectory - returns the path to the Windows folder
+    or a subdirectory of that folder that is backslash terminated.
+*******************************************************************/
+DAPI_(HRESULT) PathSystemWindowsSubdirectory(
+    __in_z_opt LPCWSTR wzSubdirectory,
+    __out_z LPWSTR* psczFullPath
+    );
+
+/*******************************************************************
  PathGetSystemTempPaths - returns the paths to system temp folders
     that are backslash terminated with higher preference first.
 *******************************************************************/

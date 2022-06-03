@@ -65,6 +65,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <DisableSpecificWarnings>4091;4458</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="env2util.cpp" />
     <ClCompile Include="envutil.cpp" />
     <ClCompile Include="eseutil.cpp" />
     <ClCompile Include="file2utl.cpp" />
@@ -82,6 +83,7 @@
     <ClCompile Include="monutil.cpp" />
     <ClCompile Include="osutil.cpp" />
     <ClCompile Include="path2utl.cpp" />
+    <ClCompile Include="path3utl.cpp" />
     <ClCompile Include="pathutil.cpp" />
     <ClCompile Include="perfutil.cpp" />
     <ClCompile Include="polcutil.cpp" />
