@@ -258,13 +258,14 @@ DAPI_(HRESULT) PathConcatRelativeToBase(
     );
 
 /*******************************************************************
- PathCompare - compares the fully expanded path of the two paths using
-               ::CompareStringW().
+ PathCompareCanonicalized - canonicalizes the two paths using PathCanonicalizeForComparison
+    which does not resolve relative paths into fully qualified paths.
+    The strings are then compared using ::CompareStringW().
 *******************************************************************/
-DAPI_(HRESULT) PathCompare(
+DAPI_(HRESULT) PathCompareCanonicalized(
     __in_z LPCWSTR wzPath1,
     __in_z LPCWSTR wzPath2,
-    __out int* pnResult
+    __out BOOL* pfEqual
     );
 
 /*******************************************************************

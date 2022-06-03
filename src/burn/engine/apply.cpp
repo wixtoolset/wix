@@ -1350,7 +1350,7 @@ static HRESULT LayoutBundle(
     LPWSTR sczBundlePath = NULL;
     LPWSTR sczBundleDownloadUrl = NULL;
     LPWSTR sczDestinationPath = NULL;
-    int nEquivalentPaths = 0;
+    BOOL fPathEqual = FALSE;
     BOOTSTRAPPER_CACHE_OPERATION cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
     BOOL fRetry = FALSE;
@@ -1375,10 +1375,10 @@ static HRESULT LayoutBundle(
     ExitOnFailure(hr, "Failed to concat layout path for bundle.");
 
     // If the destination path is the currently running bundle, bail.
-    hr = PathCompare(sczBundlePath, sczDestinationPath, &nEquivalentPaths);
+    hr = PathCompareCanonicalized(sczBundlePath, sczDestinationPath, &fPathEqual);
     ExitOnFailure(hr, "Failed to determine if layout bundle path was equivalent with current process path.");
 
-    if (CSTR_EQUAL == nEquivalentPaths && FileExistsEx(sczDestinationPath, NULL))
+    if (fPathEqual && FileExistsEx(sczDestinationPath, NULL))
     {
         hr = UserExperienceOnCacheContainerOrPayloadVerifyBegin(pContext->pUX, NULL, NULL);
         if (FAILED(hr))
@@ -1533,7 +1533,7 @@ static HRESULT AcquireContainerOrPayload(
     AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
 
     HRESULT hr = S_OK;
-    int nEquivalentPaths = 0;
+    BOOL fPathEqual = FALSE;
     LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : NULL;
     LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : NULL;
     LPCWSTR wzPayloadContainerId = pPayload && pPayload->pContainer ? pPayload->pContainer->sczId : NULL;
@@ -1673,10 +1673,10 @@ static HRESULT AcquireContainerOrPayload(
     {
     case BOOTSTRAPPER_CACHE_OPERATION_COPY:
         // If the source path and destination path are different, do the copy (otherwise there's no point).
-        hr = PathCompare(pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath, &nEquivalentPaths);
+        hr = PathCompareCanonicalized(pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath, &fPathEqual);
         ExitOnFailure(hr, "Failed to determine if payload paths were equivalent, source: %ls, destination: %ls.", pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath);
 
-        if (CSTR_EQUAL != nEquivalentPaths)
+        if (!fPathEqual)
         {
             hr = CopyPayload(pProgress, INVALID_HANDLE_VALUE, pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath);
             ExitOnFailure(hr, "Failed to copy payload: %ls", wzPayloadId);

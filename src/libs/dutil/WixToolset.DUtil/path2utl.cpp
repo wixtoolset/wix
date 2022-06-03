@@ -118,11 +118,19 @@ DAPI_(HRESULT) PathCanonicalizeForComparison(
         PathExitOnFailure(hr, "Failed to backslash terminate the canonicalized path");
     }
 
-    if ((PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX & dwCanonicalizeFlags) &&
-        PathIsFullyQualified(*psczCanonicalized, &fHasPrefix) && !fHasPrefix)
+    if (PathIsFullyQualified(*psczCanonicalized, &fHasPrefix) && !fHasPrefix &&
+        (PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX & dwCanonicalizeFlags))
     {
         hr = PathPrefix(psczCanonicalized);
         PathExitOnFailure(hr, "Failed to ensure the long path prefix on the canonicalized path");
+
+        fHasPrefix = TRUE;
+    }
+
+    if (fHasPrefix)
+    {
+        // Canonicalize \??\ into \\?\.
+        (*psczCanonicalized)[1] = L'\\';
     }
 
 LExit:
@@ -168,6 +176,40 @@ DAPI_(HRESULT) PathConcatRelativeToBase(
 LExit:
     ReleaseStr(sczCanonicalizedRelative);
 
+    return hr;
+}
+
+DAPI_(HRESULT) PathCompareCanonicalized(
+    __in_z LPCWSTR wzPath1,
+    __in_z LPCWSTR wzPath2,
+    __out BOOL* pfEqual
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCanonicalized1 = NULL;
+    LPWSTR sczCanonicalized2 = NULL;
+    DWORD dwDefaultFlags = PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX | PATH_CANONICALIZE_KEEP_UNC_ROOT;
+    int nResult = 0;
+
+    if (!wzPath1 || !wzPath2)
+    {
+        PathExitWithRootFailure(hr, E_INVALIDARG, "Both paths are required.");
+    }
+
+    hr = PathCanonicalizeForComparison(wzPath1, dwDefaultFlags, &sczCanonicalized1);
+    PathExitOnFailure(hr, "Failed to canonicalize wzPath1.");
+
+    hr = PathCanonicalizeForComparison(wzPath2, dwDefaultFlags, &sczCanonicalized2);
+    PathExitOnFailure(hr, "Failed to canonicalize wzPath2.");
+
+    nResult = ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczCanonicalized1, -1, sczCanonicalized2, -1);
+    PathExitOnNullWithLastError(nResult, hr, "Failed to compare canonicalized paths.");
+
+    *pfEqual = CSTR_EQUAL == nResult;
+
+LExit:
+    ReleaseStr(sczCanonicalized1);
+    ReleaseStr(sczCanonicalized2);
     return hr;
 }
 

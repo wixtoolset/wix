@@ -1080,32 +1080,6 @@ LExit:
 }
 
 
-DAPI_(HRESULT) PathCompare(
-    __in_z LPCWSTR wzPath1,
-    __in_z LPCWSTR wzPath2,
-    __out int* pnResult
-    )
-{
-    HRESULT hr = S_OK;
-    LPWSTR sczPath1 = NULL;
-    LPWSTR sczPath2 = NULL;
-
-    hr = PathExpand(&sczPath1, wzPath1, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
-    PathExitOnFailure(hr, "Failed to expand path1.");
-
-    hr = PathExpand(&sczPath2, wzPath2, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
-    PathExitOnFailure(hr, "Failed to expand path2.");
-
-    *pnResult = ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczPath1, -1, sczPath2, -1);
-
-LExit:
-    ReleaseStr(sczPath2);
-    ReleaseStr(sczPath1);
-
-    return hr;
-}
-
-
 DAPI_(HRESULT) PathCompress(
     __in_z LPCWSTR wzPath
     )
