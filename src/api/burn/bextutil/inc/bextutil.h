@@ -16,6 +16,7 @@ extern "C" {
 #define BextExitOnNullSource(d, p, x, e, f, ...) if (NULL == p) { x = e; BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BextExitOnNullWithLastErrorSource(d, p, x, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BextExitWithLastErrorSource(d, x, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BextExitOnWin32ErrorSource(d, e, x, f, ...) if (ERROR_SUCCESS != e) { x = HRESULT_FROM_WIN32(e); if (!FAILED(x)) { x = E_FAIL; } BextLogError(x, f, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BextExitOnOptionalXmlQueryFailureSource(d, x, b, f, ...) { { if (S_FALSE == x || E_NOTFOUND == x) { b = FALSE; x = S_OK; } else { b = SUCCEEDED(x); } }; BextExitOnRootFailureSource(d, x, f, __VA_ARGS__); }
 #define BextExitOnRequiredXmlQueryFailureSource(d, x, f, ...) { if (S_FALSE == x) { x = E_NOTFOUND; } BextExitOnRootFailureSource(d, x, f, __VA_ARGS__); }
 
@@ -26,6 +27,7 @@ extern "C" {
 #define BextExitOnNull(p, x, e, f, ...) BextExitOnNullSource(DUTIL_SOURCE_DEFAULT, p, x, e, f, __VA_ARGS__)
 #define BextExitOnNullWithLastError(p, x, f, ...) BextExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, f, __VA_ARGS__)
 #define BextExitWithLastError(x, f, ...) BextExitWithLastErrorSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
+#define BextExitOnWin32Error(e, x, f, ...) BextExitOnWin32ErrorSource(DUTIL_SOURCE_DEFAULT, e, x, f, __VA_ARGS__)
 #define BextExitOnOptionalXmlQueryFailure(x, b, f, ...) BextExitOnOptionalXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, b, f, __VA_ARGS__)
 #define BextExitOnRequiredXmlQueryFailure(x, f, ...) BextExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
 

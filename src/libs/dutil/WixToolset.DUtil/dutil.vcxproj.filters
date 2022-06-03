@@ -66,6 +66,9 @@
     <ClCompile Include="dutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="env2util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="envutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -109,6 +112,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="osutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="path3utl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="path2utl.cpp">

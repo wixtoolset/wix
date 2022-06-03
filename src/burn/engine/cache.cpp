@@ -1389,6 +1389,8 @@ static HRESULT CalculatePotentialBaseWorkingFolders(
     Assert(!pCache->rgsczPotentialBaseWorkingFolders && !pCache->cPotentialBaseWorkingFolders);
     HRESULT hr = S_OK;
     LPWSTR sczTemp = NULL;
+    LPWSTR sczPolicy = NULL;
+    BOOL fNeedsExpansion = FALSE;
 
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pCache->rgsczPotentialBaseWorkingFolders), 6, sizeof(LPWSTR), 6);
     ExitOnFailure(hr, "Failed to initialize array.");
@@ -1408,12 +1410,22 @@ static HRESULT CalculatePotentialBaseWorkingFolders(
     // but only use it if elevated because it should be secured against non-admin users.
     if (pInternalCommand->fInitiallyElevated)
     {
-        hr = PolcReadString(POLICY_BURN_REGISTRY_PATH, L"EngineWorkingDirectory", NULL, &sczTemp);
+        hr = PolcReadUnexpandedString(POLICY_BURN_REGISTRY_PATH, L"EngineWorkingDirectory", NULL, &fNeedsExpansion, &sczPolicy);
         ExitOnFailure(hr, "Failed to read EngineWorkingDirectory policy directory.");
 
-        if (sczTemp)
+        if (S_FALSE != hr)
         {
-            // PolcReadString is supposed to automatically expand REG_EXPAND_SZ values.
+            if (fNeedsExpansion)
+            {
+                hr = EnvExpandEnvironmentStringsForUser(NULL, sczPolicy, &sczTemp, NULL);
+                ExitOnFailure(hr, "Failed to expand EngineWorkingDirectory policy directory.");
+            }
+            else
+            {
+                sczTemp = sczPolicy;
+                sczPolicy = NULL;
+            }
+
             pCache->rgsczPotentialBaseWorkingFolders[pCache->cPotentialBaseWorkingFolders] = sczTemp;
             sczTemp = NULL;
             ++pCache->cPotentialBaseWorkingFolders;
@@ -1438,6 +1450,7 @@ static HRESULT CalculatePotentialBaseWorkingFolders(
 
 LExit:
     ReleaseStr(sczTemp);
+    ReleaseStr(sczPolicy);
 
     return hr;
 }

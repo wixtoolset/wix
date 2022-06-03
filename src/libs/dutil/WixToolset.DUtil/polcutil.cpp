@@ -102,6 +102,49 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT DAPI PolcReadUnexpandedString(
+    __in_z LPCWSTR wzPolicyPath,
+    __in_z LPCWSTR wzPolicyName,
+    __in_z_opt LPCWSTR wzDefault,
+    __inout BOOL* pfNeedsExpansion,
+    __deref_out_z LPWSTR* pscz
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hk = NULL;
+
+    hr = OpenPolicyKey(wzPolicyPath, &hk);
+    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
+    PolcExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
+
+    hr = RegReadUnexpandedString(hk, wzPolicyName, pfNeedsExpansion, pscz);
+    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
+    PolcExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+LExit:
+    ReleaseRegKey(hk);
+
+    if (S_FALSE == hr || FAILED(hr))
+    {
+        if (NULL == wzDefault)
+        {
+            ReleaseNullStr(*pscz);
+        }
+        else
+        {
+            hr = StrAllocString(pscz, wzDefault, 0);
+        }
+    }
+
+    return hr;
+}
+
 
 // internal functions
 

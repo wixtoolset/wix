@@ -30,6 +30,7 @@ static THEME_ASSIGN_CONTROL_ID vrgInitControls[] = {
     { BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_STANDARD, L"StandardProgressBar" },
 };
 
+static HRESULT LogUserSid();
 static void CALLBACK BafThmUtilTestingTraceError(
     __in_z LPCSTR szFile,
     __in int iLine,
@@ -494,9 +495,38 @@ HRESULT WINAPI CreateBAFunctions(
     pResults->pvBAFunctionsProcContext = pBAFunctions;
     pBAFunctions = NULL;
 
+    LogUserSid();
+
 LExit:
     ReleaseObject(pBAFunctions);
     ReleaseObject(pEngine);
+
+    return hr;
+}
+
+static HRESULT LogUserSid()
+{
+    HRESULT hr = S_OK;
+    TOKEN_USER* pTokenUser = NULL;
+    LPWSTR sczSid = NULL;
+
+    hr = ProcTokenUser(::GetCurrentProcess(), &pTokenUser);
+    BalExitOnFailure(hr, "Failed to get user from process token.");
+
+    if (!::ConvertSidToStringSidW(pTokenUser->User.Sid, &sczSid))
+    {
+        BalExitWithLastError(hr, "Failed to convert sid to string.");
+    }
+
+    BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Current User SID: %ls", sczSid);
+
+LExit:
+    ReleaseMem(pTokenUser);
+
+    if (sczSid)
+    {
+        ::LocalFree(sczSid);
+    }
 
     return hr;
 }

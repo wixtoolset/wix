@@ -92,6 +92,8 @@ namespace Bootstrapper
                 VerifyBaseWorkingFolder(L"B:\\TEST\\TMP\\", cache.rgsczPotentialBaseWorkingFolders[0]);
                 CacheUninitialize(&cache);
 
+                // First fallback is impractical to mock out - %windir%\SystemTemp on Win11 when running as SYSTEM.
+
                 hr = RegCreate(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Policies\\WiX\\Burn", GENERIC_WRITE, &hkBurnPolicy);
                 NativeAssert::Succeeded(hr, "Failed to create Burn policy key.");
 

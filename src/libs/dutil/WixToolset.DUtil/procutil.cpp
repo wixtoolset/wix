@@ -9,6 +9,7 @@
 #define ProcExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
 #define ProcExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
 #define ProcExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_PROCUTIL, x, e, s, __VA_ARGS__)
 #define ProcExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
 #define ProcExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_PROCUTIL, p, x, e, s, __VA_ARGS__)
 #define ProcExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, p, x, s, __VA_ARGS__)
@@ -70,6 +71,73 @@ extern "C" HRESULT DAPI ProcElevated(
     }
 
 LExit:
+    ReleaseHandle(hToken);
+
+    return hr;
+}
+
+extern "C" HRESULT DAPI ProcSystem(
+    __in HANDLE hProcess,
+    __out BOOL* pfSystem
+    )
+{
+    HRESULT hr = S_OK;
+    TOKEN_USER* pTokenUser = NULL;
+
+    hr = ProcTokenUser(hProcess, &pTokenUser);
+    ProcExitOnFailure(hr, "Failed to get TokenUser from process token.");
+
+    *pfSystem = ::IsWellKnownSid(pTokenUser->User.Sid, WinLocalSystemSid);
+
+LExit:
+    ReleaseMem(pTokenUser);
+
+    return hr;
+}
+
+extern "C" HRESULT DAPI ProcTokenUser(
+    __in HANDLE hProcess,
+    __out TOKEN_USER** ppTokenUser
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
+    HANDLE hToken = NULL;
+    TOKEN_USER* pTokenUser = NULL;
+    DWORD cbToken = 0;
+
+    if (!::OpenProcessToken(hProcess, TOKEN_QUERY, &hToken))
+    {
+        ProcExitWithLastError(hr, "Failed to open process token.");
+    }
+
+    if (::GetTokenInformation(hToken, TokenUser, pTokenUser, 0, &cbToken))
+    {
+        er = ERROR_SUCCESS;
+    }
+    else
+    {
+        er = ::GetLastError();
+    }
+
+    if (er != ERROR_INSUFFICIENT_BUFFER)
+    {
+        ProcExitOnWin32Error(er, hr, "Failed to get user from process token size.");
+    }
+
+    pTokenUser = reinterpret_cast<TOKEN_USER*>(MemAlloc(cbToken, TRUE));
+    ProcExitOnNull(pTokenUser, hr, E_OUTOFMEMORY, "Failed to allocate token information.");
+
+    if (!::GetTokenInformation(hToken, TokenUser, pTokenUser, cbToken, &cbToken))
+    {
+        ProcExitWithLastError(hr, "Failed to get user from process token.");
+    }
+
+    *ppTokenUser = pTokenUser;
+    pTokenUser = NULL;
+
+LExit:
+    ReleaseMem(pTokenUser);
     ReleaseHandle(hToken);
 
     return hr;

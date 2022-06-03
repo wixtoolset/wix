@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <strsafe.h>
 #include <ShlObj.h>
+#include <sddl.h>
 
 // Include error.h before dutil.h
 #include <dutilsources.h>
@@ -21,6 +22,7 @@
 #include <iniutil.h>
 #include <memutil.h>
 #include <pathutil.h>
+#include <procutil.h>
 #include <strutil.h>
 #include <monutil.h>
 #include <regutil.h>
