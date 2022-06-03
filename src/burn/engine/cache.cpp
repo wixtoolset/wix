@@ -14,10 +14,10 @@ static HRESULT CacheVerifyPayloadSignature(
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile
     );
-static HRESULT CalculateBaseWorkingFolder(
+static HRESULT CalculatePotentialBaseWorkingFolders(
+    __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
-    __in LPCWSTR wzAcquisitionFolder,
-    __inout_z LPWSTR* psczBaseWorkingFolder
+    __in LPCWSTR wzAcquisitionFolder
     );
 static HRESULT CalculateWorkingFolders(
     __in BURN_CACHE* pCache,
@@ -321,8 +321,8 @@ extern "C" HRESULT CacheEnsureAcquisitionFolder(
     hr = DirEnsureExists(pCache->sczAcquisitionFolder, NULL);
     ExitOnFailure(hr, "Failed create acquisition folder.");
 
-    // Best effort to ensure our working folder is not encrypted.
-    ::DecryptFileW(pCache->sczBaseWorkingFolder, 0);
+    // Best effort to ensure our acquisition folder is not encrypted.
+    ::DecryptFileW(pCache->sczAcquisitionFolder, 0);
 
 LExit:
     return hr;
@@ -336,9 +336,30 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
     Assert(pCache->fInitializedCache);
 
     HRESULT hr = S_OK;
+    LPWSTR sczPotential = NULL;
 
-    hr = DirEnsureExists(pCache->sczBaseWorkingFolder, NULL);
-    ExitOnFailure(hr, "Failed create working folder.");
+    if (!pCache->fInitializedBaseWorkingFolder)
+    {
+        for (DWORD i = 0; i < pCache->cPotentialBaseWorkingFolders; ++i)
+        {
+            hr = PathConcatRelativeToBase(pCache->rgsczPotentialBaseWorkingFolders[i], pCache->wzGuid, &sczPotential);
+            ExitOnFailure(hr, "Failed to append random guid on to potential path for working folder.");
+
+            hr = DirEnsureExists(sczPotential, NULL);
+            if (SUCCEEDED(hr))
+            {
+                pCache->sczBaseWorkingFolder = sczPotential;
+                sczPotential = NULL;
+                break;
+            }
+
+            LogErrorId(hr, MSG_INVALID_BASE_WORKING_FOLDER, sczPotential, NULL, NULL);
+        }
+
+        ExitOnNull(pCache->sczBaseWorkingFolder, hr, E_INVALIDSTATE, "No usable base working folder found.");
+
+        pCache->fInitializedBaseWorkingFolder = TRUE;
+    }
 
     // Best effort to ensure our working folder is not encrypted.
     ::DecryptFileW(pCache->sczBaseWorkingFolder, 0);
@@ -350,6 +371,8 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
     }
 
 LExit:
+    ReleaseStr(sczPotential);
+
     return hr;
 }
 
@@ -360,6 +383,7 @@ extern "C" HRESULT CacheCalculateBundleWorkingPath(
     )
 {
     Assert(pCache->fInitializedCache);
+    Assert(pCache->fInitializedBaseWorkingFolder);
 
     HRESULT hr = S_OK;
 
@@ -1180,7 +1204,7 @@ extern "C" HRESULT CacheRemoveBaseWorkingFolder(
 {
     HRESULT hr = S_OK;
 
-    if (pCache->fInitializedCacheSources)
+    if (pCache->fInitializedBaseWorkingFolder)
     {
         // Try to clean out everything in the working folder.
         hr = DirEnsureDeleteEx(pCache->sczBaseWorkingFolder, DIR_DELETE_FILES | DIR_DELETE_RECURSE | DIR_DELETE_SCHEDULE);
@@ -1343,70 +1367,78 @@ extern "C" void CacheUninitialize(
     __in BURN_CACHE* pCache
     )
 {
-    ReleaseNullStr(pCache->sczCurrentMachinePackageCache);
-    ReleaseNullStr(pCache->sczDefaultMachinePackageCache);
-    ReleaseNullStr(pCache->sczDefaultUserPackageCache);
-    ReleaseNullStr(pCache->sczBaseWorkingFolder);
-    ReleaseNullStr(pCache->sczAcquisitionFolder);
-    ReleaseNullStr(pCache->sczSourceProcessFolder);
+    ReleaseStrArray(pCache->rgsczPotentialBaseWorkingFolders, pCache->cPotentialBaseWorkingFolders);
+    ReleaseStr(pCache->sczCurrentMachinePackageCache);
+    ReleaseStr(pCache->sczDefaultMachinePackageCache);
+    ReleaseStr(pCache->sczDefaultUserPackageCache);
+    ReleaseStr(pCache->sczBaseWorkingFolder);
+    ReleaseStr(pCache->sczAcquisitionFolder);
+    ReleaseStr(pCache->sczSourceProcessFolder);
 
-    pCache->fRunningFromCache = FALSE;
-    pCache->fInitializedCache = FALSE;
-    pCache->fInitializedCacheSources = FALSE;
-    pCache->fPerMachineCacheRootVerified = FALSE;
-    pCache->fOriginalPerMachineCacheRootVerified = FALSE;
-    pCache->fUnverifiedCacheFolderCreated = FALSE;
-    pCache->fCustomMachinePackageCache = FALSE;
+    memset(pCache, 0, sizeof(BURN_CACHE));
 }
 
 // Internal functions.
 
-static HRESULT CalculateBaseWorkingFolder(
+static HRESULT CalculatePotentialBaseWorkingFolders(
+    __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
-    __in LPCWSTR wzAcquisitionFolder,
-    __inout_z LPWSTR* psczBaseWorkingFolder
+    __in LPCWSTR wzAcquisitionFolder
     )
 {
+    Assert(!pCache->rgsczPotentialBaseWorkingFolders && !pCache->cPotentialBaseWorkingFolders);
     HRESULT hr = S_OK;
+    LPWSTR sczTemp = NULL;
 
-    ReleaseNullStr(*psczBaseWorkingFolder);
+    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pCache->rgsczPotentialBaseWorkingFolders), 6, sizeof(LPWSTR), 6);
+    ExitOnFailure(hr, "Failed to initialize array.");
 
     // The value from the command line takes precedence.
     if (pInternalCommand->sczEngineWorkingDirectory)
     {
-        hr = PathExpand(psczBaseWorkingFolder, pInternalCommand->sczEngineWorkingDirectory, PATH_EXPAND_FULLPATH);
+        hr = PathExpand(&sczTemp, pInternalCommand->sczEngineWorkingDirectory, PATH_EXPAND_FULLPATH);
         ExitOnFailure(hr, "Failed to expand engine working directory from command-line: '%ls'", pInternalCommand->sczEngineWorkingDirectory);
 
-        ExitFunction();
+        pCache->rgsczPotentialBaseWorkingFolders[pCache->cPotentialBaseWorkingFolders] = sczTemp;
+        sczTemp = NULL;
+        ++pCache->cPotentialBaseWorkingFolders;
     }
 
     // The base working folder can be specified through policy,
     // but only use it if elevated because it should be secured against non-admin users.
     if (pInternalCommand->fInitiallyElevated)
     {
-        hr = PolcReadString(POLICY_BURN_REGISTRY_PATH, L"EngineWorkingDirectory", NULL, psczBaseWorkingFolder);
+        hr = PolcReadString(POLICY_BURN_REGISTRY_PATH, L"EngineWorkingDirectory", NULL, &sczTemp);
         ExitOnFailure(hr, "Failed to read EngineWorkingDirectory policy directory.");
 
-        if (*psczBaseWorkingFolder)
+        if (sczTemp)
         {
             // PolcReadString is supposed to automatically expand REG_EXPAND_SZ values.
-            ExitFunction();
+            pCache->rgsczPotentialBaseWorkingFolders[pCache->cPotentialBaseWorkingFolders] = sczTemp;
+            sczTemp = NULL;
+            ++pCache->cPotentialBaseWorkingFolders;
         }
     }
 
     // Default to the acquisition folder, but need to use system temp path for security reasons if running elevated.
     if (pInternalCommand->fInitiallyElevated)
     {
-        hr = PathGetSystemTempPath(psczBaseWorkingFolder);
-        ExitOnFailure(hr, "Failed to get system temp folder path for base working folder.");
+        hr = PathGetSystemTempPaths(&pCache->rgsczPotentialBaseWorkingFolders, &pCache->cPotentialBaseWorkingFolders);
+        ExitOnFailure(hr, "Failed to get system temp folder paths for base working folder.");
     }
     else
     {
-        hr = StrAllocString(psczBaseWorkingFolder, wzAcquisitionFolder, 0);
+        hr = StrAllocString(&sczTemp, wzAcquisitionFolder, 0);
         ExitOnFailure(hr, "Failed to copy acquisition folder path for base working folder.");
+
+        pCache->rgsczPotentialBaseWorkingFolders[pCache->cPotentialBaseWorkingFolders] = sczTemp;
+        sczTemp = NULL;
+        ++pCache->cPotentialBaseWorkingFolders;
     }
 
 LExit:
+    ReleaseStr(sczTemp);
+
     return hr;
 }
 
@@ -1416,11 +1448,7 @@ static HRESULT CalculateWorkingFolders(
     )
 {
     HRESULT hr = S_OK;
-    RPC_STATUS rs = RPC_S_OK;
     LPWSTR sczBaseAcquisitionPath = NULL;
-    LPWSTR sczTempPath = NULL;
-    UUID guid = {};
-    WCHAR wzGuid[39];
 
     hr = PathGetTempPath(&sczBaseAcquisitionPath);
     ExitOnFailure(hr, "Failed to get temp folder path for acquisition folder base.");
@@ -1428,31 +1456,20 @@ static HRESULT CalculateWorkingFolders(
     hr = PathBackslashTerminate(&sczBaseAcquisitionPath);
     ExitOnFailure(hr, "Failed to backslashify base engine working directory.");
 
-    hr = CalculateBaseWorkingFolder(pInternalCommand, sczBaseAcquisitionPath, &sczTempPath);
-    ExitOnFailure(hr, "Failed to get base engine working directory.");
+    hr = CalculatePotentialBaseWorkingFolders(pCache, pInternalCommand, sczBaseAcquisitionPath);
+    ExitOnFailure(hr, "Failed to get potential base engine working directories.");
 
-    hr = PathBackslashTerminate(&sczTempPath);
-    ExitOnFailure(hr, "Failed to backslashify base engine working directory.");
-
-    rs = ::UuidCreate(&guid);
-    hr = HRESULT_FROM_RPC(rs);
+    hr = GuidFixedCreate(pCache->wzGuid);
     ExitOnFailure(hr, "Failed to create working folder guid.");
 
-    if (!::StringFromGUID2(guid, wzGuid, countof(wzGuid)))
-    {
-        hr = E_OUTOFMEMORY;
-        ExitOnRootFailure(hr, "Failed to convert working folder guid into string.");
-    }
+    pCache->wzGuid[GUID_STRING_LENGTH - 1] = L'\\';
+    pCache->wzGuid[GUID_STRING_LENGTH] = L'\0';
 
-    hr = StrAllocFormatted(&pCache->sczAcquisitionFolder, L"%ls%ls\\", sczBaseAcquisitionPath, wzGuid);
+    hr = PathConcatRelativeToBase(sczBaseAcquisitionPath, pCache->wzGuid, &pCache->sczAcquisitionFolder);
     ExitOnFailure(hr, "Failed to append random guid on to temp path for acquisition folder.");
-
-    hr = StrAllocFormatted(&pCache->sczBaseWorkingFolder, L"%ls%ls\\", sczTempPath, wzGuid);
-    ExitOnFailure(hr, "Failed to append random guid on to temp path for working folder.");
 
 LExit:
     ReleaseStr(sczBaseAcquisitionPath);
-    ReleaseStr(sczTempPath);
 
     return hr;
 }

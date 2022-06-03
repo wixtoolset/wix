@@ -35,11 +35,18 @@ typedef struct _BURN_CACHE
     LPWSTR sczDefaultMachinePackageCache;
     LPWSTR sczCurrentMachinePackageCache;
 
+    WCHAR wzGuid[GUID_STRING_LENGTH + 1];
+    LPWSTR* rgsczPotentialBaseWorkingFolders;
+    DWORD cPotentialBaseWorkingFolders;
+
     // Only valid after CacheInitializeSources
     BOOL fInitializedCacheSources;
     BOOL fRunningFromCache;
     LPWSTR sczSourceProcessFolder;
     LPWSTR sczAcquisitionFolder;
+
+    // Only valid after CacheEnsureBaseWorkingFolder
+    BOOL fInitializedBaseWorkingFolder;
     LPWSTR sczBaseWorkingFolder;
 } BURN_CACHE;
 

@@ -37,11 +37,100 @@ namespace Bootstrapper
     using namespace System::IO;
     using namespace Xunit;
 
-    public ref class CacheTest : BurnUnitTest
+    public ref class CacheTest : BurnUnitTest, IClassFixture<TestRegistryFixture^>
     {
+    private:
+        TestRegistryFixture^ testRegistry;
     public:
-        CacheTest(BurnTestFixture^ fixture) : BurnUnitTest(fixture)
+        CacheTest(BurnTestFixture^ fixture, TestRegistryFixture^ registryFixture) : BurnUnitTest(fixture)
         {
+            this->testRegistry = registryFixture;
+        }
+
+        [Fact]
+        void CacheElevatedTempFallbacksTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_CACHE cache = { };
+            BURN_ENGINE_COMMAND internalCommand = { };
+            HKEY hkSystemEnvironment = NULL;
+            HKEY hkBurnPolicy = NULL;
+
+            internalCommand.fInitiallyElevated = TRUE;
+
+            try
+            {
+                this->testRegistry->SetUp();
+
+                // No registry keys, so should fallback to %windir%\TEMP.
+                hr = CacheInitialize(&cache, &internalCommand);
+                NativeAssert::Succeeded(hr, "Failed to initialize cache.");
+                Assert::NotEqual<DWORD>(0, cache.cPotentialBaseWorkingFolders);
+                VerifyBaseWorkingFolder(L"%windir%\\TEMP\\", cache.rgsczPotentialBaseWorkingFolders[0]);
+                CacheUninitialize(&cache);
+
+                hr = RegCreate(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\Environment", GENERIC_WRITE, &hkSystemEnvironment);
+                NativeAssert::Succeeded(hr, "Failed to create system environment key.");
+
+                // Third fallback is system-level %TEMP%.
+                hr = RegWriteExpandString(hkSystemEnvironment, L"TEMP", L"A:\\TEST\\TEMP");
+                NativeAssert::Succeeded(hr, "Failed to write TEMP system environment value.");
+
+                hr = CacheInitialize(&cache, &internalCommand);
+                NativeAssert::Succeeded(hr, "Failed to initialize cache.");
+                Assert::NotEqual<DWORD>(0, cache.cPotentialBaseWorkingFolders);
+                VerifyBaseWorkingFolder(L"A:\\TEST\\TEMP\\", cache.rgsczPotentialBaseWorkingFolders[0]);
+                CacheUninitialize(&cache);
+
+                // Second fallback is system-level %TMP%.
+                hr = RegWriteExpandString(hkSystemEnvironment, L"TMP", L"B:\\TEST\\TMP\\");
+                NativeAssert::Succeeded(hr, "Failed to write TEMP system environment value.");
+
+                hr = CacheInitialize(&cache, &internalCommand);
+                NativeAssert::Succeeded(hr, "Failed to initialize cache.");
+                Assert::NotEqual<DWORD>(0, cache.cPotentialBaseWorkingFolders);
+                VerifyBaseWorkingFolder(L"B:\\TEST\\TMP\\", cache.rgsczPotentialBaseWorkingFolders[0]);
+                CacheUninitialize(&cache);
+
+                hr = RegCreate(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Policies\\WiX\\Burn", GENERIC_WRITE, &hkBurnPolicy);
+                NativeAssert::Succeeded(hr, "Failed to create Burn policy key.");
+
+                // Default source is Burn policy.
+                hr = RegWriteExpandString(hkBurnPolicy, L"EngineWorkingDirectory", L"D:\\TEST\\POLICY\\");
+                NativeAssert::Succeeded(hr, "Failed to write EngineWorkingDirectory Burn policy value.");
+
+                hr = CacheInitialize(&cache, &internalCommand);
+                NativeAssert::Succeeded(hr, "Failed to initialize cache.");
+                Assert::NotEqual<DWORD>(0, cache.cPotentialBaseWorkingFolders);
+                VerifyBaseWorkingFolder(L"D:\\TEST\\POLICY\\", cache.rgsczPotentialBaseWorkingFolders[0]);
+                CacheUninitialize(&cache);
+
+                // Command line parameter overrides everything else.
+                hr = StrAllocString(&internalCommand.sczEngineWorkingDirectory, L"E:\\TEST\\COMMANDLINE\\", 0);
+                NativeAssert::Succeeded(hr, "Failed to copy command line working directory.");
+
+                hr = CacheInitialize(&cache, &internalCommand);
+                NativeAssert::Succeeded(hr, "Failed to initialize cache.");
+                Assert::NotEqual<DWORD>(0, cache.cPotentialBaseWorkingFolders);
+                VerifyBaseWorkingFolder(L"E:\\TEST\\COMMANDLINE\\", cache.rgsczPotentialBaseWorkingFolders[0]);
+                CacheUninitialize(&cache);
+            }
+            finally
+            {
+                ReleaseRegKey(hkBurnPolicy);
+                ReleaseRegKey(hkSystemEnvironment);
+                ReleaseStr(internalCommand.sczEngineWorkingDirectory);
+
+                CacheUninitialize(&cache);
+
+                this->testRegistry->TearDown();
+            }
+        }
+
+        void VerifyBaseWorkingFolder(LPCWSTR wzExpectedUnexpanded, LPCWSTR wzActual)
+        {
+            String^ expected = Environment::ExpandEnvironmentVariables(gcnew String(wzExpectedUnexpanded));
+            WixAssert::StringEqual(expected, gcnew String(wzActual), true);
         }
 
         [Fact]
@@ -93,6 +182,8 @@ namespace Bootstrapper
                     File::SetAttributes(filePath, FileAttributes::Normal);
                     File::Delete(filePath);
                 }
+
+                CacheUninitialize(&cache);
             }
         }
     };

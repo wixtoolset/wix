@@ -5,6 +5,7 @@ namespace WixToolsetTest.BurnE2E
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using Microsoft.Win32;
     using WixBuildTools.TestSupport;
     using WixTestTools;
     using WixToolset.Mba.Core;
@@ -199,6 +200,73 @@ namespace WixToolsetTest.BurnE2E
 
                 packageA.VerifyInstalled(true);
                 packageB.VerifyInstalled(true);
+            }
+        }
+
+        [RuntimeFact]
+        public void CanGetEngineWorkingDirectoryFromCommandLine()
+        {
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var testBAController = this.CreateTestBAController();
+
+            testBAController.SetImmediatelyQuit();
+
+            using (var dfs = new DisposableFileSystem())
+            {
+                var baseTempPath = dfs.GetFolder(true);
+                var logPath = bundleA.Install(0, $"-burn.engine.working.directory=\"{baseTempPath}\"");
+                LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe");
+            }
+        }
+
+        [RuntimeFact]
+        public void CanGetEngineWorkingDirectoryFromPolicy()
+        {
+            var deletePolicyKey = false;
+            string originalPolicyValue = null;
+
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var testBAController = this.CreateTestBAController();
+            var policyPath = bundleA.GetFullBurnPolicyRegistryPath();
+
+            testBAController.SetImmediatelyQuit();
+
+            try
+            {
+                using (var dfs = new DisposableFileSystem())
+                {
+                    var baseTempPath = dfs.GetFolder(true);
+
+                    var policyKey = Registry.LocalMachine.OpenSubKey(policyPath, writable: true);
+                    if (policyKey == null)
+                    {
+                        policyKey = Registry.LocalMachine.CreateSubKey(policyPath, writable: true);
+                        deletePolicyKey = true;
+                    }
+
+                    using (policyKey)
+                    {
+                        originalPolicyValue = policyKey.GetValue("EngineWorkingDirectory") as string;
+                        policyKey.SetValue("EngineWorkingDirectory", baseTempPath);
+                    }
+
+                    var logPath = bundleA.Install();
+                    LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe");
+                }
+            }
+            finally
+            {
+                if (deletePolicyKey)
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(policyPath);
+                }
+                else if (originalPolicyValue != null)
+                {
+                    using (var policyKey = Registry.LocalMachine.CreateSubKey(policyPath, writable: true))
+                    {
+                        policyKey.SetValue("EngineWorkingDirectory", originalPolicyValue);
+                    }
+                }
             }
         }
     }

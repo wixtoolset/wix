@@ -15,7 +15,8 @@ namespace WixTestTools
     public partial class BundleInstaller
     {
         public const string DependencyRegistryRoot = "Software\\Classes\\Installer\\Dependencies";
-        public const string FULL_BURN_POLICY_REGISTRY_PATH = "SOFTWARE\\WOW6432Node\\Policies\\WiX\\Burn";
+        public const string FULL_BURN_POLICY_REGISTRY_PATH = "SOFTWARE\\Policies\\WiX\\Burn";
+        public const string FULL_BURN_POLICY_REGISTRY_PATH_WOW6432NODE = "SOFTWARE\\WOW6432Node\\Policies\\WiX\\Burn";
         public const string PACKAGE_CACHE_FOLDER_NAME = "Package Cache";
 
         public string BundlePdb { get; }
@@ -35,12 +36,19 @@ namespace WixTestTools
             return this.BundleSymbol;
         }
 
+        public string GetFullBurnPolicyRegistryPath()
+        {
+            var bundleSymbol = this.GetBundleSymbol();
+            var x64 = bundleSymbol.Platform != Platform.X86;
+            return x64 ? FULL_BURN_POLICY_REGISTRY_PATH : FULL_BURN_POLICY_REGISTRY_PATH_WOW6432NODE;
+        }
+
         public string GetPackageCachePathForCacheId(string cacheId, bool perMachine)
         {
             string cachePath;
             if (perMachine)
             {
-                using var policyKey = Registry.LocalMachine.OpenSubKey(FULL_BURN_POLICY_REGISTRY_PATH);
+                using var policyKey = Registry.LocalMachine.OpenSubKey(this.GetFullBurnPolicyRegistryPath());
                 var redirectedCachePath = policyKey?.GetValue("PackageCache") as string;
                 cachePath = redirectedCachePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), PACKAGE_CACHE_FOLDER_NAME);
             }

@@ -9,6 +9,7 @@
 #define GuidExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
 #define GuidExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
 #define GuidExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_GUIDUTIL, x, e, s, __VA_ARGS__)
 #define GuidExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
 #define GuidExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_GUIDUTIL, p, x, e, s, __VA_ARGS__)
 #define GuidExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_GUIDUTIL, p, x, s, __VA_ARGS__)
@@ -29,8 +30,7 @@ extern "C" HRESULT DAPI GuidFixedCreate(
 
     if (!::StringFromGUID2(guid, wzGuid, GUID_STRING_LENGTH))
     {
-        hr = E_OUTOFMEMORY;
-        GuidExitOnRootFailure(hr, "Failed to convert guid into string.");
+        GuidExitWithRootFailure(hr, E_OUTOFMEMORY, "Failed to convert guid into string.");
     }
 
 LExit:

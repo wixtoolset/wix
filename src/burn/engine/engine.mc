@@ -149,6 +149,20 @@ Language=English
 Exit code: 0x%1!x!
 .
 
+MessageId=18
+Severity=Success
+SymbolicName=MSG_EXITING_RUN_ONCE
+Language=English
+Exit code: 0x%1!x!
+.
+
+MessageId=19
+Severity=Warning
+SymbolicName=MSG_INVALID_BASE_WORKING_FOLDER
+Language=English
+Failed to use folder as base working folder: %2!ls!, encountered error: %1!ls!.
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
@@ -811,7 +825,7 @@ MessageId=346
 Severity=Warning
 SymbolicName=MSG_CACHE_RETRYING_PACKAGE
 Language=English
-Application requested retry of caching package: %1!ls!, encountered error: 0x%2!x!. Retrying...
+Application requested retry of caching package: %2!ls!, encountered error: %1!ls!. Retrying...
 .
 
 MessageId=347
