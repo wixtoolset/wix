@@ -46,7 +46,8 @@ DWORD DAPI DirDeleteEmptyDirectoriesToRoot(
     );
 
 HRESULT DAPI DirGetCurrent(
-    __deref_out_z LPWSTR* psczCurrentDirectory
+    __deref_out_z LPWSTR* psczCurrentDirectory,
+    __out_opt SIZE_T* pcch
     );
 
 HRESULT DAPI DirSetCurrent(

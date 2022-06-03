@@ -25,7 +25,7 @@ namespace DutilTests
                 hr = GuidCreate(&sczGuid);
                 NativeAssert::Succeeded(hr, "Failed to create guid.");
 
-                hr = DirGetCurrent(&sczCurrentDir);
+                hr = DirGetCurrent(&sczCurrentDir, NULL);
                 NativeAssert::Succeeded(hr, "Failed to get current directory.");
 
                 hr = PathConcat(sczCurrentDir, sczGuid, &sczFolder);

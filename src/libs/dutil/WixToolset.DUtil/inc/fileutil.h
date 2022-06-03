@@ -34,13 +34,6 @@ typedef enum FILE_ENCODING
 } FILE_ENCODING;
 
 
-LPWSTR DAPI FileFromPath(
-    __in_z LPCWSTR wzPath
-    );
-HRESULT DAPI FileResolvePath(
-    __in_z LPCWSTR wzRelativePath,
-    __out LPWSTR *ppwzFullPath
-    );
 HRESULT DAPI FileStripExtension(
     __in_z LPCWSTR wzFileName,
     __out LPWSTR *ppwzFileNameNoExtension

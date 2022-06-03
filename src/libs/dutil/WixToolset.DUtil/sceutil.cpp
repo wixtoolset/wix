@@ -1491,11 +1491,8 @@ static HRESULT CreateSqlCe(
         // If that failed, fallback to loading from current path
         if (NULL == *phSqlCeDll)
         {
-            hr = DirGetCurrent(&sczDirectory);
-            ExitOnFailure(hr, "Failed to get current directory");
-
-            hr = PathConcat(sczDirectory, wzSqlCeDllPath, &sczDllFullPath);
-            ExitOnFailure(hr, "Failed to concatenate current directory and DLL filename");
+            hr = PathGetFullPathName(wzSqlCeDllPath, &sczDllFullPath, NULL, NULL);
+            ExitOnFailure(hr, "Failed to get full path for DLL");
 
             *phSqlCeDll = ::LoadLibraryW(sczDllFullPath);
             ExitOnNullWithLastError(*phSqlCeDll, hr, "Failed to open Sql CE DLL: %ls", sczDllFullPath);

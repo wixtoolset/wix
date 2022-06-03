@@ -3,6 +3,7 @@
 #include "precomp.h"
 
 using namespace System;
+using namespace System::IO;
 using namespace Xunit;
 using namespace WixBuildTools::TestSupport;
 
@@ -403,6 +404,70 @@ namespace DutilTests
         }
 
         [Fact]
+        void PathExpandEnvironmentVariablesTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczExpanded = NULL;
+            LPCWSTR rgwzPaths[4] =
+            {
+                L"", L"",
+                L"\\\\?\\", L"%TEMP%;%PATH%;C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 2)
+                {
+                    hr = PathExpand(&sczExpanded, rgwzPaths[i + 1], PATH_EXPAND_ENVIRONMENT);
+                    NativeAssert::Succeeded(hr, "PathExpand: {0}", rgwzPaths[i + 1]);
+                    WixAssert::StringEqual((gcnew String(rgwzPaths[i])) + Environment::ExpandEnvironmentVariables(gcnew String(rgwzPaths[i + 1])), gcnew String(sczExpanded), false);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczExpanded);
+            }
+        }
+
+        [Fact]
+        void PathExpandFullPathTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczExpanded = NULL;
+            LPCWSTR wzGreaterThanMaxPathString = L"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\\a.txt";
+
+            try
+            {
+                hr = PathExpand(&sczExpanded, wzGreaterThanMaxPathString, PATH_EXPAND_FULLPATH);
+                NativeAssert::Succeeded(hr, "Failed to expand greater than MAX_PATH string.");
+                WixAssert::StringEqual((gcnew String("\\\\?\\")) + Path::Combine(Environment::CurrentDirectory, gcnew String(wzGreaterThanMaxPathString)), gcnew String(sczExpanded), false);
+            }
+            finally
+            {
+                ReleaseStr(sczExpanded);
+            }
+        }
+
+        [Fact]
+        void PathExpandAllTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczExpanded = NULL;
+            LPCWSTR wzRelativeEnvironmentVariableString = L"%USERNAME%\\abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\\a.txt";
+
+            try
+            {
+                hr = PathExpand(&sczExpanded, wzRelativeEnvironmentVariableString, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
+                NativeAssert::Succeeded(hr, "Failed to expand path.");
+                WixAssert::StringEqual((gcnew String("\\\\?\\")) + Path::Combine(Environment::CurrentDirectory, Environment::ExpandEnvironmentVariables(gcnew String(wzRelativeEnvironmentVariableString))), gcnew String(sczExpanded), false);
+            }
+            finally
+            {
+                ReleaseStr(sczExpanded);
+            }
+        }
+
+        [Fact]
         void PathGetDirectoryTest()
         {
             HRESULT hr = S_OK;
@@ -427,6 +492,70 @@ namespace DutilTests
                     hr = PathGetDirectory(rgwzPaths[i], &sczPath);
                     NativeAssert::Succeeded(hr, "PathGetDirectory: {0}", rgwzPaths[i]);
                     NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathGetFullPathNameTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR wzFileName = NULL;
+            LPCWSTR rgwzPaths[33] =
+            {
+                L"C:\\", L"C:\\", NULL,
+                L"C:\\file", L"C:\\file", L"file",
+                L"C:\\..\\file", L"C:\\file", L"file",
+                L"C:\\dir\\..\\file.txt", L"C:\\file.txt", L"file.txt",
+                L"C:\\dir\\\\file.txt.txt", L"C:\\dir\\file.txt.txt", L"file.txt.txt",
+                L"C:\\dir/.file", L"C:\\dir\\.file", L".file",
+                L"\\\\?\\C:\\file", L"\\\\?\\C:\\file", L"file",
+                L"\\\\server\\share\\file", L"\\\\server\\share\\file", L"file",
+                L"\\\\server\\share\\..\\file", L"\\\\server\\share\\file", L"file",
+                L"\\\\?\\UNC\\server\\share\\file", L"\\\\?\\UNC\\server\\share\\file", L"file",
+                L"C:\\abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\\a.txt", L"C:\\abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\\a.txt", L"a.txt",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 3)
+                {
+                    hr = PathGetFullPathName(rgwzPaths[i], &sczPath, &wzFileName, NULL);
+                    NativeAssert::Succeeded(hr, "PathGetFullPathName: {0}", rgwzPaths[i]);
+                    NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
+                    NativeAssert::StringEqual(rgwzPaths[i + 2], wzFileName);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathGetFullPathNameRelativeTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[4] =
+            {
+                L"",
+                L"a.txt",
+                L"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\\a.txt",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+                {
+                    hr = PathGetFullPathName(rgwzPaths[i], &sczPath, NULL, NULL);
+                    NativeAssert::Succeeded(hr, "PathGetFullPathName: {0}", rgwzPaths[i]);
+                    WixAssert::StringEqual(Path::Combine(Environment::CurrentDirectory, gcnew String(rgwzPaths[i])), gcnew String(sczPath), false);
                 }
             }
             finally

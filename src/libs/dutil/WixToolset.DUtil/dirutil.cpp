@@ -9,6 +9,7 @@
 #define DirExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
 #define DirExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
 #define DirExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_DIRUTIL, x, e, s, __VA_ARGS__)
 #define DirExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
 #define DirExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_DIRUTIL, p, x, e, s, __VA_ARGS__)
 #define DirExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_DIRUTIL, p, x, s, __VA_ARGS__)
@@ -388,32 +389,58 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI DirGetCurrent(
-    __deref_out_z LPWSTR* psczCurrentDirectory
+    __deref_out_z LPWSTR* psczCurrentDirectory,
+    __out_opt SIZE_T* pcch
     )
 {
+    Assert(psczCurrentDirectory);
+
     HRESULT hr = S_OK;
-    SIZE_T cch = 0;
+    SIZE_T cchMax = 0;
+    DWORD cch = 0;
+    DWORD cchBuffer = 0;
+    DWORD dwAttempts = 0;
+    const DWORD dwMaxAttempts = 10;
 
-    if (psczCurrentDirectory && *psczCurrentDirectory)
+    if (*psczCurrentDirectory)
     {
-        hr = StrMaxLength(*psczCurrentDirectory, &cch);
-        DirExitOnFailure(hr, "Failed to determine size of current directory.");
+        hr = StrMaxLength(*psczCurrentDirectory, &cchMax);
+        DirExitOnFailure(hr, "Failed to get max length of input buffer.");
+
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
+    }
+    else
+    {
+        cchBuffer = MAX_PATH + 1;
+
+        hr = StrAlloc(psczCurrentDirectory, cchBuffer);
+        DirExitOnFailure(hr, "Failed to allocate space for current directory.");
     }
 
-    DWORD cchRequired = ::GetCurrentDirectoryW((DWORD)min(DWORD_MAX, cch), 0 == cch ? NULL : *psczCurrentDirectory);
-    if (0 == cchRequired)
+    for (; dwAttempts < dwMaxAttempts; ++dwAttempts)
     {
-        DirExitWithLastError(hr, "Failed to get current directory.");
-    }
-    else if (cch < cchRequired)
-    {
-        hr = StrAlloc(psczCurrentDirectory, cchRequired);
-        DirExitOnFailure(hr, "Failed to allocate string for current directory.");
+        cch = ::GetCurrentDirectoryW(cchBuffer, *psczCurrentDirectory);
+        DirExitOnNullWithLastError(cch, hr, "Failed to get current directory.");
 
-        if (!::GetCurrentDirectoryW(cchRequired, *psczCurrentDirectory))
+        if (cch < cchBuffer)
         {
-            DirExitWithLastError(hr, "Failed to get current directory using allocated string.");
+            break;
         }
+
+        hr = StrAlloc(psczCurrentDirectory, cch);
+        DirExitOnFailure(hr, "Failed to reallocate space for current directory.");
+
+        cchBuffer = cch;
+    }
+
+    if (dwMaxAttempts == dwAttempts)
+    {
+        DirExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "GetCurrentDirectoryW results never converged.");
+    }
+
+    if (pcch)
+    {
+        *pcch = cch;
     }
 
 LExit:
