@@ -65,6 +65,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <DisableSpecificWarnings>4091;4458</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="envutil.cpp" />
     <ClCompile Include="eseutil.cpp" />
     <ClCompile Include="file2utl.cpp" />
     <ClCompile Include="fileutil.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="inc\dpiutil.h" />
     <ClInclude Include="inc\dutil.h" />
     <ClInclude Include="inc\dutilsources.h" />
+    <ClInclude Include="inc\envutil.h" />
     <ClInclude Include="inc\eseutil.h" />
     <ClInclude Include="inc\fileutil.h" />
     <ClInclude Include="inc\gdiputil.h" />

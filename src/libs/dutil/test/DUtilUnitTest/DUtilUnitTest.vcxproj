@@ -49,6 +49,7 @@
     <ClCompile Include="DictUtilTest.cpp" />
     <ClCompile Include="DirUtilTests.cpp" />
     <ClCompile Include="DUtilTests.cpp" />
+    <ClCompile Include="EnvUtilTests.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="FileUtilTest.cpp" />
     <ClCompile Include="GuidUtilTest.cpp" />

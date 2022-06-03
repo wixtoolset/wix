@@ -444,7 +444,7 @@ DAPI_(HRESULT) RegReadValue(
     if (fExpand && SUCCEEDED(hr) && REG_EXPAND_SZ == *pdwType)
     {
         LPWSTR sczValue = reinterpret_cast<LPWSTR>(*ppbBuffer);
-        hr = PathExpand(&sczExpand, sczValue, PATH_EXPAND_ENVIRONMENT);
+        hr = EnvExpandEnvironmentStrings(sczValue, &sczExpand, NULL);
         RegExitOnFailure(hr, "Failed to expand registry value: %ls", sczValue);
 
         *ppbBuffer = reinterpret_cast<LPBYTE>(sczExpand);

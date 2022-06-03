@@ -15,6 +15,7 @@
 #include <atomutil.h>
 #include <dictutil.h>
 #include <dirutil.h>
+#include <envutil.h>
 #include <fileutil.h>
 #include <guidutil.h>
 #include <iniutil.h>
