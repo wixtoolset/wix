@@ -955,15 +955,15 @@ static HRESULT RegistrySearchValue(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     LPWSTR sczKey = NULL;
     LPWSTR sczValue = NULL;
     HKEY hKey = NULL;
     DWORD dwType = 0;
-    DWORD cbData = 0;
+    SIZE_T cbData = 0;
     LPBYTE pData = NULL;
-    DWORD cch = 0;
     BURN_VARIANT value = { };
+    DWORD dwValue = 0;
+    LONGLONG llValue = 0;
 
     // format key string
     hr = VariableFormatString(pVariables, pSearch->RegistrySearch.sczKey, &sczKey, NULL);
@@ -988,64 +988,38 @@ static HRESULT RegistrySearchValue(
     ExitOnFailure(hr, "Failed to open registry key.");
 
     // get value
-    er = ::RegQueryValueExW(hKey, sczValue, NULL, &dwType, NULL, &cbData);
-    if (ERROR_FILE_NOT_FOUND == er)
+    hr = RegReadValue(hKey, sczValue, pSearch->RegistrySearch.fExpandEnvironment, &pData, &cbData, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
         // What if there is a hidden variable in sczKey or sczValue?
         LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", sczKey, sczValue);
 
         ExitFunction1(hr = S_OK);
     }
-    ExitOnWin32Error(er, hr, "Failed to query registry key value size.");
-
-    pData = (LPBYTE)MemAlloc(cbData + sizeof(WCHAR), TRUE); // + sizeof(WCHAR) here to ensure that we always have a null terminator for REG_SZ
-    ExitOnNull(pData, hr, E_OUTOFMEMORY, "Failed to allocate memory registry value.");
-
-    er = ::RegQueryValueExW(hKey, sczValue, NULL, &dwType, pData, &cbData);
-    ExitOnWin32Error(er, hr, "Failed to query registry key value.");
+    ExitOnFailure(hr, "Failed to query registry key value.");
 
     switch (dwType)
     {
     case REG_DWORD:
-        if (sizeof(LONG) != cbData)
+        if (memcpy_s(&dwValue, sizeof(DWORD), pData, cbData))
         {
             ExitFunction1(hr = E_UNEXPECTED);
         }
-        hr = BVariantSetNumeric(&value, *((LONG*)pData));
+        hr = BVariantSetNumeric(&value, dwValue);
         break;
     case REG_QWORD:
-        if (sizeof(LONGLONG) != cbData)
+        if (memcpy_s(&llValue, sizeof(LONGLONG), pData, cbData))
         {
             ExitFunction1(hr = E_UNEXPECTED);
         }
-        hr = BVariantSetNumeric(&value, *((LONGLONG*)pData));
+        hr = BVariantSetNumeric(&value, llValue);
         break;
-    case REG_EXPAND_SZ:
-        if (pSearch->RegistrySearch.fExpandEnvironment)
-        {
-            hr = StrAlloc(&value.sczValue, cbData);
-            ExitOnFailure(hr, "Failed to allocate string buffer.");
-            value.Type = BURN_VARIANT_TYPE_STRING;
-
-            cch = ::ExpandEnvironmentStringsW((LPCWSTR)pData, value.sczValue, cbData);
-            if (cch > cbData)
-            {
-                hr = StrAlloc(&value.sczValue, cch);
-                ExitOnFailure(hr, "Failed to allocate string buffer.");
-
-                if (cch != ::ExpandEnvironmentStringsW((LPCWSTR)pData, value.sczValue, cch))
-                {
-                    ExitWithLastError(hr, "Failed to get expand environment string.");
-                }
-            }
-            break;
-        }
-        __fallthrough;
+    case REG_EXPAND_SZ: __fallthrough;
     case REG_SZ:
         hr = BVariantSetString(&value, (LPCWSTR)pData, 0, FALSE);
         break;
     default:
-        ExitOnFailure(hr = E_NOTIMPL, "Unsupported registry key value type. Type = '%u'", dwType);
+        ExitWithRootFailure(hr, E_NOTIMPL, "Unsupported registry key value type. Type = '%u'", dwType);
     }
     ExitOnFailure(hr, "Failed to read registry value.");
 

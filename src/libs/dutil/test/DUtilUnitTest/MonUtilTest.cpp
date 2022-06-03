@@ -481,6 +481,8 @@ namespace DutilTests
                 ReleaseMem(pResults->rgDirectories);
                 ReleaseMem(pResults->rgRegKeys);
                 ReleaseMem(pResults);
+
+                RegUninitialize();
             }
         }
     };

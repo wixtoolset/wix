@@ -9,6 +9,7 @@
 #define RegExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_REGUTIL, x, s, __VA_ARGS__)
 #define RegExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_REGUTIL, x, s, __VA_ARGS__)
 #define RegExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_REGUTIL, x, s, __VA_ARGS__)
+#define RegExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_REGUTIL, x, e, s, __VA_ARGS__)
 #define RegExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_REGUTIL, x, s, __VA_ARGS__)
 #define RegExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_REGUTIL, p, x, e, s, __VA_ARGS__)
 #define RegExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_REGUTIL, p, x, s, __VA_ARGS__)
@@ -28,10 +29,19 @@ static PFN_REGQUERYINFOKEYW vpfnRegQueryInfoKeyW = ::RegQueryInfoKeyW;
 static PFN_REGQUERYVALUEEXW vpfnRegQueryValueExW = ::RegQueryValueExW;
 static PFN_REGSETVALUEEXW vpfnRegSetValueExW = ::RegSetValueExW;
 static PFN_REGDELETEVALUEW vpfnRegDeleteValueW = ::RegDeleteValueW;
+static PFN_REGGETVALUEW vpfnRegGetValueW = NULL;
+static PFN_REGGETVALUEW vpfnRegGetValueWFromLibrary = NULL;
 
 static HMODULE vhAdvApi32Dll = NULL;
 static BOOL vfRegInitialized = FALSE;
 
+static HRESULT GetRegValue(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __deref_out_bcount_opt(*pcbBuffer) BYTE* pbBuffer,
+    __inout SIZE_T* pcbBuffer,
+    __out DWORD* pdwType
+    );
 static HRESULT WriteStringToRegistry(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
@@ -46,12 +56,20 @@ DAPI_(HRESULT) RegInitialize()
     hr = LoadSystemLibrary(L"AdvApi32.dll", &vhAdvApi32Dll);
     RegExitOnFailure(hr, "Failed to load AdvApi32.dll");
 
-    // ignore failures - if this doesn't exist, we'll fall back to RegDeleteKeyW
+    // Ignore failures - if this doesn't exist, we'll fall back to RegDeleteKeyW.
     vpfnRegDeleteKeyExWFromLibrary = reinterpret_cast<PFN_REGDELETEKEYEXW>(::GetProcAddress(vhAdvApi32Dll, "RegDeleteKeyExW"));
 
-    if (NULL == vpfnRegDeleteKeyExW)
+    // Ignore failures - if this doesn't exist, we'll fall back to RegQueryValueExW.
+    vpfnRegGetValueWFromLibrary = reinterpret_cast<PFN_REGGETVALUEW>(::GetProcAddress(vhAdvApi32Dll, "RegGetValueW"));
+
+    if (!vpfnRegDeleteKeyExW)
     {
         vpfnRegDeleteKeyExW = vpfnRegDeleteKeyExWFromLibrary;
+    }
+
+    if (!vpfnRegGetValueW)
+    {
+        vpfnRegGetValueW = vpfnRegGetValueWFromLibrary;
     }
 
     vfRegInitialized = TRUE;
@@ -68,7 +86,9 @@ DAPI_(void) RegUninitialize()
         ::FreeLibrary(vhAdvApi32Dll);
         vhAdvApi32Dll = NULL;
         vpfnRegDeleteKeyExWFromLibrary = NULL;
+        vpfnRegGetValueWFromLibrary = NULL;
         vpfnRegDeleteKeyExW = NULL;
+        vpfnRegGetValueW = NULL;
     }
 
     vfRegInitialized = FALSE;
@@ -84,7 +104,8 @@ DAPI_(void) RegFunctionOverride(
     __in_opt PFN_REGQUERYINFOKEYW pfnRegQueryInfoKeyW,
     __in_opt PFN_REGQUERYVALUEEXW pfnRegQueryValueExW,
     __in_opt PFN_REGSETVALUEEXW pfnRegSetValueExW,
-    __in_opt PFN_REGDELETEVALUEW pfnRegDeleteValueW
+    __in_opt PFN_REGDELETEVALUEW pfnRegDeleteValueW,
+    __in_opt PFN_REGGETVALUEW pfnRegGetValueW
     )
 {
     vpfnRegCreateKeyExW = pfnRegCreateKeyExW ? pfnRegCreateKeyExW : ::RegCreateKeyExW;
@@ -96,6 +117,14 @@ DAPI_(void) RegFunctionOverride(
     vpfnRegQueryValueExW = pfnRegQueryValueExW ? pfnRegQueryValueExW : ::RegQueryValueExW;
     vpfnRegSetValueExW = pfnRegSetValueExW ? pfnRegSetValueExW : ::RegSetValueExW;
     vpfnRegDeleteValueW = pfnRegDeleteValueW ? pfnRegDeleteValueW : ::RegDeleteValueW;
+    vpfnRegGetValueW = pfnRegGetValueW ? pfnRegGetValueW : vpfnRegGetValueWFromLibrary;
+}
+
+
+DAPI_(void) RegFunctionForceFallback()
+{
+    vpfnRegDeleteKeyExW = NULL;
+    vpfnRegGetValueW = NULL;
 }
 
 
@@ -358,51 +387,101 @@ LExit:
     return hr;
 }
 
+DAPI_(HRESULT) RegReadValue(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __in BOOL fExpand,
+    __deref_out_bcount_opt(*pcbBuffer) BYTE** ppbBuffer,
+    __inout SIZE_T* pcbBuffer,
+    __out DWORD* pdwType
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwAttempts = 0;
+    LPWSTR sczExpand = NULL;
+
+    hr = GetRegValue(hk, wzName, *ppbBuffer, pcbBuffer, pdwType);
+    if (E_FILENOTFOUND == hr)
+    {
+        ExitFunction();
+    }
+    else if (E_MOREDATA != hr)
+    {
+        RegExitOnFailure(hr, "Failed to get size of raw registry value.");
+
+        // Zero-length raw values can exist
+        if (!*ppbBuffer && 0 < *pcbBuffer)
+        {
+            hr = E_MOREDATA;
+        }
+    }
+
+    while (E_MOREDATA == hr && dwAttempts < 10)
+    {
+        ++dwAttempts;
+
+        if (*ppbBuffer)
+        {
+            *ppbBuffer = static_cast<LPBYTE>(MemReAlloc(*ppbBuffer, *pcbBuffer, FALSE));
+        }
+        else
+        {
+            *ppbBuffer = static_cast<LPBYTE>(MemAlloc(*pcbBuffer, FALSE));
+        }
+        RegExitOnNull(*ppbBuffer, hr, E_OUTOFMEMORY, "Failed to allocate buffer for raw registry value.");
+
+        hr = GetRegValue(hk, wzName, *ppbBuffer, pcbBuffer, pdwType);
+        if (E_FILENOTFOUND == hr)
+        {
+            ExitFunction();
+        }
+        else if (E_MOREDATA != hr)
+        {
+            RegExitOnFailure(hr, "Failed to read raw registry value.");
+        }
+    }
+
+    if (fExpand && SUCCEEDED(hr) && REG_EXPAND_SZ == *pdwType)
+    {
+        LPWSTR sczValue = reinterpret_cast<LPWSTR>(*ppbBuffer);
+        hr = PathExpand(&sczExpand, sczValue, PATH_EXPAND_ENVIRONMENT);
+        RegExitOnFailure(hr, "Failed to expand registry value: %ls", sczValue);
+
+        *ppbBuffer = reinterpret_cast<LPBYTE>(sczExpand);
+        *pcbBuffer = (lstrlenW(sczExpand) + 1) * sizeof(WCHAR);
+        sczExpand = NULL;
+        ReleaseMem(sczValue);
+    }
+
+LExit:
+    ReleaseStr(sczExpand);
+
+    return hr;
+}
+
 DAPI_(HRESULT) RegReadBinary(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __deref_out_bcount_opt(*pcbBuffer) BYTE** ppbBuffer,
-    __out SIZE_T *pcbBuffer
-     )
+    __out SIZE_T* pcbBuffer
+    )
 {
     HRESULT hr = S_OK;
-    LPBYTE pbBuffer = NULL;
-    DWORD er = ERROR_SUCCESS;
-    DWORD cb = 0;
     DWORD dwType = 0;
 
-    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, NULL, &cb);
-    RegExitOnWin32Error(er, hr, "Failed to get size of registry value.");
-
-    // Zero-length binary values can exist
-    if (0 < cb)
+    hr = RegReadValue(hk, wzName, FALSE, ppbBuffer, pcbBuffer, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
-        pbBuffer = static_cast<LPBYTE>(MemAlloc(cb, FALSE));
-        RegExitOnNull(pbBuffer, hr, E_OUTOFMEMORY, "Failed to allocate buffer for binary registry value.");
-
-        er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, pbBuffer, &cb);
-        if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
-        {
-            ExitFunction1(hr = E_FILENOTFOUND);
-        }
-        RegExitOnWin32Error(er, hr, "Failed to read registry value.");
+        ExitFunction();
     }
+    RegExitOnFailure(hr, "Failed to read binary registry value.");
 
-    if (REG_BINARY == dwType)
+    if (REG_BINARY != dwType)
     {
-        *ppbBuffer = pbBuffer;
-        pbBuffer = NULL;
-        *pcbBuffer = cb;
-    }
-    else
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Error reading binary registry value due to unexpected data type: %u", dwType);
+        RegExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE), "Error reading binary registry value due to unexpected data type: %u", dwType);
     }
 
 LExit:
-    ReleaseMem(pbBuffer);
-
     return hr;
 }
 
@@ -414,64 +493,63 @@ DAPI_(HRESULT) RegReadString(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     SIZE_T cbValue = 0;
-    DWORD cch = 0;
-    DWORD cb = 0;
+    DWORD dwType = 0;
+
+    if (psczValue && *psczValue)
+    {
+        hr = MemSizeChecked(*psczValue, &cbValue);
+        RegExitOnFailure(hr, "Failed to get size of input buffer.");
+    }
+
+    hr = RegReadValue(hk, wzName, TRUE, reinterpret_cast<LPBYTE*>(psczValue), &cbValue, &dwType);
+    if (E_FILENOTFOUND == hr)
+    {
+        ExitFunction();
+    }
+    RegExitOnFailure(hr, "Failed to read string registry value.");
+
+    if (REG_EXPAND_SZ != dwType && REG_SZ != dwType)
+    {
+        RegExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE), "Error reading string registry value due to unexpected data type: %u", dwType);
+    }
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) RegReadUnexpandedString(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __inout BOOL* pfNeedsExpansion,
+    __deref_out_z LPWSTR* psczValue
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cbValue = 0;
     DWORD dwType = 0;
     LPWSTR sczExpand = NULL;
 
     if (psczValue && *psczValue)
     {
-        hr = StrMaxLength(*psczValue, &cbValue);
-        RegExitOnFailure(hr, "Failed to determine length of string.");
-
-        cch = (DWORD)min(DWORD_MAX, cbValue);
+        hr = MemSizeChecked(*psczValue, &cbValue);
+        RegExitOnFailure(hr, "Failed to get size of input buffer.");
     }
 
-    if (2 > cch)
+    hr = RegReadValue(hk, wzName, FALSE, reinterpret_cast<LPBYTE*>(psczValue), &cbValue, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
-        cch = 2;
-
-        hr = StrAlloc(psczValue, cch);
-        RegExitOnFailure(hr, "Failed to allocate string to minimum size.");
+        ExitFunction();
     }
+    RegExitOnFailure(hr, "Failed to read expand string registry value.");
 
-    cb = sizeof(WCHAR) * (cch - 1); // subtract one to ensure there will be a space at the end of the string for the null terminator.
-    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(*psczValue), &cb);
-    if (ERROR_MORE_DATA == er)
+    if (REG_EXPAND_SZ != dwType && REG_SZ != dwType)
     {
-        cch = cb / sizeof(WCHAR) + 1; // add one to ensure there will be space at the end for the null terminator
-        hr = StrAlloc(psczValue, cch);
-        RegExitOnFailure(hr, "Failed to allocate string bigger for registry value.");
-
-        er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(*psczValue), &cb);
+        RegExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE), "Error reading expand string registry value due to unexpected data type: %u", dwType);
     }
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
-    {
-        ExitFunction1(hr = E_FILENOTFOUND);
-    }
-    RegExitOnWin32Error(er, hr, "Failed to read registry key.");
 
-    if (REG_SZ == dwType || REG_EXPAND_SZ == dwType)
-    {
-        // Always ensure the registry value is null terminated.
-        (*psczValue)[cch - 1] = L'\0';
-
-        if (REG_EXPAND_SZ == dwType)
-        {
-            hr = StrAllocString(&sczExpand, *psczValue, 0);
-            RegExitOnFailure(hr, "Failed to copy registry value to expand.");
-
-            hr = PathExpand(psczValue, sczExpand, PATH_EXPAND_ENVIRONMENT);
-            RegExitOnFailure(hr, "Failed to expand registry value: %ls", *psczValue);
-        }
-    }
-    else
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Error reading string registry value due to unexpected data type: %u", dwType);
-    }
+    *pfNeedsExpansion = REG_EXPAND_SZ == dwType;
 
 LExit:
     ReleaseStr(sczExpand);
@@ -488,57 +566,27 @@ DAPI_(HRESULT) RegReadStringArray(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     DWORD dwNullCharacters = 0;
     DWORD dwType = 0;
-    DWORD cb = 0;
-    DWORD cch = 0;
+    SIZE_T cb = 0;
+    SIZE_T cch = 0;
     LPCWSTR wzSource = NULL;
     LPWSTR sczValue = NULL;
 
-    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(sczValue), &cb);
-    if (0 < cb)
+    hr = RegReadValue(hk, wzName, FALSE, reinterpret_cast<LPBYTE*>(&sczValue), &cb, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
-        cch = cb / sizeof(WCHAR);
-        hr = StrAlloc(&sczValue, cch);
-        RegExitOnFailure(hr, "Failed to allocate string for registry value.");
-
-        er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(sczValue), &cb);
+        ExitFunction();
     }
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
-    {
-        ExitFunction1(hr = E_FILENOTFOUND);
-    }
-    RegExitOnWin32Error(er, hr, "Failed to read registry key.");
-
-    if (cb / sizeof(WCHAR) != cch)
-    {
-        hr = E_UNEXPECTED;
-        RegExitOnFailure(hr, "The size of registry value %ls unexpected changed between 2 reads", wzName);
-    }
+    RegExitOnFailure(hr, "Failed to read string array registry value.");
 
     if (REG_MULTI_SZ != dwType)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Tried to read string array, but registry value %ls is of an incorrect type", wzName);
-    }
-
-    // Value exists, but is empty, so no strings to return.
-    if (2 > cch)
-    {
-        *prgsczStrings = NULL;
-        *pcStrings = 0;
-        ExitFunction1(hr = S_OK);
-    }
-
-    // The docs specifically say if the value was written without double-null-termination, it'll get read back without it too.
-    if (L'\0' != sczValue[cch-1] || L'\0' != sczValue[cch-2])
-    {
-        hr = E_INVALIDARG;
-        RegExitOnFailure(hr, "Tried to read string array, but registry value %ls is invalid (isn't double-null-terminated)", wzName);
+        RegExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE), "Tried to read string array, but registry value %ls is of an incorrect type", wzName);
     }
 
     cch = cb / sizeof(WCHAR);
+
     for (DWORD i = 0; i < cch; ++i)
     {
         if (L'\0' == sczValue[i])
@@ -547,8 +595,28 @@ DAPI_(HRESULT) RegReadStringArray(
         }
     }
 
-    // There's one string for every null character encountered (except the extra 1 at the end of the string)
-    *pcStrings = dwNullCharacters - 1;
+    // Value exists, but is empty, so no strings to return.
+    if (!cb || 1 == dwNullCharacters && 1 == cch || 2 == dwNullCharacters && 2 == cch)
+    {
+        *prgsczStrings = NULL;
+        *pcStrings = 0;
+        ExitFunction1(hr = S_OK);
+    }
+
+    if (sczValue[cch - 1] != L'\0')
+    {
+        // Count the terminating null character that RegReadValue added past the end.
+        ++dwNullCharacters;
+        Assert(!sczValue[cch]);
+    }
+    else if (cch > 1 && sczValue[cch - 2] == L'\0')
+    {
+        // Don't count the extra 1 at the end of the properly double-null terminated string.
+        --dwNullCharacters;
+    }
+
+    // There's one string for every null character encountered.
+    *pcStrings = dwNullCharacters;
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID *>(prgsczStrings), *pcStrings, sizeof(LPWSTR), 0);
     RegExitOnFailure(hr, "Failed to resize array while reading REG_MULTI_SZ value");
 
@@ -557,11 +625,13 @@ DAPI_(HRESULT) RegReadStringArray(
     wzSource = sczValue;
     for (DWORD i = 0; i < *pcStrings; ++i)
     {
-        hr = StrAllocString(&(*prgsczStrings)[i], wzSource, 0);
+        cch = lstrlenW(wzSource);
+
+        hr = StrAllocString(&(*prgsczStrings)[i], wzSource, cch);
         RegExitOnFailure(hr, "Failed to allocate copy of string");
 
         // Skip past this string
-        wzSource += lstrlenW(wzSource) + 1;
+        wzSource += cch + 1;
     }
 #pragma prefast(pop)
 
@@ -579,38 +649,36 @@ DAPI_(HRESULT) RegReadVersion(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     DWORD dwType = 0;
-    DWORD cb = 0;
-    LPWSTR sczVersion = NULL;
+    SIZE_T cb = 0;
+    LPWSTR sczValue = NULL;
 
-    cb = sizeof(DWORD64);
-    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(*pdw64Version), &cb);
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    hr = RegReadValue(hk, wzName, TRUE, reinterpret_cast<LPBYTE*>(&sczValue), &cb, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
-        ExitFunction1(hr = E_FILENOTFOUND);
+        ExitFunction();
     }
+    RegExitOnFailure(hr, "Failed to read version registry value.");
 
     if (REG_SZ == dwType || REG_EXPAND_SZ == dwType)
     {
-        hr = RegReadString(hk, wzName, &sczVersion);
-        RegExitOnFailure(hr, "Failed to read registry version as string.");
-
-        hr = FileVersionFromStringEx(sczVersion, 0, pdw64Version);
+        hr = FileVersionFromStringEx(sczValue, 0, pdw64Version);
         RegExitOnFailure(hr, "Failed to convert registry string to version.");
     }
     else if (REG_QWORD == dwType)
     {
-        RegExitOnWin32Error(er, hr, "Failed to read registry key.");
+        if (memcpy_s(pdw64Version, sizeof(DWORD64), sczValue, cb))
+        {
+            RegExitWithRootFailure(hr, E_INVALIDARG, "Failed to copy QWORD version value.");
+        }
     }
     else // unexpected data type
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Error reading version registry value due to unexpected data type: %u", dwType);
+        RegExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE), "Error reading version registry value due to unexpected data type: %u", dwType);
     }
 
 LExit:
-    ReleaseStr(sczVersion);
+    ReleaseStr(sczValue);
 
     return hr;
 }
@@ -623,37 +691,38 @@ DAPI_(HRESULT) RegReadWixVersion(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     DWORD dwType = 0;
-    DWORD cb = 0;
+    SIZE_T cb = 0;
     DWORD64 dw64Version = 0;
-    LPWSTR sczVersion = NULL;
+    LPWSTR sczValue = NULL;
     VERUTIL_VERSION* pVersion = NULL;
 
-    cb = sizeof(DWORD64);
-    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(&dw64Version), &cb);
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    hr = RegReadValue(hk, wzName, TRUE, reinterpret_cast<LPBYTE*>(&sczValue), &cb, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
-        ExitFunction1(hr = E_FILENOTFOUND);
+        ExitFunction();
     }
+    RegExitOnFailure(hr, "Failed to read wix version registry value.");
 
     if (REG_SZ == dwType || REG_EXPAND_SZ == dwType)
     {
-        hr = RegReadString(hk, wzName, &sczVersion);
-        RegExitOnFailure(hr, "Failed to read registry version as string.");
-
-        hr = VerParseVersion(sczVersion, 0, FALSE, &pVersion);
-        RegExitOnFailure(hr, "Failed to convert registry string to version.");
+        hr = VerParseVersion(sczValue, 0, FALSE, &pVersion);
+        RegExitOnFailure(hr, "Failed to convert registry string to wix version.");
     }
     else if (REG_QWORD == dwType)
     {
+        if (memcpy_s(&dw64Version, sizeof(DWORD64), sczValue, cb))
+        {
+            RegExitWithRootFailure(hr, E_INVALIDARG, "Failed to copy QWORD wix version value.");
+        }
+
         hr = VerVersionFromQword(dw64Version, &pVersion);
-        RegExitOnFailure(hr, "Failed to convert registry string to version.");
+        RegExitOnFailure(hr, "Failed to convert registry string to wix version.");
     }
     else // unexpected data type
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Error reading version registry value due to unexpected data type: %u", dwType);
+        RegExitOnRootFailure(hr, "Error reading wix version registry value due to unexpected data type: %u", dwType);
     }
 
     *ppVersion = pVersion;
@@ -661,7 +730,7 @@ DAPI_(HRESULT) RegReadWixVersion(
 
 LExit:
     ReleaseVerutilVersion(pVersion);
-    ReleaseStr(sczVersion);
+    ReleaseStr(sczValue);
 
     return hr;
 }
@@ -673,20 +742,18 @@ DAPI_(HRESULT) RegReadNone(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     DWORD dwType = 0;
 
-    er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, NULL, NULL);
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    hr = RegGetType(hk, wzName, &dwType);
+    if (E_FILENOTFOUND == hr)
     {
-        ExitFunction1(hr = E_FILENOTFOUND);
+        ExitFunction();
     }
-    RegExitOnWin32Error(er, hr, "Failed to query registry key value.");
+    RegExitOnFailure(hr, "Error reading none registry value type.");
 
     if (REG_NONE != dwType)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Error reading none registry value due to unexpected data type: %u", dwType);
+        RegExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE), "Error reading none registry value due to unexpected data type: %u", dwType);
     }
 
 LExit:
@@ -829,12 +896,9 @@ DAPI_(HRESULT) RegWriteStringArray(
     DWORD dwTotalStringSize = 0;
     DWORD cbTotalStringSize = 0;
     DWORD dwTemp = 0;
+    DWORD dwRemainingStringSize = 0;
 
-    if (0 == cValues)
-    {
-        wzWriteValue = L"\0";
-    }
-    else
+    if (cValues)
     {
         // Add space for the null terminator
         dwTotalStringSize = 1;
@@ -850,21 +914,22 @@ DAPI_(HRESULT) RegWriteStringArray(
         RegExitOnFailure(hr, "Failed to allocate space for string while writing REG_MULTI_SZ");
 
         wzCopyDestination = sczWriteValue;
-        dwTemp = dwTotalStringSize;
+        dwRemainingStringSize = dwTotalStringSize;
         for (DWORD i = 0; i < cValues; ++i)
         {
-            hr = ::StringCchCopyW(wzCopyDestination, dwTotalStringSize, rgwzValues[i]);
+            hr = ::StringCchCopyW(wzCopyDestination, dwRemainingStringSize, rgwzValues[i]);
             RegExitOnFailure(hr, "failed to copy string: %ls", rgwzValues[i]);
 
-            dwTemp -= lstrlenW(rgwzValues[i]) + 1;
-            wzCopyDestination += lstrlenW(rgwzValues[i]) + 1;
+            dwTemp = lstrlenW(rgwzValues[i]) + 1;
+            dwRemainingStringSize -= dwTemp;
+            wzCopyDestination += dwTemp;
         }
 
         wzWriteValue = sczWriteValue;
-    }
 
-    hr = ::DWordMult(dwTotalStringSize, sizeof(WCHAR), &cbTotalStringSize);
-    RegExitOnFailure(hr, "Failed to get total string size in bytes");
+        hr = ::DWordMult(dwTotalStringSize, sizeof(WCHAR), &cbTotalStringSize);
+        RegExitOnFailure(hr, "Failed to get total string size in bytes");
+    }
 
     er = vpfnRegSetValueExW(hk, wzName, 0, REG_MULTI_SZ, reinterpret_cast<const BYTE *>(wzWriteValue), cbTotalStringSize);
     RegExitOnWin32Error(er, hr, "Failed to set registry value to array of strings (first string of which is): %ls", wzWriteValue);
@@ -1000,6 +1065,48 @@ DAPI_(REGSAM) RegTranslateKeyBitness(
     }
 }
 
+static HRESULT GetRegValue(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __deref_out_bcount_opt(*pcbBuffer) BYTE* pbBuffer,
+    __inout SIZE_T* pcbBuffer,
+    __out DWORD* pdwType
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cb = (DWORD)min(DWORD_MAX, *pcbBuffer);
+
+    if (vpfnRegGetValueW)
+    {
+        hr = HRESULT_FROM_WIN32(vpfnRegGetValueW(hk, NULL, wzName, RRF_RT_ANY | RRF_NOEXPAND, pdwType, pbBuffer, &cb));
+    }
+    else
+    {
+        hr = HRESULT_FROM_WIN32(vpfnRegQueryValueExW(hk, wzName, NULL, pdwType, pbBuffer, &cb));
+
+        if (REG_SZ == *pdwType || REG_EXPAND_SZ == *pdwType || REG_MULTI_SZ == *pdwType)
+        {
+            if (E_MOREDATA == hr || S_OK == hr && (cb + sizeof(WCHAR)) > *pcbBuffer)
+            {
+                // Make sure there's room for a null terminator at the end.
+                HRESULT hrAdd = ::DWordAdd(cb, sizeof(WCHAR), &cb);
+
+                hr = FAILED(hrAdd) ? hrAdd : (pbBuffer ? E_MOREDATA : S_OK);
+            }
+            else if (S_OK == hr && pbBuffer)
+            {
+                // Always ensure the registry value is null terminated.
+                WCHAR* pch = reinterpret_cast<WCHAR*>(pbBuffer + cb);
+                *pch = L'\0';
+            }
+        }
+    }
+
+    *pcbBuffer = cb;
+
+    return hr;
+}
+
 static HRESULT WriteStringToRegistry(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
@@ -1013,8 +1120,11 @@ static HRESULT WriteStringToRegistry(
 
     if (wzValue)
     {
-        hr = ::StringCbLengthW(wzValue, STRSAFE_MAX_CCH * sizeof(TCHAR), &cbValue);
+        hr = ::StringCbLengthW(wzValue, DWORD_MAX, &cbValue);
         RegExitOnFailure(hr, "Failed to determine length of registry value: %ls", wzName);
+
+        // Need to include the null terminator.
+        cbValue += sizeof(WCHAR);
 
         er = vpfnRegSetValueExW(hk, wzName, 0, dwType, reinterpret_cast<const BYTE *>(wzValue), static_cast<DWORD>(cbValue));
         RegExitOnWin32Error(er, hr, "Failed to set registry value: %ls", wzName);
