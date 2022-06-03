@@ -64,31 +64,12 @@ DAPI_(HRESULT) PathCanonicalizeForComparison(
 
     if (PATH_CANONICALIZE_KEEP_UNC_ROOT & dwCanonicalizeFlags)
     {
-        if (L'\\' == sczNormalizedPath[0] && (L'\\' == sczNormalizedPath[1] || L'?' == sczNormalizedPath[1]) && L'?' == sczNormalizedPath[2] && L'\\' == sczNormalizedPath[3])
+        BOOL fUNC = FALSE;
+        LPCWSTR wzPastRoot = PathSkipPastRoot(sczNormalizedPath, NULL, NULL, &fUNC);
+        if (fUNC)
         {
-            if (L'U' == sczNormalizedPath[4] && L'N' == sczNormalizedPath[5] && L'C' == sczNormalizedPath[6] && L'\\' == sczNormalizedPath[7])
-            {
-                cchUncRootLength = 8;
-            }
-        }
-        else if (L'\\' == sczNormalizedPath[0] && L'\\' == sczNormalizedPath[1])
-        {
-            cchUncRootLength = 2;
-        }
-
-        if (cchUncRootLength)
-        {
-            DWORD dwRemainingSlashes = 2;
-
-            for (wzNormalizedPath += cchUncRootLength; *wzNormalizedPath && dwRemainingSlashes; ++wzNormalizedPath)
-            {
-                ++cchUncRootLength;
-
-                if (L'\\' == *wzNormalizedPath)
-                {
-                    --dwRemainingSlashes;
-                }
-            }
+            wzNormalizedPath = wzPastRoot;
+            cchUncRootLength = wzPastRoot - sczNormalizedPath;
         }
     }
 
@@ -115,22 +96,24 @@ DAPI_(HRESULT) PathCanonicalizeForComparison(
     if (PATH_CANONICALIZE_BACKSLASH_TERMINATE & dwCanonicalizeFlags)
     {
         hr = PathBackslashTerminate(psczCanonicalized);
-        PathExitOnFailure(hr, "Failed to backslash terminate the canonicalized path");
+        PathExitOnFailure(hr, "Failed to backslash terminate the canonicalized path.");
     }
 
-    if (PathIsFullyQualified(*psczCanonicalized, &fHasPrefix) && !fHasPrefix &&
-        (PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX & dwCanonicalizeFlags))
+    if (PATH_CANONICALIZE_APPEND_EXTENDED_PATH_PREFIX & dwCanonicalizeFlags)
     {
-        hr = PathPrefix(psczCanonicalized);
-        PathExitOnFailure(hr, "Failed to ensure the long path prefix on the canonicalized path");
-
-        fHasPrefix = TRUE;
+        hr = PathPrefix(psczCanonicalized, 0, PATH_PREFIX_SHORT_PATHS);
+        PathExitOnFailure(hr, "Failed to ensure the extended path prefix on the canonicalized path.");
     }
+
+    PathSkipPastRoot(*psczCanonicalized, &fHasPrefix, NULL, NULL);
 
     if (fHasPrefix)
     {
-        // Canonicalize \??\ into \\?\.
+        // Canonicalize prefix into \\?\.
+        (*psczCanonicalized)[0] = L'\\';
         (*psczCanonicalized)[1] = L'\\';
+        (*psczCanonicalized)[2] = L'?';
+        (*psczCanonicalized)[3] = L'\\';
     }
 
 LExit:
@@ -188,7 +171,7 @@ DAPI_(HRESULT) PathCompareCanonicalized(
     HRESULT hr = S_OK;
     LPWSTR sczCanonicalized1 = NULL;
     LPWSTR sczCanonicalized2 = NULL;
-    DWORD dwDefaultFlags = PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX | PATH_CANONICALIZE_KEEP_UNC_ROOT;
+    DWORD dwDefaultFlags = PATH_CANONICALIZE_APPEND_EXTENDED_PATH_PREFIX | PATH_CANONICALIZE_KEEP_UNC_ROOT;
     int nResult = 0;
 
     if (!wzPath1 || !wzPath2)
@@ -221,7 +204,7 @@ DAPI_(HRESULT) PathDirectoryContainsPath(
     HRESULT hr = S_OK;
     LPWSTR sczCanonicalizedDirectory = NULL;
     LPWSTR sczCanonicalizedPath = NULL;
-    DWORD dwDefaultFlags = PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX | PATH_CANONICALIZE_KEEP_UNC_ROOT;
+    DWORD dwDefaultFlags = PATH_CANONICALIZE_APPEND_EXTENDED_PATH_PREFIX | PATH_CANONICALIZE_KEEP_UNC_ROOT;
     size_t cchDirectory = 0;
 
     if (!wzDirectory || !*wzDirectory)
@@ -239,7 +222,7 @@ DAPI_(HRESULT) PathDirectoryContainsPath(
     hr = PathCanonicalizeForComparison(wzPath, dwDefaultFlags, &sczCanonicalizedPath);
     PathExitOnFailure(hr, "Failed to canonicalize the path.");
 
-    if (!PathIsFullyQualified(sczCanonicalizedDirectory, NULL))
+    if (!PathIsFullyQualified(sczCanonicalizedDirectory))
     {
         PathExitWithRootFailure(hr, E_INVALIDARG, "wzDirectory must be a fully qualified path.");
     }

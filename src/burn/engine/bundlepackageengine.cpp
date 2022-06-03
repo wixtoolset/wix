@@ -763,7 +763,7 @@ static HRESULT ExecuteBundle(
 
     if (fPseudoPackage)
     {
-        if (!PathIsFullyQualified(pPackagePayload->sczFilePath, NULL))
+        if (!PathIsFullyQualified(pPackagePayload->sczFilePath))
         {
             ExitWithRootFailure(hr, E_INVALIDSTATE, "Related bundles must have a fully qualified target path.");
         }

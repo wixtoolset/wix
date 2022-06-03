@@ -364,17 +364,27 @@ extern "C" DWORD DAPI DirDeleteEmptyDirectoriesToRoot(
     __in DWORD /*dwFlags*/
     )
 {
+    HRESULT hr = S_OK;
     DWORD cDeletedDirs = 0;
     LPWSTR sczPath = NULL;
+    LPCWSTR wzPastRoot = NULL;
+    SIZE_T cchRoot = 0;
 
-    while (wzPath && *wzPath && ::RemoveDirectoryW(wzPath))
+    // Make sure the path is normalized and prefixed.
+    hr = PathExpand(&sczPath, wzPath, PATH_EXPAND_FULLPATH);
+    DirExitOnFailure(hr, "Failed to get full path for: %ls", wzPath);
+
+    wzPastRoot = PathSkipPastRoot(sczPath, NULL, NULL, NULL);
+    DirExitOnNull(wzPastRoot, hr, E_INVALIDARG, "Full path was not rooted: %ls", sczPath);
+
+    cchRoot = wzPastRoot - sczPath;
+
+    while (sczPath && sczPath[cchRoot] && ::RemoveDirectoryW(sczPath))
     {
         ++cDeletedDirs;
 
-        HRESULT hr = PathGetParentPath(wzPath, &sczPath);
-        DirExitOnFailure(hr, "Failed to get parent directory for path: %ls", wzPath);
-
-        wzPath = sczPath;
+        hr = PathGetParentPath(sczPath, &sczPath, &cchRoot);
+        DirExitOnFailure(hr, "Failed to get parent directory for path: %ls", sczPath);
     }
 
 LExit:

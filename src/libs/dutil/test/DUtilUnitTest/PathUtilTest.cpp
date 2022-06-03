@@ -135,13 +135,21 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"\\\\server\\share\\", sczCanonicalized);
 
-                hr = PathCanonicalizeForComparison(L"\\\\.\\share\\otherdir\\unc.exe", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
+                hr = PathCanonicalizeForComparison(L"\\\\.\\UNC\\server\\share\\..\\unc.exe", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
-                NativeAssert::StringEqual(L"\\\\.\\share\\otherdir\\unc.exe", sczCanonicalized);
+                NativeAssert::StringEqual(L"\\\\?\\UNC\\server\\share\\unc.exe", sczCanonicalized);
 
-                hr = PathCanonicalizeForComparison(L"\\\\.\\share\\otherdir\\unc.exe", 0, &sczCanonicalized);
+                hr = PathCanonicalizeForComparison(L"\\\\..\\share\\otherdir\\unc.exe", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\..\\share\\otherdir\\unc.exe", sczCanonicalized);
+
+                hr = PathCanonicalizeForComparison(L"\\\\..\\share\\otherdir\\unc.exe", 0, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"\\\\share\\otherdir\\unc.exe", sczCanonicalized);
+
+                hr = PathCanonicalizeForComparison(L"\\\\.\\UNC\\share\\otherdir\\unc.exe", 0, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\UNC\\share\\otherdir\\unc.exe", sczCanonicalized);
 
                 hr = PathCanonicalizeForComparison(L"\\\\server\\share\\..\\..\\otherdir\\unc.exe", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
@@ -215,7 +223,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"C:\\invalid:pathchars?.exe", sczCanonicalized);
 
-                hr = PathCanonicalizeForComparison(L"C:\\addprefix.exe", PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX, &sczCanonicalized);
+                hr = PathCanonicalizeForComparison(L"C:\\addprefix.exe", PATH_CANONICALIZE_APPEND_EXTENDED_PATH_PREFIX, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"\\\\?\\C:\\addprefix.exe", sczCanonicalized);
 
@@ -312,7 +320,7 @@ namespace DutilTests
             LPCWSTR rgwzPaths[8] =
             {
                 L"C:\\simplepath", L"D:\\simplepath",
-                L"\\\\.\\share\\otherdir\\unc.exe", L"\\\\share\\otherdir\\unc.exe",
+                L"\\\\..\\share\\otherdir\\unc.exe", L"\\\\share\\otherdir\\unc.exe",
                 L"\\\\server\\.\\otherdir\\unc.exe", L"\\\\server\\otherdir\\unc.exe",
                 L"\\\\server\\\\otherdir\\unc.exe", L"\\\\server\\otherdir\\unc.exe",
             };
@@ -541,9 +549,10 @@ namespace DutilTests
         {
             HRESULT hr = S_OK;
             LPWSTR sczPath = NULL;
-            LPCWSTR rgwzPaths[18] =
+            LPCWSTR rgwzPaths[20] =
             {
                 L"C:\\a\\b", L"C:\\a\\",
+                L"C:\\a\\b\\", L"C:\\a\\b\\",
                 L"C:\\a", L"C:\\",
                 L"C:\\", L"C:\\",
                 L"\"C:\\a\\b\\c\"", L"\"C:\\a\\b\\",
@@ -560,6 +569,40 @@ namespace DutilTests
                 {
                     hr = PathGetDirectory(rgwzPaths[i], &sczPath);
                     NativeAssert::Succeeded(hr, "PathGetDirectory: {0}", rgwzPaths[i]);
+                    NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
+                }
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
+        void PathGetParentPathTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+            LPCWSTR rgwzPaths[20] =
+            {
+                L"C:\\a\\b", L"C:\\a\\",
+                L"C:\\a\\b\\", L"C:\\a\\",
+                L"C:\\a", L"C:\\",
+                L"C:\\", NULL,
+                L"\"C:\\a\\b\\c\"", L"\"C:\\a\\b\\",
+                L"\"C:\\a\\b\\\"c", L"\"C:\\a\\b\\",
+                L"\"C:\\a\\b\"\\c", L"\"C:\\a\\b\"\\",
+                L"\"C:\\a\\\"b\\c", L"\"C:\\a\\\"b\\",
+                L"C:\\a\"\\\"b\\c", L"C:\\a\"\\\"b\\",
+                L"C:\\a\"\\b\\c\"", L"C:\\a\"\\b\\",
+            };
+
+            try
+            {
+                for (DWORD i = 0; i < countof(rgwzPaths); i += 2)
+                {
+                    hr = PathGetParentPath(rgwzPaths[i], &sczPath, NULL);
+                    NativeAssert::Succeeded(hr, "PathGetParentPath: {0}", rgwzPaths[i]);
                     NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
                 }
             }
@@ -691,6 +734,12 @@ namespace DutilTests
                 NativeAssert::StringEqual(L"Software\\", rgsczPaths[0]);
                 NativeAssert::StringEqual(L"Software\\Microsoft\\", rgsczPaths[1]);
                 NativeAssert::StringEqual(L"Software\\Microsoft\\Windows\\", rgsczPaths[2]);
+                ReleaseNullStrArray(rgsczPaths, cPaths);
+
+                hr = PathGetHierarchyArray(L"Software", &rgsczPaths, &cPaths);
+                NativeAssert::Succeeded(hr, "Failed to get parent directories array for relative path");
+                Assert::Equal<DWORD>(1, cPaths);
+                NativeAssert::StringEqual(L"Software", rgsczPaths[0]);
                 ReleaseNullStrArray(rgsczPaths, cPaths);
 
                 hr = PathGetHierarchyArray(L"c:/foo/bar/bas/a.txt", &rgsczPaths, &cPaths);
@@ -832,8 +881,12 @@ namespace DutilTests
                     hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
                     NativeAssert::Succeeded(hr, "Failed to copy string");
 
-                    hr = PathPrefix(&sczPath);
+                    hr = PathPrefix(&sczPath, 0, 0);
                     NativeAssert::Succeeded(hr, "PathPrefix: {0}", rgwzPaths[i]);
+                    NativeAssert::StringEqual(rgwzPaths[i], sczPath);
+
+                    hr = PathPrefix(&sczPath, 0, PATH_PREFIX_SHORT_PATHS);
+                    NativeAssert::Succeeded(hr, "PathPrefix (SHORT_PATHS): {0}", rgwzPaths[i]);
                     NativeAssert::StringEqual(rgwzPaths[i + 1], sczPath);
                 }
             }
@@ -871,7 +924,7 @@ namespace DutilTests
                     hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
                     NativeAssert::Succeeded(hr, "Failed to copy string");
 
-                    hr = PathPrefix(&sczPath);
+                    hr = PathPrefix(&sczPath, 0, PATH_PREFIX_EXPECT_FULLY_QUALIFIED);
                     NativeAssert::SpecificReturnCode(E_INVALIDARG, hr, "PathPrefix: {0}, {1}", rgwzPaths[i], sczPath);
                 }
             }
@@ -884,169 +937,144 @@ namespace DutilTests
         [Fact]
         void PathIsRootedAndFullyQualifiedTest()
         {
-            HRESULT hr = S_OK;
-            LPWSTR sczPath = NULL;
-            LPCWSTR rgwzPaths[15] =
+            LPCWSTR rgwzPaths[30] =
             {
-                L"//",
-                L"///",
-                L"C:/",
-                L"C://",
-                L"C:/foo1",
-                L"C://foo2",
-                L"//test/unc/path/to/something",
-                L"//a/b/c/d/e",
-                L"//a/b/",
-                L"//a/b",
-                L"//test/unc",
-                L"//Server",
-                L"//Server/Foo.txt",
-                L"//Server/Share/Foo.txt",
-                L"//Server/Share/Test/Foo.txt",
+                L"//", L"",
+                L"///", L"",
+                L"C:/", L"",
+                L"C://", L"/",
+                L"C:/foo1", L"foo1",
+                L"C://foo2", L"/foo2",
+                L"//test/unc/path/to/something", L"path/to/something",
+                L"//a/b/c/d/e", L"c/d/e",
+                L"//a/b/", L"",
+                L"//a/b", L"",
+                L"//test/unc", L"",
+                L"//Server", L"",
+                L"//Server/Foo.txt", L"",
+                L"//Server/Share/Foo.txt", L"Foo.txt",
+                L"//Server/Share/Test/Foo.txt", L"Test/Foo.txt",
             };
 
-            try
-            {
-                for (DWORD i = 0; i < countof(rgwzPaths); ++i)
-                {
-                    ValidateFullyQualifiedPath(rgwzPaths[i], TRUE, FALSE);
-                    ValidateRootedPath(rgwzPaths[i], TRUE);
-
-                    hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
-                    NativeAssert::Succeeded(hr, "Failed to copy string");
-
-                    PathFixedReplaceForwardSlashes(sczPath);
-                    ValidateFullyQualifiedPath(sczPath, TRUE, FALSE);
-                    ValidateRootedPath(sczPath, TRUE);
-                }
-            }
-            finally
-            {
-                ReleaseStr(sczPath);
-            }
+            ValidateSkipPastRoot(rgwzPaths, countof(rgwzPaths), FALSE, TRUE, TRUE);
         }
 
         [Fact]
         void PathIsRootedAndFullyQualifiedWithPrefixTest()
         {
-            HRESULT hr = S_OK;
-            LPWSTR sczPath = NULL;
-            LPCWSTR rgwzPaths[6] =
+            LPCWSTR rgwzPaths[12] =
             {
-                L"//?/UNC/test/unc/path/to/something",
-                L"//?/UNC/test/unc",
-                L"//?/UNC/a/b1",
-                L"//?/UNC/a/b2/",
-                L"//?/C:/foo/bar.txt",
-                L"/??/C:/foo/bar.txt",
+                L"//?/UNC/test/unc/path/to/something", L"path/to/something",
+                L"//?/UNC/test/unc", L"",
+                L"//?/UNC/a/b1", L"",
+                L"//?/UNC/a/b2/", L"",
+                L"//?/C:/foo/bar.txt", L"foo/bar.txt",
+                L"/??/C:/foo/bar.txt", L"foo/bar.txt",
             };
 
-            try
-            {
-                for (DWORD i = 0; i < countof(rgwzPaths); ++i)
-                {
-                    ValidateFullyQualifiedPath(rgwzPaths[i], TRUE, TRUE);
-                    ValidateRootedPath(rgwzPaths[i], TRUE);
-
-                    hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
-                    NativeAssert::Succeeded(hr, "Failed to copy string");
-
-                    PathFixedReplaceForwardSlashes(sczPath);
-                    ValidateFullyQualifiedPath(sczPath, TRUE, TRUE);
-                    ValidateRootedPath(sczPath, TRUE);
-                }
-            }
-            finally
-            {
-                ReleaseStr(sczPath);
-            }
+            ValidateSkipPastRoot(rgwzPaths, countof(rgwzPaths), TRUE, TRUE, TRUE);
         }
 
         [Fact]
         void PathIsRootedButNotFullyQualifiedTest()
         {
-            HRESULT hr = S_OK;
-            LPWSTR sczPath = NULL;
-            LPCWSTR rgwzPaths[7] =
+            LPCWSTR rgwzPaths[14] =
             {
-                L"/",
-                L"a:",
-                L"A:",
-                L"z:",
-                L"Z:",
-                L"C:foo.txt",
-                L"/dir",
+                L"/", L"",
+                L"a:", L"",
+                L"A:", L"",
+                L"z:", L"",
+                L"Z:", L"",
+                L"C:foo.txt", L"foo.txt",
+                L"/dir", L"dir",
             };
 
-            try
-            {
-                for (DWORD i = 0; i < countof(rgwzPaths); ++i)
-                {
-                    ValidateFullyQualifiedPath(rgwzPaths[i], FALSE, FALSE);
-                    ValidateRootedPath(rgwzPaths[i], TRUE);
-
-                    hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
-                    NativeAssert::Succeeded(hr, "Failed to copy string");
-
-                    PathFixedReplaceForwardSlashes(sczPath);
-                    ValidateFullyQualifiedPath(sczPath, FALSE, FALSE);
-                    ValidateRootedPath(sczPath, TRUE);
-                }
-            }
-            finally
-            {
-                ReleaseStr(sczPath);
-            }
+            ValidateSkipPastRoot(rgwzPaths, countof(rgwzPaths), FALSE, FALSE, TRUE);
         }
 
         [Fact]
         void PathIsNotRootedAndNotFullyQualifiedTest()
         {
+            LPCWSTR rgwzPaths[18] =
+            {
+                NULL, NULL,
+                L"", NULL,
+                L"dir", NULL,
+                L"dir/subdir", NULL,
+                L"@:/foo", NULL,  // 064 = @     065 = A
+                L"[://", NULL,   // 091 = [     090 = Z
+                L"`:/foo ", NULL, // 096 = `     097 = a
+                L"{://", NULL,   // 123 = {     122 = z
+                L"[:", NULL,
+            };
+
+            ValidateSkipPastRoot(rgwzPaths, countof(rgwzPaths), FALSE, FALSE, FALSE);
+        }
+
+        void ValidateSkipPastRoot(LPCWSTR* rgwzPaths, DWORD cPaths, BOOL fExpectedPrefix, BOOL fExpectedFullyQualified, BOOL fExpectedRooted)
+        {
             HRESULT hr = S_OK;
             LPWSTR sczPath = NULL;
-            LPCWSTR rgwzPaths[9] =
-            {
-                NULL,
-                L"",
-                L"dir",
-                L"dir/subdir",
-                L"@:/foo",  // 064 = @     065 = A
-                L"[://",   // 091 = [     090 = Z
-                L"`:/foo ", // 096 = `     097 = a
-                L"{://",   // 123 = {     122 = z
-                L"[:",
-            };
+            LPWSTR sczSkipRootPath = NULL;
+            LPCWSTR wzSkipRootPath = NULL;
+            BOOL fHasPrefix = FALSE;
 
             try
             {
-                for (DWORD i = 0; i < countof(rgwzPaths); ++i)
+                for (DWORD i = 0; i < cPaths; i += 2)
                 {
-                    ValidateFullyQualifiedPath(rgwzPaths[i], FALSE, FALSE);
-                    ValidateRootedPath(rgwzPaths[i], FALSE);
+                    wzSkipRootPath = PathSkipPastRoot(rgwzPaths[i], &fHasPrefix, NULL, NULL);
+                    NativeAssert::StringEqual(rgwzPaths[i + 1], wzSkipRootPath);
+                    ValidateExtendedPrefixPath(rgwzPaths[i], fExpectedPrefix, fHasPrefix);
+                    ValidateFullyQualifiedPath(rgwzPaths[i], fExpectedFullyQualified);
+                    ValidateRootedPath(rgwzPaths[i], fExpectedRooted);
 
-                    if (!rgwzPaths[i])
+                    if (rgwzPaths[i])
                     {
-                        continue;
+                        hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
+                        NativeAssert::Succeeded(hr, "Failed to copy string");
+
+                        PathFixedReplaceForwardSlashes(sczPath);
                     }
 
-                    hr = StrAllocString(&sczPath, rgwzPaths[i], 0);
-                    NativeAssert::Succeeded(hr, "Failed to copy string");
+                    if (rgwzPaths[i + 1])
+                    {
+                        hr = StrAllocString(&sczSkipRootPath, rgwzPaths[i + 1], 0);
+                        NativeAssert::Succeeded(hr, "Failed to copy string");
 
-                    PathFixedReplaceForwardSlashes(sczPath);
-                    ValidateFullyQualifiedPath(sczPath, FALSE, FALSE);
-                    ValidateRootedPath(sczPath, FALSE);
+                        PathFixedReplaceForwardSlashes(sczSkipRootPath);
+                    }
+
+                    wzSkipRootPath = PathSkipPastRoot(sczPath, &fHasPrefix, NULL, NULL);
+                    NativeAssert::StringEqual(sczSkipRootPath, wzSkipRootPath);
+                    ValidateExtendedPrefixPath(sczPath, fExpectedPrefix, fHasPrefix);
+                    ValidateFullyQualifiedPath(sczPath, fExpectedFullyQualified);
+                    ValidateRootedPath(sczPath, fExpectedRooted);
                 }
             }
             finally
             {
                 ReleaseStr(sczPath);
+                ReleaseStr(sczSkipRootPath);
             }
         }
 
-        void ValidateFullyQualifiedPath(LPCWSTR wzPath, BOOL fExpected, BOOL fExpectedHasPrefix)
+        void ValidateExtendedPrefixPath(LPCWSTR wzPath, BOOL fExpected, BOOL fHasExtendedPrefix)
         {
-            BOOL fHasLongPathPrefix = FALSE;
-            BOOL fRooted = PathIsFullyQualified(wzPath, &fHasLongPathPrefix);
+            String^ message = String::Format("HasExtendedPrefix: {0}", gcnew String(wzPath));
+            if (fExpected)
+            {
+                Assert::True(fHasExtendedPrefix, message);
+            }
+            else
+            {
+                Assert::False(fHasExtendedPrefix, message);
+            }
+        }
+
+        void ValidateFullyQualifiedPath(LPCWSTR wzPath, BOOL fExpected)
+        {
+            BOOL fRooted = PathIsFullyQualified(wzPath);
             String^ message = String::Format("IsFullyQualified: {0}", gcnew String(wzPath));
             if (fExpected)
             {
@@ -1055,16 +1083,6 @@ namespace DutilTests
             else
             {
                 Assert::False(fRooted, message);
-            }
-
-            message = String::Format("HasLongPathPrefix: {0}", gcnew String(wzPath));
-            if (fExpectedHasPrefix)
-            {
-                Assert::True(fHasLongPathPrefix, message);
-            }
-            else
-            {
-                Assert::False(fHasLongPathPrefix, message);
             }
         }
 

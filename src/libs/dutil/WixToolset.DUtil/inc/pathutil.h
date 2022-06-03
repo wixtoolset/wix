@@ -8,8 +8,8 @@ extern "C" {
 
 typedef enum _PATH_CANONICALIZE
 {
-    // Always prefix fully qualified paths with the long path prefix (\\?\).
-    PATH_CANONICALIZE_APPEND_LONG_PATH_PREFIX = 0x0001,
+    // Always prefix fully qualified paths with the extended path prefix (\\?\).
+    PATH_CANONICALIZE_APPEND_EXTENDED_PATH_PREFIX = 0x0001,
     // Always terminate the path with \.
     PATH_CANONICALIZE_BACKSLASH_TERMINATE = 0x0002,
     // Don't collapse . or .. in the \\server\share portion of a UNC path.
@@ -21,6 +21,14 @@ typedef enum _PATH_EXPAND
     PATH_EXPAND_ENVIRONMENT = 0x0001,
     PATH_EXPAND_FULLPATH    = 0x0002,
 } PATH_EXPAND;
+
+typedef enum _PATH_PREFIX
+{
+    // Add prefix even if the path is not longer than MAX_PATH.
+    PATH_PREFIX_SHORT_PATHS    = 0x0001,
+    // Error with E_INVALIDARG if the path is not fully qualified.
+    PATH_PREFIX_EXPECT_FULLY_QUALIFIED = 0x0002,
+} PATH_PREFIX;
 
 
 /*******************************************************************
@@ -40,8 +48,9 @@ DAPI_(LPCWSTR) PathExtension(
 
 /*******************************************************************
  PathGetDirectory - extracts the directory from a path including the directory separator.
-                    This means calling the function again with the previous result returns the same result.
-                    Returns S_FALSE if the path only contains a file name.
+    Calling the function again with the previous result returns the same result.
+    Returns S_FALSE if the path only contains a file name.
+    For example, C:\a\b -> C:\a\ -> C:\a\
 ********************************************************************/
 DAPI_(HRESULT) PathGetDirectory(
     __in_z LPCWSTR wzPath,
@@ -49,12 +58,18 @@ DAPI_(HRESULT) PathGetDirectory(
     );
 
 /*******************************************************************
-PathGetParentPath - extracts the parent directory from a full path.
-                    *psczDirectory is NULL if the path only contains a file name.
+PathGetParentPath - extracts the parent directory from a path
+    ignoring a trailing slash so that when called repeatedly,
+    it eventually returns the root portion of the path.
+    *psczDirectory is NULL if the path only contains a file name or
+    the path only contains the root.
+    *pcchRoot is the length of the root part of the path.
+    For example, C:\a\b -> C:\a\ -> C:\ -> NULL
 ********************************************************************/
 DAPI_(HRESULT) PathGetParentPath(
     __in_z LPCWSTR wzPath,
-    __out_z LPWSTR *psczDirectory
+    __out_z LPWSTR *psczDirectory,
+    __out_opt SIZE_T* pcchRoot
     );
 
 /*******************************************************************
@@ -78,11 +93,14 @@ DAPI_(HRESULT) PathGetFullPathName(
     );
 
 /*******************************************************************
- PathPrefix - prefixes a full path with \\?\ or \\?\UNC as
-              appropriate.
+ PathPrefix - prefixes a path with \\?\ or \\?\UNC if it doesn't
+    already have an extended prefix, is longer than MAX_PATH,
+    and is fully qualified.
 ********************************************************************/
 DAPI_(HRESULT) PathPrefix(
-    __inout LPWSTR *psczFullPath
+    __inout_z LPWSTR *psczFullPath,
+    __in SIZE_T cchFullPath,
+    __in DWORD dwPrefixFlags
     );
 
 /*******************************************************************
@@ -204,14 +222,27 @@ DAPI_(HRESULT) PathGetKnownFolder(
     );
 
 /*******************************************************************
+ PathSkipPastRoot - returns a pointer to the first character after
+    the root portion of the path or NULL if the path has no root.
+    For example, the pointer will point to the "a" in "after":
+    C:\after, C:after, \after, \\server\share\after,
+    \\?\C:\afterroot, \\?\UNC\server\share\after
+*******************************************************************/
+DAPI_(LPCWSTR) PathSkipPastRoot(
+    __in_z LPCWSTR wzPath,
+    __out_opt BOOL* pfHasExtendedPrefix,
+    __out_opt BOOL* pfFullyQualified,
+    __out_opt BOOL* pfUNC
+    );
+
+/*******************************************************************
  PathIsFullyQualified - returns true if the path is fully qualified; false otherwise.
     Note that some rooted paths like C:dir are not fully qualified.
     For example, these are all fully qualified: C:\dir, C:/dir, \\server\share, \\?\C:\dir.
     For example, these are not fully qualified: C:dir, C:, \dir, dir, dir\subdir.
 *******************************************************************/
 DAPI_(BOOL) PathIsFullyQualified(
-    __in_z LPCWSTR wzPath,
-    __out_opt BOOL* pfHasLongPathPrefix
+    __in_z LPCWSTR wzPath
     );
 
 /*******************************************************************

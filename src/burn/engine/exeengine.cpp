@@ -363,7 +363,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
 
     if (pPackage->Exe.fPseudoPackage && BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE != pPackagePayload->verification)
     {
-        if (!PathIsFullyQualified(pPackagePayload->sczFilePath, NULL))
+        if (!PathIsFullyQualified(pPackagePayload->sczFilePath))
         {
             ExitWithRootFailure(hr, E_INVALIDSTATE, "Pseudo ExePackages must have a fully qualified target path.");
         }
