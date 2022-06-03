@@ -134,10 +134,12 @@ extern "C" HRESULT LoggingOpen(
 
         if (sczPrefixFormatted && *sczPrefixFormatted)
         {
-            LPCWSTR wzPrefix = sczPrefixFormatted;
-
             // Best effort to open default logging.
-            if (PathIsRooted(sczPrefixFormatted))
+            LPCWSTR wzPrefix = sczPrefixFormatted;
+            LPCWSTR wzPastRoot = PathSkipPastRoot(sczPrefixFormatted, NULL, NULL, NULL);
+
+            // If the log path is rooted and has a file component, then use that path as is.
+            if (wzPastRoot && *wzPastRoot)
             {
                 hr = PathGetDirectory(sczPrefixFormatted, &sczLoggingBaseFolder);
                 ExitOnFailure(hr, "Failed to get parent directory from '%ls'.", sczPrefixFormatted);

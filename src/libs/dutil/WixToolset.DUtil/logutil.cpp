@@ -133,7 +133,7 @@ extern "C" HRESULT DAPI LogOpen(
         hr = PathConcat(wzDirectory, wzLog, &sczCombined);
         LoguExitOnFailure(hr, "Failed to combine the log path.");
 
-        if (!PathIsFullyQualified(sczCombined, NULL))
+        if (!PathIsFullyQualified(sczCombined))
         {
             hr = PathExpand(&LogUtil_sczLogPath, sczCombined, PATH_EXPAND_FULLPATH);
             LoguExitOnFailure(hr, "Failed to expand the log path.");

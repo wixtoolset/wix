@@ -120,13 +120,34 @@ LExit:
 
 DAPI_(HRESULT) PathGetParentPath(
     __in_z LPCWSTR wzPath,
-    __out_z LPWSTR *psczParent
+    __out_z LPWSTR* psczParent,
+    __out_opt SIZE_T* pcchRoot
     )
 {
     HRESULT hr = S_OK;
+    LPCWSTR wzPastRoot = NULL;
     LPCWSTR wzParent = NULL;
+    LPCWSTR wz = NULL;
 
-    for (LPCWSTR wz = wzPath; *wz; ++wz)
+    wzPastRoot = PathSkipPastRoot(wzPath, NULL, NULL, NULL);
+
+    if (pcchRoot)
+    {
+        *pcchRoot = !wzPastRoot ? 0 : wzPastRoot - wzPath;
+    }
+
+    if (wzPastRoot && *wzPastRoot)
+    {
+        Assert(wzPastRoot > wzPath);
+        wz = wzPastRoot;
+        wzParent = wzPastRoot - 1;
+    }
+    else
+    {
+        wz = wzPath;
+    }
+
+    for (; *wz; ++wz)
     {
         if (IsPathSeparatorChar(*wz) && wz[1])
         {
@@ -143,7 +164,7 @@ DAPI_(HRESULT) PathGetParentPath(
     }
     else
     {
-        ReleaseNullStr(psczParent);
+        ReleaseNullStr(*psczParent);
     }
 
 LExit:
@@ -164,9 +185,8 @@ DAPI_(HRESULT) PathExpand(
     LPWSTR sczExpandedPath = NULL;
     SIZE_T cchWritten = 0;
     DWORD cchExpandedPath = 0;
-    SIZE_T cbSize = 0;
-
     LPWSTR sczFullPath = NULL;
+    DWORD dwPrefixFlags = 0;
 
     //
     // First, expand any environment variables.
@@ -201,20 +221,7 @@ DAPI_(HRESULT) PathExpand(
             }
         }
 
-        if (MAX_PATH < cch)
-        {
-            hr = PathPrefix(&sczExpandedPath); // ignore invald arg from path prefix because this may not be a complete path yet
-            if (E_INVALIDARG == hr)
-            {
-                hr = S_OK;
-            }
-            PathExitOnFailure(hr, "Failed to prefix long path after expanding environment variables.");
-
-            hr = StrMaxLength(sczExpandedPath, &cbSize);
-            PathExitOnFailure(hr, "Failed to get max length of expanded path.");
-
-            cchExpandedPath = (DWORD)min(DWORD_MAX, cbSize);
-        }
+        cchWritten = cch;
     }
 
     //
@@ -227,16 +234,18 @@ DAPI_(HRESULT) PathExpand(
         hr = PathGetFullPathName(wzPath, &sczFullPath, NULL, &cchWritten);
         PathExitOnFailure(hr, "Failed to get full path for string: %ls", wzPath);
 
-        if (MAX_PATH < cchWritten)
-        {
-            hr = PathPrefix(&sczFullPath);
-            PathExitOnFailure(hr, "Failed to prefix long path after expanding.");
-        }
+        dwPrefixFlags |= PATH_PREFIX_EXPECT_FULLY_QUALIFIED;
     }
     else
     {
         sczFullPath = sczExpandedPath;
         sczExpandedPath = NULL;
+    }
+
+    if (dwResolveFlags)
+    {
+        hr = PathPrefix(&sczFullPath, cchWritten, dwPrefixFlags);
+        PathExitOnFailure(hr, "Failed to prefix path after expanding.");
     }
 
     hr = StrAllocString(psczFullPath, sczFullPath ? sczFullPath : wzRelativePath, 0);
@@ -319,29 +328,54 @@ LExit:
 
 
 DAPI_(HRESULT) PathPrefix(
-    __inout LPWSTR *psczFullPath
+    __inout_z LPWSTR* psczFullPath,
+    __in SIZE_T cchFullPath,
+    __in DWORD dwPrefixFlags
     )
 {
-    Assert(psczFullPath && *psczFullPath);
+    Assert(psczFullPath);
 
     HRESULT hr = S_OK;
     LPWSTR wzFullPath = *psczFullPath;
     BOOL fFullyQualified = FALSE;
     BOOL fHasPrefix = FALSE;
+    BOOL fUNC = FALSE;
     SIZE_T cbFullPath = 0;
 
-    fFullyQualified = PathIsFullyQualified(wzFullPath, &fHasPrefix);
+    PathSkipPastRoot(wzFullPath, &fHasPrefix, &fFullyQualified, &fUNC);
+
     if (fHasPrefix)
     {
         ExitFunction();
     }
 
-    if (fFullyQualified && L':' == wzFullPath[1]) // normal path
+    // The prefix is only allowed on fully qualified paths.
+    if (!fFullyQualified)
     {
-        hr = StrAllocPrefix(psczFullPath, L"\\\\?\\", 4);
-        PathExitOnFailure(hr, "Failed to add prefix to file path.");
+        if (dwPrefixFlags & PATH_PREFIX_EXPECT_FULLY_QUALIFIED)
+        {
+            PathExitWithRootFailure(hr, E_INVALIDARG, "Expected fully qualified path provided to prefix: %ls.", wzFullPath);
+        }
+
+        ExitFunction();
     }
-    else if (fFullyQualified && IsPathSeparatorChar(wzFullPath[1])) // UNC
+
+    if (!(dwPrefixFlags & PATH_PREFIX_SHORT_PATHS))
+    {
+        // The prefix is not necessary unless the path is longer than MAX_PATH.
+        if (!cchFullPath)
+        {
+            hr = ::StringCchLengthW(wzFullPath, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchFullPath));
+            PathExitOnFailure(hr, "Failed to get length of path to prefix.");
+        }
+
+        if (MAX_PATH >= cchFullPath)
+        {
+            ExitFunction();
+        }
+    }
+
+    if (fUNC)
     {
         hr = StrSize(*psczFullPath, &cbFullPath);
         PathExitOnFailure(hr, "Failed to get size of full path.");
@@ -352,10 +386,10 @@ DAPI_(HRESULT) PathPrefix(
         hr = StrAllocPrefix(psczFullPath, L"\\\\?\\UNC", 7);
         PathExitOnFailure(hr, "Failed to add prefix to UNC path.");
     }
-    else
+    else // must be a normal path
     {
-        hr = E_INVALIDARG;
-        PathExitOnFailure(hr, "Invalid path provided to prefix: %ls.", wzFullPath);
+        hr = StrAllocPrefix(psczFullPath, L"\\\\?\\", 4);
+        PathExitOnFailure(hr, "Failed to add prefix to file path.");
     }
 
 LExit:
@@ -970,54 +1004,113 @@ LExit:
 }
 
 
+DAPI_(LPCWSTR) PathSkipPastRoot(
+    __in_z_opt LPCWSTR wzPath,
+    __out_opt BOOL* pfHasExtendedPrefix,
+    __out_opt BOOL* pfFullyQualified,
+    __out_opt BOOL* pfUNC
+    )
+{
+    LPCWSTR wzPastRoot = NULL;
+    BOOL fHasPrefix = FALSE;
+    BOOL fFullyQualified = FALSE;
+    BOOL fUNC = FALSE;
+    DWORD dwRootMissingSlashes = 0;
+
+    if (!wzPath || !*wzPath)
+    {
+        ExitFunction();
+    }
+
+    if (IsPathSeparatorChar(wzPath[0]))
+    {
+        if (IsPathSeparatorChar(wzPath[1]) && (L'?' == wzPath[2] || L'.' == wzPath[2]) && IsPathSeparatorChar(wzPath[3]) ||
+            L'?' == wzPath[1] && L'?' == wzPath[2] && IsPathSeparatorChar(wzPath[3]))
+        {
+            fHasPrefix = TRUE;
+
+            if (L'U' == wzPath[4] && L'N' == wzPath[5] && L'C' == wzPath[6] && IsPathSeparatorChar(wzPath[7]))
+            {
+                fUNC = TRUE;
+                wzPastRoot = wzPath + 8;
+                dwRootMissingSlashes = 2;
+            }
+            else
+            {
+                wzPastRoot = wzPath + 4;
+                dwRootMissingSlashes = 1;
+            }
+        }
+        else if (IsPathSeparatorChar(wzPath[1]))
+        {
+            fUNC = TRUE;
+            wzPastRoot = wzPath + 2;
+            dwRootMissingSlashes = 2;
+        }
+    }
+
+    if (dwRootMissingSlashes)
+    {
+        Assert(wzPastRoot);
+        fFullyQualified = TRUE;
+
+        for (; *wzPastRoot && dwRootMissingSlashes; ++wzPastRoot)
+        {
+            if (IsPathSeparatorChar(*wzPastRoot))
+            {
+                --dwRootMissingSlashes;
+            }
+        }
+    }
+    else
+    {
+        Assert(!wzPastRoot);
+
+        if (IsPathSeparatorChar(wzPath[0]))
+        {
+            wzPastRoot = wzPath + 1;
+        }
+        else if (IsValidDriveChar(wzPath[0]) && wzPath[1] == L':')
+        {
+            if (IsPathSeparatorChar(wzPath[2]))
+            {
+                fFullyQualified = TRUE;
+                wzPastRoot = wzPath + 3;
+            }
+            else
+            {
+                wzPastRoot = wzPath + 2;
+            }
+        }
+    }
+
+LExit:
+    if (pfHasExtendedPrefix)
+    {
+        *pfHasExtendedPrefix = fHasPrefix;
+    }
+
+    if (pfFullyQualified)
+    {
+        *pfFullyQualified = fFullyQualified;
+    }
+
+    if (pfUNC)
+    {
+        *pfUNC = fUNC;
+    }
+
+    return wzPastRoot;
+}
+
+
 DAPI_(BOOL) PathIsFullyQualified(
-    __in_z LPCWSTR wzPath,
-    __out_opt BOOL* pfHasLongPathPrefix
+    __in_z LPCWSTR wzPath
     )
 {
     BOOL fFullyQualified = FALSE;
-    BOOL fHasLongPathPrefix = FALSE;
 
-    if (!wzPath || !wzPath[0] || !wzPath[1])
-    {
-        // There is no way to specify a fully qualified path with one character (or less).
-        ExitFunction();
-    }
-
-    if (!IsPathSeparatorChar(wzPath[0]))
-    {
-        // The only way to specify a fully qualified path that doesn't begin with a slash
-        // is the drive, colon, slash format (C:\).
-        if (IsValidDriveChar(wzPath[0]) &&
-            L':' == wzPath[1] &&
-            IsPathSeparatorChar(wzPath[2]))
-        {
-            fFullyQualified = TRUE;
-        }
-
-        ExitFunction();
-    }
-
-    // Non-drive fully qualified paths must start with \\ or \?.
-    // \??\ is an archaic form of \\?\.
-    if (L'?' != wzPath[1] && !IsPathSeparatorChar(wzPath[1]))
-    {
-        ExitFunction();
-    }
-
-    fFullyQualified = TRUE;
-
-    if (L'?' == wzPath[2] && IsPathSeparatorChar(wzPath[3]))
-    {
-        fHasLongPathPrefix = TRUE;
-    }
-
-
-LExit:
-    if (pfHasLongPathPrefix)
-    {
-        *pfHasLongPathPrefix = fHasLongPathPrefix;
-    }
+    PathSkipPastRoot(wzPath, NULL, &fFullyQualified, NULL);
 
     return fFullyQualified;
 }
@@ -1027,9 +1120,7 @@ DAPI_(BOOL) PathIsRooted(
     __in_z LPCWSTR wzPath
     )
 {
-    return wzPath &&
-        (IsPathSeparatorChar(wzPath[0]) ||
-        IsValidDriveChar(wzPath[0]) && wzPath[1] == L':');
+    return NULL != PathSkipPastRoot(wzPath, NULL, NULL, NULL);
 }
 
 
@@ -1118,78 +1209,47 @@ DAPI_(HRESULT) PathGetHierarchyArray(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczPathCopy = NULL;
-    LPWSTR sczNewPathCopy = NULL;
-    DWORD cArraySpacesNeeded = 0;
-    size_t cchPath = 0;
+    LPCWSTR wz = NULL;
+    SIZE_T cch = 0;
+    *pcPathArray = 0;
 
-    hr = ::StringCchLengthW(wzPath, STRSAFE_MAX_LENGTH, &cchPath);
-    PathExitOnRootFailure(hr, "Failed to get string length of path: %ls", wzPath);
+    PathExitOnNull(wzPath, hr, E_INVALIDARG, "wzPath is required.");
 
-    if (!cchPath)
+    wz = PathSkipPastRoot(wzPath, NULL, NULL, NULL);
+    if (wz)
     {
-        ExitFunction1(hr = E_INVALIDARG);
+        cch = wz - wzPath;
+
+        hr = MemEnsureArraySize(reinterpret_cast<void**>(prgsczPathArray), 1, sizeof(LPWSTR), 5);
+        PathExitOnFailure(hr, "Failed to allocate array.");
+
+        hr = StrAllocString(*prgsczPathArray, wzPath, cch);
+        PathExitOnFailure(hr, "Failed to copy root into array.");
+
+        *pcPathArray += 1;
+    }
+    else
+    {
+        wz = wzPath;
     }
 
-    for (size_t i = 0; i < cchPath; ++i)
+    for (; *wz; ++wz)
     {
-        if (IsPathSeparatorChar(wzPath[i]))
+        ++cch;
+
+        if (IsPathSeparatorChar(*wz) || !wz[1])
         {
-            ++cArraySpacesNeeded;
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<void**>(prgsczPathArray), *pcPathArray, 1, sizeof(LPWSTR), 5);
+            PathExitOnFailure(hr, "Failed to allocate array.");
+
+            hr = StrAllocString(*prgsczPathArray + *pcPathArray, wzPath, cch);
+            PathExitOnFailure(hr, "Failed to copy path into array.");
+
+            *pcPathArray += 1;
         }
     }
-
-    if (!IsPathSeparatorChar(wzPath[cchPath - 1]))
-    {
-        ++cArraySpacesNeeded;
-    }
-
-    // If it's a UNC path, cut off the first three paths, 2 because it starts with a double backslash, and another because the first ("\\servername\") isn't a path.
-    if (IsPathSeparatorChar(wzPath[0]) && IsPathSeparatorChar(wzPath[1]))
-    {
-        if (3 > cArraySpacesNeeded)
-        {
-            ExitFunction1(hr = E_INVALIDARG);
-        }
-
-        cArraySpacesNeeded -= 3;
-    }
-
-    Assert(cArraySpacesNeeded >= 1);
-
-    hr = MemEnsureArraySize(reinterpret_cast<void **>(prgsczPathArray), cArraySpacesNeeded, sizeof(LPWSTR), 0);
-    PathExitOnFailure(hr, "Failed to allocate array of size %u for parent directories", cArraySpacesNeeded);
-    *pcPathArray = cArraySpacesNeeded;
-
-    hr = StrAllocString(&sczPathCopy, wzPath, 0);
-    PathExitOnFailure(hr, "Failed to allocate copy of original path");
-
-    for (DWORD i = 0; i < cArraySpacesNeeded; ++i)
-    {
-        hr = StrAllocString((*prgsczPathArray) + cArraySpacesNeeded - 1 - i, sczPathCopy, 0);
-        PathExitOnFailure(hr, "Failed to copy path");
-
-        DWORD cchPathCopy = lstrlenW(sczPathCopy);
-
-        // If it ends in a backslash, it's a directory path, so cut off everything the last backslash before we get the directory portion of the path
-        if (IsPathSeparatorChar(wzPath[cchPathCopy - 1]))
-        {
-            sczPathCopy[cchPathCopy - 1] = L'\0';
-        }
-        
-        hr = PathGetDirectory(sczPathCopy, &sczNewPathCopy);
-        PathExitOnFailure(hr, "Failed to get directory portion of path");
-
-        ReleaseStr(sczPathCopy);
-        sczPathCopy = sczNewPathCopy;
-        sczNewPathCopy = NULL;
-    }
-
-    hr = S_OK;
 
 LExit:
-    ReleaseStr(sczPathCopy);
-
     return hr;
 }
 
