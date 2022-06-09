@@ -331,6 +331,13 @@ Language=English
 Detected msi package with invalid version, product code: '%1!ls!', version: '%2!ls!'
 .
 
+MessageId=124
+Severity=Warning
+SymbolicName=MSG_DETECTED_EXE_PACKAGE_INVALID_VERSION
+Language=English
+Detected exe package with invalid version, arp id: '%1!ls!', version: '%2!ls!'
+.
+
 MessageId=151
 Severity=Error
 SymbolicName=MSG_FAILED_DETECT_PACKAGE

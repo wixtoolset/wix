@@ -109,7 +109,17 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (!packageSymbol.Permanent)
             {
-                this.BackendHelper.ValidateBundleCondition(symbol.SourceLineNumbers, "ExePackage", "DetectCondition", symbol.DetectCondition, BundleConditionPhase.Detect);
+                if (symbol.DetectionType == WixBundleExePackageDetectionType.Condition)
+                {
+                    this.BackendHelper.ValidateBundleCondition(symbol.SourceLineNumbers, "ExePackage", "DetectCondition", symbol.DetectCondition, BundleConditionPhase.Detect);
+                }
+                else if (symbol.DetectionType == WixBundleExePackageDetectionType.Arp)
+                {
+                    if (!this.BackendHelper.IsValidWixVersion(symbol.ArpDisplayVersion))
+                    {
+                        this.Messaging.Write(WarningMessages.InvalidWixVersion(symbol.SourceLineNumbers, symbol.ArpDisplayVersion, "ArpEntry", "Version"));
+                    }
+                }
             }
         }
 

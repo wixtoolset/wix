@@ -213,7 +213,7 @@ LExit:
 extern "C" HRESULT ApprovedExesVerifySecureLocation(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe
+    __in LPCWSTR wzExecutablePath
     )
 {
     HRESULT hr = S_OK;
@@ -232,7 +232,7 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
         hr = VariableGetString(pVariables, wzSecureFolderVariable, &scz);
         if (SUCCEEDED(hr))
         {
-            hr = PathDirectoryContainsPath(scz, pLaunchApprovedExe->sczExecutablePath);
+            hr = PathDirectoryContainsPath(scz, wzExecutablePath);
             if (S_OK == hr)
             {
                 ExitFunction();
@@ -252,14 +252,14 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
     // If the package cache is redirected, hr is S_FALSE.
     if (S_FALSE == hr)
     {
-        hr = PathDirectoryContainsPath(sczSecondary, pLaunchApprovedExe->sczExecutablePath);
+        hr = PathDirectoryContainsPath(sczSecondary, wzExecutablePath);
         if (S_OK == hr)
         {
             ExitFunction();
         }
     }
 
-    hr = PathDirectoryContainsPath(scz, pLaunchApprovedExe->sczExecutablePath);
+    hr = PathDirectoryContainsPath(scz, wzExecutablePath);
     if (S_OK == hr)
     {
         ExitFunction();

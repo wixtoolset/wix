@@ -33,12 +33,12 @@ namespace WixToolsetTest.BurnE2E
 
             if (!File.Exists(targetFilePath))
             {
-                var testTool = new TestTool(Path.Combine(TestData.Get(), "win-x86", "TestExe.exe"))
+                var testExeTool = new TestExeTool
                 {
                     Arguments = "/lf \"" + targetFilePath + $"|{FiveGB}\"",
                     ExpectedExitCode = 0,
                 };
-                testTool.Run(true);
+                testExeTool.Run(true);
             }
         }
 

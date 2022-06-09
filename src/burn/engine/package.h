@@ -16,6 +16,13 @@ typedef _BURN_PACKAGE BURN_PACKAGE;
 
 const DWORD BURN_PACKAGE_INVALID_PATCH_INDEX = 0x80000000;
 
+enum BURN_EXE_DETECTION_TYPE
+{
+    BURN_EXE_DETECTION_TYPE_NONE,
+    BURN_EXE_DETECTION_TYPE_CONDITION,
+    BURN_EXE_DETECTION_TYPE_ARP,
+};
+
 enum BURN_EXE_EXIT_CODE_TYPE
 {
     BURN_EXE_EXIT_CODE_TYPE_NONE,
@@ -338,6 +345,12 @@ typedef struct _BURN_PACKAGE
         } Bundle;
         struct
         {
+            BURN_EXE_DETECTION_TYPE detectionType;
+
+            BOOL fArpWin64;
+            LPWSTR sczArpKeyPath;
+            VERUTIL_VERSION* pArpDisplayVersion;
+
             LPWSTR sczDetectCondition;
             LPWSTR sczInstallArguments;
             LPWSTR sczRepairArguments;

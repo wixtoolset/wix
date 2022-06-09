@@ -411,12 +411,36 @@ namespace WixToolset.Core.Burn.Bundles
                     }
                     else if (package.SpecificPackageSymbol is WixBundleExePackageSymbol exePackage) // EXE
                     {
-                        writer.WriteAttributeString("DetectCondition", exePackage.DetectCondition);
                         writer.WriteAttributeString("InstallArguments", exePackage.InstallCommand);
-                        writer.WriteAttributeString("UninstallArguments", exePackage.UninstallCommand);
-                        writer.WriteAttributeString("Uninstallable", exePackage.Uninstallable ? "yes" : "no");
                         writer.WriteAttributeString("RepairArguments", exePackage.RepairCommand);
                         writer.WriteAttributeString("Repairable", exePackage.Repairable ? "yes" : "no");
+
+                        switch (exePackage.DetectionType)
+                        {
+                            case WixBundleExePackageDetectionType.Condition:
+                                writer.WriteAttributeString("DetectionType", "condition");
+                                writer.WriteAttributeString("DetectCondition", exePackage.DetectCondition);
+
+                                if (exePackage.Uninstallable)
+                                {
+                                    writer.WriteAttributeString("UninstallArguments", exePackage.UninstallCommand);
+                                    writer.WriteAttributeString("Uninstallable", "yes");
+                                }
+                                break;
+                            case WixBundleExePackageDetectionType.Arp:
+                                writer.WriteAttributeString("DetectionType", "arp");
+                                writer.WriteAttributeString("ArpId", exePackage.ArpId);
+                                writer.WriteAttributeString("ArpDisplayVersion", exePackage.ArpDisplayVersion);
+
+                                if (exePackage.ArpWin64)
+                                {
+                                    writer.WriteAttributeString("ArpWin64", "yes");
+                                }
+                                break;
+                            case WixBundleExePackageDetectionType.None:
+                                writer.WriteAttributeString("DetectionType", "none");
+                                break;
+                        }
 
                         if (!String.IsNullOrEmpty(exePackage.ExeProtocol))
                         {

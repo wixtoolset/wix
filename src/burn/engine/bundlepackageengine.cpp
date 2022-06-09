@@ -365,8 +365,7 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
         break;
 
     default:
-        hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Invalid package current state: %d.", pPackage->currentState);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Invalid package current state: %d.", pPackage->currentState);
     }
 
     // Calculate the rollback action if there is an execute action.
@@ -413,8 +412,7 @@ extern "C" HRESULT BundlePackageEnginePlanCalculatePackage(
             break;
 
         default:
-            hr = E_INVALIDARG;
-            ExitOnRootFailure(hr, "Invalid package expected state.");
+            ExitWithRootFailure(hr, E_INVALIDARG, "Invalid package expected state.");
         }
     }
 
