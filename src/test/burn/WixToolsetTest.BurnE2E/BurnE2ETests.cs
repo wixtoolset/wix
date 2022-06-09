@@ -31,6 +31,23 @@ namespace WixToolsetTest.BurnE2E
             this.Installers.Push(installer);
         }
 
+        protected ArpEntryInstaller CreateArpEntryInstaller(string id, bool perMachine = true, bool x64 = false)
+        {
+            var installer = new ArpEntryInstaller(this.TestContext, id, perMachine, x64);
+            this.Installers.Push(installer);
+            return installer;
+        }
+
+        protected ArpEntryInstaller CreateArpEntryInstaller(BundleInstaller bundleInstaller, string packageId)
+        {
+            if (!bundleInstaller.TryGetArpEntryExePackageConfiguration(packageId, out var arpId, out _, out var arpWin64, out var perMachine))
+            {
+                return null;
+            }
+
+            return this.CreateArpEntryInstaller(arpId, perMachine, arpWin64);
+        }
+
         protected BundleInstaller CreateBundleInstaller(string name)
         {
             var installer = new BundleInstaller(this.TestContext, name);

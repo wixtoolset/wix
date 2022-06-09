@@ -2,6 +2,16 @@
 
 #include "precomp.h"
 
+static HRESULT DetectArpEntry(
+    __in const BURN_PACKAGE* pPackage,
+    __out BOOTSTRAPPER_PACKAGE_STATE* pPackageState,
+    __out_opt LPWSTR* psczQuietUninstallString
+    );
+static HRESULT ParseArpUninstallString(
+    __in_z LPCWSTR wzArpUninstallString,
+    __inout LPWSTR* psczExecutablePath,
+    __inout LPWSTR* psczArguments
+    );
 
 // function definitions
 
@@ -16,17 +26,72 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
     IXMLDOMNode* pixnNode = NULL;
     LPWSTR scz = NULL;
 
-    // @DetectCondition
-    hr = XmlGetAttributeEx(pixnExePackage, L"DetectCondition", &pPackage->Exe.sczDetectCondition);
-    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @DetectCondition.");
+    // @DetectionType
+    hr = XmlGetAttributeEx(pixnExePackage, L"DetectionType", &scz);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @DetectionType.");
+
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"condition", -1))
+    {
+        pPackage->Exe.detectionType = BURN_EXE_DETECTION_TYPE_CONDITION;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"arp", -1))
+    {
+        pPackage->Exe.detectionType = BURN_EXE_DETECTION_TYPE_ARP;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"none", -1))
+    {
+        pPackage->Exe.detectionType = BURN_EXE_DETECTION_TYPE_NONE;
+    }
+    else
+    {
+        ExitWithRootFailure(hr, E_UNEXPECTED, "Invalid detection type: %ls", scz);
+    }
+
+    if (BURN_EXE_DETECTION_TYPE_CONDITION == pPackage->Exe.detectionType)
+    {
+        // @DetectCondition
+        hr = XmlGetAttributeEx(pixnExePackage, L"DetectCondition", &pPackage->Exe.sczDetectCondition);
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @DetectCondition.");
+
+        // @UninstallArguments
+        hr = XmlGetAttributeEx(pixnExePackage, L"UninstallArguments", &pPackage->Exe.sczUninstallArguments);
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UninstallArguments.");
+
+        // @Uninstallable
+        hr = XmlGetYesNoAttribute(pixnExePackage, L"Uninstallable", &pPackage->Exe.fUninstallable);
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Uninstallable.");
+    }
+    else if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType)
+    {
+        // @ArpId
+        hr = XmlGetAttributeEx(pixnExePackage, L"ArpId", &scz);
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ArpId.");
+
+        hr = PathConcatRelativeToBase(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\", scz, &pPackage->Exe.sczArpKeyPath);
+        ExitOnFailure(hr, "Failed to build full key path.");
+
+        // @ArpDisplayVersion
+        hr = XmlGetAttributeEx(pixnExePackage, L"ArpDisplayVersion", &scz);
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ArpDisplayVersion.");
+
+        hr = VerParseVersion(scz, 0, FALSE, &pPackage->Exe.pArpDisplayVersion);
+        ExitOnFailure(hr, "Failed to parse @ArpDisplayVersion: %ls", scz);
+
+        if (pPackage->Exe.pArpDisplayVersion->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_MANIFEST_INVALID_VERSION, scz);
+        }
+
+        // @ArpWin64
+        hr = XmlGetYesNoAttribute(pixnExePackage, L"ArpWin64", &pPackage->Exe.fArpWin64);
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @ArpWin64.");
+
+        pPackage->Exe.fUninstallable = TRUE;
+    }
 
     // @InstallArguments
     hr = XmlGetAttributeEx(pixnExePackage, L"InstallArguments", &pPackage->Exe.sczInstallArguments);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallArguments.");
-
-    // @UninstallArguments
-    hr = XmlGetAttributeEx(pixnExePackage, L"UninstallArguments", &pPackage->Exe.sczUninstallArguments);
-    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UninstallArguments.");
 
     // @RepairArguments
     hr = XmlGetAttributeEx(pixnExePackage, L"RepairArguments", &pPackage->Exe.sczRepairArguments);
@@ -35,10 +100,6 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
     // @Repairable
     hr = XmlGetYesNoAttribute(pixnExePackage, L"Repairable", &pPackage->Exe.fRepairable);
     ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Repairable.");
-
-    // @Uninstallable
-    hr = XmlGetYesNoAttribute(pixnExePackage, L"Uninstallable", &pPackage->Exe.fUninstallable);
-    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Uninstallable.");
 
     // @Bundle
     hr = XmlGetYesNoAttribute(pixnExePackage, L"Bundle", &pPackage->Exe.fBundle);
@@ -64,8 +125,7 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
         }
         else
         {
-            hr = E_UNEXPECTED;
-            ExitOnFailure(hr, "Invalid protocol type: %ls", scz);
+            ExitWithRootFailure(hr, E_UNEXPECTED, "Invalid protocol type: %ls", scz);
         }
     }
 
@@ -91,6 +151,8 @@ extern "C" void ExeEnginePackageUninitialize(
     ReleaseStr(pPackage->Exe.sczInstallArguments);
     ReleaseStr(pPackage->Exe.sczRepairArguments);
     ReleaseStr(pPackage->Exe.sczUninstallArguments);
+    ReleaseStr(pPackage->Exe.sczArpKeyPath);
+    ReleaseVerutilVersion(pPackage->Exe.pArpDisplayVersion);
     ReleaseMem(pPackage->Exe.rgExitCodes);
 
     // free command-line arguments
@@ -126,15 +188,31 @@ extern "C" HRESULT ExeEngineDetectPackage(
     HRESULT hr = S_OK;
     BOOL fDetected = FALSE;
 
-    // evaluate detect condition
-    if (pPackage->Exe.sczDetectCondition && *pPackage->Exe.sczDetectCondition)
+    switch (pPackage->Exe.detectionType)
     {
-        hr = ConditionEvaluate(pVariables, pPackage->Exe.sczDetectCondition, &fDetected);
-        ExitOnFailure(hr, "Failed to evaluate executable package detect condition.");
-    }
+    case BURN_EXE_DETECTION_TYPE_NONE:
+        pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+        break;
+    case BURN_EXE_DETECTION_TYPE_CONDITION:
+        // evaluate detect condition
+        if (pPackage->Exe.sczDetectCondition && *pPackage->Exe.sczDetectCondition)
+        {
+            hr = ConditionEvaluate(pVariables, pPackage->Exe.sczDetectCondition, &fDetected);
+            ExitOnFailure(hr, "Failed to evaluate EXE package detect condition.");
+        }
 
-    // update detect state
-    pPackage->currentState = fDetected ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+        // update detect state
+        pPackage->currentState = fDetected ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+
+        break;
+    case BURN_EXE_DETECTION_TYPE_ARP:
+        hr = DetectArpEntry(pPackage, &pPackage->currentState, NULL);
+        ExitOnFailure(hr, "Failed to detect EXE package by ArpEntry.");
+
+        break;
+    default:
+        ExitWithRootFailure(hr, E_INVALIDARG, "Unknown EXE package detection type: %d.", pPackage->Exe.detectionType);
+    }
 
     if (pPackage->fCanAffectRegistration)
     {
@@ -187,6 +265,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
         }
         break;
 
+    case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
     case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
         switch (pPackage->requested)
         {
@@ -205,8 +284,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
         break;
 
     default:
-        hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Invalid package current state: %d.", pPackage->currentState);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Invalid package current state: %d.", pPackage->currentState);
     }
 
     // Calculate the rollback action if there is an execute action.
@@ -232,6 +310,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
             }
             break;
 
+        case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
             switch (pPackage->requested)
             {
@@ -251,8 +330,7 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
             break;
 
         default:
-            hr = E_INVALIDARG;
-            ExitOnRootFailure(hr, "Invalid package expected state.");
+            ExitWithRootFailure(hr, E_INVALIDARG, "Invalid package expected state.");
         }
     }
 
@@ -356,10 +434,41 @@ extern "C" HRESULT ExeEngineExecutePackage(
     LPWSTR sczUserArgs = NULL;
     LPWSTR sczUserArgsObfuscated = NULL;
     LPWSTR sczCommandObfuscated = NULL;
+    LPWSTR sczArpUninstallString = NULL;
+    LPWSTR sczArpArguments = NULL;
+    BOOTSTRAPPER_PACKAGE_STATE applyState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
     DWORD dwExitCode = 0;
     BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
+    LPCWSTR wzUninstallArguments = pPackage->Exe.sczUninstallArguments;
+
+    if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType &&
+        (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action ||
+        BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->exePackage.action && fRollback))
+    {
+        hr = DetectArpEntry(pPackage, &applyState, &sczArpUninstallString);
+        ExitOnFailure(hr, "Failed to query ArpEntry for uninstall.");
+
+        if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT == applyState && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action)
+        {
+            if (fRollback)
+            {
+                LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), LoggingPackageStateToString(applyState));
+            }
+            else
+            {
+                LogId(REPORT_STANDARD, MSG_ATTEMPTED_UNINSTALL_ABSENT_PACKAGE, pPackage->sczId);
+            }
+
+            ExitFunction();
+        }
+        else if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT != applyState && BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->exePackage.action)
+        {
+            LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), LoggingPackageStateToString(applyState));
+            ExitFunction();
+        }
+    }
 
     if (pPackage->Exe.fPseudoPackage && BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE != pPackagePayload->verification)
     {
@@ -372,7 +481,30 @@ extern "C" HRESULT ExeEngineExecutePackage(
         ExitOnFailure(hr, "Failed to build executable path.");
 
         hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
-        ExitOnFailure(hr, "Failed to get cached path for pseudo-package: %ls", pPackage->sczId);
+        ExitOnFailure(hr, "Failed to get parent directory for pseudo-package: %ls", pPackage->sczId);
+    }
+    else if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action)
+    {
+        ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "QuietUninstallString is null.");
+
+        hr = ParseArpUninstallString(sczArpUninstallString, &sczExecutablePath, &sczArpArguments);
+        ExitOnFailure(hr, "Failed to parse QuietUninstallString: %ls.", sczArpUninstallString);
+
+        if (pPackage->fPerMachine)
+        {
+            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczExecutablePath);
+            ExitOnFailure(hr, "Failed to verify the QuietUninstallString executable path is in a secure location: %ls", sczExecutablePath);
+            if (S_FALSE == hr)
+            {
+                LogStringLine(REPORT_STANDARD, "The QuietUninstallString executable path is not in a secure location: %ls", sczExecutablePath);
+                ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED));
+            }
+        }
+
+        hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get parent directory for QuietUninstallString executable path: %ls", sczExecutablePath);
+
+        wzUninstallArguments = sczArpArguments;
     }
     else
     {
@@ -396,7 +528,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        wzArguments = pPackage->Exe.sczUninstallArguments;
+        wzArguments = wzUninstallArguments;
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
@@ -404,8 +536,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
         break;
 
     default:
-        hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Invalid Exe package action: %d.", pExecuteAction->exePackage.action);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Invalid Exe package action: %d.", pExecuteAction->exePackage.action);
     }
 
     // now add optional arguments
@@ -443,8 +574,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
                 break;
 
             default:
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid Exe package action: %d.", pExecuteAction->exePackage.action);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid Exe package action: %d.", pExecuteAction->exePackage.action);
             }
         }
     }
@@ -524,6 +654,8 @@ LExit:
     StrSecureZeroFreeString(sczUserArgs);
     ReleaseStr(sczUserArgsObfuscated);
     ReleaseStr(sczCommandObfuscated);
+    ReleaseStr(sczArpUninstallString);
+    ReleaseStr(sczArpArguments);
 
     ReleaseFileHandle(hExecutableFile);
 
@@ -892,5 +1024,108 @@ extern "C" HRESULT ExeEngineHandleExitCode(
     }
 
 //LExit:
+    return hr;
+}
+
+static HRESULT DetectArpEntry(
+    __in const BURN_PACKAGE* pPackage,
+    __out BOOTSTRAPPER_PACKAGE_STATE* pPackageState,
+    __out_opt LPWSTR* psczQuietUninstallString
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hKey = NULL;
+    VERUTIL_VERSION* pVersion = NULL;
+    int nCompareResult = 0;
+    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    REG_KEY_BITNESS keyBitness = pPackage->Exe.fArpWin64 ? REG_KEY_64BIT : REG_KEY_32BIT;
+
+    *pPackageState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+    if (psczQuietUninstallString)
+    {
+        ReleaseNullStr(*psczQuietUninstallString);
+    }
+
+    hr = RegOpenEx(hkRoot, pPackage->Exe.sczArpKeyPath, KEY_READ, keyBitness, &hKey);
+    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    ExitOnFailure(hr, "Failed to open registry key: %ls.", pPackage->Exe.sczArpKeyPath);
+
+    hr = RegReadWixVersion(hKey, L"DisplayVersion", &pVersion);
+    if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    ExitOnFailure(hr, "Failed to read DisplayVersion.");
+
+    if (pVersion->fInvalid)
+    {
+        LogId(REPORT_WARNING, MSG_DETECTED_EXE_PACKAGE_INVALID_VERSION, pPackage->Exe.sczArpKeyPath, pVersion->sczVersion);
+    }
+
+    hr = VerCompareParsedVersions(pPackage->Exe.pArpDisplayVersion, pVersion, &nCompareResult);
+    ExitOnFailure(hr, "Failed to compare versions.");
+
+    if (nCompareResult < 0)
+    {
+        *pPackageState = BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE;
+    }
+    else if (nCompareResult > 0)
+    {
+        *pPackageState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
+    }
+    else
+    {
+        *pPackageState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
+    }
+
+    if (psczQuietUninstallString)
+    {
+        hr = RegReadString(hKey, L"QuietUninstallString", psczQuietUninstallString);
+        if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+        {
+            hr = S_OK;
+        }
+        ExitOnFailure(hr, "Failed to read QuietUninstallString.");
+    }
+
+LExit:
+    ReleaseRegKey(hKey);
+    ReleaseVerutilVersion(pVersion);
+
+    return hr;
+}
+
+static HRESULT ParseArpUninstallString(
+    __in_z LPCWSTR wzArpUninstallString,
+    __inout LPWSTR* psczExecutablePath,
+    __inout LPWSTR* psczArguments
+    )
+{
+    HRESULT hr = S_OK;
+    int argc = 0;
+    LPWSTR* argv = NULL;
+
+    hr = AppParseCommandLine(wzArpUninstallString, &argc, &argv);
+    ExitOnFailure(hr, "Failed to parse uninstall string as command line: %ls.", wzArpUninstallString);
+    ExitOnNull(argc, hr, E_INVALIDARG, "Uninstall string must contain an executable path.");
+
+    hr = StrAllocString(psczExecutablePath, argv[0], 0);
+    ExitOnFailure(hr, "Failed to copy executable path for ArpCommand.");
+
+    for (int i = 1; i < argc; ++i)
+    {
+        hr = AppAppendCommandLineArgument(psczArguments, argv[i]);
+        ExitOnFailure(hr, "Failed to append argument for ArpCommand.");
+    }
+
+LExit:
+    if (argv)
+    {
+        AppFreeCommandLineArgs(argv);
+    }
+
     return hr;
 }

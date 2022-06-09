@@ -2026,6 +2026,10 @@ namespace WixToolset.Core
             var bundle = YesNoType.NotSet;
             var slipstream = YesNoType.NotSet;
             var hasPayloadInfo = false;
+            WixBundleExePackageDetectionType? exeDetectionType = WixBundleExePackageDetectionType.None;
+            string arpId = null;
+            string arpDisplayVersion = null;
+            var arpWin64 = YesNoType.NotSet;
 
             var expectedNetFx4Args = new string[] { "/q", "/norestart" };
 
@@ -2204,6 +2208,112 @@ namespace WixToolset.Core
             compilerPayload.FinishCompilingPackage();
             var id = compilerPayload.Id;
 
+            // Now that the package ID is known, we can parse the extension attributes...
+            var contextValues = new Dictionary<string, string>() { { "PackageId", id.Id } };
+            foreach (var attribute in extensionAttributes)
+            {
+                this.Core.ParseExtensionAttribute(node, attribute, contextValues);
+            }
+
+            if (packageType == WixBundlePackageType.Exe && (detectCondition != null || uninstallArguments != null))
+            {
+                exeDetectionType = WixBundleExePackageDetectionType.Condition;
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    var allowed = true;
+                    switch (child.Name.LocalName)
+                    {
+                        case "ArpEntry":
+                            allowed = packageType == WixBundlePackageType.Exe;
+                            if (allowed)
+                            {
+                                if (exeDetectionType == WixBundleExePackageDetectionType.Arp)
+                                {
+                                    this.Core.Write(ErrorMessages.TooManyChildren(Preprocessor.GetSourceLineNumbers(child), node.Name.LocalName, child.Name.LocalName));
+                                }
+                                else if (!exeDetectionType.HasValue || exeDetectionType.Value == WixBundleExePackageDetectionType.Condition)
+                                {
+                                    exeDetectionType = null;
+                                }
+                                else
+                                {
+                                    if (exeDetectionType.Value != WixBundleExePackageDetectionType.None)
+                                    {
+                                        throw new WixException($"Unexpected WixBundleExePackageDetectionType: {exeDetectionType}");
+                                    }
+
+                                    exeDetectionType = WixBundleExePackageDetectionType.Arp;
+                                }
+
+                                this.ParseExePackageArpEntryElement(child, out arpId, out arpDisplayVersion, out arpWin64);
+                            }
+                            break;
+                        case "SlipstreamMsp":
+                            allowed = (packageType == WixBundlePackageType.Msi);
+                            if (allowed)
+                            {
+                                this.ParseSlipstreamMspElement(child, id.Id);
+                            }
+                            break;
+                        case "MsiProperty":
+                            allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
+                            if (allowed)
+                            {
+                                this.ParseMsiPropertyElement(child, id.Id);
+                            }
+                            break;
+                        case "Payload":
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id);
+                            break;
+                        case "PayloadGroupRef":
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);
+                            break;
+                        case "Provides":
+                            this.ParseProvidesElement(child, packageType, id.Id, out _);
+                            break;
+                        case "ExitCode":
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
+                            if (allowed)
+                            {
+                                this.ParseExitCodeElement(child, id.Id);
+                            }
+                            break;
+                        case "CommandLine":
+                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
+                            if (allowed)
+                            {
+                                this.ParseCommandLineElement(child, id.Id);
+                            }
+                            break;
+                        case "BundlePackagePayload":
+                        case "ExePackagePayload":
+                        case "MsiPackagePayload":
+                        case "MspPackagePayload":
+                        case "MsuPackagePayload":
+                            allowed = packagePayloadElementName == child.Name.LocalName;
+                            // Handled previously
+                            break;
+                        default:
+                            allowed = false;
+                            break;
+                    }
+
+                    if (!allowed)
+                    {
+                        this.Core.UnexpectedElement(node, child);
+                    }
+                }
+                else
+                {
+                    var context = new Dictionary<string, string>() { { "Id", id.Id } };
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
+
             if (id.Id == BurnConstants.BundleDefaultBoundaryId)
             {
                 this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
@@ -2234,36 +2344,71 @@ namespace WixToolset.Core
                     perMachine = YesNoDefaultType.Default;
                 }
 
-                if (permanent == YesNoType.No)
+                if (exeDetectionType == WixBundleExePackageDetectionType.Arp)
                 {
-                    if (uninstallArguments == null)
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", "Permanent", "no"));
-                    }
+                    // Missing attributes are reported when parsing the element.
                 }
-                else if (permanent == YesNoType.NotSet)
+                else if (exeDetectionType == WixBundleExePackageDetectionType.Condition)
                 {
-                    if (uninstallArguments == null)
+                    if (String.IsNullOrEmpty(detectCondition))
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", "Permanent"));
+                        if (permanent == YesNoType.No)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "Permanent", "no"));
+                        }
+                        else if (permanent == YesNoType.NotSet)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "Permanent"));
+                        }
+                        else if (repairArguments != null)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "RepairArguments"));
+                        }
+                        else if (uninstallArguments != null)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallArguments"));
+                        }
+                        else
+                        {
+                            Debug.Assert(detectCondition == String.Empty);
+                            exeDetectionType = WixBundleExePackageDetectionType.None;
+                        }
                     }
-                }
 
-                // Detect condition is recommended or required for Exe packages (depending on whether repair or uninstall arguments were provided).
-                if (String.IsNullOrEmpty(detectCondition))
-                {
-                    if (repairArguments != null)
+                    if (uninstallArguments == null)
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "RepairArguments"));
+                        if (permanent == YesNoType.No)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", "Permanent", "no"));
+                        }
+                        else if (permanent == YesNoType.NotSet)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", "Permanent"));
+                        }
                     }
-                    else if (uninstallArguments != null)
+                }
+                else if (exeDetectionType == WixBundleExePackageDetectionType.None)
+                {
+                    if (permanent == YesNoType.No)
                     {
-                        this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallArguments"));
+                        this.Core.Write(ErrorMessages.ExpectedAttributeOrElementWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "ArpEntry", "Permanent", "no"));
+                    }
+                    else if (permanent == YesNoType.NotSet)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributeOrElementWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "ArpEntry", "Permanent"));
+                    }
+                    else if (repairArguments != null)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributeOrElementWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "ArpEntry", "RepairArguments"));
                     }
                     else
                     {
-                        this.Core.Write(WarningMessages.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
+                        this.Core.Write(WarningMessages.ExePackageDetectInformationRecommended(sourceLineNumbers));
                     }
+                }
+                else
+                {
+                    this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "ArpEntry", String.IsNullOrEmpty(detectCondition) ? "UninstallArguments" : "DetectCondition"));
                 }
 
                 if (repairArguments == null && repairCondition != null)
@@ -2341,82 +2486,6 @@ namespace WixToolset.Core
                 }
             }
 
-            // Now that the package ID is known, we can parse the extension attributes...
-            var contextValues = new Dictionary<string, string>() { { "PackageId", id.Id } };
-            foreach (var attribute in extensionAttributes)
-            {
-                this.Core.ParseExtensionAttribute(node, attribute, contextValues);
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    var allowed = true;
-                    switch (child.Name.LocalName)
-                    {
-                        case "SlipstreamMsp":
-                            allowed = (packageType == WixBundlePackageType.Msi);
-                            if (allowed)
-                            {
-                                this.ParseSlipstreamMspElement(child, id.Id);
-                            }
-                            break;
-                        case "MsiProperty":
-                            allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
-                            if (allowed)
-                            {
-                                this.ParseMsiPropertyElement(child, id.Id);
-                            }
-                            break;
-                        case "Payload":
-                            this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id);
-                            break;
-                        case "PayloadGroupRef":
-                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);
-                            break;
-                        case "Provides":
-                            this.ParseProvidesElement(child, packageType, id.Id, out _);
-                            break;
-                        case "ExitCode":
-                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
-                            if (allowed)
-                            {
-                                this.ParseExitCodeElement(child, id.Id);
-                            }
-                            break;
-                        case "CommandLine":
-                            allowed = (packageType == WixBundlePackageType.Bundle || packageType == WixBundlePackageType.Exe);
-                            if (allowed)
-                            {
-                                this.ParseCommandLineElement(child, id.Id);
-                            }
-                            break;
-                        case "BundlePackagePayload":
-                        case "ExePackagePayload":
-                        case "MsiPackagePayload":
-                        case "MspPackagePayload":
-                        case "MsuPackagePayload":
-                            allowed = packagePayloadElementName == child.Name.LocalName;
-                            // Handled previously
-                            break;
-                        default:
-                            allowed = false;
-                            break;
-                    }
-
-                    if (!allowed)
-                    {
-                        this.Core.UnexpectedElement(node, child);
-                    }
-                }
-                else
-                {
-                    var context = new Dictionary<string, string>() { { "Id", id.Id } };
-                    this.Core.ParseExtensionElement(node, child, context);
-                }
-            }
-
             if (!this.Core.EncounteredError)
             {
                 var compilerPackagePayload = childCompilerPackagePayload ?? (hasPayloadInfo ? new CompilerPackagePayload(compilerPayload, packageType) : null);
@@ -2474,6 +2543,7 @@ namespace WixToolset.Core
                     case WixBundlePackageType.Exe:
                         WixBundleExePackageAttributes exeAttributes = 0;
                         exeAttributes |= (YesNoType.Yes == bundle) ? WixBundleExePackageAttributes.Bundle : 0;
+                        exeAttributes |= (YesNoType.Yes == arpWin64) ? WixBundleExePackageAttributes.ArpWin64 : 0;
 
                         this.Core.AddSymbol(new WixBundleExePackageSymbol(sourceLineNumbers, id)
                         {
@@ -2482,7 +2552,10 @@ namespace WixToolset.Core
                             InstallCommand = installArguments,
                             RepairCommand = repairArguments,
                             UninstallCommand = uninstallArguments,
-                            ExeProtocol = protocol
+                            ExeProtocol = protocol,
+                            DetectionType = exeDetectionType.Value,
+                            ArpId = arpId,
+                            ArpDisplayVersion = arpDisplayVersion,
                         });
                         break;
 
@@ -2943,6 +3016,57 @@ namespace WixToolset.Core
                     BundleId = id,
                     Action = actionType.Value,
                 });
+            }
+        }
+
+        private void ParseExePackageArpEntryElement(XElement node, out string id, out string version, out YesNoType win64)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            id = null;
+            version = null;
+            win64 = YesNoType.NotSet;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib);
+                            break;
+                        case "Version":
+                            version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Win64":
+                            win64 = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (String.IsNullOrEmpty(id))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            if (String.IsNullOrEmpty(version))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+            }
+
+            if (win64 == YesNoType.NotSet)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Win64"));
             }
         }
 

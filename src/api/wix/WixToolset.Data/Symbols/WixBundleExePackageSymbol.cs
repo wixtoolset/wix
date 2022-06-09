@@ -16,6 +16,9 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.RepairCommand), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.UninstallCommand), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.ExeProtocol), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.DetectionType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.ArpId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.ArpDisplayVersion), IntermediateFieldType.String),
             },
             typeof(WixBundleExePackageSymbol));
     }
@@ -33,6 +36,19 @@ namespace WixToolset.Data.Symbols
         RepairCommand,
         UninstallCommand,
         ExeProtocol,
+        DetectionType,
+        ArpId,
+        ArpDisplayVersion,
+    }
+
+    /// <summary>
+    /// How Burn will detect the ExePackage.
+    /// </summary>
+    public enum WixBundleExePackageDetectionType
+    {
+        None,
+        Condition,
+        Arp,
     }
 
     [Flags]
@@ -40,6 +56,7 @@ namespace WixToolset.Data.Symbols
     {
         None = 0,
         Bundle = 1,
+        ArpWin64 = 2,
     }
 
     public class WixBundleExePackageSymbol : IntermediateSymbol
@@ -90,6 +107,24 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleExePackageSymbolFields.ExeProtocol, value);
         }
 
+        public WixBundleExePackageDetectionType DetectionType
+        {
+            get => (WixBundleExePackageDetectionType)this.Fields[(int)WixBundleExePackageSymbolFields.DetectionType].AsNumber();
+            set => this.Set((int)WixBundleExePackageSymbolFields.DetectionType, (int)value);
+        }
+
+        public string ArpId
+        {
+            get => (string)this.Fields[(int)WixBundleExePackageSymbolFields.ArpId];
+            set => this.Set((int)WixBundleExePackageSymbolFields.ArpId, value);
+        }
+
+        public string ArpDisplayVersion
+        {
+            get => (string)this.Fields[(int)WixBundleExePackageSymbolFields.ArpDisplayVersion];
+            set => this.Set((int)WixBundleExePackageSymbolFields.ArpDisplayVersion, value);
+        }
+
         public bool IsBundle
         {
             get { return this.Attributes.HasFlag(WixBundleExePackageAttributes.Bundle); }
@@ -102,6 +137,22 @@ namespace WixToolset.Data.Symbols
                 else
                 {
                     this.Attributes &= ~WixBundleExePackageAttributes.Bundle;
+                }
+            }
+        }
+
+        public bool ArpWin64
+        {
+            get { return this.Attributes.HasFlag(WixBundleExePackageAttributes.ArpWin64); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleExePackageAttributes.ArpWin64;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleExePackageAttributes.ArpWin64;
                 }
             }
         }

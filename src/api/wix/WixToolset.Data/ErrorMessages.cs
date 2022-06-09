@@ -388,7 +388,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedAttribute, "The {0}/@{1} attribute was not found; it is required.", elementName, attributeName);
         }
 
-        public static Message ExpectedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attribute1Name, string attribute2Name, Boolean eitherOr)
+        public static Message ExpectedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attribute1Name, string attribute2Name, bool eitherOr)
         {
             return Message(sourceLineNumbers, Ids.ExpectedAttribute, "The {0} element must have a value for exactly one of the {1} or {2} attributes.", elementName, attribute1Name, attribute2Name, eitherOr);
         }
@@ -403,7 +403,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedAttribute, "The {0}/@{1} attribute was not found; it is required when attribute {2} has a value of '{3}'.", elementName, attributeName, otherAttributeName, otherAttributeValue);
         }
 
-        public static Message ExpectedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName, string otherAttributeValue, Boolean otherAttributeValueUnless)
+        public static Message ExpectedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName, string otherAttributeValue, bool otherAttributeValueUnless)
         {
             return Message(sourceLineNumbers, Ids.ExpectedAttribute, "The {0}/@{1} attribute was not found; it is required unless the attribute {2} has a value of '{3}'.", elementName, attributeName, otherAttributeName, otherAttributeValue, otherAttributeValueUnless);
         }
@@ -426,6 +426,21 @@ namespace WixToolset.Data
         public static Message ExpectedAttributeOrElement(SourceLineNumber sourceLineNumbers, string parentElement, string attribute, string childElement)
         {
             return Message(sourceLineNumbers, Ids.ExpectedAttributeOrElement, "Element '{0}' missing attribute '{1}' or child element '{2}'. Exactly one of those is required.", parentElement, attribute, childElement);
+        }
+
+        public static Message ExpectedAttributeOrElementWithOtherAttribute(SourceLineNumber sourceLineNumbers, string parentElement, string attribute, string childElement, string otherAttribute)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeOrElementWithOtherAttribute, "Element '{0}' missing attribute '{1}' or child element '{2}'. Exactly one of those is required when attribute '{3}' is specified.", parentElement, attribute, childElement, otherAttribute);
+        }
+
+        public static Message ExpectedAttributeOrElementWithOtherAttribute(SourceLineNumber sourceLineNumbers, string parentElement, string attribute, string childElement, string otherAttribute, string otherAttributeValue)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeOrElementWithOtherAttribute, "Element '{0}' missing attribute '{1}' or child element '{2}'. Exactly one of those is required when attribute '{3}' is specified with value '{4}'.", parentElement, attribute, childElement, otherAttribute, otherAttributeValue);
+        }
+
+        public static Message ExpectedAttributeOrElementWithoutOtherAttribute(SourceLineNumber sourceLineNumbers, string parentElement, string attribute, string childElement, string otherAttribute)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeOrElementWithoutOtherAttribute, "Element '{0}' missing attribute '{1}' or child element '{2}'. Exactly one of those is required when attribute '{3}' is not specified.", parentElement, attribute, childElement, otherAttribute);
         }
 
         public static Message ExpectedAttributes(SourceLineNumber sourceLineNumbers, string elementName, string attributeName1, string attributeName2)
@@ -839,7 +854,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalAttributeWithoutOtherAttributes, "The {0}/@{1} attribute can only be specified with one of the following attributes: {2} or {3} present.", elementName, attributeName, otherAttributeName1, otherAttributeName2);
         }
 
-        public static Message IllegalAttributeWithoutOtherAttributes(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName1, string otherAttributeName2, string otherAttributeValue, Boolean uniquifier)
+        public static Message IllegalAttributeWithoutOtherAttributes(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName1, string otherAttributeName2, string otherAttributeValue, bool uniquifier)
         {
             return Message(sourceLineNumbers, Ids.IllegalAttributeWithoutOtherAttributes, "The {0}/@{1} attribute can only be specified with one of the following attributes: {2} or {3} present with value '{4}'.", elementName, attributeName, otherAttributeName1, otherAttributeName2, otherAttributeValue, uniquifier);
         }
@@ -899,7 +914,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalComponentWithAutoGeneratedGuid, "The Component/@Guid attribute's value '*' is not valid for this component because it does not meet the criteria for having an automatically generated guid. Components using a Directory as a KeyPath or containing ODBCDataSource child elements cannot use an automatically generated guid. Make sure your component doesn't have a Directory as the KeyPath and move any ODBCDataSource child elements to components with explicit component guids.");
         }
 
-        public static Message IllegalComponentWithAutoGeneratedGuid(SourceLineNumber sourceLineNumbers, Boolean registryKeyPath)
+        public static Message IllegalComponentWithAutoGeneratedGuid(SourceLineNumber sourceLineNumbers, bool registryKeyPath)
         {
             return Message(sourceLineNumbers, Ids.IllegalComponentWithAutoGeneratedGuid, "The Component/@Guid attribute's value '*' is not valid for this component because it does not meet the criteria for having an automatically generated guid. Components with registry keypaths and files cannot use an automatically generated guid. Create multiple components, each with one file and/or one registry value keypath, to use automatically generated guids.", registryKeyPath);
         }
@@ -1414,12 +1429,12 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.MergeFeatureRequired, "The {0} table contains a row with primary key(s) '{1}' which requires a feature to properly merge from the merge module '{2}'.  Nest a MergeRef element with an Id attribute set to the value '{3}' under a Feature element to fix this error.", tableName, primaryKeys, mergeModuleFile, mergeId);
         }
 
-        public static Message MergeLanguageFailed(SourceLineNumber sourceLineNumbers, Int16 language, string mergeModuleFile)
+        public static Message MergeLanguageFailed(SourceLineNumber sourceLineNumbers, short language, string mergeModuleFile)
         {
             return Message(sourceLineNumbers, Ids.MergeLanguageFailed, "The language '{0}' is supported but uses an invalid language transform in the merge module '{1}'.", language, mergeModuleFile);
         }
 
-        public static Message MergeLanguageUnsupported(SourceLineNumber sourceLineNumbers, Int16 language, string mergeModuleFile)
+        public static Message MergeLanguageUnsupported(SourceLineNumber sourceLineNumbers, short language, string mergeModuleFile)
         {
             return Message(sourceLineNumbers, Ids.MergeLanguageUnsupported, "Could not locate language '{0}' (or a transform for this language) in the merge module '{1}'.  This is likely due to an incorrectly authored Merge/@Language attribute.", language, mergeModuleFile);
         }
@@ -2710,6 +2725,8 @@ namespace WixToolset.Data
             MsiTransactionX86BeforeX64Package2 = 410,
             MsiTransactionInvalidPackage = 411,
             MsiTransactionInvalidPackage2 = 412,
+            ExpectedAttributeOrElementWithOtherAttribute = 413,
+            ExpectedAttributeOrElementWithoutOtherAttribute = 414,
         }
     }
 }

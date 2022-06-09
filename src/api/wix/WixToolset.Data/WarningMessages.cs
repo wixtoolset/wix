@@ -237,6 +237,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DetectConditionRecommended, "The {0}/@DetectCondition attribute is recommended so the package is only installed when absent.", elementName);
         }
 
+        public static Message ExePackageDetectInformationRecommended(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.ExePackageDetectInformationRecommended, "The ExePackage/@DetectCondition attribute or child element ArpEntry is recommended so the package is only installed when absent.");
+        }
+
         public static Message DownloadUrlNotSupportedForAttachedContainers(SourceLineNumber sourceLineNumbers, string containerId)
         {
             return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForAttachedContainers, "The Container '{0}' is attached but included a @DownloadUrl attribute. Attached Containers cannot be downloaded so the download URL is being ignored.", containerId);
@@ -267,7 +272,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.EmptyCabinet, "The cabinet '{0}' does not contain any files.  If this installation contains no files, this warning can likely be safely ignored.  Otherwise, please add files to the cabinet or remove it.", cabinetName);
         }
 
-        public static Message EmptyCabinet(SourceLineNumber sourceLineNumbers, string cabinetName, Boolean isPatch)
+        public static Message EmptyCabinet(SourceLineNumber sourceLineNumbers, string cabinetName, bool isPatch)
         {
             return Message(sourceLineNumbers, Ids.EmptyCabinet, "The cabinet '{0}' does not contain any files.  If this patch contains no files, this warning can likely be safely ignored.  Otherwise, try passing -p to torch.exe when first building the transforms, or add a ComponentRef to your PatchFamily authoring to pull changed files into the cabinet.", cabinetName, isPatch);
         }
@@ -322,7 +327,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalActionInSequence, "The {0} table contains an action '{1}' which is not allowed in this table.  If this is a standard action then it is not valid for this table, if it is a custom action or dialog then this table does not accept actions of that type.  This action will be left out of the decompiled output.", sequenceTableName, actionName);
         }
 
-        public static Message IllegalColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, Object value)
+        public static Message IllegalColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
         {
             return Message(sourceLineNumbers, Ids.IllegalColumnValue, "The {0}.{1} column's value, '{2}', is not a recognized legal value.  This information will be left out of the decompiled output.", tableName, columnName, value);
         }
@@ -407,7 +412,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.MsiTransactionLimitations, "MSI transactions have limitations that make it hard to use them successfully in a bundle. Test the bundle thoroughly, especially in upgrade scenarios and the scenario that required them in the first place.");
         }
 
-        public static Message NestedInstall(SourceLineNumber sourceLineNumbers, string tableName, string columnName, Object value)
+        public static Message NestedInstall(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
         {
             return Message(sourceLineNumbers, Ids.NestedInstall, "The {0}.{1} column's value, '{2}', indicates a nested install.  Nested installations are not supported by the WiX team.  This action will be left out of the decompiled output.", tableName, columnName, value);
         }
@@ -628,7 +633,7 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.UnknownPermission, "The {0} table contains a row with primary key '{1}' which has an unknown permission at bit {2}.", tableName, primaryKey, bitPosition);
         }
 
-        public static Message UnrepresentableColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, Object value)
+        public static Message UnrepresentableColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
         {
             return Message(sourceLineNumbers, Ids.UnrepresentableColumnValue, "The {0}.{1} column's value, '{2}', cannot currently be represented in the WiX schema.", tableName, columnName, value);
         }
@@ -686,6 +691,11 @@ namespace WixToolset.Data
             }
 
             return Message(sourceLineNumbers, Ids.WindowsInstallerFileTooLarge, "The Windows Installer does not support {0} files larger than 2GB in size. Reduce the size or number of files embedded in '{1}' or the installation will likely fail with an unexpected error.", fileDescription, path);
+        }
+
+        public static Message InvalidWixVersion(SourceLineNumber sourceLineNumbers, string version, string elementName, string attributeName)
+        {
+            return Message(sourceLineNumbers, Ids.InvalidWixVersion, "Invalid WixVersion '{0}' in {1}/@'{2}'. Comparisons may yield unexpected results.", version, elementName, attributeName);
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
@@ -827,6 +837,8 @@ namespace WixToolset.Data
             WindowsInstallerFileTooLarge = 1158,
             UnavailableBundleConditionVariable = 1159,
             DiscardedRollbackBoundary2 = 1160,
+            ExePackageDetectInformationRecommended = 1161,
+            InvalidWixVersion = 1162,
         }
     }
 }

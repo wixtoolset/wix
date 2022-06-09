@@ -2798,7 +2798,8 @@ static BOOL NeedsCache(
 {
     BOOTSTRAPPER_ACTION_STATE action = fExecute ? pPackage->execute : pPackage->rollback;
     // TODO: bundles could theoretically use package cache
-    if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type || BURN_PACKAGE_TYPE_EXE == pPackage->type) // Bundle and Exe packages require the package for all operations (even uninstall).
+    if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type || // Bundle and Exe packages require the package for all operations (even uninstall).
+        BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_DETECTION_TYPE_ARP != pPackage->Exe.detectionType)
     {
         return BOOTSTRAPPER_ACTION_STATE_NONE != action;
     }

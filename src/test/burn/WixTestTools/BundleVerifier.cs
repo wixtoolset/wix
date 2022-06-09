@@ -80,6 +80,29 @@ namespace WixTestTools
             File.Delete(expectedCachePath);
         }
 
+        public bool TryGetArpEntryExePackageConfiguration(string packageId, out string arpId, out string arpVersion, out bool arpWin64, out bool perMachine)
+        {
+            using var wixOutput = WixOutput.Read(this.BundlePdb);
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().SingleOrDefault(p => p.Id.Id == packageId);
+            var exePackageSymbol = section.Symbols.OfType<WixBundleExePackageSymbol>().SingleOrDefault(p => p.Id.Id == packageId);
+            if (packageSymbol == null || exePackageSymbol == null || exePackageSymbol.DetectionType != WixBundleExePackageDetectionType.Arp)
+            {
+                arpId = null;
+                arpVersion = null;
+                arpWin64 = false;
+                perMachine = false;
+                return false;
+            }
+
+            arpId = exePackageSymbol.ArpId;
+            arpVersion = exePackageSymbol.ArpDisplayVersion;
+            arpWin64 = exePackageSymbol.ArpWin64;
+            perMachine = packageSymbol.PerMachine == true;
+            return true;
+        }
+
         public bool TryGetRegistration(out BundleRegistration registration)
         {
             var bundleSymbol = this.GetBundleSymbol();
