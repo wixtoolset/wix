@@ -654,10 +654,10 @@ namespace Bootstrapper
             fRollback = FALSE;
             dwIndex = 0;
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
-            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA", TRUE, BURN_CACHE_PACKAGE_TYPE_REQUIRED, BURN_CACHE_PACKAGE_TYPE_REQUIRED);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA", TRUE, BURN_CACHE_PACKAGE_TYPE_REQUIRED, BURN_CACHE_PACKAGE_TYPE_OPTIONAL);
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++, L"PackageA");
             ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 6);
-            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageB", TRUE, BURN_CACHE_PACKAGE_TYPE_REQUIRED, BURN_CACHE_PACKAGE_TYPE_REQUIRED);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageB", TRUE, BURN_CACHE_PACKAGE_TYPE_REQUIRED, BURN_CACHE_PACKAGE_TYPE_OPTIONAL);
             ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++, L"PackageB");
             Assert::Equal(dwIndex, pPlan->cCacheActions);
 
@@ -822,6 +822,125 @@ namespace Bootstrapper
             Assert::Equal(3ul, pEngineState->packages.cPackages);
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[1], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PackageB", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
+        }
+
+        [Fact]
+        void MultipleBundlePackageUninstallTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzMultipleBundlePackageManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
+            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY, pPlan->dwRegistrationOperations);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, FALSE, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            ValidateDependentRegistrationAction(pPlan, fRollback, dwIndex++, TRUE, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageB", FALSE, BURN_CACHE_PACKAGE_TYPE_OPTIONAL, BURN_CACHE_PACKAGE_TYPE_REQUIRED);
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++, L"PackageB");
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 6);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"PackageA", FALSE, BURN_CACHE_PACKAGE_TYPE_OPTIONAL, BURN_CACHE_PACKAGE_TYPE_REQUIRED);
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++, L"PackageA");
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(78462280ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageB");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageB", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", unregisterActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageB", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            dwExecuteCheckpointId += 1; // cache checkpoints
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"PackageA");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", unregisterActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageB", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", registerActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageB", BOOTSTRAPPER_ACTION_STATE_INSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            dwExecuteCheckpointId += 1; // cache checkpoints
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", registerActions1, 1);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteBundlePackage(pPlan, fRollback, dwIndex++, L"PackageA", BOOTSTRAPPER_ACTION_STATE_INSTALL, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(2ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(4ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            ValidateCleanAction(pPlan, dwIndex++, L"PackageB");
+            ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
+            ValidateCleanAction(pPlan, dwIndex++, L"NetFx48Web");
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", NULL);
+            ValidatePlannedProvider(pPlan, uIndex++, L"{7506235A-7C59-4750-82C7-EB460A87ED3A}", NULL);
+            ValidatePlannedProvider(pPlan, uIndex++, L"{B39CEE4D-CCD7-4797-BE3A-6613BD1DC4BE}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(3ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[1], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PackageB", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
         [Fact]

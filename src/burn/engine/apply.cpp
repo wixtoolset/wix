@@ -2781,7 +2781,7 @@ static HRESULT ExecuteBundlePackage(
     }
     else
     {
-        hrExecute = BundlePackageEngineExecutePackage(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
+        hrExecute = BundlePackageEngineExecutePackage(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, SUCCEEDED(pExecuteAction->bundlePackage.pPackage->hrCacheResult), GenericExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-user BUNDLE package.");
     }
 

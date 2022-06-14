@@ -7,11 +7,6 @@ static HRESULT DetectArpEntry(
     __out BOOTSTRAPPER_PACKAGE_STATE* pPackageState,
     __out_opt LPWSTR* psczQuietUninstallString
     );
-static HRESULT ParseArpUninstallString(
-    __in_z LPCWSTR wzArpUninstallString,
-    __inout LPWSTR* psczExecutablePath,
-    __inout LPWSTR* psczArguments
-    );
 
 // function definitions
 
@@ -435,20 +430,20 @@ extern "C" HRESULT ExeEngineExecutePackage(
     LPWSTR sczUserArgsObfuscated = NULL;
     LPWSTR sczCommandObfuscated = NULL;
     LPWSTR sczArpUninstallString = NULL;
-    LPWSTR sczArpArguments = NULL;
+    int argcArp = 0;
+    LPWSTR* argvArp = NULL;
     BOOTSTRAPPER_PACKAGE_STATE applyState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
     DWORD dwExitCode = 0;
     BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
-    LPCWSTR wzUninstallArguments = pPackage->Exe.sczUninstallArguments;
 
     if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType &&
         (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action ||
         BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->exePackage.action && fRollback))
     {
         hr = DetectArpEntry(pPackage, &applyState, &sczArpUninstallString);
-        ExitOnFailure(hr, "Failed to query ArpEntry for uninstall.");
+        ExitOnFailure(hr, "Failed to query ArpEntry for %hs.", BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action ? "uninstall" : "install");
 
         if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT == applyState && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action)
         {
@@ -487,8 +482,13 @@ extern "C" HRESULT ExeEngineExecutePackage(
     {
         ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "QuietUninstallString is null.");
 
-        hr = ParseArpUninstallString(sczArpUninstallString, &sczExecutablePath, &sczArpArguments);
+        hr = AppParseCommandLine(sczArpUninstallString, &argcArp, &argvArp);
         ExitOnFailure(hr, "Failed to parse QuietUninstallString: %ls.", sczArpUninstallString);
+
+        ExitOnNull(argcArp, hr, E_INVALIDARG, "QuietUninstallString must contain an executable path.");
+
+        hr = StrAllocString(&sczExecutablePath, argvArp[0], 0);
+        ExitOnFailure(hr, "Failed to copy executable path.");
 
         if (pPackage->fPerMachine)
         {
@@ -503,8 +503,6 @@ extern "C" HRESULT ExeEngineExecutePackage(
 
         hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
         ExitOnFailure(hr, "Failed to get parent directory for QuietUninstallString executable path: %ls", sczExecutablePath);
-
-        wzUninstallArguments = sczArpArguments;
     }
     else
     {
@@ -528,7 +526,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        wzArguments = wzUninstallArguments;
+        wzArguments = pPackage->Exe.sczUninstallArguments;
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
@@ -582,6 +580,12 @@ extern "C" HRESULT ExeEngineExecutePackage(
     // build base command
     hr = StrAllocFormatted(&sczBaseCommand, L"\"%ls\"", sczExecutablePath);
     ExitOnFailure(hr, "Failed to allocate base command.");
+
+    for (int i = 1; i < argcArp; ++i)
+    {
+        hr = AppAppendCommandLineArgument(&sczBaseCommand, argvArp[i]);
+        ExitOnFailure(hr, "Failed to append argument from ARP.");
+    }
 
     if (pPackage->Exe.fBundle)
     {
@@ -655,7 +659,11 @@ LExit:
     ReleaseStr(sczUserArgsObfuscated);
     ReleaseStr(sczCommandObfuscated);
     ReleaseStr(sczArpUninstallString);
-    ReleaseStr(sczArpArguments);
+
+    if (argvArp)
+    {
+        AppFreeCommandLineArgs(argvArp);
+    }
 
     ReleaseFileHandle(hExecutableFile);
 
@@ -1094,38 +1102,6 @@ static HRESULT DetectArpEntry(
 LExit:
     ReleaseRegKey(hKey);
     ReleaseVerutilVersion(pVersion);
-
-    return hr;
-}
-
-static HRESULT ParseArpUninstallString(
-    __in_z LPCWSTR wzArpUninstallString,
-    __inout LPWSTR* psczExecutablePath,
-    __inout LPWSTR* psczArguments
-    )
-{
-    HRESULT hr = S_OK;
-    int argc = 0;
-    LPWSTR* argv = NULL;
-
-    hr = AppParseCommandLine(wzArpUninstallString, &argc, &argv);
-    ExitOnFailure(hr, "Failed to parse uninstall string as command line: %ls.", wzArpUninstallString);
-    ExitOnNull(argc, hr, E_INVALIDARG, "Uninstall string must contain an executable path.");
-
-    hr = StrAllocString(psczExecutablePath, argv[0], 0);
-    ExitOnFailure(hr, "Failed to copy executable path for ArpCommand.");
-
-    for (int i = 1; i < argc; ++i)
-    {
-        hr = AppAppendCommandLineArgument(psczArguments, argv[i]);
-        ExitOnFailure(hr, "Failed to append argument for ArpCommand.");
-    }
-
-LExit:
-    if (argv)
-    {
-        AppFreeCommandLineArgs(argv);
-    }
 
     return hr;
 }

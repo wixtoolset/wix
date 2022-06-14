@@ -2805,12 +2805,15 @@ static BURN_CACHE_PACKAGE_TYPE GetCachePackageType(
     case BOOTSTRAPPER_ACTION_STATE_NONE:
         break;
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type ||
-            BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_DETECTION_TYPE_ARP != pPackage->Exe.detectionType)
+        if (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_DETECTION_TYPE_ARP != pPackage->Exe.detectionType)
         {
-            // Bundle and non-ArpEntry Exe packages require the package for all operations (even uninstall).
-            // TODO: bundles could theoretically use package cache.
+            // non-ArpEntry Exe packages require the package for all operations (even uninstall).
             cachePackageType = BURN_CACHE_PACKAGE_TYPE_REQUIRED;
+        }
+        else if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type)
+        {
+            // Bundle packages prefer the cache but can fallback to the ARP registration.
+            cachePackageType = BURN_CACHE_PACKAGE_TYPE_OPTIONAL;
         }
         else
         {
@@ -2823,6 +2826,7 @@ static BURN_CACHE_PACKAGE_TYPE GetCachePackageType(
     case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE: __fallthrough;
     default:
+        // TODO: bundles could theoretically use package cache.
         cachePackageType = BURN_CACHE_PACKAGE_TYPE_REQUIRED;
         break;
     }

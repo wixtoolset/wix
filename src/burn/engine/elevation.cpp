@@ -907,6 +907,9 @@ extern "C" HRESULT ElevationExecuteBundlePackage(
     hr = BuffWriteNumber(&pbData, &cbData, fRollback);
     ExitOnFailure(hr, "Failed to write rollback.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, SUCCEEDED(pExecuteAction->bundlePackage.pPackage->hrCacheResult));
+    ExitOnFailure(hr, "Failed to write fCacheAvailable.");
+
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->bundlePackage.sczParent);
     ExitOnFailure(hr, "Failed to write the parent to the message buffer.");
 
@@ -2855,7 +2858,8 @@ static HRESULT OnExecuteBundlePackage(
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
-    DWORD dwRollback = 0;
+    BOOL fRollback = FALSE;
+    BOOL fCacheAvailable = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
     LPWSTR sczIgnoreDependencies = NULL;
     LPWSTR sczAncestors = NULL;
@@ -2871,8 +2875,11 @@ static HRESULT OnExecuteBundlePackage(
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.bundlePackage.action);
     ExitOnFailure(hr, "Failed to read action.");
 
-    hr = BuffReadNumber(pbData, cbData, &iData, &dwRollback);
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
     ExitOnFailure(hr, "Failed to read rollback.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fCacheAvailable);
+    ExitOnFailure(hr, "Failed to read fCacheAvailable.");
 
     hr = BuffReadString(pbData, cbData, &iData, &executeAction.bundlePackage.sczParent);
     ExitOnFailure(hr, "Failed to read the parent.");
@@ -2918,7 +2925,7 @@ static HRESULT OnExecuteBundlePackage(
     }
 
     // Execute BUNDLE package.
-    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &bundleRestart);
+    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, fRollback, fCacheAvailable, GenericExecuteMessageHandler, hPipe, &bundleRestart);
     ExitOnFailure(hr, "Failed to execute BUNDLE package.");
 
 LExit:
