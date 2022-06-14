@@ -343,6 +343,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z LPCWSTR wzPackageId,
         __in DWORD cCachePayloads,
         __in DWORD64 dw64PackageCacheSize,
+        __in BOOL fVital,
         __inout BOOL* pfCancel
         )  = 0;
 
@@ -727,5 +728,13 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in BOOL fPerMachine,
         __in_z LPCWSTR wzVersion,
         __inout BOOL* pfCancel
+        ) = 0;
+
+    // OnCachePackageNonVitalValidationFailure - called when the engine failed validating a package in the package cache that is non-vital to execution.
+    STDMETHOD(OnCachePackageNonVitalValidationFailure)(
+        __in_z LPCWSTR wzPackageId,
+        __in HRESULT hrStatus,
+        __in BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION recommendation,
+        __inout BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION* pAction
         ) = 0;
 };

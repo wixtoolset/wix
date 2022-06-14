@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 3, 31, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2022, 6, 10, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -726,7 +726,8 @@ EXTERN_C BAAPI UserExperienceOnCachePackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in DWORD cCachePayloads,
-    __in DWORD64 dw64PackageCacheSize
+    __in DWORD64 dw64PackageCacheSize,
+    __in BOOL fVital
     )
 {
     HRESULT hr = S_OK;
@@ -737,6 +738,7 @@ EXTERN_C BAAPI UserExperienceOnCachePackageBegin(
     args.wzPackageId = wzPackageId;
     args.cCachePayloads = cCachePayloads;
     args.dw64PackageCacheSize = dw64PackageCacheSize;
+    args.fVital = fVital;
 
     results.cbSize = sizeof(results);
 
@@ -777,6 +779,40 @@ EXTERN_C BAAPI UserExperienceOnCachePackageComplete(
     if (FAILED(hrStatus))
     {
         *pAction = results.action;
+    }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnCachePackageNonVitalValidationFailure(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in HRESULT hrStatus,
+    __inout BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION* pAction
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_ARGS args = { };
+    BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.hrStatus = hrStatus;
+    args.recommendation = *pAction;
+
+    results.cbSize = sizeof(results);
+    results.action = *pAction;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGENONVITALVALIDATIONFAILURE, &args, &results);
+    ExitOnFailure(hr, "BA OnCachePackageNonVitalValidationFailure failed.");
+
+    switch (results.action)
+    {
+    case BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION_NONE: __fallthrough;
+    case BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION_ACQUIRE:
+        *pAction = results.action;
+        break;
     }
 
 LExit:

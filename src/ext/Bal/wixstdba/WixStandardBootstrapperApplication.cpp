@@ -655,6 +655,7 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR wzPackageId,
         __in DWORD cCachePayloads,
         __in DWORD64 dw64PackageCacheSize,
+        __in BOOL fVital,
         __inout BOOL* pfCancel
         )
     {
@@ -673,7 +674,7 @@ public: // IBootstrapperApplication
             }
         }
 
-        return __super::OnCachePackageBegin(wzPackageId, cCachePayloads, dw64PackageCacheSize, pfCancel);
+        return __super::OnCachePackageBegin(wzPackageId, cCachePayloads, dw64PackageCacheSize, fVital, pfCancel);
     }
 
 
@@ -1488,6 +1489,9 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE:
             OnDetectRelatedBundlePackageFallback(reinterpret_cast<BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGENONVITALVALIDATIONFAILURE:
+            OnCachePackageNonVitalValidationFailureFallback(reinterpret_cast<BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_RESULTS*>(pvResults));
+            break;
         default:
 #ifdef DEBUG
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
@@ -2175,6 +2179,14 @@ private: // privates
         )
     {
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCachePackageNonVitalValidationFailureFallback(
+        __in BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_ARGS* pArgs,
+        __inout BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPACKAGENONVITALVALIDATIONFAILURE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
 

@@ -330,7 +330,7 @@ static HRESULT BalBaseBAProcOnCachePackageBegin(
     __inout BA_ONCACHEPACKAGEBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnCachePackageBegin(pArgs->wzPackageId, pArgs->cCachePayloads, pArgs->dw64PackageCacheSize, &pResults->fCancel);
+    return pBA->OnCachePackageBegin(pArgs->wzPackageId, pArgs->cCachePayloads, pArgs->dw64PackageCacheSize, pArgs->fVital, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnCacheAcquireBegin(
@@ -756,6 +756,15 @@ static HRESULT BalBaseBAProcOnDetectRelatedBundlePackage(
     return pBA->OnDetectRelatedBundlePackage(pArgs->wzPackageId, pArgs->wzBundleId, pArgs->relationType, pArgs->fPerMachine, pArgs->wzVersion, &pResults->fCancel);
 }
 
+static HRESULT BalBaseBAProcOnCachePackageNonVitalValidationFailure(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_ARGS* pArgs,
+    __inout BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_RESULTS* pResults
+    )
+{
+    return pBA->OnCachePackageNonVitalValidationFailure(pArgs->wzPackageId, pArgs->hrStatus, pArgs->recommendation, &pResults->action);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -1023,6 +1032,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE:
             hr = BalBaseBAProcOnDetectRelatedBundlePackage(pBA, reinterpret_cast<BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGENONVITALVALIDATIONFAILURE:
+            hr = BalBaseBAProcOnCachePackageNonVitalValidationFailure(pBA, reinterpret_cast<BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_RESULTS*>(pvResults));
             break;
         }
     }

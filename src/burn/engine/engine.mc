@@ -417,9 +417,9 @@ Planned related bundle: %1!ls!, detect type: %2!hs!, default plan type: %3!hs!, 
 
 MessageId=208
 Severity=Warning
-SymbolicName=MSG_PLAN_DISABLING_ROLLBACK_NO_CACHE
+SymbolicName=MSG_APPLY_SKIPPED_ROLLBACK_NO_CACHE
 Language=English
-Plan disabled rollback due to incomplete cache for package: %1!ls!, original rollback action: %2!hs!
+Skipping apply rollback of package: %1!ls! due to cache error: 0x%2!x!, original rollback action: %3!hs!. Continuing...
 .
 
 MessageId=209

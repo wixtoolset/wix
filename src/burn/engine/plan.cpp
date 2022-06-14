@@ -78,11 +78,13 @@ static HRESULT AddRegistrationAction(
     );
 static HRESULT AddCachePackage(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fVital
     );
 static HRESULT AddCachePackageHelper(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fVital
     );
 static HRESULT AddCacheSlipstreamMsps(
     __in BURN_PLAN* pPlan,
@@ -134,7 +136,7 @@ static HRESULT CalculateExecuteActions(
     __in BURN_PACKAGE* pPackage,
     __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary
     );
-static BOOL NeedsCache(
+static BURN_CACHE_PACKAGE_TYPE GetCachePackageType(
     __in BURN_PACKAGE* pPackage,
     __in BOOL fExecute
     );
@@ -894,7 +896,7 @@ static HRESULT PlanPackagesHelper(
         DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
-        UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, pPackage->fPlannedCache, pPackage->fPlannedUncache);
+        UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, NULL != pPackage->hCacheEvent, pPackage->fPlannedUncache);
 
         if (pPackage->compatiblePackage.fPlannable)
         {
@@ -999,7 +1001,7 @@ static HRESULT ProcessPackage(
     {
         if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
         {
-            hr = PlanLayoutPackage(pPlan, pPackage);
+            hr = PlanLayoutPackage(pPlan, pPackage, TRUE);
             ExitOnFailure(hr, "Failed to plan layout package.");
         }
     }
@@ -1015,7 +1017,7 @@ static HRESULT ProcessPackage(
         {
             if (ForceCache(pPlan, pPackage))
             {
-                hr = AddCachePackage(pPlan, pPackage);
+                hr = AddCachePackage(pPlan, pPackage, TRUE);
                 ExitOnFailure(hr, "Failed to plan cache package.");
 
                 if (pPackage->fPerMachine)
@@ -1127,7 +1129,8 @@ LExit:
 
 extern "C" HRESULT PlanLayoutPackage(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fVital
     )
 {
     HRESULT hr = S_OK;
@@ -1143,6 +1146,7 @@ extern "C" HRESULT PlanLayoutPackage(
 
     pCacheAction->type = BURN_CACHE_ACTION_TYPE_PACKAGE;
     pCacheAction->package.pPackage = pPackage;
+    pPackage->fCacheVital = fVital;
 
     ++pPlan->cOverallProgressTicksTotal;
 
@@ -1170,17 +1174,13 @@ extern "C" HRESULT PlanExecutePackage(
     hr = DependencyPlanPackageBegin(fPerMachine, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to begin plan dependency actions for package: %ls", pPackage->sczId);
 
-    if (fRequestedCache || NeedsCache(pPackage, TRUE))
+    pPackage->executeCacheType = fRequestedCache ? BURN_CACHE_PACKAGE_TYPE_REQUIRED : GetCachePackageType(pPackage, TRUE);
+    pPackage->rollbackCacheType = GetCachePackageType(pPackage, FALSE);
+
+    if (BURN_CACHE_PACKAGE_TYPE_NONE != pPackage->executeCacheType || BURN_CACHE_PACKAGE_TYPE_NONE != pPackage->rollbackCacheType)
     {
-        hr = AddCachePackage(pPlan, pPackage);
+        hr = AddCachePackage(pPlan, pPackage, BURN_CACHE_PACKAGE_TYPE_REQUIRED == pPackage->executeCacheType);
         ExitOnFailure(hr, "Failed to plan cache package.");
-    }
-    else if (!pPackage->fCached && NeedsCache(pPackage, FALSE))
-    {
-        // TODO: this decision should be made during apply instead of plan based on whether the package is actually cached.
-        // If the package is not in the cache, disable any rollback that would require the package from the cache.
-        LogId(REPORT_STANDARD, MSG_PLAN_DISABLING_ROLLBACK_NO_CACHE, pPackage->sczId, LoggingActionStateToString(pPackage->rollback));
-        pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     }
 
     // Add execute actions.
@@ -1364,6 +1364,8 @@ extern "C" HRESULT PlanRelatedBundlesInitialize(
         pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
         pRelatedBundle->defaultPlanRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
         pRelatedBundle->planRelationType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
+        pRelatedBundle->package.executeCacheType = BURN_CACHE_PACKAGE_TYPE_NONE;
+        pRelatedBundle->package.rollbackCacheType = BURN_CACHE_PACKAGE_TYPE_NONE;
 
         // Determine the plan relation type even if later it is ignored due to the planned action, the command relation type, or the related bundle not being plannable.
         // This gives more information to the BA in case it wants to override default behavior.
@@ -2088,10 +2090,6 @@ static void UninitializeCacheAction(
 {
     switch (pCacheAction->type)
     {
-    case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
-        ReleaseHandle(pCacheAction->syncpoint.hEvent);
-        break;
-
     case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
         ReleaseStr(pCacheAction->bundleLayout.sczExecutableName);
         ReleaseStr(pCacheAction->bundleLayout.sczUnverifiedPath);
@@ -2145,7 +2143,7 @@ static void ResetPlannedPackageState(
     pPackage->cacheType = pPackage->authoredCacheType;
     pPackage->defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
     pPackage->requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
-    pPackage->fPlannedCache = FALSE;
+    pPackage->fCacheVital = FALSE;
     pPackage->fPlannedUncache = FALSE;
     pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -2156,7 +2154,9 @@ static void ResetPlannedPackageState(
     pPackage->fDependencyManagerWasHere = FALSE;
     pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
     pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
-    pPackage->hCacheEvent = NULL;
+    pPackage->executeCacheType = BURN_CACHE_PACKAGE_TYPE_NONE;
+    pPackage->rollbackCacheType = BURN_CACHE_PACKAGE_TYPE_NONE;
+    ReleaseHandle(pPackage->hCacheEvent);
 
     ReleaseNullStr(pPackage->sczCacheFolder);
 
@@ -2314,19 +2314,21 @@ LExit:
 
 static HRESULT AddCachePackage(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fVital
     )
 {
     HRESULT hr = S_OK;
 
     // If this is an MSI package with slipstream MSPs, ensure the MSPs are cached first.
-    if (BURN_PACKAGE_TYPE_MSI == pPackage->type && 0 < pPackage->Msi.cSlipstreamMspPackages)
+    // TODO: Slipstream packages are not accounted for when caching the MSI package is optional.
+    if (BURN_PACKAGE_TYPE_MSI == pPackage->type && 0 < pPackage->Msi.cSlipstreamMspPackages && fVital)
     {
         hr = AddCacheSlipstreamMsps(pPlan, pPackage);
         ExitOnFailure(hr, "Failed to plan slipstream patches for package.");
     }
 
-    hr = AddCachePackageHelper(pPlan, pPackage);
+    hr = AddCachePackageHelper(pPlan, pPackage, fVital);
     ExitOnFailure(hr, "Failed to plan cache package.");
 
 LExit:
@@ -2335,7 +2337,8 @@ LExit:
 
 static HRESULT AddCachePackageHelper(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fVital
     )
 {
     AssertSz(pPackage->sczCacheId && *pPackage->sczCacheId, "AddCachePackageHelper() expects the package to have a cache id.");
@@ -2353,6 +2356,9 @@ static HRESULT AddCachePackageHelper(
     {
         ExitFunction();
     }
+
+    pPackage->hCacheEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
+    ExitOnNullWithLastError(pPackage->hCacheEvent, hr, "Failed to create syncpoint event.");
 
     // Cache checkpoints happen before the package is cached because downloading packages'
     // payloads will not roll themselves back the way installation packages rollback on
@@ -2381,7 +2387,7 @@ static HRESULT AddCachePackageHelper(
         pCacheAction->checkpoint.dwId = dwCheckpoint;
     }
 
-    hr = PlanLayoutPackage(pPlan, pPackage);
+    hr = PlanLayoutPackage(pPlan, pPackage, fVital);
     ExitOnFailure(hr, "Failed to plan cache for package.");
 
     // Create syncpoint action.
@@ -2389,15 +2395,11 @@ static HRESULT AddCachePackageHelper(
     ExitOnFailure(hr, "Failed to append cache action.");
 
     pCacheAction->type = BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT;
-    pCacheAction->syncpoint.hEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
-    ExitOnNullWithLastError(pCacheAction->syncpoint.hEvent, hr, "Failed to create syncpoint event.");
-
-    pPackage->hCacheEvent = pCacheAction->syncpoint.hEvent;
+    pCacheAction->syncpoint.pPackage = pPackage;
 
     hr = PlanExecuteCacheSyncAndRollback(pPlan, pPackage);
     ExitOnFailure(hr, "Failed to plan package cache syncpoint");
 
-    pPackage->fPlannedCache = TRUE;
     if (pPackage->fCanAffectRegistration)
     {
         pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
@@ -2421,7 +2423,7 @@ static HRESULT AddCacheSlipstreamMsps(
         BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[i].pMspPackage;
         AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
 
-        hr = AddCachePackageHelper(pPlan, pMspPackage);
+        hr = AddCachePackageHelper(pPlan, pMspPackage, TRUE);
         ExitOnFailure(hr, "Failed to plan slipstream MSP: %ls", pMspPackage->sczId);
     }
 
@@ -2791,22 +2793,41 @@ LExit:
     return hr;
 }
 
-static BOOL NeedsCache(
+static BURN_CACHE_PACKAGE_TYPE GetCachePackageType(
     __in BURN_PACKAGE* pPackage,
     __in BOOL fExecute
     )
 {
-    BOOTSTRAPPER_ACTION_STATE action = fExecute ? pPackage->execute : pPackage->rollback;
-    // TODO: bundles could theoretically use package cache
-    if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type || // Bundle and Exe packages require the package for all operations (even uninstall).
-        BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_DETECTION_TYPE_ARP != pPackage->Exe.detectionType)
+    BURN_CACHE_PACKAGE_TYPE cachePackageType = BURN_CACHE_PACKAGE_TYPE_NONE;
+
+    switch (fExecute ? pPackage->execute : pPackage->rollback)
     {
-        return BOOTSTRAPPER_ACTION_STATE_NONE != action;
+    case BOOTSTRAPPER_ACTION_STATE_NONE:
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
+        if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type ||
+            BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_DETECTION_TYPE_ARP != pPackage->Exe.detectionType)
+        {
+            // Bundle and non-ArpEntry Exe packages require the package for all operations (even uninstall).
+            // TODO: bundles could theoretically use package cache.
+            cachePackageType = BURN_CACHE_PACKAGE_TYPE_REQUIRED;
+        }
+        else
+        {
+            // The other package types can uninstall without the original package.
+            cachePackageType = BURN_CACHE_PACKAGE_TYPE_NONE;
+        }
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_INSTALL: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE: __fallthrough;
+    default:
+        cachePackageType = BURN_CACHE_PACKAGE_TYPE_REQUIRED;
+        break;
     }
-    else // The other package types can uninstall without the original package.
-    {
-        return BOOTSTRAPPER_ACTION_STATE_UNINSTALL < action;
-    }
+
+    return cachePackageType;
 }
 
 static BOOL ForceCache(
@@ -2881,7 +2902,7 @@ static void CacheActionLog(
         break;
 
     case BURN_CACHE_ACTION_TYPE_PACKAGE:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE id: %ls", wzBase, iAction, pAction->package.pPackage->sczId);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE id: %ls, vital: %hs, execute cache type: %hs, rollback cache type: %hs", wzBase, iAction, pAction->package.pPackage->sczId, LoggingBoolToString(pAction->package.pPackage->fCacheVital), LoggingCachePackageTypeToString(pAction->package.pPackage->executeCacheType), LoggingCachePackageTypeToString(pAction->package.pPackage->rollbackCacheType));
         break;
 
     case BURN_CACHE_ACTION_TYPE_ROLLBACK_PACKAGE:
@@ -2889,7 +2910,7 @@ static void CacheActionLog(
         break;
 
     case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: SIGNAL_SYNCPOINT event handle: 0x%p", wzBase, iAction, pAction->syncpoint.hEvent);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: SIGNAL_SYNCPOINT package id: %ls, event handle: 0x%p", wzBase, iAction, pAction->syncpoint.pPackage->sczId, pAction->syncpoint.pPackage->hCacheEvent);
         break;
 
     default:

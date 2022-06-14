@@ -6,4 +6,11 @@
       <Payload SourceFile="!(bindpath.net2x86)\TestExe.exe.config" />
     </PayloadGroup>
   </Fragment>
+
+  <Fragment>
+    <Component Id="TestExeComponent" Directory="INSTALLFOLDER">
+      <File Source="!(bindpath.net2x86)\TestExe.exe" KeyPath="yes" />
+      <File Source="!(bindpath.net2x86)\TestExe.exe.config" />
+    </Component>
+  </Fragment>
 </Wix>

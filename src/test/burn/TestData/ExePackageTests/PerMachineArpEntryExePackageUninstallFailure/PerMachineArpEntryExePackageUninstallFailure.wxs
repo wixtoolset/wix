@@ -1,0 +1,24 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?define ArpId = {2BE9DAA8-E202-4E42-B25E-B39AA987A59C}?>
+<?define ArpKeyPath = HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(var.ArpId)?>
+<?define ArpVersion = 1.0.0.0?>
+<?define TestExePath = [ProgramFilesFolder]~Test WiX\$(var.TestGroupName)\PackageTestExe\testexe.exe?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Fragment>
+    <Variable Name="FAILWHENDEFERRED" bal:Overridable="yes" />
+
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageTestExe" SourceFile="$(var.PackageTestExe.TargetPath)">
+        <MsiProperty Name="WIXFAILWHENDEFERRED" Value="[FAILWHENDEFERRED]" />
+      </MsiPackage>
+      <ExePackage Id="TestExe" PerMachine="yes"
+                  InstallArguments="/regw &quot;$(var.ArpKeyPath),DisplayVersion,String,$(var.ArpVersion)&quot; /regw &quot;$(var.ArpKeyPath),QuietUninstallString,String,\&quot;$(var.TestExePath)\&quot; /regd \&quot;$(var.ArpKeyPath)\&quot;&quot;">
+        <ArpEntry Id="$(var.ArpId)" Version="$(var.ArpVersion)" Win64="no" />
+
+        <PayloadGroupRef Id="TestExePayloads" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+</Wix>
