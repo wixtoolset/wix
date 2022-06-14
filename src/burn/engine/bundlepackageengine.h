@@ -53,6 +53,7 @@ HRESULT BundlePackageEngineExecutePackage(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
+    __in BOOL fCacheAvailable,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart

@@ -18,6 +18,7 @@ static HRESULT ExecuteBundle(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
+    __in BOOL fCacheAvailable,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __in BOOTSTRAPPER_ACTION_STATE action,
@@ -29,6 +30,11 @@ static HRESULT ExecuteBundle(
     __in_z_opt LPCWSTR wzAncestors,
     __in_z_opt LPCWSTR wzEngineWorkingDirectory,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
+static HRESULT DetectArpEntry(
+    __in BURN_PACKAGE* pPackage,
+    __out BOOL* pfRegistered,
+    __out LPWSTR* psczQuietUninstallString
     );
 static BOOTSTRAPPER_RELATION_TYPE ConvertRelationType(
     __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE relationType
@@ -197,6 +203,7 @@ extern "C" void BundlePackageEnginePackageUninitialize(
     )
 {
     ReleaseStr(pPackage->Bundle.sczBundleId);
+    ReleaseStr(pPackage->Bundle.sczArpKeyPath);
     ReleaseVerutilVersion(pPackage->Bundle.pVersion);
     ReleaseStr(pPackage->Bundle.sczRegistrationKey);
     ReleaseStr(pPackage->Bundle.sczInstallArguments);
@@ -600,6 +607,7 @@ extern "C" HRESULT BundlePackageEngineExecutePackage(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
+    __in BOOL fCacheAvailable,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -613,7 +621,7 @@ extern "C" HRESULT BundlePackageEngineExecutePackage(
     BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
     BURN_PACKAGE* pPackage = pExecuteAction->bundlePackage.pPackage;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, FALSE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, fCacheAvailable, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, FALSE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
@@ -635,7 +643,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, TRUE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, TRUE, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, TRUE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" void BundlePackageEngineUpdateInstallRegistrationState(
@@ -678,10 +686,10 @@ static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     BOOTSTRAPPER_RELATION_TYPE relationType = RelatedBundleConvertRelationType(pBundle->relationType);
     BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleId, -1, pPackage->Bundle.sczBundleId, -1))
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleId, -1, pPackage->Bundle.sczBundleId, -1) &&
+        pPackage->Bundle.fWin64 == (REG_KEY_64BIT == pBundle->regBitness))
     {
         Assert(BOOTSTRAPPER_RELATION_UPGRADE == relationType);
-        Assert(pPackage->Bundle.fWin64 == (REG_KEY_64BIT == pBundle->regBitness));
 
         pContext->fSelfFound = TRUE;
     }
@@ -727,6 +735,7 @@ static HRESULT ExecuteBundle(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
+    __in BOOL fCacheAvailable,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __in BOOTSTRAPPER_ACTION_STATE action,
@@ -749,6 +758,10 @@ static HRESULT ExecuteBundle(
     LPWSTR sczUserArgs = NULL;
     LPWSTR sczUserArgsObfuscated = NULL;
     LPWSTR sczCommandObfuscated = NULL;
+    LPWSTR sczArpUninstallString = NULL;
+    int argcArp = 0;
+    LPWSTR* argvArp = NULL;
+    BOOL fRegistered = FALSE;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
     STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
@@ -771,6 +784,51 @@ static HRESULT ExecuteBundle(
 
         hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
         ExitOnFailure(hr, "Failed to get cached path for related bundle: %ls", pPackage->sczId);
+    }
+    else if (!fCacheAvailable)
+    {
+        ExitOnNull(BOOTSTRAPPER_ACTION_STATE_UNINSTALL == action, hr, E_INVALIDARG, "The only supported action when the cache is not available is UNINSTALL.");
+
+        hr = DetectArpEntry(pPackage, &fRegistered, &sczArpUninstallString);
+        ExitOnFailure(hr, "Failed to query ARP for uninstall.");
+
+        if (!fRegistered)
+        {
+            if (fRollback)
+            {
+                LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pPackage->sczId, LoggingActionStateToString(action), LoggingPackageStateToString(BOOTSTRAPPER_PACKAGE_STATE_ABSENT));
+            }
+            else
+            {
+                LogId(REPORT_STANDARD, MSG_ATTEMPTED_UNINSTALL_ABSENT_PACKAGE, pPackage->sczId);
+            }
+
+            ExitFunction();
+        }
+
+        ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "QuietUninstallString is null.");
+
+        hr = AppParseCommandLine(sczArpUninstallString, &argcArp, &argvArp);
+        ExitOnFailure(hr, "Failed to parse QuietUninstallString: %ls.", sczArpUninstallString);
+
+        ExitOnNull(argcArp, hr, E_INVALIDARG, "QuietUninstallString must contain an executable path.");
+
+        hr = StrAllocString(&sczExecutablePath, argvArp[0], 0);
+        ExitOnFailure(hr, "Failed to copy executable path.");
+
+        if (pPackage->fPerMachine)
+        {
+            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczExecutablePath);
+            ExitOnFailure(hr, "Failed to verify the QuietUninstallString executable path is in a secure location: %ls", sczExecutablePath);
+            if (S_FALSE == hr)
+            {
+                LogStringLine(REPORT_STANDARD, "The QuietUninstallString executable path is not in a secure location: %ls", sczExecutablePath);
+                ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED));
+            }
+        }
+
+        hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get parent directory for QuietUninstallString executable path: %ls", sczExecutablePath);
     }
     else
     {
@@ -858,6 +916,12 @@ static HRESULT ExecuteBundle(
     // build base command
     hr = StrAllocFormatted(&sczBaseCommand, L"\"%ls\"", sczExecutablePath);
     ExitOnFailure(hr, "Failed to allocate base command.");
+
+    for (int i = 1; i < argcArp; ++i)
+    {
+        hr = AppAppendCommandLineArgument(&sczBaseCommand, argvArp[i]);
+        ExitOnFailure(hr, "Failed to append argument from ARP.");
+    }
 
     if (!fRunEmbedded)
     {
@@ -962,6 +1026,12 @@ LExit:
     StrSecureZeroFreeString(sczUserArgs);
     ReleaseStr(sczUserArgsObfuscated);
     ReleaseStr(sczCommandObfuscated);
+    ReleaseStr(sczArpUninstallString);
+
+    if (argvArp)
+    {
+        AppFreeCommandLineArgs(argvArp);
+    }
 
     ReleaseHandle(pi.hThread);
     ReleaseHandle(pi.hProcess);
@@ -970,6 +1040,51 @@ LExit:
     // Best effort to clear the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE, FALSE);
+
+    return hr;
+}
+
+static HRESULT DetectArpEntry(
+    __in BURN_PACKAGE* pPackage,
+    __out BOOL* pfRegistered,
+    __out LPWSTR* psczQuietUninstallString
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hKey = NULL;
+    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    REG_KEY_BITNESS keyBitness = pPackage->Bundle.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT;
+
+    *pfRegistered = FALSE;
+    if (psczQuietUninstallString)
+    {
+        ReleaseNullStr(*psczQuietUninstallString);
+    }
+
+    if (!pPackage->Bundle.sczArpKeyPath)
+    {
+        hr = PathConcatRelativeToBase(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\", pPackage->Bundle.sczBundleId, &pPackage->Bundle.sczArpKeyPath);
+        ExitOnFailure(hr, "Failed to build full key path.");
+    }
+
+    hr = RegOpenEx(hkRoot, pPackage->Bundle.sczArpKeyPath, KEY_READ, keyBitness, &hKey);
+    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    ExitOnFailure(hr, "Failed to open registry key: %ls.", pPackage->Bundle.sczArpKeyPath);
+
+    *pfRegistered = TRUE;
+
+    hr = RegReadString(hKey, L"QuietUninstallString", psczQuietUninstallString);
+    if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    {
+        hr = S_OK;
+    }
+    ExitOnFailure(hr, "Failed to read QuietUninstallString.");
+
+LExit:
+    ReleaseRegKey(hKey);
 
     return hr;
 }

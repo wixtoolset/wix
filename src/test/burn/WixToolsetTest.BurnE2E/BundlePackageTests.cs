@@ -5,6 +5,7 @@ namespace WixToolsetTest.BurnE2E
     using System;
     using System.IO;
     using WixTestTools;
+    using WixToolset.Mba.Core;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -136,6 +137,117 @@ namespace WixToolsetTest.BurnE2E
             upgradeBundlePackageBundlev1.Install();
             upgradeBundlePackageBundlev1.VerifyUnregisteredAndRemovedFromPackageCache();
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
+
+        [RuntimeFact]
+        public void CanRecacheAndReinstallBundlePackageOnUninstallRollback()
+        {
+            var packageFail = this.CreatePackageInstaller("PackageFail");
+            var packageA = this.CreatePackageInstaller(@"..\BasicFunctionalityTests\PackageA");
+            var bundleA = this.CreateBundleInstaller(@"..\BasicFunctionalityTests\BundleA");
+            var bundlePackageUninstallFailureBundle = this.CreateBundleInstaller("BundlePackageUninstallFailureBundle");
+            var testBAController = this.CreateTestBAController();
+            var bundleASelfCachedPath = bundleA.GetExpectedCachedBundlePath();
+            var bundleAEmbeddedCachedPath = bundlePackageUninstallFailureBundle.GetPackageEntryPointCachePath("PackageA");
+
+            packageA.VerifyInstalled(false);
+            packageFail.VerifyInstalled(false);
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            testBAController.SetPackageRequestedCacheType("PackageA", BOOTSTRAPPER_CACHE_TYPE.Remove);
+
+            var installLogPath = bundlePackageUninstallFailureBundle.Install();
+            bundlePackageUninstallFailureBundle.VerifyRegisteredAndInPackageCache();
+            packageFail.VerifyInstalled(true);
+            bundleA.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+
+            Assert.False(LogVerifier.MessageInLogFile(installLogPath, $"Applying execute package: PackageA, action: Install, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"Applying execute package: PackageA, action: Install, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+
+            testBAController.ResetPackageStates("PackageA");
+            testBAController.SetAllowAcquireAfterValidationFailure();
+
+            var uninstallLogPath = bundlePackageUninstallFailureBundle.Uninstall((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, "FAILWHENDEFERRED=1");
+            bundlePackageUninstallFailureBundle.VerifyRegisteredAndInPackageCache();
+            bundleA.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+            packageFail.VerifyInstalled(true);
+
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, "TESTBA: OnCachePackageNonVitalValidationFailure() - id: PackageA, default: None, requested: Acquire"));
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying execute package: PackageA, action: Uninstall, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying execute package: PackageA, action: Uninstall, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying rollback package: PackageA, action: Install, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying rollback package: PackageA, action: Install, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+        }
+
+        [RuntimeFact]
+        public void CanReinstallBundlePackageOnUninstallRollback()
+        {
+            var packageFail = this.CreatePackageInstaller("PackageFail");
+            var packageA = this.CreatePackageInstaller(@"..\BasicFunctionalityTests\PackageA");
+            var bundleA = this.CreateBundleInstaller(@"..\BasicFunctionalityTests\BundleA");
+            var bundlePackageUninstallFailureBundle = this.CreateBundleInstaller("BundlePackageUninstallFailureBundle");
+            var bundleASelfCachedPath = bundleA.GetExpectedCachedBundlePath();
+            var bundleAEmbeddedCachedPath = bundlePackageUninstallFailureBundle.GetPackageEntryPointCachePath("PackageA");
+
+            packageA.VerifyInstalled(false);
+            packageFail.VerifyInstalled(false);
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            var installLogPath = bundlePackageUninstallFailureBundle.Install();
+            bundlePackageUninstallFailureBundle.VerifyRegisteredAndInPackageCache();
+            packageFail.VerifyInstalled(true);
+            bundleA.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+
+            Assert.False(LogVerifier.MessageInLogFile(installLogPath, $"Applying execute package: PackageA, action: Install, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"Applying execute package: PackageA, action: Install, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+
+            var uninstallLogPath = bundlePackageUninstallFailureBundle.Uninstall((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, "FAILWHENDEFERRED=1");
+            bundlePackageUninstallFailureBundle.VerifyRegisteredAndInPackageCache();
+            bundleA.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+            packageFail.VerifyInstalled(true);
+
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, "TESTBA: OnCachePackageNonVitalValidationFailure() - id: PackageA"));
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying execute package: PackageA, action: Uninstall, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying execute package: PackageA, action: Uninstall, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying rollback package: PackageA, action: Install, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying rollback package: PackageA, action: Install, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+        }
+
+        [RuntimeFact]
+        public void CanSkipReinstallBundlePackageOnUninstallRollback()
+        {
+            var packageFail = this.CreatePackageInstaller("PackageFail");
+            var packageA = this.CreatePackageInstaller(@"..\BasicFunctionalityTests\PackageA");
+            var bundleA = this.CreateBundleInstaller(@"..\BasicFunctionalityTests\BundleA");
+            var bundlePackageUninstallFailureBundle = this.CreateBundleInstaller("BundlePackageUninstallFailureBundle");
+            var testBAController = this.CreateTestBAController();
+            var bundleASelfCachedPath = bundleA.GetExpectedCachedBundlePath();
+            var bundleAEmbeddedCachedPath = bundlePackageUninstallFailureBundle.GetPackageEntryPointCachePath("PackageA");
+
+            packageA.VerifyInstalled(false);
+            packageFail.VerifyInstalled(false);
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            testBAController.SetPackageRequestedCacheType("PackageA", BOOTSTRAPPER_CACHE_TYPE.Remove);
+
+            var installLogPath = bundlePackageUninstallFailureBundle.Install();
+            bundlePackageUninstallFailureBundle.VerifyRegisteredAndInPackageCache();
+            packageFail.VerifyInstalled(true);
+            bundleA.VerifyRegisteredAndInPackageCache(expectedSystemComponent: 1);
+
+            Assert.False(LogVerifier.MessageInLogFile(installLogPath, $"Applying execute package: PackageA, action: Install, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"Applying execute package: PackageA, action: Install, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+
+            var uninstallLogPath = bundlePackageUninstallFailureBundle.Uninstall((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, "FAILWHENDEFERRED=1");
+            bundlePackageUninstallFailureBundle.VerifyRegisteredAndInPackageCache();
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+            packageFail.VerifyInstalled(true);
+
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, "TESTBA: OnCachePackageNonVitalValidationFailure() - id: PackageA, default: None, requested: None"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying execute package: PackageA, action: Uninstall, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying execute package: PackageA, action: Uninstall, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying rollback package: PackageA, action: Install, path: {bundleASelfCachedPath}"), bundleASelfCachedPath);
+            Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, $"Applying rollback package: PackageA, action: Install, path: {bundleAEmbeddedCachedPath}"), bundleAEmbeddedCachedPath);
         }
     }
 }
