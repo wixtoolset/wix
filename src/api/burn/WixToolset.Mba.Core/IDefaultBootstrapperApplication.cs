@@ -94,6 +94,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<CachePackageCompleteEventArgs> CachePackageComplete;
 
         /// <summary>
+        /// Fired when the engine failed validating a package in the package cache that is non-vital to execution.
+        /// </summary>
+        event EventHandler<CachePackageNonVitalValidationFailureEventArgs> CachePackageNonVitalValidationFailure;
+
+        /// <summary>
         /// Fired when the engine begins the extraction of the payload from the container.
         /// </summary>
         event EventHandler<CachePayloadExtractBeginEventArgs> CachePayloadExtractBegin;

@@ -92,6 +92,10 @@ LPCSTR LoggingCacheTypeToString(
     BOOTSTRAPPER_CACHE_TYPE cacheType
     );
 
+LPCSTR LoggingCachePackageTypeToString(
+    BURN_CACHE_PACKAGE_TYPE cachePackageType
+    );
+
 LPCSTR LoggingDependencyActionToString(
     BURN_DEPENDENCY_ACTION action
     );
@@ -140,6 +144,10 @@ LPCSTR LoggingMspTargetActionToString(
 
 LPCSTR LoggingPerMachineToString(
     __in BOOL fPerMachine
+    );
+
+LPCSTR LoggingPlannedCacheToString(
+    __in const BURN_PACKAGE* pPackage
     );
 
 LPCSTR LoggingRegistrationTypeToString(

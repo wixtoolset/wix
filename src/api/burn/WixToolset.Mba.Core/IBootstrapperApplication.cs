@@ -553,17 +553,13 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CachePackageBegin"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="cCachePayloads"></param>
-        /// <param name="dw64PackageCacheSize"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCachePackageBegin(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.U4)] int cCachePayloads,
             [MarshalAs(UnmanagedType.U8)] long dw64PackageCacheSize,
+            [MarshalAs(UnmanagedType.Bool)] bool fVital,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
@@ -672,11 +668,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CachePackageComplete"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCachePackageComplete(
@@ -1183,6 +1174,18 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.CachePackageNonVitalValidationFailure"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCachePackageNonVitalValidationFailure(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            int hrStatus,
+            BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION recommendation,
+            ref BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION action
             );
     }
 
@@ -1868,6 +1871,23 @@ namespace WixToolset.Mba.Core
         /// Ignored if hrStatus is a success.
         /// </summary>
         Retry,
+    }
+
+    /// <summary>
+    /// The available actions for <see cref="IDefaultBootstrapperApplication.CachePackageNonVitalValidationFailure"/>
+    /// </summary>
+    public enum BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Instructs the engine to try to acquire the package so execution can use it.
+        /// Most of the time this is used for installing the package during rollback.
+        /// </summary>
+        Acquire,
     }
 
     /// <summary>

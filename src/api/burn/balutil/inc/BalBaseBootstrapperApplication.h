@@ -505,6 +505,7 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR /*wzPackageId*/,
         __in DWORD /*cCachePayloads*/,
         __in DWORD64 /*dw64PackageCacheSize*/,
+        __in BOOL /*fVital*/,
         __inout BOOL* pfCancel
         )
     {
@@ -1081,6 +1082,16 @@ public: // IBootstrapperApplication
         )
     {
         *pfCancel |= CheckCanceled();
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCachePackageNonVitalValidationFailure(
+        __in_z LPCWSTR /*wzPackageId*/,
+        __in HRESULT /*hrStatus*/,
+        __in BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION /*recommendation*/,
+        __inout BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION* /*pAction*/
+        )
+    {
         return S_OK;
     }
 

@@ -445,6 +445,23 @@ extern "C" LPCSTR LoggingCacheTypeToString(
     }
 }
 
+extern "C" LPCSTR LoggingCachePackageTypeToString(
+    BURN_CACHE_PACKAGE_TYPE cachePackageType
+    )
+{
+    switch (cachePackageType)
+    {
+    case BURN_CACHE_PACKAGE_TYPE_NONE:
+        return "None";
+    case BURN_CACHE_PACKAGE_TYPE_OPTIONAL:
+        return "Optional";
+    case BURN_CACHE_PACKAGE_TYPE_REQUIRED:
+        return "Required";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingDependencyActionToString(
     BURN_DEPENDENCY_ACTION action
     )
@@ -667,6 +684,18 @@ extern "C" LPCSTR LoggingPerMachineToString(
     }
 
     return "PerUser";
+}
+
+extern "C" LPCSTR LoggingPlannedCacheToString(
+    __in const BURN_PACKAGE* pPackage
+    )
+{
+    if (!pPackage->hCacheEvent)
+    {
+        return "No";
+    }
+
+    return pPackage->fCacheVital ? "Vital" : "NonVital";
 }
 
 extern "C" LPCSTR LoggingRegistrationTypeToString(

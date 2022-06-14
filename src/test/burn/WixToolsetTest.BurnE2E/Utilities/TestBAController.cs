@@ -42,6 +42,11 @@ namespace WixToolsetTest.BurnE2E
             }
         }
 
+        public void SetAllowAcquireAfterValidationFailure(string value = "true")
+        {
+            this.SetBurnTestValue("AllowAcquireAfterValidationFailure", value);
+        }
+
         public void SetExplicitlyElevateAndPlanFromOnElevateBegin(string value = "true")
         {
             this.SetBurnTestValue("ExplicitlyElevateAndPlanFromOnElevateBegin", value);
@@ -130,6 +135,16 @@ namespace WixToolsetTest.BurnE2E
         public void SetPackageRetryExecuteFilesInUse(string packageId, int? retryCount)
         {
             this.SetPackageState(packageId, "RetryExecuteFilesInUse", retryCount.HasValue ? retryCount.ToString() : null);
+        }
+
+        /// <summary>
+        /// Sets the requested cache type for a package that the TestBA will return to the engine during plan.
+        /// </summary>
+        /// <param name="packageId">Package identity.</param>
+        /// <param name="type">Cache type to request.</param>
+        public void SetPackageRequestedCacheType(string packageId, BOOTSTRAPPER_CACHE_TYPE type)
+        {
+            this.SetPackageState(packageId, "CacheRequested", type.ToString());
         }
 
         /// <summary>

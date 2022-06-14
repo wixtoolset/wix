@@ -27,6 +27,7 @@ namespace WixToolset.Test.BA
 
         private string updateBundlePath;
 
+        private bool allowAcquireAfterValidationFailure;
         private bool forceKeepRegistration;
         private bool immediatelyQuit;
         private bool quitAfterDetect;
@@ -85,7 +86,11 @@ namespace WixToolset.Test.BA
 
             List<string> verifyArguments = this.ReadVerifyArguments();
 
-            foreach (string arg in BootstrapperCommand.ParseCommandLineToArgs(this.Command.CommandLine))
+            IBootstrapperApplicationData baManifest = new BootstrapperApplicationData();
+            IMbaCommand mbaCommand = this.Command.ParseCommandLine();
+            mbaCommand.SetOverridableVariables(baManifest.Bundle.OverridableVariables, this.engine);
+
+            foreach (string arg in mbaCommand.UnknownCommandLineArgs)
             {
                 // If we're not in the update already, process the updatebundle.
                 if (this.Command.Relation != RelationType.Update && arg.StartsWith("-updatebundle:", StringComparison.OrdinalIgnoreCase))
@@ -124,6 +129,12 @@ namespace WixToolset.Test.BA
             if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out redetectCount))
             {
                 redetectCount = 0;
+            }
+
+            string allowAcquireAfterValidationFailure = this.ReadPackageAction(null, "AllowAcquireAfterValidationFailure");
+            if (String.IsNullOrEmpty(allowAcquireAfterValidationFailure) || !Boolean.TryParse(allowAcquireAfterValidationFailure, out this.allowAcquireAfterValidationFailure))
+            {
+                this.allowAcquireAfterValidationFailure = false;
             }
 
             string explicitlyElevateAndPlanFromOnElevateBegin = this.ReadPackageAction(null, "ExplicitlyElevateAndPlanFromOnElevateBegin");
@@ -277,6 +288,15 @@ namespace WixToolset.Test.BA
             {
                 args.State = state;
             }
+
+            BOOTSTRAPPER_CACHE_TYPE cacheType;
+            string cacheAction = this.ReadPackageAction(args.PackageId, "CacheRequested");
+            if (TryParseEnum<BOOTSTRAPPER_CACHE_TYPE>(cacheAction, out cacheType))
+            {
+                args.CacheType = cacheType;
+            }
+
+            this.Log("OnPlanPackageBegin() - id: {0}, defaultState: {1}, requestedState: {2}, defaultCache: {3}, requestedCache: {4}", args.PackageId, args.RecommendedState, args.State, args.RecommendedCacheType, args.CacheType);
         }
 
         protected override void OnPlanPatchTarget(PlanPatchTargetEventArgs args)
@@ -335,6 +355,16 @@ namespace WixToolset.Test.BA
             {
                 this.Log("    CancelCacheAtProgress: {0}", this.cancelCacheAtProgress);
             }
+        }
+
+        protected override void OnCachePackageNonVitalValidationFailure(CachePackageNonVitalValidationFailureEventArgs args)
+        {
+            if (this.allowAcquireAfterValidationFailure)
+            {
+                args.Action = BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION.Acquire;
+            }
+
+            this.Log("OnCachePackageNonVitalValidationFailure() - id: {0}, default: {1}, requested: {2}", args.PackageId, args.Recommendation, args.Action);
         }
 
         protected override void OnCacheAcquireProgress(CacheAcquireProgressEventArgs args)

@@ -16,6 +16,13 @@ typedef _BURN_PACKAGE BURN_PACKAGE;
 
 const DWORD BURN_PACKAGE_INVALID_PATCH_INDEX = 0x80000000;
 
+enum BURN_CACHE_PACKAGE_TYPE
+{
+    BURN_CACHE_PACKAGE_TYPE_NONE,
+    BURN_CACHE_PACKAGE_TYPE_OPTIONAL,
+    BURN_CACHE_PACKAGE_TYPE_REQUIRED,
+};
+
 enum BURN_EXE_DETECTION_TYPE
 {
     BURN_EXE_DETECTION_TYPE_NONE,
@@ -277,7 +284,7 @@ typedef struct _BURN_PACKAGE
     BOOTSTRAPPER_CACHE_TYPE cacheType;          // only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;// only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;       // only valid during Plan.
-    BOOL fPlannedCache;                         // only valid during Plan.
+    BOOL fCacheVital;                           // only valid during Plan.
     BOOL fPlannedUncache;                       // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE execute;          // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE rollback;         // only valid during Plan.
@@ -286,9 +293,12 @@ typedef struct _BURN_PACKAGE
     BURN_DEPENDENCY_ACTION dependencyExecute;   // only valid during Plan.
     BURN_DEPENDENCY_ACTION dependencyRollback;  // only valid during Plan.
     BOOL fDependencyManagerWasHere;             // only valid during Plan.
+    BURN_CACHE_PACKAGE_TYPE executeCacheType;   // only valid during Plan.
+    BURN_CACHE_PACKAGE_TYPE rollbackCacheType;  // only valid during Plan.
     HANDLE hCacheEvent;                         // only valid during Plan.
     LPWSTR sczCacheFolder;                      // only valid during Apply.
     HRESULT hrCacheResult;                      // only valid during Apply.
+    BOOL fAcquireOptionalSource;                // only valid during Apply.
     BOOL fReachedExecution;                     // only valid during Apply.
     BOOL fAbandonedProcess;                     // only valid during Apply.
 

@@ -1930,12 +1930,13 @@ namespace WixToolset.Mba.Core
     public class CachePackageBeginEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public CachePackageBeginEventArgs(string packageId, int cachePayloads, long packageCacheSize, bool cancelRecommendation)
+        public CachePackageBeginEventArgs(string packageId, int cachePayloads, long packageCacheSize, bool vital, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.CachePayloads = cachePayloads;
             this.PackageCacheSize = packageCacheSize;
+            this.Vital = vital;
         }
 
         /// <summary>
@@ -1952,6 +1953,11 @@ namespace WixToolset.Mba.Core
         /// Gets the size on disk required by the specific package.
         /// </summary>
         public long PackageCacheSize { get; private set; }
+
+        /// <summary>
+        /// If caching a package is not vital, then acquisition will be skipped unless the BA opts in through <see cref="IDefaultBootstrapperApplication.CachePackageNonVitalValidationFailure"/>.
+        /// </summary>
+        public bool Vital { get; private set; }
     }
 
     /// <summary>
@@ -2481,5 +2487,24 @@ namespace WixToolset.Mba.Core
         /// Gets the version of the related bundle detected.
         /// </summary>
         public string Version { get; private set; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CachePackageNonVitalValidationFailure"/>
+    /// </summary>
+    [Serializable]
+    public class CachePackageNonVitalValidationFailureEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION>
+    {
+        /// <summary />
+        public CachePackageNonVitalValidationFailureEventArgs(string packageId, int hrStatus, BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION recommendation, BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION action)
+            : base(hrStatus, recommendation, action)
+        {
+            this.PackageId = packageId;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package that was being validated.
+        /// </summary>
+        public string PackageId { get; private set; }
     }
 }

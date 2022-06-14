@@ -280,6 +280,9 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public event EventHandler<DetectRelatedBundlePackageEventArgs> DetectRelatedBundlePackage;
 
+        /// <inheritdoc/>
+        public event EventHandler<CachePackageNonVitalValidationFailureEventArgs> CachePackageNonVitalValidationFailure;
+
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
@@ -1376,6 +1379,18 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CachePackageNonVitalValidationFailure"/> event.
+        /// </summary>
+        protected virtual void OnCachePackageNonVitalValidationFailure(CachePackageNonVitalValidationFailureEventArgs args)
+        {
+            EventHandler<CachePackageNonVitalValidationFailureEventArgs> handler = this.CachePackageNonVitalValidationFailure;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
 
         int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
@@ -1570,6 +1585,7 @@ namespace WixToolset.Mba.Core
             this.OnPlanPackageBegin(args);
 
             pRequestedState = args.State;
+            pRequestedCacheType = args.CacheType;
             fCancel = args.Cancel;
             return args.HResult;
         }
@@ -1728,9 +1744,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnCachePackageBegin(string wzPackageId, int cCachePayloads, long dw64PackageCacheSize, ref bool fCancel)
+        int IBootstrapperApplication.OnCachePackageBegin(string wzPackageId, int cCachePayloads, long dw64PackageCacheSize, bool fVital, ref bool fCancel)
         {
-            CachePackageBeginEventArgs args = new CachePackageBeginEventArgs(wzPackageId, cCachePayloads, dw64PackageCacheSize, fCancel);
+            CachePackageBeginEventArgs args = new CachePackageBeginEventArgs(wzPackageId, cCachePayloads, dw64PackageCacheSize, fVital, fCancel);
             this.OnCachePackageBegin(args);
 
             fCancel = args.Cancel;
@@ -2128,6 +2144,15 @@ namespace WixToolset.Mba.Core
             this.OnDetectRelatedBundlePackage(args);
 
             fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCachePackageNonVitalValidationFailure(string wzPackageId, int hrStatus, BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION recommendation, ref BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION action)
+        {
+            CachePackageNonVitalValidationFailureEventArgs args = new CachePackageNonVitalValidationFailureEventArgs(wzPackageId, hrStatus, recommendation, action);
+            this.OnCachePackageNonVitalValidationFailure(args);
+
+            action = args.Action;
             return args.HResult;
         }
 

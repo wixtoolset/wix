@@ -117,7 +117,7 @@ typedef struct _BURN_CACHE_ACTION
         } rollbackPackage;
         struct
         {
-            HANDLE hEvent;
+            BURN_PACKAGE* pPackage;
         } syncpoint;
         struct
         {
@@ -392,7 +392,8 @@ HRESULT PlanLayoutContainer(
     );
 HRESULT PlanLayoutPackage(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fVital
     );
 HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,

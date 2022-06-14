@@ -189,7 +189,14 @@ BAAPI UserExperienceOnCachePackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in DWORD cCachePayloads,
-    __in DWORD64 dw64PackageCacheSize
+    __in DWORD64 dw64PackageCacheSize,
+    __in BOOL fVital
+    );
+BAAPI UserExperienceOnCachePackageNonVitalValidationFailure(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in HRESULT hrStatus,
+    __inout BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION* pAction
     );
 BAAPI UserExperienceOnCachePackageComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,

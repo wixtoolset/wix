@@ -110,7 +110,8 @@ static HRESULT ApplyLayoutContainer(
 static HRESULT ApplyProcessPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_PACKAGE* pPackage,
-    __in BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
+    __in BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem,
+    __in BOOL fVital
     );
 static HRESULT ApplyCacheVerifyContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -202,6 +203,10 @@ static HRESULT DoRollbackActions(
     __in BURN_EXECUTE_CONTEXT* pContext,
     __in DWORD dwCheckpoint,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+    );
+static BOOL ShouldSkipPackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fRollback
     );
 static HRESULT ExecuteRelatedBundle(
     __in BURN_ENGINE_STATE* pEngineState,
@@ -379,6 +384,7 @@ extern "C" void ApplyReset(
     {
         BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
         pPackage->hrCacheResult = S_OK;
+        pPackage->fAcquireOptionalSource = FALSE;
         pPackage->fReachedExecution = FALSE;
         pPackage->fAbandonedProcess = FALSE;
         pPackage->transactionRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
@@ -633,7 +639,7 @@ extern "C" HRESULT ApplyCache(
             break;
 
         case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
-            if (!::SetEvent(pCacheAction->syncpoint.hEvent))
+            if (!::SetEvent(pCacheAction->syncpoint.pPackage->hCacheEvent))
             {
                 ExitWithLastError(hr, "Failed to set syncpoint event.");
             }
@@ -959,12 +965,13 @@ static HRESULT ApplyCachePackage(
     HRESULT hr = S_OK;
     BOOL fCanceledBegin = FALSE;
     BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION cachePackageCompleteAction = BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE;
+    BOOL fVital = pPackage->fCacheVital;
 
     for (;;)
     {
         fCanceledBegin = FALSE;
 
-        hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cItems, pPackage->payloads.qwTotalSize);
+        hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cItems, pPackage->payloads.qwTotalSize, fVital);
         if (FAILED(hr))
         {
             fCanceledBegin = TRUE;
@@ -975,7 +982,7 @@ static HRESULT ApplyCachePackage(
             {
                 BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem = pPackage->payloads.rgItems + i;
 
-                hr = ApplyProcessPayload(pContext, pPackage, pPayloadGroupItem);
+                hr = ApplyProcessPayload(pContext, pPackage, pPayloadGroupItem, fVital);
                 if (FAILED(hr))
                 {
                     break;
@@ -984,7 +991,7 @@ static HRESULT ApplyCachePackage(
         }
 
         pPackage->hrCacheResult = hr;
-        cachePackageCompleteAction = SUCCEEDED(hr) || pPackage->fVital || fCanceledBegin ? BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE;
+        cachePackageCompleteAction = SUCCEEDED(hr) || (pPackage->fVital && fVital) || fCanceledBegin ? BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE;
         UserExperienceOnCachePackageComplete(pContext->pUX, pPackage->sczId, hr, &cachePackageCompleteAction);
 
         if (SUCCEEDED(hr))
@@ -1014,7 +1021,7 @@ static HRESULT ApplyCachePackage(
 
             continue;
         }
-        else if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE == cachePackageCompleteAction && !pPackage->fVital) // ignore non-vital download failures.
+        else if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE == cachePackageCompleteAction && (!pPackage->fVital || !fVital)) // ignore non-vital download failures.
         {
             LogId(REPORT_STANDARD, MSG_CACHE_CONTINUING_NONVITAL_PACKAGE, pPackage->sczId, hr);
             hr = S_OK;
@@ -1101,7 +1108,7 @@ static HRESULT ApplyLayoutBundle(
     {
         BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem = pPayloads->rgItems + i;
 
-        hr = ApplyProcessPayload(pContext, NULL, pPayloadGroupItem);
+        hr = ApplyProcessPayload(pContext, NULL, pPayloadGroupItem, TRUE);
         ExitOnFailure(hr, "Failed to layout bundle payload: %ls", pPayloadGroupItem->pPayload->sczKey);
     }
 
@@ -1164,12 +1171,14 @@ LExit:
 static HRESULT ApplyProcessPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_PACKAGE* pPackage,
-    __in BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
+    __in BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem,
+    __in BOOL fVital
     )
 {
     HRESULT hr = S_OK;
     DWORD cTryAgainAttempts = 0;
     BOOL fRetry = FALSE;
+    BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION action = BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION_NONE;
     BURN_PAYLOAD* pPayload = pPayloadGroupItem->pPayload;
 
     Assert(pContext->pPayloads && pPackage || pContext->wzLayoutDirectory);
@@ -1183,6 +1192,18 @@ static HRESULT ApplyProcessPayload(
     if (SUCCEEDED(hr))
     {
         ExitFunction();
+    }
+    else if (pPackage && !pPackage->fAcquireOptionalSource && !fVital)
+    {
+        HRESULT hrResponse = UserExperienceOnCachePackageNonVitalValidationFailure(pContext->pUX, pPackage->sczId, hr, &action);
+        ExitOnRootFailure(hrResponse, "BA aborted cache package non-vital failure.");
+
+        if (BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION_ACQUIRE != action)
+        {
+            ExitFunction();
+        }
+
+        pPackage->fAcquireOptionalSource = TRUE;
     }
 
     for (;;)
@@ -2567,10 +2588,20 @@ static BOOL ShouldSkipPackage(
     )
 {
     BOOL fSkip = FALSE;
+    BURN_CACHE_PACKAGE_TYPE cachePackageType = fRollback ? pPackage->rollbackCacheType : pPackage->executeCacheType;
+    BOOL fCacheVital = BURN_CACHE_PACKAGE_TYPE_REQUIRED == cachePackageType;
 
-    if (FAILED(pPackage->hrCacheResult))
+    if (fCacheVital && FAILED(pPackage->hrCacheResult))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
+        if (fRollback)
+        {
+            LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_ROLLBACK_NO_CACHE, pPackage->sczId, pPackage->hrCacheResult, LoggingActionStateToString(pPackage->rollback));
+        }
+        else
+        {
+            LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
+        }
+
         ExitFunction1(fSkip = TRUE);
     }
     else if (fRollback && pPackage->fAbandonedProcess)
