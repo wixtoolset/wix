@@ -499,7 +499,6 @@ namespace WixToolset.Core.Burn.Bundles
                     else if (package.SpecificPackageSymbol is WixBundleMsuPackageSymbol msuPackage) // MSU
                     {
                         writer.WriteAttributeString("DetectCondition", msuPackage.DetectCondition);
-                        writer.WriteAttributeString("KB", msuPackage.MsuKB);
                     }
 
                     var packageMsiProperties = msiPropertiesByPackage[package.PackageId];

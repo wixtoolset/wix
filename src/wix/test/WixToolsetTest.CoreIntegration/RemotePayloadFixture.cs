@@ -289,7 +289,7 @@ namespace WixToolsetTest.CoreIntegration
                 }, elements);
 
                 // Append required attributes to build.
-                elements[0] = elements[0].Replace(">", " KB='KB2937592' DetectCondition='test'>");
+                elements[0] = elements[0].Replace(">", " DetectCondition='test'>");
 
                 var remotePayloadSourceText = "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>" +
                     "  <Fragment>" +

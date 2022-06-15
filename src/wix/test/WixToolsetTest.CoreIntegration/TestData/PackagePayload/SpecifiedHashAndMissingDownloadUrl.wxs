@@ -2,7 +2,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <MsuPackage Id="SpecifiedHashAndMissingDownloadUrl" Permanent="yes" DetectCondition="none">
+            <MsuPackage Id="SpecifiedHashAndMissingDownloadUrl" DetectCondition="none">
                 <MsuPackagePayload Name="example.msu" Hash="abcd" Size="1" Version="1.0.0.0" ProductName="KB1234567" Description="fake msu" />
             </MsuPackage>
         </PackageGroup>

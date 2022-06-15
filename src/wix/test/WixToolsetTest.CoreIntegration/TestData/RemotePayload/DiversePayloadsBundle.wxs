@@ -6,7 +6,7 @@
         <Chain>
             <PackageGroupRef Id="ExternalContainerPackages" />
             <ExePackage SourceFile="signed_bundle_engine.exe" DetectCondition="none" Permanent="yes" />
-            <MsuPackage SourceFile="Windows8.1-KB2937592-x86.msu" DetectCondition="none" Permanent="yes" Compressed="no" DownloadUrl="http://example.com/test.msu" />
+            <MsuPackage SourceFile="Windows8.1-KB2937592-x86.msu" DetectCondition="none" Compressed="no" DownloadUrl="http://example.com/test.msu" />
             <MsiPackage SourceFile="test.msi" Compressed="no" />
         </Chain>
         <Container Name="External.cab">

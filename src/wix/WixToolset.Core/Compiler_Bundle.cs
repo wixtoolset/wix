@@ -2019,7 +2019,6 @@ namespace WixToolset.Core
             string detectCondition = null;
             string protocol = null;
             long? installSize = null;
-            string msuKB = null;
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
             CompilerPackagePayload childCompilerPackagePayload = null;
@@ -2114,6 +2113,7 @@ namespace WixToolset.Core
                             break;
                         case "Permanent":
                             permanent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            allowed = (packageType != WixBundlePackageType.Msu);
                             break;
                         case "Visible":
                             visible = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2152,10 +2152,6 @@ namespace WixToolset.Core
                             break;
                         case "InstallSize":
                             installSize = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, Int64.MaxValue);
-                            break;
-                        case "KB":
-                            msuKB = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            allowed = (packageType == WixBundlePackageType.Msu);
                             break;
                         case "Compressed":
                             compilerPayload.ParseCompressed(attrib);
@@ -2464,21 +2460,6 @@ namespace WixToolset.Core
             }
             else if (packageType == WixBundlePackageType.Msu)
             {
-                if (permanent == YesNoType.No)
-                {
-                    if (String.IsNullOrEmpty(msuKB))
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "KB", "Permanent", "no"));
-                    }
-                }
-                else if (permanent == YesNoType.NotSet)
-                {
-                    if (String.IsNullOrEmpty(msuKB))
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttributeWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "KB", "Permanent"));
-                    }
-                }
-
                 // Detect condition is recommended for Msu packages.
                 if (String.IsNullOrEmpty(detectCondition))
                 {
@@ -2583,8 +2564,7 @@ namespace WixToolset.Core
                     case WixBundlePackageType.Msu:
                         this.Core.AddSymbol(new WixBundleMsuPackageSymbol(sourceLineNumbers, id)
                         {
-                            DetectCondition = detectCondition,
-                            MsuKB = msuKB
+                            DetectCondition = detectCondition
                         });
                         break;
                 }
