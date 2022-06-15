@@ -43,11 +43,13 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var customElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:BundleCustomTableBA");
-                Assert.Equal(3, customElements.Count);
-                Assert.Equal("<BundleCustomTableBA Id='one' Column2='two' />", customElements[0].GetTestXml());
-                Assert.Equal("<BundleCustomTableBA Id='&gt;' Column2='&lt;' />", customElements[1].GetTestXml());
-                Assert.Equal("<BundleCustomTableBA Id='1' Column2='2' />", customElements[2].GetTestXml());
+                var customElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:BundleCustomTableBA");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<BundleCustomTableBA Id='one' Column2='two' />",
+                    "<BundleCustomTableBA Id='&gt;' Column2='&lt;' />",
+                    "<BundleCustomTableBA Id='1' Column2='2' />",
+                }, customElements);
             }
         }
 
@@ -82,15 +84,17 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var packageElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties");
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
                     { "WixPackageProperties", new List<string> { "DownloadSize", "PackageSize", "InstalledSize", "Version" } },
                 };
-                Assert.Equal(3, packageElements.Count);
-                Assert.Equal("<WixPackageProperties Package='burn.exe' Vital='yes' DisplayName='Windows Installer XML Toolset' Description='WiX Toolset Bootstrapper' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' Compressed='yes' Version='*' RepairCondition='RepairRedists' Cache='keep' />", packageElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPackageProperties Package='RemotePayloadExe' Vital='yes' DisplayName='Override RemotePayload display name' Description='Override RemotePayload description' DownloadSize='1' PackageSize='1' InstalledSize='1' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_RemotePayloadExe' RollbackLogPathVariable='WixBundleRollbackLog_RemotePayloadExe' Compressed='no' Version='1.0.0.0' Cache='keep' />", packageElements[1].GetTestXml());
-                Assert.Equal("<WixPackageProperties Package='calc.exe' Vital='yes' DisplayName='Override harvested display name' Description='Override harvested description' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_calc.exe' RollbackLogPathVariable='WixBundleRollbackLog_calc.exe' Compressed='yes' Version='*' Cache='keep' />", packageElements[2].GetTestXml(ignoreAttributesByElementName));
+                var packageElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPackageProperties", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixPackageProperties Package='burn.exe' Vital='yes' DisplayName='Windows Installer XML Toolset' Description='WiX Toolset Bootstrapper' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' Compressed='yes' Version='*' RepairCondition='RepairRedists' Cache='keep' />",
+                    "<WixPackageProperties Package='RemotePayloadExe' Vital='yes' DisplayName='Override RemotePayload display name' Description='Override RemotePayload description' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_RemotePayloadExe' RollbackLogPathVariable='WixBundleRollbackLog_RemotePayloadExe' Compressed='no' Version='*' Cache='keep' />",
+                    "<WixPackageProperties Package='calc.exe' Vital='yes' DisplayName='Override harvested display name' Description='Override harvested description' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_calc.exe' RollbackLogPathVariable='WixBundleRollbackLog_calc.exe' Compressed='yes' Version='*' Cache='keep' />",
+                }, packageElements);
             }
         }
 
@@ -125,16 +129,18 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var payloadElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPayloadProperties");
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
                     { "WixPayloadProperties", new List<string> { "Size" } },
                 };
-                Assert.Equal(4, payloadElements.Count);
-                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' />", payloadElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' />", payloadElements[1].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' />", payloadElements[2].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' />", payloadElements[3].GetTestXml(ignoreAttributesByElementName));
+                var payloadElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPayloadProperties", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixPayloadProperties Package='credwiz.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' />",
+                    "<WixPayloadProperties Package='credwiz.exe' Payload='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' />",
+                    "<WixPayloadProperties Package='cscript.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' />",
+                    "<WixPayloadProperties Package='cscript.exe' Payload='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' />",
+                }, payloadElements);
             }
         }
 
@@ -167,17 +173,21 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var manifestRelatedBundlesElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:RelatedBundle");
-                Assert.Equal("<RelatedBundle Id='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' Action='Upgrade' />", manifestRelatedBundlesElements[0].GetTestXml());
-                Assert.Equal(1, manifestRelatedBundlesElements.Count);
+                var manifestRelatedBundlesElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:RelatedBundle");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<RelatedBundle Id='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' Action='Upgrade' />",
+                }, manifestRelatedBundlesElements);
 
-                var dataRelatedBundlesElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixBundleProperties");
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
                     { "WixBundleProperties", new List<string> { "DisplayName", "Id" } },
                 };
-                Assert.Equal("<WixBundleProperties DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' Id='*' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' PerMachine='yes' />", dataRelatedBundlesElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal(1, dataRelatedBundlesElements.Count);
+                var dataRelatedBundlesElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBundleProperties", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixBundleProperties DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' Id='*' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' PerMachine='yes' />",
+                }, dataRelatedBundlesElements);
             }
         }
 
@@ -212,11 +222,13 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var customElements = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='CustomTableExtension']/be:BundleCustomTableBE");
-                Assert.Equal(3, customElements.Count);
-                Assert.Equal("<BundleCustomTableBE Id='one' Column2='two' />", customElements[0].GetTestXml());
-                Assert.Equal("<BundleCustomTableBE Id='&gt;' Column2='&lt;' />", customElements[1].GetTestXml());
-                Assert.Equal("<BundleCustomTableBE Id='1' Column2='2' />", customElements[2].GetTestXml());
+                var customElements = extractResult.GetBundleExtensionTestXmlLines("/be:BundleExtensionData/be:BundleExtension[@Id='CustomTableExtension']/be:BundleCustomTableBE");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<BundleCustomTableBE Id='one' Column2='two' />",
+                    "<BundleCustomTableBE Id='&gt;' Column2='&lt;' />",
+                    "<BundleCustomTableBE Id='1' Column2='2' />",
+                }, customElements);
             }
         }
 
@@ -252,13 +264,17 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var bundleExtensions = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:BundleExtension");
-                Assert.Equal(1, bundleExtensions.Count);
-                Assert.Equal("<BundleExtension Id='ExampleBext' EntryPayloadSourcePath='u1' />", bundleExtensions[0].GetTestXml());
+                var bundleExtensions = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:BundleExtension");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<BundleExtension Id='ExampleBext' EntryPayloadSourcePath='u1' />",
+                }, bundleExtensions);
 
-                var bundleExtensionPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:UX/burn:Payload[@Id='ExampleBext']");
-                Assert.Equal(1, bundleExtensionPayloads.Count);
-                Assert.Equal("<Payload Id='ExampleBext' FilePath='fakebext.dll' SourcePath='u1' />", bundleExtensionPayloads[0].GetTestXml());
+                var bundleExtensionPayloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:UX/burn:Payload[@Id='ExampleBext']");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<Payload Id='ExampleBext' FilePath='fakebext.dll' SourcePath='u1' />",
+                }, bundleExtensionPayloads);
             }
         }
 
@@ -296,24 +312,34 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var bundleExtensions = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:BundleExtension");
-                Assert.Equal(1, bundleExtensions.Count);
-                Assert.Equal("<BundleExtension Id='ExampleBundleExtension' EntryPayloadSourcePath='u1' />", bundleExtensions[0].GetTestXml());
+                var bundleExtensions = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:BundleExtension");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<BundleExtension Id='ExampleBundleExtension' EntryPayloadSourcePath='u1' />",
+                }, bundleExtensions);
 
-                var extensionSearches = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:ExtensionSearch");
-                Assert.Equal(2, extensionSearches.Count);
-                Assert.Equal("<ExtensionSearch Id='ExampleSearchBar' Variable='SearchBar' Condition='WixBundleInstalled' ExtensionId='ExampleBundleExtension' />", extensionSearches[0].GetTestXml());
-                Assert.Equal("<ExtensionSearch Id='ExampleSearchFoo' Variable='SearchFoo' ExtensionId='ExampleBundleExtension' />", extensionSearches[1].GetTestXml());
+                var extensionSearches = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:ExtensionSearch");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<ExtensionSearch Id='ExampleSearchBar' Variable='SearchBar' Condition='WixBundleInstalled' ExtensionId='ExampleBundleExtension' />",
+                    "<ExtensionSearch Id='ExampleSearchFoo' Variable='SearchFoo' ExtensionId='ExampleBundleExtension' />",
+                }, extensionSearches);
 
-                var bundleExtensionDatas = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']");
-                Assert.Equal(1, bundleExtensionDatas.Count);
-                Assert.Equal("<BundleExtension Id='ExampleBundleExtension'>" +
+                var bundleExtensionDatas = extractResult.GetBundleExtensionTestXmlLines("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<BundleExtension Id='ExampleBundleExtension'>" +
                     "<ExampleSearch Id='ExampleSearchBar' SearchFor='Bar' />" +
                     "<ExampleSearch Id='ExampleSearchFoo' SearchFor='Foo' />" +
-                    "</BundleExtension>", bundleExtensionDatas[0].GetTestXml());
+                    "</BundleExtension>"
+                }, bundleExtensionDatas);
 
-                var exampleSearches = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']/be:ExampleSearch");
-                Assert.Equal(2, exampleSearches.Count);
+                var exampleSearches = extractResult.GetBundleExtensionTestXmlLines("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']/be:ExampleSearch");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<ExampleSearch Id='ExampleSearchBar' SearchFor='Bar' />",
+                    "<ExampleSearch Id='ExampleSearchFoo' SearchFor='Foo' />",
+                }, exampleSearches);
             }
         }
 
@@ -348,14 +374,16 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var exePackageElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage");
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
                     { "ExePackage", new List<string> { "CacheId", "InstallSize", "Size" } },
                 };
-                Assert.Equal(2, exePackageElements.Count);
-                Assert.Equal("<ExePackage Id='credwiz.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='-foo' Uninstallable='yes' Protocol='burn' Bundle='yes'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='SourceFilePayload' /></ExePackage>", exePackageElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<ExePackage Id='cscript.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='' Uninstallable='yes' Protocol='none' Bundle='yes'><PayloadRef Id='cscript.exe' /><PayloadRef Id='SourceFilePayload' /></ExePackage>", exePackageElements[1].GetTestXml(ignoreAttributesByElementName));
+                var exePackageElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<ExePackage Id='credwiz.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='-foo' Uninstallable='yes' Protocol='burn' Bundle='yes'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='SourceFilePayload' /></ExePackage>",
+                    "<ExePackage Id='cscript.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='' Uninstallable='yes' Protocol='none' Bundle='yes'><PayloadRef Id='cscript.exe' /><PayloadRef Id='SourceFilePayload' /></ExePackage>",
+                }, exePackageElements);
             }
         }
 
@@ -390,14 +418,16 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var setVariables = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:SetVariable");
-                Assert.Equal(6, setVariables.Count);
-                Assert.Equal("<SetVariable Id='SetCoercedNumber' Variable='CoercedNumber' Value='2' Type='numeric' />", setVariables[0].GetTestXml());
-                Assert.Equal("<SetVariable Id='SetCoercedString' Variable='CoercedString' Value='Bar' Type='string' />", setVariables[1].GetTestXml());
-                Assert.Equal("<SetVariable Id='SetCoercedVersion' Variable='CoercedVersion' Value='v2.0' Type='version' />", setVariables[2].GetTestXml());
-                Assert.Equal("<SetVariable Id='SetNeedsFormatting' Variable='NeedsFormatting' Value='[One] [Two] [Three]' Type='string' />", setVariables[3].GetTestXml());
-                Assert.Equal("<SetVariable Id='SetVersionString' Variable='VersionString' Value='v1.0' Type='string' />", setVariables[4].GetTestXml());
-                Assert.Equal("<SetVariable Id='SetUnset' Variable='Unset' Condition='VersionString = v2.0' />", setVariables[5].GetTestXml());
+                var setVariables = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:SetVariable");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<SetVariable Id='SetCoercedNumber' Variable='CoercedNumber' Value='2' Type='numeric' />",
+                    "<SetVariable Id='SetCoercedString' Variable='CoercedString' Value='Bar' Type='string' />",
+                    "<SetVariable Id='SetCoercedVersion' Variable='CoercedVersion' Value='v2.0' Type='version' />",
+                    "<SetVariable Id='SetNeedsFormatting' Variable='NeedsFormatting' Value='[One] [Two] [Three]' Type='string' />",
+                    "<SetVariable Id='SetVersionString' Variable='VersionString' Value='v1.0' Type='string' />",
+                    "<SetVariable Id='SetUnset' Variable='Unset' Condition='VersionString = v2.0' />",
+                }, setVariables);
             }
         }
     }

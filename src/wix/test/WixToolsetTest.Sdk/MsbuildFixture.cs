@@ -399,7 +399,7 @@ namespace WixToolsetTest.Sdk
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .Single();
-                Assert.Equal(@"bin\x86\Release\MsiPackage.wixipl", path);
+                WixAssert.StringEqual(@"bin\x86\Release\MsiPackage.wixipl", path);
             }
         }
 

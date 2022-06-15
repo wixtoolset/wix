@@ -63,8 +63,8 @@ namespace WixToolsetTest.Converters.Symbolizer
                     .OrderBy(s => s)
                     .ToArray();
 
-#if false
-                Assert.Equal(wix3Dump, wix4Dump);
+#if true
+                WixAssert.CompareLineByLine(wix3Dump, wix4Dump);
 #else // useful when you want to diff the outputs with another diff tool.
                 var wix3TextDump = String.Join(Environment.NewLine, wix3Dump);
                 var wix4TextDump = String.Join(Environment.NewLine, wix4Dump);
@@ -75,7 +75,7 @@ namespace WixToolsetTest.Converters.Symbolizer
                 File.WriteAllText(path3, wix3TextDump);
                 File.WriteAllText(path4, wix4TextDump);
 
-                Assert.Equal(wix3TextDump, wix4TextDump);
+                WixAssert.StringEqual(wix3TextDump, wix4TextDump);
 #endif
             }
         }

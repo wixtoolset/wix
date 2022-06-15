@@ -86,44 +86,44 @@ namespace WixToolsetTest.CoreIntegration
                     var section = intermediate.Sections.Single();
 
                     var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                    Assert.Equal("1.0.0.0", bundleSymbol.Version);
+                    WixAssert.StringEqual("1.0.0.0", bundleSymbol.Version);
 
                     var previousVersion = bundleSymbol.Fields[(int)WixBundleSymbolFields.Version].PreviousValue;
-                    Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
+                    WixAssert.StringEqual("!(bind.packageVersion.test.msi)", previousVersion.AsString());
 
                     var msiSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single();
-                    Assert.Equal("test.msi", msiSymbol.Id.Id);
+                    WixAssert.StringEqual("test.msi", msiSymbol.Id.Id);
 
                     var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
                     extractResult.AssertSuccess();
 
                     var burnManifestData = wixOutput.GetData(BurnConstants.BurnManifestWixOutputStreamName);
                     var extractedBurnManifestData = File.ReadAllText(Path.Combine(baFolderPath, "manifest.xml"), Encoding.UTF8);
-                    Assert.Equal(extractedBurnManifestData, burnManifestData);
+                    WixAssert.StringEqual(extractedBurnManifestData, burnManifestData);
 
                     var baManifestData = wixOutput.GetData(BurnConstants.BootstrapperApplicationDataWixOutputStreamName);
                     var extractedBaManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BootstrapperApplicationData.xml"), Encoding.UTF8);
-                    Assert.Equal(extractedBaManifestData, baManifestData);
+                    WixAssert.StringEqual(extractedBaManifestData, baManifestData);
 
                     var bextManifestData = wixOutput.GetData(BurnConstants.BundleExtensionDataWixOutputStreamName);
                     var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BundleExtensionData.xml"), Encoding.UTF8);
-                    Assert.Equal(extractedBextManifestData, bextManifestData);
+                    WixAssert.StringEqual(extractedBextManifestData, bextManifestData);
 
                     foreach (XmlAttribute attribute in extractResult.ManifestDocument.DocumentElement.Attributes)
                     {
                         switch (attribute.LocalName)
                         {
                             case "EngineVersion":
-                                Assert.Equal($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
+                                WixAssert.StringEqual($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
                                 break;
                             case "ProtocolVersion":
-                                Assert.Equal("1", attribute.Value);
+                                WixAssert.StringEqual("1", attribute.Value);
                                 break;
                             case "Win64":
-                                Assert.Equal("no", attribute.Value);
+                                WixAssert.StringEqual("no", attribute.Value);
                                 break;
                             case "xmlns":
-                                Assert.Equal("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
+                                WixAssert.StringEqual("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
                                 break;
                             default:
                                 Assert.False(true, $"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
@@ -131,30 +131,38 @@ namespace WixToolsetTest.CoreIntegration
                         }
                     }
 
-                    var commandLineElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:CommandLine");
-                    var commandLineElement = (XmlNode)Assert.Single(commandLineElements);
-                    Assert.Equal("<CommandLine Variables='upperCase' />", commandLineElement.GetTestXml());
+                    var commandLineElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:CommandLine");
+                    WixAssert.CompareLineByLine(new[]
+                    {
+                        "<CommandLine Variables='upperCase' />",
+                    }, commandLineElements);
 
-                    var logElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Log");
-                    var logElement = (XmlNode)Assert.Single(logElements);
-                    Assert.Equal("<Log PathVariable='WixBundleLog' Prefix='~TestBundle' Extension='log' />", logElement.GetTestXml());
+                    var logElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Log");
+                    WixAssert.CompareLineByLine(new[]
+                    {
+                        "<Log PathVariable='WixBundleLog' Prefix='~TestBundle' Extension='log' />",
+                    }, logElements);
 
-                    var registrationElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration");
-                    var registrationElement = (XmlNode)Assert.Single(registrationElements);
-                    Assert.Equal($"<Registration Id='{bundleSymbol.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleId}'>" +
+                    var registrationElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
+                    WixAssert.CompareLineByLine(new[]
+                    {
+                        $"<Registration Id='{bundleSymbol.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleId}'>" +
                         "<Arp DisplayName='~TestBundle' DisplayVersion='1.0.0.0' InProgressDisplayName='~InProgressTestBundle' Publisher='Example Corporation' />" +
-                        "</Registration>", registrationElement.GetTestXml());
+                        "</Registration>",
+                    }, registrationElements);
 
-                    var msiPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='test.msi']");
-                    var msiPayload = (XmlNode)Assert.Single(msiPayloads);
-                    Assert.Equal("<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
-                        msiPayload.GetTestXml(new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash" } } }));
+                    var ignoreAttributesByElementName = new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash" } } };
+                    var msiPayloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload[@Id='test.msi']", ignoreAttributesByElementName);
+                    WixAssert.CompareLineByLine(new[]
+                    {
+                        "<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
+                    }, msiPayloads);
                 }
 
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);
                 manifestResource.Load(exePath);
                 var actualManifestData = Encoding.UTF8.GetString(manifestResource.Data);
-                Assert.Equal("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                WixAssert.StringEqual("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                     "<assembly manifestVersion=\"1.0\" xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
                     "<assemblyIdentity name=\"test.exe\" version=\"1.0.0.0\" processorArchitecture=\"x86\" type=\"win32\" />" +
                     "<description>~TestBundle</description>" +
@@ -181,7 +189,7 @@ namespace WixToolsetTest.CoreIntegration
                 var attachedFolderPath = Path.Combine(baseFolder, "attached");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
-                var result = WixRunner.Execute(false, new[] // TODO: go back to elevating warnings as errors.
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     "-arch", "x64",
@@ -200,7 +208,7 @@ namespace WixToolsetTest.CoreIntegration
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);
                 manifestResource.Load(exePath);
                 var actualManifestData = Encoding.UTF8.GetString(manifestResource.Data);
-                Assert.Equal("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                WixAssert.StringEqual("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                     "<assembly manifestVersion=\"1.0\" xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
                     "<assemblyIdentity name=\"test.exe\" version=\"1.0.0.0\" processorArchitecture=\"amd64\" type=\"win32\" />" +
                     "<description>~TestBundle</description>" +
@@ -218,16 +226,16 @@ namespace WixToolsetTest.CoreIntegration
                     switch (attribute.LocalName)
                     {
                         case "EngineVersion":
-                            Assert.Equal($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
+                            WixAssert.StringEqual($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
                             break;
                         case "ProtocolVersion":
-                            Assert.Equal("1", attribute.Value);
+                            WixAssert.StringEqual("1", attribute.Value);
                             break;
                         case "Win64":
-                            Assert.Equal("yes", attribute.Value);
+                            WixAssert.StringEqual("yes", attribute.Value);
                             break;
                         case "xmlns":
-                            Assert.Equal("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
+                            WixAssert.StringEqual("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
                             break;
                         default:
                             Assert.False(true, $"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
@@ -433,7 +441,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithDuplicateCacheIds()
+        public void CannotBuildWithDuplicateCacheIds()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -459,7 +467,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithDuplicatePayloadNames()
+        public void CannotBuildWithDuplicatePayloadNames()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -520,7 +528,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithOrphanPayload()
+        public void CannotBuildWithOrphanPayload()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -547,7 +555,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithPackageInMultipleContainers()
+        public void CannotBuildWithPackageInMultipleContainers()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -603,7 +611,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithUnscheduledPackage()
+        public void CannotBuildWithUnscheduledPackage()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -629,7 +637,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CantBuildWithUnscheduledRollbackBoundary()
+        public void CannotBuildWithUnscheduledRollbackBoundary()
         {
             var folder = TestData.Get(@"TestData");
 

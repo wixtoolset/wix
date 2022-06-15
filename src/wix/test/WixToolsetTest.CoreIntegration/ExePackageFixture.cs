@@ -48,10 +48,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "ExePackage", new List<string> { "CacheId", "Size" } },
                 };
-                var exePackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
+                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.0'>" +
@@ -101,10 +98,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "ExePackage", new List<string> { "CacheId", "Size" } },
                 };
-                var exePackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
+                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.abc'>" +
@@ -154,10 +148,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "ExePackage", new List<string> { "CacheId", "Size" } },
                 };
-                var exePackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
+                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='none'>" +
@@ -203,10 +194,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "ExePackage", new List<string> { "CacheId", "Size" } },
                 };
-                var exePackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
+                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='none'>" +

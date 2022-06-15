@@ -50,13 +50,15 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload");
-                Assert.Equal(4, payloads.Count);
                 var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                Assert.Equal(@"<Payload Id='FirstX64' FilePath='FirstX64\FirstX64.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX64/FirstX64/FirstX64.msi' Packaging='embedded' SourcePath='a0' Container='BundlePackages' />", payloads[0].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86\FirstX86.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX86.msi/FirstX86/FirstX86.msi' Packaging='embedded' SourcePath='a1' Container='BundlePackages' />", payloads[1].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='FirstX86\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX86.msi/fk1m38Cf9RZ2Bx_ipinRY6BftelU/FirstX86/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a2' Container='BundlePackages' />", payloads[2].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='ff2L_N_DLQ.nSUi.l8LxG14gd2V4' FilePath='FirstX64\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX64/ff2L_N_DLQ.nSUi.l8LxG14gd2V4/FirstX64/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a3' Container='BundlePackages' />", payloads[3].GetTestXml(ignoreAttributes));
+                var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload", ignoreAttributes);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"<Payload Id='FirstX64' FilePath='FirstX64\FirstX64.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX64/FirstX64/FirstX64.msi' Packaging='embedded' SourcePath='a0' Container='BundlePackages' />",
+                    @"<Payload Id='FirstX86.msi' FilePath='FirstX86\FirstX86.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX86.msi/FirstX86/FirstX86.msi' Packaging='embedded' SourcePath='a1' Container='BundlePackages' />",
+                    @"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='FirstX86\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX86.msi/fk1m38Cf9RZ2Bx_ipinRY6BftelU/FirstX86/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a2' Container='BundlePackages' />",
+                    @"<Payload Id='ff2L_N_DLQ.nSUi.l8LxG14gd2V4' FilePath='FirstX64\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX64/ff2L_N_DLQ.nSUi.l8LxG14gd2V4/FirstX64/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a3' Container='BundlePackages' />",
+                }, payloads);
             }
         }
 
@@ -94,13 +96,15 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload");
-                Assert.Equal(4, payloads.Count);
                 var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />", payloads[0].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='FirstX64.msi' FilePath='FirstX64.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a1' Container='FirstX64' />", payloads[1].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a2' Container='WixAttachedContainer' />", payloads[2].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fC0n41rZK8oW3JK8LzHu6AT3CjdQ' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a3' Container='FirstX64' />", payloads[3].GetTestXml(ignoreAttributes));
+                var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload", ignoreAttributes);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"<Payload Id='FirstX86.msi' FilePath='FirstX86.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
+                    @"<Payload Id='FirstX64.msi' FilePath='FirstX64.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a1' Container='FirstX64' />",
+                    @"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a2' Container='WixAttachedContainer' />",
+                    @"<Payload Id='fC0n41rZK8oW3JK8LzHu6AT3CjdQ' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a3' Container='FirstX64' />",
+                }, payloads);
             }
         }
 
@@ -142,11 +146,8 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "MsiPackage", new List<string> { "CacheId", "InstallSize", "Size", "ProductCode" } },
                 };
-                var msiPackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var msiPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsiPackage", ignoreAttributes);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<MsiPackage Id='FirstX86.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX86.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX86.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{12E4699F-E774-4D05-8A01-5BDD41BBA127}'>" +
                       "<MsiProperty Id='MSIFASTINSTALL' Value='1' />" +
@@ -196,7 +197,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath
                 });
 
-                WixAssert.CompareLineByLine(new string[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "The layout-only Payload 'SharedPayload' is being added to Container 'FirstX64'. It will not be extracted during layout.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
@@ -208,11 +209,8 @@ namespace WixToolsetTest.CoreIntegration
                 extractResult.AssertSuccess();
 
                 var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']", ignoreAttributes);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Payload Id='SharedPayload' FilePath='LayoutPayloadInContainer.wxs' FileSize='*' Hash='*' LayoutOnly='yes' Packaging='embedded' SourcePath='a1' Container='FirstX64' />",
                 }, payloads);
@@ -257,11 +255,8 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(attachedFolderPath, "WixAttachedContainer", "FirstX86.msi")), "Expected extracted container to contain FirstX86.msi");
 
                 var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload", ignoreAttributes);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Payload Id='FirstX86.msi' FilePath='FirstX86.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
                     "<Payload Id='FirstX64.msi' FilePath='FirstX64.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a1' Container='FirstX64' />",
@@ -298,7 +293,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath
                 });
 
-                WixAssert.CompareLineByLine(new string[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "The Payload 'SharedPayload' can't be added to Container 'FirstX64' because it was already added to Container 'FirstX86'.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
@@ -310,11 +305,8 @@ namespace WixToolsetTest.CoreIntegration
                 extractResult.AssertSuccess();
 
                 var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributes))
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']", ignoreAttributes);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Payload Id='SharedPayload' FilePath='PayloadInMultipleContainers.wxs' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a2' Container='FirstX86' />",
                 }, payloads);
@@ -347,7 +339,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath
                 });
 
-                WixAssert.CompareLineByLine(new string[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "The layout-only Payload 'SharedPayload' is being added to Container 'FirstX64'. It will not be extracted during layout.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
@@ -362,11 +354,8 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "WixPayloadProperties", new List<string> { "Size" } },
                 };
-                var payloads = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPayloadProperties")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributesByElementName))
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var payloads = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPayloadProperties", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<WixPayloadProperties Package='FirstX64.msi' Payload='FirstX64.msi' Container='FirstX64' Name='FirstX64.msi' Size='*' />",
                     "<WixPayloadProperties Package='FirstX64.msi' Payload='SharedPayload' Container='FirstX64' Name='LayoutPayloadInContainer.wxs' Size='*' />",

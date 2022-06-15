@@ -63,8 +63,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().First();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -133,8 +133,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 {
                     var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                    Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                    Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                    WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                    WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
                 }
 
                 {
@@ -142,7 +142,7 @@ namespace WixToolsetTest.CoreIntegration
                     var path = binary[BinarySymbolFields.Data].AsPath().Path;
                     Assert.StartsWith(Path.Combine(baseFolder, @"obj\Example.Extension"), path);
                     Assert.EndsWith(@"wix-ir\example.txt", path);
-                    Assert.Equal(@"BinFromWir", binary.Id.Id);
+                    WixAssert.StringEqual(@"BinFromWir", binary.Id.Id);
                 }
             }
         }
@@ -188,8 +188,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 {
                     var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                    Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                    Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                    WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                    WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
                 }
 
                 {
@@ -197,7 +197,7 @@ namespace WixToolsetTest.CoreIntegration
                     var path = binary[BinarySymbolFields.Data].AsPath().Path;
                     Assert.StartsWith(Path.Combine(baseFolder, @"obj\test"), path);
                     Assert.EndsWith(@"wix-ir\example.txt", path);
-                    Assert.Equal(@"BinFromWir", binary.Id.Id);
+                    WixAssert.StringEqual(@"BinFromWir", binary.Id.Id);
                 }
             }
         }

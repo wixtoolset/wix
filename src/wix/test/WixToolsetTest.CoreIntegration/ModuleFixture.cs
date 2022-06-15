@@ -2,14 +2,9 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
-    using System;
     using System.IO;
-    using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Data;
-    using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class ModuleFixture

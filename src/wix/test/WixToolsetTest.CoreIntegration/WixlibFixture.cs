@@ -182,8 +182,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Symbols.OfType<FileSymbol>().First();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", wixFile[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), wixFile[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"test.txt", wixFile[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -240,7 +240,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Symbols.OfType<BinarySymbol>().First();
-                Assert.Equal(Path.Combine(folder, @"data\test2.txt"), wixFile.Data.Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\test2.txt"), wixFile.Data.Path);
             }
         }
 
@@ -284,12 +284,12 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\example.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"example.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
-                Assert.Equal("Foo", example.Id?.Id);
-                Assert.Equal("Bar", example[1].AsString());
+                WixAssert.StringEqual("Foo", example.Id?.Id);
+                WixAssert.StringEqual("Bar", example[1].AsString());
             }
         }
 
@@ -345,13 +345,13 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbols = section.Symbols.OfType<FileSymbol>().OrderBy(t => Path.GetFileName(t.Source.Path)).ToArray();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileSymbols[0][FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", fileSymbols[0][FileSymbolFields.Source].PreviousValue.AsPath().Path);
-                Assert.Equal(Path.Combine(folder, @"data\other.txt"), fileSymbols[1][FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"other.txt", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\example.txt"), fileSymbols[0][FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"example.txt", fileSymbols[0][FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\other.txt"), fileSymbols[1][FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"other.txt", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var examples = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).ToArray();
-                WixAssert.CompareLineByLine(new string[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
+                WixAssert.CompareLineByLine(new[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
                 WixAssert.CompareLineByLine(new[] { "filF5_pLhBuF5b4N9XEo52g_hUM5Lo", "filvxdStJhRE_M5kbpLsTZJXbs34Sg" }, examples.Select(t => t[0].AsString()).ToArray());
                 WixAssert.CompareLineByLine(new[] { "Bar", "Value" }, examples.Select(t => t[1].AsString()).ToArray());
             }

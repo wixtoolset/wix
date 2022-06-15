@@ -40,7 +40,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(update1Pdb));
 
                 var doc = GetExtractPatchXml(patchPath);
-                Assert.Equal("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
@@ -72,7 +72,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(update1Pdb));
 
                 var doc = GetExtractPatchXml(patchPath);
-                Assert.Equal("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
@@ -158,9 +158,11 @@ namespace WixToolsetTest.CoreIntegration
                     var doc = new XmlDocument();
                     doc.LoadXml(manifestData);
                     var nsmgr = BundleExtractor.GetBurnNamespaceManager(doc, "w");
-                    var slipstreamMspNodes = doc.SelectNodes("/w:BurnManifest/w:Chain/w:MsiPackage/w:SlipstreamMsp", nsmgr);
-                    Assert.Equal(1, slipstreamMspNodes.Count);
-                    Assert.Equal("<SlipstreamMsp Id='PatchA' />", slipstreamMspNodes[0].GetTestXml());
+                    var slipstreamMspNodes = doc.SelectNodes("/w:BurnManifest/w:Chain/w:MsiPackage/w:SlipstreamMsp", nsmgr).GetTestXmlLines();
+                    WixAssert.CompareLineByLine(new[]
+                    {
+                        "<SlipstreamMsp Id='PatchA' />",
+                    }, slipstreamMspNodes);
                 }
             }
         }
@@ -173,15 +175,9 @@ namespace WixToolsetTest.CoreIntegration
                 var doc = new XmlDocument();
                 doc.LoadXml(manifestData);
                 var nsmgr = BundleExtractor.GetBurnNamespaceManager(doc, "w");
-                var patchTargetCodes = doc.SelectNodes("/w:BurnManifest/w:PatchTargetCode", nsmgr);
+                var patchTargetCodes = doc.SelectNodes("/w:BurnManifest/w:PatchTargetCode", nsmgr).GetTestXmlLines();
 
-                var actual = new List<string>();
-                foreach (XmlNode patchTargetCodeNode in patchTargetCodes)
-                {
-                    actual.Add(patchTargetCodeNode.GetTestXml());
-                }
-
-                WixAssert.CompareLineByLine(expected, actual.ToArray());
+                WixAssert.CompareLineByLine(expected, patchTargetCodes);
             }
         }
 

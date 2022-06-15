@@ -4,6 +4,7 @@ namespace WixToolset.Core.TestPackage
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using System.Xml;
 
@@ -59,6 +60,19 @@ namespace WixToolset.Core.TestPackage
             }
 
             return Regex.Replace(formattedXml, " xmlns(:[^=]+)?='[^']*'", "");
+        }
+
+        /// <summary>
+        /// Returns the XML for each node using single quotes and stripping all namespaces.
+        /// </summary>
+        /// <param name="nodeList"></param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
+        public static string[] GetTestXmlLines(this XmlNodeList nodeList, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
+        {
+            return nodeList.Cast<XmlNode>()
+                           .Select(x => x.GetTestXml(ignoredAttributesByElementName))
+                           .ToArray();
         }
 
         private static void HandleIgnoredAttributes(XmlNode node, Dictionary<string, List<string>> ignoredAttributesByElementName)

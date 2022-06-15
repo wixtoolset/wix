@@ -181,7 +181,8 @@ namespace WixToolsetTest.Converters
                 "  </CustomTable>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <BundleCustomData Id=\"FgAppx\">",
                 "    <BundleAttributeDefinition Id=\"Column1\" />",
@@ -189,7 +190,8 @@ namespace WixToolsetTest.Converters
                 "      <BundleAttribute Id=\"Column1\" Value=\"Row1\" />",
                 "    </BundleElement>",
                 "  </BundleCustomData>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -198,10 +200,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(2, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
 
         [Fact]
@@ -216,14 +218,16 @@ namespace WixToolsetTest.Converters
                 "  </CustomTable>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <BundleCustomDataRef Id=\"FgAppx\">",
                 "    <BundleElement>",
                 "      <BundleAttribute Id=\"Column1\" Value=\"Row1\" />",
                 "    </BundleElement>",
                 "  </BundleCustomDataRef>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -232,10 +236,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(2, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
 
         [Fact]
@@ -251,7 +255,8 @@ namespace WixToolsetTest.Converters
                 "  </CustomTable>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\">",
                 "    <Column Id=\"Column1\" PrimaryKey=\"yes\" Type=\"string\" Width=\"0\" Category=\"text\" Description=\"The first custom column.\" />",
@@ -259,7 +264,8 @@ namespace WixToolsetTest.Converters
                 "      <Data Column=\"Column1\" Value=\"Row1\" />",
                 "    </Row>",
                 "  </CustomTable>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -268,10 +274,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(2, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
 
         [Fact]
@@ -286,14 +292,16 @@ namespace WixToolsetTest.Converters
                 "  </CustomTable>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomTableRef Id=\"FgAppx\">",
                 "    <Row>",
                 "      <Data Column=\"Column1\" Value=\"Row1\" />",
                 "    </Row>",
                 "  </CustomTableRef>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -302,10 +310,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(2, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
 
         [Fact]
@@ -316,10 +324,12 @@ namespace WixToolsetTest.Converters
                 "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes' />",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomTable Id=\"FgAppx\" BootstrapperApplicationData=\"yes\" />",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -328,10 +338,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(1, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
 
         [Fact]
@@ -342,10 +352,12 @@ namespace WixToolsetTest.Converters
                 "  <CustomTable Id='FgAppx' BootstrapperApplicationData='no' />",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomTable Id=\"FgAppx\" />",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -354,10 +366,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(1, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
     }
 }

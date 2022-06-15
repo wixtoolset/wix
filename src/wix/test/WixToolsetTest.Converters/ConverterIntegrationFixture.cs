@@ -35,7 +35,7 @@ namespace WixToolsetTest.Converters
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
-                Assert.Equal(expected, actual);
+                WixAssert.StringEqual(expected, actual);
 
                 EnsureFixed(targetFile);
             }
@@ -62,7 +62,7 @@ namespace WixToolsetTest.Converters
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
-                Assert.Equal(expected, actual);
+                WixAssert.StringEqual(expected, actual);
 
                 EnsureFixed(targetFile);
             }
@@ -111,7 +111,7 @@ namespace WixToolsetTest.Converters
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
-                Assert.Equal(expected, actual);
+                WixAssert.StringEqual(expected, actual);
 
                 EnsureFixed(targetFile);
             }
@@ -135,7 +135,7 @@ namespace WixToolsetTest.Converters
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
-                Assert.Equal(expected, actual);
+                WixAssert.StringEqual(expected, actual);
 
                 EnsureFixed(targetFile);
             }
@@ -161,7 +161,7 @@ namespace WixToolsetTest.Converters
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
-                Assert.Equal(expected, actual);
+                WixAssert.StringEqual(expected, actual);
 
                 // still fails because QtExecCmdTimeoutAmbiguous is unfixable
                 var result2 = RunConversion(targetFile);

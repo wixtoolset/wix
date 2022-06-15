@@ -4,6 +4,7 @@ namespace WixToolsetTest.Converters
 {
     using System;
     using System.Xml.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Converters;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
@@ -22,12 +23,14 @@ namespace WixToolsetTest.Converters
                 "  </Fragment>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Property Id=\"Prop\" Value=\"1&lt;2\" />",
                 "  </Fragment>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -36,9 +39,9 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
             Assert.Equal(1, errors);
         }
 
@@ -56,12 +59,14 @@ namespace WixToolsetTest.Converters
                 "  </Fragment>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Property Id=\"Prop\" Value=\"1&lt;2\" />",
                 "  </Fragment>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -70,9 +75,9 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
             Assert.Equal(1, errors);
         }
 
@@ -86,12 +91,14 @@ namespace WixToolsetTest.Converters
                 "  </Fragment>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Property Id=\"Prop\" Value=\" \" />",
                 "  </Fragment>",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -99,9 +106,9 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
             Assert.Equal(1, errors);
         }
     }

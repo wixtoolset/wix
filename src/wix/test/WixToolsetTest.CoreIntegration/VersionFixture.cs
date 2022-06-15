@@ -33,8 +33,13 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath
                 });
 
-                var message = result.Messages.Single(m => m.Level == MessageLevel.Error);
-                Assert.Equal("Invalid product version '257.0.0'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.", message.ToString());
+                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error)
+                                                   .Select(m => m.ToString())
+                                                   .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Invalid product version '257.0.0'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.",
+                }, errorMessages);
                 Assert.Equal(242, result.ExitCode);
             }
         }
@@ -79,7 +84,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var propertyTable = Query.QueryDatabase(msiPath, new[] { "Property" }).Select(r => r.Split('\t')).ToDictionary(r => r[0].Substring("Property:".Length), r => r[1]);
                 Assert.True(propertyTable.TryGetValue("ProductVersion", out var productVersion));
-                Assert.Equal("255.255.65535", productVersion);
+                WixAssert.StringEqual("255.255.65535", productVersion);
 
                 var extractResult = BundleExtractor.ExtractAllContainers(null, bundlePath, Path.Combine(baseFolder, "ba"), Path.Combine(baseFolder, "attached"), Path.Combine(baseFolder, "extract"));
                 extractResult.AssertSuccess();
@@ -87,7 +92,7 @@ namespace WixToolsetTest.CoreIntegration
                 var bundleVersion = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration/@Version")
                                                  .Cast<XmlAttribute>()
                                                  .Single();
-                Assert.Equal("2022.3.9-preview.0-build.5+0987654321abcdef1234567890", bundleVersion.Value);
+                WixAssert.StringEqual("2022.3.9-preview.0-build.5+0987654321abcdef1234567890", bundleVersion.Value);
             }
         }
     }

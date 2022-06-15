@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -47,7 +48,7 @@ namespace WixToolsetTest.CoreIntegration
                                                         ? field.AsNullableNumber()?.ToString()
                                                         : field?.AsString())
                                                 .ToList();
-                Assert.Equal(@"dir\file.ext", fields[(int)WixBundlePayloadSymbolFields.Name]);
+                WixAssert.StringEqual(@"dir\file.ext", fields[(int)WixBundlePayloadSymbolFields.Name]);
             }
         }
 
@@ -84,7 +85,7 @@ namespace WixToolsetTest.CoreIntegration
                                                         ? field.AsNullableNumber()?.ToString()
                                                         : field?.AsString())
                                                 .ToList();
-                Assert.Equal(@"c\d\e\f.exe", fields[(int)WixBundlePayloadSymbolFields.Name]);
+                WixAssert.StringEqual(@"c\d\e\f.exe", fields[(int)WixBundlePayloadSymbolFields.Name]);
             }
         }
 
@@ -107,7 +108,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", wixlibPath,
                 });
 
-                Assert.InRange(result.ExitCode, 2, int.MaxValue);
+                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
 
                 var expectedIllegalRelativeLongFileName = 1;
                 var expectedPayloadMustBeRelativeToCache = 2;
@@ -168,7 +169,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                WixAssert.CompareLineByLine(new string[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "The Payload 'burn.exe' is being added to Container 'PackagesContainer', overriding its Compressed value of 'no'.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
@@ -183,11 +184,8 @@ namespace WixToolsetTest.CoreIntegration
                     { "Container", new List<string> { "FileSize", "Hash" } },
                     { "Payload", new List<string> { "FileSize", "Hash" } },
                 };
-                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml(ignoreAttributesByElementName))
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Payload Id='burn.exe' FilePath='burn.exe' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='PackagesContainer' />",
                     "<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com/id/test.msi/test.msi' Packaging='external' SourcePath='test.msi' />",
@@ -196,11 +194,8 @@ namespace WixToolsetTest.CoreIntegration
                    @"<Payload Id='faf_OZ741BG7SJ6ZkcIvivZ2Yzo8' FilePath='MsiPackage\Shared.dll' FileSize='*' Hash='*' DownloadUrl='http://example.com/test.msiid/faf_OZ741BG7SJ6ZkcIvivZ2Yzo8/MsiPackage/Shared.dll' Packaging='external' SourcePath='MsiPackage\Shared.dll' />",
                 }, payloads);
 
-                var containers = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Container")
-                                              .Cast<XmlElement>()
-                                              .Select(e => e.GetTestXml(ignoreAttributesByElementName))
-                                              .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var containers = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Container", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Container Id='PackagesContainer' FileSize='*' Hash='*' DownloadUrl='http://example.com/id/PackagesContainer/packages.cab' FilePath='packages.cab' />",
                 }, containers);

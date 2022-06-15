@@ -7,7 +7,6 @@ namespace WixToolsetTest.Converters
     using System.Text;
     using System.Xml;
     using System.Xml.Linq;
-    using Xunit;
 
     public abstract class BaseConverterFixture
     {
