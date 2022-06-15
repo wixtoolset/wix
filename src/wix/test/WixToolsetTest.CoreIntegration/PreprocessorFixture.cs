@@ -34,10 +34,10 @@ namespace WixToolsetTest.CoreIntegration
 
             var includedFile = result.IncludedFiles.Single();
             Assert.NotNull(result.Document);
-            Assert.Equal(includeFile, includedFile.Path);
-            Assert.Equal(sourcePath, includedFile.SourceLineNumbers.FileName);
+            WixAssert.StringEqual(includeFile, includedFile.Path);
+            WixAssert.StringEqual(sourcePath, includedFile.SourceLineNumbers.FileName);
             Assert.Equal(1, includedFile.SourceLineNumbers.LineNumber.Value);
-            Assert.Equal($"{sourcePath}*1", includedFile.SourceLineNumbers.QualifiedFileName);
+            WixAssert.StringEqual($"{sourcePath}*1", includedFile.SourceLineNumbers.QualifiedFileName);
             Assert.Null(includedFile.SourceLineNumbers.Parent);
         }
 

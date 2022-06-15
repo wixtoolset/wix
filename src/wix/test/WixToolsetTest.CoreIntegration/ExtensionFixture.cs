@@ -43,7 +43,7 @@ namespace WixToolsetTest.CoreIntegration
                 build.BuildAndDecompileAndBuild(Build, Decompile, actualOutputPath);
 
                 var expected = File.ReadAllLines(expectedOutputPath);
-                var actual = File.ReadAllLines(actualOutputPath).Select(ReplaceGuids).ToArray(); ;
+                var actual = File.ReadAllLines(actualOutputPath).Select(ReplaceGuids).ToArray();
                 WixAssert.CompareLineByLine(expected, actual);
             }
         }
@@ -87,13 +87,13 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\example.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"example.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
-                Assert.Equal("Foo", example.Id?.Id);
-                Assert.Equal("filF5_pLhBuF5b4N9XEo52g_hUM5Lo", example[0].AsString());
-                Assert.Equal("Bar", example[1].AsString());
+                WixAssert.StringEqual("Foo", example.Id?.Id);
+                WixAssert.StringEqual("filF5_pLhBuF5b4N9XEo52g_hUM5Lo", example[0].AsString());
+                WixAssert.StringEqual("Bar", example[1].AsString());
             }
         }
 
@@ -126,8 +126,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var property = section.Symbols.OfType<PropertySymbol>().Where(p => p.Id.Id == "ExampleProperty").Single();
-                Assert.Equal("ExampleProperty", property.Id.Id);
-                Assert.Equal("test", property.Value);
+                WixAssert.StringEqual("ExampleProperty", property.Id.Id);
+                WixAssert.StringEqual("test", property.Value);
             }
         }
 

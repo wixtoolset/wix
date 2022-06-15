@@ -4,6 +4,7 @@ namespace WixToolsetTest.Core
 {
     using System;
     using System.Xml.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
@@ -19,7 +20,7 @@ namespace WixToolsetTest.Core
             var attribute = CreateAttribute("1.2.3.4");
             var result = helper.GetAttributeVersionValue(null, attribute);
 
-            Assert.Equal("1.2.3.4", result);
+            WixAssert.StringEqual("1.2.3.4", result);
         }
 
         [Fact]
@@ -29,7 +30,7 @@ namespace WixToolsetTest.Core
 
             var attribute = CreateAttribute("1.2.3.4.5");
             var exception = Assert.Throws<WixException>(() => { helper.GetAttributeVersionValue(null, attribute); });
-            Assert.Equal("The Test/@Value attribute's value, '1.2.3.4.5', is not a valid version. Specify a four-part version or semantic version, such as '#.#.#.#' or '#.#.#-label.#'.", exception.Message);
+            WixAssert.StringEqual("The Test/@Value attribute's value, '1.2.3.4.5', is not a valid version. Specify a four-part version or semantic version, such as '#.#.#.#' or '#.#.#-label.#'.", exception.Message);
         }
 
         [Fact]
@@ -44,7 +45,7 @@ namespace WixToolsetTest.Core
             var helper = GetParserHelper();
             var attribute = CreateAttribute(version);
             var exception = Assert.Throws<WixException>(() => { helper.GetAttributeVersionValue(null, attribute); });
-            Assert.Equal($"The Test/@Value attribute's value, '{version}', is not a valid version. Specify a four-part version or semantic version, such as '#.#.#.#' or '#.#.#-label.#'.", exception.Message);
+            WixAssert.StringEqual($"The Test/@Value attribute's value, '{version}', is not a valid version. Specify a four-part version or semantic version, such as '#.#.#.#' or '#.#.#-label.#'.", exception.Message);
         }
 
         [Fact]
@@ -55,7 +56,7 @@ namespace WixToolsetTest.Core
             var attribute = CreateAttribute("10.99.444-preview.0");
             var result = helper.GetAttributeVersionValue(null, attribute);
 
-            Assert.Equal("10.99.444-preview.0", result);
+            WixAssert.StringEqual("10.99.444-preview.0", result);
         }
 
         [Fact]
@@ -66,7 +67,7 @@ namespace WixToolsetTest.Core
             var attribute = CreateAttribute("1.2.3.4-meta.123-other.456");
             var result = helper.GetAttributeVersionValue(null, attribute);
 
-            Assert.Equal("1.2.3.4-meta.123-other.456", result);
+            WixAssert.StringEqual("1.2.3.4-meta.123-other.456", result);
         }
 
         [Fact]
@@ -77,7 +78,7 @@ namespace WixToolsetTest.Core
             var attribute = CreateAttribute("v1.2.3.4");
             var result = helper.GetAttributeVersionValue(null, attribute);
 
-            Assert.Equal("1.2.3.4", result);
+            WixAssert.StringEqual("1.2.3.4", result);
         }
 
 

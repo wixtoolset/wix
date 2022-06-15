@@ -52,8 +52,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().First();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -87,8 +87,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -246,14 +246,14 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var errors = section.Symbols.OfType<ErrorSymbol>().ToDictionary(t => t.Id.Id);
-                Assert.Equal("Category 55 Emergency Doomsday Crisis", errors["1234"].Message.Trim());
-                Assert.Equal(" ", errors["5678"].Message);
+                WixAssert.StringEqual("Category 55 Emergency Doomsday Crisis", errors["1234"].Message.Trim());
+                WixAssert.StringEqual(" ", errors["5678"].Message);
 
                 var customAction1 = section.Symbols.OfType<CustomActionSymbol>().Where(t => t.Id.Id == "CanWeReferenceAnError_YesWeCan").Single();
-                Assert.Equal("1234", customAction1.Target);
+                WixAssert.StringEqual("1234", customAction1.Target);
 
                 var customAction2 = section.Symbols.OfType<CustomActionSymbol>().Where(t => t.Id.Id == "TextErrorsWorkOKToo").Single();
-                Assert.Equal("If you see this, something went wrong.", customAction2.Target);
+                WixAssert.StringEqual("If you see this, something went wrong.", customAction2.Target);
             }
         }
 
@@ -461,7 +461,7 @@ namespace WixToolsetTest.CoreIntegration
                     Assert.NotNull(wixout.GetDataStream("wix-ir.json"));
 
                     var text = wixout.GetData("wix-ir/test.txt");
-                    Assert.Equal("This is test.txt.", text);
+                    WixAssert.StringEqual("This is test.txt.", text);
                 }
             }
         }
@@ -491,13 +491,13 @@ namespace WixToolsetTest.CoreIntegration
                     Assert.NotNull(wixout.GetDataStream("wix-ir.json"));
 
                     var text = wixout.GetData("wix-ir/test.txt");
-                    Assert.Equal(@"This is a\test.txt.", text);
+                    WixAssert.StringEqual(@"This is a\test.txt.", text);
 
                     var text2 = wixout.GetData("wix-ir/test.txt-1");
-                    Assert.Equal(@"This is b\test.txt.", text2);
+                    WixAssert.StringEqual(@"This is b\test.txt.", text2);
 
                     var text3 = wixout.GetData("wix-ir/test.txt-2");
-                    Assert.Equal(@"This is c\test.txt.", text3);
+                    WixAssert.StringEqual(@"This is c\test.txt.", text3);
                 }
             }
         }
@@ -533,8 +533,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -569,8 +569,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\candle.exe"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\candle.exe"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var msiAssemblyNameSymbols = section.Symbols.OfType<MsiAssemblyNameSymbol>();
                 WixAssert.CompareLineByLine(new[]
@@ -626,8 +626,8 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\candle.exe"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, @"data\candle.exe"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var msiAssemblyNameSymbols = section.Symbols.OfType<MsiAssemblyNameSymbol>();
                 WixAssert.CompareLineByLine(new[]
@@ -744,10 +744,10 @@ namespace WixToolsetTest.CoreIntegration
 
                 var output = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"), false);
                 var caRows = output.Tables["CustomAction"].Rows.Single();
-                Assert.Equal("SetINSTALLLOCATION", caRows.FieldAsString(0));
-                Assert.Equal("51", caRows.FieldAsString(1));
-                Assert.Equal("INSTALLLOCATION", caRows.FieldAsString(2));
-                Assert.Equal("[INSTALLFOLDER]", caRows.FieldAsString(3));
+                WixAssert.StringEqual("SetINSTALLLOCATION", caRows.FieldAsString(0));
+                WixAssert.StringEqual("51", caRows.FieldAsString(1));
+                WixAssert.StringEqual("INSTALLLOCATION", caRows.FieldAsString(2));
+                WixAssert.StringEqual("[INSTALLFOLDER]", caRows.FieldAsString(3));
             }
         }
 
@@ -873,7 +873,7 @@ namespace WixToolsetTest.CoreIntegration
                     first =>
                     {
                         Assert.Equal(MessageLevel.Error, first.Level);
-                        Assert.Equal("Cannot find the table definitions for the 'TableDefinitionNotExposedByExtension' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", first.ToString());
+                        WixAssert.StringEqual("Cannot find the table definitions for the 'TableDefinitionNotExposedByExtension' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", first.ToString());
                     });
 
                 Assert.False(File.Exists(msiPath));

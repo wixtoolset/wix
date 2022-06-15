@@ -64,11 +64,11 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var queryResults = Query.QueryDatabase(msiPath, new[] { "Property" }).ToDictionary(s => s.Split('\t')[0]);
-                Assert.Equal("Property:ProductVersion\t3.14.1703.0", queryResults["Property:ProductVersion"]);
-                Assert.Equal("Property:TestPackageManufacturer\tExample Corporation", queryResults["Property:TestPackageManufacturer"]);
-                Assert.Equal("Property:TestPackageName\tPacakgeWithBindVariables", queryResults["Property:TestPackageName"]);
-                Assert.Equal("Property:TestPackageVersion\t3.14.1703.0", queryResults["Property:TestPackageVersion"]);
-                Assert.Equal("Property:TestTextVersion\tv", queryResults["Property:TestTextVersion"]);
+                WixAssert.StringEqual("Property:ProductVersion\t3.14.1703.0", queryResults["Property:ProductVersion"]);
+                WixAssert.StringEqual("Property:TestPackageManufacturer\tExample Corporation", queryResults["Property:TestPackageManufacturer"]);
+                WixAssert.StringEqual("Property:TestPackageName\tPacakgeWithBindVariables", queryResults["Property:TestPackageName"]);
+                WixAssert.StringEqual("Property:TestPackageVersion\t3.14.1703.0", queryResults["Property:TestPackageVersion"]);
+                WixAssert.StringEqual("Property:TestTextVersion\tv", queryResults["Property:TestTextVersion"]);
                 Assert.False(queryResults.ContainsKey("Property:TestTextLanguage"));
             }
         }

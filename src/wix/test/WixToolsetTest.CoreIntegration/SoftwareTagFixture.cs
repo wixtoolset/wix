@@ -93,8 +93,8 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
         }
     }
 }

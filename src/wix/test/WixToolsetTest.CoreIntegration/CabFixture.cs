@@ -45,7 +45,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[] { "Notepad.exe", "test.txt" }, fileRows.Select(f => f.Name).ToArray());
 
                 var files = Query.GetCabinetFiles(cabPath);
-                Assert.Equal(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());
+                WixAssert.CompareLineByLine(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());
             }
         }
 
@@ -90,7 +90,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[] { "test.txt" }, fileRows.Select(f => f.Name).ToArray());
 
                 var files = Query.GetCabinetFiles(cabPath);
-                Assert.Equal(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());
+                WixAssert.CompareLineByLine(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());
             }
         }
 

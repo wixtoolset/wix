@@ -47,10 +47,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "ExePackage", new List<string> { "CacheId", "InstallSize", "Size" } },
                 };
-                var msiPackageElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage")
-                                                      .Cast<XmlElement>()
-                                                      .Select(e => e.GetTestXml(ignoreAttributesByElementName))
-                                                      .ToArray();
+                var msiPackageElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsiPackage", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
                     "<MsiPackage Id='MsiWithFeatures' Cache='keep' CacheId='{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0_1' InstallSize='34' Size='32803' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_MsiWithFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithFeatures' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' Language='1033' Version='1.0.0.0' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}'>" +
@@ -68,20 +65,14 @@ namespace WixToolsetTest.CoreIntegration
                     "</MsiPackage>",
                 }, msiPackageElements);
 
-                var packageElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties")
-                                                   .Cast<XmlElement>()
-                                                   .Select(e => e.GetTestXml())
-                                                   .ToArray();
-                WixAssert.CompareLineByLine(new []
+                var packageElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPackageProperties");
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<WixPackageProperties Package='MsiWithFeatures' Vital='yes' DisplayName='MsiPackage' DownloadSize='32803' PackageSize='32803' InstalledSize='34' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_MsiWithFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithFeatures' Compressed='yes' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}' Version='1.0.0.0' Cache='keep' />",
                     "<WixPackageProperties Package='MsiWithoutFeatures' Vital='yes' DisplayName='MsiPackage' DownloadSize='32803' PackageSize='32803' InstalledSize='34' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_MsiWithoutFeatures' RollbackLogPathVariable='WixBundleRollbackLog_MsiWithoutFeatures' Compressed='yes' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}' Version='1.0.0.0' Cache='keep' />",
                 }, packageElements);
 
-                var featureElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageFeatureInfo")
-                                                   .Cast<XmlElement>()
-                                                   .Select(e => e.GetTestXml())
-                                                   .ToArray();
+                var featureElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPackageFeatureInfo");
                 WixAssert.CompareLineByLine(new[]
                 {
                     "<WixPackageFeatureInfo Package='MsiWithFeatures' Feature='ProductFeature' Size='34' Display='2' Level='1' Directory='' Attributes='0' />",
@@ -120,17 +111,21 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var exePackageElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage");
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
                     { "ExePackage", new List<string> { "CacheId", "InstallSize", "Size" } },
                 };
-                Assert.Equal(1, exePackageElements.Count);
-                Assert.Equal("<ExePackage Id='PackagePayloadInPayloadGroup' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_PackagePayloadInPayloadGroup' RollbackLogPathVariable='WixBundleRollbackLog_PackagePayloadInPayloadGroup' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none'><PayloadRef Id='burn.exe' /></ExePackage>", exePackageElements[0].GetTestXml(ignoreAttributesByElementName));
+                var exePackageElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<ExePackage Id='PackagePayloadInPayloadGroup' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_PackagePayloadInPayloadGroup' RollbackLogPathVariable='WixBundleRollbackLog_PackagePayloadInPayloadGroup' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none'><PayloadRef Id='burn.exe' /></ExePackage>",
+                }, exePackageElements);
 
-                var payloadElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='burn.exe']");
-                Assert.Equal(1, payloadElements.Count);
-                Assert.Equal("<Payload Id='burn.exe' FilePath='burn.exe' FileSize='463360' Hash='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964E246A1E8AE72E2CF23E0138AFC281BAFDE45969204405E114EB20C8195DA7E5E' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />", payloadElements[0].GetTestXml());
+                var payloadElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload[@Id='burn.exe']");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<Payload Id='burn.exe' FilePath='burn.exe' FileSize='463360' Hash='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964E246A1E8AE72E2CF23E0138AFC281BAFDE45969204405E114EB20C8195DA7E5E' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
+                }, payloadElements);
             }
         }
 

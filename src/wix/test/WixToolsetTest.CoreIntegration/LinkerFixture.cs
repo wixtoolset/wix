@@ -103,7 +103,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
                 catch (WixException we)
                 {
-                    Assert.Equal("Could not find entry section in provided list of intermediates. Expected section of type 'Product'.", we.Message);
+                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Expected section of type 'Product'.", we.Message);
                     return;
                 }
 
@@ -133,7 +133,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
                 catch (WixException we)
                 {
-                    Assert.Equal("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
+                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
                     return;
                 }
 
@@ -163,7 +163,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
                 catch (WixException we)
                 {
-                    Assert.Equal("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
+                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
                     return;
                 }
 

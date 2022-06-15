@@ -34,8 +34,13 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath
                 });
 
-                var message = result.Messages.Single(m => m.Level == MessageLevel.Error);
-                Assert.Equal("Invalid product version '1.256.0'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.", message.ToString());
+                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error)
+                                                   .Select(m => m.ToString())
+                                                   .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Invalid product version '1.256.0'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.",
+                }, errorMessages);
                 Assert.Equal(242, result.ExitCode);
             }
         }

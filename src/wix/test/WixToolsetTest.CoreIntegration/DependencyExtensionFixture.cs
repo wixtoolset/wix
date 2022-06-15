@@ -44,11 +44,8 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var provides = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage/burn:Provides")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml())
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var provides = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage/burn:Provides");
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Provides Key='DependencyTests_ExeA,v1.0' Version='1.0.0.0' DisplayName='Windows Installer XML Toolset' />",
                 }, provides);
@@ -100,11 +97,8 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var provides = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage/burn:Provides")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml())
-                                            .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var provides = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsiPackage/burn:Provides");
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<Provides Key='UsingProvides' Version='1.0.0.0' DisplayName='MsiPackage' Imported='yes' />",
                 }, provides);
@@ -146,10 +140,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "Registration", new List<string> { "Id" } },
                 };
-                var registration = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration")
-                                                .Cast<XmlElement>()
-                                                .Select(e => e.GetTestXml(ignoreAttributesByElementName))
-                                                .ToArray();
+                var registration = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<Registration Id='*' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='MyProviderKey,v1.0'><Arp DisplayName='BurnBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' /></Registration>",
@@ -172,8 +163,8 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
         }
     }
 }

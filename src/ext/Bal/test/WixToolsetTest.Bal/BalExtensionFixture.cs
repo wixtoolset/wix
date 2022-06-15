@@ -41,9 +41,11 @@ namespace WixToolsetTest.Bal
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var balPackageInfos = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
-                var balPackageInfo = (XmlNode)Assert.Single(balPackageInfos);
-                Assert.Equal("<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='1' />", balPackageInfo.GetTestXml());
+                var balPackageInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='1' />",
+                }, balPackageInfos);
 
                 Assert.True(File.Exists(Path.Combine(baFolderPath, "thm.wxl")));
             }
@@ -76,9 +78,11 @@ namespace WixToolsetTest.Bal
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var balOverridableVariables = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixStdbaOverridableVariable");
-                var balOverridableVariable = (XmlNode)Assert.Single(balOverridableVariables);
-                Assert.Equal("<WixStdbaOverridableVariable Name='TEST1' />", balOverridableVariable.GetTestXml());
+                var balOverridableVariables = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixStdbaOverridableVariable");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixStdbaOverridableVariable Name='TEST1' />",
+                }, balOverridableVariables);
             }
         }
 
@@ -134,9 +138,11 @@ namespace WixToolsetTest.Bal
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var wixMbaPrereqOptionsElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixMbaPrereqOptions");
-                var wixMbaPrereqOptions = (XmlNode)Assert.Single(wixMbaPrereqOptionsElements);
-                Assert.Equal("<WixMbaPrereqOptions AlwaysInstallPrereqs='1' />", wixMbaPrereqOptions.GetTestXml());
+                var wixMbaPrereqOptionsElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqOptions");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixMbaPrereqOptions AlwaysInstallPrereqs='1' />",
+                }, wixMbaPrereqOptionsElements);
             }
         }
 
@@ -159,7 +165,7 @@ namespace WixToolsetTest.Bal
                     "-o", bundleFile,
                 });
                 Assert.Equal(6802, compileResult.ExitCode);
-                Assert.Equal("There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.", compileResult.Messages[0].ToString());
+                WixAssert.StringEqual("There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.", compileResult.Messages[0].ToString());
 
                 Assert.False(File.Exists(bundleFile));
                 Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));

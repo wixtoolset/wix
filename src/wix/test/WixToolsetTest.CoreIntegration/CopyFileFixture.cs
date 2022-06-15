@@ -39,9 +39,9 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
                 var copyFileSymbol = section.Symbols.OfType<MoveFileSymbol>().Single();
-                Assert.Equal("MoveText", copyFileSymbol.Id.Id);
+                WixAssert.StringEqual("MoveText", copyFileSymbol.Id.Id);
                 Assert.True(copyFileSymbol.Delete);
-                Assert.Equal("OtherFolder", copyFileSymbol.DestFolder);
+                WixAssert.StringEqual("OtherFolder", copyFileSymbol.DestFolder);
             }
         }
     }

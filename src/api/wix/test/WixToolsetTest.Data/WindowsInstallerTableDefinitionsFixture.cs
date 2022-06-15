@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.Data
 {
+    using WixBuildTools.TestSupport;
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
@@ -21,7 +22,7 @@ namespace WixToolsetTest.Data
                 Assert.Equal(expectedRowType, rowFromTableDefinition.GetType());
                 if (typeof(Row) != expectedRowType)
                 {
-                    Assert.Equal(expectedRowTypeName, expectedRowType.Name);
+                    WixAssert.StringEqual(expectedRowTypeName, expectedRowType.Name);
                 }
             }
         }

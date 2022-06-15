@@ -5,8 +5,8 @@ namespace WixToolsetTest.CoreNative
     using System.IO;
     using System.Linq;
     using WixToolset.Core.Native;
-    using WixToolsetTest.CoreNative.Utility;
     using WixToolset.Data;
+    using WixToolsetTest.CoreNative.Utility;
     using Xunit;
 
     public class CabinetFixture
@@ -85,7 +85,7 @@ namespace WixToolsetTest.CoreNative
                         var cabFileInfo = enumerated[i];
                         var fileInfo = new FileInfo(files[i]);
 
-                        Assert.Equal(cabFileInfo.FileId, fileInfo.Name);
+                        WixBuildTools.TestSupport.WixAssert.StringEqual(cabFileInfo.FileId, fileInfo.Name);
                         Assert.Equal(cabFileInfo.Size, fileInfo.Length);
                         Assert.True(cabFileInfo.SameAsDateTime(fileInfo.CreationTime));
                     }

@@ -2,7 +2,6 @@
 
 namespace WixToolsetTest.CoreNative
 {
-    using System.ComponentModel;
     using System.Linq;
     using WixToolset.Core.Native;
     using WixToolsetTest.CoreNative.Utility;
@@ -18,9 +17,9 @@ namespace WixToolsetTest.CoreNative
             var hashes = CertificateHashes.Read(new[] { cabFile });
 
             var hash = hashes.Single();
-            Assert.Equal(cabFile, hash.Path);
-            Assert.Equal("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hash.PublicKey);
-            Assert.Equal("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hash.Thumbprint);
+            WixBuildTools.TestSupport.WixAssert.StringEqual(cabFile, hash.Path);
+            WixBuildTools.TestSupport.WixAssert.StringEqual("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hash.PublicKey);
+            WixBuildTools.TestSupport.WixAssert.StringEqual("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hash.Thumbprint);
             Assert.Null(hash.Exception);
         }
 
@@ -32,7 +31,7 @@ namespace WixToolsetTest.CoreNative
             var hashes = CertificateHashes.Read(new[] { txtFile });
 
             var hash = hashes.Single();
-            Assert.Equal(txtFile, hash.Path);
+            WixBuildTools.TestSupport.WixAssert.StringEqual(txtFile, hash.Path);
             Assert.Null(hash.Exception);
         }
 
@@ -44,9 +43,9 @@ namespace WixToolsetTest.CoreNative
 
             var hashes = CertificateHashes.Read(new[] { cabFile, txtFile });
 
-            Assert.Equal(cabFile, hashes[0].Path);
-            Assert.Equal("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hashes[0].PublicKey);
-            Assert.Equal("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hashes[0].Thumbprint);
+            WixBuildTools.TestSupport.WixAssert.StringEqual(cabFile, hashes[0].Path);
+            WixBuildTools.TestSupport.WixAssert.StringEqual("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hashes[0].PublicKey);
+            WixBuildTools.TestSupport.WixAssert.StringEqual("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hashes[0].Thumbprint);
             Assert.Null(hashes[0].Exception);
 
             Assert.Equal(txtFile, hashes[1].Path);

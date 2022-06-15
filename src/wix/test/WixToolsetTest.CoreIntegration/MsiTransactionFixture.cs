@@ -102,10 +102,12 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var rollbackBoundaries = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:RollbackBoundary");
-                Assert.Equal(2, rollbackBoundaries.Count);
-                Assert.Equal("<RollbackBoundary Id='WixDefaultBoundary' Vital='yes' Transaction='no' />", rollbackBoundaries[0].GetTestXml());
-                Assert.Equal("<RollbackBoundary Id='rba31DvS6_ninGllmavuS.cp4RYckk' Vital='yes' Transaction='yes' LogPathVariable='WixBundleLog_rba31DvS6_ninGllmavuS.cp4RYckk' />", rollbackBoundaries[1].GetTestXml());
+                var rollbackBoundaries = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:RollbackBoundary");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<RollbackBoundary Id='WixDefaultBoundary' Vital='yes' Transaction='no' />",
+                    "<RollbackBoundary Id='rba31DvS6_ninGllmavuS.cp4RYckk' Vital='yes' Transaction='yes' LogPathVariable='WixBundleLog_rba31DvS6_ninGllmavuS.cp4RYckk' />",
+                }, rollbackBoundaries);
             }
         }
 

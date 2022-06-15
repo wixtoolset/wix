@@ -5,6 +5,7 @@ namespace WixToolsetTest.Converters
     using System;
     using System.IO;
     using System.Xml.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Converters;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
@@ -23,13 +24,15 @@ namespace WixToolsetTest.Converters
                 "  <CustomAction Id='Foo' BinaryKey='UtilCA_x64' DllEntry='WixQuietExec64' />",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
                 "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
                 "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
                 "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -38,10 +41,10 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(11, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
         }
 
         [Fact]
@@ -58,10 +61,12 @@ namespace WixToolsetTest.Converters
                 "  </CustomAction>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomAction Id=\"Foo\" Script=\"jscript\" ScriptSourceFile=\"Foo.js\" />",
-                "</Wix>");
+                "</Wix>",
+            };
 
             var expectedScript = String.Join("\n",
                 "function() {",
@@ -76,13 +81,13 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
 
-            var actual = UnformattedDocumentString(document);
+            var actual = UnformattedDocumentLines(document);
 
             Assert.Equal(2, errors);
-            Assert.Equal(expected, actual);
+            WixAssert.CompareLineByLine(expected, actual);
 
             var script = File.ReadAllText("Foo.js");
-            Assert.Equal(expectedScript, script);
+            WixAssert.StringEqual(expectedScript, script);
         }
     }
 }

@@ -111,11 +111,8 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var rollbackBoundaries = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:RollbackBoundary")
-                                                      .Cast<XmlElement>()
-                                                      .Select(e => e.GetTestXml())
-                                                      .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var rollbackBoundaries = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:RollbackBoundary");
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<RollbackBoundary Id='First' Vital='yes' Transaction='no' />",
                 }, rollbackBoundaries);
@@ -124,11 +121,8 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "MsiPackage", new List<string> { "Size" } },
                 };
-                var chainPackages = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/*")
-                                                      .Cast<XmlElement>()
-                                                      .Select(e => e.GetTestXml(ignoreAttributesByElementName))
-                                                      .ToArray();
-                WixAssert.CompareLineByLine(new string[]
+                var chainPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/*", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
                 {
                     "<MsiPackage Id='test.msi' Cache='keep' CacheId='{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='First' RollbackBoundaryBackward='First' LogPathVariable='WixBundleLog_test.msi' RollbackLogPathVariable='WixBundleRollbackLog_test.msi' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' Language='1033' Version='1.0.0.0' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}'>" +
                     "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +

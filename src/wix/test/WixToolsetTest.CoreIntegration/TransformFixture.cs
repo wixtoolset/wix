@@ -120,10 +120,10 @@ namespace WixToolsetTest.CoreIntegration
                 }, rows.Keys.OrderBy(s => s).ToArray());
 
                 Assert.True(rows.TryGetValue("ProductFeature", out var productFeatureRow));
-                Assert.Equal("MsiPackage ja-jp", productFeatureRow.FieldAsString(2));
+                WixAssert.StringEqual("MsiPackage ja-jp", productFeatureRow.FieldAsString(2));
 
                 Assert.True(rows.TryGetValue("ProductLanguage", out var productLanguageRow));
-                Assert.Equal("1041", productLanguageRow.FieldAsString(1));
+                WixAssert.StringEqual("1041", productLanguageRow.FieldAsString(1));
 
                 Assert.False(File.Exists(mstPath));
 

@@ -66,7 +66,7 @@ namespace WixToolsetTest.Sdk
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal(@"SourceDir\HeatFilePackage.wixproj", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath()?.Path);
+                WixAssert.StringEqual(@"SourceDir\HeatFilePackage.wixproj", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath()?.Path);
             }
         }
 
@@ -142,8 +142,8 @@ namespace WixToolsetTest.Sdk
                 var section = intermediate.Sections.Single();
 
                 var fileSymbols = section.Symbols.OfType<FileSymbol>().ToArray();
-                Assert.Equal(@"SourceDir\MyProgram.txt", fileSymbols[0][FileSymbolFields.Source].PreviousValue.AsPath()?.Path);
-                Assert.Equal(@"SourceDir\MyProgram.json", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath()?.Path);
+                WixAssert.StringEqual(@"SourceDir\MyProgram.txt", fileSymbols[0][FileSymbolFields.Source].PreviousValue.AsPath()?.Path);
+                WixAssert.StringEqual(@"SourceDir\MyProgram.json", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath()?.Path);
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.TestPackage
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Xml;
     using Xunit;
@@ -102,6 +103,17 @@ namespace WixToolset.Core.TestPackage
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="xpath">elements must have the 'ba' prefix</param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
+        public string[] GetBADataTestXmlLines(string xpath, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
+        {
+            return this.SelectBADataNodes(xpath).GetTestXmlLines(ignoredAttributesByElementName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="xpath">elements must have the 'be' prefix</param>
         /// <returns></returns>
         public XmlNodeList SelectBundleExtensionDataNodes(string xpath)
@@ -112,11 +124,33 @@ namespace WixToolset.Core.TestPackage
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="xpath">elements must have the 'be' prefix</param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
+        public string[] GetBundleExtensionTestXmlLines(string xpath, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
+        {
+            return this.SelectBundleExtensionDataNodes(xpath).GetTestXmlLines(ignoredAttributesByElementName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="xpath">elements must have the 'burn' prefix</param>
         /// <returns></returns>
         public XmlNodeList SelectManifestNodes(string xpath)
         {
             return this.ManifestDocument.SelectNodes(xpath, this.ManifestNamespaceManager);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="xpath">elements must have the 'burn' prefix</param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
+        public string[] GetManifestTestXmlLines(string xpath, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
+        {
+            return this.SelectManifestNodes(xpath).GetTestXmlLines(ignoredAttributesByElementName);
         }
     }
 }
