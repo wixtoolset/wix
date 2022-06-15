@@ -26,6 +26,10 @@ namespace WixTestTools
 
         public string TestName { get; }
 
+        public int? AlternateExitCode { get; set; }
+
+        public int? LastExitCode { get; set; }
+
         /// <summary>
         /// Runs the bundle asking for help.
         /// </summary>
@@ -226,7 +230,9 @@ namespace WixTestTools
 
             // Run the tool and assert the expected code.
             bundle.ExpectedExitCode = expectedExitCode;
-            bundle.Run(assertOnError);
+            bundle.AlternateExitCode = this.AlternateExitCode;
+            var result = bundle.Run(assertOnError);
+            this.LastExitCode = result.ExitCode;
 
             // Return the log file name.
             return logFile;

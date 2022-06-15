@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
+    using WixBuildTools.TestSupport;
     using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
@@ -42,14 +43,10 @@ namespace WixToolsetTest.BurnE2E
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleA_x64");
         }
 
-#if DEBUG
-        [RuntimeFact(Skip = "0xc0000005 during shutdown from tiptsf.dll")]
-#else
         [RuntimeFact]
-#endif
         public void CanInstallAndUninstallSimplePerUserBundle_x64_wixstdba()
         {
-            this.CanInstallAndUninstallSimpleBundle("PackageApu_x64", "BundleApu_x64", "PackagePerUser.wxs");
+            this.CanInstallAndUninstallSimpleBundle("PackageApu_x64", "BundleApu_x64", "PackagePerUser.wxs", unchecked((int)0xc0000005));
         }
 
         [RuntimeFact]
@@ -70,11 +67,12 @@ namespace WixToolsetTest.BurnE2E
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleD_x64");
         }
 
-        private void CanInstallAndUninstallSimpleBundle(string packageName, string bundleName, string fileName = "Package.wxs")
+        private void CanInstallAndUninstallSimpleBundle(string packageName, string bundleName, string fileName = "Package.wxs", int? alternateExitCode = null)
         {
             var package = this.CreatePackageInstaller(packageName);
 
             var bundle = this.CreateBundleInstaller(bundleName);
+            bundle.AlternateExitCode = alternateExitCode;
 
             var packageSourceCodeInstalled = package.GetInstalledFilePath(fileName);
 
@@ -89,12 +87,22 @@ namespace WixToolsetTest.BurnE2E
             // Source file should be installed
             Assert.True(File.Exists(packageSourceCodeInstalled), $"Should have found {packageName} payload installed at: {packageSourceCodeInstalled}");
 
+            if (alternateExitCode == bundle.LastExitCode)
+            {
+                WixAssert.Skip($"Install exited with {bundle.LastExitCode}");
+            }
+
             bundle.Uninstall(cachedBundlePath);
 
             // Source file should *not* be installed
             Assert.False(File.Exists(packageSourceCodeInstalled), $"{packageName} payload should have been removed by uninstall from: {packageSourceCodeInstalled}");
 
             bundle.VerifyUnregisteredAndRemovedFromPackageCache(cachedBundlePath);
+
+            if (alternateExitCode == bundle.LastExitCode)
+            {
+                WixAssert.Skip($"Uninstall exited with {bundle.LastExitCode}");
+            }
         }
     }
 }

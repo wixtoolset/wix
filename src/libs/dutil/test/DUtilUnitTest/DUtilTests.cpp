@@ -5,26 +5,49 @@
 using namespace System;
 using namespace Xunit;
 using namespace WixBuildTools::TestSupport;
+using namespace WixBuildTools::TestSupport::XunitExtensions;
 
 namespace DutilTests
 {
+    [Collection("Dutil_TraceErrorSource")]
     public ref class DUtil
     {
     public:
-        [Fact(Skip="Flaky")]
+        [SkippableFact]
         void DUtilTraceErrorSourceFiltersOnTraceLevel()
         {
             DutilInitialize(&DutilTestTraceError);
 
-            CallDutilTraceErrorSource();
+            try
+            {
+                CallDutilTraceErrorSource();
 
-            Dutil_TraceSetLevel(REPORT_DEBUG, FALSE);
+                Dutil_TraceSetLevel(REPORT_DEBUG, FALSE);
 
-            Action^ action = gcnew Action(this, &DUtil::CallDutilTraceErrorSource);
-            // See the comments in WixBuildTools.WixAssert for details.
-            WixAssert::Throws<Exception^>(action);
+                Exception^ traceErrorException = nullptr;
 
-            DutilUninitialize();
+                try
+                {
+                    CallDutilTraceErrorSource();
+                }
+                catch (Exception^ e)
+                {
+                    traceErrorException = e;
+                }
+
+                if (traceErrorException == nullptr)
+                {
+                    WixAssert::Skip("Dutil_TraceErrorSource did not call the registered callback.");
+                }
+                else
+                {
+                    WixAssert::StringEqual("hr = 0x80004005, message = Error message", traceErrorException->Message, false);
+                }
+            }
+            finally
+            {
+                DutilUninitialize();
+            }
         }
 
     private:
@@ -32,5 +55,10 @@ namespace DutilTests
         {
             Dutil_TraceErrorSource(__FILE__, __LINE__, REPORT_DEBUG, DUTIL_SOURCE_EXTERNAL, E_FAIL, "Error message");
         }
+    };
+
+    [CollectionDefinition("Dutil_TraceErrorSource", DisableParallelization = true)]
+    public ref class Dutil_TraceErrorSourceCollectionDefinition
+    {
     };
 }
