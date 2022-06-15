@@ -40,7 +40,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(4, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(7, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(7, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -54,7 +54,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(5, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(5, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMinor);
@@ -68,7 +68,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion3->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion3->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion3->cReleaseLabels);
-                Assert::Equal<DWORD>(7, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(7, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMinor);
@@ -114,14 +114,14 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion1->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(2, pVersion1->rgReleaseLabels[0].dwValue);
                 Assert::Equal<DWORD>(1, pVersion1->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(4, pVersion1->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(4, pVersion1->rgReleaseLabels[0].cchLabelOffset);
 
                 Assert::Equal<BOOL>(TRUE, pVersion1->rgReleaseLabels[1].fNumeric);
                 Assert::Equal<DWORD>(0, pVersion1->rgReleaseLabels[1].dwValue);
                 Assert::Equal<DWORD>(1, pVersion1->rgReleaseLabels[1].cchLabel);
-                Assert::Equal<DWORD>(6, pVersion1->rgReleaseLabels[1].cchLabelOffset);
+                Assert::Equal<SIZE_T>(6, pVersion1->rgReleaseLabels[1].cchLabelOffset);
 
-                Assert::Equal<DWORD>(7, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(7, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -139,9 +139,9 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion2->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(19, pVersion2->rgReleaseLabels[0].dwValue);
                 Assert::Equal<DWORD>(2, pVersion2->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(4, pVersion2->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(4, pVersion2->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(6, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMinor);
@@ -201,7 +201,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(3, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(3, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fHasMinor);
@@ -215,7 +215,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(3, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(3, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fHasMinor);
@@ -229,7 +229,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion3->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion3->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion3->cReleaseLabels);
-                Assert::Equal<DWORD>(1, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(1, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fHasMinor);
@@ -243,7 +243,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion4->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion4->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion4->cReleaseLabels);
-                Assert::Equal<DWORD>(0, pVersion4->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(0, pVersion4->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fInvalid);
                 Assert::Equal<BOOL>(FALSE, pVersion4->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion4->fHasMinor);
@@ -261,9 +261,9 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion5->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(2, pVersion5->rgReleaseLabels[0].dwValue);
                 Assert::Equal<DWORD>(1, pVersion5->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(3, pVersion5->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(3, pVersion5->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(4, pVersion5->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(4, pVersion5->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion5->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion5->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion5->fHasMinor);
@@ -281,9 +281,9 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion6->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(4, pVersion6->rgReleaseLabels[0].dwValue);
                 Assert::Equal<DWORD>(1, pVersion6->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(3, pVersion6->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(3, pVersion6->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(5, pVersion6->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(5, pVersion6->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion6->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion6->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion6->fHasMinor);
@@ -337,9 +337,9 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion1->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion1->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(6, pVersion1->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(6, pVersion1->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(7, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(7, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -357,9 +357,9 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion2->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(2, pVersion2->rgReleaseLabels[0].dwValue);
                 Assert::Equal<DWORD>(1, pVersion2->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(2, pVersion2->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(2, pVersion2->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(3, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(3, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fHasMinor);
@@ -377,9 +377,9 @@ namespace DutilTests
                 Assert::Equal<BOOL>(TRUE, pVersion3->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(2, pVersion3->rgReleaseLabels[0].dwValue);
                 Assert::Equal<DWORD>(1, pVersion3->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(2, pVersion3->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(2, pVersion3->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(3, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(3, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fHasMinor);
@@ -434,14 +434,14 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion1->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion1->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(5, pVersion1->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(5, pVersion1->rgReleaseLabels[0].cchLabelOffset);
 
                 Assert::Equal<BOOL>(TRUE, pVersion1->rgReleaseLabels[1].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion1->rgReleaseLabels[1].dwValue);
                 Assert::Equal<DWORD>(1, pVersion1->rgReleaseLabels[1].cchLabel);
-                Assert::Equal<DWORD>(7, pVersion1->rgReleaseLabels[1].cchLabelOffset);
+                Assert::Equal<SIZE_T>(7, pVersion1->rgReleaseLabels[1].cchLabelOffset);
 
-                Assert::Equal<DWORD>(8, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(8, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -458,14 +458,14 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion2->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion2->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(6, pVersion2->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(6, pVersion2->rgReleaseLabels[0].cchLabelOffset);
 
                 Assert::Equal<BOOL>(TRUE, pVersion2->rgReleaseLabels[1].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion2->rgReleaseLabels[1].dwValue);
                 Assert::Equal<DWORD>(1, pVersion2->rgReleaseLabels[1].cchLabel);
-                Assert::Equal<DWORD>(8, pVersion2->rgReleaseLabels[1].cchLabelOffset);
+                Assert::Equal<SIZE_T>(8, pVersion2->rgReleaseLabels[1].cchLabelOffset);
 
-                Assert::Equal<DWORD>(9, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(9, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMinor);
@@ -482,18 +482,18 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion3->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion3->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(4, pVersion3->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(4, pVersion3->rgReleaseLabels[0].cchLabelOffset);
 
                 Assert::Equal<BOOL>(FALSE, pVersion3->rgReleaseLabels[1].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion3->rgReleaseLabels[1].cchLabel);
-                Assert::Equal<DWORD>(6, pVersion3->rgReleaseLabels[1].cchLabelOffset);
+                Assert::Equal<SIZE_T>(6, pVersion3->rgReleaseLabels[1].cchLabelOffset);
 
                 Assert::Equal<BOOL>(TRUE, pVersion3->rgReleaseLabels[2].fNumeric);
                 Assert::Equal<DWORD>(0, pVersion3->rgReleaseLabels[2].dwValue);
                 Assert::Equal<DWORD>(1, pVersion3->rgReleaseLabels[2].cchLabel);
-                Assert::Equal<DWORD>(8, pVersion3->rgReleaseLabels[2].cchLabelOffset);
+                Assert::Equal<SIZE_T>(8, pVersion3->rgReleaseLabels[2].cchLabelOffset);
 
-                Assert::Equal<DWORD>(9, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(9, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMinor);
@@ -510,18 +510,18 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion4->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion4->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(6, pVersion4->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(6, pVersion4->rgReleaseLabels[0].cchLabelOffset);
 
                 Assert::Equal<BOOL>(FALSE, pVersion4->rgReleaseLabels[1].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion4->rgReleaseLabels[1].cchLabel);
-                Assert::Equal<DWORD>(8, pVersion4->rgReleaseLabels[1].cchLabelOffset);
+                Assert::Equal<SIZE_T>(8, pVersion4->rgReleaseLabels[1].cchLabelOffset);
 
                 Assert::Equal<BOOL>(TRUE, pVersion4->rgReleaseLabels[2].fNumeric);
                 Assert::Equal<DWORD>(0, pVersion4->rgReleaseLabels[2].dwValue);
                 Assert::Equal<DWORD>(3, pVersion4->rgReleaseLabels[2].cchLabel);
-                Assert::Equal<DWORD>(10, pVersion4->rgReleaseLabels[2].cchLabelOffset);
+                Assert::Equal<SIZE_T>(10, pVersion4->rgReleaseLabels[2].cchLabelOffset);
 
-                Assert::Equal<DWORD>(13, pVersion4->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(13, pVersion4->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion4->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fHasMinor);
@@ -569,7 +569,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(6, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -583,7 +583,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(6, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMinor);
@@ -597,7 +597,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion3->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion3->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion3->cReleaseLabels);
-                Assert::Equal<DWORD>(6, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMinor);
@@ -655,7 +655,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(30, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(40, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(11, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(11, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -669,7 +669,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(30, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(40, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(11, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(11, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMinor);
@@ -683,7 +683,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(30, pVersion3->dwPatch);
                 Assert::Equal<DWORD>(40, pVersion3->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion3->cReleaseLabels);
-                Assert::Equal<DWORD>(11, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(11, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMinor);
@@ -700,9 +700,9 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion4->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(3, pVersion4->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(12, pVersion4->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(12, pVersion4->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(15, pVersion4->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(15, pVersion4->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion4->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fHasMinor);
@@ -716,7 +716,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion5->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion5->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion5->cReleaseLabels);
-                Assert::Equal<DWORD>(0, pVersion5->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(0, pVersion5->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion5->fInvalid);
                 Assert::Equal<BOOL>(FALSE, pVersion5->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion5->fHasMinor);
@@ -761,7 +761,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(4294967295, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(4294967295, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(43, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(43, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -775,7 +775,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(0, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(0, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fHasMinor);
@@ -815,7 +815,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(6, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
@@ -829,7 +829,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(6, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMinor);
@@ -867,7 +867,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(4, pSource->dwRevision);
                 Assert::Equal<DWORD>(0, pSource->cReleaseLabels);
 
-                Assert::Equal<DWORD>(8, pSource->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(8, pSource->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pSource->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pSource->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pSource->fHasMinor);
@@ -921,26 +921,26 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pSource->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pSource->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(8, pSource->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(8, pSource->rgReleaseLabels[0].cchLabelOffset);
 
                 Assert::Equal<BOOL>(FALSE, pSource->rgReleaseLabels[1].fNumeric);
                 Assert::Equal<DWORD>(1, pSource->rgReleaseLabels[1].cchLabel);
-                Assert::Equal<DWORD>(10, pSource->rgReleaseLabels[1].cchLabelOffset);
+                Assert::Equal<SIZE_T>(10, pSource->rgReleaseLabels[1].cchLabelOffset);
 
                 Assert::Equal<BOOL>(FALSE, pSource->rgReleaseLabels[2].fNumeric);
                 Assert::Equal<DWORD>(1, pSource->rgReleaseLabels[2].cchLabel);
-                Assert::Equal<DWORD>(12, pSource->rgReleaseLabels[2].cchLabelOffset);
+                Assert::Equal<SIZE_T>(12, pSource->rgReleaseLabels[2].cchLabelOffset);
 
                 Assert::Equal<BOOL>(FALSE, pSource->rgReleaseLabels[3].fNumeric);
                 Assert::Equal<DWORD>(1, pSource->rgReleaseLabels[3].cchLabel);
-                Assert::Equal<DWORD>(14, pSource->rgReleaseLabels[3].cchLabelOffset);
+                Assert::Equal<SIZE_T>(14, pSource->rgReleaseLabels[3].cchLabelOffset);
 
                 Assert::Equal<BOOL>(TRUE, pSource->rgReleaseLabels[4].fNumeric);
                 Assert::Equal<DWORD>(5, pSource->rgReleaseLabels[4].dwValue);
                 Assert::Equal<DWORD>(1, pSource->rgReleaseLabels[4].cchLabel);
-                Assert::Equal<DWORD>(16, pSource->rgReleaseLabels[4].cchLabelOffset);
+                Assert::Equal<SIZE_T>(16, pSource->rgReleaseLabels[4].cchLabelOffset);
 
-                Assert::Equal<DWORD>(18, pSource->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(18, pSource->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pSource->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pSource->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pSource->fHasMinor);
@@ -1020,7 +1020,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(0, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(0, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fHasMinor);
@@ -1034,7 +1034,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion2->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion2->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion2->cReleaseLabels);
-                Assert::Equal<DWORD>(2, pVersion2->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(2, pVersion2->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion2->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion2->fHasMinor);
@@ -1048,7 +1048,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion3->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion3->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion3->cReleaseLabels);
-                Assert::Equal<DWORD>(4, pVersion3->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(4, pVersion3->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion3->fHasMinor);
@@ -1062,7 +1062,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(1, pVersion4->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion4->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion4->cReleaseLabels);
-                Assert::Equal<DWORD>(6, pVersion4->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(6, pVersion4->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion4->fHasMinor);
@@ -1076,7 +1076,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(2, pVersion5->dwPatch);
                 Assert::Equal<DWORD>(1, pVersion5->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion5->cReleaseLabels);
-                Assert::Equal<DWORD>(8, pVersion5->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(8, pVersion5->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion5->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion5->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion5->fHasMinor);
@@ -1090,7 +1090,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(0, pVersion6->dwPatch);
                 Assert::Equal<DWORD>(0, pVersion6->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion6->cReleaseLabels);
-                Assert::Equal<DWORD>(2, pVersion6->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(2, pVersion6->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion6->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion6->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion6->fHasMinor);
@@ -1107,9 +1107,9 @@ namespace DutilTests
 
                 Assert::Equal<BOOL>(FALSE, pVersion7->rgReleaseLabels[0].fNumeric);
                 Assert::Equal<DWORD>(1, pVersion7->rgReleaseLabels[0].cchLabel);
-                Assert::Equal<DWORD>(2, pVersion7->rgReleaseLabels[0].cchLabelOffset);
+                Assert::Equal<SIZE_T>(2, pVersion7->rgReleaseLabels[0].cchLabelOffset);
 
-                Assert::Equal<DWORD>(4, pVersion7->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(4, pVersion7->cchMetadataOffset);
                 Assert::Equal<BOOL>(TRUE, pVersion7->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion7->fHasMajor);
                 Assert::Equal<BOOL>(FALSE, pVersion7->fHasMinor);
@@ -1146,7 +1146,7 @@ namespace DutilTests
                 Assert::Equal<DWORD>(3, pVersion1->dwPatch);
                 Assert::Equal<DWORD>(4, pVersion1->dwRevision);
                 Assert::Equal<DWORD>(0, pVersion1->cReleaseLabels);
-                Assert::Equal<DWORD>(7, pVersion1->cchMetadataOffset);
+                Assert::Equal<SIZE_T>(7, pVersion1->cchMetadataOffset);
                 Assert::Equal<BOOL>(FALSE, pVersion1->fInvalid);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMajor);
                 Assert::Equal<BOOL>(TRUE, pVersion1->fHasMinor);
