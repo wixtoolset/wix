@@ -5,7 +5,7 @@
         </BootstrapperApplication>
         
         <Chain>
-            <MsuPackage DetectCondition="DetectedTheMsu" KB="xyz" SourceFile="test.msu" />
+            <MsuPackage DetectCondition="DetectedTheMsu" SourceFile="test.msu" />
         </Chain>
     </Bundle>
 </Wix>

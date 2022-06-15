@@ -10,8 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBundleMsuPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageSymbolFields.DetectCondition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageSymbolFields.MsuKB), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageSymbolFields.DetectCondition), IntermediateFieldType.String)
             },
             typeof(WixBundleMsuPackageSymbol));
     }
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Symbols
     public enum WixBundleMsuPackageSymbolFields
     {
         DetectCondition,
-        MsuKB,
     }
 
     public class WixBundleMsuPackageSymbol : IntermediateSymbol
@@ -41,12 +39,6 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleMsuPackageSymbolFields.DetectCondition];
             set => this.Set((int)WixBundleMsuPackageSymbolFields.DetectCondition, value);
-        }
-
-        public string MsuKB
-        {
-            get => (string)this.Fields[(int)WixBundleMsuPackageSymbolFields.MsuKB];
-            set => this.Set((int)WixBundleMsuPackageSymbolFields.MsuKB, value);
         }
     }
 }

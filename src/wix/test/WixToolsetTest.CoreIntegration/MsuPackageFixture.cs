@@ -88,5 +88,29 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("The MsuPackage/@CacheId attribute was not found; it is required when attribute CertificatePublicKey is specified.", message.ToString());
             }
         }
+
+        [Fact]
+        public void ErrorWhenSpecifyingPermanent()
+        {
+            var folder = TestData.Get(@"TestData", "MsuPackage");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PermanentMsuPackage.wxs"),
+                    "-o", Path.Combine(baseFolder, "test.wixlib")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The MsuPackage element contains an unexpected attribute 'Permanent'.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(4, result.ExitCode);
+            }
+        }
     }
 }

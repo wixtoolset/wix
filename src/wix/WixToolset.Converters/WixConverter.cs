@@ -1216,6 +1216,22 @@ namespace WixToolset.Converters
             this.ConvertSuppressSignatureValidation(element);
 
             this.UpdatePackageCacheAttribute(element);
+
+            var kbAttribute = element.Attribute("KB");
+
+            if (null != kbAttribute
+                && this.OnInformation(ConverterTestType.MsuPackageKBObsolete, element, "The MsuPackage element contains obsolete '{0}' attribute. Windows no longer supports silently removing MSUs so the attribute is unnecessary. The attribute will be removed.", kbAttribute.Name))
+            {
+                kbAttribute.Remove();
+            }
+
+            var permanentAttribute = element.Attribute("Permanent");
+
+            if (null != permanentAttribute
+                && this.OnInformation(ConverterTestType.MsuPackagePermanentObsolete, element, "The MsuPackage element contains obsolete '{0}' attribute. MSU packages are now always permanent because Windows no longer supports silently removing MSUs. The attribute will be removed.", permanentAttribute.Name))
+            {
+                permanentAttribute.Remove();
+            }
         }
 
         private void ConvertProductElement(XElement element)
@@ -2664,6 +2680,16 @@ namespace WixToolset.Converters
             /// Cache attribute value updated.
             /// </summary>
             BundlePackageCacheAttributeValueObsolete,
+
+            /// <summary>
+            /// The MsuPackage element contains obsolete '{0}' attribute. Windows no longer supports silently removing MSUs so the attribute is unnecessary. The attribute will be removed.
+            /// </summary>
+            MsuPackageKBObsolete,
+
+            /// <summary>
+            /// The MsuPackage element contains obsolete '{0}' attribute. MSU packages are now always permanent because Windows no longer supports silently removing MSUs. The attribute will be removed.
+            /// </summary>
+            MsuPackagePermanentObsolete,
         }
     }
 }

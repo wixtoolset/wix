@@ -5,7 +5,7 @@
         </BootstrapperApplication>
         
         <Chain>
-            <MsuPackage DetectCondition="DetectedTheMsu" KB="xyz" CacheId="8cf75b99-13c0-4184-82ce-dbde45dcd55a">
+            <MsuPackage DetectCondition="DetectedTheMsu" CacheId="8cf75b99-13c0-4184-82ce-dbde45dcd55a">
               <MsuPackagePayload Name='Windows8.1-KB2937592-x86.msu' DownloadUrl='http://wixtoolset.org' CertificatePublicKey="abc" CertificateThumbprint="123" Size='309544' />
             </MsuPackage>
         </Chain>
