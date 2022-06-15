@@ -5,9 +5,11 @@ namespace WixBuildTools.TestSupport
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Xml.Linq;
     using WixBuildTools.TestSupport.XunitExtensions;
     using Xunit;
+    using Xunit.Sdk;
 
     public class WixAssert : Assert
     {
@@ -23,7 +25,7 @@ namespace WixBuildTools.TestSupport
             var additionalExpectedLines = expectedLines.Length > lineNumber ? String.Join(Environment.NewLine, expectedLines.Skip(lineNumber).Select((s, i) => $"{lineNumber + i}: {s}")) : $"Missing {actualLines.Length - lineNumber} lines";
             var additionalActualLines = actualLines.Length > lineNumber ? String.Join(Environment.NewLine, actualLines.Skip(lineNumber).Select((s, i) => $"{lineNumber + i}: {s}")) : $"Missing {expectedLines.Length - lineNumber} lines";
 
-            WixAssert.StringEqual(additionalExpectedLines, additionalActualLines);
+            Assert.Equal<object>(additionalExpectedLines, additionalActualLines, StringObjectEqualityComparer.InvariantCulture);
         }
 
         public static void CompareXml(XContainer xExpected, XContainer xActual)
@@ -78,37 +80,13 @@ namespace WixBuildTools.TestSupport
 
         public static void StringEqual(string expected, string actual, bool ignoreCase = false)
         {
-            var comparer = ignoreCase ? StringObjectEqualityComparer.InvariantCultureIgnoreCase : StringObjectEqualityComparer.InvariantCulture;
-            Assert.Equal<object>(expected, actual, comparer);
+            WixStringEqualException.ThrowIfNotEqual(expected, actual, ignoreCase);
         }
 
         public static void NotStringEqual(string expected, string actual, bool ignoreCase = false)
         {
             var comparer = ignoreCase ? StringObjectEqualityComparer.InvariantCultureIgnoreCase : StringObjectEqualityComparer.InvariantCulture;
             Assert.NotEqual<object>(expected, actual, comparer);
-        }
-
-        private class StringObjectEqualityComparer : IEqualityComparer<object>
-        {
-            public static readonly StringObjectEqualityComparer InvariantCultureIgnoreCase = new StringObjectEqualityComparer(true);
-            public static readonly StringObjectEqualityComparer InvariantCulture = new StringObjectEqualityComparer(false);
-
-            private readonly StringComparer stringComparer;
-
-            public StringObjectEqualityComparer(bool ignoreCase)
-            {
-                this.stringComparer = ignoreCase ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture;
-            }
-
-            public new bool Equals(object x, object y)
-            {
-                return this.stringComparer.Equals((string)x,(string)y);
-            }
-
-            public int GetHashCode(object obj)
-            {
-                return this.stringComparer.GetHashCode((string)obj);
-            }
         }
 
         // There appears to have been a bug in VC++, which might or might not have been partially
@@ -156,6 +134,68 @@ namespace WixBuildTools.TestSupport
         public static new System.Exception Throws(System.Type exceptionType, System.Action testCode)
         {
             return Xunit.Assert.Throws(exceptionType, testCode);
+        }
+    }
+
+    internal class StringObjectEqualityComparer : IEqualityComparer<object>
+    {
+        public static readonly StringObjectEqualityComparer InvariantCultureIgnoreCase = new StringObjectEqualityComparer(true);
+        public static readonly StringObjectEqualityComparer InvariantCulture = new StringObjectEqualityComparer(false);
+
+        private readonly StringComparer stringComparer;
+
+        public StringObjectEqualityComparer(bool ignoreCase)
+        {
+            this.stringComparer = ignoreCase ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture;
+        }
+
+        public new bool Equals(object x, object y)
+        {
+            return this.stringComparer.Equals((string)x, (string)y);
+        }
+
+        public int GetHashCode(object obj)
+        {
+            return this.stringComparer.GetHashCode((string)obj);
+        }
+    }
+
+    public class WixStringEqualException : XunitException
+    {
+        public WixStringEqualException(string userMessage) : base(userMessage) { }
+
+        public static void ThrowIfNotEqual(string expected, string actual, bool ignoreCase)
+        {
+            var comparer = ignoreCase ? StringObjectEqualityComparer.InvariantCultureIgnoreCase : StringObjectEqualityComparer.InvariantCulture;
+            if (comparer.Equals(expected, actual))
+            {
+                return;
+            }
+
+            var sbMessage = new StringBuilder();
+
+            try
+            {
+                Assert.Equal(expected, actual, ignoreCase);
+            }
+            catch (XunitException xe)
+            {
+                // If either string is not completely in the message, then make sure it gets in there.
+                if (!xe.Message.Contains(expected) || !xe.Message.Contains(actual))
+                {
+                    sbMessage.AppendLine(xe.Message);
+                    sbMessage.AppendLine();
+                    sbMessage.AppendFormat("Expected: {0}", expected);
+                    sbMessage.AppendLine();
+                    sbMessage.AppendFormat("Actual:   {0}", actual);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            throw new WixStringEqualException(sbMessage.ToString());
         }
     }
 }
