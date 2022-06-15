@@ -12,7 +12,7 @@
                 <CommandLine Condition="!(loc.NonsenseExecuteCondition)" />
             </ExePackage>
         </Chain>
-        <Variable Name="!(loc.BuiltinBurnVariableName)" Value="1" />
-        <SetVariable Id="Builtin" Condition="!(loc.NonsenseDetectCondition)" Variable="!(loc.BuiltinBurnVariableName)" Value="1" />
+        <!--<Variable Name="FOO" Value="1" />
+        <SetVariable Id="Builtin" Condition="!(loc.NonsenseDetectCondition)" Variable="FOO" Value="1" />-->
     </Bundle>
 </Wix>

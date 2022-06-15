@@ -737,21 +737,26 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Gets a Bundle variable value and displays an error for an illegal value.
+        /// Gets a bundle variable value and displays an error for an illegal value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's value.</returns>
-        public string GetAttributeBundleVariableValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        public Identifier GetAttributeBundleVariableNameIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var variableName = this.GetAttributeIdentifier(sourceLineNumbers, attribute);
 
-            if (!String.IsNullOrEmpty(value))
+            if (!String.IsNullOrEmpty(variableName?.Id))
             {
-                this.bundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
+                this.bundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableName.Id);
+
+                if (variableName.Id.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.messaging.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, "Wix"));
+                }
             }
 
-            return value;
+            return variableName;
         }
 
         /// <summary>

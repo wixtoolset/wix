@@ -584,6 +584,29 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Verifies that a value is a legal Bundle Variable/@Name.
+        /// </summary>
+        /// <param name="value">The value to verify.</param>
+        /// <returns>true if the value is an valid Variable/@Name; false otherwise.</returns>
+        public static bool IsBundleVariableName(string value)
+        {
+            if (String.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < value.Length; ++i)
+            {
+                if (!ValidBundleVariableNameChar(value[i], i == 0))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Get an identifier attribute value and displays an error for an illegal identifier value.
         /// </summary>
         /// <param name="messaging"></param>
@@ -811,6 +834,12 @@ namespace WixToolset.Core
         {
             return ('A' <= c && 'Z' >= c) || ('a' <= c && 'z' >= c) || '_' == c ||
                    (!firstChar && (Char.IsDigit(c) || '.' == c));
+        }
+
+        private static bool ValidBundleVariableNameChar(char c, bool firstChar)
+        {
+            return ('A' <= c && 'Z' >= c) || ('a' <= c && 'z' >= c) || '_' == c ||
+                   (!firstChar && Char.IsDigit(c));
         }
     }
 }

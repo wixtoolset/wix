@@ -32,13 +32,15 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath
                 });
 
-                Assert.Equal(267, result.ExitCode);
+                var messages = result.Messages.Select(m => m.ToString()).ToList();
+                messages.Sort();
 
-                var errors = result.Messages.Where(m => m.Level == MessageLevel.Error);
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
-                    267
-                }, errors.Select(e => e.Id).ToArray());
+                    "Found orphaned Component 'filit6MyH46zIGKsPPPXDZDfeNrfVY'.  If this is a Package, every Component must have at least one parent Feature.  To include a Component in a Module, you must include it directly as a Component element of the Module element or indirectly via ComponentRef, ComponentGroup, or ComponentGroupRef elements.",
+                }, messages.ToArray());
+
+                Assert.Equal(267, result.ExitCode);
             }
         }
 

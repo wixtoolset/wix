@@ -153,6 +153,12 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 return false;
             }
+            else if (!Common.IsBundleVariableName(variableName))
+            {
+                this.Messaging.Write(CompilerErrors.IllegalBundleVariableName(sourceLineNumbers, elementName, attributeName, variableName));
+
+                return false;
+            }
             else if (BuiltinBundleVariables.Contains(variableName))
             {
                 var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
