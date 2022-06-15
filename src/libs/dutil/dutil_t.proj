@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
+    <ProjectReference Include="test\DUtilUnitTest\DUtilUnitTest.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="test\DUtilUnitTest\DUtilUnitTest.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=ARM64" />
 
     <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Targets="PackNative" />

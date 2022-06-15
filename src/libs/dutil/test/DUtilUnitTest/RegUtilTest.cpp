@@ -541,7 +541,7 @@ namespace DutilTests
 
                 hr = RegReadBinary(hkBase, L"Binary", &pbBuffer, &cbBuffer);
                 NativeAssert::Succeeded(hr, "Failed to read binary value.");
-                Assert::Equal<DWORD>(4, cbBuffer);
+                Assert::Equal<SIZE_T>(4, cbBuffer);
                 Assert::Equal<BYTE>(1, pbBuffer[0]);
                 Assert::Equal<BYTE>(2, pbBuffer[1]);
                 Assert::Equal<BYTE>(3, pbBuffer[2]);
@@ -581,7 +581,7 @@ namespace DutilTests
 
                 hr = RegReadBinary(hkBase, L"Binary", &pbBuffer, &cbBuffer);
                 NativeAssert::Succeeded(hr, "Failed to read binary value.");
-                Assert::Equal<DWORD>(0, cbBuffer);
+                Assert::Equal<SIZE_T>(0, cbBuffer);
             }
             finally
             {
