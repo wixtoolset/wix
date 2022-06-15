@@ -30,6 +30,11 @@ namespace WixTestTools
         }
 
         /// <summary>
+        /// The alternate expected exit code of the tool
+        /// </summary>
+        public int? AlternateExitCode { get; set; }
+
+        /// <summary>
         /// The arguments to pass to the tool
         /// </summary>
         public virtual string Arguments { get; set; }
@@ -139,12 +144,13 @@ namespace WixTestTools
             List<string> errors = new List<string>();
 
             // Verify that the expected return code matched the actual return code
-            if (null != this.ExpectedExitCode && this.ExpectedExitCode != result.ExitCode)
+            if (null != this.ExpectedExitCode && this.ExpectedExitCode != result.ExitCode &&
+                (null == this.AlternateExitCode || this.AlternateExitCode != result.ExitCode))
             {
                 errors.Add(String.Format("Expected exit code {0} did not match actual exit code {1}", this.ExpectedExitCode, result.ExitCode));
             }
 
-            var standardErrorString = string.Join(Environment.NewLine, result.StandardError);
+            var standardErrorString = String.Join(Environment.NewLine, result.StandardError);
 
             // Verify that the expected error string are in stderr
             if (null != this.ExpectedErrorStrings)
@@ -158,7 +164,7 @@ namespace WixTestTools
                 }
             }
 
-            var standardOutputString = string.Join(Environment.NewLine, result.StandardOutput);
+            var standardOutputString = String.Join(Environment.NewLine, result.StandardOutput);
 
             // Verify that the expected output string are in stdout
             if (null != this.ExpectedOutputStrings)

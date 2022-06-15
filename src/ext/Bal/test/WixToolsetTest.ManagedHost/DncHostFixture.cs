@@ -4,6 +4,7 @@ namespace WixToolsetTest.ManagedHost
 {
     using System;
     using WixBuildTools.TestSupport;
+    using WixBuildTools.TestSupport.XunitExtensions;
     using Xunit;
 
     public class DncHostFixture
@@ -30,7 +31,7 @@ namespace WixToolsetTest.ManagedHost
             }
         }
 
-        [Fact(Skip = "Requires .NET Core 3.1 x86 runtime which might be missing")]
+        [SkippableFact]
         public void CanLoadFDDx86EarliestCoreMBA()
         {
             // https://github.com/microsoft/vstest/issues/3586
@@ -43,13 +44,20 @@ namespace WixToolsetTest.ManagedHost
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder, x86: true);
+                var resultOutput = result.Output.ToArray();
+
+                if (resultOutput.Length > 0 && resultOutput[0] == "error from hostfxr: It was not possible to find any compatible framework version")
+                {
+                    WixAssert.Skip(String.Join(Environment.NewLine, resultOutput));
+                }
+
                 WixAssert.CompareLineByLine(new[]
                 {
                     "Loading .NET Core FDD bootstrapper application.",
                     "Creating BA thread to run asynchronously.",
                     "EarliestCoreBA",
                     "Shutdown,ReloadBootstrapper,0",
-                }, result.Output.ToArray());
+                }, resultOutput);
             }
         }
 
