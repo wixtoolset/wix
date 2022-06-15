@@ -107,6 +107,165 @@ namespace WixToolsetTest.Core
             WixAssert.CompareLineByLine(expected, actual);
         }
 
+        [Fact]
+        public void CanPreprocessIfdefWithFullVariableSyntaxFalsy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?ifdef $(A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix />"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessIfdefWithFullVariableSyntaxTruthy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?define A?>",
+                "<?ifdef $(A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessIfndefWithFullVariableSyntaxTruthy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?ifndef $(A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessIfndefWithFullVariableSyntaxFalsy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?define A?>",
+                "<?ifndef $(A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix />"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessIfdefWithFullVariableV3SyntaxTruthy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?define A?>",
+                "<?ifdef $(var.A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessIfndefWithFullVariableV3SyntaxTruthy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?ifndef $(var.A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessIfndefWithFullVariableV3SyntaxFalsy()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?define A?>",
+                "<?ifndef $(var.A) ?>",
+                "  <Fragment />",
+                "<?endif?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix />"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
         private static IPreprocessResult PreprocessFromString(string xml)
         {
             using var stringReader = new StringReader(xml);
