@@ -3659,7 +3659,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var hidden = false;
-            string name = null;
+            Identifier name = null;
             var persisted = false;
             string value = null;
             string typeValue = null;
@@ -3677,7 +3677,7 @@ namespace WixToolset.Core
                             }
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeBundleVariableValue(sourceLineNumbers, attrib);
+                            name = this.Core.GetAttributeBundleVariableNameIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Persisted":
                             if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
@@ -3706,10 +3706,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
-            else if (name.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
-            {
-                this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
-            }
 
             if (hidden && persisted)
             {
@@ -3722,7 +3718,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, name))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, name)
                 {
                     Value = value,
                     Type = type,
