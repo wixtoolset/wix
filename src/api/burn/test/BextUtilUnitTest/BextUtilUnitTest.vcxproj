@@ -36,6 +36,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ClCompile Include="BundleExtensionTests.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <!-- Warnings from referencing netstandard dlls -->
@@ -46,6 +47,7 @@
 
   <ItemGroup>
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="TestBundleExtension.h" />
   </ItemGroup>
 
   <ItemGroup>
