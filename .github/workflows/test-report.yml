@@ -1,0 +1,22 @@
+name: Build WiX Toolset v4 Test Report
+
+on:
+  workflow_run:
+    workflows: [ 'Build WiX Toolset v4' ]
+    types: [ completed ]
+    branches-ignore:
+      - master
+permissions:
+  actions: read
+  checks: write
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Test Reports
+        uses: dorny/test-reporter@v1
+        with:
+          artifact: logs_${{ github.event.workflow_run.id }}
+          name: Xunit Tests
+          path: 'TestResults/*.trx'
+          reporter: dotnet-trx
