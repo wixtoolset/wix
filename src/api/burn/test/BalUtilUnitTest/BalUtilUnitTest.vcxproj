@@ -37,6 +37,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ClCompile Include="BAFunctionsTests.cpp" />
+    <ClCompile Include="BootstrapperApplicationTests.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <!-- Warnings from referencing netstandard dlls -->
@@ -48,6 +50,8 @@
 
   <ItemGroup>
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="TestBAFunctions.h" />
+    <ClInclude Include="TestBootstrapperApplication.h" />
   </ItemGroup>
 
   <ItemGroup>

@@ -18,11 +18,15 @@
 #include <BootstrapperEngine.h>
 #include <BootstrapperApplication.h>
 
-#include "IBootstrapperEngine.h"
-#include "IBootstrapperApplication.h"
-#include "balutil.h"
-#include "balretry.h"
-#include "BAFunctions.h"
+#include <BAFunctions.h>
+#include <IBootstrapperEngine.h>
+#include <IBootstrapperApplication.h>
+#include <IBAFunctions.h>
+#include <balutil.h>
+#include <balretry.h>
+
+#include "TestBAFunctions.h"
+#include "TestBootstrapperApplication.h"
 
 #pragma managed
 #include <vcclr.h>
