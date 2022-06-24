@@ -9,6 +9,7 @@
 #define ShelExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
 #define ShelExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
 #define ShelExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_SHELUTIL, x, e, s, __VA_ARGS__)
 #define ShelExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
 #define ShelExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_SHELUTIL, p, x, e, s, __VA_ARGS__)
 #define ShelExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_SHELUTIL, p, x, s, __VA_ARGS__)
@@ -19,6 +20,10 @@
 
 static PFN_SHELLEXECUTEEXW vpfnShellExecuteExW = ::ShellExecuteExW;
 
+static HRESULT DAPI GetFolderFromCsidl(
+    __out_z LPWSTR* psczFolderPath,
+    __in int csidlFolder
+    );
 static HRESULT GetDesktopShellView(
     __in REFIID riid,
     __out void **ppv
@@ -57,7 +62,14 @@ extern "C" HRESULT DAPI ShelExec(
     )
 {
     HRESULT hr = S_OK;
-    SHELLEXECUTEINFOW shExecInfo = {};
+    SHELLEXECUTEINFOW shExecInfo = { };
+    size_t cchWorkingDirectory = 0;
+
+    // CreateProcessW has undocumented MAX_PATH restriction for lpCurrentDirectory even when long path support is enabled.
+    if (wzWorkingDirectory && FAILED(::StringCchLengthW(wzWorkingDirectory, MAX_PATH - 1, &cchWorkingDirectory)))
+    {
+        wzWorkingDirectory = NULL;
+    }
 
     shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
     shExecInfo.fMask = SEE_MASK_FLAG_DDEWAIT | SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
@@ -159,11 +171,7 @@ LExit:
 }
 
 
-/********************************************************************
- ShelGetFolder() - gets a folder by CSIDL.
-
-*******************************************************************/
-extern "C" HRESULT DAPI ShelGetFolder(
+static HRESULT DAPI GetFolderFromCsidl(
     __out_z LPWSTR* psczFolderPath,
     __in int csidlFolder
     )
@@ -184,19 +192,6 @@ LExit:
     return hr;
 }
 
-
-/********************************************************************
- ShelGetKnownFolder() - gets a folder by KNOWNFOLDERID.
-
- Note: return E_NOTIMPL if called on pre-Vista operating systems.
-*******************************************************************/
-#ifndef REFKNOWNFOLDERID
-#define REFKNOWNFOLDERID REFGUID
-#endif
-
-#ifndef KF_FLAG_CREATE
-#define KF_FLAG_CREATE              0x00008000  // Make sure that the folder already exists or create it and apply security specified in folder definition
-#endif
 
 EXTERN_C typedef HRESULT (STDAPICALLTYPE *PFN_SHGetKnownFolderPath)(
     REFKNOWNFOLDERID rfid,
@@ -249,6 +244,181 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT DAPI ShelGetFolder(
+    __out_z LPWSTR* psczFolderPath,
+    __in int csidlFolder
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczPath = NULL;
+    KNOWNFOLDERID rfid = { };
+
+    csidlFolder &= ~CSIDL_FLAG_MASK;
+
+    switch (csidlFolder)
+    {
+    case CSIDL_ADMINTOOLS:
+        rfid = FOLDERID_AdminTools;
+        break;
+    case CSIDL_APPDATA:
+        rfid = FOLDERID_RoamingAppData;
+        break;
+    case CSIDL_CDBURN_AREA:
+        rfid = FOLDERID_CDBurning;
+        break;
+    case CSIDL_COMMON_ADMINTOOLS:
+        rfid = FOLDERID_CommonAdminTools;
+        break;
+    case CSIDL_COMMON_APPDATA:
+        rfid = FOLDERID_ProgramData;
+        break;
+    case CSIDL_COMMON_DESKTOPDIRECTORY:
+        rfid = FOLDERID_PublicDesktop;
+        break;
+    case CSIDL_COMMON_DOCUMENTS:
+        rfid = FOLDERID_PublicDocuments;
+        break;
+    case CSIDL_COMMON_MUSIC:
+        rfid = FOLDERID_PublicMusic;
+        break;
+    case CSIDL_COMMON_OEM_LINKS:
+        rfid = FOLDERID_CommonOEMLinks;
+        break;
+    case CSIDL_COMMON_PICTURES:
+        rfid = FOLDERID_PublicPictures;
+        break;
+    case CSIDL_COMMON_PROGRAMS:
+        rfid = FOLDERID_CommonPrograms;
+        break;
+    case CSIDL_COMMON_STARTMENU:
+        rfid = FOLDERID_CommonStartMenu;
+        break;
+    case CSIDL_COMMON_STARTUP: __fallthrough;
+    case CSIDL_COMMON_ALTSTARTUP:
+        rfid = FOLDERID_CommonStartup;
+        break;
+    case CSIDL_COMMON_TEMPLATES:
+        rfid = FOLDERID_CommonTemplates;
+        break;
+    case CSIDL_COMMON_VIDEO:
+        rfid = FOLDERID_PublicVideos;
+        break;
+    case CSIDL_COOKIES:
+        rfid = FOLDERID_Cookies;
+        break;
+    case CSIDL_DESKTOP:
+    case CSIDL_DESKTOPDIRECTORY:
+        rfid = FOLDERID_Desktop;
+        break;
+    case CSIDL_FAVORITES: __fallthrough;
+    case CSIDL_COMMON_FAVORITES:
+        rfid = FOLDERID_Favorites;
+        break;
+    case CSIDL_FONTS:
+        rfid = FOLDERID_Fonts;
+        break;
+    case CSIDL_HISTORY:
+        rfid = FOLDERID_History;
+        break;
+    case CSIDL_INTERNET_CACHE:
+        rfid = FOLDERID_InternetCache;
+        break;
+    case CSIDL_LOCAL_APPDATA:
+        rfid = FOLDERID_LocalAppData;
+        break;
+    case CSIDL_MYMUSIC:
+        rfid = FOLDERID_Music;
+        break;
+    case CSIDL_MYPICTURES:
+        rfid = FOLDERID_Pictures;
+        break;
+    case CSIDL_MYVIDEO:
+        rfid = FOLDERID_Videos;
+        break;
+    case CSIDL_NETHOOD:
+        rfid = FOLDERID_NetHood;
+        break;
+    case CSIDL_PERSONAL:
+        rfid = FOLDERID_Documents;
+        break;
+    case CSIDL_PRINTHOOD:
+        rfid = FOLDERID_PrintHood;
+        break;
+    case CSIDL_PROFILE:
+        rfid = FOLDERID_Profile;
+        break;
+    case CSIDL_PROGRAM_FILES:
+        rfid = FOLDERID_ProgramFiles;
+        break;
+    case CSIDL_PROGRAM_FILESX86:
+        rfid = FOLDERID_ProgramFilesX86;
+        break;
+    case CSIDL_PROGRAM_FILES_COMMON:
+        rfid = FOLDERID_ProgramFilesCommon;
+        break;
+    case CSIDL_PROGRAM_FILES_COMMONX86:
+        rfid = FOLDERID_ProgramFilesCommonX86;
+        break;
+    case CSIDL_PROGRAMS:
+        rfid = FOLDERID_Programs;
+        break;
+    case CSIDL_RECENT:
+        rfid = FOLDERID_Recent;
+        break;
+    case CSIDL_RESOURCES:
+        rfid = FOLDERID_ResourceDir;
+        break;
+    case CSIDL_RESOURCES_LOCALIZED:
+        rfid = FOLDERID_LocalizedResourcesDir;
+        break;
+    case CSIDL_SENDTO:
+        rfid = FOLDERID_SendTo;
+        break;
+    case CSIDL_STARTMENU:
+        rfid = FOLDERID_StartMenu;
+        break;
+    case CSIDL_STARTUP:
+    case CSIDL_ALTSTARTUP:
+        rfid = FOLDERID_Startup;
+        break;
+    case CSIDL_SYSTEM:
+        rfid = FOLDERID_System;
+        break;
+    case CSIDL_SYSTEMX86:
+        rfid = FOLDERID_SystemX86;
+        break;
+    case CSIDL_TEMPLATES:
+        rfid = FOLDERID_Templates;
+        break;
+    case CSIDL_WINDOWS:
+        rfid = FOLDERID_Windows;
+        break;
+    default:
+        ShelExitWithRootFailure(hr, E_INVALIDARG, "Unknown csidl: %d", csidlFolder);
+    }
+
+    hr = ShelGetKnownFolder(&sczPath, rfid);
+    if (E_NOTIMPL == hr)
+    {
+        hr = S_FALSE;
+    }
+    ShelExitOnFailure(hr, "Failed to get known folder.");
+
+    if (S_FALSE == hr)
+    {
+        hr = GetFolderFromCsidl(&sczPath, csidlFolder);
+        ShelExitOnFailure(hr, "Failed to get csidl folder.");
+    }
+
+    *psczFolderPath = sczPath;
+    sczPath = NULL;
+
+LExit:
+    ReleaseStr(sczPath);
+
+    return hr;
+}
+
 
 // Internal functions.
 
@@ -287,7 +457,7 @@ static HRESULT GetDesktopShellView(
     else if (S_FALSE == hr)
     {
         //Windows XP
-        hr = SHGetDesktopFolder(&psf);
+        hr = ::SHGetDesktopFolder(&psf);
         ShelExitOnFailure(hr, "Failed to get desktop folder.");
 
         hr = psf->CreateViewObject(NULL, IID_IShellView, ppv);

@@ -317,7 +317,7 @@ extern "C" HRESULT DAPI SceOpenDatabase(
 {
     HRESULT hr = S_OK;
     DWORD dwVersionFound = 0;
-    WCHAR wzTempDbFile[MAX_PATH];
+    LPWSTR sczTempDbFile = NULL;
     LPCWSTR wzPathToOpen = NULL;
     LPWSTR sczSchemaType = NULL;
     SCE_DATABASE *pNewSceDatabase = NULL;
@@ -343,16 +343,16 @@ extern "C" HRESULT DAPI SceOpenDatabase(
     // TODO: had trouble getting SQL CE to read a file read-only, so we're copying it to a temp path for now.
     if (fReadOnly)
     {
-        hr = DirCreateTempPath(PathFile(sczFile), (LPWSTR)wzTempDbFile, _countof(wzTempDbFile));
+        hr = DirCreateTempPath(PathFile(sczFile), &sczTempDbFile);
         ExitOnFailure(hr, "Failed to get temp path");
 
-        hr = FileEnsureCopy(sczFile, (LPCWSTR)wzTempDbFile, TRUE);
+        hr = FileEnsureCopy(sczFile, sczTempDbFile, TRUE);
         ExitOnFailure(hr, "Failed to copy file to temp path");
 
-        hr = StrAllocString(&pNewSceDatabaseInternal->sczTempDbFile, (LPCWSTR)wzTempDbFile, 0);
+        hr = StrAllocString(&pNewSceDatabaseInternal->sczTempDbFile, sczTempDbFile, 0);
         ExitOnFailure(hr, "Failed to copy temp db file path");
 
-        wzPathToOpen = (LPCWSTR)wzTempDbFile;
+        wzPathToOpen = sczTempDbFile;
     }
     else
     {
@@ -424,6 +424,7 @@ extern "C" HRESULT DAPI SceOpenDatabase(
 LExit:
     ReleaseBSTR(rgdbpDataSourceProp[0].vValue.bstrVal);
     ReleaseStr(sczSchemaType);
+    ReleaseStr(sczTempDbFile);
     ReleaseDatabase(pNewSceDatabase);
 
     return hr;

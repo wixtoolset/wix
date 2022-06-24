@@ -684,9 +684,10 @@ LExit:
 extern "C" HRESULT DAPI LogHeader()
 {
     HRESULT hr = S_OK;
-    WCHAR wzComputerName[MAX_PATH];
+    WCHAR wzComputerName[MAX_COMPUTERNAME_LENGTH + 1] = { };
     DWORD cchComputerName = countof(wzComputerName);
-    WCHAR wzPath[MAX_PATH];
+    LPWSTR sczPath = NULL;
+    LPCWSTR wzPath = NULL;
     DWORD dwMajorVersion = 0;
     DWORD dwMinorVersion = 0;
     LPCSTR szLevel = LOGUTIL_UNKNOWN;
@@ -695,12 +696,19 @@ extern "C" HRESULT DAPI LogHeader()
     //
     // get the interesting data
     //
-    if (!::GetModuleFileNameW(NULL, wzPath, countof(wzPath)))
+
+    hr = PathForCurrentProcess(&sczPath, NULL);
+    if (FAILED(hr))
     {
-        memset(wzPath, 0, sizeof(wzPath));
+        wzPath = L"";
+    }
+    else
+    {
+        wzPath = sczPath;
+
+        hr = FileVersion(wzPath, &dwMajorVersion, &dwMinorVersion);
     }
 
-    hr = FileVersion(wzPath, &dwMajorVersion, &dwMinorVersion);
     if (FAILED(hr))
     {
         dwMajorVersion = 0;
@@ -743,6 +751,7 @@ extern "C" HRESULT DAPI LogHeader()
     hr = S_OK;
 
     ReleaseStr(sczCurrentDateTime);
+    ReleaseStr(sczPath);
 
     return hr;
 }

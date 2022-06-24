@@ -89,8 +89,8 @@ struct CABC_DATA
 
     STRINGDICT_HANDLE shDictHandle;
 
-    WCHAR wzCabinetPath[MAX_PATH];
-    WCHAR wzEmptyFile[MAX_PATH];
+    LPWSTR sczCabinetPath;
+    LPWSTR sczEmptyFile;
     HANDLE hEmptyFile;
     DWORD dwLastFileIndex;
 
@@ -197,33 +197,17 @@ extern "C" HRESULT DAPI CabCBegin(
 
     HRESULT hr = S_OK;
     CABC_DATA *pcd = NULL;
-    WCHAR wzTempPath[MAX_PATH] = { };
 
     C_ASSERT(sizeof(MSIFILEHASHINFO) == 20);
 
-    WCHAR wzPathBuffer [MAX_PATH] = L"";
-    size_t cchPathBuffer;
+    LPWSTR pwzPathBuffer = NULL;
     if (wzCabDir)
     {
-        hr = ::StringCchLengthW(wzCabDir, MAX_PATH, &cchPathBuffer);
-        CabcExitOnFailure(hr, "Failed to get length of cab directory");
-
-        // Need room to terminate with L'\\' and L'\0'
-        if((MAX_PATH - 1) <= cchPathBuffer || 0 == cchPathBuffer)
-        {
-            hr = E_INVALIDARG;
-            CabcExitOnFailure(hr, "Cab directory had invalid length: %u", cchPathBuffer);
-        }
-
-        hr = ::StringCchCopyW(wzPathBuffer, countof(wzPathBuffer), wzCabDir);
+        hr = StrAllocString(&pwzPathBuffer, wzCabDir, 0);
         CabcExitOnFailure(hr, "Failed to copy cab directory to buffer");
 
-        if (L'\\' != wzPathBuffer[cchPathBuffer - 1])
-        {
-            hr = ::StringCchCatW(wzPathBuffer, countof(wzPathBuffer), L"\\");
-            CabcExitOnFailure(hr, "Failed to cat \\ to end of buffer");
-            ++cchPathBuffer;
-        }
+        hr = PathBackslashTerminate(&pwzPathBuffer);
+        CabcExitOnFailure(hr, "Failed to cat \\ to end of buffer");
     }
 
     pcd = static_cast<CABC_DATA*>(MemAlloc(sizeof(CABC_DATA), TRUE));
@@ -290,33 +274,23 @@ extern "C" HRESULT DAPI CabCBegin(
         CabcExitWithLastError(hr, "failed to convert cab name to multi-byte");
     }
 
-    if (0 ==  ::WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, wzPathBuffer, -1, pcd->ccab.szCabPath, sizeof(pcd->ccab.szCab), NULL, NULL))
+    if (0 == ::WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, pwzPathBuffer, -1, pcd->ccab.szCabPath, sizeof(pcd->ccab.szCab), NULL, NULL))
     {
         CabcExitWithLastError(hr, "failed to convert cab dir to multi-byte");
     }
 
     // Remember the path to the cabinet.
-    hr= ::StringCchCopyW(pcd->wzCabinetPath, countof(pcd->wzCabinetPath), wzPathBuffer);
-    CabcExitOnFailure(hr, "Failed to copy cabinet path from path: %ls", wzPathBuffer);
-
-    hr = ::StringCchCatW(pcd->wzCabinetPath, countof(pcd->wzCabinetPath), wzCab);
+    hr = PathConcat(pwzPathBuffer, wzCab, &pcd->sczCabinetPath);
     CabcExitOnFailure(hr, "Failed to concat to cabinet path cabinet name: %ls", wzCab);
 
     // Get the empty file to use as the blank marker for duplicates.
-    if (!::GetTempPathW(countof(wzTempPath), wzTempPath))
-    {
-        CabcExitWithLastError(hr, "Failed to get temp path.");
-    }
-
-    if (!::GetTempFileNameW(wzTempPath, L"WSC", 0, pcd->wzEmptyFile))
-    {
-        CabcExitWithLastError(hr, "Failed to create a temp file name.");
-    }
+    hr = DirCreateTempPath(L"WSC", &pcd->sczEmptyFile);
+    CabcExitOnFailure(hr, "Failed to create a temp file name.");
 
     // Try to open the newly created empty file (remember, GetTempFileName() is kind enough to create a file for us)
     // with a handle to automatically delete the file on close. Ignore any failure that might happen, since the worst
     // case is we'll leave a zero byte file behind in the temp folder.
-    pcd->hEmptyFile = ::CreateFileW(pcd->wzEmptyFile, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+    pcd->hEmptyFile = ::CreateFileW(pcd->sczEmptyFile, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
 
     hr = DictCreateWithEmbeddedKey(&pcd->shDictHandle, dwMaxFiles, reinterpret_cast<void **>(&pcd->prgFiles), offsetof(CABC_FILE, pwzSourcePath), DICT_FLAG_CASEINSENSITIVE);
     CabcExitOnFailure(hr, "Failed to create dictionary to keep track of duplicate files");
@@ -358,6 +332,8 @@ extern "C" HRESULT DAPI CabCBegin(
     *phContext = pcd;
 
 LExit:
+    ReleaseStr(pwzPathBuffer);
+
     if (FAILED(hr) && pcd && pcd->hfci)
     {
         ::FCIDestroy(pcd->hfci);
@@ -527,7 +503,7 @@ extern "C" HRESULT DAPI CabCFinish(
             // files point at the same path (the empty file) so there is no point in tracking them with
             // their path.
             fileInfo.wzSourcePath = pcd->prgDuplicates[dwDupeArrayFileIndex].pwzSourcePath;
-            fileInfo.wzEmptyPath = pcd->wzEmptyFile;
+            fileInfo.wzEmptyPath = pcd->sczEmptyFile;
 
             // Use the provided token, otherwise default to the source file name.
             if (pcd->prgDuplicates[dwDupeArrayFileIndex].pwzToken)
@@ -643,7 +619,7 @@ extern "C" HRESULT DAPI CabCFinish(
     if (pcd->fGoodCab && pcd->cDuplicates)
     {
         hr = UpdateDuplicateFiles(pcd);
-        CabcExitOnFailure(hr, "Failed to update duplicates in cabinet: %ls", pcd->wzCabinetPath);
+        CabcExitOnFailure(hr, "Failed to update duplicates in cabinet: %ls", pcd->sczCabinetPath);
     }
 
 LExit:
@@ -692,6 +668,9 @@ static void FreeCabCData(
         ReleaseMem(pcd->prgFiles);
         ReleaseMem(pcd->prgDuplicates);
 
+        ReleaseStr(pcd->sczCabinetPath);
+        ReleaseStr(pcd->sczEmptyFile);
+
         ReleaseMem(pcd);
     }
 }
@@ -709,7 +688,7 @@ static HRESULT CheckForDuplicateFile(
     __in LONGLONG llFileSize
     )
 {
-    DWORD i;
+    DWORD i = 0;
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
@@ -916,17 +895,17 @@ static HRESULT UpdateDuplicateFiles(
     LPVOID pv = NULL;
     MS_CABINET_HEADER *pCabinetHeader = NULL;
 
-    hCabinet = ::CreateFileW(pcd->wzCabinetPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    hCabinet = ::CreateFileW(pcd->sczCabinetPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hCabinet)
     {
-        CabcExitWithLastError(hr, "Failed to open cabinet: %ls", pcd->wzCabinetPath);
+        CabcExitWithLastError(hr, "Failed to open cabinet: %ls", pcd->sczCabinetPath);
     }
 
     // Shouldn't need more than 16 MB to get the whole cabinet header into memory so use that as
     // the upper bound for the memory map.
     if (!::GetFileSizeEx(hCabinet, &liCabinetSize))
     {
-        CabcExitWithLastError(hr, "Failed to get size of cabinet: %ls", pcd->wzCabinetPath);
+        CabcExitWithLastError(hr, "Failed to get size of cabinet: %ls", pcd->sczCabinetPath);
     }
 
     if (0 == liCabinetSize.HighPart && liCabinetSize.LowPart < MAX_CABINET_HEADER_SIZE)
@@ -942,11 +921,11 @@ static HRESULT UpdateDuplicateFiles(
     hCabinetMapping = ::CreateFileMappingW(hCabinet, NULL, PAGE_READWRITE | SEC_COMMIT, 0, cbCabinet, NULL);
     if (NULL == hCabinetMapping || INVALID_HANDLE_VALUE == hCabinetMapping)
     {
-        CabcExitWithLastError(hr, "Failed to memory map cabinet file: %ls", pcd->wzCabinetPath);
+        CabcExitWithLastError(hr, "Failed to memory map cabinet file: %ls", pcd->sczCabinetPath);
     }
 
     pv = ::MapViewOfFile(hCabinetMapping, FILE_MAP_WRITE, 0, 0, 0);
-    CabcExitOnNullWithLastError(pv, hr, "Failed to map view of cabinet file: %ls", pcd->wzCabinetPath);
+    CabcExitOnNullWithLastError(pv, hr, "Failed to map view of cabinet file: %ls", pcd->sczCabinetPath);
 
     pCabinetHeader = static_cast<MS_CABINET_HEADER*>(pv);
 
@@ -1155,7 +1134,7 @@ static __callback INT_PTR DIAMONDAPI CabCOpen(
 
     if (INVALID_HANDLE_VALUE == reinterpret_cast<HANDLE>(pFile))
     {
-        CabcExitOnLastError(hr, "failed to open file: %s", pszFile);
+        CabcExitOnLastError(hr, "failed to open file: %hs", pszFile);
     }
 
 LExit:
@@ -1326,11 +1305,12 @@ static __callback BOOL DIAMONDAPI CabCGetTempFile(
 
     HRESULT hr = S_OK;
     char szTempPath[MAX_PATH] = { };
-    DWORD cchTempPath = MAX_PATH;
     DWORD dwProcessId = ::GetCurrentProcessId();
     HANDLE hTempFile = INVALID_HANDLE_VALUE;
 
-    if (MAX_PATH < ::GetTempPathA(cchTempPath, szTempPath))
+    // TODO: Allow user to pass in different temp path in case the default is too long,
+    // and/or see if magic similar to CABC_MAGIC_UNICODE_STRING_MARKER can be used to pass ourselves a path longer than MAX_PATH.
+    if (MAX_PATH < ::GetTempPathA(countof(szTempPath), szTempPath))
     {
         CabcExitWithLastError(hr, "Failed to get temp path during cabinet creation.");
     }
@@ -1339,7 +1319,7 @@ static __callback BOOL DIAMONDAPI CabCGetTempFile(
     {
         LONG dwTempIndex = ::InterlockedIncrement(reinterpret_cast<volatile LONG*>(&dwIndex));
 
-        hr = ::StringCbPrintfA(szFile, cbFile, "%s\\%08x.%03x", szTempPath, dwTempIndex, dwProcessId);
+        hr = ::StringCbPrintfA(szFile, cbFile, "%hs\\%08x.%03x", szTempPath, dwTempIndex, dwProcessId);
         CabcExitOnFailure(hr, "failed to format log file path.");
 
         hTempFile = ::CreateFileA(szFile, 0, FILE_SHARE_DELETE, NULL, CREATE_NEW, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
@@ -1351,7 +1331,11 @@ static __callback BOOL DIAMONDAPI CabCGetTempFile(
         }
         else
         {
-            hr = E_FAIL; // this file was taken so be pessimistic and assume we're not going to find one.
+            hr = HRESULT_FROM_WIN32(::GetLastError()); // this file was taken so be pessimistic and assume we're not going to find one.
+            if (SUCCEEDED(hr))
+            {
+                hr = E_FAIL;
+            }
         }
     }
     CabcExitOnFailure(hr, "failed to find temporary file.");
@@ -1386,7 +1370,7 @@ static __callback BOOL DIAMONDAPI CabCGetNextCabinet(
     if (pccab->iCab == 1)
     {
         pcd->wzFirstCabinetName[0] = '\0';
-        LPCWSTR pwzCabinetName = PathFile(pcd->wzCabinetPath);
+        LPCWSTR pwzCabinetName = PathFile(pcd->sczCabinetPath);
         size_t len = wcsnlen(pwzCabinetName, sizeof(pwzCabinetName));
         if (len > 4)
         {

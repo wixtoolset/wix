@@ -20,8 +20,7 @@ BOOL DAPI DirExists(
 
 HRESULT DAPI DirCreateTempPath(
     __in_z LPCWSTR wzPrefix,
-    __out_ecount_z(cchPath) LPWSTR wzPath,
-    __in DWORD cchPath
+    __out_opt LPWSTR* psczTempFile
     );
 
 HRESULT DAPI DirEnsureExists(

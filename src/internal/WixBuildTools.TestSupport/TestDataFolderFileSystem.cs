@@ -33,7 +33,7 @@ namespace WixBuildTools.TestSupport
             RobocopyFolder(sourceDirectoryPath, this.BaseFolder);
         }
 
-        private static ExternalExecutableResult RobocopyFolder(string sourceFolderPath, string destinationFolderPath)
+        public static ExternalExecutableResult RobocopyFolder(string sourceFolderPath, string destinationFolderPath)
         {
             var args = $"\"{sourceFolderPath}\" \"{destinationFolderPath}\" /E /R:1 /W:1";
             return RobocopyRunner.Execute(args);

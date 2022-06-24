@@ -269,7 +269,6 @@ extern "C" HRESULT MsuEngineExecutePackage(
     HRESULT hr = S_OK;
     LPWSTR sczCachedDirectory = NULL;
     LPWSTR sczMsuPath = NULL;
-    LPWSTR sczWindowsPath = NULL;
     LPWSTR sczSystemPath = NULL;
     LPWSTR sczWusaPath = NULL;
     LPWSTR sczCommand = NULL;
@@ -294,15 +293,12 @@ extern "C" HRESULT MsuEngineExecutePackage(
     // get wusa.exe path
     if (fUseSysNativePath)
     {
-        hr = PathGetKnownFolder(CSIDL_WINDOWS, &sczWindowsPath);
-        ExitOnFailure(hr, "Failed to find Windows directory.");
-
-        hr = PathConcat(sczWindowsPath, L"SysNative\\", &sczSystemPath);
+        hr = PathSystemWindowsSubdirectory(L"SysNative\\", &sczSystemPath);
         ExitOnFailure(hr, "Failed to append SysNative directory.");
     }
     else
     {
-        hr = PathGetKnownFolder(CSIDL_SYSTEM, &sczSystemPath);
+        hr = PathGetSystemDirectory(&sczSystemPath);
         ExitOnFailure(hr, "Failed to find System32 directory.");
     }
 
@@ -390,7 +386,6 @@ LExit:
     ReleaseStr(sczCachedDirectory);
     ReleaseStr(sczMsuPath);
     ReleaseStr(sczSystemPath);
-    ReleaseStr(sczWindowsPath);
     ReleaseStr(sczWusaPath);
     ReleaseStr(sczCommand);
     ReleaseStr(sczEscapedKB);

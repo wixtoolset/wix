@@ -28,7 +28,7 @@ static ERF verf;
 static FAKE_FILE vrgffFileTable[FILETABLESIZE];
 static DWORD vcbRes;
 static LPCBYTE vpbRes;
-static CHAR vszResource[MAX_PATH];
+static LPSTR vpszResource = NULL;
 static REX_CALLBACK_WRITE vpfnWrite = NULL;
 
 static HRESULT vhrLastError = S_OK;
@@ -85,6 +85,8 @@ LExit:
     {
         ::FDIDestroy(vhfdi);
         vhfdi = NULL;
+
+        ReleaseNullStr(vpszResource);
     }
     
     return hr;
@@ -101,6 +103,8 @@ extern "C" void RexUninitialize()
     {
         ::FDIDestroy(vhfdi);
         vhfdi = NULL;
+
+        ReleaseNullStr(vpszResource);
     }
 }
 
@@ -124,12 +128,12 @@ extern "C" HRESULT RexExtract(
 {
     Assert(vhfdi);
     HRESULT hr = S_OK;
-    BOOL fResult;
+    BOOL fResult = FALSE;
 
     HRSRC hResInfo = NULL;
     HANDLE hRes = NULL;
 
-    REX_CALLBACK_STRUCT rcs;
+    REX_CALLBACK_STRUCT rcs = { };
 
     // remember the write callback
     vpfnWrite = pfnWrite;
@@ -158,7 +162,7 @@ extern "C" HRESULT RexExtract(
     //    RexExitOnLastError(hr, "failed to convert cabinet resource name to ASCII: %ls", wzResource);
     //}
 
-    hr = ::StringCchCopyA(vszResource, countof(vszResource), szResource);
+    hr = StrAnsiAllocStringAnsi(&vpszResource, szResource, 0);
     RexExitOnFailure(hr, "Failed to copy resource name to global.");
 
     //
@@ -171,7 +175,7 @@ extern "C" HRESULT RexExtract(
     rcs.pfnProgress = pfnProgress;
     rcs.pvContext = pvContext;
 
-    fResult = ::FDICopy(vhfdi, vszResource, "", 0, RexCallback, NULL, static_cast<void*>(&rcs));
+    fResult = ::FDICopy(vhfdi, vpszResource, "", 0, RexCallback, NULL, static_cast<void*>(&rcs));
     if (!fResult && !rcs.fStopExtracting)   // if something went wrong and it wasn't us just stopping the extraction, then return a failure
     {
         hr = vhrLastError;  // TODO: put verf info in trace message here
@@ -227,7 +231,7 @@ static __callback INT_PTR FAR DIAMONDAPI RexOpen(__in_z char FAR *pszFile, int o
         RexExitOnFailure(hr, "File table exceeded");
     }
 
-    if (0 == lstrcmpA(vszResource, pszFile))
+    if (0 == lstrcmpA(vpszResource, pszFile))
     {
         vrgffFileTable[i].fUsed = TRUE;
         vrgffFileTable[i].fftType = MEMORY_FILE;
@@ -436,15 +440,16 @@ static __callback INT_PTR DIAMONDAPI RexCallback(FDINOTIFICATIONTYPE iNotificati
     HANDLE hFile = INVALID_HANDLE_VALUE;
 
     REX_CALLBACK_STRUCT* prcs = static_cast<REX_CALLBACK_STRUCT*>(pFDINotify->pv);
-    LPCSTR sz;
-    WCHAR wz[MAX_PATH];
-    FILETIME ft;
+    LPCSTR sz = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzPath = NULL;
+    FILETIME ft = { };
     int i = 0;
 
     switch (iNotification)
     {
     case fdintCOPY_FILE:  // beGIN extracting a resource from cabinet
-        Assert(pFDINotify->psz1);
+        Assert(pFDINotify->psz1 && prcs);
 
         if (prcs->fStopExtracting)
         {
@@ -453,55 +458,50 @@ static __callback INT_PTR DIAMONDAPI RexCallback(FDINOTIFICATIONTYPE iNotificati
 
         // convert params to useful variables
         sz = static_cast<LPCSTR>(pFDINotify->psz1);
-        if (!::MultiByteToWideChar(CP_ACP, 0, sz, -1, wz, countof(wz)))
-        {
-            RexExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
-        }
+        RexExitOnNull(sz, hr, E_INVALIDARG, "No cabinet file ID given to convert");
+
+        hr = StrAllocStringAnsi(&pwz, sz, 0, CP_ACP);
+        RexExitOnFailure(hr, "failed to convert cabinet file id to unicode: %hs", sz);
 
         if (prcs->pfnProgress)
         {
-            hr = prcs->pfnProgress(TRUE, wz, prcs->pvContext);
+            hr = prcs->pfnProgress(TRUE, pwz, prcs->pvContext);
             if (S_OK != hr)
             {
                 ExitFunction();
             }
         }
 
-        if (L'*' == *prcs->pwzExtract || 0 == lstrcmpW(prcs->pwzExtract, wz))
+        if (L'*' == *prcs->pwzExtract || 0 == lstrcmpW(prcs->pwzExtract, pwz))
         {
             // get the created date for the resource in the cabinet
             if (!::DosDateTimeToFileTime(pFDINotify->date, pFDINotify->time, &ft))
             {
-                RexExitWithLastError(hr, "failed to get time for resource: %ls", wz);
+                RexExitWithLastError(hr, "failed to get time for resource: %ls", pwz);
             }
-
-            WCHAR wzPath[MAX_PATH];
-
-            hr = ::StringCchCopyW(wzPath, countof(wzPath), prcs->pwzExtractDir);
-            RexExitOnFailure(hr, "failed to copy extract directory: %ls for file: %ls", prcs->pwzExtractDir, wz);
 
             if (L'*' == *prcs->pwzExtract)
             {
-                hr = ::StringCchCatW(wzPath, countof(wzPath), wz);
-                RexExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", wzPath, wz);
+                hr = PathConcat(prcs->pwzExtractDir, pwz, &pwzPath);
+                RexExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", prcs->pwzExtractDir, pwz);
             }
             else
             {
                 Assert(*prcs->pwzExtractName);
 
-                hr = ::StringCchCatW(wzPath, countof(wzPath), prcs->pwzExtractName);
-                RexExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", wzPath, prcs->pwzExtractName);
+                hr = PathConcat(prcs->pwzExtractDir, prcs->pwzExtractName, &pwzPath);
+                RexExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", prcs->pwzExtractDir, prcs->pwzExtractName);
             }
 
             // Quickly chop off the file name part of the path to ensure the path exists
             // then put the file name back on the path (by putting the first character
             // back over the null terminator).
-            LPWSTR wzFile = PathFile(wzPath);
+            LPWSTR wzFile = PathFile(pwzPath);
             WCHAR wzFileFirstChar = *wzFile;
             *wzFile = L'\0';
 
-            hr = DirEnsureExists(wzPath, NULL);
-            RexExitOnFailure(hr, "failed to ensure directory: %ls", wzPath);
+            hr = DirEnsureExists(pwzPath, NULL);
+            RexExitOnFailure(hr, "failed to ensure directory: %ls", pwzPath);
 
             hr = S_OK;
 
@@ -524,10 +524,10 @@ static __callback INT_PTR DIAMONDAPI RexCallback(FDINOTIFICATIONTYPE iNotificati
             }
 
             // open the file
-            hFile = ::CreateFileW(wzPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            hFile = ::CreateFileW(pwzPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (INVALID_HANDLE_VALUE == hFile)
             {
-                RexExitWithLastError(hr, "failed to open file: %ls", wzPath);
+                RexExitWithLastError(hr, "failed to open file: %ls", pwzPath);
             }
 
             vrgffFileTable[i].fUsed = TRUE;
@@ -554,20 +554,20 @@ static __callback INT_PTR DIAMONDAPI RexCallback(FDINOTIFICATIONTYPE iNotificati
 
         break;
     case fdintCLOSE_FILE_INFO:  // resource extraction complete
-        Assert(pFDINotify->hf && pFDINotify->psz1);
+        Assert(pFDINotify->hf && prcs && pFDINotify->psz1);
 
         // convert params to useful variables
         sz = static_cast<LPCSTR>(pFDINotify->psz1);
-        if (!::MultiByteToWideChar(CP_ACP, 0, sz, -1, wz, countof(wz)))
-        {
-            RexExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
-        }
+        RexExitOnNull(sz, hr, E_INVALIDARG, "No cabinet file ID given to convert");
+
+        hr = StrAllocStringAnsi(&pwz, sz, 0, CP_ACP);
+        RexExitOnFailure(hr, "failed to convert cabinet file id to unicode: %hs", sz);
 
         RexClose(pFDINotify->hf);
 
         if (prcs->pfnProgress)
         {
-            hr = prcs->pfnProgress(FALSE, wz, prcs->pvContext);
+            hr = prcs->pfnProgress(FALSE, pwz, prcs->pvContext);
         }
 
         if (S_OK == hr && L'*' == *prcs->pwzExtract)   // if everything is okay and we're extracting all files, keep going
@@ -596,6 +596,9 @@ LExit:
     {
         vhrLastError = hr;
     }
+
+    ReleaseStr(pwz);
+    ReleaseStr(pwzPath);
 
     return (S_OK == hr) ? ipResult : -1;
 }

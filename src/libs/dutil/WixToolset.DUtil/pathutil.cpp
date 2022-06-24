@@ -20,6 +20,11 @@
 
 #define PATH_GOOD_ENOUGH 64
 
+typedef DWORD(APIENTRY* PFN_GETTEMPPATH2W)(
+    __in DWORD BufferLength,
+    __out LPWSTR Buffer
+    );
+
 static BOOL IsPathSeparatorChar(
     __in WCHAR wc
     );
@@ -527,28 +532,55 @@ DAPI_(HRESULT) PathForCurrentProcess(
     )
 {
     HRESULT hr = S_OK;
-    DWORD cch = MAX_PATH;
+    WCHAR smallBuffer[1] = { };
+    SIZE_T cchMax = 0;
+    DWORD cchBuffer = 0;
+    DWORD cch = 0;
+    DWORD dwMaxAttempts = 20;
 
-    do
+    // GetModuleFileNameW didn't originally set the last error when the buffer was too small.
+    ::SetLastError(ERROR_SUCCESS);
+
+    cch = ::GetModuleFileNameW(hModule, smallBuffer, countof(smallBuffer));
+    PathExitOnNullWithLastError(cch, hr, "Failed to get size of path for executing process.");
+
+    if (*psczFullPath && ERROR_INSUFFICIENT_BUFFER == ::GetLastError())
     {
-        hr = StrAlloc(psczFullPath, cch);
-        PathExitOnFailure(hr, "Failed to allocate string for module path.");
+        hr = StrMaxLength(*psczFullPath, &cchMax);
+        PathExitOnFailure(hr, "Failed to get max length of input buffer.");
 
-        DWORD cchRequired = ::GetModuleFileNameW(hModule, *psczFullPath, cch);
-        if (0 == cchRequired)
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
+    }
+    else
+    {
+        cchBuffer = MAX_PATH + 1;
+
+        hr = StrAlloc(psczFullPath, cchBuffer);
+        PathExitOnFailure(hr, "Failed to allocate space for module path.");
+    }
+
+    ::SetLastError(ERROR_SUCCESS);
+
+    for (DWORD i = 0; i < dwMaxAttempts; ++i)
+    {
+        cch = ::GetModuleFileNameW(hModule, *psczFullPath, cchBuffer);
+        PathExitOnNullWithLastError(cch, hr, "Failed to get path for executing process.");
+
+        if (ERROR_INSUFFICIENT_BUFFER != ::GetLastError())
         {
-            PathExitWithLastError(hr, "Failed to get path for executing process.");
+            break;
         }
-        else if (cchRequired == cch)
+
+        if ((dwMaxAttempts - 1) == i)
         {
-            cch = cchRequired + 1;
-            hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+            PathExitWithRootFailure(hr, E_FAIL, "Unexpected failure getting path for executing process.");
         }
-        else
-        {
-            hr = S_OK;
-        }
-    } while (HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER) == hr);
+
+        cchBuffer *= 2;
+
+        hr = StrAlloc(psczFullPath, cchBuffer);
+        PathExitOnFailure(hr, "Failed to re-allocate more space for module path.");
+    }
 
 LExit:
     return hr;
@@ -582,17 +614,18 @@ DAPI_(HRESULT) PathCreateTempFile(
     __in_opt LPCWSTR wzDirectory,
     __in_opt __format_string LPCWSTR wzFileNameTemplate,
     __in DWORD dwUniqueCount,
+    __in_z LPCWSTR wzPrefix,
     __in DWORD dwFileAttributes,
     __out_opt LPWSTR* psczTempFile,
     __out_opt HANDLE* phTempFile
     )
 {
-    AssertSz(0 < dwUniqueCount, "Must specify a non-zero unique count.");
+    Assert(wzPrefix);
+    AssertSz(!wzFileNameTemplate || !*wzFileNameTemplate || 0 < dwUniqueCount, "Must specify a non-zero unique count.");
 
     HRESULT hr = S_OK;
 
     LPWSTR sczTempPath = NULL;
-    DWORD cchTempPath = MAX_PATH;
 
     HANDLE hTempFile = INVALID_HANDLE_VALUE;
     LPWSTR scz = NULL;
@@ -605,13 +638,8 @@ DAPI_(HRESULT) PathCreateTempFile(
     }
     else
     {
-        hr = StrAlloc(&sczTempPath, cchTempPath);
-        PathExitOnFailure(hr, "Failed to allocate memory for the temp path.");
-
-        if (!::GetTempPathW(cchTempPath, sczTempPath))
-        {
-            PathExitWithLastError(hr, "Failed to get temp path.");
-        }
+        hr = PathGetTempPath(&sczTempPath, NULL);
+        PathExitOnFailure(hr, "Failed to get temp path.");
     }
 
     if (wzFileNameTemplate && *wzFileNameTemplate)
@@ -621,7 +649,7 @@ DAPI_(HRESULT) PathCreateTempFile(
             hr = StrAllocFormatted(&scz, wzFileNameTemplate, i);
             PathExitOnFailure(hr, "Failed to allocate memory for file template.");
 
-            hr = StrAllocFormatted(&sczTempFile, L"%s%s", sczTempPath, scz);
+            hr = StrAllocFormatted(&sczTempFile, L"%ls%ls", sczTempPath, scz);
             PathExitOnFailure(hr, "Failed to allocate temp file name.");
 
             hTempFile = ::CreateFileW(sczTempFile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_NEW, dwFileAttributes, NULL);
@@ -642,13 +670,8 @@ DAPI_(HRESULT) PathCreateTempFile(
     // the system to provide us a temp file using its built-in mechanism.
     if (INVALID_HANDLE_VALUE == hTempFile)
     {
-        hr = StrAlloc(&sczTempFile, MAX_PATH);
-        PathExitOnFailure(hr, "Failed to allocate memory for the temp path");
-
-        if (!::GetTempFileNameW(sczTempPath, L"TMP", 0, sczTempFile))
-        {
-            PathExitWithLastError(hr, "Failed to create new temp file name.");
-        }
+        hr = PathGetTempFileName(sczTempPath, wzPrefix, 0, &sczTempFile);
+        PathExitOnFailure(hr, "Failed to create new temp file name.");
 
         hTempFile = ::CreateFileW(sczTempFile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, dwFileAttributes, NULL);
         if (INVALID_HANDLE_VALUE == hTempFile)
@@ -684,6 +707,82 @@ LExit:
 }
 
 
+DAPI_(HRESULT) PathGetTempFileName(
+    __in LPCWSTR wzPathName,
+    __in LPCWSTR wzPrefixString,
+    __in UINT uUnique,
+    __out LPWSTR* psczTempFileName
+    )
+{
+    HRESULT hr = S_OK;
+    size_t cchFullPath = 0;
+    WORD wValue = (WORD)(0xffff & uUnique);
+    LPWSTR scz = NULL;
+    LPWSTR sczTempFile = NULL;
+    HANDLE hTempFile = INVALID_HANDLE_VALUE;
+
+    hr = ::StringCchLengthW(wzPathName, STRSAFE_MAX_CCH, &cchFullPath);
+    PathExitOnFailure(hr, "Failed to get length of path to prefix.");
+
+    if (MAX_PATH - 14 >= cchFullPath)
+    {
+        hr = StrAlloc(psczTempFileName, MAX_PATH);
+        PathExitOnFailure(hr, "Failed to allocate buffer for GetTempFileNameW.");
+
+        if (!::GetTempFileNameW(wzPathName, wzPrefixString, uUnique, *psczTempFileName))
+        {
+            PathExitWithLastError(hr, "Failed to create new temp file name.");
+        }
+
+        ExitFunction();
+    }
+
+    // TODO: when uUnique is 0, consider not always starting at 0 to avoid collisions if this is called repeatedly.
+    // Purposely let it wrap around.
+    for (WORD w = 0; w < WORD_MAX && INVALID_HANDLE_VALUE == hTempFile; ++wValue)
+    {
+        hr = StrAllocFormatted(&scz, L"%ls%x.TMP", wzPrefixString, w);
+        PathExitOnFailure(hr, "Failed to allocate memory for file template.");
+
+        hr = PathConcat(wzPathName, scz, &sczTempFile);
+        PathExitOnFailure(hr, "Failed to allocate temp file name.");
+
+        hTempFile = ::CreateFileW(sczTempFile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_NEW, 0, NULL);
+        if (INVALID_HANDLE_VALUE == hTempFile)
+        {
+            // if the file already exists, try next one.
+            hr = HRESULT_FROM_WIN32(::GetLastError());
+            if (HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
+            {
+                hr = S_OK;
+            }
+            PathExitOnFailure(hr, "Failed to create file: %ls", sczTempFile);
+        }
+
+        ++w;
+    }
+
+    if (INVALID_HANDLE_VALUE == hTempFile)
+    {
+        PathExitWithRootFailure(hr, HRESULT_FROM_WIN32(ERROR_FILE_EXISTS), "Failed to create temp file.");
+    }
+
+    hr = StrAllocString(psczTempFileName, sczTempFile, 0);
+    PathExitOnFailure(hr, "Failed to copy temp file string.");
+
+LExit:
+    if (INVALID_HANDLE_VALUE != hTempFile)
+    {
+        ::CloseHandle(hTempFile);
+    }
+
+    ReleaseStr(scz);
+    ReleaseStr(sczTempFile);
+
+    return hr;
+}
+
+
 DAPI_(HRESULT) PathCreateTimeBasedTempFile(
     __in_z_opt LPCWSTR wzDirectory,
     __in_z LPCWSTR wzPrefix,
@@ -695,7 +794,7 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
 {
     HRESULT hr = S_OK;
     BOOL fRetry = FALSE;
-    WCHAR wzTempPath[MAX_PATH] = { };
+    LPWSTR sczTempParentPath = NULL;
     LPWSTR sczPrefix = NULL;
     LPWSTR sczPrefixFolder = NULL;
     SYSTEMTIME time = { };
@@ -711,12 +810,10 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
     }
     else
     {
-        if (!::GetTempPathW(countof(wzTempPath), wzTempPath))
-        {
-            PathExitWithLastError(hr, "Failed to get temp folder.");
-        }
+        hr = PathGetTempPath(&sczTempParentPath, NULL);
+        PathExitOnFailure(hr, "Failed to get temp folder.");
 
-        hr = PathConcat(wzTempPath, wzPrefix, &sczPrefix);
+        hr = PathConcat(sczTempParentPath, wzPrefix, &sczPrefix);
         PathExitOnFailure(hr, "Failed to concatenate the temp folder and log prefix.");
     }
 
@@ -778,6 +875,7 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
 
 LExit:
     ReleaseFile(hTempFile);
+    ReleaseStr(sczTempParentPath);
     ReleaseStr(sczTempPath);
     ReleaseStr(sczPrefixFolder);
     ReleaseStr(sczPrefix);
@@ -799,7 +897,6 @@ DAPI_(HRESULT) PathCreateTempDirectory(
     HRESULT hr = S_OK;
 
     LPWSTR sczTempPath = NULL;
-    DWORD cchTempPath = MAX_PATH;
 
     LPWSTR scz = NULL;
 
@@ -813,13 +910,8 @@ DAPI_(HRESULT) PathCreateTempDirectory(
     }
     else
     {
-        hr = StrAlloc(&sczTempPath, cchTempPath);
-        PathExitOnFailure(hr, "Failed to allocate memory for the temp path.");
-
-        if (!::GetTempPathW(cchTempPath, sczTempPath))
-        {
-            PathExitWithLastError(hr, "Failed to get temp path.");
-        }
+        hr = PathGetTempPath(&sczTempPath, NULL);
+        PathExitOnFailure(hr, "Failed to get temp path.");
     }
 
     for (DWORD i = 1; i <= dwUniqueCount; ++i)
@@ -869,46 +961,230 @@ LExit:
 
 
 DAPI_(HRESULT) PathGetTempPath(
-    __out_z LPWSTR* psczTempPath
+    __out_z LPWSTR* psczTempPath,
+    __out_opt SIZE_T* pcch
     )
 {
+
     HRESULT hr = S_OK;
-    WCHAR wzTempPath[MAX_PATH + 1] = { };
+    SIZE_T cchMax = 0;
+    DWORD cchBuffer = 0;
     DWORD cch = 0;
+    DWORD dwAttempts = 0;
+    HMODULE hModule = NULL;
+    PFN_GETTEMPPATH2W pfnGetTempPath = NULL;
+    const DWORD dwMaxAttempts = 10;
 
-    cch = ::GetTempPathW(countof(wzTempPath), wzTempPath);
-    if (!cch)
+    if (*psczTempPath)
     {
-        PathExitWithLastError(hr, "Failed to GetTempPath.");
+        hr = StrMaxLength(*psczTempPath, &cchMax);
+        PathExitOnFailure(hr, "Failed to get max length of input buffer.");
+
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
     }
-    else if (cch >= countof(wzTempPath))
+    else
     {
-        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "TEMP directory path too long.");
+        cchBuffer = MAX_PATH + 1;
+
+        hr = StrAlloc(psczTempPath, cchBuffer);
+        PathExitOnFailure(hr, "Failed to allocate space for temp path.");
     }
 
-    hr = StrAllocString(psczTempPath, wzTempPath, cch);
-    PathExitOnFailure(hr, "Failed to copy TEMP directory path.");
+    hr = LoadSystemLibrary(L"kernel32.dll", &hModule);
+    PathExitOnFailure(hr, "Failed to load kernel32.dll");
+
+    pfnGetTempPath = reinterpret_cast<PFN_GETTEMPPATH2W>(::GetProcAddress(hModule, "GetTempPath2W"));
+    if (!pfnGetTempPath)
+    {
+        pfnGetTempPath = ::GetTempPathW;
+    }
+
+    for (; dwAttempts < dwMaxAttempts; ++dwAttempts)
+    {
+        cch = pfnGetTempPath(cchBuffer, *psczTempPath);
+        PathExitOnNullWithLastError(cch, hr, "Failed to get temp path.");
+
+        cch += 1; // add one for null terminator.
+
+        if (cch <= cchBuffer)
+        {
+            break;
+        }
+
+        hr = StrAlloc(psczTempPath, cch);
+        PathExitOnFailure(hr, "Failed to reallocate space for temp path.");
+
+        cchBuffer = cch;
+    }
+
+    if (dwMaxAttempts == dwAttempts)
+    {
+        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "GetTempPathW results never converged.");
+    }
+
+    if (pcch)
+    {
+        *pcch = cch - 1; // remove one for null terminator.
+    }
 
 LExit:
     return hr;
 }
 
 
-DAPI_(HRESULT) PathGetKnownFolder(
-    __in int csidl,
-    __out LPWSTR* psczKnownFolder
+DAPI_(HRESULT) PathGetSystemDirectory(
+    __out_z LPWSTR* psczSystemPath
     )
 {
     HRESULT hr = S_OK;
+    SIZE_T cchMax = 0;
+    DWORD cchBuffer = 0;
+    DWORD cch = 0;
 
-    hr = StrAlloc(psczKnownFolder, MAX_PATH);
-    PathExitOnFailure(hr, "Failed to allocate memory for known folder.");
+    if (*psczSystemPath)
+    {
+        hr = StrMaxLength(*psczSystemPath, &cchMax);
+        PathExitOnFailure(hr, "Failed to get max length of input buffer.");
 
-    hr = ::SHGetFolderPathW(NULL, csidl, NULL, SHGFP_TYPE_CURRENT, *psczKnownFolder);
-    PathExitOnFailure(hr, "Failed to get known folder path.");
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
+    }
+    else
+    {
+        cchBuffer = MAX_PATH + 1;
 
-    hr = PathBackslashTerminate(psczKnownFolder);
-    PathExitOnFailure(hr, "Failed to ensure known folder path is backslash terminated.");
+        hr = StrAlloc(psczSystemPath, cchBuffer);
+        PathExitOnFailure(hr, "Failed to allocate space for system directory.");
+    }
+
+    cch = ::GetSystemDirectoryW(*psczSystemPath, cchBuffer);
+    PathExitOnNullWithLastError(cch, hr, "Failed to get system directory path with default size.");
+
+    if (cch > cchBuffer)
+    {
+        hr = StrAlloc(psczSystemPath, cch);
+        PathExitOnFailure(hr, "Failed to realloc system directory path.");
+
+        cchBuffer = cch;
+
+        cch = ::GetSystemDirectoryW(*psczSystemPath, cchBuffer);
+        PathExitOnNullWithLastError(cch, hr, "Failed to get system directory path with returned size.");
+
+        if (cch > cchBuffer)
+        {
+            PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Failed to get system directory path with returned size.");
+        }
+    }
+
+    hr = PathBackslashTerminate(psczSystemPath);
+    PathExitOnFailure(hr, "Failed to terminate system directory path with backslash.");
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) PathGetSystemWow64Directory(
+    __out_z LPWSTR* psczSystemPath
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cchMax = 0;
+    DWORD cchBuffer = 0;
+    DWORD cch = 0;
+
+    if (*psczSystemPath)
+    {
+        hr = StrMaxLength(*psczSystemPath, &cchMax);
+        PathExitOnFailure(hr, "Failed to get max length of input buffer.");
+
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
+    }
+    else
+    {
+        cchBuffer = MAX_PATH + 1;
+
+        hr = StrAlloc(psczSystemPath, cchBuffer);
+        PathExitOnFailure(hr, "Failed to allocate space for system wow64 directory.");
+    }
+
+    cch = ::GetSystemWow64DirectoryW(*psczSystemPath, cchBuffer);
+    PathExitOnNullWithLastError(cch, hr, "Failed to get system wow64 directory path with default size.");
+
+    cch += 1; // add one for the null terminator.
+
+    if (cch > cchBuffer)
+    {
+        hr = StrAlloc(psczSystemPath, cch);
+        PathExitOnFailure(hr, "Failed to realloc system wow64 directory path.");
+
+        cchBuffer = cch;
+
+        cch = ::GetSystemWow64DirectoryW(*psczSystemPath, cchBuffer);
+        PathExitOnNullWithLastError(cch, hr, "Failed to get system wow64 directory path with returned size.");
+
+        cch += 1; // add one for the null terminator.
+
+        if (cch > cchBuffer)
+        {
+            PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Failed to get system wow64 directory path with returned size.");
+        }
+    }
+
+    hr = PathBackslashTerminate(psczSystemPath);
+    PathExitOnFailure(hr, "Failed to terminate system wow64 directory path with backslash.");
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) PathGetVolumePathName(
+    __in_z LPCWSTR wzFileName,
+    __out_z LPWSTR* psczVolumePathName
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cchBuffer = 0;
+    SIZE_T cchMax = 0;
+    const DWORD dwMaxAttempts = 20;
+
+    if (*psczVolumePathName)
+    {
+        hr = StrMaxLength(*psczVolumePathName, &cchMax);
+        PathExitOnFailure(hr, "Failed to get max length of input buffer.");
+
+        cchBuffer = (DWORD)min(DWORD_MAX, cchMax);
+    }
+    else
+    {
+        cchBuffer = MAX_PATH + 1;
+
+        hr = StrAlloc(psczVolumePathName, cchBuffer);
+        PathExitOnFailure(hr, "Failed to allocate space for volume path name.");
+    }
+
+    for (DWORD i = 0; i < dwMaxAttempts; ++i)
+    {
+        if (::GetVolumePathNameW(wzFileName, *psczVolumePathName, cchBuffer))
+        {
+            break;
+        }
+
+        hr = HRESULT_FROM_WIN32(::GetLastError());
+        if (HRESULT_FROM_WIN32(ERROR_FILENAME_EXCED_RANGE) != hr && E_INSUFFICIENT_BUFFER != hr ||
+            (dwMaxAttempts - 1) == i)
+        {
+            PathExitWithRootFailure(hr, hr, "Failed to get volume path name of: %ls", wzFileName);
+        }
+
+        cchBuffer *= 2;
+
+        hr = StrAlloc(psczVolumePathName, cchBuffer);
+        PathExitOnFailure(hr, "Failed to re-allocate more space for volume path name.");
+    }
+
+    hr = PathBackslashTerminate(psczVolumePathName);
+    PathExitOnFailure(hr, "Failed to terminate volume path name with backslash.");
 
 LExit:
     return hr;

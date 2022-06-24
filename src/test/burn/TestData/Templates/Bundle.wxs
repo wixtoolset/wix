@@ -3,10 +3,13 @@
 <?ifndef Version?>
 <?define Version = 1.0.0.0?>
 <?endif?>
+<?ifndef BundleLogDirectory?>
+<?define BundleLogDirectory = .?>
+<?endif?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
   <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes">
-    <Log Prefix="~$(var.TestGroupName)_$(var.BundleName)" />
+    <Log Prefix="$(var.BundleLogDirectory)\~$(var.TestGroupName)_$(var.BundleName)" />
 
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
 

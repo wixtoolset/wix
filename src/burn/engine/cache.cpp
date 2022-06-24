@@ -174,7 +174,7 @@ extern "C" HRESULT CacheInitialize(
 
     // Cache paths are initialized once so they cannot be changed while the engine is caching payloads.
     // Always construct the default machine package cache path so we can determine if we're redirected.
-    hr = PathGetKnownFolder(CSIDL_COMMON_APPDATA, &sczAppData);
+    hr = ShelGetFolder(&sczAppData, CSIDL_COMMON_APPDATA);
     ExitOnFailure(hr, "Failed to find local %hs appdata directory.", "per-machine");
 
     hr = PathConcat(sczAppData, PACKAGE_CACHE_FOLDER_NAME, &pCache->sczDefaultMachinePackageCache);
@@ -210,7 +210,7 @@ extern "C" HRESULT CacheInitialize(
     pCache->fCustomMachinePackageCache = !fPathEqual;
 
 
-    hr = PathGetKnownFolder(CSIDL_LOCAL_APPDATA, &sczAppData);
+    hr = ShelGetFolder(&sczAppData, CSIDL_LOCAL_APPDATA);
     ExitOnFailure(hr, "Failed to find local %hs appdata directory.", "per-user");
 
     hr = PathConcat(sczAppData, PACKAGE_CACHE_FOLDER_NAME, &pCache->sczDefaultUserPackageCache);
@@ -1469,7 +1469,7 @@ static HRESULT CalculateWorkingFolders(
     HRESULT hr = S_OK;
     LPWSTR sczBaseAcquisitionPath = NULL;
 
-    hr = PathGetTempPath(&sczBaseAcquisitionPath);
+    hr = PathGetTempPath(&sczBaseAcquisitionPath, NULL);
     ExitOnFailure(hr, "Failed to get temp folder path for acquisition folder base.");
 
     hr = PathBackslashTerminate(&sczBaseAcquisitionPath);

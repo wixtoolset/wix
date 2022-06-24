@@ -261,15 +261,15 @@ static HRESULT DAPI CabOperation(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fResult;
+    BOOL fResult = FALSE;
 
     LPWSTR sczCabinet = NULL;
     LPWSTR pwz = NULL;
-    CHAR szCabDirectory[MAX_PATH * 4]; // Make sure these are big enough for UTF-8 strings
-    CHAR szCabFile[MAX_PATH * 4];
+    LPSTR pszCabDirectory = NULL;
+    CHAR szCabFile[MAX_PATH * 4] = { }; // Make sure this is big enough for UTF-8 strings
 
-    CAB_CALLBACK_STRUCT ccs;
-    PFNFDINOTIFY pfnFdiNotify;
+    CAB_CALLBACK_STRUCT ccs = { };
+    PFNFDINOTIFY pfnFdiNotify = NULL;
 
     //
     // ensure the cabinet.dll is loaded
@@ -299,15 +299,13 @@ static HRESULT DAPI CabOperation(
     // If a full path was not provided, use the relative current directory.
     if (wzCabinet == pwz)
     {
-        hr = ::StringCchCopyA(szCabDirectory, countof(szCabDirectory), ".\\");
+        hr = StrAnsiAllocStringAnsi(&pszCabDirectory, ".\\", 0);
         CabExitOnFailure(hr, "Failed to copy relative current directory as cabinet directory.");
     }
     else
     {
-        if (!::WideCharToMultiByte(CP_UTF8, 0, sczCabinet, -1, szCabDirectory, countof(szCabDirectory), NULL, NULL))
-        {
-            CabExitWithLastError(hr, "failed to convert cabinet directory to ASCII: %ls", sczCabinet);
-        }
+        hr = StrAnsiAllocString(&pszCabDirectory, sczCabinet, 0, CP_UTF8);
+        CabExitOnFailure(hr, "failed to convert cabinet directory to ASCII: %ls", sczCabinet);
     }
 
     //
@@ -331,7 +329,7 @@ static HRESULT DAPI CabOperation(
         v_pfnNetFx11Notify = pfnNotify;
         pfnFdiNotify = FDINotify;
     }
-    fResult = vpfnFDICopy(vhfdi, szCabFile, szCabDirectory, 0, pfnFdiNotify, NULL, static_cast<void*>(&ccs));
+    fResult = vpfnFDICopy(vhfdi, szCabFile, pszCabDirectory, 0, pfnFdiNotify, NULL, static_cast<void*>(&ccs));
     if (!fResult && !ccs.fStopExtracting)   // if something went wrong and it wasn't us just stopping the extraction, then return a failure
     {
         CabExitWithLastError(hr, "failed to extract cabinet file: %ls", sczCabinet);
@@ -339,6 +337,7 @@ static HRESULT DAPI CabOperation(
 
 LExit:
     ReleaseStr(sczCabinet);
+    ReleaseStr(pszCabDirectory);
     v_pfnNetFx11Notify = NULL;
 
     return hr;
@@ -493,14 +492,15 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
     INT_PTR ipResult = 0;   // result to return on success
 
     CAB_CALLBACK_STRUCT* pccs = static_cast<CAB_CALLBACK_STRUCT*>(pFDINotify->pv);
-    LPCSTR sz;
-    WCHAR wz[MAX_PATH];
-    FILETIME ft;
+    LPCSTR sz = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzPath = NULL;
+    FILETIME ft = { };
 
     switch (iNotification)
     {
     case fdintCOPY_FILE:  // begin extracting a resource from cabinet
-        CabExitOnNull(pFDINotify->psz1, hr, E_INVALIDARG, "No cabinet file ID given to convert");
+        Assert(pccs && pFDINotify->psz1);
         CabExitOnNull(pccs, hr, E_INVALIDARG, "Failed to call cabextract callback, because no callback struct was provided");
 
         if (pccs->fStopExtracting)
@@ -510,40 +510,37 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
 
         // convert params to useful variables
         sz = static_cast<LPCSTR>(pFDINotify->psz1);
-        if (!::MultiByteToWideChar(CP_ACP, 0, sz, -1, wz, countof(wz)))
-        {
-            CabExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
-        }
+        CabExitOnNull(sz, hr, E_INVALIDARG, "No cabinet file ID given to convert");
+
+        hr = StrAllocStringAnsi(&pwz, sz, 0, CP_ACP);
+        CabExitOnFailure(hr, "failed to convert cabinet file id to unicode: %hs", sz);
 
         if (pccs->pfnProgress)
         {
-            hr = pccs->pfnProgress(TRUE, wz, pccs->pvContext);
+            hr = pccs->pfnProgress(TRUE, pwz, pccs->pvContext);
             if (S_OK != hr)
             {
                 ExitFunction();
             }
         }
 
-        if (L'*' == *pccs->pwzExtract || 0 == lstrcmpW(pccs->pwzExtract, wz))
+        if (L'*' == *pccs->pwzExtract || 0 == lstrcmpW(pccs->pwzExtract, pwz))
         {
             // get the created date for the resource in the cabinet
             FILETIME ftLocal;
             if (!::DosDateTimeToFileTime(pFDINotify->date, pFDINotify->time, &ftLocal))
             {
-                CabExitWithLastError(hr, "failed to get time for resource: %ls", wz);
+                CabExitWithLastError(hr, "failed to get time for resource: %ls", pwz);
             }
             ::LocalFileTimeToFileTime(&ftLocal, &ft);
 
-            WCHAR wzPath[MAX_PATH];
-            hr = ::StringCchCopyW(wzPath, countof(wzPath), pccs->pwzExtractDir);
-            CabExitOnFailure(hr, "failed to copy in extract directory: %ls for file: %ls", pccs->pwzExtractDir, wz);
-            hr = ::StringCchCatW(wzPath, countof(wzPath), wz);
-            CabExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", wzPath, wz);
+            hr = PathConcat(pccs->pwzExtractDir, pwz, &pwzPath);
+            CabExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", pccs->pwzExtractDir, pwz);
 
-            hFile = OpenFileWithRetry(wzPath, GENERIC_WRITE, CREATE_ALWAYS);
+            hFile = OpenFileWithRetry(pwzPath, GENERIC_WRITE, CREATE_ALWAYS);
             if (INVALID_HANDLE_VALUE == hFile)
             {
-                CabExitWithLastError(hr, "failed to create file: %ls", wzPath);
+                CabExitWithLastError(hr, "failed to create file: %ls", pwzPath);
             }
 
             ::SetFileTime(hFile, &ft, &ft, &ft);   // try to set the file time (who cares if it fails)
@@ -567,17 +564,15 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
 
         break;
     case fdintCLOSE_FILE_INFO:  // resource extraction complete
-        Assert(pFDINotify->hf && pFDINotify->psz1);
+        Assert(pFDINotify->hf && pccs && pFDINotify->psz1);
         CabExitOnNull(pccs, hr, E_INVALIDARG, "Failed to call cabextract callback, because no callback struct was provided");
 
         // convert params to useful variables
         sz = static_cast<LPCSTR>(pFDINotify->psz1);
         CabExitOnNull(sz, hr, E_INVALIDARG, "Failed to convert cabinet file id, because no cabinet file id was provided");
 
-        if (!::MultiByteToWideChar(CP_ACP, 0, sz, -1, wz, countof(wz)))
-        {
-            CabExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
-        }
+        hr = StrAllocStringAnsi(&pwz, sz, 0, CP_ACP);
+        CabExitOnFailure(hr, "failed to convert cabinet file id to unicode: %hs", sz);
 
         if (NULL != pFDINotify->hf)  // just close the file
         {
@@ -586,7 +581,7 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
 
         if (pccs->pfnProgress)
         {
-            hr = pccs->pfnProgress(FALSE, wz, pccs->pvContext);
+            hr = pccs->pfnProgress(FALSE, pwz, pccs->pvContext);
         }
 
         if (S_OK == hr && L'*' == *pccs->pwzExtract)   // if everything is okay and we're extracting all files, keep going
@@ -612,6 +607,9 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
 
 LExit:
     ReleaseFileHandle(hFile);
+
+    ReleaseStr(pwz);
+    ReleaseStr(pwzPath);
 
     return (S_OK == hr) ? ipResult : -1;
 }

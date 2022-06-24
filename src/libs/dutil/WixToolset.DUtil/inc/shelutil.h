@@ -33,10 +33,25 @@ HRESULT DAPI ShelExecUnelevated(
     __in_z_opt LPCWSTR wzWorkingDirectory,
     __in int nShowCmd
     );
+
+/********************************************************************
+ ShelGetFolder() - translates the CSIDL into KNOWNFOLDERID and calls ShelGetKnownFolder.
+    If that returns E_NOTIMPL then falls back to ::SHGetFolderPathW.
+    The CSIDL_FLAG values are not supported, CSIDL_FLAG_CREATE is always used.
+    The path is backslash terminated.
+
+*******************************************************************/
 HRESULT DAPI ShelGetFolder(
     __out_z LPWSTR* psczFolderPath,
     __in int csidlFolder
     );
+
+/********************************************************************
+ ShelGetKnownFolder() - gets a folder by KNOWNFOLDERID with ::SHGetKnownFolderPath.
+    The path is backslash terminated.
+
+ Note: return E_NOTIMPL if called on pre-Vista operating systems.
+*******************************************************************/
 HRESULT DAPI ShelGetKnownFolder(
     __out_z LPWSTR* psczFolderPath,
     __in REFKNOWNFOLDERID rfidFolder

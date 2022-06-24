@@ -229,7 +229,7 @@ namespace WixTestTools
             returnValue.AppendLine("Tool run result:");
             returnValue.AppendLine("----------------");
             returnValue.AppendLine("Command:");
-            returnValue.AppendLine($"\"{result.StartInfo.FileName}\" {result.StartInfo.Arguments}");
+            returnValue.AppendLine($"\"{result.FileName}\" {result.Arguments}");
             returnValue.AppendLine();
             returnValue.AppendLine("Standard Output:");
             foreach (var line in result.StandardOutput ?? new string[0])

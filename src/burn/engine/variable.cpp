@@ -1947,18 +1947,18 @@ static HRESULT InitializeVariableTempFolder(
     UNREFERENCED_PARAMETER(dwpData);
 
     HRESULT hr = S_OK;
-    WCHAR wzPath[MAX_PATH] = { };
+    LPWSTR sczPath = NULL;
 
-    if (!::GetTempPathW(MAX_PATH, wzPath))
-    {
-        ExitWithLastError(hr, "Failed to get temp path.");
-    }
+    hr = PathGetTempPath(&sczPath, NULL);
+    ExitOnFailure(hr, "Failed to get temp path.");
 
     // set value
-    hr = BVariantSetString(pValue, wzPath, 0, FALSE);
+    hr = BVariantSetString(pValue, sczPath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
+    ReleaseStr(sczPath);
+
     return hr;
 }
 
@@ -1969,7 +1969,7 @@ static HRESULT InitializeVariableSystemFolder(
 {
     HRESULT hr = S_OK;
     BOOL f64 = (BOOL)dwpData;
-    WCHAR wzSystemFolder[MAX_PATH + 2] = { };
+    LPWSTR sczSystemFolder = NULL;
 
 #if !defined(_WIN64)
     BOOL fIsWow64 = FALSE;
@@ -1979,57 +1979,43 @@ static HRESULT InitializeVariableSystemFolder(
     {
         if (f64)
         {
-            if (!::GetSystemDirectoryW(wzSystemFolder, countof(wzSystemFolder)))
-            {
-                ExitWithLastError(hr, "Failed to get 64-bit system folder.");
-            }
+            hr = PathGetSystemDirectory(&sczSystemFolder);
+            ExitOnFailure(hr, "Failed to get 64-bit system folder.");
         }
         else
         {
-            if (!::GetSystemWow64DirectoryW(wzSystemFolder, countof(wzSystemFolder)))
-            {
-                ExitWithLastError(hr, "Failed to get 32-bit system folder.");
-            }
+            hr = PathGetSystemWow64Directory(&sczSystemFolder);
+            ExitOnFailure(hr, "Failed to get 32-bit system folder.");
         }
     }
     else
     {
         if (!f64)
         {
-            if (!::GetSystemDirectoryW(wzSystemFolder, countof(wzSystemFolder)))
-            {
-                ExitWithLastError(hr, "Failed to get 32-bit system folder.");
-            }
+            hr = PathGetSystemDirectory(&sczSystemFolder);
+            ExitOnFailure(hr, "Failed to get 32-bit system folder.");
         }
     }
 #else
     if (f64)
     {
-        if (!::GetSystemDirectoryW(wzSystemFolder, countof(wzSystemFolder)))
-        {
-            ExitWithLastError(hr, "Failed to get 64-bit system folder.");
-        }
+        hr = PathGetSystemDirectory(&sczSystemFolder);
+        ExitOnFailure(hr, "Failed to get 64-bit system folder.");
     }
     else
     {
-        if (!::GetSystemWow64DirectoryW(wzSystemFolder, countof(wzSystemFolder)))
-        {
-            ExitWithLastError(hr, "Failed to get 32-bit system folder.");
-        }
+        hr = PathGetSystemWow64Directory(&sczSystemFolder);
+        ExitOnFailure(hr, "Failed to get 32-bit system folder.");
     }
 #endif
 
-    if (*wzSystemFolder)
-    {
-        hr = PathFixedBackslashTerminate(wzSystemFolder, countof(wzSystemFolder));
-        ExitOnFailure(hr, "Failed to backslash terminate system folder.");
-    }
-
     // set value
-    hr = BVariantSetString(pValue, wzSystemFolder, 0, FALSE);
+    hr = BVariantSetString(pValue, sczSystemFolder, 0, FALSE);
     ExitOnFailure(hr, "Failed to set system folder variant value.");
 
 LExit:
+    ReleaseStr(sczSystemFolder);
+
     return hr;
 }
 
@@ -2041,26 +2027,25 @@ static HRESULT InitializeVariableWindowsVolumeFolder(
     UNREFERENCED_PARAMETER(dwpData);
 
     HRESULT hr = S_OK;
-    WCHAR wzWindowsPath[MAX_PATH] = { };
-    WCHAR wzVolumePath[MAX_PATH] = { };
+    LPWSTR sczWindowsPath = NULL;
+    LPWSTR sczVolumePath = NULL;
 
     // get windows directory
-    if (!::GetWindowsDirectoryW(wzWindowsPath, countof(wzWindowsPath)))
-    {
-        ExitWithLastError(hr, "Failed to get windows directory.");
-    }
+    hr = PathSystemWindowsSubdirectory(NULL, &sczWindowsPath);
+    ExitOnFailure(hr, "Failed to get windows directory.");
 
     // get volume path name
-    if (!::GetVolumePathNameW(wzWindowsPath, wzVolumePath, MAX_PATH))
-    {
-        ExitWithLastError(hr, "Failed to get volume path name.");
-    }
+    hr = PathGetVolumePathName(sczWindowsPath, &sczVolumePath);
+    ExitOnFailure(hr, "Failed to get volume path name.");
 
     // set value
-    hr = BVariantSetString(pValue, wzVolumePath, 0, FALSE);
+    hr = BVariantSetString(pValue, sczVolumePath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
+    ReleaseStr(sczWindowsPath);
+    ReleaseStr(sczVolumePath);
+
     return hr;
 }
 
