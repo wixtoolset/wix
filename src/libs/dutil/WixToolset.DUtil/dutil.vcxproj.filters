@@ -21,6 +21,9 @@
     <ClCompile Include="aclutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="app2util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="apputil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

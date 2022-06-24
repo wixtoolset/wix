@@ -46,6 +46,7 @@
   <ItemGroup>
     <ClCompile Include="acl2util.cpp" />
     <ClCompile Include="aclutil.cpp" />
+    <ClCompile Include="app2util.cpp" />
     <ClCompile Include="apputil.cpp" />
     <ClCompile Include="apuputil.cpp" />
     <ClCompile Include="atomutil.cpp" />

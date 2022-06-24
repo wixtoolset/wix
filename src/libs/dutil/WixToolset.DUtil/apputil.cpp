@@ -8,6 +8,7 @@
 #define AppExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
 #define AppExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
 #define AppExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_APPUTIL, x, e, s, __VA_ARGS__)
 #define AppExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
 #define AppExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_APPUTIL, p, x, e, s, __VA_ARGS__)
 #define AppExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_APPUTIL, p, x, s, __VA_ARGS__)
@@ -31,20 +32,50 @@ static HRESULT EscapeCommandLineArgument(
     __out_z LPWSTR* psczEscaped
     );
 
-DAPI_(void) AppFreeCommandLineArgs(
-    __in LPWSTR* argv
+DAPI_(HRESULT) LoadSystemLibrary(
+    __in_z LPCWSTR wzModuleName,
+    __out HMODULE* phModule
     )
 {
-    // The "ignored" hack in AppParseCommandLine requires an adjustment.
-    LPWSTR* argvOriginal = argv - 1;
-    ::LocalFree(argvOriginal);
+    HRESULT hr = LoadSystemLibraryWithPath(wzModuleName, phModule, NULL);
+    return hr;
 }
 
-/********************************************************************
-AppInitialize - initializes the standard safety precautions for an
-                installation application.
+DAPI_(HRESULT) LoadSystemLibraryWithPath(
+    __in_z LPCWSTR wzModuleName,
+    __out HMODULE* phModule,
+    __deref_out_z_opt LPWSTR* psczPath
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cch = 0;
+    WCHAR wzPath[MAX_PATH] = { };
 
-********************************************************************/
+    cch = ::GetSystemDirectoryW(wzPath, MAX_PATH);
+    AppExitOnNullWithLastError(cch, hr, "Failed to get the Windows system directory.");
+
+    if (L'\\' != wzPath[cch - 1])
+    {
+        hr = ::StringCchCatNW(wzPath, MAX_PATH, L"\\", 1);
+        AppExitOnRootFailure(hr, "Failed to terminate the string with a backslash.");
+    }
+
+    hr = ::StringCchCatW(wzPath, MAX_PATH, wzModuleName);
+    AppExitOnRootFailure(hr, "Failed to create the fully-qualified path to %ls.", wzModuleName);
+
+    *phModule = ::LoadLibraryW(wzPath);
+    AppExitOnNullWithLastError(*phModule, hr, "Failed to load the library %ls.", wzModuleName);
+
+    if (psczPath)
+    {
+        hr = StrAllocString(psczPath, wzPath, MAX_PATH);
+        AppExitOnFailure(hr, "Failed to copy the path to library.");
+    }
+
+LExit:
+    return hr;
+}
+
 DAPI_(void) AppInitialize(
     __in_ecount(cSafelyLoadSystemDlls) LPCWSTR rgsczSafelyLoadSystemDlls[],
     __in DWORD cSafelyLoadSystemDlls
@@ -99,39 +130,6 @@ DAPI_(void) AppInitialize(
 DAPI_(void) AppInitializeUnsafe()
 {
     ::HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
-}
-
-DAPI_(HRESULT) AppParseCommandLine(
-    __in LPCWSTR wzCommandLine,
-    __in int* pArgc,
-    __in LPWSTR** pArgv
-    )
-{
-    HRESULT hr = S_OK;
-    LPWSTR sczCommandLine = NULL;
-    LPWSTR* argv = NULL;
-    int argc = 0;
-
-    // CommandLineToArgvW tries to treat the first argument as the path to the process,
-    // which fails pretty miserably if your first argument is something like
-    // FOO="C:\Program Files\My Company". So give it something harmless to play with.
-    hr = StrAllocConcat(&sczCommandLine, L"ignored ", 0);
-    AppExitOnFailure(hr, "Failed to initialize command line.");
-
-    hr = StrAllocConcat(&sczCommandLine, wzCommandLine, 0);
-    AppExitOnFailure(hr, "Failed to copy command line.");
-
-    argv = ::CommandLineToArgvW(sczCommandLine, &argc);
-    AppExitOnNullWithLastError(argv, hr, "Failed to parse command line.");
-
-    // Skip "ignored" argument/hack.
-    *pArgv = argv + 1;
-    *pArgc = argc - 1;
-
-LExit:
-    ReleaseStr(sczCommandLine);
-
-    return hr;
 }
 
 DAPI_(HRESULT) AppAppendCommandLineArgument(
