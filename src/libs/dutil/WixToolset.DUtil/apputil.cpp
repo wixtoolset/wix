@@ -17,9 +17,12 @@
 #define AppExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_APPUTIL, e, x, s, __VA_ARGS__)
 #define AppExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_APPUTIL, g, x, s, __VA_ARGS__)
 
-const DWORD PRIVATE_LOAD_LIBRARY_SEARCH_SYSTEM32 = 0x00000800;
 typedef BOOL(WINAPI *LPFN_SETDEFAULTDLLDIRECTORIES)(DWORD);
 typedef BOOL(WINAPI *LPFN_SETDLLDIRECTORYW)(LPCWSTR);
+
+static BOOL vfInitialized = FALSE;
+static LPFN_SETDEFAULTDLLDIRECTORIES vpfnSetDefaultDllDirectories = NULL;
+static LPFN_SETDLLDIRECTORYW vpfnSetDllDirectory = NULL;
 
 /********************************************************************
 EscapeCommandLineArgument - encodes wzArgument such that
@@ -32,12 +35,48 @@ static HRESULT EscapeCommandLineArgument(
     __out_z LPWSTR* psczEscaped
     );
 
+static void Initialize()
+{
+    HRESULT hr = S_OK;
+    HMODULE hKernel32 = NULL;
+
+    if (vfInitialized)
+    {
+        ExitFunction();
+    }
+
+    hKernel32 = ::GetModuleHandleW(L"kernel32");
+    AppExitOnNullWithLastError(hKernel32, hr, "Failed to get module handle for kernel32.");
+
+    vpfnSetDefaultDllDirectories = (LPFN_SETDEFAULTDLLDIRECTORIES)::GetProcAddress(hKernel32, "SetDefaultDllDirectories");
+    vpfnSetDllDirectory = (LPFN_SETDLLDIRECTORYW)::GetProcAddress(hKernel32, "SetDllDirectoryW");
+
+    vfInitialized = TRUE;
+
+LExit:
+    return;
+}
+
 DAPI_(HRESULT) LoadSystemLibrary(
     __in_z LPCWSTR wzModuleName,
     __out HMODULE* phModule
     )
 {
-    HRESULT hr = LoadSystemLibraryWithPath(wzModuleName, phModule, NULL);
+    HRESULT hr = S_OK;
+
+    Initialize();
+
+    if (vpfnSetDefaultDllDirectories) // LOAD_LIBRARY_SEARCH_SYSTEM32 was added at same time as SetDefaultDllDirectories.
+    {
+        *phModule = ::LoadLibraryExW(wzModuleName, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+        AppExitOnNullWithLastError(*phModule, hr, "Failed to get load library with LOAD_LIBRARY_SEARCH_SYSTEM32.");
+    }
+    else
+    {
+        hr = LoadSystemLibraryWithPath(wzModuleName, phModule, NULL);
+    }
+
+LExit:
     return hr;
 }
 
@@ -63,13 +102,38 @@ DAPI_(HRESULT) LoadSystemLibraryWithPath(
     hr = ::StringCchCatW(wzPath, MAX_PATH, wzModuleName);
     AppExitOnRootFailure(hr, "Failed to create the fully-qualified path to %ls.", wzModuleName);
 
-    *phModule = ::LoadLibraryW(wzPath);
+    *phModule = ::LoadLibraryExW(wzPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     AppExitOnNullWithLastError(*phModule, hr, "Failed to load the library %ls.", wzModuleName);
 
     if (psczPath)
     {
         hr = StrAllocString(psczPath, wzPath, MAX_PATH);
         AppExitOnFailure(hr, "Failed to copy the path to library.");
+    }
+
+LExit:
+    return hr;
+}
+
+DAPI_(HRESULT) LoadSystemApiSet(
+    __in_z LPCWSTR wzApiSet,
+    __out HMODULE* phModule
+    )
+{
+    HRESULT hr = S_OK;
+
+    Initialize();
+
+    if (!vpfnSetDefaultDllDirectories)
+    {
+        // For many API sets, the .dll does not actually exist on disk so there's no point on even trying if SetDefaultDllDirectories is not available.
+        // On OS's where API sets are implemented, the loader requires just the API set name with .dll.
+        // It is not safe to pass such strings to LoadLibraryEx without LOAD_LIBRARY_SEARCH_SYSTEM32, which isn't available on old OS's.
+        AppExitWithRootFailure(hr, E_MODNOTFOUND, "OS doesn't support API sets.");
+    }
+    else
+    {
+        hr = LoadSystemLibrary(wzApiSet, phModule);
     }
 
 LExit:
@@ -87,13 +151,12 @@ DAPI_(void) AppInitialize(
 
     ::HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
+    Initialize();
+
     // Best effort call to initialize default DLL directories to system only.
-    HMODULE hKernel32 = ::GetModuleHandleW(L"kernel32");
-    Assert(hKernel32);
-    LPFN_SETDEFAULTDLLDIRECTORIES pfnSetDefaultDllDirectories = (LPFN_SETDEFAULTDLLDIRECTORIES)::GetProcAddress(hKernel32, "SetDefaultDllDirectories");
-    if (pfnSetDefaultDllDirectories)
+    if (vpfnSetDefaultDllDirectories)
     {
-        if (pfnSetDefaultDllDirectories(PRIVATE_LOAD_LIBRARY_SEARCH_SYSTEM32))
+        if (vpfnSetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32))
         {
             fSetDefaultDllDirectories = TRUE;
         }
@@ -109,10 +172,9 @@ DAPI_(void) AppInitialize(
     if (!fSetDefaultDllDirectories)
     {
         // Remove current working directory from search order.
-        LPFN_SETDLLDIRECTORYW pfnSetDllDirectory = (LPFN_SETDLLDIRECTORYW)::GetProcAddress(hKernel32, "SetDllDirectoryW");
-        if (!pfnSetDllDirectory || !pfnSetDllDirectory(L""))
+        if (!vpfnSetDllDirectory || !vpfnSetDllDirectory(L""))
         {
-            hr = HRESULT_FROM_WIN32(::GetLastError());
+            hr = vpfnSetDllDirectory ? HRESULT_FROM_WIN32(::GetLastError()) : HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND);
             TraceError(hr, "Failed to call SetDllDirectory.");
         }
 
