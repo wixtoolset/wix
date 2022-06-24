@@ -353,7 +353,7 @@ extern "C" HRESULT DAPI ConsoleReadW(
             ConExitOnLastError(hr, "failed to read string from console");
 
         cchTotalRead += cchRead;
-        if (1 < cchTotalRead && '\r' == psz[cchTotalRead - 2] || '\n' == psz[cchTotalRead - 1])
+        if (1 < cchTotalRead && '\r' == psz[cchTotalRead - 2] && '\n' == psz[cchTotalRead - 1])
         {
             psz[cchTotalRead - 2] = '\0';  // chop off the \r\n
             break;
