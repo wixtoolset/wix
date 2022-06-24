@@ -207,8 +207,8 @@ extern "C" {
 // other functions
 
 /*******************************************************************
- LoadSystemLibrary - Fully qualifies the path to a module in the
-                     Windows system directory and loads it.
+ LoadSystemLibrary - Securely loads the module from the
+                     Windows system directory.
 
  Returns
    E_MODNOTFOUND - The module could not be found.
@@ -232,6 +232,18 @@ HRESULT DAPI LoadSystemLibraryWithPath(
     __in_z LPCWSTR wzModuleName,
     __out HMODULE* phModule,
     __deref_out_z_opt LPWSTR* psczPath
+    );
+
+/*******************************************************************
+ LoadSystemApiSet - Securely loads the API set provided by the system.
+
+ Returns
+   E_MODNOTFOUND - The module could not be found.
+   * - Another error occured.
+********************************************************************/
+DAPI_(HRESULT) LoadSystemApiSet(
+    __in_z LPCWSTR wzApiSet,
+    __out HMODULE* phModule
     );
 
 #ifdef __cplusplus
