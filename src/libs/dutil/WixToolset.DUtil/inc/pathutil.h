@@ -159,16 +159,28 @@ DAPI_(HRESULT) PathRelativeToModule(
 /*******************************************************************
  PathCreateTempFile
 
- Note: if wzDirectory is null, ::GetTempPath() will be used instead.
+ Note: if wzDirectory is null, ::GetTempPath2() will be used instead.
        if wzFileNameTemplate is null, GetTempFileName() will be used instead.
 *******************************************************************/
 DAPI_(HRESULT) PathCreateTempFile(
     __in_opt LPCWSTR wzDirectory,
     __in_opt __format_string LPCWSTR wzFileNameTemplate,
     __in DWORD dwUniqueCount,
+    __in_z LPCWSTR wzPrefix,
     __in DWORD dwFileAttributes,
     __out_opt LPWSTR* psczTempFile,
     __out_opt HANDLE* phTempFile
+    );
+
+/*******************************************************************
+ PathGetTempFileName - wrapper around ::GetTempFileName.
+    If the wzPathName is too long, it will use its own algorithm.
+*******************************************************************/
+DAPI_(HRESULT) PathGetTempFileName(
+    __in LPCWSTR wzPathName,
+    __in LPCWSTR wzPrefixString,
+    __in UINT uUnique,
+    __out LPWSTR* psczTempFileName
     );
 
 /*******************************************************************
@@ -187,7 +199,7 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
 /*******************************************************************
  PathCreateTempDirectory
 
- Note: if wzDirectory is null, ::GetTempPath() will be used instead.
+ Note: if wzDirectory is null, ::GetTempPath2() will be used instead.
 *******************************************************************/
 DAPI_(HRESULT) PathCreateTempDirectory(
     __in_opt LPCWSTR wzDirectory,
@@ -201,7 +213,24 @@ DAPI_(HRESULT) PathCreateTempDirectory(
     that is backslash terminated.
 *******************************************************************/
 DAPI_(HRESULT) PathGetTempPath(
-    __out_z LPWSTR* psczTempPath
+    __out_z LPWSTR* psczTempPath,
+    __out_opt SIZE_T* pcch
+    );
+
+/*******************************************************************
+ PathGetSystemDirectory - returns the path to the system folder
+    that is backslash terminated.
+*******************************************************************/
+DAPI_(HRESULT) PathGetSystemDirectory(
+    __out_z LPWSTR* psczSystemPath
+    );
+
+/*******************************************************************
+ PathGetSystemWow64Directory - returns the path to the system WoW 64 folder
+    that is backslash terminated.
+*******************************************************************/
+DAPI_(HRESULT) PathGetSystemWow64Directory(
+    __out_z LPWSTR* psczSystemPath
     );
 
 /*******************************************************************
@@ -223,12 +252,11 @@ DAPI_(HRESULT) PathGetSystemTempPaths(
     );
 
 /*******************************************************************
- PathGetKnownFolder - returns the path to a well-known shell folder
-
+ PathGetVolumePathName - wrapper for ::GetVolumePathNameW.
 *******************************************************************/
-DAPI_(HRESULT) PathGetKnownFolder(
-    __in int csidl,
-    __out LPWSTR* psczKnownFolder
+DAPI_(HRESULT) PathGetVolumePathName(
+    __in_z LPCWSTR wzFileName,
+    __out_z LPWSTR* psczVolumePathName
     );
 
 /*******************************************************************
@@ -340,11 +368,34 @@ DAPI_(HRESULT) PathGetHierarchyArray(
     __inout LPUINT pcPathArray
     );
 
+/********************************************************************
+ Path2FunctionAllowFallback - allow functions only available in newer versions of Windows.
+                              Typically used for unit testing.
+
+*********************************************************************/
+void DAPI Path2FunctionAllowFallback();
+
+/********************************************************************
+ Path2FunctionForceFallback - ignore functions only available in newer versions of Windows.
+                              Typically used for unit testing.
+
+*********************************************************************/
+void DAPI Path2FunctionForceFallback();
+
 /*******************************************************************
  PathCanonicalizePath - wrapper around PathCanonicalizeW.
 *******************************************************************/
 DAPI_(HRESULT) PathCanonicalizePath(
     __in_z LPCWSTR wzPath,
+    __deref_out_z LPWSTR* psczCanonicalized
+    );
+
+/*******************************************************************
+ PathAllocCanonicalizePath - wrapper around PathAllocCanonicalize.
+*******************************************************************/
+DAPI_(HRESULT) PathAllocCanonicalizePath(
+    __in_z LPCWSTR wzPath,
+    __in DWORD dwFlags,
     __deref_out_z LPWSTR* psczCanonicalized
     );
 

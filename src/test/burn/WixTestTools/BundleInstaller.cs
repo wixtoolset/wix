@@ -28,6 +28,8 @@ namespace WixTestTools
 
         public int? AlternateExitCode { get; set; }
 
+        public string LogDirectory { get; set; }
+
         public int? LastExitCode { get; set; }
 
         /// <summary>
@@ -194,7 +196,7 @@ namespace WixTestTools
             sb.Append(" -quiet");
             
             // Generate the log file name.
-            string logFile = Path.Combine(Path.GetTempPath(), String.Format("{0}_{1}_{2:yyyyMMddhhmmss}_{4}_{3}.log", this.TestGroupName, this.TestName, DateTime.UtcNow, Path.GetFileNameWithoutExtension(this.Bundle), mode));
+            string logFile = Path.Combine(this.LogDirectory ?? Path.GetTempPath(), String.Format("{0}_{1}_{2:yyyyMMddhhmmss}_{4}_{3}.log", this.TestGroupName, this.TestName, DateTime.UtcNow, Path.GetFileNameWithoutExtension(this.Bundle), mode));
             sb.AppendFormat(" -log \"{0}\"", logFile);
 
             // Set operation.

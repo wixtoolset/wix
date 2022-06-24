@@ -1284,21 +1284,18 @@ extern "C" HRESULT DAPI FileCreateTempW(
     Assert(wzPrefix && *wzPrefix);
     HRESULT hr = E_FAIL;
 
-    WCHAR wzTempPath[MAX_PATH];
-    DWORD cchTempPath = countof(wzTempPath);
+    LPWSTR pwzTempPath = NULL;
     LPWSTR pwzTempFile = NULL;
 
     HANDLE hTempFile = INVALID_HANDLE_VALUE;
     int i = 0;
 
-    if (!::GetTempPathW(cchTempPath, wzTempPath))
-    {
-        FileExitOnLastError(hr, "failed to get temp path");
-    }
+    hr = PathGetTempPath(&pwzTempPath, NULL);
+    FileExitOnFailure(hr, "failed to get temp path");
 
     for (i = 0; i < 1000 && INVALID_HANDLE_VALUE == hTempFile; ++i)
     {
-        hr = StrAllocFormatted(&pwzTempFile, L"%s%s%05d.%s", wzTempPath, wzPrefix, i, wzExtension);
+        hr = StrAllocFormatted(&pwzTempFile, L"%s%s%05d.%s", pwzTempPath, wzPrefix, i, wzExtension);
         FileExitOnFailure(hr, "failed to allocate memory for temp filename");
 
         hTempFile = ::CreateFileW(pwzTempFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -1330,6 +1327,7 @@ extern "C" HRESULT DAPI FileCreateTempW(
 LExit:
     ReleaseFile(hTempFile);
     ReleaseStr(pwzTempFile);
+    ReleaseStr(pwzTempPath);
 
     return hr;
 }

@@ -148,6 +148,7 @@ extern "C" HRESULT ApprovedExesLaunch(
     LPWSTR sczCommand = NULL;
     LPWSTR sczCommandObfuscated = NULL;
     LPWSTR sczExecutableDirectory = NULL;
+    size_t cchExecutableDirectory = 0;
     STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
 
@@ -177,9 +178,17 @@ extern "C" HRESULT ApprovedExesLaunch(
     // Try to get the directory of the executable so we can set the current directory of the process to help those executables
     // that expect stuff to be relative to them.  Best effort only.
     hr = PathGetDirectory(pLaunchApprovedExe->sczExecutablePath, &sczExecutableDirectory);
+    if (SUCCEEDED(hr))
+    {
+        // CreateProcessW has undocumented MAX_PATH restriction for lpCurrentDirectory even when long path support is enabled.
+        hr = ::StringCchLengthW(sczExecutableDirectory, MAX_PATH - 1, &cchExecutableDirectory);
+    }
+
     if (FAILED(hr))
     {
         ReleaseNullStr(sczExecutableDirectory);
+
+        hr = S_OK;
     }
 
     LogId(REPORT_STANDARD, MSG_LAUNCHING_APPROVED_EXE, pLaunchApprovedExe->sczExecutablePath, sczCommandObfuscated);

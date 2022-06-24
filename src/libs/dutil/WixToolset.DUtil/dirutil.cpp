@@ -59,34 +59,10 @@ LExit:
  *******************************************************************/
 extern "C" HRESULT DAPI DirCreateTempPath(
     __in_z LPCWSTR wzPrefix,
-    __out_ecount_z(cchPath) LPWSTR wzPath,
-    __in DWORD cchPath
+    __out_opt LPWSTR* psczTempFile
     )
 {
-    Assert(wzPrefix);
-    Assert(wzPath);
-
-    HRESULT hr = S_OK;
-
-    WCHAR wzDir[MAX_PATH];
-    WCHAR wzFile[MAX_PATH];
-    DWORD cch = 0;
-
-    cch = ::GetTempPathW(countof(wzDir), wzDir);
-    if (!cch || cch >= countof(wzDir))
-    {
-        DirExitWithLastError(hr, "Failed to GetTempPath.");
-    }
-
-    if (!::GetTempFileNameW(wzDir, wzPrefix, 0, wzFile))
-    {
-        DirExitWithLastError(hr, "Failed to GetTempFileName.");
-    }
-
-    hr = ::StringCchCopyW(wzPath, cchPath, wzFile);
-
-LExit:
-    return hr;
+    return PathCreateTempFile(NULL, NULL, 0, wzPrefix, 0, psczTempFile, NULL);
 }
 
 
@@ -192,18 +168,19 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
     Assert(wzPath && *wzPath);
 
     HRESULT hr = S_OK;
-    DWORD er;
+    DWORD er = ERROR_SUCCESS;
 
-    DWORD dwAttrib;
+    DWORD dwAttrib = 0;
     HANDLE hFind = INVALID_HANDLE_VALUE;
     LPWSTR sczDelete = NULL;
-    WIN32_FIND_DATAW wfd;
+    WIN32_FIND_DATAW wfd = { };
 
     BOOL fDeleteFiles = (DIR_DELETE_FILES == (dwFlags & DIR_DELETE_FILES));
     BOOL fRecurse = (DIR_DELETE_RECURSE == (dwFlags & DIR_DELETE_RECURSE));
     BOOL fScheduleDelete = (DIR_DELETE_SCHEDULE == (dwFlags & DIR_DELETE_SCHEDULE));
-    WCHAR wzTempDirectory[MAX_PATH] = { };
-    WCHAR wzTempPath[MAX_PATH] = { };
+    WCHAR wzSafeFileName[MAX_PATH + 1] = { };
+    LPWSTR sczTempDirectory = NULL;
+    LPWSTR sczTempPath = NULL;
 
     if (-1 == (dwAttrib = ::GetFileAttributesW(wzPath)))
     {
@@ -231,10 +208,8 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
         {
             if (fScheduleDelete)
             {
-                if (!::GetTempPathW(countof(wzTempDirectory), wzTempDirectory))
-                {
-                    DirExitWithLastError(hr, "Failed to get temp directory.");
-                }
+                hr = PathGetTempPath(&sczTempDirectory, NULL);
+                DirExitOnFailure(hr, "Failed to get temp directory.");
             }
 
             // Delete everything in this directory.
@@ -256,10 +231,11 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                 }
 
                 // For extra safety and to silence OACR.
-                wfd.cFileName[MAX_PATH - 1] = L'\0';
+                hr = ::StringCchCopyNExW(wzSafeFileName, countof(wzSafeFileName), wfd.cFileName, countof(wfd.cFileName), NULL, NULL, STRSAFE_FILL_BEHIND_NULL | STRSAFE_NULL_ON_FAILURE);
+                DirExitOnFailure(hr, "Failed to ensure file name was null terminated.");
 
-                hr = PathConcat(wzPath, wfd.cFileName, &sczDelete);
-                DirExitOnFailure(hr, "Failed to concat filename '%ls' to directory: %ls", wfd.cFileName, wzPath);
+                hr = PathConcat(wzPath, wzSafeFileName, &sczDelete);
+                DirExitOnFailure(hr, "Failed to concat filename '%ls' to directory: %ls", wzSafeFileName, wzPath);
 
                 if (fRecurse && wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
@@ -288,16 +264,14 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                     {
                         if (fScheduleDelete)
                         {
-                            if (!::GetTempFileNameW(wzTempDirectory, L"DEL", 0, wzTempPath))
-                            {
-                                DirExitWithLastError(hr, "Failed to get temp file to move to.");
-                            }
+                            hr = PathGetTempFileName(sczTempDirectory, L"DEL", 0, &sczTempPath);
+                            DirExitOnFailure(hr, "Failed to get temp file to move to.");
 
                             // Try to move the file to the temp directory then schedule for delete,
                             // otherwise just schedule for delete.
-                            if (::MoveFileExW(sczDelete, wzTempPath, MOVEFILE_REPLACE_EXISTING))
+                            if (::MoveFileExW(sczDelete, sczTempPath, MOVEFILE_REPLACE_EXISTING))
                             {
-                                ::MoveFileExW(wzTempPath, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
+                                ::MoveFileExW(sczTempPath, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
                             }
                             else
                             {
@@ -348,6 +322,8 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
 LExit:
     ReleaseFileFindHandle(hFind);
     ReleaseStr(sczDelete);
+    ReleaseStr(sczTempDirectory);
+    ReleaseStr(sczTempPath);
 
     return hr;
 }

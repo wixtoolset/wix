@@ -211,7 +211,7 @@ extern "C" void LoggingOpenFailed()
     LPCWSTR* lpStrings = const_cast<LPCWSTR*>(&LOG_FAILED_EVENT_LOG_MESSAGE);
     WORD wNumStrings = 1;
 
-    hr = LogOpen(NULL, L"Setup", L"_Failed", L"txt", FALSE, FALSE, NULL);
+    hr = LogOpen(NULL, L"Setup", L"_Failed", L"log", FALSE, FALSE, NULL);
     if (SUCCEEDED(hr))
     {
         ExitFunction();
@@ -965,19 +965,14 @@ static HRESULT GetNonSessionSpecificTempFolder(
     )
 {
     HRESULT hr = S_OK;
-    WCHAR wzTempFolder[MAX_PATH] = { };
+    LPWSTR sczTempFolder = NULL;
     SIZE_T cchTempFolder = 0;
     DWORD dwSessionId = 0;
     LPWSTR sczSessionId = 0;
     SIZE_T cchSessionId = 0;
 
-    if (!::GetTempPathW(countof(wzTempFolder), wzTempFolder))
-    {
-        ExitWithLastError(hr, "Failed to get temp folder.");
-    }
-
-    hr = ::StringCchLengthW(wzTempFolder, countof(wzTempFolder), reinterpret_cast<size_t*>(&cchTempFolder));
-    ExitOnFailure(hr, "Failed to get length of temp folder.");
+    hr = PathGetTempPath(&sczTempFolder, &cchTempFolder);
+    ExitOnFailure(hr, "Failed to get temp folder.");
 
     // If our session id is in the TEMP path then remove that part so we get the non-session
     // specific temporary folder.
@@ -989,17 +984,18 @@ static HRESULT GetNonSessionSpecificTempFolder(
         hr = ::StringCchLengthW(sczSessionId, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchSessionId));
         ExitOnFailure(hr, "Failed to get length of session id string.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzTempFolder + cchTempFolder - cchSessionId, static_cast<DWORD>(cchSessionId), sczSessionId, static_cast<DWORD>(cchSessionId)))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, sczTempFolder + cchTempFolder - cchSessionId, static_cast<DWORD>(cchSessionId), sczSessionId, static_cast<DWORD>(cchSessionId)))
         {
             cchTempFolder -= cchSessionId;
         }
     }
 
-    hr = StrAllocString(psczNonSessionTempFolder, wzTempFolder, cchTempFolder);
+    hr = StrAllocString(psczNonSessionTempFolder, sczTempFolder, cchTempFolder);
     ExitOnFailure(hr, "Failed to copy temp folder.");
 
 LExit:
     ReleaseStr(sczSessionId);
+    ReleaseStr(sczTempFolder);
 
     return hr;
 }

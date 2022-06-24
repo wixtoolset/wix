@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace TestExe
@@ -151,6 +153,67 @@ namespace TestExe
         }
     }
 
+    public class DeleteManifestsTask : Task
+    {
+        public DeleteManifestsTask(string Data) : base(Data) { }
+
+        public override void RunTask()
+        {
+            string filePath = System.Environment.ExpandEnvironmentVariables(this.data);
+            IntPtr type = new IntPtr(24); //RT_MANIFEST
+            IntPtr name = new IntPtr(1); //CREATEPROCESS_MANIFEST_RESOURCE_ID
+            DeleteResource(filePath, type, name, 1033);
+        }
+
+        private static void DeleteResource(string filePath, IntPtr type, IntPtr name, ushort language, bool throwOnError = false)
+        {
+            bool discard = true;
+            IntPtr handle = BeginUpdateResourceW(filePath, false);
+            try
+            {
+                if (handle == IntPtr.Zero)
+                {
+                    throw new Win32Exception();
+                }
+
+                if (!UpdateResourceW(handle, type, name, language, IntPtr.Zero, 0))
+                {
+                    throw new Win32Exception();
+                }
+
+                discard = false;
+            }
+            catch
+            {
+                if (throwOnError)
+                {
+                    throw;
+                }
+            }
+            finally
+            {
+                if (handle != IntPtr.Zero)
+                {
+                    if (!EndUpdateResourceW(handle, discard) && throwOnError)
+                    {
+                        throw new Win32Exception();
+                    }
+                }
+            }
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+        private extern static IntPtr BeginUpdateResourceW(string fileName, [MarshalAs(UnmanagedType.Bool)] bool deleteExistingResources);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private extern static bool UpdateResourceW(IntPtr hUpdate, IntPtr type, IntPtr name, ushort language, IntPtr pData, uint cb);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private extern static bool EndUpdateResourceW(IntPtr hUpdate, [MarshalAs(UnmanagedType.Bool)] bool discard);
+    }
+
     public class TaskParser
     {
 
@@ -195,6 +258,10 @@ namespace TestExe
                                 break;
                             case "/fe":
                                 t = new FileExistsTask(args[i + 1]);
+                                tasks.Add(t);
+                                break;
+                            case "/dm":
+                                t = new DeleteManifestsTask(args[i + 1]);
                                 tasks.Add(t);
                                 break;
 #if NET35

@@ -87,31 +87,27 @@ DAPI_(HRESULT) LoadSystemLibraryWithPath(
     )
 {
     HRESULT hr = S_OK;
-    DWORD cch = 0;
-    WCHAR wzPath[MAX_PATH] = { };
+    LPWSTR sczDirectory = NULL;
+    LPWSTR sczPath = NULL;
 
-    cch = ::GetSystemDirectoryW(wzPath, MAX_PATH);
-    AppExitOnNullWithLastError(cch, hr, "Failed to get the Windows system directory.");
+    hr = PathGetSystemDirectory(&sczDirectory);
+    AppExitOnFailure(hr, "Failed to get the Windows system directory.");
 
-    if (L'\\' != wzPath[cch - 1])
-    {
-        hr = ::StringCchCatNW(wzPath, MAX_PATH, L"\\", 1);
-        AppExitOnRootFailure(hr, "Failed to terminate the string with a backslash.");
-    }
+    hr = StrAllocFormatted(&sczPath, L"%ls%ls", sczDirectory, wzModuleName);
+    AppExitOnFailure(hr, "Failed to create the fully-qualified path to %ls.", wzModuleName);
 
-    hr = ::StringCchCatW(wzPath, MAX_PATH, wzModuleName);
-    AppExitOnRootFailure(hr, "Failed to create the fully-qualified path to %ls.", wzModuleName);
-
-    *phModule = ::LoadLibraryExW(wzPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    AppExitOnNullWithLastError(*phModule, hr, "Failed to load the library %ls.", wzModuleName);
+    *phModule = ::LoadLibraryExW(sczPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    AppExitOnNullWithLastError(*phModule, hr, "Failed to load the library %ls.", sczPath);
 
     if (psczPath)
     {
-        hr = StrAllocString(psczPath, wzPath, MAX_PATH);
-        AppExitOnFailure(hr, "Failed to copy the path to library.");
+        *psczPath = sczPath;
+        sczPath = NULL;
     }
 
 LExit:
+    ReleaseStr(sczDirectory);
+
     return hr;
 }
 

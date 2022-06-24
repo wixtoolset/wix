@@ -12,6 +12,8 @@ namespace WixBuildTools.TestSupport
 
         public string[] StandardOutput { get; set; }
 
-        public ProcessStartInfo StartInfo { get; set; }
+        public string FileName { get; set; }
+
+        public string Arguments { get; set; }
     }
 }

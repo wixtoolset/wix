@@ -486,7 +486,7 @@ static HRESULT RunUntrusted(
 
     si.cb = sizeof(si);
     si.wShowWindow = static_cast<WORD>(pEngineState->command.nCmdShow);
-    if (!::CreateProcessW(wzCleanRoomBundlePath, sczFullCommandLine, NULL, NULL, TRUE, 0, 0, NULL, &si, &pi))
+    if (!::CreateProcessW(wzCleanRoomBundlePath, sczFullCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
     {
         ExitWithLastError(hr, "Failed to launch clean room process: %ls", sczFullCommandLine);
     }

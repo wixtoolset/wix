@@ -7,6 +7,11 @@ using namespace System::IO;
 using namespace Xunit;
 using namespace WixBuildTools::TestSupport;
 
+// from PathCch.h
+#ifndef PATHCCH_ALLOW_LONG_PATHS
+#define PATHCCH_ALLOW_LONG_PATHS       0x01
+#endif
+
 namespace DutilTests
 {
     public ref class PathUtil
@@ -102,7 +107,27 @@ namespace DutilTests
         }
 
         [Fact]
+        void PathCanonicalizeForComparisonFallbackTest()
+        {
+            Path2FunctionForceFallback();
+
+            try
+            {
+                PathCanonicalizeForComparisonTestCore(FALSE);
+            }
+            finally
+            {
+                Path2FunctionAllowFallback();
+            }
+        }
+
+        [Fact]
         void PathCanonicalizeForComparisonTest()
+        {
+            PathCanonicalizeForComparisonTestCore(TRUE);
+        }
+
+        void PathCanonicalizeForComparisonTestCore(BOOL fLongPathSupported)
         {
             HRESULT hr = S_OK;
             LPWSTR sczCanonicalized = NULL;
@@ -110,10 +135,26 @@ namespace DutilTests
             try
             {
                 hr = PathCanonicalizeForComparison(L"C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", 0, &sczCanonicalized);
-                Assert::Equal<HRESULT>(HRESULT_FROM_WIN32(ERROR_FILENAME_EXCED_RANGE), hr);
+                if (!fLongPathSupported)
+                {
+                    Assert::Equal<HRESULT>(HRESULT_FROM_WIN32(ERROR_FILENAME_EXCED_RANGE), hr);
+                }
+                else
+                {
+                    NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                    NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                }
 
                 hr = PathCanonicalizeForComparison(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", 0, &sczCanonicalized);
-                Assert::Equal<HRESULT>(HRESULT_FROM_WIN32(ERROR_FILENAME_EXCED_RANGE), hr);
+                if (!fLongPathSupported)
+                {
+                    Assert::Equal<HRESULT>(HRESULT_FROM_WIN32(ERROR_FILENAME_EXCED_RANGE), hr);
+                }
+                else
+                {
+                    NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                    NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                }
 
                 hr = PathCanonicalizeForComparison(L"\\\\server", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
@@ -230,6 +271,52 @@ namespace DutilTests
                 hr = PathCanonicalizeForComparison(L"C:\\addbackslash.exe", PATH_CANONICALIZE_BACKSLASH_TERMINATE, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
                 NativeAssert::StringEqual(L"C:\\addbackslash.exe\\", sczCanonicalized);
+            }
+            finally
+            {
+                ReleaseStr(sczCanonicalized);
+            }
+        }
+
+        [Fact]
+        void PathAllocCanonicalizePathTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczCanonicalized = NULL;
+
+            try
+            {
+                hr = PathAllocCanonicalizePath(L"C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+
+                hr = PathAllocCanonicalizePath(L"abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+
+                hr = PathAllocCanonicalizePath(L"\\\\server\\share\\..\\..\\otherdir\\unc.exe", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\otherdir\\unc.exe", sczCanonicalized); // This is surprising.
+
+                hr = PathAllocCanonicalizePath(L"C:\\dir\\subdir\\..\\..\\otherdir\\backslashes.exe", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"C:\\otherdir\\backslashes.exe", sczCanonicalized);
+
+                hr = PathAllocCanonicalizePath(L"C:/dir/subdir/../../otherdir/forwardslashes.exe", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"C:/dir/subdir/../../otherdir/forwardslashes.exe", sczCanonicalized);
+
+                hr = PathAllocCanonicalizePath(L"\\\\?\\C:\\test\\..\\validlongpath.exe", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"C:\\validlongpath.exe", sczCanonicalized);
+
+                hr = PathAllocCanonicalizePath(L"\\\\?\\test\\..\\invalidlongpath.exe", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"\\\\?\\invalidlongpath.exe", sczCanonicalized);
+
+                hr = PathAllocCanonicalizePath(L"C:\\.\\invalid:pathchars?.exe", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
+                NativeAssert::Succeeded(hr, "Failed to canonicalize path");
+                NativeAssert::StringEqual(L"C:\\invalid:pathchars?.exe", sczCanonicalized);
             }
             finally
             {
@@ -545,6 +632,25 @@ namespace DutilTests
         }
 
         [Fact]
+        void PathForCurrentProcessTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczPath = NULL;
+
+            try
+            {
+                hr = PathForCurrentProcess(&sczPath, NULL);
+                NativeAssert::Succeeded(hr, "Failed to get current process path.");
+
+                WixAssert::StringEqual(System::Diagnostics::Process::GetCurrentProcess()->MainModule->FileName, gcnew String(sczPath), false);
+            }
+            finally
+            {
+                ReleaseStr(sczPath);
+            }
+        }
+
+        [Fact]
         void PathGetDirectoryTest()
         {
             HRESULT hr = S_OK;
@@ -824,6 +930,78 @@ namespace DutilTests
             finally
             {
                 ReleaseStrArray(rgsczPaths, cPaths);
+            }
+        }
+
+        [Fact]
+        void PathGetTempPathTest()
+        {
+            HRESULT hr = S_OK;
+            LPCWSTR wzEnvName = L"TMP";
+            LPCWSTR wzEnvName2 = L"TEMP";
+            LPCWSTR wzLongTempPath = L"C:\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\\";
+            LPWSTR sczTempPath = NULL;
+            WCHAR wzOriginalTemp[MAX_PATH + 1] = { };
+            WCHAR wzOriginalTemp2[MAX_PATH + 1] = { };
+            DWORD cch = 0;
+            DWORD cch2 = 0;
+            SIZE_T cchTemp = 0;
+            size_t cchTemp2 = 0;
+
+            try
+            {
+                cch = ::GetEnvironmentVariableW(wzEnvName, wzOriginalTemp, countof(wzOriginalTemp));
+                Assert::NotEqual<DWORD>(0, cch);
+
+                if (!::SetEnvironmentVariableW(wzEnvName, wzLongTempPath))
+                {
+                    Assert::Equal<DWORD>(0xFFFFFFFF, ::GetLastError());
+                }
+
+                cch2 = ::GetEnvironmentVariableW(wzEnvName2, wzOriginalTemp2, countof(wzOriginalTemp2));
+                Assert::NotEqual<DWORD>(0, cch2);
+
+                hr = PathGetTempPath(&sczTempPath, &cchTemp);
+                NativeAssert::Succeeded(hr, "Failed to get temp path.");
+
+                PathFixedBackslashTerminate(wzOriginalTemp2, countof(wzOriginalTemp2));
+
+                hr = ::StringCchLengthW(wzOriginalTemp2, countof(wzOriginalTemp2), &cchTemp2);
+                NativeAssert::Succeeded(hr, "Failed to get temp path length.");
+
+                NativeAssert::StringEqual(wzOriginalTemp2, sczTempPath);
+                Assert::Equal<SIZE_T>(cchTemp2, cchTemp);
+            }
+            finally
+            {
+                if (cch)
+                {
+                    ::SetEnvironmentVariableW(wzEnvName, wzOriginalTemp);
+                }
+
+                ReleaseStr(sczTempPath);
+            }
+        }
+
+        [Fact]
+        void PathGetVolumePathNameTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczVolumePathName = NULL;
+
+            try
+            {
+                hr = StrAlloc(&sczVolumePathName, 1);
+                NativeAssert::Succeeded(hr, "Failed to alloc volume path name.");
+
+                hr = PathGetVolumePathName(L"C:\\Windows", &sczVolumePathName);
+                NativeAssert::Succeeded(hr, "PathGetVolumePathName failed.");
+
+                NativeAssert::StringEqual(L"C:\\", sczVolumePathName);
+            }
+            finally
+            {
+                ReleaseStr(sczVolumePathName);
             }
         }
 

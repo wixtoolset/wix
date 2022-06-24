@@ -110,7 +110,7 @@ namespace WixTestTools
             this.NoRestart = true;
             this.ForceRestart = false;
             this.PromptRestart = false;
-            this.LogFile = string.Empty;
+            this.LogFile = String.Empty;
             this.LoggingOptions = MSIExecLoggingOptions.VOICEWARMUP;
             this.OtherArguments = String.Empty;
         }
@@ -230,14 +230,14 @@ namespace WixTestTools
             }
 
             // logfile and logging options
-            if (0 != loggingOptionsString.Length || !string.IsNullOrEmpty(this.LogFile))
+            if (0 != loggingOptionsString.Length || !String.IsNullOrEmpty(this.LogFile))
             {
                 arguments.Append(" /l");
                 if (0 != loggingOptionsString.Length)
                 {
                     arguments.AppendFormat("{0} ", loggingOptionsString);
                 }
-                if (!string.IsNullOrEmpty(this.LogFile))
+                if (!String.IsNullOrEmpty(this.LogFile))
                 {
                     arguments.AppendFormat(" \"{0}\" ", this.LogFile);
                 }
@@ -268,7 +268,7 @@ namespace WixTestTools
             };
 
             // product
-            if (!string.IsNullOrEmpty(this.Product))
+            if (!String.IsNullOrEmpty(this.Product))
             {
                 arguments.AppendFormat(" \"{0}\" ", this.Product);
             }
@@ -309,6 +309,12 @@ namespace WixTestTools
             /// The function returns the value ERROR_CALL_NOT_IMPLEMENTED. Available beginning with Windows Installer version 3.0. 
             /// </summary>
             ERROR_CALL_NOT_IMPLEMENTED = 120,
+
+            /// <summary>
+            /// ERROR_FILENAME_EXCED_RANGE              206
+            /// The filename or extension is too long.
+            /// </summary>
+            ERROR_FILENAME_EXCED_RANGE = 206,
 
             /// <summary>
             /// ERROR_APPHELP_BLOCK                     1259 

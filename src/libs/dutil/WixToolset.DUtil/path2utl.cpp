@@ -19,6 +19,65 @@
 #define PathExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PATHUTIL, g, x, s, __VA_ARGS__)
 
 
+typedef HRESULT(WINAPI* PFN_PATH_ALLOC_CANONICALIZE)(
+    __in LPCWSTR wzSource,
+    __in DWORD dwFlags,
+    __out_z LPWSTR* psczPathOut
+    );
+
+static BOOL vfInitialized = FALSE;
+static HMODULE vhPathApiSet_1_1_0 = NULL;
+static PFN_PATH_ALLOC_CANONICALIZE vpfnPathAllocCanonicalize = NULL;
+static BOOL vfForceFallback = FALSE;
+
+// from PathCch.h
+#ifndef PATHCCH_ALLOW_LONG_PATHS
+#define PATHCCH_ALLOW_LONG_PATHS       0x01
+#endif
+
+static HRESULT Initialize()
+{
+    HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
+
+    if (vfInitialized)
+    {
+        ExitFunction();
+    }
+
+    hr = LoadSystemApiSet(L"api-ms-win-core-path-l1-1-0.dll", &vhPathApiSet_1_1_0);
+    if (E_MODNOTFOUND == hr)
+    {
+        hr = E_NOTIMPL;
+    }
+    PathExitOnFailure(hr, "Failed to load api-ms-win-core-path-l1-1-0.dll");
+
+    vpfnPathAllocCanonicalize = reinterpret_cast<PFN_PATH_ALLOC_CANONICALIZE>(::GetProcAddress(vhPathApiSet_1_1_0, "PathAllocCanonicalize"));
+    if (!vpfnPathAllocCanonicalize)
+    {
+        er = ::GetLastError();
+        PathExitWithRootFailure(hr, ERROR_PROC_NOT_FOUND == er ? E_NOTIMPL : HRESULT_FROM_WIN32(er), "Failed to get address of PathAllocCanonicalize.");
+    }
+
+    vfInitialized = TRUE;
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(void) Path2FunctionAllowFallback()
+{
+    vfForceFallback = FALSE;
+}
+
+
+DAPI_(void) Path2FunctionForceFallback()
+{
+    vfForceFallback = TRUE;
+}
+
+
 DAPI_(HRESULT) PathCanonicalizePath(
     __in_z LPCWSTR wzPath,
     __deref_out_z LPWSTR* psczCanonicalized
@@ -40,6 +99,37 @@ DAPI_(HRESULT) PathCanonicalizePath(
     }
 
 LExit:
+    return hr;
+}
+
+DAPI_(HRESULT) PathAllocCanonicalizePath(
+    __in_z LPCWSTR wzPath,
+    __in DWORD dwFlags,
+    __deref_out_z LPWSTR* psczCanonicalized
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCanonicalizedPath = NULL;
+
+    hr = Initialize();
+    if (E_NOTIMPL == hr || SUCCEEDED(hr) && !vpfnPathAllocCanonicalize)
+    {
+        ExitFunction1(hr = E_NOTIMPL);
+    }
+    PathExitOnFailure(hr, "Failed to initialize path2utl.");
+
+    hr = vpfnPathAllocCanonicalize(wzPath, dwFlags, &sczCanonicalizedPath);
+    PathExitOnFailure(hr, "Failed to canonicalize: %ls", wzPath);
+
+    hr = StrAllocString(psczCanonicalized, sczCanonicalizedPath, 0);
+    PathExitOnFailure(hr, "Failed to copy the canonicalized path.");
+
+LExit:
+    if (sczCanonicalizedPath)
+    {
+        ::LocalFree(sczCanonicalizedPath);
+    }
+
     return hr;
 }
 
@@ -75,7 +165,19 @@ DAPI_(HRESULT) PathCanonicalizeForComparison(
 
     if (*wzNormalizedPath)
     {
-        hr = PathCanonicalizePath(wzNormalizedPath, psczCanonicalized);
+        if (!vfForceFallback)
+        {
+            hr = PathAllocCanonicalizePath(wzNormalizedPath, PATHCCH_ALLOW_LONG_PATHS, psczCanonicalized);
+        }
+        else
+        {
+            hr = E_NOTIMPL;
+        }
+
+        if (E_NOTIMPL == hr)
+        {
+            hr = PathCanonicalizePath(wzNormalizedPath, psczCanonicalized);
+        }
         PathExitOnFailure(hr, "Failed to canonicalize: %ls", wzNormalizedPath);
     }
     else
@@ -273,33 +375,52 @@ DAPI_(HRESULT) PathSystemWindowsSubdirectory(
     )
 {
     HRESULT hr = S_OK;
-    WCHAR wzTempPath[MAX_PATH + 1] = { };
+    LPWSTR sczWindowsPath = NULL;
+    DWORD cchBuffer = MAX_PATH + 1;
     DWORD cch = 0;
 
-    cch = ::GetSystemWindowsDirectoryW(wzTempPath, countof(wzTempPath));
-    if (!cch)
+    hr = StrAlloc(&sczWindowsPath, cchBuffer);
+    PathExitOnFailure(hr, "Failed to alloc Windows directory path.");
+
+    cch = ::GetSystemWindowsDirectoryW(sczWindowsPath, cchBuffer);
+    PathExitOnNullWithLastError(cch, hr, "Failed to get Windows directory path with default size.");
+
+    cch += 1; // add 1 for null terminator.
+
+    if (cch > cchBuffer)
     {
-        PathExitWithLastError(hr, "Failed to get Windows directory path.");
-    }
-    else if (cch >= countof(wzTempPath))
-    {
-        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Windows directory path too long.");
+        hr = StrAlloc(&sczWindowsPath, cch);
+        PathExitOnFailure(hr, "Failed to realloc Windows directory path.");
+
+        cchBuffer = cch;
+
+        cch = ::GetSystemWindowsDirectoryW(sczWindowsPath, cchBuffer);
+        PathExitOnNullWithLastError(cch, hr, "Failed to get Windows directory path with returned size.");
+
+        cch += 1; // add 1 for null terminator.
+
+        if (cch > cchBuffer)
+        {
+            PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Failed to get Windows directory path with returned size.");
+        }
     }
 
     if (wzSubdirectory)
     {
-        hr = PathConcatRelativeToBase(wzTempPath, wzSubdirectory, psczFullPath);
+        hr = PathConcatRelativeToBase(sczWindowsPath, wzSubdirectory, psczFullPath);
         PathExitOnFailure(hr, "Failed to concat subdirectory on Windows directory path.");
     }
     else
     {
-        hr = StrAllocString(psczFullPath, wzTempPath, 0);
-        PathExitOnFailure(hr, "Failed to copy Windows directory path.");
+        *psczFullPath = sczWindowsPath;
+        sczWindowsPath = NULL;
     }
 
     hr = PathBackslashTerminate(psczFullPath);
     PathExitOnFailure(hr, "Failed to terminate Windows directory path with backslash.");
 
 LExit:
+    ReleaseStr(sczWindowsPath);
+
     return hr;
 }

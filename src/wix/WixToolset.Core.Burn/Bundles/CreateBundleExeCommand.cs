@@ -231,6 +231,10 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteEndElement();
                     }
 
+                    writer.WriteStartElement("longPathAware", ws2016Namespace);
+                    writer.WriteString("true");
+                    writer.WriteEndElement();
+
                     writer.WriteEndElement(); // </windowSettings>
                     writer.WriteEndElement(); // </application>
                 }
