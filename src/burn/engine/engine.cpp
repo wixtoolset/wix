@@ -50,6 +50,15 @@ static HRESULT DAPI RedirectLoggingOverPipe(
     __in_opt LPVOID pvContext
     );
 static HRESULT Restart();
+static void CALLBACK BurnTraceError(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    );
 
 
 // function definitions
@@ -105,6 +114,7 @@ extern "C" HRESULT EngineRun(
 
     // Always initialize logging first
     LogInitialize(::GetModuleHandleW(NULL));
+    DutilInitialize(&BurnTraceError);
     fLogInitialized = TRUE;
 
     // Ensure that log contains approriate level of information
@@ -313,6 +323,7 @@ LExit:
 
     if (fLogInitialized)
     {
+        DutilUninitialize();
         LogClose(FALSE);
     }
 
@@ -968,4 +979,34 @@ static HRESULT Restart()
 LExit:
     ReleaseHandle(hProcessToken);
     return hr;
+}
+
+static void CALLBACK BurnTraceError(
+    __in_z LPCSTR /*szFile*/,
+    __in int /*iLine*/,
+    __in REPORT_LEVEL /*rl*/,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    BOOL fLog = FALSE;
+
+    switch (source)
+    {
+    case DUTIL_SOURCE_DEFAULT:
+        fLog = TRUE;
+        break;
+    default:
+        fLog = REPORT_VERBOSE < LogGetLevel();
+        break;
+    }
+
+    if (fLog)
+    {
+        DutilSuppressTraceErrorSource();
+        LogErrorStringArgs(hrError, szFormat, args);
+        DutilUnsuppressTraceErrorSource();
+    }
 }
