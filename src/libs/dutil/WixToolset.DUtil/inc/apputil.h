@@ -16,6 +16,11 @@ void DAPI AppFreeCommandLineArgs(
     __in LPWSTR* argv
     );
 
+/********************************************************************
+AppInitialize - initializes the standard safety precautions for an
+                installation application.
+
+********************************************************************/
 void DAPI AppInitialize(
     __in_ecount(cSafelyLoadSystemDlls) LPCWSTR rgsczSafelyLoadSystemDlls[],
     __in DWORD cSafelyLoadSystemDlls
