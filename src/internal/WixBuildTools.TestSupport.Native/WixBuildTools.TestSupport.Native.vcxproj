@@ -33,7 +33,7 @@
     <CLRSupport>true</CLRSupport>
     <Description>WixBuildTools C++/CLI Test Support</Description>
     <SignOutput>false</SignOutput>
-    <IsWixTestProject>true</IsWixTestProject>
+    <IsWixTestSupportProject>true</IsWixTestSupportProject>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
