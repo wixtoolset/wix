@@ -9,6 +9,15 @@
     <SigningConfiguration>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), signing.json))\signing.json</SigningConfiguration>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(IsWixTestSupportProject)'=='true' ">
+    <IsTestProject>false</IsTestProject>
+    <IsWixTestProject>true</IsWixTestProject>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsWixTestSupportProject)'=='true' ">
+    <ProjectCapability Remove="TestContainer" />
+  </ItemGroup>
+
   <Target Name="__FixupGitBaseVersion" BeforeTargets="_GitPopulateVersionInfo">
     <PropertyGroup>
       <GitBaseVersion>$(GitBaseVersion.Replace('{apiversion}', '$(ApiVersion)'))</GitBaseVersion>
