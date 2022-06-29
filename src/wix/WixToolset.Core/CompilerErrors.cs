@@ -21,7 +21,7 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.IllegalBundleVariableName, "The {0}/@{1} attribute's value, '{2}', is not a legal bundle variable name. Identifiers may contain ASCII characters A-Z, a-z, digits, or underscores (_). Every identifier must begin with either a letter or an underscore.", elementName, attributeName, value);
         }
 
-        public static Message IllegalName(SourceLineNumber sourceLineNumbers, string parentElement, string name)
+        public static Message IllegalTagName(SourceLineNumber sourceLineNumbers, string parentElement, string name)
         {
             return Message(sourceLineNumbers, Ids.IllegalName, "The Tag/@Name attribute value, '{1}', contains invalid filename identifiers. The Tag/@Name may have defaulted from the {0}/@Name attrbute. If so, use the Tag/@Name attribute to provide a valid filename. Any character except for the follow may be used: \\ ? | > < : / * \".", parentElement, name);
         }

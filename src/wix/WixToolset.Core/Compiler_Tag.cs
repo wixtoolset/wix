@@ -68,7 +68,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(name) && !this.Core.IsValidLongFilename(name))
             {
-                this.Core.Write(CompilerErrors.IllegalName(sourceLineNumbers, node.Name.LocalName, name));
+                this.Core.Write(CompilerErrors.IllegalTagName(sourceLineNumbers, node.Name.LocalName, name));
             }
 
             if (String.IsNullOrEmpty(regid))
@@ -178,7 +178,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(name) && !this.Core.IsValidLongFilename(name))
             {
-                this.Core.Write(CompilerErrors.IllegalName(sourceLineNumbers, node.Name.LocalName, name));
+                this.Core.Write(CompilerErrors.IllegalTagName(sourceLineNumbers, node.Name.LocalName, name));
             }
 
             if (String.IsNullOrEmpty(regid))
