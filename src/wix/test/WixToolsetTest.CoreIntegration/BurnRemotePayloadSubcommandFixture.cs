@@ -10,7 +10,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core.TestPackage;
     using Xunit;
 
-    public class RemotePayloadFixture
+    public class BurnRemotePayloadSubcommandFixture
     {
         [Fact]
         public void CanGetRemoteBundlePayload()
