@@ -313,6 +313,74 @@ LExit:
     return hr;
 }
 
+DAPI_(HRESULT) AppWaitForSingleObject(
+    __in HANDLE hHandle,
+    __in DWORD dwMilliseconds
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwResult = 0;
+
+    dwResult = ::WaitForSingleObject(hHandle, dwMilliseconds);
+    if (WAIT_TIMEOUT == dwResult)
+    {
+        ExitFunction1(hr = HRESULT_FROM_WIN32(dwResult));
+    }
+    else if (WAIT_ABANDONED == dwResult)
+    {
+        AppExitOnWin32Error(dwResult, hr, "Abandoned wait for single object.");
+    }
+    else if (WAIT_OBJECT_0 != dwResult)
+    {
+        AssertSz(WAIT_FAILED == dwResult, "Unexpected return code from WaitForSingleObject.");
+        AppExitWithLastError(hr, "Failed to wait for single object.");
+    }
+
+LExit:
+    return hr;
+}
+
+DAPI_(HRESULT) AppWaitForMultipleObjects(
+    __in DWORD dwCount,
+    __in const HANDLE* rghHandles,
+    __in BOOL fWaitAll,
+    __in DWORD dwMilliseconds,
+    __out_opt DWORD* pdwSignaledIndex
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwResult = 0;
+    DWORD dwSignaledIndex = dwCount;
+
+    dwResult = ::WaitForMultipleObjects(dwCount, rghHandles, fWaitAll, dwMilliseconds);
+    if (WAIT_TIMEOUT == dwResult)
+    {
+        ExitFunction1(hr = HRESULT_FROM_WIN32(dwResult));
+    }
+    else if (WAIT_ABANDONED_0 <= dwResult && (WAIT_ABANDONED_0 + dwCount) > dwResult)
+    {
+        dwSignaledIndex = dwResult - WAIT_ABANDONED_0;
+        AppExitOnWin32Error(dwResult, hr, "Abandoned wait for multiple objects, index: %u.", dwSignaledIndex);
+    }
+    else if (WAIT_OBJECT_0 <= dwResult && (WAIT_OBJECT_0 + dwCount) > dwResult)
+    {
+        dwSignaledIndex = dwResult - WAIT_OBJECT_0;
+    }
+    else
+    {
+        AssertSz(WAIT_FAILED == dwResult, "Unexpected return code from WaitForMultipleObjects.");
+        AppExitWithLastError(hr, "Failed to wait for multiple objects.");
+    }
+
+LExit:
+    if (pdwSignaledIndex)
+    {
+        *pdwSignaledIndex = dwSignaledIndex;
+    }
+
+    return hr;
+}
+
 static HRESULT EscapeCommandLineArgument(
     __in_z LPCWSTR wzArgument,
     __out_z LPWSTR* psczEscaped

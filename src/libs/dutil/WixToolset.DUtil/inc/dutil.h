@@ -130,6 +130,7 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #define ExitOnWin32ErrorSource(d, e, x, s, ...) if (ERROR_SUCCESS != e) { x = HRESULT_FROM_WIN32(e); if (!FAILED(x)) { x = E_FAIL; } Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, s, __VA_ARGS__); goto LExit; }
 #define ExitOnOptionalXmlQueryFailureSource(d, x, b, s, ...) { { if (S_FALSE == x || E_NOTFOUND == x) { b = FALSE; x = S_OK; } else { b = SUCCEEDED(x); } }; ExitOnRootFailureSource(d, x, s, __VA_ARGS__); }
 #define ExitOnRequiredXmlQueryFailureSource(d, x, s, ...) { if (S_FALSE == x) { x = E_NOTFOUND; } ExitOnRootFailureSource(d, x, s, __VA_ARGS__); }
+#define ExitOnWaitObjectFailureSource(d, x, b, s, ...) { { if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == x) { b = TRUE; x = S_OK; } else { b = FALSE; } }; ExitOnFailureSource(d, x, s, __VA_ARGS__); }
 
 #define ExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
 #define ExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
@@ -145,6 +146,7 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #define ExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DEFAULT, e, x, s, __VA_ARGS__)
 #define ExitOnOptionalXmlQueryFailure(x, b, s, ...) ExitOnOptionalXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, b, s, __VA_ARGS__)
 #define ExitOnRequiredXmlQueryFailure(x, s, ...) ExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
+#define ExitOnWaitObjectFailure(x, b, s, ...) ExitOnWaitObjectFailureSource(DUTIL_SOURCE_DEFAULT, x, b, s, __VA_ARGS__)
 
 // release macros
 #define ReleaseObject(x) if (x) { x->Release(); }

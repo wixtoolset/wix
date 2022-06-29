@@ -12,6 +12,9 @@ struct BURN_CACHE_THREAD_CONTEXT
 };
 
 
+static PFN_PROCWAITFORCOMPLETION vpfnProcWaitForCompletion = ProcWaitForCompletion;
+
+
 // internal function declarations
 
 static HRESULT CoreRecreateCommandLine(
@@ -64,9 +67,6 @@ static HRESULT DetectPackagePayloadsCached(
     );
 static DWORD WINAPI CacheThreadProc(
     __in LPVOID lpThreadParameter
-    );
-static HRESULT WaitForCacheThread(
-    __in HANDLE hCacheThread
     );
 static void LogPackages(
     __in_opt const BURN_PACKAGE* pUpgradeBundlePackage,
@@ -636,6 +636,7 @@ extern "C" HRESULT CoreApply(
     BURN_APPLY_CONTEXT applyContext = { };
     BOOL fDeleteApplyCs = FALSE;
     BURN_CACHE_THREAD_CONTEXT cacheThreadContext = { };
+    DWORD dwCacheExitCode = 0;
     BOOL fRollbackCache = FALSE;
     DWORD dwPhaseCount = 0;
     BOOTSTRAPPER_APPLYCOMPLETE_ACTION applyCompleteAction = BOOTSTRAPPER_APPLYCOMPLETE_ACTION_NONE;
@@ -744,7 +745,10 @@ extern "C" HRESULT CoreApply(
         // If we're not caching in parallel, wait for the cache thread to terminate.
         if (!pEngineState->fParallelCacheAndExecute)
         {
-            hr = WaitForCacheThread(applyContext.hCacheThread);
+            hr = ThrdWaitForCompletion(applyContext.hCacheThread, INFINITE, &dwCacheExitCode);
+            ExitOnFailure(hr, "Failed to wait for cache thread before execute.");
+
+            hr = (HRESULT)dwCacheExitCode;
             ExitOnFailure(hr, "Failed while caching, aborting execution.");
 
             ReleaseHandle(applyContext.hCacheThread);
@@ -761,10 +765,12 @@ extern "C" HRESULT CoreApply(
     // Wait for cache thread to terminate, this should return immediately unless we're waiting for layout to complete.
     if (applyContext.hCacheThread)
     {
-        HRESULT hrCached = WaitForCacheThread(applyContext.hCacheThread);
+        HRESULT hrCached = ThrdWaitForCompletion(applyContext.hCacheThread, INFINITE, &dwCacheExitCode);
+        ExitOnFailure(hrCached, "Failed to wait for cache thread after execute.");
+
         if (SUCCEEDED(hr))
         {
-            hr = hrCached;
+            hr = (HRESULT)dwCacheExitCode;
         }
     }
 
@@ -1940,6 +1946,22 @@ LExit:
     return hr;
 }
 
+extern "C" void CoreFunctionOverride(
+    __in_opt PFN_PROCWAITFORCOMPLETION pfnProcWaitForCompletion
+    )
+{
+    vpfnProcWaitForCompletion = pfnProcWaitForCompletion;
+}
+
+extern "C" HRESULT DAPI CoreWaitForProcCompletion(
+    __in HANDLE hProcess,
+    __in DWORD dwTimeout,
+    __out DWORD* pdwReturnCode
+    )
+{
+    return vpfnProcWaitForCompletion(hProcess, dwTimeout, pdwReturnCode);
+}
+
 // internal helper functions
 
 static HRESULT AppendEscapedArgumentToCommandLine(
@@ -2266,26 +2288,6 @@ LExit:
     }
 
     return (DWORD)hr;
-}
-
-static HRESULT WaitForCacheThread(
-    __in HANDLE hCacheThread
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (WAIT_OBJECT_0 != ::WaitForSingleObject(hCacheThread, INFINITE))
-    {
-        ExitWithLastError(hr, "Failed to wait for cache thread to terminate.");
-    }
-
-    if (!::GetExitCodeThread(hCacheThread, (DWORD*)&hr))
-    {
-        ExitWithLastError(hr, "Failed to get cache thread exit code.");
-    }
-
-LExit:
-    return hr;
 }
 
 static void LogPackages(

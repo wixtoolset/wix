@@ -17,6 +17,7 @@
 #define ProcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, p, x, s, __VA_ARGS__)
 #define ProcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_PROCUTIL, e, x, s, __VA_ARGS__)
 #define ProcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PROCUTIL, g, x, s, __VA_ARGS__)
+#define ProcExitOnWaitObjectFailure(x, b, s, ...) ExitOnWaitObjectFailureSource(DUTIL_SOURCE_PROCUTIL, x, b, s, __VA_ARGS__)
 
 
 // private functions
@@ -403,29 +404,24 @@ LExit:
 extern "C" HRESULT DAPI ProcWaitForCompletion(
     __in HANDLE hProcess,
     __in DWORD dwTimeout,
-    __out DWORD *pReturnCode
+    __out_opt DWORD* pdwReturnCode
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
+    BOOL fTimedOut = FALSE;
 
-    // Wait for everything to finish
-    er = ::WaitForSingleObject(hProcess, dwTimeout);
-    if (WAIT_FAILED == er)
-    {
-        ProcExitWithLastError(hr, "Failed to wait for process to complete.");
-    }
-    else if (WAIT_TIMEOUT == er)
-    {
-        ExitFunction1(hr = HRESULT_FROM_WIN32(er));
-    }
+    // Wait for everything to finish.
+    hr = AppWaitForSingleObject(hProcess, dwTimeout);
+    ProcExitOnWaitObjectFailure(hr, fTimedOut, "Failed to wait for process to complete.");
 
-    if (!::GetExitCodeProcess(hProcess, &er))
+    if (fTimedOut)
+    {
+        hr = HRESULT_FROM_WIN32(WAIT_TIMEOUT);
+    }
+    else if (pdwReturnCode && !::GetExitCodeProcess(hProcess, pdwReturnCode))
     {
         ProcExitWithLastError(hr, "Failed to get process return code.");
     }
-
-    *pReturnCode = er;
 
 LExit:
     return hr;
@@ -442,10 +438,10 @@ extern "C" HRESULT DAPI ProcWaitForIds(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
     HANDLE hProcess = NULL;
-    HANDLE * rghProcesses = NULL;
+    HANDLE* rghProcesses = NULL;
     DWORD cProcesses = 0;
+    BOOL fTimedOut = FALSE;
 
     rghProcesses =  static_cast<HANDLE*>(MemAlloc(sizeof(DWORD) * cProcessIds, TRUE));
     ProcExitOnNull(rgdwProcessIds, hr, E_OUTOFMEMORY, "Failed to allocate array for process ID Handles.");
@@ -459,16 +455,14 @@ extern "C" HRESULT DAPI ProcWaitForIds(
         }
     }
 
-    er = ::WaitForMultipleObjects(cProcesses, rghProcesses, TRUE, dwMilliseconds);
-    if (WAIT_FAILED == er)
+    hr = AppWaitForMultipleObjects(cProcesses, rghProcesses, TRUE, dwMilliseconds, NULL);
+    ProcExitOnWaitObjectFailure(hr, fTimedOut, "Failed to wait for processes to complete.");
+
+    if (fTimedOut)
     {
-        ProcExitWithLastError(hr, "Failed to wait for process to complete.");
+        ProcExitWithRootFailure(hr, HRESULT_FROM_WIN32(WAIT_TIMEOUT), "Timed out while waiting for processes to complete.");
     }
-    else if (WAIT_TIMEOUT == er)
-    {
-        ProcExitOnWin32Error(er, hr, "Timed out while waiting for process to complete.");
-    }
-    
+
 LExit:
     if (rghProcesses)
     {

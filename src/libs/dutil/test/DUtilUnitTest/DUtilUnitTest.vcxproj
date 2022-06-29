@@ -44,6 +44,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ClCompile Include="AppUtilTests.cpp" />
     <ClCompile Include="ApupUtilTests.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="DictUtilTest.cpp" />

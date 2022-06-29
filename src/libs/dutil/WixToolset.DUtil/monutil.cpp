@@ -16,6 +16,7 @@
 #define MonExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_MONUTIL, p, x, s, __VA_ARGS__)
 #define MonExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_MONUTIL, e, x, s, __VA_ARGS__)
 #define MonExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_MONUTIL, g, x, s, __VA_ARGS__)
+#define MonExitOnWaitObjectFailure(x, b, s, ...) ExitOnWaitObjectFailureSource(DUTIL_SOURCE_MONUTIL, x, b, s, __VA_ARGS__)
 
 const int MON_THREAD_GROWTH = 5;
 const int MON_ARRAY_GROWTH = 40;
@@ -1101,11 +1102,12 @@ static DWORD WINAPI WaiterThread(
 {
     HRESULT hr = S_OK;
     HRESULT hrTemp = S_OK;
-    DWORD dwRet = 0;
     BOOL fAgain = FALSE;
     BOOL fContinue = TRUE;
     BOOL fNotify = FALSE;
     BOOL fRet = FALSE;
+    BOOL fTimedOut = FALSE;
+    DWORD dwSignaledIndex = 0;
     MSG msg = { };
     MON_ADD_MESSAGE *pAddMessage = NULL;
     MON_REMOVE_MESSAGE *pRemoveMessage = NULL;
@@ -1128,13 +1130,14 @@ static DWORD WINAPI WaiterThread(
 
     do
     {
-        dwRet = ::WaitForMultipleObjects(pWaiterContext->cHandles - pWaiterContext->cRequestsFailing, pWaiterContext->rgHandles, FALSE, pWaiterContext->cRequestsPending > 0 ? dwWait : INFINITE);
+        hr = AppWaitForMultipleObjects(pWaiterContext->cHandles - pWaiterContext->cRequestsFailing, pWaiterContext->rgHandles, FALSE, pWaiterContext->cRequestsPending > 0 ? dwWait : INFINITE, &dwSignaledIndex);
+        MonExitOnWaitObjectFailure(hr, fTimedOut, "Failed to wait for multiple objects.");
 
         uCurrentTime = ::GetTickCount();
         uDeltaInMs = uCurrentTime - uLastTimeInMs;
         uLastTimeInMs = uCurrentTime;
 
-        if (WAIT_OBJECT_0 == dwRet)
+        if (!fTimedOut && 0 == dwSignaledIndex)
         {
             do
             {
@@ -1391,10 +1394,10 @@ static DWORD WINAPI WaiterThread(
                 }
             } while (fAgain);
         }
-        else if (dwRet > WAIT_OBJECT_0 && dwRet - WAIT_OBJECT_0 < pWaiterContext->cHandles)
+        else if (!fTimedOut)
         {
             // OK a handle fired - only notify if it's the actual target, and not just some parent waiting for the target child to exist
-            dwRequestIndex = dwRet - WAIT_OBJECT_0 - 1;
+            dwRequestIndex = dwSignaledIndex - 1;
             fNotify = (pWaiterContext->rgRequests[dwRequestIndex].dwPathHierarchyIndex == pWaiterContext->rgRequests[dwRequestIndex].cPathHierarchy - 1);
 
             // Initiate re-waits before we notify callback, to ensure we don't miss a single update
@@ -1425,10 +1428,6 @@ static DWORD WINAPI WaiterThread(
                     Notify(S_OK, pWaiterContext, pWaiterContext->rgRequests + dwRequestIndex);
                 }
             }
-        }
-        else if (WAIT_TIMEOUT != dwRet)
-        {
-            MonExitWithLastError(hr, "Failed to wait for multiple objects with return code %u", dwRet);
         }
 
         // OK, now that we've checked all triggered handles (resetting silence period timers appropriately), check for any pending notifications that we can finally fire
@@ -1726,10 +1725,10 @@ static LRESULT CALLBACK MonWndProc(
     DEV_BROADCAST_HANDLE *pHandle = NULL;
     DEV_BROADCAST_VOLUME *pVolume = NULL;
     DWORD dwUnitMask = 0;
-    DWORD er = ERROR_SUCCESS;
     WCHAR chDrive = L'\0';
     BOOL fArrival = FALSE;
     BOOL fReturnTrue = FALSE;
+    BOOL fTimedOut = FALSE;
     CREATESTRUCT *pCreateStruct = NULL;
     MON_WAITER_CONTEXT *pWaiterContext = NULL;
     MON_STRUCT *pm = NULL;
@@ -1821,24 +1820,23 @@ static LRESULT CALLBACK MonWndProc(
                     }
                 }
 
-                er = ::WaitForSingleObject(pm->internalWait.hWait, MON_THREAD_WAIT_REMOVE_DEVICE);
+                hr = AppWaitForSingleObject(pm->internalWait.hWait, MON_THREAD_WAIT_REMOVE_DEVICE);
+                MonExitOnWaitObjectFailure(hr, fTimedOut, "WaitForSingleObject failed with non-timeout reason while waiting for response from waiter thread");
+
                 // Make sure any waiter thread processing really old messages can immediately know that we're no longer waiting for a response
-                if (WAIT_OBJECT_0 == er)
+                if (!fTimedOut)
                 {
                     // If the response ID matches what we sent, we actually got a valid reply!
                     if (pm->internalWait.dwReceiveIteration != pm->internalWait.dwSendIteration)
                     {
-                        TraceError(HRESULT_FROM_WIN32(er), "Waiter thread received wrong ID reply");
+                        TraceError(E_UNEXPECTED, "Waiter thread received wrong ID reply");
                     }
-                }
-                else if (WAIT_TIMEOUT == er)
-                {
-                    TraceError(HRESULT_FROM_WIN32(er), "No response from any waiter thread for query remove message");
                 }
                 else
                 {
-                    MonExitWithLastError(hr, "WaitForSingleObject failed with non-timeout reason while waiting for response from waiter thread");
+                    TraceError(HRESULT_FROM_WIN32(WAIT_TIMEOUT), "No response from any waiter thread for query remove message");
                 }
+
                 ++pm->internalWait.dwSendIteration;
             }
         }

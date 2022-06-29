@@ -1687,15 +1687,8 @@ static HRESULT WaitForElevatedChildCacheThread(
     HRESULT hr = S_OK;
     DWORD dwExitCode = ERROR_SUCCESS;
 
-    if (WAIT_OBJECT_0 != ::WaitForSingleObject(hCacheThread, BURN_TIMEOUT))
-    {
-        ExitWithLastError(hr, "Failed to wait for cache thread to terminate.");
-    }
-
-    if (!::GetExitCodeThread(hCacheThread, &dwExitCode))
-    {
-        ExitWithLastError(hr, "Failed to get cache thread exit code.");
-    }
+    hr = ThrdWaitForCompletion(hCacheThread, BURN_TIMEOUT, &dwExitCode);
+    ExitOnFailure(hr, "Failed to wait for cache thread to complete.");
 
     AssertSz(dwExitCode == dwExpectedExitCode, "Cache thread should have exited with the expected exit code.");
 

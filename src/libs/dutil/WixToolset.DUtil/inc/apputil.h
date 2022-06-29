@@ -84,6 +84,27 @@ HRESULT DAPI AppEscapeCommandLineArgumentFormattedArgs(
     __in va_list args
     );
 
+/********************************************************************
+AppWaitForSingleObject - wrapper for ::WaitForSingleObject.
+
+********************************************************************/
+HRESULT DAPI AppWaitForSingleObject(
+    __in HANDLE hHandle,
+    __in DWORD dwMilliseconds
+    );
+
+/********************************************************************
+AppWaitForMultipleObjects - wrapper for ::WaitForMultipleObjects.
+
+********************************************************************/
+HRESULT DAPI AppWaitForMultipleObjects(
+    __in DWORD dwCount,
+    __in const HANDLE* rghHandles,
+    __in BOOL fWaitAll,
+    __in DWORD dwMilliseconds,
+    __out_opt DWORD* pdwSignaledIndex
+    );
+
 #ifdef __cplusplus
 }
 #endif

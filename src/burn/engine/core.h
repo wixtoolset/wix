@@ -174,6 +174,12 @@ typedef struct _BURN_APPLY_CONTEXT
     DWORD dwCacheCheckpoint;
 } BURN_APPLY_CONTEXT;
 
+typedef HRESULT (DAPI *PFN_PROCWAITFORCOMPLETION)(
+    __in HANDLE hProcess,
+    __in DWORD dwTimeout,
+    __out DWORD* pReturnCode
+    );
+
 
 // function declarations
 
@@ -279,6 +285,14 @@ HRESULT CoreParseCommandLine(
     __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
     __inout HANDLE* phSectionFile,
     __inout HANDLE* phSourceEngineFile
+    );
+void CoreFunctionOverride(
+    __in_opt PFN_PROCWAITFORCOMPLETION pfnProcWaitForCompletion
+    );
+HRESULT DAPI CoreWaitForProcCompletion(
+    __in HANDLE hProcess,
+    __in DWORD dwTimeout,
+    __out_opt DWORD* pdwReturnCode
     );
 
 #if defined(__cplusplus)

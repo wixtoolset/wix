@@ -104,6 +104,7 @@
     <ClCompile Include="strutil.cpp" />
     <ClCompile Include="svcutil.cpp" />
     <ClCompile Include="thmutil.cpp" />
+    <ClCompile Include="thrdutil.cpp" />
     <ClCompile Include="timeutil.cpp" />
     <ClCompile Include="uncutil.cpp" />
     <ClCompile Include="uriutil.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="inc\strutil.h" />
     <ClInclude Include="inc\svcutil.h" />
     <ClInclude Include="inc\thmutil.h" />
+    <ClInclude Include="inc\thrdutil.h" />
     <ClInclude Include="inc\timeutil.h" />
     <ClInclude Include="inc\uriutil.h" />
     <ClInclude Include="inc\userutil.h" />

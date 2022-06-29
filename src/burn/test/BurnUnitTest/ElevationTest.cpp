@@ -54,7 +54,6 @@ namespace Bootstrapper
             HRESULT hr = S_OK;
             BURN_ENGINE_STATE engineState = { };
             BURN_PIPE_CONNECTION* pConnection = &engineState.companionConnection;
-            HANDLE hEvent = NULL;
             DWORD dwResult = S_OK;
 
             engineState.sczBundleEngineWorkingPath = L"tests\\ignore\\this\\path\\to\\burn.exe";
@@ -62,6 +61,7 @@ namespace Bootstrapper
             try
             {
                 ShelFunctionOverride(ElevateTest_ShellExecuteExW);
+                CoreFunctionOverride(ThrdWaitForCompletion);
 
                 PipeConnectionInitialize(pConnection);
 
@@ -87,7 +87,6 @@ namespace Bootstrapper
             finally
             {
                 PipeConnectionUninitialize(pConnection);
-                ReleaseHandle(hEvent);
             }
         }
     };
