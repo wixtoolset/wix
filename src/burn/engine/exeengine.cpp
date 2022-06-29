@@ -687,7 +687,6 @@ extern "C" HRESULT ExeEngineRunProcess(
 {
     HRESULT hr = S_OK;
     LPWSTR sczCommand = NULL;
-    STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
     GENERIC_EXECUTE_MESSAGE message = { };
     int nResult = IDNOACTION;
@@ -695,7 +694,6 @@ extern "C" HRESULT ExeEngineRunProcess(
     BOOL fDelayedCancel = FALSE;
     BOOL fFireAndForget = BURN_PACKAGE_TYPE_EXE == pPackage->type && pPackage->Exe.fFireAndForget;
     BOOL fInheritHandles = BURN_PACKAGE_TYPE_BUNDLE == pPackage->type;
-    size_t cchCachedDirectory = 0;
 
     // Always add user supplied arguments last.
     if (wzUserArgs)
@@ -704,19 +702,10 @@ extern "C" HRESULT ExeEngineRunProcess(
         ExitOnFailure(hr, "Failed to append user args.");
     }
 
-    // CreateProcessW has undocumented MAX_PATH restriction for lpCurrentDirectory even when long path support is enabled.
-    if (wzCachedDirectory && FAILED(::StringCchLengthW(wzCachedDirectory, MAX_PATH - 1, &cchCachedDirectory)))
-    {
-        wzCachedDirectory = NULL;
-    }
-
     // Make the cache location of the executable the current directory to help those executables
     // that expect stuff to be relative to them.
-    si.cb = sizeof(si);
-    if (!::CreateProcessW(wzExecutablePath, sczCommand ? sczCommand : sczBaseCommand, NULL, NULL, fInheritHandles, CREATE_NO_WINDOW, NULL, wzCachedDirectory, &si, &pi))
-    {
-        ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
-    }
+    hr = CoreCreateProcess(wzExecutablePath, sczCommand ? sczCommand : sczBaseCommand, fInheritHandles, CREATE_NO_WINDOW, wzCachedDirectory, 0, &pi);
+    ExitOnFailure(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROCESS_STARTED;
     message.dwUIHint = MB_OK;

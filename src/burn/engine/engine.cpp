@@ -445,7 +445,6 @@ static HRESULT RunUntrusted(
     LPWSTR sczCachedCleanRoomBundlePath = NULL;
     LPWSTR sczParameters = NULL;
     LPWSTR sczFullCommandLine = NULL;
-    STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
     HANDLE hFileAttached = NULL;
     HANDLE hFileSelf = NULL;
@@ -484,12 +483,8 @@ static HRESULT RunUntrusted(
     hr = StrAllocFormattedSecure(&sczFullCommandLine, L"\"%ls\" %ls", wzCleanRoomBundlePath, sczParameters);
     ExitOnFailure(hr, "Failed to allocate full command-line.");
 
-    si.cb = sizeof(si);
-    si.wShowWindow = static_cast<WORD>(pEngineState->command.nCmdShow);
-    if (!::CreateProcessW(wzCleanRoomBundlePath, sczFullCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
-    {
-        ExitWithLastError(hr, "Failed to launch clean room process: %ls", sczFullCommandLine);
-    }
+    hr = CoreCreateProcess(wzCleanRoomBundlePath, sczFullCommandLine, TRUE, 0, NULL, static_cast<WORD>(pEngineState->command.nCmdShow), &pi);
+    ExitOnFailure(hr, "Failed to launch clean room process: %ls", sczFullCommandLine);
 
     hProcess = pi.hProcess;
     pi.hProcess = NULL;

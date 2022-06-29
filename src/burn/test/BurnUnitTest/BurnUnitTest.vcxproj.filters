@@ -24,6 +24,9 @@
     <ClCompile Include="ElevationTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EmbeddedTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ManifestHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -174,6 +174,19 @@ typedef struct _BURN_APPLY_CONTEXT
     DWORD dwCacheCheckpoint;
 } BURN_APPLY_CONTEXT;
 
+typedef BOOL (STDAPICALLTYPE *PFN_CREATEPROCESSW)(
+    __in_opt LPCWSTR lpApplicationName,
+    __inout_opt LPWSTR lpCommandLine,
+    __in_opt LPSECURITY_ATTRIBUTES lpProcessAttributes,
+    __in_opt LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    __in BOOL bInheritHandles,
+    __in DWORD dwCreationFlags,
+    __in_opt LPVOID lpEnvironment,
+    __in_opt LPCWSTR lpCurrentDirectory,
+    __in LPSTARTUPINFOW lpStartupInfo,
+    __out LPPROCESS_INFORMATION lpProcessInformation
+    );
+
 typedef HRESULT (DAPI *PFN_PROCWAITFORCOMPLETION)(
     __in HANDLE hProcess,
     __in DWORD dwTimeout,
@@ -287,7 +300,17 @@ HRESULT CoreParseCommandLine(
     __inout HANDLE* phSourceEngineFile
     );
 void CoreFunctionOverride(
+    __in_opt PFN_CREATEPROCESSW pfnCreateProcessW,
     __in_opt PFN_PROCWAITFORCOMPLETION pfnProcWaitForCompletion
+    );
+HRESULT CoreCreateProcess(
+    __in_opt LPCWSTR wzApplicationName,
+    __inout_opt LPWSTR sczCommandLine,
+    __in BOOL fInheritHandles,
+    __in DWORD dwCreationFlags,
+    __in_opt LPCWSTR wzCurrentDirectory,
+    __in WORD wShowWindow,
+    __out LPPROCESS_INFORMATION pProcessInformation
     );
 HRESULT DAPI CoreWaitForProcCompletion(
     __in HANDLE hProcess,

@@ -73,6 +73,7 @@
 #include "manifest.h"
 #include "splashscreen.h"
 #include "detect.h"
+#include "externalengine.h"
 
 #include "engine.version.h"
 

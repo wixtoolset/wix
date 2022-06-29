@@ -12,6 +12,7 @@ struct BURN_CACHE_THREAD_CONTEXT
 };
 
 
+static PFN_CREATEPROCESSW vpfnCreateProcessW = ::CreateProcessW;
 static PFN_PROCWAITFORCOMPLETION vpfnProcWaitForCompletion = ProcWaitForCompletion;
 
 
@@ -1947,10 +1948,44 @@ LExit:
 }
 
 extern "C" void CoreFunctionOverride(
+    __in_opt PFN_CREATEPROCESSW pfnCreateProcessW,
     __in_opt PFN_PROCWAITFORCOMPLETION pfnProcWaitForCompletion
     )
 {
+    vpfnCreateProcessW = pfnCreateProcessW;
     vpfnProcWaitForCompletion = pfnProcWaitForCompletion;
+}
+
+extern "C" HRESULT CoreCreateProcess(
+    __in_opt LPCWSTR wzApplicationName,
+    __inout_opt LPWSTR sczCommandLine,
+    __in BOOL fInheritHandles,
+    __in DWORD dwCreationFlags,
+    __in_opt LPCWSTR wzCurrentDirectory,
+    __in WORD wShowWindow,
+    __out LPPROCESS_INFORMATION pProcessInformation
+    )
+{
+    HRESULT hr = S_OK;
+    STARTUPINFOW si = { };
+    size_t cchCurrentDirectory = 0;
+
+    // CreateProcessW has undocumented MAX_PATH restriction for lpCurrentDirectory even when long path support is enabled.
+    if (wzCurrentDirectory && FAILED(::StringCchLengthW(wzCurrentDirectory, MAX_PATH - 1, &cchCurrentDirectory)))
+    {
+        wzCurrentDirectory = NULL;
+    }
+
+    si.cb = sizeof(si);
+    si.wShowWindow = wShowWindow;
+
+    if (!vpfnCreateProcessW(wzApplicationName, sczCommandLine, NULL, NULL, fInheritHandles, dwCreationFlags, NULL, wzCurrentDirectory, &si, pProcessInformation))
+    {
+        ExitWithLastError(hr, "CreateProcessW failed with return code: %d", Dutil_er);
+    }
+
+LExit:
+    return hr;
 }
 
 extern "C" HRESULT DAPI CoreWaitForProcCompletion(
