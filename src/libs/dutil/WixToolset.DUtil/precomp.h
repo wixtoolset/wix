@@ -90,6 +90,7 @@
 #include "timeutil.h"
 #include "wndutil.h"
 #include "thmutil.h"
+#include "thrdutil.h"
 #include "uncutil.h"
 #include "uriutil.h"
 #include "userutil.h"

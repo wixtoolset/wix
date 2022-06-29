@@ -28,6 +28,7 @@
 #include <resrutil.h>
 #include <shelutil.h>
 #include <strutil.h>
+#include <thrdutil.h>
 #include <wiutil.h>
 #include <xmlutil.h>
 #include <dictutil.h>

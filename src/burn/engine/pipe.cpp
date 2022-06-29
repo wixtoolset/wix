@@ -422,6 +422,7 @@ extern "C" HRESULT PipeTerminateChildProcess(
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
+    BOOL fTimedOut = FALSE;
 
     // Prepare the exit message.
     hr = BuffWriteNumber(&pbData, &cbData, dwParentExitCode);
@@ -443,31 +444,28 @@ extern "C" HRESULT PipeTerminateChildProcess(
     // If we were able to get a handle to the other process, wait for it to exit.
     if (pConnection->hProcess)
     {
-        if (WAIT_FAILED == ::WaitForSingleObject(pConnection->hProcess, PIPE_WAIT_FOR_CONNECTION * PIPE_RETRY_FOR_CONNECTION))
-        {
-            ExitWithLastError(hr, "Failed to wait for child process exit.");
-        }
+        hr = AppWaitForSingleObject(pConnection->hProcess, PIPE_WAIT_FOR_CONNECTION * PIPE_RETRY_FOR_CONNECTION);
+        ExitOnWaitObjectFailure(hr, fTimedOut, "Failed to wait for child process exit.");
+
+        AssertSz(!fTimedOut, "Timed out while waiting for child process to exit.");
+    }
 
 #ifdef DEBUG
+    if (pConnection->hProcess && !fTimedOut)
+    {
         DWORD dwChildExitCode = 0;
-        DWORD dwErrorCode = ERROR_SUCCESS;
-        BOOL fReturnedExitCode = ::GetExitCodeProcess(pConnection->hProcess, &dwChildExitCode);
-        if (!fReturnedExitCode)
-        {
-            dwErrorCode = ::GetLastError(); // if the other process is elevated and we are not, then we'll get ERROR_ACCESS_DENIED.
+        HRESULT hrDebug = S_OK;
 
-            // The unit test use a thread instead of a process so try to get the exit code from
-            // the thread because we failed to get it from the process.
-            if (ERROR_INVALID_HANDLE == dwErrorCode)
-            {
-                fReturnedExitCode = ::GetExitCodeThread(pConnection->hProcess, &dwChildExitCode);
-            }
+        hrDebug = CoreWaitForProcCompletion(pConnection->hProcess, 0, &dwChildExitCode);
+        if (E_ACCESSDENIED != hrDebug) // if the other process is elevated and we are not, then we'll get ERROR_ACCESS_DENIED.
+        {
+            TraceError(hrDebug, "Failed to wait for child process completion.");
         }
-        AssertSz((fReturnedExitCode && dwChildExitCode == dwParentExitCode) ||
-                 (!fReturnedExitCode && ERROR_ACCESS_DENIED == dwErrorCode),
+
+        AssertSz(E_ACCESSDENIED == hrDebug || dwChildExitCode == dwParentExitCode,
                  "Child elevated process did not return matching exit code to parent process.");
-#endif
     }
+#endif
 
 LExit:
     return hr;

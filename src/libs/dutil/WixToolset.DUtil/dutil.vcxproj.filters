@@ -162,6 +162,9 @@
     <ClCompile Include="thmutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="thrdutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="timeutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -342,6 +345,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\thmutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\thrdutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\timeutil.h">

@@ -46,6 +46,7 @@
 #include <srputil.h>
 #include <strutil.h>
 #include <svcutil.h>
+#include <thrdutil.h>
 #include <userutil.h>
 #include <wiutil.h>
 #include <wuautil.h>

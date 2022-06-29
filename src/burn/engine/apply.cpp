@@ -2333,6 +2333,8 @@ static HRESULT DoExecuteAction(
 
     HRESULT hr = S_OK;
     HANDLE rghWait[2] = { };
+    DWORD dwSignaledIndex = 0;
+    DWORD dwExitCode = 0;
     BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
     BOOL fRetry = FALSE;
     BOOL fStopWusaService = FALSE;
@@ -2356,27 +2358,23 @@ static HRESULT DoExecuteAction(
             // wait for cache sync-point
             rghWait[0] = pExecuteAction->waitCachePackage.pPackage->hCacheEvent;
             rghWait[1] = pContext->pApplyContext->hCacheThread;
-            switch (::WaitForMultipleObjects(rghWait[1] ? 2 : 1, rghWait, FALSE, INFINITE))
-            {
-            case WAIT_OBJECT_0:
-                break;
 
-            case WAIT_OBJECT_0 + 1:
-                if (!::GetExitCodeThread(pContext->pApplyContext->hCacheThread, (DWORD*)&hr))
+            hr = AppWaitForMultipleObjects(rghWait[1] ? 2 : 1, rghWait, FALSE, INFINITE, &dwSignaledIndex);
+            ExitOnFailure(hr, "Failed to wait for cache check-point.");
+
+            switch (dwSignaledIndex)
+            {
+            case 0:
+                break;
+            case 1:
+                if (!::GetExitCodeThread(pContext->pApplyContext->hCacheThread, &dwExitCode))
                 {
                     ExitWithLastError(hr, "Failed to get cache thread exit code.");
                 }
 
-                if (SUCCEEDED(hr))
-                {
-                    hr = E_UNEXPECTED;
-                }
-                ExitOnFailure(hr, "Cache thread exited unexpectedly.");
-
-            case WAIT_FAILED: __fallthrough;
-            default:
-                ExitWithLastError(hr, "Failed to wait for cache check-point.");
+                ExitWithRootFailure(hr, E_UNEXPECTED, "Cache thread exited unexpectedly with exit code: %u.", dwExitCode);
             }
+
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:

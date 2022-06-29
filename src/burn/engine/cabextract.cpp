@@ -262,10 +262,8 @@ extern "C" HRESULT CabExtractClose(
         }
 
         // wait for thread to terminate
-        if (WAIT_OBJECT_0 != ::WaitForSingleObject(pContext->Cabinet.hThread, INFINITE))
-        {
-            ExitWithLastError(hr, "Failed to wait for thread to terminate.");
-        }
+        hr = AppWaitForSingleObject(pContext->Cabinet.hThread, INFINITE);
+        ExitOnFailure(hr, "Failed to wait for thread to terminate.");
     }
 
 LExit:
@@ -306,29 +304,31 @@ static HRESULT WaitForOperation(
 {
     HRESULT hr = S_OK;
     HANDLE rghWait[2] = { };
+    DWORD dwSignaledIndex = 0;
 
     // wait for operation complete event
     rghWait[0] = pContext->Cabinet.hOperationCompleteEvent;
     rghWait[1] = pContext->Cabinet.hThread;
-    switch (::WaitForMultipleObjects(countof(rghWait), rghWait, FALSE, INFINITE))
+
+    hr = AppWaitForMultipleObjects(countof(rghWait), rghWait, FALSE, INFINITE, &dwSignaledIndex);
+    ExitOnFailure(hr, "Failed to wait for operation complete event.");
+
+    switch (dwSignaledIndex)
     {
-    case WAIT_OBJECT_0:
+    case 0:
         if (!::ResetEvent(pContext->Cabinet.hOperationCompleteEvent))
         {
             ExitWithLastError(hr, "Failed to reset operation complete event.");
         }
-        break;
 
-    case WAIT_OBJECT_0 + 1:
+        break;
+    case 1:
         if (!::GetExitCodeThread(pContext->Cabinet.hThread, (DWORD*)&hr))
         {
             ExitWithLastError(hr, "Failed to get extraction thread exit code.");
         }
-        ExitFunction();
 
-    case WAIT_FAILED: __fallthrough;
-    default:
-        ExitWithLastError(hr, "Failed to wait for operation complete event.");
+        ExitFunction();
     }
 
     // clear operation
@@ -430,10 +430,8 @@ static DWORD WINAPI ExtractThreadProc(
     }
 
     // wait for begin operation event
-    if (WAIT_FAILED == ::WaitForSingleObject(pContext->Cabinet.hBeginOperationEvent, INFINITE))
-    {
-        ExitWithLastError(hr, "Failed to wait for begin operation event.");
-    }
+    hr = AppWaitForSingleObject(pContext->Cabinet.hBeginOperationEvent, INFINITE);
+    ExitOnFailure(hr, "Failed to wait for begin operation event.");
 
     if (!::ResetEvent(pContext->Cabinet.hBeginOperationEvent))
     {
@@ -517,10 +515,8 @@ static INT_PTR CopyFileCallback(
     }
 
     // wait for begin operation event
-    if (WAIT_FAILED == ::WaitForSingleObject(pContext->Cabinet.hBeginOperationEvent, INFINITE))
-    {
-        ExitWithLastError(hr, "Failed to wait for begin operation event.");
-    }
+    hr = AppWaitForSingleObject(pContext->Cabinet.hBeginOperationEvent, INFINITE);
+    ExitOnFailure(hr, "Failed to wait for begin operation event.");
 
     if (!::ResetEvent(pContext->Cabinet.hBeginOperationEvent))
     {
@@ -552,10 +548,8 @@ static INT_PTR CopyFileCallback(
     }
 
     // wait for begin operation event
-    if (WAIT_FAILED == ::WaitForSingleObject(pContext->Cabinet.hBeginOperationEvent, INFINITE))
-    {
-        ExitWithLastError(hr, "Failed to wait for begin operation event.");
-    }
+    hr = AppWaitForSingleObject(pContext->Cabinet.hBeginOperationEvent, INFINITE);
+    ExitOnFailure(hr, "Failed to wait for begin operation event.");
 
     if (!::ResetEvent(pContext->Cabinet.hBeginOperationEvent))
     {

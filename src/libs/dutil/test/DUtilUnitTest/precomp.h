@@ -13,6 +13,7 @@
 #include <dutil.h>
 
 #include <verutil.h>
+#include <apputil.h>
 #include <atomutil.h>
 #include <dictutil.h>
 #include <dirutil.h>

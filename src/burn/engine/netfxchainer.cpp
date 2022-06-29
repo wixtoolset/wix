@@ -338,7 +338,8 @@ extern "C" HRESULT NetFxRunChainer(
     )
 {
     HRESULT hr = S_OK;
-    DWORD er = 0;
+    DWORD dwSignaledIndex = 0;
+    BOOL fTimedOut = 0;
     WCHAR wzGuid[GUID_STRING_LENGTH];
     LPWSTR sczEventName = NULL;
     LPWSTR sczSectionName = NULL;
@@ -381,9 +382,17 @@ extern "C" HRESULT NetFxRunChainer(
 
     for (;;)
     {
-        er = ::WaitForMultipleObjects(2, handles, FALSE, 100);
-        if (WAIT_OBJECT_0 == er)
+        hr = AppWaitForMultipleObjects(2, handles, FALSE, 100, &dwSignaledIndex);
+        ExitOnWaitObjectFailure(hr, fTimedOut, "Failed to wait for netfx chainer process to complete");
+
+        if (fTimedOut)
         {
+            continue;
+        }
+
+        switch (dwSignaledIndex)
+        {
+        case 0:
             // Process has exited
             *pdwExitCode = NetFxGetResult(pNetfxChainer, &hrInternalError);
             if (E_PENDING == *pdwExitCode)
@@ -396,21 +405,17 @@ extern "C" HRESULT NetFxRunChainer(
             else if (FAILED(hrInternalError))
             {
                 // push internal error message
-                OnNetFxError(pNetfxChainer, hrInternalError, pfnGenericMessageHandler, pvContext);
+                hr = OnNetFxError(pNetfxChainer, hrInternalError, pfnGenericMessageHandler, pvContext);
                 ExitOnFailure(hr, "Failed to send internal error message from netfx chainer.");
-            }           
+            }
 
-            break;
-        }
-        else if (WAIT_OBJECT_0 + 1 == er)
-        {
+            ExitFunction();
+        case 1:
             // Chainee has notified us of a change.
             hr = ProcessNetFxMessage(pNetfxChainer, pfnGenericMessageHandler, pvContext);
             ExitOnFailure(hr, "Failed to process netfx chainer message.");
-        }
-        else if (WAIT_FAILED == er)
-        {
-            ExitWithLastError(hr, "Failed to wait for netfx chainer process to complete");
+
+            break;
         }
     }
 

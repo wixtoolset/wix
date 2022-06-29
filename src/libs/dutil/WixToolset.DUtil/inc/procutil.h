@@ -58,7 +58,7 @@ HRESULT DAPI ProcExecute(
 HRESULT DAPI ProcWaitForCompletion(
     __in HANDLE hProcess,
     __in DWORD dwTimeout,
-    __out DWORD *pReturnCode
+    __out_opt DWORD* pdwReturnCode
     );
 HRESULT DAPI ProcWaitForIds(
     __in_ecount(cProcessIds) const DWORD* pdwProcessIds,
