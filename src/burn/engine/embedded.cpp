@@ -52,7 +52,6 @@ extern "C" HRESULT EmbeddedRunBundle(
     DWORD dwCurrentProcessId = ::GetCurrentProcessId();
     HANDLE hCreatedPipesEvent = NULL;
     LPWSTR sczCommand = NULL;
-    STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
     BURN_PIPE_RESULT result = { };
 
@@ -79,10 +78,8 @@ extern "C" HRESULT EmbeddedRunBundle(
         ExitOnFailure(hr, "Failed to append user args.");
     }
 
-    if (!::CreateProcessW(wzExecutablePath, sczCommand, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-    {
-        ExitWithLastError(hr, "Failed to create embedded process at path: %ls", wzExecutablePath);
-    }
+    hr = CoreCreateProcess(wzExecutablePath, sczCommand, TRUE, CREATE_NO_WINDOW, NULL, 0, &pi);
+    ExitOnFailure(hr, "Failed to create embedded process at path: %ls", wzExecutablePath);
 
     connection.dwProcessId = ::GetProcessId(pi.hProcess);
     connection.hProcess = pi.hProcess;
@@ -95,7 +92,7 @@ extern "C" HRESULT EmbeddedRunBundle(
     ExitOnFailure(hr, "Failed to process messages from embedded message.");
 
     // Get the return code from the embedded process.
-    hr = ProcWaitForCompletion(connection.hProcess, INFINITE, pdwExitCode);
+    hr = CoreWaitForProcCompletion(connection.hProcess, INFINITE, pdwExitCode);
     ExitOnFailure(hr, "Failed to wait for embedded executable: %ls", wzExecutablePath);
 
 LExit:

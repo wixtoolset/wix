@@ -47,6 +47,7 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CacheTest.cpp" />
     <ClCompile Include="ElevationTest.cpp" />
+    <ClCompile Include="EmbeddedTest.cpp" />
     <ClCompile Include="ManifestHelpers.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="PlanTest.cpp" />

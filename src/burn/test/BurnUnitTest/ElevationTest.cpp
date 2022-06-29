@@ -61,7 +61,7 @@ namespace Bootstrapper
             try
             {
                 ShelFunctionOverride(ElevateTest_ShellExecuteExW);
-                CoreFunctionOverride(ThrdWaitForCompletion);
+                CoreFunctionOverride(NULL, ThrdWaitForCompletion);
 
                 PipeConnectionInitialize(pConnection);
 

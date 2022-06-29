@@ -345,7 +345,6 @@ extern "C" HRESULT NetFxRunChainer(
     LPWSTR sczSectionName = NULL;
     LPWSTR sczCommand = NULL;
     NetFxChainer* pNetfxChainer = NULL;
-    STARTUPINFOW si = { };
     PROCESS_INFORMATION pi = { };
     HRESULT hrInternalError = 0;
 
@@ -372,11 +371,8 @@ extern "C" HRESULT NetFxRunChainer(
         ExitOnFailure(hr, "Failed to append user args.");
     }
 
-    si.cb = sizeof(si);
-    if (!::CreateProcessW(wzExecutablePath, sczCommand, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-    {
-        ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
-    }
+    hr = CoreCreateProcess(wzExecutablePath, sczCommand, FALSE, CREATE_NO_WINDOW, NULL, 0, &pi);
+    ExitOnFailure(hr, "Failed to CreateProcess on path: %ls", wzExecutablePath);
 
     HANDLE handles[2] = { pi.hProcess, pNetfxChainer->hEventChaineeSend };
 
