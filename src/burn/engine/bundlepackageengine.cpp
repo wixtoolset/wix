@@ -763,8 +763,7 @@ static HRESULT ExecuteBundle(
     LPWSTR* argvArp = NULL;
     BOOL fRegistered = FALSE;
     HANDLE hExecutableFile = INVALID_HANDLE_VALUE;
-    STARTUPINFOW si = { };
-    PROCESS_INFORMATION pi = { };
+    BURN_PIPE_CONNECTION connection = { };
     DWORD dwExitCode = 0;
     GENERIC_EXECUTE_MESSAGE message = { };
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
@@ -1006,7 +1005,7 @@ static HRESULT ExecuteBundle(
 
     if (fRunEmbedded)
     {
-        hr = EmbeddedRunBundle(sczExecutablePath, sczBaseCommand, sczUserArgs, pfnGenericMessageHandler, pvContext, &dwExitCode);
+        hr = EmbeddedRunBundle(&connection, sczExecutablePath, sczBaseCommand, sczUserArgs, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run bundle as embedded from path: %ls", sczExecutablePath);
     }
     else
@@ -1033,8 +1032,6 @@ LExit:
         AppFreeCommandLineArgs(argvArp);
     }
 
-    ReleaseHandle(pi.hThread);
-    ReleaseHandle(pi.hProcess);
     ReleaseFileHandle(hExecutableFile);
 
     // Best effort to clear the execute package cache folder and action variables.

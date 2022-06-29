@@ -8,6 +8,11 @@ static HRESULT CopyStringToExternal(
     __in_z_opt LPWSTR wzBuffer,
     __inout SIZE_T* pcchBuffer
     );
+static HRESULT ProcessUnknownEmbeddedMessages(
+    __in BURN_PIPE_MESSAGE* /*pMsg*/,
+    __in_opt LPVOID /*pvContext*/,
+    __out DWORD* pdwResult
+    );
 
 // function definitions
 
@@ -212,7 +217,7 @@ HRESULT ExternalEngineSendEmbeddedError(
     hr = BuffWriteNumber(&pbData, &cbData, dwUIHint);
     ExitOnFailure(hr, "Failed to write UI hint to message buffer.");
 
-    hr = PipeSendMessage(pEngineState->embeddedConnection.hPipe, BURN_EMBEDDED_MESSAGE_TYPE_ERROR, pbData, cbData, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(pEngineState->embeddedConnection.hPipe, BURN_EMBEDDED_MESSAGE_TYPE_ERROR, pbData, cbData, ProcessUnknownEmbeddedMessages, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send embedded message over pipe.");
 
     *pnResult = static_cast<int>(dwResult);
@@ -247,7 +252,7 @@ HRESULT ExternalEngineSendEmbeddedProgress(
     hr = BuffWriteNumber(&pbData, &cbData, dwOverallProgressPercentage);
     ExitOnFailure(hr, "Failed to write overall progress percentage to message buffer.");
 
-    hr = PipeSendMessage(pEngineState->embeddedConnection.hPipe, BURN_EMBEDDED_MESSAGE_TYPE_PROGRESS, pbData, cbData, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(pEngineState->embeddedConnection.hPipe, BURN_EMBEDDED_MESSAGE_TYPE_PROGRESS, pbData, cbData, ProcessUnknownEmbeddedMessages, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send embedded progress message over pipe.");
 
     *pnResult = static_cast<int>(dwResult);
@@ -820,4 +825,15 @@ static HRESULT CopyStringToExternal(
     }
 
     return hr;
+}
+
+static HRESULT ProcessUnknownEmbeddedMessages(
+    __in BURN_PIPE_MESSAGE* /*pMsg*/,
+    __in_opt LPVOID /*pvContext*/,
+    __out DWORD* pdwResult
+    )
+{
+    *pdwResult = (DWORD)E_NOTIMPL;
+
+    return S_OK;
 }
