@@ -15,6 +15,7 @@ typedef enum _BURN_EMBEDDED_MESSAGE_TYPE
 
 
 HRESULT EmbeddedRunBundle(
+    __in BURN_PIPE_CONNECTION* pConnection,
     __in_z LPCWSTR wzExecutablePath,
     __in_z LPWSTR sczBaseCommand,
     __in_z_opt LPCWSTR wzUserArgs,

@@ -3,12 +3,14 @@
 #include "precomp.h"
 
 
+const DWORD TEST_UNKNOWN_MESSAGE_ID = 0xFFFE;
 const HRESULT S_TEST_SUCCEEDED = 0x3133;
 const DWORD TEST_EXIT_CODE = 666;
 
 struct BUNDLE_RUNNER_CONTEXT
 {
     DWORD dwResult;
+    BURN_PIPE_CONNECTION connection;
 };
 
 
@@ -68,7 +70,7 @@ namespace Bootstrapper
                 //
                 // bundle runner setup
                 //
-                hr = EmbeddedRunBundle(L"C:\\ignored\\target.exe", L"\"C:\\ignored\\target.exe\"", NULL, EmbeddedTest_GenericMessageHandler, &bundleRunnerContext, &dwExitCode);
+                hr = EmbeddedRunBundle(&bundleRunnerContext.connection, L"C:\\ignored\\target.exe", L"\"C:\\ignored\\target.exe\"", NULL, EmbeddedTest_GenericMessageHandler, &bundleRunnerContext, &dwExitCode);
                 TestThrowOnFailure(hr, L"Failed to run embedded bundle.");
 
                 // check results
@@ -146,6 +148,15 @@ static DWORD CALLBACK EmbeddedTest_ThreadProc(
     hr = PipeChildConnect(pConnection, FALSE);
     ExitOnFailure(hr, "Failed to connect to parent bundle runner.");
 
+    // post unknown message
+    hr = PipeSendMessage(pConnection->hPipe, TEST_UNKNOWN_MESSAGE_ID, NULL, 0, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to post unknown message to parent bundle runner.");
+
+    if (E_NOTIMPL != dwResult)
+    {
+        ExitWithRootFailure(hr, E_UNEXPECTED, "Unexpected result from unknown message: %d", dwResult);
+    }
+
     // post known message
     hr = ExternalEngineSendEmbeddedError(&engineState, S_TEST_SUCCEEDED, NULL, 0, reinterpret_cast<int*>(&dwResult));
     ExitOnFailure(hr, "Failed to post known message to parent bundle runner.");
@@ -167,9 +178,19 @@ static int EmbeddedTest_GenericMessageHandler(
 
     if (GENERIC_EXECUTE_MESSAGE_ERROR == pMessage->type)
     {
+        // post unknown message
+        HRESULT hr = PipeSendMessage(pContext->connection.hPipe, TEST_UNKNOWN_MESSAGE_ID, NULL, 0, NULL, NULL, &dwResult);
+        ExitOnFailure(hr, "Failed to post unknown message to embedded bundle.");
+
+        if (E_NOTIMPL != dwResult)
+        {
+            ExitWithRootFailure(hr, E_UNEXPECTED, "Unexpected result from unknown message: %d", dwResult);
+        }
+
         pContext->dwResult = pMessage->error.dwErrorCode;
         dwResult = TEST_EXIT_CODE;
     }
 
+LExit:
     return dwResult;
 }

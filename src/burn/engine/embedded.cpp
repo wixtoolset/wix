@@ -40,6 +40,7 @@ static HRESULT OnEmbeddedProgress(
 
 *******************************************************************/
 extern "C" HRESULT EmbeddedRunBundle(
+    __in BURN_PIPE_CONNECTION* pConnection,
     __in_z LPCWSTR wzExecutablePath,
     __in_z LPWSTR sczBaseCommand,
     __in_z_opt LPCWSTR wzUserArgs,
@@ -55,20 +56,19 @@ extern "C" HRESULT EmbeddedRunBundle(
     PROCESS_INFORMATION pi = { };
     BURN_PIPE_RESULT result = { };
 
-    BURN_PIPE_CONNECTION connection = { };
-    PipeConnectionInitialize(&connection);
+    PipeConnectionInitialize(pConnection);
 
     BURN_EMBEDDED_CALLBACK_CONTEXT context = { };
     context.pfnGenericMessageHandler = pfnGenericMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeCreateNameAndSecret(&connection.sczName, &connection.sczSecret);
+    hr = PipeCreateNameAndSecret(&pConnection->sczName, &pConnection->sczSecret);
     ExitOnFailure(hr, "Failed to create embedded pipe name and client token.");
 
-    hr = PipeCreatePipes(&connection, FALSE, &hCreatedPipesEvent);
+    hr = PipeCreatePipes(pConnection, FALSE, &hCreatedPipesEvent);
     ExitOnFailure(hr, "Failed to create embedded pipe.");
 
-    hr = StrAllocFormatted(&sczCommand, L"%ls -%ls %ls %ls %u", sczBaseCommand, BURN_COMMANDLINE_SWITCH_EMBEDDED, connection.sczName, connection.sczSecret, dwCurrentProcessId);
+    hr = StrAllocFormatted(&sczCommand, L"%ls -%ls %ls %ls %u", sczBaseCommand, BURN_COMMANDLINE_SWITCH_EMBEDDED, pConnection->sczName, pConnection->sczSecret, dwCurrentProcessId);
     ExitOnFailure(hr, "Failed to append embedded args.");
 
     // Always add user supplied arguments last.
@@ -81,18 +81,18 @@ extern "C" HRESULT EmbeddedRunBundle(
     hr = CoreCreateProcess(wzExecutablePath, sczCommand, TRUE, CREATE_NO_WINDOW, NULL, 0, &pi);
     ExitOnFailure(hr, "Failed to create embedded process at path: %ls", wzExecutablePath);
 
-    connection.dwProcessId = ::GetProcessId(pi.hProcess);
-    connection.hProcess = pi.hProcess;
+    pConnection->dwProcessId = ::GetProcessId(pi.hProcess);
+    pConnection->hProcess = pi.hProcess;
     pi.hProcess = NULL;
 
-    hr = PipeWaitForChildConnect(&connection);
+    hr = PipeWaitForChildConnect(pConnection);
     ExitOnFailure(hr, "Failed to wait for embedded process to connect to pipe.");
 
-    hr = PipePumpMessages(connection.hPipe, ProcessEmbeddedMessages, &context, &result);
+    hr = PipePumpMessages(pConnection->hPipe, ProcessEmbeddedMessages, &context, &result);
     ExitOnFailure(hr, "Failed to process messages from embedded message.");
 
     // Get the return code from the embedded process.
-    hr = CoreWaitForProcCompletion(connection.hProcess, INFINITE, pdwExitCode);
+    hr = CoreWaitForProcCompletion(pConnection->hProcess, INFINITE, pdwExitCode);
     ExitOnFailure(hr, "Failed to wait for embedded executable: %ls", wzExecutablePath);
 
 LExit:
@@ -101,7 +101,7 @@ LExit:
 
     StrSecureZeroFreeString(sczCommand);
     ReleaseHandle(hCreatedPipesEvent);
-    PipeConnectionUninitialize(&connection);
+    PipeConnectionUninitialize(pConnection);
 
     return hr;
 }
@@ -133,8 +133,8 @@ static HRESULT ProcessEmbeddedMessages(
         break;
 
     default:
-        hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Unexpected embedded message sent to child process, msg: %u", pMsg->dwMessage);
+        LogStringLine(REPORT_DEBUG, "Unexpected embedded message received from child process, msg: %u", pMsg->dwMessage);
+        dwResult = (DWORD)E_NOTIMPL;
     }
 
     *pdwResult = dwResult;
