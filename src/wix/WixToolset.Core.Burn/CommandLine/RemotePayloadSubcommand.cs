@@ -26,6 +26,7 @@ namespace WixToolset.Core.Burn.CommandLine
         private static readonly XName ExePackagePayloadName = "ExePackagePayload";
         private static readonly XName MsuPackagePayloadName = "MsuPackagePayload";
         private static readonly XName PayloadName = "Payload";
+        private static readonly XName PayloadGroupName = "PayloadGroup";
         private static readonly XName RemoteBundleName = "RemoteBundle";
         private static readonly XName RemoteRelatedBundleName = "RemoteRelatedBundle";
 
@@ -192,42 +193,31 @@ namespace WixToolset.Core.Burn.CommandLine
         private XElement HarvestPackageElement(IEnumerable<string> paths)
         {
             var harvestedFiles = this.HarvestRemotePayloads(paths).ToList();
+            var firstFile = harvestedFiles.FirstOrDefault();
 
-            XElement element;
-
-            switch (harvestedFiles[0].PackageType)
+            if (firstFile == null)
             {
-                case WixBundlePackageType.Bundle:
-                    element = new XElement(BundlePackageName);
-                    break;
-
-                case WixBundlePackageType.Exe:
-                    element = new XElement(ExePackageName);
-                    break;
-
-                case WixBundlePackageType.Msu:
-                    element = new XElement(MsuPackageName);
-                    break;
-
-                default:
-                    return null;
+                return null;
             }
 
-            var packagePayloadFile = harvestedFiles.FirstOrDefault();
+            var containerElement = firstFile.PackageElement;
 
-            if (packagePayloadFile != null)
+            if (containerElement == null)
             {
-                if (packagePayloadFile.Element.Attribute("CertificateThumbprint") != null)
+                containerElement = new XElement(PayloadGroupName);
+            }
+            else
+            {
+                var cacheId = CacheIdGenerator.GenerateRemoteCacheId(firstFile.HarvestedPackageSymbol, firstFile.PayloadSymbol);
+                if (cacheId != null)
                 {
-                    var cacheId = CacheIdGenerator.GenerateCacheIdFromPayloadHashAndThumbprint(packagePayloadFile.PayloadSymbol);
-
-                    element.Add(new XAttribute("CacheId", cacheId));
+                    containerElement.Add(new XAttribute("CacheId", cacheId));
                 }
-
-                element.Add(harvestedFiles.Select(h => h.Element));
             }
 
-            return element;
+            containerElement.Add(harvestedFiles.Select(h => h.Element));
+
+            return containerElement;
         }
 
         private IEnumerable<HarvestedFile> HarvestRemotePayloads(IEnumerable<string> paths)
@@ -363,14 +353,19 @@ namespace WixToolset.Core.Burn.CommandLine
             var harvestedFile = new HarvestedFile
             {
                 Element = element,
-                PackageType = packageType,
                 PayloadSymbol = payloadSymbol,
             };
 
             switch (packageType)
             {
                 case WixBundlePackageType.Bundle:
-                    this.HarvestBundle(harvestedFile);
+                    this.HarvestBundlePackage(harvestedFile);
+                    break;
+                case WixBundlePackageType.Exe:
+                    this.HarvestExePackage(harvestedFile);
+                    break;
+                case WixBundlePackageType.Msu:
+                    this.HarvestMsuPackage(harvestedFile);
                     break;
             }
 
@@ -390,7 +385,7 @@ namespace WixToolset.Core.Burn.CommandLine
             return Path.GetFileName(path); 
         }
 
-        private void HarvestBundle(HarvestedFile harvestedFile)
+        private void HarvestBundlePackage(HarvestedFile harvestedFile)
         {
             var packagePayloadSymbol = new WixBundleBundlePackagePayloadSymbol(null, new Identifier(AccessModifier.Section, harvestedFile.PayloadSymbol.Id.Id))
             {
@@ -448,16 +443,34 @@ namespace WixToolset.Core.Burn.CommandLine
                 }
 
                 harvestedFile.PackagePayloads.AddRange(command.Payloads);
-
+                harvestedFile.HarvestedPackageSymbol = command.HarvestedBundlePackage;
                 harvestedFile.Element.Add(bundleElement);
+
+                harvestedFile.PackageElement = new XElement(BundlePackageName);
+                if (BurnCommon.BurnV3Namespace == command.HarvestedBundlePackage.ManifestNamespace)
+                {
+                    harvestedFile.PackageElement.Add(new XAttribute("Visible", "yes"));
+                }
             }
+        }
+
+        private void HarvestExePackage(HarvestedFile harvestedFile)
+        {
+            harvestedFile.PackageElement = new XElement(ExePackageName);
+        }
+
+        private void HarvestMsuPackage(HarvestedFile harvestedFile)
+        {
+            harvestedFile.PackageElement = new XElement(MsuPackageName);
         }
 
         private class HarvestedFile
         {
             public XElement Element { get; set; }
 
-            public WixBundlePackageType? PackageType { get; internal set; }
+            public XElement PackageElement { get; set; }
+
+            public IntermediateSymbol HarvestedPackageSymbol { get; set; }
 
             public WixBundlePayloadSymbol PayloadSymbol { get; set; }
 

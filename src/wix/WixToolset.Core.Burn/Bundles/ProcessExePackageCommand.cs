@@ -35,7 +35,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
             {
-                this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateCacheIdFromPackagePayloadHash(this.Messaging, packagePayload, "ExePackage");
+                this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateLocalCacheId(this.Messaging, null, packagePayload, this.Facade.PackageSymbol.SourceLineNumbers, "ExePackage");
             }
 
             this.Facade.PackageSymbol.Version = packagePayload.Version;
