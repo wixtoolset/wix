@@ -1,0 +1,7 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <SetVariable Id="Builtin" Variable="WixBundleInstalled" Value="1" />
+        <Variable Name="WixCustomVariable" />
+        <Variable Name="AppDataFolder" />
+    </Fragment>
+</Wix>

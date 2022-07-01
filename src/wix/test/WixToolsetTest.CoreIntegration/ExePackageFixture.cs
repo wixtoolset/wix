@@ -44,14 +44,10 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var ignoreAttributes = new Dictionary<string, List<string>>
-                {
-                    { "ExePackage", new List<string> { "CacheId", "Size" } },
-                };
-                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
+                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.0'>" +
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964' InstallSize='463360' Size='463360' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.0'>" +
                       "<PayloadRef Id='burn.exe' />" +
                     "</ExePackage>",
                 }, exePackages);
@@ -465,9 +461,12 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", Path.Combine(baseFolder, "bin", "test.exe")
                 });
 
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackage/@CacheId attribute was not found; it is required when attribute CertificatePublicKey is specified.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+
                 Assert.Equal(10, result.ExitCode);
-                var message = result.Messages.Single();
-                Assert.Equal("The ExePackage/@CacheId attribute was not found; it is required when attribute CertificatePublicKey is specified.", message.ToString());
             }
         }
     }

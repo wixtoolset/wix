@@ -59,13 +59,11 @@ namespace WixToolsetTest.CoreIntegration
                     { "Payload", new List<string> { "Size", "Hash" } },
                 };
                 WixAssert.StringEqual(
-                    "<root>" +
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
                     "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
                     "</BundlePackagePayload>" +
-                    "</BundlePackage>" +
-                    "</root>", xml.GetFragmentTestXml(ignoreAttributesByElementName));
+                    "</BundlePackage>", xml.GetTestXml(ignoreAttributesByElementName));
 
                 // ExternalWithoutDownloadUrl
                 var externalWithoutDownloadUrlOutFile = Path.Combine(outputFolder, "externalWithoutDownloadUrl_out.xml");
@@ -83,7 +81,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 xml = File.ReadAllText(externalWithoutDownloadUrlOutFile);
                 WixAssert.StringEqual(
-                    "<root>" +
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
                     "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
@@ -92,8 +89,7 @@ namespace WixToolsetTest.CoreIntegration
                     "<Payload Name='test.msi' Hash='*' Size='*' />" +
                     "<Payload Name='test.txt' Hash='*' Size='*' />" +
                     "<Payload Name='Shared.dll' Hash='*' Size='*' />" +
-                    "</BundlePackage>" +
-                    "</root>", xml.GetFragmentTestXml(ignoreAttributesByElementName));
+                    "</BundlePackage>", xml.GetTestXml(ignoreAttributesByElementName));
 
                 // External
                 var externalOutFile = Path.Combine(outputFolder, "external_out.xml");
@@ -111,7 +107,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 xml = File.ReadAllText(externalOutFile);
                 WixAssert.StringEqual(
-                    "<root>" +
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
                     "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
@@ -121,8 +116,7 @@ namespace WixToolsetTest.CoreIntegration
                     "<Payload Name='test.msi' Hash='*' Size='*' />" +
                     "<Payload Name='test.txt' Hash='*' Size='*' />" +
                     "<Payload Name='Shared.dll' Hash='*' Size='*' />" +
-                    "</BundlePackage>" +
-                    "</root>", xml.GetFragmentTestXml(ignoreAttributesByElementName));
+                    "</BundlePackage>", xml.GetTestXml(ignoreAttributesByElementName));
 
                 // All
                 var allOutFile = Path.Combine(outputFolder, "all_out.xml");
@@ -140,7 +134,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 xml = File.ReadAllText(allOutFile);
                 WixAssert.StringEqual(
-                    "<root>" +
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
                     "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
@@ -151,8 +144,7 @@ namespace WixToolsetTest.CoreIntegration
                     "<Payload Name='test.msi' Hash='*' Size='*' />" +
                     "<Payload Name='test.txt' Hash='*' Size='*' />" +
                     "<Payload Name='Shared.dll' Hash='*' Size='*' />" +
-                    "</BundlePackage>" +
-                    "</root>", xml.GetFragmentTestXml(ignoreAttributesByElementName));
+                    "</BundlePackage>", xml.GetTestXml(ignoreAttributesByElementName));
             }
         }
 
@@ -266,6 +258,8 @@ namespace WixToolsetTest.CoreIntegration
                 var remotePayloadSourceFile = Path.Combine(outputFolder, "remotePayload.wxs");
                 var intermediateFolder = Path.Combine(outputFolder, "obj");
                 var bundleFile = Path.Combine(intermediateFolder, "out.exe");
+                var baFolderPath = Path.Combine(outputFolder, "ba");
+                var extractFolderPath = Path.Combine(outputFolder, "extract");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -313,6 +307,17 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var msuPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsuPackage");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<MsuPackage Id='Windows8.1_KB2937592_x86.msu' Cache='keep' CacheId='904ADEA6AB675ACE16483138BF3F5850FD56ACB6E3A1108E2BA23632620C427C' InstallSize='309544' Size='309544' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='test'>" +
+                    "<PayloadRef Id='Windows8.1_KB2937592_x86.msu' />" +
+                    "</MsuPackage>",
+                }, msuPackages);
             }
         }
 
@@ -328,6 +333,8 @@ namespace WixToolsetTest.CoreIntegration
                 var remotePayloadSourceFile = Path.Combine(outputFolder, "remotePayload.wxs");
                 var intermediateFolder = Path.Combine(outputFolder, "obj");
                 var bundleFile = Path.Combine(intermediateFolder, "out.exe");
+                var baFolderPath = Path.Combine(outputFolder, "ba");
+                var extractFolderPath = Path.Combine(outputFolder, "extract");
 
                 var result = WixRunner.Execute(new[]
                 {

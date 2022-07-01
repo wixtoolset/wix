@@ -20,6 +20,10 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -28,11 +32,22 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-bindpath", dotDatafolder,
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, "bin", "test.exe")
+                    "-o", bundlePath,
                 });
 
                 result.AssertSuccess();
-                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.exe")));
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var msuPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsuPackage");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<MsuPackage Id='test.msu' Cache='keep' CacheId='B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794D' InstallSize='28' Size='28' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='DetectedTheMsu'>" +
+                    "<PayloadRef Id='test.msu' />" +
+                    "</MsuPackage>",
+                }, msuPackages);
             }
         }
 
@@ -46,6 +61,10 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -54,11 +73,22 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-bindpath", dotDatafolder,
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, "bin", "test.exe")
+                    "-o", bundlePath,
                 });
 
                 result.AssertSuccess();
-                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.exe")));
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var msuPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsuPackage");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<MsuPackage Id='Windows8.1_KB2937592_x86.msu' Cache='keep' CacheId='8cf75b99-13c0-4184-82ce-dbde45dcd55a' InstallSize='309544' Size='309544' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='DetectedTheMsu'>" +
+                    "<PayloadRef Id='Windows8.1_KB2937592_x86.msu' />" +
+                    "</MsuPackage>",
+                }, msuPackages);
             }
         }
 
@@ -83,9 +113,12 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", Path.Combine(baseFolder, "bin", "test.exe")
                 });
 
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The MsuPackage/@CacheId attribute was not found; it is required when attribute CertificatePublicKey is specified.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+
                 Assert.Equal(10, result.ExitCode);
-                var message = result.Messages.Single();
-                Assert.Equal("The MsuPackage/@CacheId attribute was not found; it is required when attribute CertificatePublicKey is specified.", message.ToString());
             }
         }
 

@@ -12,7 +12,6 @@
                 <CommandLine Condition="!(loc.NonsenseExecuteCondition)" />
             </ExePackage>
         </Chain>
-        <!--<Variable Name="FOO" Value="1" />
-        <SetVariable Id="Builtin" Condition="!(loc.NonsenseDetectCondition)" Variable="FOO" Value="1" />-->
+        <SetVariable Id="Builtin" Condition="!(loc.NonsenseDetectCondition)" Variable="FOO" Value="1" />
     </Bundle>
 </Wix>
