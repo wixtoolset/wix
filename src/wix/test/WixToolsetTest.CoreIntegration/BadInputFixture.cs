@@ -163,17 +163,15 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
 
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidLocVariableNames.wxs"),
                     "-loc", Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidLocValues.wxl"),
-                    "-bindpath", Path.Combine(folder, ".Data"),
-                    "-bindpath", Path.Combine(folder, "DecompileSingleFileCompressed"),
-                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                    "-o", wixlibPath,
                 });
 
                 var messages = result.Messages.Select(m => m.ToString()).ToList();
@@ -187,6 +185,39 @@ namespace WixToolsetTest.CoreIntegration
                 }, messages.ToArray());
 
                 Assert.Equal(6603, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildBundleWithReservedVariableNames()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleWithInvalid", "BundleWithReservedVariableNames.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                var messages = result.Messages.Select(m => m.ToString()).ToList();
+                messages.Sort();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The SetVariable/@Variable attribute's value, 'WixBundleInstalled', is one of the illegal options: 'AdminToolsFolder', 'AppDataFolder', 'CommonAppDataFolder', 'CommonFiles64Folder', 'CommonFilesFolder', 'CompatibilityMode', 'Date', 'DesktopFolder', 'FavoritesFolder', 'FontsFolder', 'InstallerName', 'InstallerVersion', 'LocalAppDataFolder', 'LogonUser', 'MyPicturesFolder', 'NativeMachine', 'NTProductType', 'NTSuiteBackOffice', 'NTSuiteDataCenter', 'NTSuiteEnterprise', 'NTSuitePersonal', 'NTSuiteSmallBusiness', 'NTSuiteSmallBusinessRestricted', 'NTSuiteWebServer', 'PersonalFolder', 'Privileged', 'ProgramFiles64Folder', 'ProgramFiles6432Folder', 'ProgramFilesFolder', 'ProgramMenuFolder', 'RebootPending', 'SendToFolder', 'ServicePackLevel', 'StartMenuFolder', 'StartupFolder', 'System64Folder', 'SystemFolder', 'TempFolder', 'TemplateFolder', 'TerminalServer', 'UserLanguageID', 'UserUILanguageID', 'VersionMsi', 'VersionNT', 'VersionNT64', 'WindowsFolder', 'WindowsVolume', 'WixBundleAction', 'WixBundleCommandLineAction', 'WixBundleForcedRestartPackage', 'WixBundleElevated', 'WixBundleInstalled', 'WixBundleProviderKey', 'WixBundleTag', or 'WixBundleVersion'.",
+                    "The Variable/@Name attribute's value begins with the reserved prefix 'Wix'. Some prefixes are reserved by the Windows Installer and WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.",
+                    "The Variable/@Name attribute's value, 'AppDataFolder', is one of the illegal options: 'AdminToolsFolder', 'AppDataFolder', 'CommonAppDataFolder', 'CommonFiles64Folder', 'CommonFilesFolder', 'CompatibilityMode', 'Date', 'DesktopFolder', 'FavoritesFolder', 'FontsFolder', 'InstallerName', 'InstallerVersion', 'LocalAppDataFolder', 'LogonUser', 'MyPicturesFolder', 'NativeMachine', 'NTProductType', 'NTSuiteBackOffice', 'NTSuiteDataCenter', 'NTSuiteEnterprise', 'NTSuitePersonal', 'NTSuiteSmallBusiness', 'NTSuiteSmallBusinessRestricted', 'NTSuiteWebServer', 'PersonalFolder', 'Privileged', 'ProgramFiles64Folder', 'ProgramFiles6432Folder', 'ProgramFilesFolder', 'ProgramMenuFolder', 'RebootPending', 'SendToFolder', 'ServicePackLevel', 'StartMenuFolder', 'StartupFolder', 'System64Folder', 'SystemFolder', 'TempFolder', 'TemplateFolder', 'TerminalServer', 'UserLanguageID', 'UserUILanguageID', 'VersionMsi', 'VersionNT', 'VersionNT64', 'WindowsFolder', 'WindowsVolume', 'WixBundleAction', 'WixBundleCommandLineAction', 'WixBundleForcedRestartPackage', 'WixBundleElevated', 'WixBundleInstalled', 'WixBundleProviderKey', 'WixBundleTag', or 'WixBundleVersion'.",
+                }, messages.ToArray());
+
+                Assert.Equal(348, result.ExitCode);
             }
         }
 
@@ -217,6 +248,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 WixAssert.CompareLineByLine(new[]
                 {
+                    "*Search/@Condition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "Bundle/@Condition contains the built-in Variable 'WixBundleInstalled', which is not available when it is evaluated. (Unavailable Variables are: 'RebootPending', 'WixBundleAction', or 'WixBundleInstalled'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "ExePackage/@DetectCondition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "The CommandLine/@Condition attribute's value '=' is not a valid bundle condition.",

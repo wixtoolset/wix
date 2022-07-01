@@ -41,10 +41,7 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var msiProperties = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage/burn:MsiProperty")
-                                            .Cast<XmlElement>()
-                                            .Select(e => e.GetTestXml())
-                                            .ToArray();
+                var msiProperties = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsiPackage/burn:MsiProperty");
                 WixAssert.CompareLineByLine(new[]
                 {
                     "<MsiProperty Id='MSIFASTINSTALL' Value='7' />"

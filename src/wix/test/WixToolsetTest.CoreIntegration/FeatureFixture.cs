@@ -71,7 +71,10 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     7503
                 }, errors.Select(e => e.Id).ToArray());
-                Assert.Equal("Maximum depth of the Feature tree allowed in an MSI was exceeded. An MSI does not support a Feature tree with depth greater than 16. The Feature 'Depth17' is at depth 17.", errors.Single().ToString());
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Maximum depth of the Feature tree allowed in an MSI was exceeded. An MSI does not support a Feature tree with depth greater than 16. The Feature 'Depth17' is at depth 17.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
             }
         }
     }
