@@ -100,7 +100,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.ChainPackage.CacheId))
             {
-                this.ChainPackage.CacheId = String.Format("{0}v{1}", this.MsiPackage.ProductCode, this.MsiPackage.ProductVersion);
+                this.ChainPackage.CacheId = CacheIdGenerator.GenerateLocalCacheId(this.Messaging, harvestedMsiPackage, this.PackagePayload, this.MsiPackage.SourceLineNumbers, "MsiPackage");
             }
 
             if (String.IsNullOrEmpty(this.ChainPackage.DisplayName))

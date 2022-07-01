@@ -32,7 +32,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
             {
-                this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateCacheIdFromPackagePayloadHash(this.Messaging, packagePayload, "MsuPackage");
+                this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateLocalCacheId(this.Messaging, null, packagePayload, this.Facade.PackageSymbol.SourceLineNumbers, "MsuPackage");
             }
 
             this.Facade.PackageSymbol.PerMachine = true; // MSUs are always per-machine.

@@ -94,7 +94,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.ChainPackage.CacheId))
             {
-                this.ChainPackage.CacheId = String.Format("{0}v{1}", this.BundlePackage.BundleId, this.BundlePackage.Version);
+                this.ChainPackage.CacheId = CacheIdGenerator.GenerateLocalCacheId(this.Messaging, harvestedBundlePackage, this.PackagePayload, this.BundlePackage.SourceLineNumbers, "BundlePackage");
             }
 
             if (String.IsNullOrEmpty(this.ChainPackage.DisplayName))

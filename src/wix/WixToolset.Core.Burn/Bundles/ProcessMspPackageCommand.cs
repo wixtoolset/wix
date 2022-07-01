@@ -82,7 +82,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (String.IsNullOrEmpty(this.ChainPackage.CacheId))
             {
-                this.ChainPackage.CacheId = this.MspPackage.PatchCode;
+                this.ChainPackage.CacheId = CacheIdGenerator.GenerateLocalCacheId(this.Messaging, harvestedMspPackage, this.PackagePayload, this.MspPackage.SourceLineNumbers, "MspPackage");
             }
         }
 
