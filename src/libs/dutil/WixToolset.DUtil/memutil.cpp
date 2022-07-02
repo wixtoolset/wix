@@ -19,13 +19,13 @@
 #define MemExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_MEMUTIL, g, x, s, __VA_ARGS__)
 
 
-#if DEBUG
+#ifndef NDEBUG
 static BOOL vfMemInitialized = FALSE;
 #endif
 
 extern "C" HRESULT DAPI MemInitialize()
 {
-#if DEBUG
+#ifndef NDEBUG
     vfMemInitialized = TRUE;
 #endif
     return S_OK;
@@ -33,7 +33,7 @@ extern "C" HRESULT DAPI MemInitialize()
 
 extern "C" void DAPI MemUninitialize()
 {
-#if DEBUG
+#ifndef NDEBUG
     vfMemInitialized = FALSE;
 #endif
 }

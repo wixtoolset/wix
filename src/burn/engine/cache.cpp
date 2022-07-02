@@ -983,7 +983,7 @@ extern "C" HRESULT CacheCompleteBundle(
     __in_z LPCWSTR wzExecutableName,
     __in_z LPCWSTR wzBundleId,
     __in_z LPCWSTR wzSourceBundlePath
-#ifdef DEBUG
+#ifndef NDEBUG
     , __in_z LPCWSTR wzExecutablePath
 #endif
     )

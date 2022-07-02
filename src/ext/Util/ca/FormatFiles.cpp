@@ -141,7 +141,7 @@ extern "C" UINT __stdcall WixExecFormatFiles(
 
     hr = WcaGetProperty(L"CustomActionData", &sczCustomActionData);
     ExitOnFailure(hr, "Failed to get CustomActionData.");
-#ifdef _DEBUG
+#ifndef NDEBUG
     WcaLog(LOGMSG_STANDARD, "CustomActionData: %ls", sczCustomActionData);
 #endif
 
@@ -192,7 +192,7 @@ extern "C" UINT __stdcall WixExecFormatFiles(
             break;
         }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
         WcaLog(LOGMSG_STANDARD, "File: %ls", sczCustomActionData);
         WcaLog(LOGMSG_STANDARD, "Content: %ls", sczFileContent);
 #endif

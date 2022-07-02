@@ -617,7 +617,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     if (dwRegistrationOptions & BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE)
     {
         hr = CacheCompleteBundle(pCache, pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczId, wzEngineWorkingPath
-#ifdef DEBUG
+#ifndef NDEBUG
                         , pRegistration->sczCacheExecutablePath
 #endif
                         );

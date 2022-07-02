@@ -137,7 +137,7 @@ extern "C" HRESULT WIXAPI WcaProgressMessage(
 
         fExplicitProgressMessages = TRUE;
     }
-#if DEBUG
+#ifndef NDEBUG
     else if (fExtendProgressBar)   // if we are extending the progress bar, make sure we're not deferred
     {
         AssertSz(!::MsiGetMode(WcaGetInstallHandle(), MSIRUNMODE_SCHEDULED), "cannot add ticks to progress bar length from deferred CustomAction");
@@ -439,7 +439,7 @@ extern "C" HRESULT WIXAPI WcaFetchSingleRecord(
     }
     ExitOnFailure(hr, "failed to fetch single record from view");
 
-#ifdef DEBUG // only do this in debug to verify that a single record was returned
+#ifndef NDEBUG // only do this in debug to verify that a single record was returned
     MSIHANDLE hRecTest;
     er = ::MsiViewFetch(hView, &hRecTest);
     AssertSz(ERROR_NO_MORE_ITEMS == er && NULL == hRecTest, "WcaSingleFetch() did not fetch a single record");
@@ -742,7 +742,7 @@ extern "C" BOOL WIXAPI WcaIsPropertySet(
 {
     DWORD cchProperty = 0;
     char szEmpty[1] = "";
-#ifdef DEBUG
+#ifndef NDEBUG
     UINT er =
 #endif
         ::MsiGetPropertyA(WcaGetInstallHandle(), szProperty, szEmpty, &cchProperty);
@@ -762,7 +762,7 @@ extern "C" BOOL WIXAPI WcaIsUnicodePropertySet(
 {
     DWORD cchProperty = 0;
     wchar_t wzEmpty[1] = L"";
-#ifdef DEBUG
+#ifndef NDEBUG
     UINT er =
 #endif
         ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, wzEmpty, &cchProperty);

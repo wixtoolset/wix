@@ -125,7 +125,7 @@ extern "C" HRESULT MspEngineDetectInitialize(
     POSSIBLE_TARGETPRODUCT* rgPossibleTargetProducts = NULL;
     DWORD cPossibleTargetProducts = 0;
 
-#ifdef DEBUG
+#ifndef NDEBUG
     // All patch info should be initialized to zero.
     for (DWORD i = 0; i < pPackages->cPatchInfo; ++i)
     {

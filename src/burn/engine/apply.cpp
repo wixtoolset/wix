@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 
-#ifdef DEBUG
+#ifndef NDEBUG
     #define IgnoreRollbackError(x, f, ...) if (FAILED(x)) { TraceError(x, f, __VA_ARGS__); }; x = S_OK
 #else
     #define IgnoreRollbackError(x, f, ...) x = S_OK

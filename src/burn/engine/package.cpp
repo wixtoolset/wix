@@ -325,7 +325,7 @@ extern "C" HRESULT PackagesParseFromXml(
 
     AssertSz(pPackages->cPatchInfo == cMspPackages, "Count of packages patch info should be equal to the number of MSP packages.");
 
-#if DEBUG
+#ifndef NDEBUG
     // Loop through all MSI packages seeing if any of them are missing their slipstream MSP.
     for (DWORD i = 0; i < pPackages->cPackages; ++i)
     {

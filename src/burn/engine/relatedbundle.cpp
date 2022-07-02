@@ -400,7 +400,7 @@ static HRESULT LoadRelatedBundleFromKey(
     pRelatedBundle->detectRelationType = relationType;
 
     hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, fSupportsBurnProtocol, fPerMachine, wzRelatedBundleId,
-#ifdef DEBUG
+#ifndef NDEBUG
                                        pRelatedBundle->detectRelationType,
 #endif
                                        fCached, sczCachePath, qwFileSize, pBundleDependencyProvider);

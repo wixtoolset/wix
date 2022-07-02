@@ -687,7 +687,7 @@ public: // IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCacheAcquireProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage);
 #endif
 
@@ -706,7 +706,7 @@ public: // IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCacheContainerOrPayloadVerifyProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage);
 #endif
 
@@ -725,7 +725,7 @@ public: // IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCachePayloadExtractProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage);
 #endif
 
@@ -745,7 +745,7 @@ public: // IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCacheVerifyProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%, step: %u", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, verifyStep);
 #endif
 
@@ -907,7 +907,7 @@ public: // IBootstrapperApplication
         __inout int* pResult
         )
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnExecuteMsiMessage() - package: %ls, message: %ls", wzPackageId, wzMessage);
 #endif
         if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display && (INSTALLMESSAGE_WARNING == messageType || INSTALLMESSAGE_USER == messageType))
@@ -936,7 +936,7 @@ public: // IBootstrapperApplication
     {
         WCHAR wzProgress[5] = { };
 
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnProgress() - progress: %u%%, overall progress: %u%%", dwProgressPercentage, dwOverallProgressPercentage);
 #endif
 
@@ -1025,7 +1025,7 @@ public: // IBootstrapperApplication
     {
         WCHAR wzProgress[5] = { };
 
-#ifdef DEBUG
+#ifndef NDEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnExecuteProgress() - package: %ls, progress: %u%%, overall progress: %u%%", wzPackageId, dwProgressPercentage, dwOverallProgressPercentage);
 #endif
 
@@ -1493,7 +1493,7 @@ public: // IBootstrapperApplication
             OnCachePackageNonVitalValidationFailureFallback(reinterpret_cast<BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPACKAGENONVITALVALIDATIONFAILURE_RESULTS*>(pvResults));
             break;
         default:
-#ifdef DEBUG
+#ifndef NDEBUG
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
 #endif
             m_pfnBAFunctionsProc((BA_FUNCTIONS_MESSAGE)message, pvArgs, pvResults, m_pvBAFunctionsProcContext);

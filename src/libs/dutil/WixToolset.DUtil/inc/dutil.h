@@ -75,7 +75,7 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #endif
 
 
-#ifdef DEBUG
+#ifndef NDEBUG
 
 #define AssertSetModule(m) (void)Dutil_SetAssertModule(m)
 #define AssertSetDisplayFunction(pfn) (void)Dutil_SetAssertDisplayFunction(pfn)
@@ -88,7 +88,7 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #define TraceError(x, f, ...) (void)Dutil_TraceError(__FILE__, __LINE__, REPORT_ERROR, x, f, __VA_ARGS__)
 #define TraceErrorDebug(x, f, ...) (void)Dutil_TraceError(__FILE__, __LINE__, REPORT_DEBUG, x, f, __VA_ARGS__)
 
-#else // !DEBUG
+#else // !NDEBUG
 
 #define AssertSetModule(m)
 #define AssertSetDisplayFunction(pfn)
@@ -100,7 +100,7 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #define TraceError(x, f, ...)
 #define TraceErrorDebug(x, f, ...)
 
-#endif // DEBUG
+#endif // NDEBUG
 
 // DUTIL_SOURCE_DEFAULT can be overriden
 #ifndef DUTIL_SOURCE_DEFAULT

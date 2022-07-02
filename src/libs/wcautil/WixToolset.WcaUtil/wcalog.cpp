@@ -172,7 +172,7 @@ extern "C" void __cdecl WcaLog(
 
     if (LOGMSG_STANDARD == llv || 
         (LOGMSG_VERBOSE == llv && IsVerboseLoggingLite())
-#ifdef DEBUG
+#ifndef NDEBUG
         || LOGMSG_TRACEONLY == llv
 #endif
         )
@@ -189,7 +189,7 @@ extern "C" void __cdecl WcaLog(
         StringCchVPrintfA(szBuf, countof(szBuf), szFmt, args);
         va_end(args);
 
-#ifdef DEBUG
+#ifndef NDEBUG
         // always write to the log in debug
 #else
         if (llv == LOGMSG_STANDARD || (llv == LOGMSG_VERBOSE && IsVerboseLoggingLite()))
@@ -202,7 +202,7 @@ extern "C" void __cdecl WcaLog(
             WcaProcessMessage(INSTALLMESSAGE_INFO, hrec);
         }
 
-#if DEBUG
+#ifndef NDEBUG
         StringCchCatA(szBuf, countof(szBuf), "\n");
         OutputDebugStringA(szBuf);
 #endif

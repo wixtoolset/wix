@@ -49,7 +49,7 @@ extern "C" void WIXAPI WcaGlobalInitialize(
 ********************************************************************/
 extern "C" void WIXAPI WcaGlobalFinalize()
 {
-#ifdef DEBUG
+#ifndef NDEBUG
     if (WcaIsInitialized())
     {
         CHAR szBuf[2048];

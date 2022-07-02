@@ -6114,7 +6114,7 @@ static HRESULT LoadControls(
         case THEME_CONTROL_TYPE_PANEL:
             wzWindowClass = vsczPanelClass;
             dwWindowExBits |= WS_EX_CONTROLPARENT;
-#ifdef DEBUG
+#ifndef NDEBUG
             StrAllocFormatted(&pControl->sczText, L"Panel '%ls', id: %d", pControl->sczName, pControl->wId);
 #endif
             break;
@@ -6678,7 +6678,7 @@ static void ResizeControl(
     GetControlDimensions(pControl, prcParent, &w, &h, &x, &y);
     ::SetWindowPos(pControl->hWnd, NULL, x, y, w, h, SWP_NOACTIVATE | SWP_NOZORDER);
 
-#ifdef DEBUG
+#ifndef NDEBUG
     if (THEME_CONTROL_TYPE_BUTTON == pControl->type)
     {
         Trace(REPORT_STANDARD, "Resizing button (%ls/%ls) to (%d,%d)+(%d,%d) for parent (%d,%d)-(%d,%d)",

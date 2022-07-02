@@ -3104,7 +3104,7 @@ namespace Bootstrapper
             pRelatedBundle->detectRelationType = relationType;
 
             hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, TRUE, TRUE, wzId,
-#ifdef DEBUG
+#ifndef NDEBUG
                                                pRelatedBundle->detectRelationType,
 #endif
                                                TRUE, wzFilePath, 0, &dependencyProvider);

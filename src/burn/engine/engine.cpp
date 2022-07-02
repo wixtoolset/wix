@@ -118,7 +118,7 @@ extern "C" HRESULT EngineRun(
     fLogInitialized = TRUE;
 
     // Ensure that log contains approriate level of information
-#ifdef _DEBUG
+#ifndef NDEBUG
     LogSetLevel(REPORT_DEBUG, FALSE);
 #else
     LogSetLevel(REPORT_VERBOSE, FALSE); // FALSE means don't write an additional text line to the log saying the level changed

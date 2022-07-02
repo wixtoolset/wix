@@ -743,7 +743,7 @@ extern "C" HRESULT DAPI SceFinishUpdate(
     ExitOnFailure(hr, "Failed to get IAccessor interface");
 
 // This can be used when stepping through the debugger to see bind failures
-#ifdef DEBUG
+#ifndef NDEBUG
     if (0 < pRow->dwBindingIndex)
     {
         hr = MemEnsureArraySize(reinterpret_cast<void **>(&rgBindStatus), pRow->dwBindingIndex, sizeof(DBBINDSTATUS), 0);

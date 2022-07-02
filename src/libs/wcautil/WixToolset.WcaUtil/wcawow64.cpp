@@ -100,7 +100,7 @@ extern "C" HRESULT WIXAPI WcaDisableWow64FSRedirection()
 {
     AssertSz(s_fWow64Initialized && s_pfnDisableWow64 != NULL, "WcaDisableWow64FSRedirection() called, but Wow64 API was not initialized");
 
-#ifdef DEBUG
+#ifndef NDEBUG
     AssertSz(!s_fWow64FSDisabled, "You must call WcaRevertWow64FSRedirection() before calling WcaDisableWow64FSRedirection() again");
 #endif
 
@@ -127,7 +127,7 @@ extern "C" HRESULT WIXAPI WcaRevertWow64FSRedirection()
 {
     AssertSz(s_fWow64Initialized && s_pfnDisableWow64 != NULL, "WcaRevertWow64FSRedirection() called, but Wow64 API was not initialized");
 
-#ifdef DEBUG
+#ifndef NDEBUG
     AssertSz(s_fWow64FSDisabled, "You must call WcaDisableWow64FSRedirection() before calling WcaRevertWow64FSRedirection()");
 #endif
 
@@ -153,7 +153,7 @@ extern "C" HRESULT WIXAPI WcaFinalizeWow64()
 {
     if (s_fWow64FSDisabled)
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         AssertSz(FALSE, "WcaFinalizeWow64() called while Filesystem redirection was disabled.");
 #else
         // If we aren't in debug mode, let's do our best to recover gracefully

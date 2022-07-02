@@ -450,7 +450,7 @@ extern "C" HRESULT PipeTerminateChildProcess(
         AssertSz(!fTimedOut, "Timed out while waiting for child process to exit.");
     }
 
-#ifdef DEBUG
+#ifndef NDEBUG
     if (pConnection->hProcess && !fTimedOut)
     {
         DWORD dwChildExitCode = 0;

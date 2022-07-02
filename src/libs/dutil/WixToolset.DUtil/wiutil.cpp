@@ -1260,7 +1260,7 @@ static INT HandleInstallProgress(
         }
     }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     WCHAR wz[256];
     ::StringCchPrintfW(wz, countof(wz), L"1: %d 2: %d 3: %d 4: %d", iFields[0], iFields[1], iFields[2], iFields[3]);
     Trace(REPORT_STANDARD, "MSI progress[%x]: %ls", pContext->dwCurrentProgressIndex, wz);
@@ -1521,7 +1521,7 @@ static INT SendProgressUpdate(
     //    //qwProgressComplete = min(qwProgressComplete, pEngineInfo->qwProgressStageTotal);
     //}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     DWORD64 qwCompleted = pContext->rgMsiProgress[pContext->dwCurrentProgressIndex].dwCompleted;
     DWORD64 qwTotal = pContext->rgMsiProgress[pContext->dwCurrentProgressIndex].dwTotal;
     Trace(REPORT_STANDARD, "MSI progress: %I64u/%I64u (%u%%)", qwCompleted, qwTotal, dwPercentage);

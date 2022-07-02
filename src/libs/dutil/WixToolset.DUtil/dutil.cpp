@@ -478,11 +478,11 @@ extern "C" void DAPI Dutil_RootFailure(
     __in HRESULT hrError
     )
 {
-#ifndef DEBUG
+#ifdef NDEBUG
     UNREFERENCED_PARAMETER(szFile);
     UNREFERENCED_PARAMETER(iLine);
     UNREFERENCED_PARAMETER(hrError);
-#endif // DEBUG
+#endif // NDEBUG
 
     TraceError(hrError, "Root failure at %s:%d", szFile, iLine);
 }

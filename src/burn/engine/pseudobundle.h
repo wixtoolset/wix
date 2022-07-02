@@ -11,7 +11,7 @@ HRESULT PseudoBundleInitializeRelated(
     __in BOOL fSupportsBurnProtocol,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzId,
-#ifdef DEBUG
+#ifndef NDEBUG
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
 #endif
     __in BOOL fCached,

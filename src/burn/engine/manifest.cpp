@@ -7,7 +7,7 @@ static HRESULT ParseFromXml(
     __in IXMLDOMDocument* pixdDocument,
     __in BURN_ENGINE_STATE* pEngineState
     );
-#if DEBUG
+#ifndef NDEBUG
 static void ValidateHarvestingAttributes(
     __in IXMLDOMDocument* pixdDocument
     );
@@ -48,7 +48,7 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
     hr = XmlLoadDocumentFromBuffer(pbBuffer, cbBuffer, &pixdDocument);
     ExitOnFailure(hr, "Failed to load manifest as XML document.");
 
-#if DEBUG
+#ifndef NDEBUG
     ValidateHarvestingAttributes(pixdDocument);
 #endif
 
@@ -172,7 +172,7 @@ LExit:
     return hr;
 }
 
-#if DEBUG
+#ifndef NDEBUG
 static void ValidateHarvestingAttributes(
     __in IXMLDOMDocument* pixdDocument
     )
