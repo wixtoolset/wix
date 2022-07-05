@@ -90,6 +90,7 @@ namespace WixToolset.UI
                 // in the UI .wixlib.
                 var platform = this.Context.Platform == Platform.ARM64 ? "A64" : this.Context.Platform.ToString();
                 var source = $"WixUiCa_{platform}";
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, source);
 
                 section.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixUIPrintEula"))
                 {

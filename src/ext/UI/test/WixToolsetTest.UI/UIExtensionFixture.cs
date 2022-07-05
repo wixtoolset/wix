@@ -20,14 +20,27 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerMachineFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerUserFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerMachineFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerUserFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X86\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixSetDefaultPerMachineFolder\t51\tWixPerMachineFolder\t[ProgramFilesFolder][ApplicationFolderName]\t",
+                "CustomAction:WixSetDefaultPerUserFolder\t51\tWixPerUserFolder\t[LocalAppDataFolder]Apps\\[ApplicationFolderName]\t",
+                "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
+                "CustomAction:WixSetPerUserFolder\t51\tAPPLICATIONFOLDER\t[WixPerUserFolder]\t",
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
@@ -37,14 +50,27 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(BuildX64, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerMachineFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerUserFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerMachineFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerUserFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIPrintEula\t65\tWixUiCa_X64\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIValidatePath\t65\tWixUiCa_X64\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X64\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixSetDefaultPerMachineFolder\t51\tWixPerMachineFolder\t[ProgramFilesFolder][ApplicationFolderName]\t",
+                "CustomAction:WixSetDefaultPerUserFolder\t51\tWixPerUserFolder\t[LocalAppDataFolder]Apps\\[ApplicationFolderName]\t",
+                "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
+                "CustomAction:WixSetPerUserFolder\t51\tAPPLICATIONFOLDER\t[WixPerUserFolder]\t",
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_X64\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_X64\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
@@ -54,14 +80,27 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(BuildARM64, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(BuildARM64, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerMachineFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetDefaultPerUserFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerMachineFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixSetPerUserFolder\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIPrintEula\t65\tWixUiCa_A64\t"));
-            Assert.Single(results, result => result.StartsWith("CustomAction:WixUIValidatePath\t65\tWixUiCa_A64\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_A64\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixSetDefaultPerMachineFolder\t51\tWixPerMachineFolder\t[ProgramFilesFolder][ApplicationFolderName]\t",
+                "CustomAction:WixSetDefaultPerUserFolder\t51\tWixPerUserFolder\t[LocalAppDataFolder]Apps\\[ApplicationFolderName]\t",
+                "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
+                "CustomAction:WixSetPerUserFolder\t51\tAPPLICATIONFOLDER\t[WixPerUserFolder]\t",
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_A64\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_A64\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
@@ -71,10 +110,25 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
             Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
             Assert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X86\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
@@ -84,8 +138,23 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X86\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
@@ -95,8 +164,23 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:WelcomeEulaDlg\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X86\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
@@ -144,10 +228,25 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction");
             Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
             Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
             Assert.Single(results, result => result.StartsWith("Dialog:SetupTypeDlg\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X86\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\tPrintEula\t",
+                "CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
         }
 
         [Fact]
