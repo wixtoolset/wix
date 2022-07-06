@@ -215,6 +215,7 @@
     <ResolveReferencesDependsOn>
       BeforeResolveReferences;
       AssignProjectConfiguration;
+      _ValidateProjectAssetsFile;
       ResolveProjectReferences;
       FindInvalidProjectReferences;
       ResolveNativeProjectReferences;
@@ -225,6 +226,27 @@
       AfterResolveReferences
     </ResolveReferencesDependsOn>
   </PropertyGroup>
+
+  <!--
+    ================================================================================================
+                                        _ValidateProjectAssetsFile
+
+    Ensures that the project assets file exists which indicates restore was completed. Restore is
+    required if there are any PackageReferences in the project.
+
+    [IN]
+    @(PackageReference) - Package references, if any.
+    $(ProjectAssetsFile) - Project assets file that should be created during restore.
+    ================================================================================================
+    -->
+  <Target
+    Name="_ValidateProjectAssetsFile"
+    Condition=" '@(PackageReference)' != '' ">
+
+    <Error Text="The $(ProjectAssetsFile) file does not exist. Restore the project before trying to build again. Restore and build with &quot;MSBuild -Restore&quot; or &quot;dotnet build&quot;."
+           Condition="!Exists('$(ProjectAssetsFile)')" />
+
+  </Target>
 
   <!--
     ================================================================================================
@@ -332,7 +354,7 @@
       <_ResolvedProjectReferencePaths Remove="@(WixLibrary)" />
     </ItemGroup>
 
-    <!-- Convert resolved project references into compiler defines and named and unamed bind paths-->
+    <!-- Convert resolved project references into compiler defines and named and unamed bind paths -->
     <CreateProjectReferenceDefineConstantsAndBindPaths
         ResolvedProjectReferences="@(_ResolvedProjectReferencePaths)"
         ProjectConfigurations="$(VSProjectConfigurations)">
