@@ -40,6 +40,11 @@ namespace WixToolset.Data
         public uint Revision { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the version did not parse correctly.
+        /// </summary>
+        public bool Invalid { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the major version was defined.
         /// </summary>
         public bool HasMajor { get; set; }
@@ -70,14 +75,13 @@ namespace WixToolset.Data
         public string Metadata { get; set; }
 
         /// <summary>
-        /// Tries to parse a string value into a valid <c>WixVersion</c>.
+        /// Parse a string value into a <c>WixVersion</c>. The returned version may be invalid.
         /// </summary>
         /// <param name="parse">String value to parse into a version.</param>
-        /// <param name="version">Parsed version.</param>
-        /// <returns>True if the version was successfully parsed, or false otherwise.</returns>
-        public static bool TryParse(string parse, out WixVersion version)
+        /// <returns>Parsed version.</returns>
+        public static WixVersion Parse(string parse)
         {
-            version = new WixVersion();
+            var version = new WixVersion();
 
             var labels = new List<WixVersionLabel>();
             var start = 0;
@@ -286,13 +290,44 @@ namespace WixToolset.Data
                 }
             }
 
+            version.Labels = labels.Count == 0 ? null : labels.ToArray();
+
             if (invalid)
+            {
+                // If the prefix was parsed but the rest of the version was
+                // invalid, store the full invalid version in the Metadata
+                // and clear the prefix.
+                if (version.Prefix.HasValue && partBegin == 1)
+                {
+                    version.Prefix = null;
+                    version.Metadata = parse;
+                }
+                else // store the remaining invalid content in Metadata.
+                {
+                    version.Metadata = (partBegin < end) ? parse.Substring(partBegin) : String.Empty;
+                }
+
+                version.Invalid = true;
+            }
+
+            return version;
+        }
+
+        /// <summary>
+        /// Tries to parse a string value into a valid <c>WixVersion</c>.
+        /// </summary>
+        /// <param name="parse">String value to parse into a version.</param>
+        /// <param name="version">Parsed version.</param>
+        /// <returns>True if the version was successfully parsed, or false otherwise.</returns>
+        public static bool TryParse(string parse, out WixVersion version)
+        {
+            version = WixVersion.Parse(parse);
+
+            if (version.Invalid)
             {
                 version = null;
                 return false;
             }
-
-            version.Labels = labels.Count == 0 ? null : labels.ToArray();
 
             return true;
         }
