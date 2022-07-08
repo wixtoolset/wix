@@ -455,7 +455,7 @@
     <ResolveWixReferences
       WixReferences="@(WixExtension)"
       SearchPaths="$(WixExtensionSearchPaths)"
-      SearchFilenameExtensions=".dll">
+      SearchFilenameExtensions=".wixext.dll">
       <Output TaskParameter="ResolvedWixReferences" ItemName="_AllResolvedWixExtensionPaths" />
     </ResolveWixReferences>
 
