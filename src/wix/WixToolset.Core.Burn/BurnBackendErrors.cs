@@ -92,7 +92,7 @@ namespace WixToolset.Core.Burn
 
         public static Message InvalidBundleManifest(SourceLineNumber sourceLineNumbers, string bundleExecutable, string reason)
         {
-            return Message(sourceLineNumbers, Ids.InvalidBundleManifest, "Unable to harvest bundle executable '{0}'. The manifest was invalid. {1}", bundleExecutable, reason);
+            return Message(sourceLineNumbers, Ids.InvalidBundleManifest, "Unable to read bundle executable '{0}'. Its manifest is invalid. {1}", bundleExecutable, reason);
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)

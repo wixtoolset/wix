@@ -78,7 +78,7 @@ namespace WixToolsetTest.Core
             var attribute = CreateAttribute("v1.2.3.4");
             var result = helper.GetAttributeVersionValue(null, attribute);
 
-            WixAssert.StringEqual("1.2.3.4", result);
+            WixAssert.StringEqual("v1.2.3.4", result);
         }
 
 

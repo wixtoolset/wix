@@ -119,5 +119,40 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             return Common.IsValidShortFilename(filename, allowWildcards);
         }
+
+        public bool TryParseFourPartVersion(string version, out string parsedVersion)
+        {
+            if (WixVersion.TryParse(version, out var wixVersion) && wixVersion.HasMajor && wixVersion.Major < 65536 && wixVersion.Minor < 65536 && wixVersion.Patch < 65536 && wixVersion.Revision < 65536)
+            {
+                parsedVersion = $"{wixVersion.Major}.{wixVersion.Minor}.{wixVersion.Patch}.{wixVersion.Revision}";
+                return true;
+            }
+
+            parsedVersion = null;
+            return false;
+        }
+
+        public bool TryParseMsiProductVersion(string version, bool strict, out string parsedVersion)
+        {
+            if (WixVersion.TryParse(version, out var wixVersion) && wixVersion.HasMajor && wixVersion.Major < 256 && wixVersion.Minor < 256 && wixVersion.Patch < 65536 && wixVersion.Labels == null && String.IsNullOrEmpty(wixVersion.Metadata))
+            {
+                parsedVersion = $"{wixVersion.Major}.{wixVersion.Minor}";
+
+                if (strict || wixVersion.HasPatch)
+                {
+                    parsedVersion += $".{wixVersion.Patch}";
+                }
+
+                if (!strict && wixVersion.HasRevision)
+                {
+                    parsedVersion += $".{wixVersion.Revision}";
+                }
+
+                return true;
+            }
+
+            parsedVersion = null;
+            return false;
+        }
     }
 }

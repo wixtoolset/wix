@@ -39,7 +39,7 @@ namespace WixToolsetTest.CoreIntegration
                                                    .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "Invalid product version '1.256.0'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.",
+                    "Invalid product version '1.256.0'. MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. The revision value is ignored but version labels and metadata are not allowed.",
                 }, errorMessages);
                 Assert.Equal(242, result.ExitCode);
             }

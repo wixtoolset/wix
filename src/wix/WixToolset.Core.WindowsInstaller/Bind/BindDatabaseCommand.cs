@@ -127,6 +127,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 tableDefinitions = command.TableDefinitions;
             }
 
+            if (section.Type == SectionType.Product)
+            {
+                this.ProcessProductVersion(packageSymbol, section, validate: false);
+            }
+
             // Calculate codepage
             var codepage = this.CalculateCodepage(packageSymbol, moduleSymbol, patchSymbol);
 
@@ -298,8 +303,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Now that delayed fields are processed, validate the package/module version.
-            this.VerifyVersion(packageSymbol, moduleSymbol);
+            // Now that delayed fields are processed, fixup the package version (if needed) and validate it
+            // which will short circuit duplicate errors later if the ProductVersion is invalid.
+            if (SectionType.Product == section.Type)
+            {
+                this.ProcessProductVersion(packageSymbol, section, validate: true);
+            }
 
             // Process dependency references.
             if (SectionType.Product == section.Type || SectionType.Module == section.Type)
@@ -551,21 +560,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return result;
         }
 
-        private void VerifyVersion(WixPackageSymbol packageSymbol, WixModuleSymbol moduleSymbol)
+        private void ProcessProductVersion(WixPackageSymbol packageSymbol, IntermediateSection section, bool validate)
         {
-            if (packageSymbol != null)
+            if (this.WindowsInstallerBackendHelper.TryParseMsiProductVersion(packageSymbol.Version, strict: false, out var version))
             {
-                if (!this.WindowsInstallerBackendHelper.IsValidMsiProductVersion(packageSymbol.Version))
+                if (packageSymbol.Version != version)
                 {
-                    this.Messaging.Write(ErrorMessages.InvalidProductVersion(packageSymbol.SourceLineNumbers, packageSymbol.Version));
+                    packageSymbol.Version = version;
+
+                    var productVersionProperty = section.Symbols.OfType<PropertySymbol>().FirstOrDefault(p => p.Id.Id == "ProductVersion");
+                    productVersionProperty.Value = version;
                 }
             }
-            else if (moduleSymbol != null)
+            else if (validate)
             {
-                if (!this.WindowsInstallerBackendHelper.IsValidFourPartVersion(moduleSymbol.Version))
-                {
-                    this.Messaging.Write(WindowsInstallerBackendErrors.InvalidModuleVersion(moduleSymbol.SourceLineNumbers, moduleSymbol.Version));
-                }
+                this.Messaging.Write(ErrorMessages.InvalidProductVersion(packageSymbol.SourceLineNumbers, packageSymbol.Version));
             }
         }
 

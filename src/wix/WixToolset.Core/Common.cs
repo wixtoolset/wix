@@ -134,7 +134,7 @@ namespace WixToolset.Core
 
         public static bool IsValidMsiProductVersion(string version)
         {
-            return Version.TryParse(version, out var ver) && ver.Major < 256 && ver.Minor < 256 && ver.Build < 65536;
+            return WixVersion.TryParse(version, out var wixVersion) && wixVersion.HasMajor && wixVersion.Major < 256 && wixVersion.Minor < 256 && wixVersion.Patch < 65536 && wixVersion.Labels == null && String.IsNullOrEmpty(wixVersion.Metadata);
         }
 
         public static bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)

@@ -227,6 +227,16 @@ namespace WixToolset.Core.Burn
                 return;
             }
 
+            // Resolve any delayed fields now that the variable cache is populated with package information.
+            if (this.DelayedFields.Any())
+            {
+                this.BackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
+            }
+
+            // Now that delayed variables are resolved the bundle version must be valid so ensure
+            // it is correct.
+            this.ProcessBundleVersion(bundleSymbol);
+
             // Reindex the payloads now that all the payloads (minus the manifest payloads that will be created later)
             // are present.
             payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
@@ -342,12 +352,6 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 boundaries = command.UsedRollbackBoundaries;
-            }
-
-            // Resolve any delayed fields before generating the manifest.
-            if (this.DelayedFields.Any())
-            {
-                this.BackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
             }
 
             {
@@ -533,6 +537,22 @@ namespace WixToolset.Core.Burn
             }
 
             bundleSymbol.UpgradeCode = this.NormalizeBundleRelatedBundleId(bundleSymbol.SourceLineNumbers, bundleSymbol.UpgradeCode, null, null);
+        }
+
+        private void ProcessBundleVersion(WixBundleSymbol bundleSymbol)
+        {
+            if (WixVersion.TryParse(bundleSymbol.Version, out var wixVersion))
+            {
+                // Trim the prefix from the version if it is there.
+                if (wixVersion.Prefix.HasValue)
+                {
+                    bundleSymbol.Version = bundleSymbol.Version.Substring(1);
+                }
+            }
+            else
+            {
+                this.Messaging.Write(ErrorMessages.IllegalVersionValue(bundleSymbol.SourceLineNumbers, "Bundle", "Version", bundleSymbol.Version));
+            }
         }
 
         private string NormalizeBundleRelatedBundleId(SourceLineNumber sourceLineNumber, string relatedBundleId, string elementName, string attributeName)
