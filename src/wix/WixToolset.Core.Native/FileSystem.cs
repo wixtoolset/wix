@@ -7,6 +7,7 @@ namespace WixToolset.Core.Native
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Security.AccessControl;
+    using System.Threading;
 
     /// <summary>
     /// File system helpers.
@@ -23,13 +24,20 @@ namespace WixToolset.Core.Native
         {
             EnsureDirectoryWithoutFile(destination);
 
-            if (!allowHardlink || !CreateHardLink(destination, source, IntPtr.Zero))
+            var hardlinked = false;
+
+            if (allowHardlink)
+            {
+                ActionWithRetries(() => hardlinked = CreateHardLink(destination, source, IntPtr.Zero));
+            }
+
+            if (!hardlinked)
             {
 #if DEBUG
                 var er = Marshal.GetLastWin32Error();
 #endif
 
-                File.Copy(source, destination, overwrite: true);
+                ActionWithRetries(() => File.Copy(source, destination, overwrite: true));
             }
         }
 
@@ -42,7 +50,7 @@ namespace WixToolset.Core.Native
         {
             EnsureDirectoryWithoutFile(destination);
 
-            File.Move(source, destination);
+            ActionWithRetries(() => File.Move(source, destination));
         }
 
         /// <summary>
@@ -56,7 +64,31 @@ namespace WixToolset.Core.Native
 
             foreach (var file in files)
             {
-                new FileInfo(file).SetAccessControl(aclReset);
+                var fileInfo = new FileInfo(file);
+                ActionWithRetries(() => fileInfo.SetAccessControl(aclReset));
+            }
+        }
+
+        /// <summary>
+        /// Executes an action and retries on any exception up to a few times. Primarily
+        /// intended for use with file system operations that might get interrupted by
+        /// external systems (usually anti-virus).
+        /// </summary>
+        /// <param name="action">Action to execute.</param>
+        /// <param name="maxRetries">Maximum retry attempts.</param>
+        public static void ActionWithRetries(Action action, int maxRetries = 3)
+        {
+            for (var attempt = 1; attempt <= maxRetries; ++attempt)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch when (attempt < maxRetries)
+                {
+                    Thread.Sleep(250);
+                }
             }
         }
 
@@ -66,10 +98,10 @@ namespace WixToolset.Core.Native
 
             if (!String.IsNullOrEmpty(directory))
             {
-                Directory.CreateDirectory(directory);
+                ActionWithRetries(() => Directory.CreateDirectory(directory));
             }
 
-            File.Delete(path);
+            ActionWithRetries(() => File.Delete(path));
         }
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

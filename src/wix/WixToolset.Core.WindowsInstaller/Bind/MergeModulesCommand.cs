@@ -9,6 +9,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Threading;
+    using WixToolset.Core.Native;
     using WixToolset.Core.Native.Msi;
     using WixToolset.Core.Native.Msm;
     using WixToolset.Data;
@@ -69,10 +71,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 merge = MsmInterop.GetMsmMerge();
 
-                merge.OpenLog(logPath);
+                FileSystem.ActionWithRetries(() => merge.OpenLog(logPath));
                 logOpen = true;
 
-                merge.OpenDatabase(this.OutputPath);
+                FileSystem.ActionWithRetries(() => merge.OpenDatabase(this.OutputPath));
                 databaseOpen = true;
 
                 var featureModulesByMergeId = this.Section.Symbols.OfType<WixFeatureModulesSymbol>().GroupBy(t => t.WixMergeRef).ToDictionary(g => g.Key);
@@ -97,7 +99,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
 
                         this.Messaging.Write(VerboseMessages.OpeningMergeModule(wixMergeRow.SourceFile, mergeLanguage));
-                        merge.OpenModule(wixMergeRow.SourceFile, mergeLanguage);
+                        FileSystem.ActionWithRetries(() => merge.OpenModule(wixMergeRow.SourceFile, mergeLanguage));
                         moduleOpen = true;
 
                         trackedFiles.Add(this.BackendHelper.TrackFile(wixMergeRow.SourceFile, TrackedFileType.Input, wixMergeRow.SourceLineNumbers));
