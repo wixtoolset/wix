@@ -1326,12 +1326,7 @@ namespace WixToolset.Data
 
         public static Message InvalidProductVersion(SourceLineNumber sourceLineNumbers, string version)
         {
-            return Message(sourceLineNumbers, Ids.InvalidProductVersion, "Invalid product version '{0}'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.", version);
-        }
-
-        public static Message InvalidProductVersion(SourceLineNumber sourceLineNumbers, string version, string packagePath)
-        {
-            return Message(sourceLineNumbers, Ids.InvalidProductVersion, "Invalid product version '{0}' in package '{1}'. When included in a bundle, all product version fields in an MSI package must be less than 65536.", version, packagePath);
+            return Message(sourceLineNumbers, Ids.InvalidProductVersion, "Invalid product version '{0}'. MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. The revision value is ignored but version labels and metadata are not allowed.", version);
         }
 
         public static Message InvalidRemoveComponent(SourceLineNumber sourceLineNumbers, string component, string feature, string transformPath)

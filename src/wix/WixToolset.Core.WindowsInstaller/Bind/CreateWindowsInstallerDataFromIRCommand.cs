@@ -224,6 +224,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddWixEnsureTableSymbol((WixEnsureTableSymbol)symbol);
                         break;
 
+                    case SymbolDefinitionType.WixModule:
+                        this.AddWixModuleSymbol((WixModuleSymbol)symbol);
+                        break;
+
                     case SymbolDefinitionType.WixPackage:
                         this.AddWixPackageSymbol((WixPackageSymbol)symbol);
                         break;
@@ -1033,14 +1037,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddUpgradeSymbol(UpgradeSymbol symbol)
         {
-            if (!String.IsNullOrEmpty(symbol.VersionMin) && !this.BackendHelper.IsValidMsiProductVersion(symbol.VersionMin))
+            if (this.CheckUpgradeVersion(symbol, symbol.VersionMin, out var changedVersion))
             {
-                this.Messaging.Write(ErrorMessages.InvalidProductVersion(symbol.SourceLineNumbers, symbol.VersionMin));
+                symbol.VersionMin = changedVersion;
             }
 
-            if (!String.IsNullOrEmpty(symbol.VersionMax) && !this.BackendHelper.IsValidMsiProductVersion(symbol.VersionMax))
+            if (this.CheckUpgradeVersion(symbol, symbol.VersionMax, out changedVersion))
             {
-                this.Messaging.Write(ErrorMessages.InvalidProductVersion(symbol.SourceLineNumbers, symbol.VersionMax));
+                symbol.VersionMax = changedVersion;
             }
 
             var row = (UpgradeRow)this.CreateRow(symbol, "Upgrade");
@@ -1245,6 +1249,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             catch (WixMissingTableDefinitionException e)
             {
                 this.Messaging.Write(e.Error);
+            }
+        }
+
+        private void AddWixModuleSymbol(WixModuleSymbol symbol)
+        {
+            if (!String.IsNullOrEmpty(symbol.Version) && this.BackendHelper.TryParseFourPartVersion(symbol.Version, out var version))
+            {
+                var row = this.CreateRow(symbol, "ModuleSignature");
+                row[0] = symbol.ModuleId;
+                row[1] = symbol.Language;
+                row[2] = version;
+            }
+            else
+            {
+                this.Messaging.Write(WindowsInstallerBackendErrors.InvalidModuleVersion(symbol.SourceLineNumbers, symbol.Version));
             }
         }
 
@@ -1582,6 +1601,30 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private Row CreateRow(IntermediateSymbol symbol, TableDefinition tableDefinition)
         {
             return this.BackendHelper.CreateRow(this.Section, symbol, this.Data, tableDefinition);
+        }
+
+        private bool CheckUpgradeVersion(UpgradeSymbol symbol, string version, out string changedVersion)
+        {
+            if (String.IsNullOrEmpty(version))
+            {
+                // Null is allowed.
+            }
+            else if (this.BackendHelper.TryParseMsiProductVersion(version, strict: false, out var parsedVersionMin))
+            {
+                // If the strictly parsed value is different, update the symbol.
+                if (version != parsedVersionMin)
+                {
+                    changedVersion = parsedVersionMin;
+                    return true;
+                }
+            }
+            else
+            {
+                this.Messaging.Write(ErrorMessages.InvalidProductVersion(symbol.SourceLineNumbers, version));
+            }
+
+            changedVersion = null;
+            return false;
         }
 
         private string CreateShortName(string longName, bool keepExtension, params string[] args)

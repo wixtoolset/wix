@@ -93,7 +93,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="value">The Filename value.</param>
         /// <param name="source">true to get a source name; false to get a target name</param>
         /// <param name="longName">true to get a long name; false to get a short name</param>
-        /// <returns>The name.</returns>
+        /// <returns>The requesed file name.</returns>
         string GetMsiFileName(string value, bool source, bool longName);
 
         /// <summary>
@@ -165,5 +165,22 @@ namespace WixToolset.Extensibility.Services
         /// Thus the returned array will always be of length 4.
         /// </remarks>
         string[] SplitMsiFileName(string value);
+
+        /// <summary>
+        /// Tries to parse a version from the provided version string.
+        /// </summary>
+        /// <param name="version">The version to verify and parse.</param>
+        /// <param name="parsedVersion">The parsed result if possible, otherwise null.</param>
+        /// <returns>True if the version was able to parsed, otherwise false.</returns>
+        bool TryParseFourPartVersion(string version, out string parsedVersion);
+
+        /// <summary>
+        /// Tries to parse an MSI product version from the provided version string.
+        /// </summary>
+        /// <param name="version">The version to verify and parse.</param>
+        /// <param name="strict">Indicates whether to return a strict (255.255.65535) product version or any valid product version (255.255.65535.*).</param>
+        /// <param name="parsedVersion">The parsed result if possible, otherwise null.</param>
+        /// <returns>True if the version was able to parsed as an product version, otherwise false.</returns>
+        bool TryParseMsiProductVersion(string version, bool strict, out string parsedVersion);
     }
 }

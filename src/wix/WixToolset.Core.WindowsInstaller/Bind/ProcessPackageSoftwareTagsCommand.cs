@@ -36,32 +36,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var trackedFiles = new List<ITrackedFile>();
 
-            string productName = null;
-            string productVersion = null;
-            string manufacturer = null;
-            string upgradeCode = null;
-
             var summaryInfo = this.Section.Symbols.OfType<SummaryInformationSymbol>().FirstOrDefault(s => s.PropertyId == SummaryInformationType.PackageCode);
             var packageCode = NormalizeGuid(summaryInfo?.Value);
 
-            foreach (var property in this.Section.Symbols.OfType<PropertySymbol>())
-            {
-                switch (property.Id.Id)
-                {
-                    case "ProductName":
-                        productName = property.Value;
-                        break;
-                    case "ProductVersion":
-                        productVersion = property.Value;
-                        break;
-                    case "Manufacturer":
-                        manufacturer = property.Value;
-                        break;
-                    case "UpgradeCode":
-                        upgradeCode = NormalizeGuid(property.Value);
-                        break;
-                }
-            }
+            var packageSymbol = this.Section.Symbols.OfType<WixPackageSymbol>().First();
+            var upgradeCode = NormalizeGuid(packageSymbol.UpgradeCode);
 
             var fileSymbolsById = this.Section.Symbols.OfType<FileSymbol>().Where(f => f.Id != null).ToDictionary(f => f.Id.Id);
 
@@ -83,7 +62,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     using (var fs = new FileStream(fileSymbol.Source.Path, FileMode.Create))
                     {
-                        CreateTagFile(fs, uniqueId, productName, productVersion, tagRow.Regid, manufacturer, persistentId);
+                        CreateTagFile(fs, uniqueId, packageSymbol.Name, packageSymbol.Version, tagRow.Regid, packageSymbol.Manufacturer, persistentId);
                     }
 
                     // Ensure the matching "SoftwareIdentificationTag" row exists and
@@ -113,7 +92,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private static void CreateTagFile(Stream stream, string uniqueId, string name, string version, string regid, string manufacturer, string persistendId)
         {
-            var versionScheme = Version.TryParse(version, out _) ? "multipartnumeric" : "alphanumeric";
+            var versionScheme = "alphanumeric";
+
+            if (WixVersion.TryParse(version, out var parsedVersion))
+            {
+                if (parsedVersion.Prefix.HasValue)
+                {
+                    version = version.Substring(1);
+                }
+
+                if (Version.TryParse(version, out _))
+                {
+                    versionScheme = "multipartnumeric";
+                }
+                else if (!parsedVersion.HasRevision)
+                {
+                    versionScheme = "semver";
+                }
+                else
+                {
+                    versionScheme = "multipartnumeric+suffix";
+                }
+            }
 
             using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true }))
             {

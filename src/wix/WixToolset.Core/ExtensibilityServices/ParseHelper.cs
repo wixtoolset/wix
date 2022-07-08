@@ -552,10 +552,9 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (!String.IsNullOrEmpty(value))
             {
-                if (WixVersion.TryParse(value, out var version))
+                if (WixVersion.TryParse(value, out var _))
                 {
-                    // Return the attribute value sans-prefix, if present.
-                    return version.Prefix.HasValue ? value.Substring(1) : value;
+                    return value;
                 }
 
                 // Allow versions to contain binder variables.

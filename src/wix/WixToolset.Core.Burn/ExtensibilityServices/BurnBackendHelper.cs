@@ -134,6 +134,16 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             return this.backendHelper.SplitMsiFileName(value);
         }
 
+        public bool TryParseFourPartVersion(string version, out string parsedVersion)
+        {
+            return this.backendHelper.TryParseFourPartVersion(version, out parsedVersion);
+        }
+
+        public bool TryParseMsiProductVersion(string version, bool strict, out string parsedVersion)
+        {
+            return this.backendHelper.TryParseMsiProductVersion(version, strict, out parsedVersion);
+        }
+
         public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)
         {
             return this.backendHelper.TrackFile(path, type, sourceLineNumbers);
