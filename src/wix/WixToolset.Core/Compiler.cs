@@ -5910,7 +5910,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Message"));
             }
 
-
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)

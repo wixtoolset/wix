@@ -13,6 +13,66 @@ namespace WixToolsetTest.CoreIntegration
     public class VersionFixture
     {
         [Fact]
+        public void CanBuildMsiWithPrefixedVersion()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test1.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-d", "Version=v4.3.2.1",
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var productVersion = GetProductVersionFromMsi(msiPath);
+                Assert.Equal("4.3.2.1", productVersion);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildMsiWithExtendedVersion()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test1.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-d", "Version=v4.3.2-preview.1",
+                    "-o", msiPath
+                });
+
+                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error)
+                                                   .Select(m => m.ToString())
+                                                   .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Invalid product version '4.3.2-preview.1'. Product version must have a major version less than 256, a minor version less than 256, and a build version less than 65536.",
+                }, errorMessages);
+                Assert.Equal(242, result.ExitCode);
+            }
+        }
+
+        [Fact]
         public void CannotBuildMsiWithInvalidMajorVersion()
         {
             var folder = TestData.Get(@"TestData");
@@ -26,7 +86,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    Path.Combine(folder, "Version", "Package.wxs"),
+                    Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-d", "Version=257.0.0",
@@ -60,7 +120,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    Path.Combine(folder, "Version", "Package.wxs"),
+                    Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-d", "Version=255.255.65535",
@@ -82,8 +142,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result3.AssertSuccess();
 
-                var propertyTable = Query.QueryDatabase(msiPath, new[] { "Property" }).Select(r => r.Split('\t')).ToDictionary(r => r[0].Substring("Property:".Length), r => r[1]);
-                Assert.True(propertyTable.TryGetValue("ProductVersion", out var productVersion));
+                var productVersion = GetProductVersionFromMsi(msiPath);
                 WixAssert.StringEqual("255.255.65535", productVersion);
 
                 var extractResult = BundleExtractor.ExtractAllContainers(null, bundlePath, Path.Combine(baseFolder, "ba"), Path.Combine(baseFolder, "attached"), Path.Combine(baseFolder, "extract"));
@@ -94,6 +153,14 @@ namespace WixToolsetTest.CoreIntegration
                                                  .Single();
                 WixAssert.StringEqual("2022.3.9-preview.0-build.5+0987654321abcdef1234567890", bundleVersion.Value);
             }
+        }
+
+        private static string GetProductVersionFromMsi(string msiPath)
+        {
+            var propertyTable = Query.QueryDatabase(msiPath, new[] { "Property" }).Select(r => r.Split('\t')).ToDictionary(r => r[0].Substring("Property:".Length), r => r[1]);
+            Assert.True(propertyTable.TryGetValue("ProductVersion", out var productVersion));
+
+            return productVersion;
         }
     }
 }
