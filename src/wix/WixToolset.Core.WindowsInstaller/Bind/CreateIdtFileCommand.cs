@@ -241,7 +241,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     typeCharacter = column.Nullable ? 'V' : 'v';
                     break;
                 default:
-                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixDataStrings.EXP_UnknownColumnType, column.Type));
+                    throw new InvalidOperationException($"Unknown column type: {column.Type}");
             }
 
             return String.Concat(typeCharacter, column.Length);
