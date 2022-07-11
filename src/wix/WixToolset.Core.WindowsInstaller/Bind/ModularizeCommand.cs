@@ -127,7 +127,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // ensure the value is an identifier (otherwise it shouldn't be modularized this way)
                         if (!this.BackendHelper.IsValidIdentifier(fieldData))
                         {
-                            throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixDataStrings.EXP_CannotModularizeIllegalID, fieldData));
+                            throw new InvalidOperationException($"The value '{fieldData}' is not a legal identifier and therefore cannot be modularized.");
                         }
 
                         // if we're not supposed to suppress modularization of this identifier

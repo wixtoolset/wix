@@ -15,21 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="WixDataStrings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>WixDataStrings.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="WixDataStrings.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>WixDataStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.IO.Compression" />
   </ItemGroup>
 </Project>

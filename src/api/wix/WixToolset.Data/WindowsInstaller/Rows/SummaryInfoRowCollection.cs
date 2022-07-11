@@ -18,8 +18,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
             if (0 != String.CompareOrdinal("_SummaryInformation", table.Name))
             {
-                string message = string.Format(WixDataStrings.EXP_UnsupportedTable, table.Name);
-                throw new ArgumentException(message, "table");
+                throw new ArgumentException($"The table {table.Name} is not supported.", "table");
             }
 
             foreach (Row row in table.Rows)
