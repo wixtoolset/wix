@@ -49,9 +49,9 @@ call wix\wix.cmd %_C% || exit /b
 call ext\ext.cmd %_C% || exit /b
 
 
-:: samples
+:: tools
 
-call samples\samples.cmd %_C% || exit /b
+call tools\tools.cmd %_C% || exit /b
 
 
 :: integration tests
