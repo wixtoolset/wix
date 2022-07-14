@@ -698,7 +698,7 @@ namespace WixToolset.Core
                             this.ParseBootstrapperApplicationDllElement(child, id);
                             break;
                         case "Payload":
-                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, isRemoteAllowed: false);
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
@@ -788,7 +788,7 @@ namespace WixToolset.Core
                 }
             }
 
-            compilerPayload.FinishCompilingPayload();
+            compilerPayload.FinishCompilingPayload(Compiler.BurnUXContainerId.Id);
 
             // Now that the Id is known, we can parse the extension attributes.
             var context = new Dictionary<string, string>
@@ -872,7 +872,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "Payload":
-                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, isRemoteAllowed: false);
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
@@ -1237,7 +1237,7 @@ namespace WixToolset.Core
                 }
             }
 
-            compilerPayload.FinishCompilingPayload();
+            compilerPayload.FinishCompilingPayload(Compiler.BurnUXContainerId.Id);
 
             // Now that the Id is known, we can parse the extension attributes.
             var context = new Dictionary<string, string>
@@ -1259,7 +1259,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "Payload":
-                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, isRemoteAllowed: false);
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
@@ -1393,12 +1393,16 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element. (BA or PayloadGroup)</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        private Identifier ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId)
+        /// <param name="isRemoteAllowed">Indicates if the Payload element can be remote or not.</param>
+        private Identifier ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId, bool isRemoteAllowed)
         {
             Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node);
+            var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
+            {
+                IsRemoteAllowed = isRemoteAllowed
+            };
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
@@ -1414,11 +1418,23 @@ namespace WixToolset.Core
                         case "Id":
                             compilerPayload.ParseId(attrib);
                             break;
+                        case "CertificatePublicKey":
+                            compilerPayload.ParseCertificatePublicKey(attrib);
+                            break;
+                        case "CertificateThumbprint":
+                            compilerPayload.ParseCertificateThumbprint(attrib);
+                            break;
                         case "Compressed":
                             compilerPayload.ParseCompressed(attrib);
                             break;
+                        case "Hash":
+                            compilerPayload.ParseHash(attrib);
+                            break;
                         case "Name":
                             compilerPayload.ParseName(attrib);
+                            break;
+                        case "Size":
+                            compilerPayload.ParseSize(attrib);
                             break;
                         case "SourceFile":
                             compilerPayload.ParseSourceFile(attrib);
@@ -1442,7 +1458,7 @@ namespace WixToolset.Core
                 }
             }
 
-            compilerPayload.FinishCompilingPayload();
+            compilerPayload.FinishCompilingPayload(parentId?.Id);
 
             // Now that the PayloadId is known, we can parse the extension attributes.
             var context = new Dictionary<string, string>
@@ -1539,7 +1555,7 @@ namespace WixToolset.Core
                             packageType = WixBundlePackageType.Msu;
                             break;
                         case "Payload":
-                            this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id);
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id, isRemoteAllowed: true);
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id);
@@ -2263,7 +2279,7 @@ namespace WixToolset.Core
                             }
                             break;
                         case "Payload":
-                            this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id);
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id, isRemoteAllowed: true);
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);

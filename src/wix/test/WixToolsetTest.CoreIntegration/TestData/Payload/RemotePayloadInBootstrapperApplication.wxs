@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Bundle Name="RemotePayloadInBootstrapperApplication" Version="1.0.0.0" Manufacturer="test" UpgradeCode="{B04C20B8-70C3-4DE1-8D91-4F11C7C68DED}">
+        <BootstrapperApplicationRef Id="fakeba">
+            <PayloadGroupRef Id="RemotePayload" />
+        </BootstrapperApplicationRef>
+
+        <Chain>
+            <MsiPackage SourceFile="test.msi" DownloadUrl="http://example.com/{0}id/{1}/{2}" Compressed="no" />
+        </Chain>
+    </Bundle>
+
+    <Fragment>
+        <PayloadGroup Id="RemotePayload">
+            <Payload Id="RemotePayload" Name="someremotefile.txt" DownloadUrl="http://example.com/{0}id/{1}/{2}" Hash="abc" Size="123" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

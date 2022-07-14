@@ -650,7 +650,7 @@ namespace WixToolset.Data
 
         public static Message UxPayloadsOnlySupportEmbedding(SourceLineNumber sourceLineNumbers, string sourceFile)
         {
-            return Message(sourceLineNumbers, Ids.UxPayloadsOnlySupportEmbedding, "A bootstrapper application payload ('{0}') was marked for something other than embedded packaging, possibly because it included a @DownloadUrl attribute. At present, bootstrapper application payloads must be embedded in the bundle, so the requested packaging is being ignored.", sourceFile);
+            return Message(sourceLineNumbers, Ids.UxPayloadsOnlySupportEmbedding, "A bootstrapper application or bundle extension payload ('{0}') was marked for something other than embedded packaging, possibly because it included a @DownloadUrl attribute. Bootstrapper application and bundle extension payloads must be embedded in the bundle, so the requested packaging is being ignored and the file is being embedded anyway.", sourceFile);
         }
 
         public static Message ValidationFailedDueToSystemPolicy()

@@ -247,13 +247,12 @@ namespace WixToolset.Core
         {
             this.CalculateAndVerifyFields();
             this.GenerateIdFromFilename();
-            this.GenerateIdFromPrefix("ppy");
         }
 
-        public void FinishCompilingPayload()
+        public void FinishCompilingPayload(string parentId)
         {
             this.CalculateAndVerifyFields();
-            this.GenerateIdFromPrefix("pay");
+            this.GenerateIdFromPrefix("pay", parentId);
         }
 
         private void GenerateIdFromFilename()
@@ -268,14 +267,18 @@ namespace WixToolset.Core
                 {
                     this.Id = this.Core.CreateIdentifierFromFilename(Path.GetFileName(this.SourceFile));
                 }
+                else // if Name and SourceFile were not specified an error was already reported.
+                {
+                    this.Id = Identifier.Invalid;
+                }
             }
         }
 
-        private void GenerateIdFromPrefix(string prefix)
+        private void GenerateIdFromPrefix(string prefix, string parentId)
         {
             if (this.Id == null)
             {
-                this.Id = this.Core.CreateIdentifier(prefix, this.SourceFile?.ToUpperInvariant() ?? String.Empty);
+                this.Id = this.Core.CreateIdentifier(prefix, parentId, this.SourceFile?.ToUpperInvariant() ?? this.Name?.ToUpperInvariant());
             }
         }
 

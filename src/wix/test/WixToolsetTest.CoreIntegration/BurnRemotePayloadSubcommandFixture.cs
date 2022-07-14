@@ -398,7 +398,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Blocked by https://github.com/wixtoolset/issues/issues/5601 - Support RemotePayload for Payload elements")]
+        [Fact]
         public void CanGetRemotePayloadWithCertificate()
         {
             var folder = TestData.Get(@"TestData");
@@ -441,9 +441,7 @@ namespace WixToolsetTest.CoreIntegration
                 var remotePayloadSourceText = "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>" +
                     "  <Fragment>" +
                     "    <PackageGroup Id='BundlePackages'>" +
-                    "      <ExePackage CacheId='xyz'>" +
                     String.Join(Environment.NewLine, elements) +
-                    "      </ExePackage>" +
                     "    </PackageGroup>" +
                     "  </Fragment>" +
                     "</Wix>";
