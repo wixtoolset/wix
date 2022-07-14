@@ -201,5 +201,86 @@ namespace WixToolsetTest.CoreIntegration
                 }, containers);
             }
         }
+
+        [Fact]
+        public void CanBuildBundleWithRemotePackagePaylod()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Payload", "RemotePayloadInPackage.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var payloadElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<Payload Id='payU3zeF5QWZvsWVEfgPVoFiuo65qQ' FilePath='reallybig.dat' FileSize='100000000' Hash='4312abcef' DownloadUrl='example.com/reallybig.dat' Packaging='external' SourcePath='reallybig.dat' />",
+                    "<Payload Id='burn.exe' FilePath='burn.exe' FileSize='463360' Hash='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964E246A1E8AE72E2CF23E0138AFC281BAFDE45969204405E114EB20C8195DA7E5E' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
+                    "<Payload Id='payIswsNTCI1qS7UYl_lydLSgHt2Aw' FilePath='fake.txt' FileSize='1' Hash='bcadef' DownloadUrl='example.com/fake.txt' Packaging='external' SourcePath='fake.txt' />",
+                    "<Payload Id='RemotePayloadExe' FilePath='fake.exe' FileSize='1' Hash='a' DownloadUrl='example.com' Packaging='external' SourcePath='fake.exe' />",
+                }, payloadElements);
+
+                var payloadRefElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage/burn:PayloadRef");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<PayloadRef Id='burn.exe' />",
+                    "<PayloadRef Id='payU3zeF5QWZvsWVEfgPVoFiuo65qQ' />",
+                    "<PayloadRef Id='RemotePayloadExe' />",
+                    "<PayloadRef Id='payIswsNTCI1qS7UYl_lydLSgHt2Aw' />"
+                }, payloadRefElements);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildRemotePayloadInBootstrapperApplication()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, "bin", "test.exe");
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Payload", "RemotePayloadInBootstrapperApplication.wxs"),
+                    Path.Combine(folder, "SimpleBundle", "MultiFileBootstrapperApplication.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The Payload 'RemotePayload' is being added to Container 'WixUXContainer', overriding its Compressed value of 'no'.",
+                    "Bootstrapper application and bundle extension payloads must be embedded in the bundle. The payload 'someremotefile.txt' is remote thus cannot be found for embedding. Provide a full path to the payload via the Payload/@SourceFile attribute."
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+            }
+        }
     }
 }

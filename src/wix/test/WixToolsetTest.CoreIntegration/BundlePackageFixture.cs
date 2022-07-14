@@ -103,7 +103,7 @@ namespace WixToolsetTest.CoreIntegration
                     "<Provides Key='MyProviderKey,v1.0' Version='1.0.0.0' DisplayName='BurnBundle' Imported='yes' />" +
                     "<RelatedBundle Id='{B94478B1-E1F3-4700-9CE8-6AA090854AEC}' Action='Upgrade' />" +
                     "<PayloadRef Id='chain.exe' />" +
-                    "<PayloadRef Id='payP6wZpeHEAZbDUQPEKeCpQ_9bN.4' />" +
+                    "<PayloadRef Id='paydfjdGCAZtFxTeTjs0nIscHI86SY' />" +
                     "</BundlePackage>",
                 }, bundlePackages);
 
@@ -175,7 +175,7 @@ namespace WixToolsetTest.CoreIntegration
                 var payloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<Payload Id='payP6wZpeHEAZbDUQPEKeCpQ_9bN.4' FilePath='signed_cab1.cab' FileSize='*' Hash='*' Packaging='external' SourcePath='signed_cab1.cab' />",
+                    "<Payload Id='paydfjdGCAZtFxTeTjs0nIscHI86SY' FilePath='signed_cab1.cab' FileSize='*' Hash='*' Packaging='external' SourcePath='signed_cab1.cab' />",
                     "<Payload Id='chain.exe' FilePath='chain.exe' FileSize='*' Hash='*' Packaging='external' SourcePath='chain.exe' />",
                 }, payloads);
 

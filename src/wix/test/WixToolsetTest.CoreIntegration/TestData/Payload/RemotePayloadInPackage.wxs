@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage DetectCondition="ForTestPurposesOnly" SourceFile="burn.exe" Permanent="yes">
+                <Payload Hash="4312abcef" Size="100000000" Name="reallybig.dat" DownloadUrl="example.com/reallybig.dat" />
+            </ExePackage>
+
+            <ExePackage Id="RemotePayloadExe" DetectCondition="ForTestPurposesOnly" Description="Override RemotePayload description"
+                        DisplayName="Override RemotePayload display name" Permanent="yes">
+                <ExePackagePayload Description="RemotePayload description" Hash="a" ProductName="RemotePayload product name"
+                                   Size="1" Version="1.0.0.0" Name="fake.exe" DownloadUrl="example.com" />
+                <Payload Hash="bcadef" Size="1" Name="fake.txt" DownloadUrl="example.com/fake.txt" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>
