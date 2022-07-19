@@ -1,0 +1,24 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" />
+
+    <ui:WixUI Id="WixUI_Minimal" />
+
+    <Binary Id="TestData" SourceFile="$(var.ManagedCA.TargetDir)testsub\testfile.txt" />
+    <Binary Id="ManagedCA" SourceFile="$(var.ManagedCA.TargetDir)$(var.ManagedCA.TargetName).CA.dll" />
+    <CustomAction Id="SampleCA1" BinaryRef="ManagedCA" DllEntry="SampleCA1" Execute="firstSequence" />
+    <CustomAction Id="SampleCustomAction2" BinaryRef="ManagedCA" DllEntry="SampleCA2" Execute="firstSequence" Return="ignore" />
+
+    <InstallUISequence>
+      <Custom Action="SampleCA1" After="CostFinalize" Condition="NOT Installed" />
+      <Custom Action="SampleCustomAction2" After="SampleCA1" Condition="NOT Installed" />
+    </InstallUISequence>
+
+    <InstallExecuteSequence>
+      <Custom Action="SampleCA1" After="CostFinalize" Condition="NOT Installed" />
+      <Custom Action="SampleCustomAction2" After="SampleCA1" Condition="NOT Installed" />
+    </InstallExecuteSequence>
+  </Fragment>
+</Wix>

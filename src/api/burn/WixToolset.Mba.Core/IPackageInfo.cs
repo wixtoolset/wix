@@ -68,6 +68,11 @@ namespace WixToolset.Mba.Core
         string PrereqLicenseUrl { get; }
 
         /// <summary>
+        /// See <see cref="PrimaryPackageType"/>
+        /// </summary>
+        PrimaryPackageType PrimaryPackageType { get; }
+
+        /// <summary>
         /// 
         /// </summary>
         string ProductCode { get; }

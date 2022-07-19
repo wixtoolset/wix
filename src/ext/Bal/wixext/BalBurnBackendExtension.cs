@@ -5,6 +5,8 @@ namespace WixToolset.Bal
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
+    using System.Xml;
     using WixToolset.Bal.Symbols;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
@@ -29,12 +31,48 @@ namespace WixToolset.Bal
 
         protected override IReadOnlyCollection<IntermediateSymbolDefinition> SymbolDefinitions => BurnSymbolDefinitions;
 
+        public override bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol)
+        {
+            if (symbol is WixBalPackageInfoSymbol balPackageInfoSymbol)
+            {
+                // There might be a more efficient way to do this,
+                // but this is an easy way to ensure we're creating valid XML.
+                var sb = new StringBuilder();
+                using (var writer = XmlWriter.Create(sb))
+                {
+                    writer.WriteStartElement(symbol.Definition.Name, BurnConstants.BootstrapperApplicationDataNamespace);
+
+                    writer.WriteAttributeString("PackageId", balPackageInfoSymbol.PackageId);
+
+                    if (balPackageInfoSymbol.DisplayInternalUICondition != null)
+                    {
+                        writer.WriteAttributeString("DisplayInternalUICondition", balPackageInfoSymbol.DisplayInternalUICondition);
+                    }
+
+                    if (balPackageInfoSymbol.PrimaryPackageType != BalPrimaryPackageType.None)
+                    {
+                        writer.WriteAttributeString("PrimaryPackageType", balPackageInfoSymbol.PrimaryPackageType.ToString().ToLower());
+                    }
+
+                    writer.WriteEndElement();
+                }
+
+                this.BackendHelper.AddBootstrapperApplicationData(sb.ToString());
+
+                return true;
+            }
+            else
+            {
+                return base.TryProcessSymbol(section, symbol);
+            }
+        }
+
         public override void SymbolsFinalized(IntermediateSection section)
         {
             base.SymbolsFinalized(section);
 
             this.VerifyBalConditions(section);
-            this.VerifyBalPackageInfos(section);
+            this.VerifyDisplayInternalUICondition(section);
             this.VerifyOverridableVariables(section);
 
             var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationDllSymbol>().SingleOrDefault();
@@ -44,24 +82,31 @@ namespace WixToolset.Bal
                 return;
             }
 
+            var isIuiBA = baId.StartsWith("WixInternalUIBootstrapperApplication");
             var isStdBA = baId.StartsWith("WixStandardBootstrapperApplication");
             var isMBA = baId.StartsWith("WixManagedBootstrapperApplicationHost");
             var isDNC = baId.StartsWith("WixDotNetCoreBootstrapperApplicationHost");
             var isSCD = isDNC && this.VerifySCD(section);
+
+            if (isIuiBA)
+            {
+                // This needs to happen before VerifyPrereqPackages because it can add prereq packages.
+                this.VerifyPrimaryPackages(section);
+            }
 
             if (isDNC)
             {
                 this.FinalizeBAFactorySymbol(section);
             }
 
-            if (isStdBA || isMBA || isDNC)
+            if (isIuiBA || isStdBA || isMBA || isDNC)
             {
                 this.VerifyBAFunctions(section);
             }
 
-            if (isMBA || (isDNC && !isSCD))
+            if (isIuiBA || isMBA || (isDNC && !isSCD))
             {
-                this.VerifyPrereqPackages(section, isDNC);
+                this.VerifyPrereqPackages(section, isDNC, isIuiBA);
             }
         }
 
@@ -133,12 +178,241 @@ namespace WixToolset.Bal
             }
         }
 
-        private void VerifyBalPackageInfos(IntermediateSection section)
+        private void VerifyDisplayInternalUICondition(IntermediateSection section)
         {
-            var balPackageInfoSymbols = section.Symbols.OfType<WixBalPackageInfoSymbol>().ToList();
-            foreach (var balPackageInfoSymbol in balPackageInfoSymbols)
+            foreach (var balPackageInfoSymbol in section.Symbols.OfType<WixBalPackageInfoSymbol>().ToList())
             {
-                this.BackendHelper.ValidateBundleCondition(balPackageInfoSymbol.SourceLineNumbers, "*Package", "bal:DisplayInternalUICondition", balPackageInfoSymbol.DisplayInternalUICondition, BundleConditionPhase.Plan);
+                if (balPackageInfoSymbol.DisplayInternalUICondition != null)
+                {
+                    this.BackendHelper.ValidateBundleCondition(balPackageInfoSymbol.SourceLineNumbers, "*Package", "bal:DisplayInternalUICondition", balPackageInfoSymbol.DisplayInternalUICondition, BundleConditionPhase.Plan);
+                }
+            }
+        }
+
+        private void VerifyPrimaryPackages(IntermediateSection section)
+        {
+            WixBalPackageInfoSymbol defaultPrimaryPackage = null;
+            WixBalPackageInfoSymbol x86PrimaryPackage = null;
+            WixBalPackageInfoSymbol x64PrimaryPackage = null;
+            WixBalPackageInfoSymbol arm64PrimaryPackage = null;
+            var nonPermanentNonPrimaryPackages = new List<WixBundlePackageSymbol>();
+
+            var balPackageInfoSymbolsByPackageId = section.Symbols.OfType<WixBalPackageInfoSymbol>().ToDictionary(x => x.PackageId);
+            var mbaPrereqInfoSymbolsByPackageId = section.Symbols.OfType<WixMbaPrereqInformationSymbol>().ToDictionary(x => x.PackageId);
+            var msiPackageSymbolsByPackageId = section.Symbols.OfType<WixBundleMsiPackageSymbol>().ToDictionary(x => x.Id.Id);
+            var packageSymbols = section.Symbols.OfType<WixBundlePackageSymbol>().ToList();
+            foreach (var packageSymbol in packageSymbols)
+            {
+                var packageId = packageSymbol.Id?.Id;
+                var isPrereq = false;
+                var primaryPackageType = BalPrimaryPackageType.None;
+
+                if (mbaPrereqInfoSymbolsByPackageId.TryGetValue(packageId, out var _))
+                {
+                    isPrereq = true;
+                }
+
+                if (balPackageInfoSymbolsByPackageId.TryGetValue(packageId, out var balPackageInfoSymbol))
+                {
+                    primaryPackageType = balPackageInfoSymbol.PrimaryPackageType;
+                }
+
+                if (packageSymbol.Permanent)
+                {
+                    if (primaryPackageType != BalPrimaryPackageType.None)
+                    {
+                        this.Messaging.Write(BalErrors.IuibaPermanentPrimaryPackageType(packageSymbol.SourceLineNumbers));
+                    }
+                    else
+                    {
+                        if (!isPrereq)
+                        {
+                            var prereqInfoSymbol = section.AddSymbol(new WixMbaPrereqInformationSymbol(packageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
+                            {
+                                PackageId = packageId,
+                            });
+
+                            mbaPrereqInfoSymbolsByPackageId.Add(packageId, prereqInfoSymbol);
+                        }
+
+                        this.VerifyIuibaPrereqPackage(packageSymbol);
+                    }
+                }
+                else
+                {
+                    if (isPrereq)
+                    {
+                        if (primaryPackageType == BalPrimaryPackageType.None)
+                        {
+                            this.Messaging.Write(BalErrors.IuibaNonPermanentPrereqPackage(packageSymbol.SourceLineNumbers));
+                        }
+                        else
+                        {
+                            this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(
+                                packageSymbol.SourceLineNumbers,
+                                packageSymbol.Type + "Package",
+                                "PrereqPackage",
+                                "yes",
+                                "PrimaryPackageType"));
+                        }
+                    }
+                    else if (primaryPackageType == BalPrimaryPackageType.None)
+                    {
+                        nonPermanentNonPrimaryPackages.Add(packageSymbol);
+                    }
+                    else if (packageSymbol.Type != WixBundlePackageType.Msi)
+                    {
+                        this.Messaging.Write(BalErrors.IuibaNonMsiPrimaryPackage(packageSymbol.SourceLineNumbers));
+                    }
+                    else if (!msiPackageSymbolsByPackageId.TryGetValue(packageId, out var msiPackageSymbol))
+                    {
+                        throw new WixException($"Missing WixBundleMsiPackageSymbol for package '{packageId}'");
+                    }
+                    else if (msiPackageSymbol.EnableFeatureSelection)
+                    {
+                        this.Messaging.Write(BalErrors.IuibaPrimaryPackageEnableFeatureSelection(packageSymbol.SourceLineNumbers));
+                    }
+                    else
+                    {
+                        if (primaryPackageType == BalPrimaryPackageType.Default)
+                        {
+                            if (defaultPrimaryPackage == null)
+                            {
+                                defaultPrimaryPackage = balPackageInfoSymbol;
+                            }
+                            else
+                            {
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType(balPackageInfoSymbol.SourceLineNumbers, "default"));
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType2(defaultPrimaryPackage.SourceLineNumbers));
+                            }
+                        }
+                        else if (balPackageInfoSymbol.PrimaryPackageType == BalPrimaryPackageType.X86)
+                        {
+                            if (x86PrimaryPackage == null)
+                            {
+                                x86PrimaryPackage = balPackageInfoSymbol;
+                            }
+                            else
+                            {
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType(balPackageInfoSymbol.SourceLineNumbers, "x86"));
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType2(x86PrimaryPackage.SourceLineNumbers));
+                            }
+                        }
+                        else if (balPackageInfoSymbol.PrimaryPackageType == BalPrimaryPackageType.X64)
+                        {
+                            if (x64PrimaryPackage == null)
+                            {
+                                x64PrimaryPackage = balPackageInfoSymbol;
+                            }
+                            else
+                            {
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType(balPackageInfoSymbol.SourceLineNumbers, "x64"));
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType2(x64PrimaryPackage.SourceLineNumbers));
+                            }
+                        }
+                        else if (balPackageInfoSymbol.PrimaryPackageType == BalPrimaryPackageType.ARM64)
+                        {
+                            if (arm64PrimaryPackage == null)
+                            {
+                                arm64PrimaryPackage = balPackageInfoSymbol;
+                            }
+                            else
+                            {
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType(balPackageInfoSymbol.SourceLineNumbers, "arm64"));
+                                this.Messaging.Write(BalErrors.MultiplePrimaryPackageType2(arm64PrimaryPackage.SourceLineNumbers));
+                            }
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+
+                        this.VerifyIuibaPrimaryPackage(packageSymbol, balPackageInfoSymbol);
+                    }
+                }
+            }
+
+            if (defaultPrimaryPackage == null && nonPermanentNonPrimaryPackages.Count == 1)
+            {
+                var packageSymbol = nonPermanentNonPrimaryPackages[0];
+
+                if (packageSymbol.Type == WixBundlePackageType.Msi)
+                {
+                    var packageId = packageSymbol.Id?.Id;
+                    var msiPackageSymbol = section.Symbols.OfType<WixBundleMsiPackageSymbol>()
+                                                  .SingleOrDefault(x => x.Id.Id == packageId);
+                    if (!msiPackageSymbol.EnableFeatureSelection)
+                    {
+                        if (!balPackageInfoSymbolsByPackageId.TryGetValue(packageId, out var balPackageInfoSymbol))
+                        {
+                            balPackageInfoSymbol = section.AddSymbol(new WixBalPackageInfoSymbol(packageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
+                            {
+                                PackageId = packageId,
+                            });
+
+                            balPackageInfoSymbolsByPackageId.Add(packageId, balPackageInfoSymbol);
+                        }
+
+                        balPackageInfoSymbol.PrimaryPackageType = BalPrimaryPackageType.Default;
+                        defaultPrimaryPackage = balPackageInfoSymbol;
+                        nonPermanentNonPrimaryPackages.RemoveAt(0);
+
+                        this.VerifyIuibaPrimaryPackage(packageSymbol, balPackageInfoSymbol);
+                    }
+                }
+            }
+
+            if (nonPermanentNonPrimaryPackages.Count > 0)
+            {
+                foreach (var packageSymbol in nonPermanentNonPrimaryPackages)
+                {
+                    this.Messaging.Write(BalErrors.IuibaNonPermanentNonPrimaryPackage(packageSymbol.SourceLineNumbers));
+                }
+            }
+            else if (defaultPrimaryPackage == null)
+            {
+                this.Messaging.Write(BalErrors.MissingIUIPrimaryPackage());
+            }
+            else
+            {
+                var foundPrimaryPackage = false;
+                var chainPackageGroupSymbols = section.Symbols.OfType<WixGroupSymbol>()
+                                                              .Where(x => x.ChildType == ComplexReferenceChildType.Package &&
+                                                                          x.ParentType == ComplexReferenceParentType.PackageGroup &&
+                                                                          x.ParentId == BurnConstants.BundleChainPackageGroupId);
+                foreach (var chainPackageGroupSymbol in chainPackageGroupSymbols)
+                {
+                    var packageId = chainPackageGroupSymbol.ChildId;
+                    if (balPackageInfoSymbolsByPackageId.TryGetValue(packageId, out var balPackageInfo) && balPackageInfo.PrimaryPackageType != BalPrimaryPackageType.None)
+                    {
+                        foundPrimaryPackage = true;
+                    }
+                    else if (foundPrimaryPackage && mbaPrereqInfoSymbolsByPackageId.TryGetValue(packageId, out var mbaPrereqInformationSymbol))
+                    {
+                        this.Messaging.Write(BalWarnings.IuibaPrereqPackageAfterPrimaryPackage(chainPackageGroupSymbol.SourceLineNumbers));
+                    }
+                }
+            }
+        }
+
+        private void VerifyIuibaPrereqPackage(WixBundlePackageSymbol packageSymbol)
+        {
+            if (packageSymbol.Cache == BundleCacheType.Force)
+            {
+                this.Messaging.Write(BalWarnings.IuibaForceCachePrereq(packageSymbol.SourceLineNumbers));
+            }
+        }
+
+        private void VerifyIuibaPrimaryPackage(WixBundlePackageSymbol packageSymbol, WixBalPackageInfoSymbol balPackageInfoSymbol)
+        {
+            if (packageSymbol.InstallCondition != null)
+            {
+                this.Messaging.Write(BalWarnings.IuibaPrimaryPackageInstallCondition(packageSymbol.SourceLineNumbers));
+            }
+
+            if (balPackageInfoSymbol.DisplayInternalUICondition != null)
+            {
+                this.Messaging.Write(BalWarnings.IuibaPrimaryPackageDisplayInternalUICondition(packageSymbol.SourceLineNumbers));
             }
         }
 
@@ -161,10 +435,10 @@ namespace WixToolset.Bal
             }
         }
 
-        private void VerifyPrereqPackages(IntermediateSection section, bool isDNC)
+        private void VerifyPrereqPackages(IntermediateSection section, bool isDNC, bool isIuiBA)
         {
             var prereqInfoSymbols = section.Symbols.OfType<WixMbaPrereqInformationSymbol>().ToList();
-            if (prereqInfoSymbols.Count == 0)
+            if (!isIuiBA && prereqInfoSymbols.Count == 0)
             {
                 var message = isDNC ? BalErrors.MissingDNCPrereq() : BalErrors.MissingMBAPrereq();
                 this.Messaging.Write(message);

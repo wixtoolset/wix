@@ -144,17 +144,17 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
         if (E_MBAHOST_NET452_ON_WIN7RTM == hr)
         {
             BalLogError(hr, "The Burn engine cannot run with an MBA under the .NET 4 CLR on Windows 7 RTM with .NET 4.5.2 (or greater) installed.");
-            vstate.prereqData.hrHostInitialization = hr;
+            vstate.prereqData.hrFatalError = hr;
         }
         else if (vstate.prereqData.fCompleted)
         {
             hr = E_PREREQBA_INFINITE_LOOP;
             BalLogError(hr, "The prerequisites were already installed. The bootstrapper application will not be reloaded to prevent an infinite loop.");
-            vstate.prereqData.hrHostInitialization = hr;
+            vstate.prereqData.hrFatalError = hr;
         }
         else
         {
-            vstate.prereqData.hrHostInitialization = S_OK;
+            vstate.prereqData.hrFatalError = S_OK;
         }
 
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application because managed host could not be loaded, error: 0x%08x.", hr);
@@ -305,6 +305,8 @@ static HRESULT LoadMbaConfiguration(
         hr = XmlGetAttributeNumber(pixnHost, L"AlwaysInstallPrereqs", reinterpret_cast<DWORD*>(&pState->prereqData.fAlwaysInstallPrereqs));
         BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get AlwaysInstallPrereqs value.");
     }
+
+    pState->prereqData.fPerformHelp = !pState->prereqData.fAlwaysInstallPrereqs;
 
 LExit:
     ReleaseObject(pixnHost);

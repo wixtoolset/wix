@@ -143,6 +143,12 @@ namespace WixToolsetTest.Bal
                 {
                     "<WixMbaPrereqOptions AlwaysInstallPrereqs='1' />",
                 }, wixMbaPrereqOptionsElements);
+
+                var wixMbaPrereqInformationElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqInformation");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixMbaPrereqInformation PackageId='wixnative.exe' />",
+                }, wixMbaPrereqInformationElements);
             }
         }
 

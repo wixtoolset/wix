@@ -9,6 +9,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
     using System.Xml;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Data;
@@ -160,7 +161,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         public void AddBootstrapperApplicationData(IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false)
         {
-            this.BootstrapperApplicationManifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnCommon.BADataNamespace);
+            this.BootstrapperApplicationManifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnConstants.BootstrapperApplicationDataNamespace);
         }
 
         public void AddBundleExtensionData(string extensionId, string xml)
@@ -172,7 +173,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
         public void AddBundleExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false)
         {
             var manifestData = this.GetBundleExtensionManifestData(extensionId);
-            manifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnCommon.BundleExtensionDataNamespace);
+            manifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnConstants.BundleExtensionDataNamespace);
         }
 
         #endregion

@@ -451,8 +451,8 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_ERROR_TYPE errorType,
         __in_z LPCWSTR wzPackageId,
         __in DWORD dwCode,
-        __in_z LPCWSTR /*wzError*/,
-        __in DWORD /*dwUIHint*/,
+        __in_z LPCWSTR wzError,
+        __in DWORD dwUIHint,
         __in DWORD /*cData*/,
         __in_ecount_z_opt(cData) LPCWSTR* /*rgwzData*/,
         __in int /*nRecommendation*/,
@@ -461,7 +461,15 @@ public: // IBootstrapperApplication
     {
         BalRetryErrorOccurred(wzPackageId, dwCode);
 
-        if (CheckCanceled())
+        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_display)
+        {
+            HRESULT hr = m_pEngine->SendEmbeddedError(dwCode, wzError, dwUIHint, pResult);
+            if (FAILED(hr))
+            {
+                *pResult = IDERROR;
+            }
+        }
+        else if (CheckCanceled())
         {
             *pResult = IDCANCEL;
         }

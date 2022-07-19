@@ -19,6 +19,20 @@
     </Fragment>
 
     <Fragment>
+        <BootstrapperApplication Id="WixInternalUIBootstrapperApplication$(var.Suffix)">
+            <BootstrapperApplicationDll Id="WixInternalUIBootstrapperApplication" SourceFile="!(bindpath.$(var.platform))\wixiuiba.dll" />
+            <Payload SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" Name="prereqba.dll" />
+        </BootstrapperApplication>
+    </Fragment>
+
+    <Fragment>
+        <BootstrapperApplication Id="WixInternalUIBootstrapperApplication.Standard$(var.Suffix)">
+            <PayloadGroupRef Id="WixIuibaStandardPayloads" />
+        </BootstrapperApplication>
+        <BootstrapperApplicationRef Id="WixInternalUIBootstrapperApplication$(var.Suffix)" />
+    </Fragment>
+
+    <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication$(var.Suffix)">
             <BootstrapperApplicationDll Id="WixStandardBootstrapperApplication" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>

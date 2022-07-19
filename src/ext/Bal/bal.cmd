@@ -14,14 +14,6 @@ nuget restore dnchost\packages.config || exit /b
 msbuild -t:Restore -p:Configuration=%_C% || exit /b
 
 :: Build
-msbuild -p:Configuration=%_C%;Platform=x86 dnchost\dnchost.vcxproj || exit /b
-msbuild -p:Configuration=%_C%;Platform=x64 dnchost\dnchost.vcxproj || exit /b
-msbuild -p:Configuration=%_C%;Platform=ARM64 dnchost\dnchost.vcxproj || exit /b
-
-msbuild -p:Configuration=%_C%;Platform=x86 mbahost\mbahost.vcxproj || exit /b
-msbuild -p:Configuration=%_C%;Platform=x64 mbahost\mbahost.vcxproj || exit /b
-msbuild -p:Configuration=%_C%;Platform=ARM64 mbahost\mbahost.vcxproj || exit /b
-
 msbuild -p:Configuration=%_C%;Platform=x86 test\examples\TestEngine\Example.TestEngine.vcxproj || exit /b
 msbuild -p:Configuration=%_C%;Platform=x64 test\examples\TestEngine\Example.TestEngine.vcxproj || exit /b
 msbuild -p:Configuration=%_C%;Platform=ARM64 test\examples\TestEngine\Example.TestEngine.vcxproj || exit /b

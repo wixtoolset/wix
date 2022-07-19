@@ -13,6 +13,7 @@ namespace WixToolset.Bal
             {
                 new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.PackageId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.DisplayInternalUICondition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.PrimaryPackageType), IntermediateFieldType.Number),
             },
             typeof(WixBalPackageInfoSymbol));
     }
@@ -26,6 +27,16 @@ namespace WixToolset.Bal.Symbols
     {
         PackageId,
         DisplayInternalUICondition,
+        PrimaryPackageType,
+    }
+
+    public enum BalPrimaryPackageType
+    {
+        None,
+        Default,
+        X86,
+        X64,
+        ARM64,
     }
 
     public class WixBalPackageInfoSymbol : IntermediateSymbol
@@ -50,6 +61,12 @@ namespace WixToolset.Bal.Symbols
         {
             get => this.Fields[(int)WixBalPackageInfoSymbolFields.DisplayInternalUICondition].AsString();
             set => this.Set((int)WixBalPackageInfoSymbolFields.DisplayInternalUICondition, value);
+        }
+
+        public BalPrimaryPackageType PrimaryPackageType
+        {
+            get => (BalPrimaryPackageType)this.Fields[(int)WixBalPackageInfoSymbolFields.PrimaryPackageType].AsNumber();
+            set => this.Set((int)WixBalPackageInfoSymbolFields.PrimaryPackageType, (int)value);
         }
     }
 }

@@ -63,17 +63,27 @@ namespace WixTestTools
             return row.Value;
         }
 
-        public void VerifyInstalled(bool installed)
+        public bool IsInstalled()
         {
             var productCode = this.GetProperty("ProductCode");
-            Assert.Equal(installed, MsiUtilities.IsProductInstalled(productCode));
+            return MsiUtilities.IsProductInstalled(productCode);
+        }
+
+        public bool IsInstalledWithVersion()
+        {
+            var productCode = this.GetProperty("ProductCode");
+            Version prodVersion = new Version(this.GetProperty("ProductVersion"));
+            return MsiUtilities.IsProductInstalledWithVersion(productCode, prodVersion);
+        }
+
+        public void VerifyInstalled(bool installed)
+        {
+            Assert.Equal(installed, this.IsInstalled());
         }
 
         public void VerifyInstalledWithVersion(bool installed)
         {
-            var productCode = this.GetProperty("ProductCode");
-            Version prodVersion = new Version(this.GetProperty("ProductVersion"));
-            Assert.Equal(installed, MsiUtilities.IsProductInstalledWithVersion(productCode, prodVersion));
+            Assert.Equal(installed, this.IsInstalledWithVersion());
         }
 
         public void DeleteTestRegistryValue(string name)

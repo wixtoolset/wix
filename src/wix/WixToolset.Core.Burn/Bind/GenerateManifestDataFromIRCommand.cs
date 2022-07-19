@@ -10,6 +10,7 @@ namespace WixToolset.Core.Burn.Bind
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.Burn.ExtensibilityServices;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
@@ -191,10 +192,10 @@ namespace WixToolset.Core.Burn.Bind
                     switch (customDataSymbol.Type)
                     {
                         case WixBundleCustomDataType.BootstrapperApplication:
-                            writer.WriteStartElement(elementName, BurnCommon.BADataNamespace);
+                            writer.WriteStartElement(elementName, BurnConstants.BootstrapperApplicationDataNamespace);
                             break;
                         case WixBundleCustomDataType.BundleExtension:
-                            writer.WriteStartElement(elementName, BurnCommon.BundleExtensionDataNamespace);
+                            writer.WriteStartElement(elementName, BurnConstants.BundleExtensionDataNamespace);
                             break;
                         default:
                             throw new NotImplementedException();

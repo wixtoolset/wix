@@ -170,7 +170,7 @@ static DWORD WINAPI ThreadProc(
     SPLASHSCREEN_INFO splashScreenInfo = { };
 
     WNDCLASSW wc = { };
-    BOOL fRegistered = TRUE;
+    BOOL fRegistered = FALSE;
 
     BOOL fRet = FALSE;
     MSG msg = { };
