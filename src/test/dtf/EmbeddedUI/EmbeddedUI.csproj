@@ -1,49 +1,24 @@
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{864B8C50-7895-4485-AC89-900D86FD8C0D}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>WixToolset.Samples.EmbeddedUI</RootNamespace>
-    <AssemblyName>WixToolset.Samples.EmbeddedUI</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net35</TargetFramework>
+    <Description>Sample managed embedded external UI</Description>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="InstallProgressCounter.cs" />
-    <Compile Include="SampleEmbeddedUI.cs" />
-    <Compile Include="SetupWizard.xaml.cs">
-      <DependentUpon>SetupWizard.xaml</DependentUpon>
-    </Compile>
+    <Content Include="EmbeddedUI.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Include="SetupWizard.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="PresentationCore">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Dtf.CustomAction" />
   </ItemGroup>
-
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

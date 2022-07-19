@@ -1,0 +1,1 @@
+test file for testing subdirectory support and binary stream reading

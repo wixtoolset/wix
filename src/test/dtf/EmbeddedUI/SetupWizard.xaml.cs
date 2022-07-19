@@ -16,19 +16,44 @@ namespace WixToolset.Samples.EmbeddedUI
     using System.Windows.Shapes;
     using WixToolset.Dtf.WindowsInstaller;
 
+    public enum SetupOperationType
+    {
+        Install,
+        Repair,
+        Uninstall
+    }
+
     /// <summary>
     /// Interaction logic for SetupWizard.xaml
     /// </summary>
     public partial class SetupWizard : Window
     {
+        private bool isMaintenance;
         private ManualResetEvent installStartEvent;
         private InstallProgressCounter progressCounter;
         private bool canceled;
 
-        public SetupWizard(ManualResetEvent installStartEvent)
+        public SetupOperationType Operation { get; private set; }
+
+        public SetupWizard(ManualResetEvent installStartEvent, bool isMaintenance)
         {
             this.installStartEvent = installStartEvent;
             this.progressCounter = new InstallProgressCounter(0.5);
+            this.isMaintenance = isMaintenance;
+
+            this.Loaded += this.SetupWizard_Loaded;
+        }
+
+        private void SetupWizard_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.Loaded -= this.SetupWizard_Loaded;
+
+            if (this.isMaintenance)
+            {
+                this.installButton.Visibility = Visibility.Hidden;
+                this.repairButton.Visibility = Visibility.Visible;
+                this.uninstallButton.Visibility = Visibility.Visible;
+            }
         }
 
         public MessageResult ProcessMessage(InstallMessage messageType, Record messageRecord,
@@ -82,7 +107,27 @@ namespace WixToolset.Samples.EmbeddedUI
 
         private void installButton_Click(object sender, RoutedEventArgs e)
         {
+            this.Operation = SetupOperationType.Install;
+            this.StartInstall();
+        }
+
+        private void repairButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Operation = SetupOperationType.Repair;
+            this.StartInstall();
+        }
+
+        private void uninstallButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Operation = SetupOperationType.Uninstall;
+            this.StartInstall();
+        }
+
+        private void StartInstall()
+        {
             this.installButton.Visibility = Visibility.Hidden;
+            this.repairButton.Visibility = Visibility.Hidden;
+            this.uninstallButton.Visibility = Visibility.Hidden;
             this.progressBar.Visibility = Visibility.Visible;
             this.progressLabel.Visibility = Visibility.Visible;
             this.installStartEvent.Set();

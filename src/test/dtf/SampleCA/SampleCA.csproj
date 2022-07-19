@@ -1,8 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net20</TargetFramework>
     <Description>Sample managed custom actions</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="CustomAction.config" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="testsub\testfile.txt" CopyToOutputDirectory="PreserveNewest" />
+    <CustomActionContents Include="testsub\SampleCAs.cs=$(OutputDirectory)testsub\testfile.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Dtf.CustomAction" />
