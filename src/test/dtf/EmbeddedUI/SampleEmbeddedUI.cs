@@ -11,6 +11,7 @@ namespace WixToolset.Samples.EmbeddedUI
 
     public class SampleEmbeddedUI : IEmbeddedUI
     {
+        private bool isMaintenance;
         private Thread appThread;
         private Application app;
         private SetupWizard setupWizard;
@@ -46,11 +47,11 @@ namespace WixToolset.Samples.EmbeddedUI
 
                 if (String.Equals(session["REMOVE"], "All", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Don't show custom UI when uninstalling.
+                    // Don't show custom UI when uninstall was specified on the command line.
                     return false;
-
-                    // An embedded UI could display an uninstall wizard, it's just not imlemented here.
                 }
+
+                this.isMaintenance = session.EvaluateCondition("Installed");
             }
 
             // Start the setup wizard on a separate thread.
@@ -69,6 +70,16 @@ namespace WixToolset.Samples.EmbeddedUI
             }
             else
             {
+                switch (this.setupWizard.Operation)
+                {
+                    case SetupOperationType.Repair:
+                        session["REINSTALL"] = "ALL";
+                        break;
+                    case SetupOperationType.Uninstall:
+                        session["REMOVE"] = "ALL";
+                        break;
+                }
+
                 // Start the installation with a silenced internal UI.
                 // This "embedded external UI" will handle message types except for source resolution.
                 internalUILevel = InstallUIOptions.NoChange | InstallUIOptions.SourceResolutionOnly;
@@ -121,7 +132,7 @@ namespace WixToolset.Samples.EmbeddedUI
         private void Run()
         {
             this.app = new Application();
-            this.setupWizard = new SetupWizard(this.installStartEvent);
+            this.setupWizard = new SetupWizard(this.installStartEvent, this.isMaintenance);
             this.setupWizard.InitializeComponent();
             this.app.Run(this.setupWizard);
             this.installExitEvent.Set();

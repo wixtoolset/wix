@@ -8,6 +8,8 @@
 	Title="Sample Embedded UI" Height="400" Width="540" Visibility="Visible">
 	<Grid>
 		<TextBox Margin="8,8,8,63" Name="messagesTextBox" IsReadOnly="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" FontFamily="Lucida Console" FontSize="10" />
+		<Button Height="23" HorizontalAlignment="Left" Name="repairButton" VerticalAlignment="Bottom" Width="75" Visibility="Hidden" Click="repairButton_Click" Margin="8,0,0,8">Repair</Button>
+		<Button Height="23" HorizontalAlignment="Left" Name="uninstallButton" VerticalAlignment="Bottom" Width="75" Visibility="Hidden" Click="uninstallButton_Click" Margin="91,0,0,8">Uninstall</Button>
 		<Button Height="23" HorizontalAlignment="Right" Name="installButton" VerticalAlignment="Bottom" Width="75" Click="installButton_Click" Margin="0,0,91,8">Install</Button>
 		<Button Height="23" HorizontalAlignment="Right" Name="exitButton" VerticalAlignment="Bottom" Width="75" Visibility="Hidden" Click="exitButton_Click" Margin="0,0,8,8">Exit</Button>
 		<Button Height="23" Margin="0,0,8,8" Name="cancelButton" VerticalAlignment="Bottom" Width="75" HorizontalAlignment="Right" Click="cancelButton_Click">Cancel</Button>
