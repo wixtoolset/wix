@@ -53,7 +53,7 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 writer.Formatting = Formatting.Indented;
                 writer.WriteStartDocument();
-                writer.WriteStartElement("BundleExtensionData", BurnCommon.BundleExtensionDataNamespace);
+                writer.WriteStartElement("BundleExtensionData", BurnConstants.BundleExtensionDataNamespace);
 
                 this.InternalBurnBackendHelper.WriteBundleExtensionData(writer);
 

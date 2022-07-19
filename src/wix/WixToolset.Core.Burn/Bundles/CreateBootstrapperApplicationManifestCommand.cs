@@ -67,7 +67,7 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 writer.Formatting = Formatting.Indented;
                 writer.WriteStartDocument();
-                writer.WriteStartElement("BootstrapperApplicationData", BurnCommon.BADataNamespace);
+                writer.WriteStartElement("BootstrapperApplicationData", BurnConstants.BootstrapperApplicationDataNamespace);
 
                 this.WriteBundleInfo(writer);
 

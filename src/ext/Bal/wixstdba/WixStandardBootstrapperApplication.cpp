@@ -248,10 +248,20 @@ public: // IBootstrapperApplication
 
         if (m_fPrereq)
         {
-            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
-            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
+            if (m_pPrereqData->fPerformLayout && BOOTSTRAPPER_ACTION_LAYOUT == m_command.action)
             {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+                // The parent BA has requested that this BA be in charge of layout.
+                m_fPrereq = FALSE;
+            }
+            else
+            {
+                m_fPreplanPrereqs = m_pPrereqData->fAlwaysInstallPrereqs;
+
+                // Pre-req BA should only show help or do an install (to launch the parent BA which can then do the right action).
+                if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
+                {
+                    m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+                }
             }
         }
         else // maybe modify the action state if the bundle is or is not already installed.
@@ -527,11 +537,11 @@ public: // IBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
-        BOOL fPlannedPrereqs = WIXSTDBA_STATE_PLANNING_PREREQS == m_state;
+        BOOL fPreplannedPrereqs = WIXSTDBA_STATE_PLANNING_PREREQS == m_state;
         WIXSTDBA_STATE completedState = WIXSTDBA_STATE_PLANNED;
         BOOL fApply = TRUE;
 
-        if (fPlannedPrereqs)
+        if (fPreplannedPrereqs)
         {
             if (SUCCEEDED(hrStatus) && !m_fPrereqPackagePlanned)
             {
@@ -547,7 +557,7 @@ public: // IBootstrapperApplication
                 // Need to force the state change since normally moving backwards is prevented.
                 ::PostMessageW(m_hWnd, WM_WIXSTDBA_CHANGE_STATE, 0, WIXSTDBA_STATE_HELP);
 
-                ::PostMessageW(m_hWnd, WM_WIXSTDBA_SHOW_HELP, 0, 0);                
+                ::PostMessageW(m_hWnd, WM_WIXSTDBA_SHOW_HELP, 0, 0);
 
                 ExitFunction();
             }
@@ -562,7 +572,7 @@ public: // IBootstrapperApplication
             ExitFunction();
         }
 
-        if (fPlannedPrereqs)
+        if (fPreplannedPrereqs)
         {
             // If the UI should be visible, display it now and hide the splash screen
             if (BOOTSTRAPPER_DISPLAY_NONE < m_command.display)
@@ -1056,13 +1066,14 @@ public: // IBootstrapperApplication
 
         hr = __super::OnExecutePackageComplete(wzPackageId, hrStatus, restart, recommendation, pAction);
 
-        BAL_INFO_PACKAGE* pPackage = NULL;
-        HRESULT hrPrereq = BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
-        if (SUCCEEDED(hrPrereq))
+        if (m_fPrereq && BOOTSTRAPPER_APPLY_RESTART_NONE != restart)
         {
+            BAL_INFO_PACKAGE* pPackage = NULL;
+            HRESULT hrPrereq = BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
+
             // If the prerequisite required a restart (any restart) then do an immediate
             // restart to ensure that the bundle will get launched again post reboot.
-            if (m_fPrereq && pPackage->fPrereqPackage && BOOTSTRAPPER_APPLY_RESTART_NONE != restart)
+            if (SUCCEEDED(hrPrereq) && pPackage->fPrereqPackage)
             {
                 *pAction = BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RESTART;
             }
@@ -2283,7 +2294,7 @@ private:
             // Okay, we're ready for packages now.
             pThis->SetState(WIXSTDBA_STATE_INITIALIZED, hr);
 
-            if (!pThis->m_fPreplanPrereqs && BOOTSTRAPPER_ACTION_HELP == pThis->m_command.action)
+            if (pThis->m_fPerformHelp && BOOTSTRAPPER_ACTION_HELP == pThis->m_command.action)
             {
                 firstAction = WM_WIXSTDBA_SHOW_HELP;
             }
@@ -4246,7 +4257,7 @@ public:
         m_hWnd = NULL;
 
         m_state = WIXSTDBA_STATE_INITIALIZING;
-        m_hrFinal = pPrereqData ? pPrereqData->hrHostInitialization : S_OK;
+        m_hrFinal = pPrereqData ? pPrereqData->hrFatalError : S_OK;
 
         m_restartResult = BOOTSTRAPPER_APPLY_RESTART_NONE;
         m_fRestartRequired = FALSE;
@@ -4269,7 +4280,8 @@ public:
 
         m_pPrereqData = pPrereqData;
         m_fPrereq = NULL != pPrereqData;
-        m_fPreplanPrereqs = m_fPrereq && m_pPrereqData->fAlwaysInstallPrereqs;
+        m_fPreplanPrereqs = FALSE;
+        m_fPerformHelp = !m_fPrereq || m_pPrereqData->fPerformHelp;
         m_fPrereqPackagePlanned = FALSE;
         m_fPrereqInstalled = FALSE;
         m_fPrereqSkipped = FALSE;
@@ -4554,6 +4566,7 @@ private:
     PREQBA_DATA* m_pPrereqData;
     BOOL m_fPrereq;
     BOOL m_fPreplanPrereqs;
+    BOOL m_fPerformHelp;
     BOOL m_fPrereqPackagePlanned;
     BOOL m_fPrereqInstalled;
     BOOL m_fPrereqSkipped;

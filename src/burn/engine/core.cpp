@@ -447,9 +447,6 @@ extern "C" HRESULT CorePlan(
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
     BOOL fContinuePlanning = TRUE; // assume we won't skip planning due to dependencies.
 
-    hr = PlanSetVariables(action, &pEngineState->variables);
-    ExitOnFailure(hr, "Failed to update action.");
-
     LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action));
 
     fPlanBegan = TRUE;
@@ -468,6 +465,9 @@ extern "C" HRESULT CorePlan(
     // Always reset the plan.
     pEngineState->fPlanned = FALSE;
     PlanReset(&pEngineState->plan, &pEngineState->variables, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
+
+    hr = PlanSetVariables(action, &pEngineState->variables);
+    ExitOnFailure(hr, "Failed to update action.");
 
     // Remember the overall action state in the plan since it shapes the changes
     // we make everywhere.

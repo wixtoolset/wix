@@ -33,6 +33,10 @@
       <BootstrapperApplication>
         <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
       </BootstrapperApplication>
+    <?elseif $(var.BA) = "iui"?>
+      <BootstrapperApplication>
+        <bal:WixInternalUIBootstrapperApplication />
+      </BootstrapperApplication>
     <?else?>
       <BootstrapperApplicationRef Id="$(var.BA)" />
     <?endif?>

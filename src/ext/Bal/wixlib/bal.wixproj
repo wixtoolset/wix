@@ -22,6 +22,9 @@
     <ProjectReference Include="..\mbahost\mbahost.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\mbahost\mbahost.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\mbahost\mbahost.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />

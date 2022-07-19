@@ -16,7 +16,8 @@ namespace WixToolset.Bal
     /// </summary>
     public sealed class BalCompiler : BaseCompilerExtension
     {
-        private readonly Dictionary<string, WixMbaPrereqInformationSymbol> prereqInfoSymbolsByPackageId;
+        private readonly Dictionary<string, WixBalPackageInfoSymbol> packageInfoSymbolsByPackageId = new Dictionary<string, WixBalPackageInfoSymbol>();
+        private readonly Dictionary<string, WixMbaPrereqInformationSymbol> prereqInfoSymbolsByPackageId = new Dictionary<string, WixMbaPrereqInformationSymbol>();
 
         private enum WixDotNetCoreBootstrapperApplicationHostTheme
         {
@@ -32,6 +33,13 @@ namespace WixToolset.Bal
             Standard,
         }
 
+        private enum WixInternalUIBootstrapperApplicationTheme
+        {
+            Unknown,
+            None,
+            Standard,
+        }
+
         private enum WixStandardBootstrapperApplicationTheme
         {
             Unknown,
@@ -41,14 +49,6 @@ namespace WixToolset.Bal
             None,
             RtfLargeLicense,
             RtfLicense,
-        }
-
-        /// <summary>
-        /// Instantiate a new BalCompiler.
-        /// </summary>
-        public BalCompiler()
-        {
-            this.prereqInfoSymbolsByPackageId = new Dictionary<string, WixMbaPrereqInformationSymbol>();
         }
 
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/bal";
@@ -83,6 +83,9 @@ namespace WixToolset.Bal
                 case "BootstrapperApplication":
                     switch (element.Name.LocalName)
                     {
+                        case "WixInternalUIBootstrapperApplication":
+                            this.ParseWixInternalUIBootstrapperApplicationElement(intermediate, section, element);
+                            break;
                         case "WixStandardBootstrapperApplication":
                             this.ParseWixStandardBootstrapperApplicationElement(intermediate, section, element);
                             break;
@@ -113,7 +116,6 @@ namespace WixToolset.Bal
         public override void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
-            WixMbaPrereqInformationSymbol prereqInfo;
 
             switch (parentElement.Name.LocalName)
             {
@@ -137,42 +139,63 @@ namespace WixToolset.Bal
                                     case "MsiPackage":
                                     case "MspPackage":
                                         var displayInternalUICondition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
-                                        section.AddSymbol(new WixBalPackageInfoSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
-                                        {
-                                            PackageId = packageId,
-                                            DisplayInternalUICondition = displayInternalUICondition,
-                                        });
+                                        var packageInfo = this.GetBalPackageInfoSymbol(section, sourceLineNumbers, packageId);
+                                        packageInfo.DisplayInternalUICondition = displayInternalUICondition;
                                         break;
                                     default:
                                         this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
                                         break;
                                 }
                                 break;
-                            case "PrereqLicenseFile":
-
-                                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
+                            case "PrimaryPackageType":
+                            {
+                                var primaryPackageType = BalPrimaryPackageType.None;
+                                var primaryPackageTypeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
+                                switch (primaryPackageTypeValue)
                                 {
-                                    // at the time the extension attribute is parsed, the compiler might not yet have
-                                    // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
-                                    var prereqPackage = parentElement.Attribute(this.Namespace + "PrereqPackage");
-
-                                    if (null != prereqPackage && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqPackage))
-                                    {
-                                        prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
-                                        {
-                                            PackageId = packageId,
-                                        });
-
-                                        this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
-                                    }
-                                    else
-                                    {
-                                        this.Messaging.Write(BalErrors.AttributeRequiresPrereqPackage(sourceLineNumbers, parentElement.Name.LocalName, "PrereqLicenseFile"));
+                                    case "default":
+                                        primaryPackageType = BalPrimaryPackageType.Default;
                                         break;
-                                    }
+                                    case "x86":
+                                        primaryPackageType = BalPrimaryPackageType.X86;
+                                        break;
+                                    case "x64":
+                                        primaryPackageType = BalPrimaryPackageType.X64;
+                                        break;
+                                    case "arm64":
+                                        primaryPackageType = BalPrimaryPackageType.ARM64;
+                                        break;
+                                    default:
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, parentElement.Name.LocalName, "PrimaryPackageType", primaryPackageTypeValue, "default", "x86", "x64", "arm64"));
+                                        break;
                                 }
 
-                                if (null != prereqInfo.LicenseUrl)
+                                // at the time the extension attribute is parsed, the compiler might not yet have
+                                // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
+                                var prereqPackage = parentElement.Attribute(this.Namespace + "PrereqPackage");
+                                var prereqInfo = this.GetMbaPrereqInformationSymbol(section, sourceLineNumbers, prereqPackage, packageId);
+                                if (prereqInfo != null)
+                                {
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, parentElement.Name.LocalName, "PrereqPackage", "yes", "PrimaryPackageType"));
+                                }
+                                else
+                                {
+                                    var packageInfo = this.GetBalPackageInfoSymbol(section, sourceLineNumbers, packageId);
+                                    packageInfo.PrimaryPackageType = primaryPackageType;
+                                }
+                                break;
+                            }
+                            case "PrereqLicenseFile":
+                            {
+                                // at the time the extension attribute is parsed, the compiler might not yet have
+                                // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
+                                var prereqPackage = parentElement.Attribute(this.Namespace + "PrereqPackage");
+                                var prereqInfo = this.GetMbaPrereqInformationSymbol(section, sourceLineNumbers, prereqPackage, packageId);
+                                if (prereqInfo == null)
+                                {
+                                    this.Messaging.Write(BalErrors.AttributeRequiresPrereqPackage(sourceLineNumbers, parentElement.Name.LocalName, "PrereqLicenseFile"));
+                                }
+                                else if (null != prereqInfo.LicenseUrl)
                                 {
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, parentElement.Name.LocalName, "PrereqLicenseFile", "PrereqLicenseUrl"));
                                 }
@@ -181,31 +204,19 @@ namespace WixToolset.Bal
                                     prereqInfo.LicenseFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
                                 }
                                 break;
+                            }
                             case "PrereqLicenseUrl":
+                            {
+                                // at the time the extension attribute is parsed, the compiler might not yet have
+                                // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
+                                var prereqPackage = parentElement.Attribute(this.Namespace + "PrereqPackage");
+                                var prereqInfo = this.GetMbaPrereqInformationSymbol(section, sourceLineNumbers, prereqPackage, packageId);
 
-                                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
+                                if (prereqInfo == null)
                                 {
-                                    // at the time the extension attribute is parsed, the compiler might not yet have
-                                    // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
-                                    var prereqPackage = parentElement.Attribute(this.Namespace + "PrereqPackage");
-
-                                    if (null != prereqPackage && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqPackage))
-                                    {
-                                        prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
-                                        {
-                                            PackageId = packageId,
-                                        });
-
-                                        this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
-                                    }
-                                    else
-                                    {
-                                        this.Messaging.Write(BalErrors.AttributeRequiresPrereqPackage(sourceLineNumbers, parentElement.Name.LocalName, "PrereqLicenseUrl"));
-                                        break;
-                                    }
+                                    this.Messaging.Write(BalErrors.AttributeRequiresPrereqPackage(sourceLineNumbers, parentElement.Name.LocalName, "PrereqLicenseUrl"));
                                 }
-
-                                if (null != prereqInfo.LicenseFile)
+                                else if (null != prereqInfo.LicenseFile)
                                 {
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, parentElement.Name.LocalName, "PrereqLicenseUrl", "PrereqLicenseFile"));
                                 }
@@ -214,19 +225,9 @@ namespace WixToolset.Bal
                                     prereqInfo.LicenseUrl = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
                                 }
                                 break;
+                            }
                             case "PrereqPackage":
-                                if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
-                                {
-                                    if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out _))
-                                    {
-                                        prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
-                                        {
-                                            PackageId = packageId,
-                                        });
-
-                                        this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
-                                    }
-                                }
+                                this.GetMbaPrereqInformationSymbol(section, sourceLineNumbers, attribute, packageId);
                                 break;
                             default:
                                 this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
@@ -298,6 +299,41 @@ namespace WixToolset.Bal
                     }
                     break;
             }
+        }
+
+        private WixBalPackageInfoSymbol GetBalPackageInfoSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string packageId)
+        {
+            if (!this.packageInfoSymbolsByPackageId.TryGetValue(packageId, out var packageInfo))
+            {
+                packageInfo = section.AddSymbol(new WixBalPackageInfoSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
+                {
+                    PackageId = packageId,
+                });
+
+                this.packageInfoSymbolsByPackageId.Add(packageId, packageInfo);
+            }
+
+            return packageInfo;
+        }
+
+        private WixMbaPrereqInformationSymbol GetMbaPrereqInformationSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute prereqAttribute, string packageId)
+        {
+            WixMbaPrereqInformationSymbol prereqInfo = null;
+
+            if (prereqAttribute != null && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqAttribute))
+            {
+                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out _))
+                {
+                    prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
+                    {
+                        PackageId = packageId,
+                    });
+
+                    this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
+                }
+            }
+
+            return prereqInfo;
         }
 
         /// <summary>
@@ -415,6 +451,101 @@ namespace WixToolset.Bal
                     LicenseUrl = licenseUrl,
                 });
                 this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePackage, packageId);
+            }
+        }
+
+        private void ParseWixInternalUIBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            WixInternalUIBootstrapperApplicationTheme? theme = null;
+            string themeFile = null;
+            string logoFile = null;
+            string localizationFile = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "LogoFile":
+                            logoFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ThemeFile":
+                            themeFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "LocalizationFile":
+                            localizationFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Theme":
+                            var themeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (themeValue)
+                            {
+                                case "none":
+                                    theme = WixInternalUIBootstrapperApplicationTheme.None;
+                                    break;
+                                case "standard":
+                                    theme = WixInternalUIBootstrapperApplicationTheme.Standard;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Theme", themeValue, "none", "standard"));
+                                    theme = WixInternalUIBootstrapperApplicationTheme.Unknown;
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
+
+            if (!theme.HasValue)
+            {
+                theme = WixInternalUIBootstrapperApplicationTheme.Standard;
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                if (!String.IsNullOrEmpty(logoFile))
+                {
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixIuibaLogo"))
+                    {
+                        Value = logoFile,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(themeFile))
+                {
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixIuibaThemeXml"))
+                    {
+                        Value = themeFile,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(localizationFile))
+                {
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixIuibaThemeWxl"))
+                    {
+                        Value = localizationFile,
+                    });
+                }
+
+                var baId = "WixInternalUIBootstrapperApplication";
+                switch (theme)
+                {
+                    case WixInternalUIBootstrapperApplicationTheme.Standard:
+                        baId = "WixInternalUIBootstrapperApplication.Standard";
+                        break;
+                }
+
+                this.CreateBARef(section, sourceLineNumbers, node, baId);
             }
         }
 

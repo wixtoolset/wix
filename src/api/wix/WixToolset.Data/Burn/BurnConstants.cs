@@ -14,6 +14,9 @@ namespace WixToolset.Data.Burn
         public const string BundleExtensionDataWixOutputStreamName = "wix-bextdata";
         public const string BootstrapperApplicationDataWixOutputStreamName = "wix-badata.xml";
 
+        public const string BootstrapperApplicationDataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
+        public const string BundleExtensionDataNamespace = "http://wixtoolset.org/schemas/v4/BundleExtensionData";
+
         public const string BootstrapperApplicationDataSymbolDefinitionTag = "WixBootstrapperApplicationData";
         public const string BundleExtensionSearchSymbolDefinitionTag = "WixBundleExtensionSearch";
 

@@ -110,18 +110,18 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     {
         if (DNCHOSTTYPE_SCD == vstate.type)
         {
-            vstate.prereqData.hrHostInitialization = E_DNCHOST_SCD_RUNTIME_FAILURE;
+            vstate.prereqData.hrFatalError = E_DNCHOST_SCD_RUNTIME_FAILURE;
             BalLogError(hr, "The self-contained .NET Core runtime failed to load. This is an unrecoverable error.");
         }
         else if (vstate.prereqData.fCompleted)
         {
             hr = E_PREREQBA_INFINITE_LOOP;
             BalLogError(hr, "The prerequisites were already installed. The bootstrapper application will not be reloaded to prevent an infinite loop.");
-            vstate.prereqData.hrHostInitialization = hr;
+            vstate.prereqData.hrFatalError = hr;
         }
         else
         {
-            vstate.prereqData.hrHostInitialization = S_OK;
+            vstate.prereqData.hrFatalError = S_OK;
         }
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application because .NET Core host could not be loaded, error: 0x%08x.", hr);
 
@@ -232,6 +232,8 @@ static HRESULT LoadDncConfiguration(
         hr = XmlGetAttributeNumber(pixnHost, L"AlwaysInstallPrereqs", reinterpret_cast<DWORD*>(&pState->prereqData.fAlwaysInstallPrereqs));
         BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get AlwaysInstallPrereqs value.");
     }
+
+    pState->prereqData.fPerformHelp = !pState->prereqData.fAlwaysInstallPrereqs;
 
     pState->type = DNCHOSTTYPE_FDD;
 

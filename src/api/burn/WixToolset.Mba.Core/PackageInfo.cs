@@ -64,6 +64,37 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Metadata for BAs like WixInternalUIBootstrapperApplication that only support one main package.
+    /// </summary>
+    public enum PrimaryPackageType
+    {
+        /// <summary>
+        /// Not a primary package.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// The default package if no architecture specific package is available for the current architecture.
+        /// </summary>
+        Default,
+
+        /// <summary>
+        /// The package to use on x86 machines.
+        /// </summary>
+        X86,
+
+        /// <summary>
+        /// The package to use on x64 machines.
+        /// </summary>
+        X64,
+
+        /// <summary>
+        /// The package to use on ARM64 machines.
+        /// </summary>
+        ARM64,
+    }
+
+    /// <summary>
     /// Default implementation of <see cref="IPackageInfo"/>.
     /// </summary>
     public class PackageInfo : IPackageInfo
@@ -115,6 +146,9 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public string PrereqLicenseUrl { get; internal set; }
+
+        /// <inheritdoc/>
+        public PrimaryPackageType PrimaryPackageType { get; internal set; }
 
         /// <inheritdoc/>
         public object CustomData { get; set; }

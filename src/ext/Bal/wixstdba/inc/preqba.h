@@ -4,8 +4,10 @@
 
 struct PREQBA_DATA
 {
-    HRESULT hrHostInitialization;
+    HRESULT hrFatalError;
     BOOL fAlwaysInstallPrereqs;
+    BOOL fPerformHelp;
+    BOOL fPerformLayout;
     BOOL fCompleted;
 };
 

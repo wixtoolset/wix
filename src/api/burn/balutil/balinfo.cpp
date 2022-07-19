@@ -529,6 +529,33 @@ static HRESULT ParseBalPackageInfoFromXml(
         hr = XmlGetAttributeEx(pNode, L"DisplayInternalUICondition", &pPackage->sczDisplayInternalUICondition);
         ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get DisplayInternalUICondition setting for package.");
 
+        hr = XmlGetAttributeEx(pNode, L"PrimaryPackageType", &scz);
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get PrimaryPackageType setting for package.");
+
+        if (fXmlFound)
+        {
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"default", -1))
+            {
+                pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_DEFAULT;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"x86", -1))
+            {
+                pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_X86;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"x64", -1))
+            {
+                pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_X64;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"arm64", -1))
+            {
+                pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_ARM64;
+            }
+            else
+            {
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for WixBalPackageInfo/@PrimaryPackageType: %ls", scz);
+            }
+        }
+
         ReleaseNullObject(pNode);
     }
     ExitOnFailure(hr, "Failed to parse all WixBalPackageInfo elements.");

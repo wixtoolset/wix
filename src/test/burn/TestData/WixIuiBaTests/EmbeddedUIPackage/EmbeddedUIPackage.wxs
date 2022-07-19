@@ -1,0 +1,13 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" />
+
+    <ui:WixUI Id="WixUI_Minimal" />
+
+    <UI>
+      <EmbeddedUI SourceFile="$(var.EmbeddedUI.TargetDir)$(var.EmbeddedUI.TargetName).CA.dll" />
+    </UI>
+  </Fragment>
+</Wix>

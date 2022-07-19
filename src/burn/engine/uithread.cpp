@@ -98,7 +98,7 @@ static DWORD WINAPI ThreadProc(
     UITHREAD_INFO info = { };
 
     WNDCLASSW wc = { };
-    BOOL fRegistered = TRUE;
+    BOOL fRegistered = FALSE;
     HWND hWnd = NULL;
 
     BOOL fRet = FALSE;

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmbeddedUI", "EmbeddedUI\EmbeddedUI.csproj", "{864B8C50-7895-4485-AC89-900D86FD8C0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCA", "SampleCA\SampleCA.csproj", "{8F53B9CC-6FBE-493D-9C9A-09B2AD578CE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedCA", "ManagedCA\ManagedCA.csproj", "{8F53B9CC-6FBE-493D-9C9A-09B2AD578CE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

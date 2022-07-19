@@ -24,10 +24,8 @@ namespace WixToolset.Core.Burn.Bundles
         public const string BurnAuthoredContainerEmbeddedIdFormat = "a{0}";
 
         public const string BADataFileName = "BootstrapperApplicationData.xml";
-        public const string BADataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
 
         public const string BundleExtensionDataFileName = "BundleExtensionData.xml";
-        public const string BundleExtensionDataNamespace = "http://wixtoolset.org/schemas/v4/BundleExtensionData";
 
         // See WinNT.h for details about the PE format, including the
         // structure and offsets for IMAGE_DOS_HEADER, IMAGE_NT_HEADERS32,

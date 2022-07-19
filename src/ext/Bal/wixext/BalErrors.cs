@@ -18,9 +18,39 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.BAFunctionsPayloadRequiredInUXContainer, "The BAFunctions DLL Payload element must be located inside the BootstrapperApplication container.");
         }
 
+        public static Message IuibaNonMsiPrimaryPackage(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IuibaNonMsiPrimaryPackage, "When using WixInternalUIBootstrapperApplication, each primary package must be an MsiPackage.");
+        }
+
+        public static Message IuibaNonPermanentNonPrimaryPackage(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IuibaNonPermanentNonPrimaryPackage, "When using WixInternalUIBootstrapperApplication, packages must either be non-permanent and have the bal:PrimaryPackageType attribute, or be permanent and have the bal:PrereqPackage attribute set to 'yes'.");
+        }
+
+        public static Message IuibaNonPermanentPrereqPackage(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IuibaNonPermanentPrereqPackage, "When using WixInternalUIBootstrapperApplication and bal:PrereqPackage is set to 'yes', the package must be permanent.");
+        }
+
+        public static Message IuibaPermanentPrimaryPackageType(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IuibaPermanentPrimaryPackageType, "When using WixInternalUIBootstrapperApplication, packages with the bal:PrimaryPackageType attribute must not be permanent.");
+        }
+
+        public static Message IuibaPrimaryPackageEnableFeatureSelection(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IuibaPrimaryPackageEnableFeatureSelection, "When using WixInternalUIBootstrapperApplication, primary packages must not have feature selection enabled because it interferes with the user selecting feature through the MSI UI.");
+        }
+
         public static Message MissingDNCPrereq()
         {
             return Message(null, Ids.MissingDNCPrereq, "There must be at least one PrereqPackage when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
+        }
+
+        public static Message MissingIUIPrimaryPackage()
+        {
+            return Message(null, Ids.MissingIUIPrimaryPackage, "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".");
         }
 
         public static Message MissingMBAPrereq()
@@ -36,6 +66,16 @@ namespace WixToolset.Bal
         public static Message MultiplePrereqLicenses(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.MultiplePrereqLicenses, "There may only be one package in the bundle that has either the PrereqLicenseFile attribute or the PrereqLicenseUrl attribute.");
+        }
+
+        public static Message MultiplePrimaryPackageType(SourceLineNumber sourceLineNumbers, string primaryPackageType)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePrimaryPackageType, "There may only be one package in the bundle with PrimaryPackageType of '{0}'.", primaryPackageType);
+        }
+
+        public static Message MultiplePrimaryPackageType2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePrimaryPackageType2, "The location of the package related to the previous error.");
         }
 
         public static Message NonUpperCaseOverridableVariable(SourceLineNumber sourceLineNumbers, string name, string expectedName)
@@ -62,6 +102,14 @@ namespace WixToolset.Bal
             BAFunctionsPayloadRequiredInUXContainer = 6805,
             MissingDNCPrereq = 6806,
             NonUpperCaseOverridableVariable = 6807,
+            MissingIUIPrimaryPackage = 6808,
+            MultiplePrimaryPackageType = 6809,
+            MultiplePrimaryPackageType2 = 6810,
+            IuibaNonPermanentNonPrimaryPackage = 6811,
+            IuibaNonPermanentPrereqPackage = 6812,
+            IuibaPermanentPrimaryPackageType = 6813,
+            IuibaNonMsiPrimaryPackage = 6814,
+            IuibaPrimaryPackageEnableFeatureSelection = 6815,
         }
     }
 }

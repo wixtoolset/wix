@@ -5,6 +5,7 @@ namespace WixToolset.Core.TestPackage
     using System.IO;
     using System.Xml;
     using WixToolset.Core.Burn.Bundles;
+    using WixToolset.Data.Burn;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -72,7 +73,7 @@ namespace WixToolset.Core.TestPackage
         public static XmlNamespaceManager GetBADataNamespaceManager(XmlDocument document, string prefix)
         {
             var namespaceManager = new XmlNamespaceManager(document.NameTable);
-            namespaceManager.AddNamespace(prefix, BurnCommon.BADataNamespace);
+            namespaceManager.AddNamespace(prefix, BurnConstants.BootstrapperApplicationDataNamespace);
             return namespaceManager;
         }
 
@@ -85,7 +86,7 @@ namespace WixToolset.Core.TestPackage
         public static XmlNamespaceManager GetBundleExtensionDataNamespaceManager(XmlDocument document, string prefix)
         {
             var namespaceManager = new XmlNamespaceManager(document.NameTable);
-            namespaceManager.AddNamespace(prefix, BurnCommon.BundleExtensionDataNamespace);
+            namespaceManager.AddNamespace(prefix, BurnConstants.BundleExtensionDataNamespace);
             return namespaceManager;
         }
 
