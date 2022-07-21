@@ -115,6 +115,7 @@ namespace WixToolset.Core.Burn.Bind
 
                     // Symbols used before binding.
                     case SymbolDefinitionType.WixComplexReference:
+                    case SymbolDefinitionType.WixFragment:
                     case SymbolDefinitionType.WixOrdering:
                     case SymbolDefinitionType.WixSimpleReference:
                     case SymbolDefinitionType.WixVariable:
