@@ -255,7 +255,7 @@ extern "C" HRESULT PackagesParseFromXml(
                 fUninstallable = pPackage->Exe.fUninstallable;
                 break;
             case BURN_PACKAGE_TYPE_MSU:
-                fUninstallable = pPackage->Msu.fUninstallable;
+                fUninstallable = FALSE;
                 break;
             }
 

@@ -2249,6 +2249,7 @@ namespace Bootstrapper
         void SingleMsuInstallTest()
         {
             HRESULT hr = S_OK;
+            LONGLONG llPlannedAction = 0;
             BURN_ENGINE_STATE engineState = { };
             BURN_ENGINE_STATE* pEngineState = &engineState;
             BURN_PLAN* pPlan = &engineState.plan;
@@ -2260,7 +2261,10 @@ namespace Bootstrapper
             hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
+            llPlannedAction = VariableGetNumericHelper(&engineState.variables, BURN_BUNDLE_ACTION);
+
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<LONGLONG>(BOOTSTRAPPER_ACTION_INSTALL, llPlannedAction);
             NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleId);
             NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
@@ -2302,7 +2306,6 @@ namespace Bootstrapper
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteWaitCachePackage(pPlan, fRollback, dwIndex++, L"test.msu");
-            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteMsuPackage(pPlan, fRollback, dwIndex++, L"test.msu", BOOTSTRAPPER_ACTION_STATE_INSTALL);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -2314,8 +2317,6 @@ namespace Bootstrapper
             dwExecuteCheckpointId = 2;
             ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
             ValidateExecuteUncachePackage(pPlan, fRollback, dwIndex++, L"test.msu");
-            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteMsuPackage(pPlan, fRollback, dwIndex++, L"test.msu", BOOTSTRAPPER_ACTION_STATE_UNINSTALL);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
@@ -2336,7 +2337,6 @@ namespace Bootstrapper
             Assert::Equal(uIndex, pPlan->cPlannedProviders);
 
             Assert::Equal(1ul, pEngineState->packages.cPackages);
-            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"test.msu", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
         [Fact]

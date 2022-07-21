@@ -421,8 +421,6 @@ typedef struct _BURN_PACKAGE
         struct
         {
             LPWSTR sczDetectCondition;
-            LPWSTR sczKB;
-            BOOL fUninstallable;
         } Msu;
     };
 } BURN_PACKAGE;

@@ -31,24 +31,12 @@ extern "C" HRESULT MsuEngineParsePackageFromXml(
 {
     HRESULT hr = S_OK;
 
-    // @KB
-    hr = XmlGetAttributeEx(pixnMsuPackage, L"KB", &pPackage->Msu.sczKB);
-    ExitOnFailure(hr, "Failed to get @KB.");
-
     // @DetectCondition
     hr = XmlGetAttributeEx(pixnMsuPackage, L"DetectCondition", &pPackage->Msu.sczDetectCondition);
-    ExitOnFailure(hr, "Failed to get @DetectCondition.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @DetectCondition.");
 
-    // We can only uninstall MSU packages if they have a KB and we are on Win7 or newer.
-    if (pPackage->Msu.sczKB && *pPackage->Msu.sczKB && ::IsWindows7OrGreater())
-    {
-        pPackage->Msu.fUninstallable = TRUE;
-    }
-    else
-    {
-        pPackage->fPermanent = TRUE;
-        pPackage->Msu.fUninstallable = FALSE;
-    }
+    // Uninstalling MSU packages isn't supported because newer OS's don't allow silent uninstallation.
+    pPackage->fPermanent = TRUE;
 
 LExit:
     return hr;
@@ -58,7 +46,6 @@ extern "C" void MsuEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     )
 {
-    ReleaseNullStr(pPackage->Msu.sczKB);
     ReleaseNullStr(pPackage->Msu.sczDetectCondition);
 }
 
@@ -108,30 +95,7 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
     switch (pPackage->currentState)
     {
     case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
-        switch (pPackage->requested)
-        {
-        case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
-        case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-            break;
-
-        case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
-        case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-            execute = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
-            break;
-
-        case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
-            execute = pPackage->Msu.fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
-            break;
-
-        case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT:
-            execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
-            break;
-
-        default:
-            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-            break;
-        }
+        execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         break;
 
     case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
@@ -141,10 +105,6 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
         case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
-            break;
-
-        case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT:
-            execute = pPackage->Msu.fUninstallable ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
 
         default:
@@ -161,41 +121,7 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
     // Calculate the rollback action if there is an execute action.
     if (BOOTSTRAPPER_ACTION_STATE_NONE != execute)
     {
-        switch (pPackage->currentState)
-        {
-        case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
-            switch (pPackage->requested)
-            {
-            case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT: __fallthrough;
-            case BOOTSTRAPPER_REQUEST_STATE_ABSENT:
-                rollback = BOOTSTRAPPER_ACTION_STATE_INSTALL;
-                break;
-
-            default:
-                rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-                break;
-            }
-            break;
-
-        case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
-            switch (pPackage->requested)
-            {
-            case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
-            case BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT: __fallthrough;
-            case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-                rollback = !pPackage->fPermanent ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
-                break;
-
-            default:
-                rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-                break;
-            }
-            break;
-
-        default:
-            hr = E_INVALIDARG;
-            ExitOnRootFailure(hr, "Invalid package expected state.");
-        }
+        rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     }
 
     // return values
@@ -272,7 +198,6 @@ extern "C" HRESULT MsuEngineExecutePackage(
     LPWSTR sczSystemPath = NULL;
     LPWSTR sczWusaPath = NULL;
     LPWSTR sczCommand = NULL;
-    LPWSTR sczEscapedKB = NULL;
     SC_HANDLE schWu = NULL;
     BOOL fWuWasDisabled = FALSE;
     STARTUPINFOW si = { };
@@ -324,15 +249,6 @@ extern "C" HRESULT MsuEngineExecutePackage(
         ExitOnFailure(hr, "Failed to format MSU install command.");
         break;
 
-    case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        hr = AppEscapeCommandLineArgumentFormatted(&sczEscapedKB, L"%ls", pPackage->Msu.sczKB);
-        ExitOnFailure(hr, "Failed to escape MSU KB.");
-
-        // format command
-        hr = StrAllocFormatted(&sczCommand, L"\"%ls\" /uninstall /kb:%ls /quiet /norestart", sczWusaPath, sczEscapedKB);
-        ExitOnFailure(hr, "Failed to format MSU uninstall command.");
-        break;
-
     default:
         hr = E_UNEXPECTED;
         ExitOnFailure(hr, "Failed to get action arguments for MSU package.");
@@ -347,7 +263,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
         ExitOnFailure(hr, "Failed to append log path to MSU command-line.");
     }
 
-    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msuPackage.action), sczMsuPath ? sczMsuPath : pPackage->Msu.sczKB, sczCommand);
+    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msuPackage.action), sczMsuPath, sczCommand);
 
     hr = EnsureWUServiceEnabled(fStopWusaService, &schWu, &fWuWasDisabled);
     ExitOnFailure(hr, "Failed to ensure WU service was enabled to install MSU package.");
@@ -388,7 +304,6 @@ LExit:
     ReleaseStr(sczSystemPath);
     ReleaseStr(sczWusaPath);
     ReleaseStr(sczCommand);
-    ReleaseStr(sczEscapedKB);
 
     ReleaseHandle(pi.hProcess);
     ReleaseHandle(pi.hThread);
