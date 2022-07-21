@@ -35,6 +35,7 @@ namespace WixToolset.Data.Symbols
         None = 0x0,
         Hidden = 0x1,
         Persisted = 0x2,
+        BuiltIn = 0x4,
     }
 
     public enum WixBundleVariableType
@@ -104,6 +105,22 @@ namespace WixToolset.Data.Symbols
                 else
                 {
                     this.Attributes &= ~WixBundleVariableAttributes.Persisted;
+                }
+            }
+        }
+
+        public bool BuiltIn
+        {
+            get { return this.Attributes.HasFlag(WixBundleVariableAttributes.BuiltIn); }
+            set
+            {
+                if (value)
+                {
+                    this.Attributes |= WixBundleVariableAttributes.BuiltIn;
+                }
+                else
+                {
+                    this.Attributes &= ~WixBundleVariableAttributes.BuiltIn;
                 }
             }
         }

@@ -248,7 +248,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             else
             {
-                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, "Variable", variable);
+                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, "Variable", variable, allowBuiltIn: false);
             }
 
             section.AddSymbol(new WixSearchSymbol(sourceLineNumbers, id)
@@ -314,6 +314,30 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 Table = tableName,
             });
+        }
+
+        public Identifier GetAttributeBundleVariableNameIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            var variableId = this.GetAttributeIdentifier(sourceLineNumbers, attribute);
+
+            if (!String.IsNullOrEmpty(variableId?.Id))
+            {
+                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableId.Id, allowBuiltIn: false);
+            }
+
+            return variableId;
+        }
+
+        public string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            var variableName = this.GetAttributeValue(sourceLineNumbers, attribute);
+
+            if (!String.IsNullOrEmpty(variableName))
+            {
+                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableName, allowBuiltIn: false);
+            }
+
+            return variableName;
         }
 
         public string GetAttributeGuidValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool generatable = false, bool canBeEmpty = false)

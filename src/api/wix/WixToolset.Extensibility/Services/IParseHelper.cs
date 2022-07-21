@@ -234,6 +234,22 @@ namespace WixToolset.Extensibility.Services
         string GetAttributeValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule = EmptyRule.CanBeWhitespaceOnly);
 
         /// <summary>
+        /// Gets a bundle variable name identifier and displays an error for an illegal value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
+        Identifier GetAttributeBundleVariableNameIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute);
+
+        /// <summary>
+        /// Gets a bundle variable name value and displays an error for an illegal value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <returns>The attribute's value.</returns>
+        string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
+
+        /// <summary>
         /// Get a guid attribute value and displays an error for an illegal guid value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>

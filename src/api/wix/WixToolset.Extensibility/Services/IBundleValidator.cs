@@ -39,8 +39,9 @@ namespace WixToolset.Extensibility.Services
         /// <param name="elementName"></param>
         /// <param name="attributeName"></param>
         /// <param name="variableName"></param>
+        /// <param name="allowBuiltIn">Whether to bypass checks for reserved values.</param>
         /// <returns>Whether the name is valid.</returns>
-        bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName);
+        bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, bool allowBuiltIn);
 
         /// <summary>
         /// Validates a bundle condition and displays an error for an illegal value.

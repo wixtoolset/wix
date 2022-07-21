@@ -415,8 +415,7 @@ namespace WixToolset.Util
                     id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                     break;
                 case "Variable":
-                    variable = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                    // TODO: handle standard bundle variables
+                    variable = this.ParseHelper.GetAttributeBundleVariableNameValue(sourceLineNumbers, attrib);
                     break;
                 case "Condition":
                     condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -505,10 +504,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
                 section.AddSymbol(new WixComponentSearchSymbol(sourceLineNumbers, id)
                 {
                     Guid = guid,
@@ -616,10 +615,10 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
             }
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+
                 section.AddSymbol(new WixWindowsFeatureSearchSymbol(sourceLineNumbers, id)
                 {
                     Type = feature,
@@ -1043,10 +1042,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
                 this.CreateWixFileSearchRow(section, sourceLineNumbers, id, path, attributes, type);
             }
         }
@@ -1157,10 +1156,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, node.Name.LocalName, id, variable, condition, after, null);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, node.Name.LocalName, id, variable, condition, after, null);
+
                 this.CreateWixFileSearchRow(section, sourceLineNumbers, id, path, attributes, type);
             }
         }
@@ -2645,10 +2644,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
                 section.AddSymbol(new WixProductSearchSymbol(sourceLineNumbers, id)
                 {
                     Guid = guid,
@@ -2777,10 +2776,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
                 section.AddSymbol(new WixRegistrySearchSymbol(sourceLineNumbers, id)
                 {
                     Root = root.Value,
