@@ -1804,6 +1804,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.RelativePathForRegistryElement, "Cannot convert RelativePath into Registry elements.");
         }
 
+        public static Message ReservedBurnNamespaceViolation(SourceLineNumber sourceLineNumbers, string element, string attribute, string prefix)
+        {
+            return Message(sourceLineNumbers, Ids.ReservedNamespaceViolation, "The {0}/@{1} attribute's value begins with the reserved prefix '{2}'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.", element, attribute, prefix);
+        }
+
         public static Message ReservedNamespaceViolation(SourceLineNumber sourceLineNumbers, string element, string attribute, string prefix)
         {
             return Message(sourceLineNumbers, Ids.ReservedNamespaceViolation, "The {0}/@{1} attribute's value begins with the reserved prefix '{2}'. Some prefixes are reserved by the Windows Installer and WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.", element, attribute, prefix);

@@ -37,6 +37,14 @@
             Value="Release"
             Result="value"
             Bitness="always64" />
+
+        <util:RegistrySearch
+            Variable="WixCustomVariable"
+            Root="HKLM"
+            Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Custom"
+            Value="Release"
+            Result="value"
+            Bitness="always64" />
     </Fragment>
 
     <Fragment>

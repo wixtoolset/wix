@@ -462,35 +462,32 @@ namespace WixToolset.Core
                     Type = ContainerType.Attached,
                 });
 
+                var wellKnownVariableAttributes = WixBundleVariableAttributes.Persisted | WixBundleVariableAttributes.BuiltIn;
+
                 // Ensure that the bundle stores the well-known persisted values.
                 this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_INPROGRESS_NAME))
                 {
-                    Hidden = false,
-                    Persisted = true,
+                    Attributes = wellKnownVariableAttributes,
                 });
 
                 this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_NAME))
                 {
-                    Hidden = false,
-                    Persisted = true,
+                    Attributes = wellKnownVariableAttributes,
                 });
 
                 this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
                 {
-                    Hidden = false,
-                    Persisted = true,
+                    Attributes = wellKnownVariableAttributes,
                 });
 
                 this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
                 {
-                    Hidden = false,
-                    Persisted = true,
+                    Attributes = wellKnownVariableAttributes,
                 });
 
                 this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
                 {
-                    Hidden = false,
-                    Persisted = true,
+                    Attributes = wellKnownVariableAttributes,
                 });
             }
         }
@@ -3620,7 +3617,7 @@ namespace WixToolset.Core
                             id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Variable":
-                            variable = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            variable = this.Core.GetAttributeBundleVariableNameValue(sourceLineNumbers, attrib);
                             break;
                         case "Condition":
                             condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3655,10 +3652,10 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("sbv", variable, condition, after, value, type.ToString());
             }
 
-            this.Core.CreateWixSearchSymbol(sourceLineNumbers, node.Name.LocalName, id, variable, condition, after);
-
             if (!this.Messaging.EncounteredError)
             {
+                this.Core.CreateWixSearchSymbol(sourceLineNumbers, node.Name.LocalName, id, variable, condition, after);
+
                 this.Core.AddSymbol(new WixSetVariableSymbol(sourceLineNumbers, id)
                 {
                     Value = value,

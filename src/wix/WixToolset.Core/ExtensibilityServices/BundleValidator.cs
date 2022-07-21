@@ -145,7 +145,7 @@ namespace WixToolset.Core.ExtensibilityServices
             return relativePath;
         }
 
-        public bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
+        public bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, bool allowBuiltIn)
         {
             if (String.IsNullOrEmpty(variableName))
             {
@@ -159,10 +159,16 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 return false;
             }
-            else if (BuiltinBundleVariables.Contains(variableName))
+            else if (!allowBuiltIn && BuiltinBundleVariables.Contains(variableName))
             {
                 var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
                 this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+
+                return false;
+            }
+            else if (!allowBuiltIn && variableName.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Messaging.Write(ErrorMessages.ReservedBurnNamespaceViolation(sourceLineNumbers, elementName, attributeName, "Wix"));
 
                 return false;
             }

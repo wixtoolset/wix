@@ -163,7 +163,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void ValidateSearch(WixSearchSymbol symbol)
         {
-            this.BackendHelper.ValidateBundleVariableName(symbol.SourceLineNumbers, "*Search", "Variable", symbol.Variable);
+            this.BackendHelper.ValidateBundleVariableName(symbol.SourceLineNumbers, "*Search", "Variable", symbol.Variable, allowBuiltIn: false);
 
             if (symbol.Condition != null)
             {
@@ -173,7 +173,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void ValidateVariable(WixBundleVariableSymbol symbol)
         {
-            this.BackendHelper.ValidateBundleVariableName(symbol.SourceLineNumbers, "Variable", "Name", symbol.Id.Id);
+            this.BackendHelper.ValidateBundleVariableName(symbol.SourceLineNumbers, "Variable", "Name", symbol.Id.Id, allowBuiltIn: symbol.BuiltIn);
         }
     }
 }

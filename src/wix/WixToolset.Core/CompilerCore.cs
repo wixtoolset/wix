@@ -744,19 +744,12 @@ namespace WixToolset.Core
         /// <returns>The attribute's value.</returns>
         public Identifier GetAttributeBundleVariableNameIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            var variableName = this.GetAttributeIdentifier(sourceLineNumbers, attribute);
+            return this.parseHelper.GetAttributeBundleVariableNameIdentifier(sourceLineNumbers, attribute);
+        }
 
-            if (!String.IsNullOrEmpty(variableName?.Id))
-            {
-                this.bundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableName.Id);
-
-                if (variableName.Id.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
-                {
-                    this.messaging.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, "Wix"));
-                }
-            }
-
-            return variableName;
+        public string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            return this.parseHelper.GetAttributeBundleVariableNameValue(sourceLineNumbers, attribute);
         }
 
         /// <summary>
