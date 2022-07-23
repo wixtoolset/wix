@@ -33,5 +33,25 @@ namespace WixToolsetTest.BurnE2E
 
             packageA.VerifyInstalled(false);
         }
+
+        [RuntimeFact]
+        public void WixStdBAFailsWithLockedFile()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundleA = this.CreateBundleInstaller("WixStdBaBundle");
+
+            packageA.VerifyInstalled(false);
+
+            bundleA.Install();
+
+            packageA.VerifyInstalled(true);
+
+            // Lock the file that will be uninstalled.
+            var targetInstallFile = packageA.GetInstalledFilePath("Package.wxs");
+            using (var lockTargetFile = new FileStream(targetInstallFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                bundleA.Uninstall(expectedExitCode: (int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
+            }
+        }
     }
 }

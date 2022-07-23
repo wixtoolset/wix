@@ -2,7 +2,10 @@
 
 setlocal
 pushd %~dp0
+
 set _NUGET_CACHE=%USERPROFILE%\.nuget\packages
+if "%NUGET_PACKAGES%" NEQ "" set _NUGET_CACHE=%NUGET_PACKAGES%
+
 echo Cleaning...
 
 if exist ..\build rd /s/q ..\build
