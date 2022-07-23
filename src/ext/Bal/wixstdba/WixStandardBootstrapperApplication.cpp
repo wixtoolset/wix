@@ -867,25 +867,9 @@ public: // IBootstrapperApplication
                         hr = StrAllocFromError(&sczError, dwCode, NULL);
                         if (FAILED(hr) || !sczError || !*sczError)
                         {
-                            // special case for ERROR_FAIL_NOACTION_REBOOT: use loc string for Windows XP
-                            if (ERROR_FAIL_NOACTION_REBOOT == dwCode)
-                            {
-                                LOC_STRING* pLocString = NULL;
-                                hr = LocGetString(m_pWixLoc, L"#(loc.ErrorFailNoActionReboot)", &pLocString);
-                                if (SUCCEEDED(hr))
-                                {
-                                    StrAllocString(&sczError, pLocString->wzText, 0);
-                                }
-                                else
-                                {
-                                    StrAllocFormatted(&sczError, L"0x%x", dwCode);
-                                }
-                            }
-                            else
-                            {
-                                StrAllocFormatted(&sczError, L"0x%x", dwCode);
-                            }
+                            StrAllocFormatted(&sczError, L"0x%x", dwCode);
                         }
+
                         hr = S_OK;
                     }
 
@@ -1050,6 +1034,34 @@ public: // IBootstrapperApplication
         SetTaskbarButtonProgress(m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
 
         return __super::OnExecuteProgress(wzPackageId, dwProgressPercentage, dwOverallProgressPercentage, pfCancel);
+    }
+
+
+    virtual STDMETHODIMP OnExecuteFilesInUse(
+        __in_z LPCWSTR wzPackageId,
+        __in DWORD cFiles,
+        __in_ecount_z(cFiles) LPCWSTR* rgwzFiles,
+        __in int nRecommendation,
+        __in BOOTSTRAPPER_FILES_IN_USE_TYPE source,
+        __inout int* pResult
+    )
+    {
+     
+        if (!m_fShowingInternalUiThisPackage && !m_fPrereq && wzPackageId && *wzPackageId)
+        {
+            // If this is an MSI package, display the files-in-use dialog.
+            BAL_INFO_PACKAGE* pPackage = NULL;
+            BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
+
+            if (pPackage && BAL_INFO_PACKAGE_TYPE_MSI == pPackage->type)
+            {
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "Package %ls has %d applications holding files in use.", wzPackageId, cFiles);
+
+                return ShowFilesInUse(cFiles, rgwzFiles, source);
+            }
+        }
+
+        return __super::OnExecuteFilesInUse(wzPackageId, cFiles, rgwzFiles, nRecommendation, source, pResult);
     }
 
 
@@ -2198,6 +2210,126 @@ private: // privates
         )
     {
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPACKAGENONVITALVALIDATIONFAILURE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+
+    int ShowFilesInUse(
+        __in DWORD cFiles,
+        __in_ecount_z(cFiles) LPCWSTR* rgwzFiles,
+        __in BOOTSTRAPPER_FILES_IN_USE_TYPE /*source*/
+    )
+    {
+        HRESULT hr = S_OK;
+        LPWSTR sczFilesInUse = NULL;
+        DWORD_PTR cchLen = 0;
+        int nResult = IDERROR;
+
+        // If the user has choosen to ignore on a previously displayed "files in use" page, 
+        // we will return the same result for other cases. No need to display the page again.
+        if (IDIGNORE == m_nLastFilesInUseResult)
+        {
+            nResult = m_nLastFilesInUseResult;
+        }
+        else if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display) // Only show files in use when using full display mode.
+        {
+            // Show applications using the files.
+            if (cFiles > 0)
+            {
+                // See https://msdn.microsoft.com/en-us/library/aa371614%28v=vs.85%29.aspx for details.
+                for (DWORD i = 1; i < cFiles; i += 2)
+                {
+                    hr = ::StringCchLengthW(rgwzFiles[i], STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
+                    BalExitOnFailure(hr, "Failed to calculate length of string");
+
+                    if (cchLen > 0)
+                    {
+                        hr = StrAllocConcat(&sczFilesInUse, rgwzFiles[i], 0);
+                        BalExitOnFailure(hr, "Failed to concat files in use");
+
+                        hr = StrAllocConcat(&sczFilesInUse, L"\r\n", 2);
+                        BalExitOnFailure(hr, "Failed to concat files in use");
+                    }
+                }
+            }
+
+            hr = ShowFilesInUseDialog(sczFilesInUse, &nResult);
+            ExitOnFailure(hr, "Failed to show files-in-use task dialog.");
+        }
+        else
+        {
+            // Silent UI level installations always shut down applications and services, 
+            // and on Windows Vista and later, use Restart Manager unless disabled.
+            nResult = IDOK;
+        }
+
+    LExit:
+        ReleaseStr(sczFilesInUse);
+
+        // Remember the answer from the user.
+        m_nLastFilesInUseResult = FAILED(hr) ? IDERROR : nResult;
+
+        return m_nLastFilesInUseResult;
+    }
+
+
+    int ShowFilesInUseDialog(
+        __in_z_opt LPCWSTR sczFilesInUse,
+        __out int* pnResult
+    )
+    {
+        HRESULT hr = S_OK;
+        TASKDIALOGCONFIG config = { };
+        LPWSTR sczTitle = NULL;
+        LPWSTR sczLabel = NULL;
+        LPWSTR sczCloseRadioButton = NULL;
+        LPWSTR sczDontCloseRadioButton = NULL;
+        LOC_STRING* pLocString = NULL;
+
+        // Get the loc strings for the files-in-use task dialog text.
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
+        ExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+
+        hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
+        ExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
+        ExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+
+        hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
+        ExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseCloseRadioButton)", &pLocString);
+        ExitOnFailure(hr, "Failed to get FilesInUseCloseRadioButton loc string.");
+
+        hr = StrAllocString(&sczCloseRadioButton, pLocString->wzText, 0);
+        ExitOnFailure(hr, "Failed to copy FilesInUseCloseRadioButton loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseDontCloseRadioButton)", &pLocString);
+        ExitOnFailure(hr, "Failed to get FilesInUseDontCloseRadioButton loc string.");
+
+        hr = StrAllocString(&sczDontCloseRadioButton, pLocString->wzText, 0);
+        ExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
+
+        const TASKDIALOG_BUTTON buttons[] = {
+            { IDOK, sczCloseRadioButton },
+            { IDIGNORE, sczDontCloseRadioButton },
+        };
+
+        config.cbSize = sizeof(config);
+        config.hInstance = m_hModule;
+        config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_SIZE_TO_CONTENT;
+        config.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+        config.pszWindowTitle = sczTitle;
+        config.pszMainInstruction = sczLabel;
+        config.pszContent = sczFilesInUse ? sczFilesInUse : L"";
+        config.pButtons = buttons;
+        config.cButtons = 2;
+
+        hr = TaskDialogIndirect(&config, pnResult, NULL, NULL);
+        ExitOnFailure(hr, "Failed to show files-in-use task dialog.");
+
+    LExit:
+        return hr;
     }
 
 
@@ -4135,7 +4267,7 @@ LExit:
         if (m_fTaskbarButtonOK)
         {
             hr = m_pTaskbarList->SetProgressState(m_hWnd, tbpFlags);
-            BalExitOnFailure(hr, "Failed to set taskbar button state.", tbpFlags);
+            BalExitOnFailure(hr, "Failed to set taskbar button state: %d.", tbpFlags);
         }
 
     LExit:
@@ -4285,6 +4417,8 @@ public:
         m_fPrereqPackagePlanned = FALSE;
         m_fPrereqInstalled = FALSE;
         m_fPrereqSkipped = FALSE;
+
+        m_nLastFilesInUseResult = IDNOACTION;
 
         pEngine->AddRef();
         m_pEngine = pEngine;
@@ -4577,6 +4711,8 @@ private:
     CRITICAL_SECTION m_csShowingInternalUiThisPackage;
     BOOL m_fShowingInternalUiThisPackage;
     BOOL m_fTriedToLaunchElevated;
+
+    int m_nLastFilesInUseResult;
 
     HMODULE m_hBAFModule;
     PFN_BA_FUNCTIONS_PROC m_pfnBAFunctionsProc;

@@ -55,7 +55,7 @@ extern "C" HRESULT DisplayStart(
     );
 extern "C" HRESULT LoadStart(
     __in_z LPCWSTR wzThemePath,
-    __in_z LPCWSTR wzWxlPath,
+    __in_z_opt LPCWSTR wzWxlPath,
     __in HWND hWnd,
     __out HANDLE* phThread
     );
