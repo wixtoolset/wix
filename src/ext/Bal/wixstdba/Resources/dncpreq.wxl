@@ -30,4 +30,12 @@
   <String Id="FailureCloseButton">&amp;Close</String>
   <String Id="SCDRUNTIMEFAILUREErrorMessage">[WixBundleName] cannot run on this machine. Install the latest updates and/or the latest OS to run in a supported environment.</String>
   <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Core runtime even though all of the prerequisites are installed.</String>
+  <String Id="FilesInUseTitle">Files In Use</String>
+  <String Id="FilesInUseLabel">The following applications are using files that need to be updated:</String>
+  <String Id="FilesInUseNetfxCloseRadioButton">Close the &amp;applications.</String>
+  <String Id="FilesInUseCloseRadioButton">Close the &amp;applications and attempt to restart them.</String>
+  <String Id="FilesInUseDontCloseRadioButton">&amp;Do not close applications. A reboot will be required.</String>
+  <String Id="FilesInUseRetryButton">&amp;Retry</String>
+  <String Id="FilesInUseIgnoreButton">&amp;Ignore</String>
+  <String Id="FilesInUseExitButton">E&amp;xit</String>
 </WixLocalization>
