@@ -1049,17 +1049,30 @@ public: // IBootstrapperApplication
         )
     {
      
-        if (!m_fShowingInternalUiThisPackage && !m_fPrereq && wzPackageId && *wzPackageId)
+        if (!m_fShowingInternalUiThisPackage && wzPackageId && *wzPackageId)
         {
             BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "Package %ls has %d applications holding files in use.", wzPackageId, cFiles);
 
             switch (source)
             {
             case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI:
+                if (m_fShowStandardFilesInUse)
+                {
+                    return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+                }
+                break;
             case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM:
-                return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+                if (m_fShowRMFilesInUse)
+                {
+                    return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+                }
+                break;
             case BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX:
-                return ShowNetfxFilesInUse(cFiles, rgwzFiles, pResult);
+                if (m_fShowNetfxFilesInUse)
+                {
+                    return ShowNetfxFilesInUse(cFiles, rgwzFiles, pResult);
+                }
+                break;
             }
         }
 
@@ -2289,34 +2302,20 @@ private: // privates
         LPWSTR sczLabel = NULL;
         LPWSTR sczCloseRadioButton = NULL;
         LPWSTR sczDontCloseRadioButton = NULL;
-        LOC_STRING* pLocString = NULL;
         int nButton = 0;
         int nRadioButton = 0;
 
-        // Get the loc strings for the files-in-use task dialog text.
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+        hr = BalFormatString(m_pFilesInUseTitleLoc->wzText, &sczTitle);
+        BalExitOnFailure(hr, "Failed to format FilesInUseTitle loc string.");
 
-        hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+        hr = BalFormatString(m_pFilesInUseLabelLoc->wzText, &sczLabel);
+        BalExitOnFailure(hr, "Failed to format FilesInUseLabel loc string.");
 
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+        hr = BalFormatString(m_pFilesInUseCloseRadioButtonLoc->wzText, &sczCloseRadioButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseCloseRadioButton loc string.");
 
-        hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
-
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseCloseRadioButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseCloseRadioButton loc string.");
-
-        hr = StrAllocString(&sczCloseRadioButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseCloseRadioButton loc string.");
-
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseDontCloseRadioButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseDontCloseRadioButton loc string.");
-
-        hr = StrAllocString(&sczDontCloseRadioButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
+        hr = BalFormatString(m_pFilesInUseDontCloseRadioButtonLoc->wzText, &sczDontCloseRadioButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseDontCloseRadioButton loc string.");
 
         const TASKDIALOG_BUTTON rgRadioButtons[] = {
             { IDOK, sczCloseRadioButton },
@@ -2346,6 +2345,11 @@ private: // privates
 #endif
 
     LExit:
+        ReleaseStr(sczTitle);
+        ReleaseStr(sczLabel);
+        ReleaseStr(sczCloseRadioButton);
+        ReleaseStr(sczDontCloseRadioButton);
+
         return hr;
     }
 
@@ -2362,38 +2366,21 @@ private: // privates
         LPWSTR sczRetryButton = NULL;
         LPWSTR sczIgnoreButton = NULL;
         LPWSTR sczExitButton = NULL;
-        LOC_STRING* pLocString = NULL;
 
-        // Get the loc strings for the files-in-use task dialog text.
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+        hr = BalFormatString(m_pFilesInUseTitleLoc->wzText, &sczTitle);
+        BalExitOnFailure(hr, "Failed to format FilesInUseTitle loc string.");
 
-        hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+        hr = BalFormatString(m_pFilesInUseLabelLoc->wzText, &sczLabel);
+        BalExitOnFailure(hr, "Failed to format FilesInUseLabel loc string.");
 
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+        hr = BalFormatString(m_pFilesInUseRetryButtonLoc->wzText, &sczRetryButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseRetryButton loc string.");
 
-        hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
+        hr = BalFormatString(m_pFilesInUseIgnoreButtonLoc->wzText, &sczIgnoreButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseIgnoreButton loc string.");
 
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseRetryButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseRetryButton loc string.");
-
-        hr = StrAllocString(&sczRetryButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseRetryButton loc string.");
-
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseIgnoreButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseIgnoreButton loc string.");
-
-        hr = StrAllocString(&sczIgnoreButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseIgnoreButton loc string.");
-
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseExitButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseExitButton loc string.");
-
-        hr = StrAllocString(&sczExitButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseExitButton loc string.");
+        hr = BalFormatString(m_pFilesInUseExitButtonLoc->wzText, &sczExitButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseExitButton loc string.");
 
         const TASKDIALOG_BUTTON rgButtons[] = {
             { IDRETRY, sczRetryButton },
@@ -2419,6 +2406,12 @@ private: // privates
 #endif
 
     LExit:
+        ReleaseStr(sczTitle);
+        ReleaseStr(sczLabel);
+        ReleaseStr(sczRetryButton);
+        ReleaseStr(sczIgnoreButton);
+        ReleaseStr(sczExitButton);
+
         return hr;
     }
 
@@ -2485,34 +2478,20 @@ private: // privates
         LPWSTR sczLabel = NULL;
         LPWSTR sczNetfxCloseRadioButton = NULL;
         LPWSTR sczDontCloseRadioButton = NULL;
-        LOC_STRING* pLocString = NULL;
         int nButton = 0;
         int nRadioButton = 0;
 
-        // Get the loc strings for the files-in-use task dialog text.
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+        hr = BalFormatString(m_pFilesInUseTitleLoc->wzText, &sczTitle);
+        BalExitOnFailure(hr, "Failed to format FilesInUseTitle loc string.");
 
-        hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+        hr = BalFormatString(m_pFilesInUseLabelLoc->wzText, &sczLabel);
+        BalExitOnFailure(hr, "Failed to format FilesInUseLabel loc string.");
 
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+        hr = BalFormatString(m_pFilesInUseNetfxCloseRadioButtonLoc->wzText, &sczNetfxCloseRadioButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseNetfxCloseRadioButton loc string.");
 
-        hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
-
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseNetfxCloseRadioButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseNetfxCloseRadioButton loc string.");
-
-        hr = StrAllocString(&sczNetfxCloseRadioButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseNetfxCloseRadioButton loc string.");
-
-        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseDontCloseRadioButton)", &pLocString);
-        BalExitOnFailure(hr, "Failed to get FilesInUseDontCloseRadioButton loc string.");
-
-        hr = StrAllocString(&sczDontCloseRadioButton, pLocString->wzText, 0);
-        BalExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
+        hr = BalFormatString(m_pFilesInUseDontCloseRadioButtonLoc->wzText, &sczDontCloseRadioButton);
+        BalExitOnFailure(hr, "Failed to format FilesInUseDontCloseRadioButton loc string.");
 
         const TASKDIALOG_BUTTON rgRadioButtons[] = {
             { IDYES, sczNetfxCloseRadioButton },
@@ -2542,6 +2521,11 @@ private: // privates
 #endif
 
     LExit:
+        ReleaseStr(sczTitle);
+        ReleaseStr(sczLabel);
+        ReleaseStr(sczNetfxCloseRadioButton);
+        ReleaseStr(sczDontCloseRadioButton);
+
         return hr;
     }
 
@@ -2736,6 +2720,8 @@ private:
         hr = LoadLocalization(sczModulePath, m_sczLanguage);
         ExitOnFailure(hr, "Failed to load localization.");
 
+        LoadFilesInUse();
+
         hr = LoadTheme(sczModulePath, m_sczLanguage);
         ExitOnFailure(hr, "Failed to load theme.");
 
@@ -2895,6 +2881,40 @@ private:
         ReleaseStr(sczLocPath);
 
         return hr;
+    }
+
+
+    HRESULT LoadIndividualLocString(
+        __in_z LPCWSTR wzId,
+        __out LOC_STRING** ppLocString
+        )
+    {
+        HRESULT hr = LocGetString(m_pWixLoc, wzId, ppLocString);
+
+        if (E_NOTFOUND == hr)
+        {
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_DEBUG, "WIXSTDBA: Missing loc string '%ls'.", wzId);
+        }
+
+        return hr;
+    }
+
+
+    void LoadFilesInUse()
+    {
+        // Get the loc strings for the files-in-use dialogs.
+        LoadIndividualLocString(L"#(loc.FilesInUseTitle)", &m_pFilesInUseTitleLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseLabel)", &m_pFilesInUseLabelLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseCloseRadioButton)", &m_pFilesInUseCloseRadioButtonLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseDontCloseRadioButton)", &m_pFilesInUseDontCloseRadioButtonLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseRetryButton)", &m_pFilesInUseRetryButtonLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseIgnoreButton)", &m_pFilesInUseIgnoreButtonLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseExitButton)", &m_pFilesInUseExitButtonLoc);
+        LoadIndividualLocString(L"#(loc.FilesInUseNetfxCloseRadioButton)", &m_pFilesInUseNetfxCloseRadioButtonLoc);
+
+        m_fShowRMFilesInUse = m_pFilesInUseTitleLoc && m_pFilesInUseLabelLoc && m_pFilesInUseCloseRadioButtonLoc && m_pFilesInUseDontCloseRadioButtonLoc;
+        m_fShowStandardFilesInUse = m_pFilesInUseTitleLoc && m_pFilesInUseLabelLoc && m_pFilesInUseRetryButtonLoc && m_pFilesInUseIgnoreButtonLoc && m_pFilesInUseExitButtonLoc;
+        m_fShowNetfxFilesInUse = m_pFilesInUseTitleLoc && m_pFilesInUseLabelLoc && m_pFilesInUseNetfxCloseRadioButtonLoc && m_pFilesInUseDontCloseRadioButtonLoc;
     }
 
 
@@ -4631,8 +4651,19 @@ public:
         m_fPrereqInstalled = FALSE;
         m_fPrereqSkipped = FALSE;
 
+        m_fShowStandardFilesInUse = FALSE;
+        m_fShowRMFilesInUse = FALSE;
+        m_fShowNetfxFilesInUse = FALSE;
         m_nLastMsiFilesInUseResult = IDNOACTION;
         m_nLastNetfxFilesInUseResult = IDNOACTION;
+        m_pFilesInUseTitleLoc = NULL;
+        m_pFilesInUseLabelLoc = NULL;
+        m_pFilesInUseCloseRadioButtonLoc = NULL;
+        m_pFilesInUseNetfxCloseRadioButtonLoc = NULL;
+        m_pFilesInUseDontCloseRadioButtonLoc = NULL;
+        m_pFilesInUseRetryButtonLoc = NULL;
+        m_pFilesInUseIgnoreButtonLoc = NULL;
+        m_pFilesInUseExitButtonLoc = NULL;
 
         pEngine->AddRef();
         m_pEngine = pEngine;
@@ -4926,8 +4957,19 @@ private:
     BOOL m_fShowingInternalUiThisPackage;
     BOOL m_fTriedToLaunchElevated;
 
+    BOOL m_fShowStandardFilesInUse;
+    BOOL m_fShowRMFilesInUse;
+    BOOL m_fShowNetfxFilesInUse;
     int m_nLastMsiFilesInUseResult;
     int m_nLastNetfxFilesInUseResult;
+    LOC_STRING* m_pFilesInUseTitleLoc;
+    LOC_STRING* m_pFilesInUseLabelLoc;
+    LOC_STRING* m_pFilesInUseCloseRadioButtonLoc;
+    LOC_STRING* m_pFilesInUseNetfxCloseRadioButtonLoc;
+    LOC_STRING* m_pFilesInUseDontCloseRadioButtonLoc;
+    LOC_STRING* m_pFilesInUseRetryButtonLoc;
+    LOC_STRING* m_pFilesInUseIgnoreButtonLoc;
+    LOC_STRING* m_pFilesInUseExitButtonLoc;
 
     HMODULE m_hBAFModule;
     PFN_BA_FUNCTIONS_PROC m_pfnBAFunctionsProc;

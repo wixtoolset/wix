@@ -30,4 +30,12 @@
   <String Id="FailureCloseButton">&amp;Close</String>
   <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
   <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
+  <String Id="FilesInUseTitle">Files In Use</String>
+  <String Id="FilesInUseLabel">The following applications are using files that need to be updated:</String>
+  <String Id="FilesInUseNetfxCloseRadioButton">Close the &amp;applications.</String>
+  <String Id="FilesInUseCloseRadioButton">Close the &amp;applications and attempt to restart them.</String>
+  <String Id="FilesInUseDontCloseRadioButton">&amp;Do not close applications. A reboot will be required.</String>
+  <String Id="FilesInUseRetryButton">&amp;Retry</String>
+  <String Id="FilesInUseIgnoreButton">&amp;Ignore</String>
+  <String Id="FilesInUseExitButton">E&amp;xit</String>
 </WixLocalization>
