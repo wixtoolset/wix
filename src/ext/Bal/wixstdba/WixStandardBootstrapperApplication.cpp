@@ -1044,7 +1044,7 @@ public: // IBootstrapperApplication
         __in int nRecommendation,
         __in BOOTSTRAPPER_FILES_IN_USE_TYPE source,
         __inout int* pResult
-    )
+        )
     {
      
         if (!m_fShowingInternalUiThisPackage && !m_fPrereq && wzPackageId && *wzPackageId)
@@ -2217,14 +2217,14 @@ private: // privates
         __in DWORD cFiles,
         __in_ecount_z(cFiles) LPCWSTR* rgwzFiles,
         __in BOOTSTRAPPER_FILES_IN_USE_TYPE /*source*/
-    )
+        )
     {
         HRESULT hr = S_OK;
         LPWSTR sczFilesInUse = NULL;
         DWORD_PTR cchLen = 0;
         int nResult = IDERROR;
 
-        // If the user has choosen to ignore on a previously displayed "files in use" page, 
+        // If the user has chosen to ignore on a previously displayed "files in use" page,
         // we will return the same result for other cases. No need to display the page again.
         if (IDIGNORE == m_nLastFilesInUseResult)
         {
@@ -2232,26 +2232,20 @@ private: // privates
         }
         else if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display) // Only show files in use when using full display mode.
         {
-            // Show applications using the files.
-            if (cFiles > 0)
+            // See https://docs.microsoft.com/en-us/windows/win32/msi/sending-messages-to-windows-installer-using-msiprocessmessage for details.
+            for (DWORD i = 1; i < cFiles; i += 2)
             {
-                // See https://msdn.microsoft.com/en-us/library/aa371614%28v=vs.85%29.aspx for details.
-                for (DWORD i = 1; i < cFiles; i += 2)
+                hr = ::StringCchLengthW(rgwzFiles[i], STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
+                BalExitOnFailure(hr, "Failed to calculate length of string.");
+
+                if (cchLen)
                 {
-                    hr = ::StringCchLengthW(rgwzFiles[i], STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
-                    BalExitOnFailure(hr, "Failed to calculate length of string");
-
-                    if (cchLen > 0)
-                    {
-                        hr = StrAllocConcat(&sczFilesInUse, rgwzFiles[i], 0);
-                        BalExitOnFailure(hr, "Failed to concat files in use");
-
-                        hr = StrAllocConcat(&sczFilesInUse, L"\r\n", 2);
-                        BalExitOnFailure(hr, "Failed to concat files in use");
-                    }
+                    hr = StrAllocConcatFormatted(&sczFilesInUse, L"%ls\r\n", rgwzFiles[i]);
+                    BalExitOnFailure(hr, "Failed to concat files in use.");
                 }
             }
 
+            // Show applications using the files.
             hr = ShowFilesInUseDialog(sczFilesInUse, &nResult);
             ExitOnFailure(hr, "Failed to show files-in-use task dialog.");
         }
@@ -2275,7 +2269,7 @@ private: // privates
     int ShowFilesInUseDialog(
         __in_z_opt LPCWSTR sczFilesInUse,
         __out int* pnResult
-    )
+        )
     {
         HRESULT hr = S_OK;
         TASKDIALOGCONFIG config = { };
@@ -2284,6 +2278,8 @@ private: // privates
         LPWSTR sczCloseRadioButton = NULL;
         LPWSTR sczDontCloseRadioButton = NULL;
         LOC_STRING* pLocString = NULL;
+        int nButton = 0;
+        int nRadioButton = 0;
 
         // Get the loc strings for the files-in-use task dialog text.
         hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
@@ -2310,23 +2306,32 @@ private: // privates
         hr = StrAllocString(&sczDontCloseRadioButton, pLocString->wzText, 0);
         ExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
 
-        const TASKDIALOG_BUTTON buttons[] = {
+        const TASKDIALOG_BUTTON rgRadioButtons[] = {
             { IDOK, sczCloseRadioButton },
             { IDIGNORE, sczDontCloseRadioButton },
         };
 
         config.cbSize = sizeof(config);
+        config.hwndParent = m_hWnd;
         config.hInstance = m_hModule;
-        config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_SIZE_TO_CONTENT;
-        config.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+        config.dwFlags = TDF_SIZE_TO_CONTENT | TDF_POSITION_RELATIVE_TO_WINDOW;
+        config.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
         config.pszWindowTitle = sczTitle;
         config.pszMainInstruction = sczLabel;
         config.pszContent = sczFilesInUse ? sczFilesInUse : L"";
-        config.pButtons = buttons;
-        config.cButtons = 2;
+        config.nDefaultButton = IDOK;
+        config.pRadioButtons = rgRadioButtons;
+        config.cRadioButtons = countof(rgRadioButtons);
+        config.nDefaultRadioButton = IDOK;
 
-        hr = TaskDialogIndirect(&config, pnResult, NULL, NULL);
+        hr = ::TaskDialogIndirect(&config, &nButton, &nRadioButton, NULL);
         ExitOnFailure(hr, "Failed to show files-in-use task dialog.");
+
+        *pnResult = IDOK == nButton ? nRadioButton : nButton;
+
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: FilesInUse task dialog result: button - %d, radio button - %d, result - %d", nButton, nRadioButton, *pnResult);
+#endif
 
     LExit:
         return hr;
