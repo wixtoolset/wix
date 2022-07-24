@@ -604,6 +604,8 @@ public: // IBootstrapperApplication
         m_fStartedExecution = FALSE;
         m_dwCalculatedCacheProgress = 0;
         m_dwCalculatedExecuteProgress = 0;
+        m_nLastMsiFilesInUseResult = IDNOACTION;
+        m_nLastNetfxFilesInUseResult = IDNOACTION;
 
         return __super::OnApplyBegin(dwPhaseCount, pfCancel);
     }
@@ -1049,15 +1051,15 @@ public: // IBootstrapperApplication
      
         if (!m_fShowingInternalUiThisPackage && !m_fPrereq && wzPackageId && *wzPackageId)
         {
-            // If this is an MSI package, display the files-in-use dialog.
-            BAL_INFO_PACKAGE* pPackage = NULL;
-            BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "Package %ls has %d applications holding files in use.", wzPackageId, cFiles);
 
-            if (pPackage && BAL_INFO_PACKAGE_TYPE_MSI == pPackage->type)
+            switch (source)
             {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "Package %ls has %d applications holding files in use.", wzPackageId, cFiles);
-
-                return ShowFilesInUse(cFiles, rgwzFiles, source);
+            case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI:
+            case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM:
+                return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+            case BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX:
+                return ShowNetfxFilesInUse(cFiles, rgwzFiles, pResult);
             }
         }
 
@@ -2213,10 +2215,11 @@ private: // privates
     }
 
 
-    int ShowFilesInUse(
+    HRESULT ShowMsiFilesInUse(
         __in DWORD cFiles,
         __in_ecount_z(cFiles) LPCWSTR* rgwzFiles,
-        __in BOOTSTRAPPER_FILES_IN_USE_TYPE /*source*/
+        __in BOOTSTRAPPER_FILES_IN_USE_TYPE source,
+        __inout int* pResult
         )
     {
         HRESULT hr = S_OK;
@@ -2226,9 +2229,9 @@ private: // privates
 
         // If the user has chosen to ignore on a previously displayed "files in use" page,
         // we will return the same result for other cases. No need to display the page again.
-        if (IDIGNORE == m_nLastFilesInUseResult)
+        if (IDIGNORE == m_nLastMsiFilesInUseResult)
         {
-            nResult = m_nLastFilesInUseResult;
+            nResult = m_nLastMsiFilesInUseResult;
         }
         else if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display) // Only show files in use when using full display mode.
         {
@@ -2246,8 +2249,16 @@ private: // privates
             }
 
             // Show applications using the files.
-            hr = ShowFilesInUseDialog(sczFilesInUse, &nResult);
-            ExitOnFailure(hr, "Failed to show files-in-use task dialog.");
+            if (BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM == source)
+            {
+                hr = ShowRestartManagerMsiFilesInUseDialog(sczFilesInUse, &nResult);
+                ExitOnFailure(hr, "Failed to show RM files-in-use dialog.");
+            }
+            else
+            {
+                hr = ShowStandardMsiFilesInUseDialog(sczFilesInUse, &nResult);
+                ExitOnFailure(hr, "Failed to show files-in-use dialog.");
+            }
         }
         else
         {
@@ -2260,13 +2271,14 @@ private: // privates
         ReleaseStr(sczFilesInUse);
 
         // Remember the answer from the user.
-        m_nLastFilesInUseResult = FAILED(hr) ? IDERROR : nResult;
+        m_nLastMsiFilesInUseResult = FAILED(hr) ? IDERROR : nResult;
+        *pResult = m_nLastMsiFilesInUseResult;
 
-        return m_nLastFilesInUseResult;
+        return hr;
     }
 
 
-    int ShowFilesInUseDialog(
+    int ShowRestartManagerMsiFilesInUseDialog(
         __in_z_opt LPCWSTR sczFilesInUse,
         __out int* pnResult
         )
@@ -2283,28 +2295,28 @@ private: // privates
 
         // Get the loc strings for the files-in-use task dialog text.
         hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
-        ExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+        BalExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
 
         hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
-        ExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+        BalExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
 
         hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
-        ExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+        BalExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
 
         hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
-        ExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
+        BalExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
 
         hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseCloseRadioButton)", &pLocString);
-        ExitOnFailure(hr, "Failed to get FilesInUseCloseRadioButton loc string.");
+        BalExitOnFailure(hr, "Failed to get FilesInUseCloseRadioButton loc string.");
 
         hr = StrAllocString(&sczCloseRadioButton, pLocString->wzText, 0);
-        ExitOnFailure(hr, "Failed to copy FilesInUseCloseRadioButton loc string.");
+        BalExitOnFailure(hr, "Failed to copy FilesInUseCloseRadioButton loc string.");
 
         hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseDontCloseRadioButton)", &pLocString);
-        ExitOnFailure(hr, "Failed to get FilesInUseDontCloseRadioButton loc string.");
+        BalExitOnFailure(hr, "Failed to get FilesInUseDontCloseRadioButton loc string.");
 
         hr = StrAllocString(&sczDontCloseRadioButton, pLocString->wzText, 0);
-        ExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
+        BalExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
 
         const TASKDIALOG_BUTTON rgRadioButtons[] = {
             { IDOK, sczCloseRadioButton },
@@ -2325,12 +2337,208 @@ private: // privates
         config.nDefaultRadioButton = IDOK;
 
         hr = ::TaskDialogIndirect(&config, &nButton, &nRadioButton, NULL);
-        ExitOnFailure(hr, "Failed to show files-in-use task dialog.");
+        BalExitOnFailure(hr, "Failed to show RM files-in-use task dialog.");
 
         *pnResult = IDOK == nButton ? nRadioButton : nButton;
 
 #ifdef DEBUG
-        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: FilesInUse task dialog result: button - %d, radio button - %d, result - %d", nButton, nRadioButton, *pnResult);
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: RMFilesInUse task dialog result: button - %d, radio button - %d, result - %d", nButton, nRadioButton, *pnResult);
+#endif
+
+    LExit:
+        return hr;
+    }
+
+
+    int ShowStandardMsiFilesInUseDialog(
+        __in_z_opt LPCWSTR sczFilesInUse,
+        __out int* pnResult
+        )
+    {
+        HRESULT hr = S_OK;
+        TASKDIALOGCONFIG config = { };
+        LPWSTR sczTitle = NULL;
+        LPWSTR sczLabel = NULL;
+        LPWSTR sczRetryButton = NULL;
+        LPWSTR sczIgnoreButton = NULL;
+        LPWSTR sczExitButton = NULL;
+        LOC_STRING* pLocString = NULL;
+
+        // Get the loc strings for the files-in-use task dialog text.
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+
+        hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+
+        hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseRetryButton)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseRetryButton loc string.");
+
+        hr = StrAllocString(&sczRetryButton, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseRetryButton loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseIgnoreButton)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseIgnoreButton loc string.");
+
+        hr = StrAllocString(&sczIgnoreButton, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseIgnoreButton loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseExitButton)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseExitButton loc string.");
+
+        hr = StrAllocString(&sczExitButton, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseExitButton loc string.");
+
+        const TASKDIALOG_BUTTON rgButtons[] = {
+            { IDRETRY, sczRetryButton },
+            { IDIGNORE, sczIgnoreButton },
+            { IDCANCEL, sczExitButton },
+        };
+
+        config.cbSize = sizeof(config);
+        config.hwndParent = m_hWnd;
+        config.hInstance = m_hModule;
+        config.dwFlags = TDF_SIZE_TO_CONTENT | TDF_POSITION_RELATIVE_TO_WINDOW;
+        config.pszWindowTitle = sczTitle;
+        config.pszMainInstruction = sczLabel;
+        config.pszContent = sczFilesInUse ? sczFilesInUse : L"";
+        config.pButtons = rgButtons;
+        config.cButtons = countof(rgButtons);
+
+        hr = ::TaskDialogIndirect(&config, pnResult, NULL, NULL);
+        BalExitOnFailure(hr, "Failed to show files-in-use task dialog.");
+
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: FilesInUse task dialog result: %d", *pnResult);
+#endif
+
+    LExit:
+        return hr;
+    }
+
+
+    HRESULT ShowNetfxFilesInUse(
+        __in DWORD cFiles,
+        __in_ecount_z(cFiles) LPCWSTR* rgwzFiles,
+        __inout int* pResult
+        )
+    {
+        HRESULT hr = S_OK;
+        LPWSTR sczFilesInUse = NULL;
+        DWORD_PTR cchLen = 0;
+        int nResult = IDERROR;
+
+        // If the user has chosen to ignore on a previously displayed "files in use" page,
+        // we will return the same result for other cases. No need to display the page again.
+        if (IDNO == m_nLastNetfxFilesInUseResult)
+        {
+            nResult = m_nLastNetfxFilesInUseResult;
+        }
+        else if (BOOTSTRAPPER_DISPLAY_FULL != m_command.display) // Only show files in use when using full display mode.
+        {
+            nResult = IDYES;
+        }
+        else
+        {
+            for (DWORD i = 0; i < cFiles; ++i)
+            {
+                hr = ::StringCchLengthW(rgwzFiles[i], STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
+                BalExitOnFailure(hr, "Failed to calculate length of string.");
+
+                if (cchLen)
+                {
+                    hr = StrAllocConcatFormatted(&sczFilesInUse, L"%ls\r\n", rgwzFiles[i]);
+                    BalExitOnFailure(hr, "Failed to concat files in use.");
+                }
+            }
+
+            // Show applications using the files.
+            hr = ShowNetfxFilesInUseDialog(sczFilesInUse, &nResult);
+            ExitOnFailure(hr, "Failed to show Netfx files-in-use dialog.");
+        }
+
+    LExit:
+        ReleaseStr(sczFilesInUse);
+
+        // Remember the answer from the user.
+        m_nLastNetfxFilesInUseResult = FAILED(hr) ? IDERROR : nResult;
+        *pResult = m_nLastNetfxFilesInUseResult;
+
+        return hr;
+    }
+
+
+    int ShowNetfxFilesInUseDialog(
+        __in_z_opt LPCWSTR sczFilesInUse,
+        __out int* pnResult
+        )
+    {
+        HRESULT hr = S_OK;
+        TASKDIALOGCONFIG config = { };
+        LPWSTR sczTitle = NULL;
+        LPWSTR sczLabel = NULL;
+        LPWSTR sczNetfxCloseRadioButton = NULL;
+        LPWSTR sczDontCloseRadioButton = NULL;
+        LOC_STRING* pLocString = NULL;
+        int nButton = 0;
+        int nRadioButton = 0;
+
+        // Get the loc strings for the files-in-use task dialog text.
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseTitle)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseTitle loc string.");
+
+        hr = StrAllocString(&sczTitle, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseTitle loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseLabel)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseLabel loc string.");
+
+        hr = StrAllocString(&sczLabel, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseLabel loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseNetfxCloseRadioButton)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseNetfxCloseRadioButton loc string.");
+
+        hr = StrAllocString(&sczNetfxCloseRadioButton, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseNetfxCloseRadioButton loc string.");
+
+        hr = LocGetString(m_pWixLoc, L"#(loc.FilesInUseDontCloseRadioButton)", &pLocString);
+        BalExitOnFailure(hr, "Failed to get FilesInUseDontCloseRadioButton loc string.");
+
+        hr = StrAllocString(&sczDontCloseRadioButton, pLocString->wzText, 0);
+        BalExitOnFailure(hr, "Failed to copy FilesInUseDontCloseRadioButton loc string.");
+
+        const TASKDIALOG_BUTTON rgRadioButtons[] = {
+            { IDYES, sczNetfxCloseRadioButton },
+            { IDNO, sczDontCloseRadioButton },
+        };
+
+        config.cbSize = sizeof(config);
+        config.hwndParent = m_hWnd;
+        config.hInstance = m_hModule;
+        config.dwFlags = TDF_SIZE_TO_CONTENT | TDF_POSITION_RELATIVE_TO_WINDOW;
+        config.dwCommonButtons = TDCBF_RETRY_BUTTON | TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
+        config.pszWindowTitle = sczTitle;
+        config.pszMainInstruction = sczLabel;
+        config.pszContent = sczFilesInUse ? sczFilesInUse : L"";
+        config.nDefaultButton = IDRETRY;
+        config.pRadioButtons = rgRadioButtons;
+        config.cRadioButtons = countof(rgRadioButtons);
+        config.nDefaultRadioButton = IDYES;
+
+        hr = ::TaskDialogIndirect(&config, &nButton, &nRadioButton, NULL);
+        BalExitOnFailure(hr, "Failed to show Netfx files-in-use task dialog.");
+
+        *pnResult = IDOK == nButton ? nRadioButton : nButton;
+
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: NetfxFilesInUse task dialog result: button - %d, radio button - %d, result - %d", nButton, nRadioButton, *pnResult);
 #endif
 
     LExit:
@@ -4423,7 +4631,8 @@ public:
         m_fPrereqInstalled = FALSE;
         m_fPrereqSkipped = FALSE;
 
-        m_nLastFilesInUseResult = IDNOACTION;
+        m_nLastMsiFilesInUseResult = IDNOACTION;
+        m_nLastNetfxFilesInUseResult = IDNOACTION;
 
         pEngine->AddRef();
         m_pEngine = pEngine;
@@ -4717,7 +4926,8 @@ private:
     BOOL m_fShowingInternalUiThisPackage;
     BOOL m_fTriedToLaunchElevated;
 
-    int m_nLastFilesInUseResult;
+    int m_nLastMsiFilesInUseResult;
+    int m_nLastNetfxFilesInUseResult;
 
     HMODULE m_hBAFModule;
     PFN_BA_FUNCTIONS_PROC m_pfnBAFunctionsProc;
