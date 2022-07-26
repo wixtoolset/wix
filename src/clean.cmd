@@ -25,6 +25,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.bootstrappercore.native" rd /s/q "%_NUGET_CA
 if exist "%_NUGET_CACHE%\wixtoolset.burn" rd /s/q "%_NUGET_CACHE%\wixtoolset.burn"
 if exist "%_NUGET_CACHE%\wixtoolset.core" rd /s/q "%_NUGET_CACHE%\wixtoolset.core"
 if exist "%_NUGET_CACHE%\wixtoolset.core.burn" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.burn"
+if exist "%_NUGET_CACHE%\wixtoolset.core.extensioncache" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.extensioncache"
 if exist "%_NUGET_CACHE%\wixtoolset.core.native" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.native"
 if exist "%_NUGET_CACHE%\wixtoolset.core.testpackage" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.testpackage"
 if exist "%_NUGET_CACHE%\wixtoolset.core.windowsinstaller" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.windowsinstaller"
