@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk">
+
+  <ItemGroup>
+    <BindInputPaths Include="." />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <HarvestFileSuppressUniqueIds>true</HarvestFileSuppressUniqueIds>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <HarvestFile Include="HeatFilePackage.wixproj">
+      <ComponentGroupName>ProductComponents</ComponentGroupName>
+      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+    </HarvestFile>
+  </ItemGroup>
+
+  <Import Project="$(HeatTargetsPath)" />
+</Project>

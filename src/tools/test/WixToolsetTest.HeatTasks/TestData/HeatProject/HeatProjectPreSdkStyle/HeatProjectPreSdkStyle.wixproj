@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk">
+
+  <ItemGroup>
+    <BindInputPaths Include="." />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <EnableProjectHarvesting>true</EnableProjectHarvesting>
+    <HarvestProjectsSuppressUniqueIds>true</HarvestProjectsSuppressUniqueIds>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ToolsVersion4Cs\ToolsVersion4Cs.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(HeatTargetsPath)" />
+</Project>

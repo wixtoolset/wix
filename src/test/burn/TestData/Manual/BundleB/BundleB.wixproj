@@ -22,6 +22,7 @@
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" />
     <PackageReference Include="WixToolset.Bal.wixext" />
   </ItemGroup>
   <!-- We do this dynamically to avoid committing so many files to source control. -->

@@ -11,6 +11,9 @@ namespace WixToolsetTest.Sdk
 
     public class MsbuildFixture
     {
+        public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Sdk");
+        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
+
         [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
@@ -26,7 +29,10 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "SimpleBundle.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { "-p:SignOutput=true" });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { 
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SignOutput=true",
+                    });
                 result.AssertSuccess();
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
@@ -66,7 +72,10 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "UncompressedBundle.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { "-p:SignOutput=true" });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SignOutput=true"
+                });
                 result.AssertSuccess();
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
@@ -106,7 +115,9 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "SimpleMergeModule.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                });
                 result.AssertSuccess();
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
@@ -142,7 +153,10 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { "-p:SignOutput=true" });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SignOutput=true"
+                });
                 result.AssertSuccess();
 
                 var platformSwitches = result.Output.Where(line => line.Contains("-platform x86"));
@@ -208,7 +222,9 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MergeMsiPackage.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                });
                 result.AssertSuccess();
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
@@ -270,6 +286,7 @@ namespace WixToolsetTest.Sdk
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     wixpdbType == null ? String.Empty : $"-p:WixPdbType={wixpdbType}",
                     "-p:SuppressValidation=true"
                 });
@@ -300,6 +317,7 @@ namespace WixToolsetTest.Sdk
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     $"-p:Platform=x64",
                 });
                 result.AssertSuccess();
@@ -337,6 +355,7 @@ namespace WixToolsetTest.Sdk
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "SuppressIces", "ICE12"),
                 }, suppressValidation: false);
                 result.AssertSuccess();
@@ -360,6 +379,7 @@ namespace WixToolsetTest.Sdk
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "SuppressSpecificWarnings", "1118;1102"),
                 });
                 result.AssertSuccess();
@@ -389,6 +409,7 @@ namespace WixToolsetTest.Sdk
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     "-p:OutputType=IntermediatePostLink",
                 }, outOfProc: outOfProc);
                 result.AssertSuccess();
@@ -418,7 +439,9 @@ namespace WixToolsetTest.Sdk
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
                 // Build
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, verbosityLevel: "diag");
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                }, verbosityLevel: "diag");
                 result.AssertSuccess();
 
                 var buildOutput = String.Join("\r\n", result.Output);
@@ -432,6 +455,7 @@ namespace WixToolsetTest.Sdk
                 // Clean
                 result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     "-t:Clean",
                 }, verbosityLevel: "diag");
                 result.AssertSuccess();
@@ -477,7 +501,7 @@ namespace WixToolsetTest.Sdk
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixToolDir", Path.Combine(MsbuildUtilities.WixMsbuildPath, "broken", "net461")),
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixToolDir", Path.Combine(MsbuildFixture.WixMsbuildPath, "broken", "net461")),
                 }, outOfProc: true);
                 Assert.Equal(1, result.ExitCode);
 

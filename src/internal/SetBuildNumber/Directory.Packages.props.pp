@@ -28,6 +28,8 @@
     <PackageVersion Include="WixToolset.Core.WindowsInstaller" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Core.TestPackage" Version="{packageversion}" />
 
+    <PackageVersion Include="WixToolset.Heat" Version="{packageversion}" />
+
     <PackageVersion Include="WixToolset.Bal.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dependency.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.NetFx.wixext" Version="{packageversion}" />

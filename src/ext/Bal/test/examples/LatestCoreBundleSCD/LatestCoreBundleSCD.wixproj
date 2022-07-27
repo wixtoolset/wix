@@ -7,4 +7,8 @@
             <Transforms>ba.xslt</Transforms>
         </HarvestDirectory>
     </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="WixToolset.Heat" />
+    </ItemGroup>
 </Project>
