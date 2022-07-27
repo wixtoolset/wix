@@ -39,7 +39,7 @@ namespace WixToolset.Core.TestPackage
         {
             var result = new ExtractBAContainerResult();
             Directory.CreateDirectory(tempFolderPath);
-            using (var burnReader = BurnReader.Open(messaging, bundleFilePath))
+            using (var burnReader = BurnReader.Open(messaging, new TestFileSystem(), bundleFilePath))
             {
                 result.Success = burnReader.ExtractUXContainer(baFolderPath, tempFolderPath);
 
@@ -137,6 +137,21 @@ namespace WixToolset.Core.TestPackage
             var document = new XmlDocument();
             document.Load(Path.Combine(baFolderPath, "manifest.xml"));
             return document;
+        }
+
+        private class TestFileSystem : IFileSystem
+        {
+            public void CopyFile(string source, string destination, bool allowHardlink)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(destination));
+                File.Copy(source, destination);
+            }
+
+            public void MoveFile(string source, string destination)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(destination));
+                File.Move(source, destination);
+            }
         }
     }
 }

@@ -21,9 +21,12 @@ namespace WixToolset.Core
         internal LayoutCreator(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         public void Layout(ILayoutContext context)
         {
@@ -42,7 +45,7 @@ namespace WixToolset.Core
                 {
                     this.Messaging.Write(VerboseMessages.LayingOutMedia());
 
-                    var command = new TransferFilesCommand(this.Messaging, context.Extensions, context.FileTransfers, context.ResetAcls);
+                    var command = new TransferFilesCommand(this.Messaging, this.FileSystem, context.Extensions, context.FileTransfers, context.ResetAcls);
                     command.Execute();
                 }
 

@@ -16,9 +16,12 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         public ValidateSubcommand(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private string DatabasePath { get; set; }
 
@@ -76,7 +79,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 data = WindowsInstallerData.Load(this.WixpdbPath);
             }
 
-            var command = new ValidateDatabaseCommand(this.Messaging, this.IntermediateFolder, this.DatabasePath, data, this.CubeFiles, this.Ices, this.SuppressIces);
+            var command = new ValidateDatabaseCommand(this.Messaging, this.FileSystem, this.IntermediateFolder, this.DatabasePath, data, this.CubeFiles, this.Ices, this.SuppressIces);
             command.Execute();
 
             return Task.FromResult(this.Messaging.EncounteredError ? 1 : 0);

@@ -15,19 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Core.Native\WixToolset.Core.Native.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="WixToolset.Data" />
     <PackageReference Include="WixToolset.Extensibility" />
   </ItemGroup>
 
-  <!--
-    These package references are duplicated in WixToolset.Core.TestPackage.csproj. If
-    you update these here, be sure to update them there.
-  -->
   <ItemGroup>
+    <PackageReference Include="System.IO.FileSystem.AccessControl" />
     <PackageReference Include="System.Text.Encoding.CodePages" />
     <PackageReference Include="NuGet.Versioning" />
   </ItemGroup>

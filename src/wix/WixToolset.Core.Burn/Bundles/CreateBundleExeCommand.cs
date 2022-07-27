@@ -9,7 +9,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Xml;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
@@ -19,9 +18,10 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBundleExeCommand
     {
-        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
+        public CreateBundleExeCommand(IMessaging messaging, IFileSystem fileSystem, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
         {
             this.Messaging = messaging;
+            this.FileSystem = fileSystem;
             this.BackendHelper = backendHelper;
             this.IntermediateFolder = intermediateFolder;
             this.OutputPath = outputPath;
@@ -34,6 +34,8 @@ namespace WixToolset.Core.Burn.Bundles
         public IFileTransfer Transfer { get; private set; }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -68,7 +70,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Transfer = this.BackendHelper.CreateFileTransfer(bundleTempPath, this.OutputPath, true, this.BundleSymbol.SourceLineNumbers);
 
-            FileSystem.CopyFile(stubFile, bundleTempPath, allowHardlink: false);
+            this.FileSystem.CopyFile(stubFile, bundleTempPath, allowHardlink: false);
             File.SetAttributes(bundleTempPath, FileAttributes.Normal);
 
             var fourPartVersion = this.GetFourPartVersion(this.BundleSymbol);

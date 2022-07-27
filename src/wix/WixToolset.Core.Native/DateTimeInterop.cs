@@ -20,8 +20,8 @@ namespace WixToolset.Core.Native
         {
             // dateTime.ToLocalTime() does not match FileTimeToLocalFileTime() for some reason.
             // so we need to call FileTimeToLocalFileTime() from kernel32.dll.
-            long filetime = dateTime.ToFileTime();
-            long localTime = 0;
+            var filetime = dateTime.ToFileTime();
+            var localTime = 0L;
             FileTimeToLocalFileTime(ref filetime, ref localTime);
             FileTimeToDosDateTime(ref localTime, out cabDate, out cabTime);
         }

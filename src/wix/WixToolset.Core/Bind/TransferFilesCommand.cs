@@ -5,7 +5,7 @@ namespace WixToolset.Core.Bind
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using WixToolset.Core.Native;
+    using System.Security.AccessControl;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -13,15 +13,18 @@ namespace WixToolset.Core.Bind
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool resetAcls)
+        public TransferFilesCommand(IMessaging messaging, IFileSystem fileSystem, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool resetAcls)
         {
             this.Extensions = extensions;
             this.Messaging = messaging;
+            this.FileSystem = fileSystem;
             this.FileTransfers = fileTransfers;
             this.ResetAcls = resetAcls;
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IEnumerable<ILayoutExtension> Extensions { get; }
 
@@ -158,7 +161,7 @@ namespace WixToolset.Core.Bind
             {
                 try
                 {
-                    FileSystem.ResetAcls(destinationFiles);
+                    this.AclReset(destinationFiles);
                 }
                 catch (Exception e)
                 {
@@ -177,7 +180,7 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            FileSystem.CopyFile(source, destination, allowHardlink: true);
+            this.FileSystem.CopyFile(source, destination, allowHardlink: true);
         }
 
         private void MoveFile(string source, string destination)
@@ -190,7 +193,19 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            FileSystem.MoveFile(source, destination);
+            this.FileSystem.MoveFile(source, destination);
+        }
+
+        private void AclReset(IEnumerable<string> files)
+        {
+            var aclReset = new FileSecurity();
+            aclReset.SetAccessRuleProtection(false, false);
+
+            foreach (var file in files)
+            {
+                var fileInfo = new FileInfo(file);
+                ExtensibilityServices.FileSystem.ActionWithRetries(() => fileInfo.SetAccessControl(aclReset));
+            }
         }
     }
 }

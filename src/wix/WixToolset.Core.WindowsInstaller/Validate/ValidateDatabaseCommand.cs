@@ -18,9 +18,10 @@ namespace WixToolset.Core.WindowsInstaller.Validate
         // Set of ICEs that have equivalent-or-better checks in WiX.
         private static readonly string[] WellKnownSuppressedIces = new[] { "ICE08", "ICE33", "ICE47", "ICE66" };
 
-        public ValidateDatabaseCommand(IMessaging messaging, string intermediateFolder, string databasePath, WindowsInstallerData data, IEnumerable<string> cubeFiles, IEnumerable<string> ices, IEnumerable<string> suppressedIces)
+        public ValidateDatabaseCommand(IMessaging messaging, IFileSystem fileSystem, string intermediateFolder, string databasePath, WindowsInstallerData data, IEnumerable<string> cubeFiles, IEnumerable<string> ices, IEnumerable<string> suppressedIces)
         {
             this.Messaging = messaging;
+            this.FileSystem = fileSystem;
             this.Data = data;
             this.DatabasePath = databasePath;
             this.CubeFiles = cubeFiles;
@@ -39,6 +40,8 @@ namespace WixToolset.Core.WindowsInstaller.Validate
         public bool EncounteredError => this.Messaging.EncounteredError;
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private WindowsInstallerData Data { get; }
 
@@ -71,7 +74,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
             var workingDatabasePath = Path.Combine(this.IntermediateFolder, workingDatabaseFilename);
             try
             {
-                FileSystem.CopyFile(this.DatabasePath, workingDatabasePath, allowHardlink: false);
+                this.FileSystem.CopyFile(this.DatabasePath, workingDatabasePath, allowHardlink: false);
 
                 var attributes = File.GetAttributes(workingDatabasePath);
                 File.SetAttributes(workingDatabasePath, attributes & ~FileAttributes.ReadOnly);

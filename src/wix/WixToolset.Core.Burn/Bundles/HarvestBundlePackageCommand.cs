@@ -18,6 +18,7 @@ namespace WixToolset.Core.Burn.Bundles
         public HarvestBundlePackageCommand(IServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, string intermediateFolder, WixBundlePayloadSymbol payloadSymbol, WixBundleBundlePackagePayloadSymbol packagePayloadSymbol, Dictionary<string, WixBundlePayloadSymbol> packagePayloadsById)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
             this.BackendExtensions = backendExtensions;
             this.IntermediateFolder = intermediateFolder;
@@ -28,6 +29,8 @@ namespace WixToolset.Core.Burn.Bundles
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -66,7 +69,7 @@ namespace WixToolset.Core.Burn.Bundles
             var sourcePath = this.PackagePayload.SourceFile.Path;
             var sourceLineNumbers = this.PackagePayload.SourceLineNumbers;
 
-            using (var burnReader = BurnReader.Open(this.Messaging, sourcePath))
+            using (var burnReader = BurnReader.Open(this.Messaging, this.FileSystem, sourcePath))
             {
                 if (burnReader.Invalid)
                 {

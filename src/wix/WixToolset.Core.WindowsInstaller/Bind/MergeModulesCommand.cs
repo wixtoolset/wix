@@ -71,10 +71,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 merge = MsmInterop.GetMsmMerge();
 
-                FileSystem.ActionWithRetries(() => merge.OpenLog(logPath));
+                ActionWithRetries(() => merge.OpenLog(logPath));
                 logOpen = true;
 
-                FileSystem.ActionWithRetries(() => merge.OpenDatabase(this.OutputPath));
+                ActionWithRetries(() => merge.OpenDatabase(this.OutputPath));
                 databaseOpen = true;
 
                 var featureModulesByMergeId = this.Section.Symbols.OfType<WixFeatureModulesSymbol>().GroupBy(t => t.WixMergeRef).ToDictionary(g => g.Key);
@@ -99,7 +99,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
 
                         this.Messaging.Write(VerboseMessages.OpeningMergeModule(wixMergeRow.SourceFile, mergeLanguage));
-                        FileSystem.ActionWithRetries(() => merge.OpenModule(wixMergeRow.SourceFile, mergeLanguage));
+                        ActionWithRetries(() => merge.OpenModule(wixMergeRow.SourceFile, mergeLanguage));
                         moduleOpen = true;
 
                         trackedFiles.Add(this.BackendHelper.TrackFile(wixMergeRow.SourceFile, TrackedFileType.Input, wixMergeRow.SourceLineNumbers));
@@ -339,6 +339,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             this.TrackedFiles = trackedFiles;
+        }
+
+        internal static void ActionWithRetries(Action action, int maxRetries = 3)
+        {
+            for (var attempt = 1; attempt <= maxRetries; ++attempt)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch when (attempt < maxRetries)
+                {
+                    Thread.Sleep(250);
+                }
+            }
         }
     }
 }

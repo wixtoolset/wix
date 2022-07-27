@@ -28,6 +28,7 @@ namespace WixToolset.Core.Burn
             this.ServiceProvider = context.ServiceProvider;
 
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+            this.FileSystem = context.ServiceProvider.GetService<IFileSystem>();
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
             this.InternalBurnBackendHelper = context.ServiceProvider.GetService<IInternalBurnBackendHelper>();
@@ -48,6 +49,8 @@ namespace WixToolset.Core.Burn
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -507,7 +510,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationDllSymbol, bundleSymbol, uxContainer, containers.Values);
+                var command = new CreateBundleExeCommand(this.Messaging, this.FileSystem, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationDllSymbol, bundleSymbol, uxContainer, containers.Values);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);
