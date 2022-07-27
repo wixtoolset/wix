@@ -27,16 +27,19 @@ namespace WixToolset.Core.Burn.Bundles
 
         private BinaryReader binaryReader;
         private readonly List<DictionaryEntry> attachedContainerPayloadNames;
+        private readonly IFileSystem fileSystem;
 
         /// <summary>
         /// Creates a BurnReader for reading a PE file.
         /// </summary>
-        /// <param name="messaging"></param>
+        /// <param name="messaging">Messaging.</param>
+        /// <param name="fileSystem">File system.</param>
         /// <param name="fileExe">File to read.</param>
-        private BurnReader(IMessaging messaging, string fileExe)
+        private BurnReader(IMessaging messaging, IFileSystem fileSystem, string fileExe)
             : base(messaging, fileExe)
         {
             this.attachedContainerPayloadNames = new List<DictionaryEntry>();
+            this.fileSystem = fileSystem;
         }
 
         /// <summary>
@@ -47,13 +50,14 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Opens a Burn reader.
         /// </summary>
-        /// <param name="messaging"></param>
+        /// <param name="messaging">Messaging.</param>
+        /// <param name="fileSystem">File system.</param>
         /// <param name="fileExe">Path to file.</param>
         /// <returns>Burn reader.</returns>
-        public static BurnReader Open(IMessaging messaging, string fileExe)
+        public static BurnReader Open(IMessaging messaging, IFileSystem fileSystem, string fileExe)
         {
             var binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
-            var reader = new BurnReader(messaging, fileExe)
+            var reader = new BurnReader(messaging, fileSystem, fileExe)
             {
                 binaryReader = binaryReader,
             };
@@ -96,8 +100,7 @@ namespace WixToolset.Core.Burn.Bundles
             var cabinet = new Cabinet(tempCabPath);
             cabinet.Extract(outputDirectory);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(manifestPath));
-            FileSystem.MoveFile(manifestOriginalPath, manifestPath);
+            this.fileSystem.MoveFile(manifestOriginalPath, manifestPath);
 
             var document = new XmlDocument();
             document.Load(manifestPath);
@@ -114,8 +117,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var sourcePath = Path.Combine(outputDirectory, sourcePathNode.Value);
                 var destinationPath = Path.Combine(outputDirectory, filePathNode.Value);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
-                FileSystem.MoveFile(sourcePath, destinationPath);
+                this.fileSystem.MoveFile(sourcePath, destinationPath);
             }
 
             foreach (XmlNode payload in payloads)
@@ -183,8 +185,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var sourcePath = Path.Combine(outputDirectory, (string)entry.Key);
                 var destinationPath = Path.Combine(outputDirectory, (string)entry.Value);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
-                FileSystem.MoveFile(sourcePath, destinationPath);
+                this.fileSystem.MoveFile(sourcePath, destinationPath);
             }
 
             return true;

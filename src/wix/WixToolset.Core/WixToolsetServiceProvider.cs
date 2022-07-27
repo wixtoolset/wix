@@ -27,6 +27,7 @@ namespace WixToolset.Core
             this.AddService((provider, singletons) => AddSingleton<ILayoutServices>(singletons, new LayoutServices(provider)));
             this.AddService((provider, singletons) => AddSingleton<IBackendHelper>(singletons, new BackendHelper(provider)));
             this.AddService((provider, singletons) => AddSingleton<IPathResolver>(singletons, new PathResolver()));
+            this.AddService((provider, singletons) => AddSingleton<IFileSystem>(singletons, new FileSystem()));
             this.AddService((provider, singletons) => AddSingleton<IWixBranding>(singletons, new WixBranding()));
 
             // Transients.

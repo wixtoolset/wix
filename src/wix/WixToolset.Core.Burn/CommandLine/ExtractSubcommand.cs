@@ -7,20 +7,19 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Bundles;
-    using WixToolset.Core.Burn.Inscribe;
     using WixToolset.Extensibility.Services;
 
     internal class ExtractSubcommand : BurnSubcommandBase
     {
         public ExtractSubcommand(IServiceProvider serviceProvider)
         {
-            this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
-
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private string InputPath { get; set; }
 
@@ -49,7 +48,7 @@ namespace WixToolset.Core.Burn.CommandLine
 
             var uxExtractPath = Path.Combine(this.ExtractPath, "BA");
 
-            using (var reader = BurnReader.Open(this.Messaging, this.InputPath))
+            using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputPath))
             {
                 reader.ExtractUXContainer(uxExtractPath, this.IntermediateFolder);
 

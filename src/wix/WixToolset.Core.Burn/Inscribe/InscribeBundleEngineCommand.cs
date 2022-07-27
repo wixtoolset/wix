@@ -5,7 +5,6 @@ namespace WixToolset.Core.Burn.Inscribe
     using System;
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
-    using WixToolset.Core.Native;
     using WixToolset.Extensibility.Services;
 
     internal class InscribeBundleEngineCommand
@@ -13,12 +12,15 @@ namespace WixToolset.Core.Burn.Inscribe
         public InscribeBundleEngineCommand(IServiceProvider serviceProvider, string inputPath, string outputPath, string intermediateFolder)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
             this.IntermediateFolder = intermediateFolder;
             this.InputFilePath = inputPath;
             this.OutputFile = outputPath;
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private string IntermediateFolder { get; }
 
@@ -30,7 +32,7 @@ namespace WixToolset.Core.Burn.Inscribe
         {
             var tempFile = Path.Combine(this.IntermediateFolder, "bundle_engine_unsigned.exe");
 
-            using (var reader = BurnReader.Open(this.Messaging, this.InputFilePath))
+            using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputFilePath))
             using (var writer = File.Open(tempFile, FileMode.Create, FileAccess.Write, FileShare.Read | FileShare.Delete))
             {
                 reader.Stream.Seek(0, SeekOrigin.Begin);
@@ -56,9 +58,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 // TODO: update writer with detached container signatures.
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(this.OutputFile));
-
-            FileSystem.MoveFile(tempFile, this.OutputFile);
+            this.FileSystem.MoveFile(tempFile, this.OutputFile);
         }
     }
 }

@@ -5,7 +5,6 @@ namespace WixToolset.Core.Burn.Inscribe
     using System;
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
-    using WixToolset.Core.Native;
     using WixToolset.Extensibility.Services;
 
     internal class InscribeBundleCommand
@@ -13,6 +12,7 @@ namespace WixToolset.Core.Burn.Inscribe
         public InscribeBundleCommand(IServiceProvider serviceProvider, string inputPath, string signedEngineFile, string outputPath, string intermediateFolder)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
             this.IntermediateFolder = intermediateFolder;
             this.InputFilePath = inputPath;
             this.SignedEngineFile = signedEngineFile;
@@ -20,6 +20,8 @@ namespace WixToolset.Core.Burn.Inscribe
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private string IntermediateFolder { get; }
 
@@ -34,9 +36,9 @@ namespace WixToolset.Core.Burn.Inscribe
             var inscribed = false;
             var tempFile = Path.Combine(this.IntermediateFolder, "~bundle_engine_signed.exe");
 
-            using (var reader = BurnReader.Open(this.Messaging, this.InputFilePath))
+            using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputFilePath))
             {
-                FileSystem.CopyFile(this.SignedEngineFile, tempFile, allowHardlink: false);
+                this.FileSystem.CopyFile(this.SignedEngineFile, tempFile, allowHardlink: false);
 
                 using (var writer = BurnWriter.Open(this.Messaging, tempFile))
                 {
@@ -44,9 +46,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 }
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(this.OutputFile));
-
-            FileSystem.MoveFile(tempFile, this.OutputFile);
+            this.FileSystem.MoveFile(tempFile, this.OutputFile);
 
             return inscribed;
         }

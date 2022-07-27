@@ -1,26 +1,16 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.Native
+namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Runtime.InteropServices;
-    using System.Security.AccessControl;
     using System.Threading;
+    using WixToolset.Extensibility.Services;
 
-    /// <summary>
-    /// File system helpers.
-    /// </summary>
-    public static class FileSystem
+    internal class FileSystem : IFileSystem
     {
-        /// <summary>
-        /// Copies a file.
-        /// </summary>
-        /// <param name="source">The file to copy.</param>
-        /// <param name="destination">The destination file.</param>
-        /// <param name="allowHardlink">Allow hardlinks.</param>
-        public static void CopyFile(string source, string destination, bool allowHardlink)
+        public void CopyFile(string source, string destination, bool allowHardlink)
         {
             EnsureDirectoryWithoutFile(destination);
 
@@ -41,32 +31,11 @@ namespace WixToolset.Core.Native
             }
         }
 
-        /// <summary>
-        /// Moves a file.
-        /// </summary>
-        /// <param name="source">The file to move.</param>
-        /// <param name="destination">The destination file.</param>
-        public static void MoveFile(string source, string destination)
+        public void MoveFile(string source, string destination)
         {
             EnsureDirectoryWithoutFile(destination);
 
             ActionWithRetries(() => File.Move(source, destination));
-        }
-
-        /// <summary>
-        /// Reset the ACLs on a set of files.
-        /// </summary>
-        /// <param name="files">The list of file paths to set ACLs.</param>
-        public static void ResetAcls(IEnumerable<string> files)
-        {
-            var aclReset = new FileSecurity();
-            aclReset.SetAccessRuleProtection(false, false);
-
-            foreach (var file in files)
-            {
-                var fileInfo = new FileInfo(file);
-                ActionWithRetries(() => fileInfo.SetAccessControl(aclReset));
-            }
         }
 
         /// <summary>
@@ -76,7 +45,7 @@ namespace WixToolset.Core.Native
         /// </summary>
         /// <param name="action">Action to execute.</param>
         /// <param name="maxRetries">Maximum retry attempts.</param>
-        public static void ActionWithRetries(Action action, int maxRetries = 3)
+        internal static void ActionWithRetries(Action action, int maxRetries = 3)
         {
             for (var attempt = 1; attempt <= maxRetries; ++attempt)
             {
