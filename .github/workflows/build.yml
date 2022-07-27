@@ -9,6 +9,10 @@ on:
     branches:
       - master
       - develop
+  workflow_dispatch:
+    inputs:
+      tags:
+        manual: true
 
 env:
   DOTNET_NOLOGO: true
