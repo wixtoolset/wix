@@ -2,13 +2,9 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Project>
-  <PropertyGroup>
-    <SegmentName>tools</SegmentName>
-  </PropertyGroup>
-
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup>
-    <PublishRoot>$(OutputPath)publish\</PublishRoot>
+    <OutputPath>$(OutputPath)test\$(ProjectName)</OutputPath>
   </PropertyGroup>
 </Project>

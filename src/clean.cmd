@@ -39,6 +39,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.dtf.resources" rd /s/q "%_NUGET_CACHE%\wixto
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.windowsinstaller" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.windowsinstaller"
 if exist "%_NUGET_CACHE%\wixtoolset.dutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.dutil"
 if exist "%_NUGET_CACHE%\wixtoolset.extensibility" rd /s/q "%_NUGET_CACHE%\wixtoolset.extensibility"
+if exist "%_NUGET_CACHE%\wixtoolset.heat" rd /s/q "%_NUGET_CACHE%\wixtoolset.heat"
 if exist "%_NUGET_CACHE%\wixtoolset.mba.core" rd /s/q "%_NUGET_CACHE%\wixtoolset.mba.core"
 if exist "%_NUGET_CACHE%\wixtoolset.netfx.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.netfx.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.sdk" rd /s/q "%_NUGET_CACHE%\wixtoolset.sdk"

@@ -2,8 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
-  <Import Project="..\..\Directory.Build.props" />
+<Project Sdk="Microsoft.Build.Traversal">
 
   <PropertyGroup>
     <EarliestCoreMBAProjectPath>EarliestCoreMBA\Example.EarliestCoreMBA.csproj</EarliestCoreMBAProjectPath>
@@ -28,14 +27,12 @@
       <SkipFDDx86>true</SkipFDDx86>
       <SkipSCD>true</SkipSCD>
     </CoreMBAProject>
-    
+
     <FullMBAProject Include="$(FullFramework2MBAProjectPath)" />
     <FullMBAProject Include="$(FullFramework4MBAProjectPath)" />
-    
-    <ExampleBundleProject Include="**\*.wixproj" />
   </ItemGroup>
 
-  <Target Name="PublishCoreExamples">
+  <Target Name="PublishCoreExamples" BeforeTargets="Build">
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd-x86" -r win-x86 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.SkipFDDx86)'==''" />
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x64 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
@@ -46,9 +43,7 @@
           Condition="'%(CoreMBAProject.TrimMode)'!=''" />
   </Target>
 
-  <Target Name="Build" DependsOnTargets="PublishCoreExamples">
-    <MSBuild Projects="%(ExampleBundleProject.Identity)" />
-  </Target>
-  
-  <Import Project="..\..\..\..\Directory.Build.targets" />
+  <ItemGroup>
+    <ProjectReference Include="**\*.wixproj" />
+  </ItemGroup>
 </Project>

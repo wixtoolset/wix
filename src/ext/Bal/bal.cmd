@@ -22,7 +22,7 @@ msbuild -p:Configuration=%_C% || exit /b
 
 dotnet test test\WixToolsetTest.Dnc.HostGenerator -c %_C% --nologo --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Dnc.HostGenerator.trx" || exit /b
 
-msbuild -p:Configuration=%_C% test\examples\examples.proj || exit /b
+msbuild -Restore -p:Configuration=%_C% test\examples\examples.proj -bl || exit /b
 
 :: Test
 dotnet test test\WixToolsetTest.Bal -c %_C% --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Bal.trx" || exit /b

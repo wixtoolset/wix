@@ -34,7 +34,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <WixHarvestTargetsPath Condition=" '$(WixHarvestTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.harvest.targets</WixHarvestTargetsPath>
     <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(MSBuildThisFileDirectory)WixToolset.Signing.targets</WixSigningTargetsPath>
   </PropertyGroup>
 
@@ -966,7 +965,6 @@
     -->
   </Target>
 
-  <Import Project="$(WixHarvestTargetsPath)" Condition=" '$(WixHarvestTargetsPath)' != '' and Exists('$(WixHarvestTargetsPath)')" />
   <Import Project="$(WixSigningTargetsPath)"  />
 
   <!-- Extension point: Define CustomAfterWixTargets to a .targets file that you want to include after this file. -->

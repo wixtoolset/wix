@@ -13,7 +13,6 @@
   <ItemGroup>
     <Content Include="build\$(MSBuildThisFileName).props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="build\$(MSBuildThisFileName).targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="tools\wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\WixToolset.Signing.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\wix.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\wix.targets" CopyToOutputDirectory="PreserveNewest" />

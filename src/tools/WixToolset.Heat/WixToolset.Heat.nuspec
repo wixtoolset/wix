@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+  </metadata>
+
+  <files>
+    <file src="$projectFolder$\$id$.targets" target="build" />
+    <file src="tools\**\*" target="tools" />
+  </files>
+</package>
