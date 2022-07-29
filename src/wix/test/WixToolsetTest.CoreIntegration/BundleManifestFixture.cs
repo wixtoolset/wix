@@ -21,7 +21,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var bundlePath = Path.Combine(baseFolder, "bin", "test.exe");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 

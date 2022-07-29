@@ -192,7 +192,7 @@ namespace WixToolset.Core.Burn.Bundles
                     string dpiAwarenessValue = null;
                     string gdiScalingValue = null;
 
-                    switch(bootstrapperApplicationSymbol.DpiAwareness)
+                    switch (bootstrapperApplicationSymbol.DpiAwareness)
                     {
                         case WixBootstrapperApplicationDpiAwarenessType.GdiScaled:
                             gdiScalingValue = "true";
