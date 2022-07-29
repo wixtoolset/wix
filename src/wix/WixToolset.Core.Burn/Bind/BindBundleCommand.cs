@@ -41,7 +41,6 @@ namespace WixToolset.Core.Burn
             this.Output = context.IntermediateRepresentation;
             this.OutputPath = context.OutputPath;
             this.OutputPdbPath = context.PdbPath;
-            //this.VariableResolver = context.VariableResolver;
 
             this.BackendExtensions = backedExtensions;
         }
@@ -73,8 +72,6 @@ namespace WixToolset.Core.Burn
         private string OutputPdbPath { get; }
 
         private string IntermediateFolder { get; }
-
-        private IVariableResolver VariableResolver { get; }
 
         public IReadOnlyCollection<IFileTransfer> FileTransfers { get; private set; }
 
