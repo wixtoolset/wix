@@ -906,7 +906,7 @@ static void RevealNulls(
 
 
 /********************************************************************
-WcaGetRecordFormattedString() - gets formatted string filed from record
+WcaGetRecordFormattedString() - gets formatted string field from record
 
 ********************************************************************/
 extern "C" HRESULT WIXAPI WcaGetRecordFormattedString(
@@ -1253,11 +1253,11 @@ extern "C" void WIXAPI RevertCustomActionData(
 }
 
 /********************************************************************
-WcaReadStringFromCaData() - reads a string out of the CustomActionData
+WcaReadStringFromCaDataImpl() - reads a string out of the CustomActionData
 
 NOTE: this modifies the passed in ppwzCustomActionData variable
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaReadStringFromCaData(
+extern "C" HRESULT WIXAPI WcaReadStringFromCaDataImpl(
     __deref_in LPWSTR* ppwzCustomActionData,
     __deref_out_z LPWSTR* ppwzString
     )
@@ -1278,11 +1278,11 @@ LExit:
 
 
 /********************************************************************
-WcaReadIntegerFromCaData() - reads an integer out of the CustomActionData
+WcaReadIntegerFromCaDataImpl() - reads an integer out of the CustomActionData
 
 NOTE: this modifies the passed in ppwzCustomActionData variable
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaReadIntegerFromCaData(
+extern "C" HRESULT WIXAPI WcaReadIntegerFromCaDataImpl(
     __deref_in LPWSTR* ppwzCustomActionData,
     __out int* piResult
     )
@@ -1297,12 +1297,12 @@ extern "C" HRESULT WIXAPI WcaReadIntegerFromCaData(
 
 
 /********************************************************************
-WcaReadStreamFromCaData() - reads a stream out of the CustomActionData
+WcaReadStreamFromCaDataImpl() - reads a stream out of the CustomActionData
 
 NOTE: this modifies the passed in ppwzCustomActionData variable
 NOTE: returned stream should be freed with WcaFreeStream()
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaReadStreamFromCaData(
+extern "C" HRESULT WIXAPI WcaReadStreamFromCaDataImpl(
     __deref_in LPWSTR* ppwzCustomActionData,
     __deref_out_bcount(*pcbData) BYTE** ppbData,
     __out DWORD_PTR* pcbData
@@ -1321,13 +1321,12 @@ LExit:
     return hr;
 }
 
-
 /********************************************************************
-WcaWriteStringToCaData() - adds a string to the CustomActionData to
+WcaWriteStringToCaDataImpl() - adds a string to the CustomActionData to
 feed a deferred CustomAction
 
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaWriteStringToCaData(
+extern "C" HRESULT WIXAPI WcaWriteStringToCaDataImpl(
     __in_z LPCWSTR wzString,
     __deref_inout_z_opt LPWSTR* ppwzCustomActionData
     )
@@ -1381,28 +1380,33 @@ LExit:
 
 
 /********************************************************************
-WcaWriteIntegerToCaData() - adds an integer to the CustomActionData to
+WcaWriteIntegerToCaDataImpl() - adds an integer to the CustomActionData to
 feed a deferred CustomAction
 
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaWriteIntegerToCaData(
+extern "C" HRESULT WIXAPI WcaWriteIntegerToCaDataImpl(
     __in int i,
     __deref_out_z_opt LPWSTR* ppwzCustomActionData
     )
 {
     WCHAR wzBuffer[13];
-    StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%d", i);
+    HRESULT hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%d", i);
+    ExitOnFailure(hr, "failed to write integer to ca data");
 
-    return WcaWriteStringToCaData(wzBuffer, ppwzCustomActionData);
+    hr = WcaWriteStringToCaDataImpl(wzBuffer, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write integer to ca data");
+
+LExit:
+    return hr;
 }
 
 
 /********************************************************************
-WcaWriteStreamToCaData() - adds a byte stream to the CustomActionData to
+WcaWriteStreamToCaDataImpl() - adds a byte stream to the CustomActionData to
 feed a deferred CustomAction
 
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaWriteStreamToCaData(
+extern "C" HRESULT WIXAPI WcaWriteStreamToCaDataImpl(
     __in_bcount(cbData) const BYTE* pbData,
     __in SIZE_T cbData,
     __deref_inout_z_opt LPWSTR* ppwzCustomActionData
@@ -1414,13 +1418,206 @@ extern "C" HRESULT WIXAPI WcaWriteStreamToCaData(
     hr = StrAllocBase85Encode(pbData, cbData, &pwzData);
     ExitOnFailure(hr, "failed to encode data into string");
 
-    hr = WcaWriteStringToCaData(pwzData, ppwzCustomActionData);
+    hr = WcaWriteStringToCaDataImpl(pwzData, ppwzCustomActionData);
 
 LExit:
     ReleaseStr(pwzData);
     return hr;
 }
 
+#ifdef ANNOTATE
+extern "C" HRESULT WIXAPI WcaReadAnnotatedStringFromCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __deref_in LPWSTR * ppwzCustomActionData,
+    __deref_out_z LPWSTR * ppwzString
+)
+{
+    HRESULT hr;
+    LPWSTR writtenAnnotation = NULL;
+
+    hr = WcaReadStringFromCaDataImpl(ppwzCustomActionData, &writtenAnnotation);
+
+    if (E_NOMOREITEMS != hr)
+    {
+        ExitOnFailure(hr, "failed to get written annotation");
+
+        hr = WcaReadStringFromCaDataImpl(ppwzCustomActionData, ppwzString);
+        ExitOnFailure(hr, "failed to read string from custom action data");
+        WcaLog(LOGMSG_STANDARD, "%hs(%d) Read String (%hs) = \"%ls\"", szFile, iLine, szVar, L'\0' == *ppwzString ? L"<Empty string>" : *ppwzString);
+        WcaLog(LOGMSG_STANDARD, "%ls", writtenAnnotation);
+    }
+
+LExit:
+    ReleaseStr(writtenAnnotation);
+    return hr;
+}
+
+extern "C" HRESULT WIXAPI WcaReadAnnotatedIntegerFromCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __deref_in LPWSTR * ppwzCustomActionData,
+    __out int* piResult
+)
+{
+    HRESULT hr;
+    LPWSTR writtenAnnotation = NULL;
+
+    hr = WcaReadStringFromCaDataImpl(ppwzCustomActionData, &writtenAnnotation);
+
+    if (E_NOMOREITEMS != hr)
+    {
+        ExitOnFailure(hr, "failed to get written annotation");
+
+        WCHAR nextCharacter = **ppwzCustomActionData;
+
+        hr = WcaReadIntegerFromCaDataImpl(ppwzCustomActionData, piResult);
+        ExitOnFailure(hr, "failed to read integer from custom action data");
+
+        if (L'\x80' == nextCharacter)
+        {
+            WcaLog(LOGMSG_STANDARD, "%hs(%d) Read Integer (%hs) = \"<null string>\"", szFile, iLine, szVar);
+        }
+        else
+        {
+            WcaLog(LOGMSG_STANDARD, "%hs(%d) Read Integer (%hs) = \"%d\"", szFile, iLine, szVar, *piResult);
+        }
+
+        WcaLog(LOGMSG_STANDARD, "%ls", writtenAnnotation);
+    }
+
+LExit:
+    ReleaseStr(writtenAnnotation);
+    return hr;
+}
+
+extern "C" HRESULT WIXAPI WcaReadAnnotatedStreamFromCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __deref_in LPWSTR * ppwzCustomActionData,
+    __deref_out_bcount(*pcbData) BYTE * *ppbData,
+    __out DWORD_PTR * pcbData
+)
+{
+    HRESULT hr;
+    LPWSTR writtenAnnotation = NULL;
+
+    hr = WcaReadStringFromCaDataImpl(ppwzCustomActionData, &writtenAnnotation);
+
+    if (E_NOMOREITEMS != hr)
+    {
+        ExitOnFailure(hr, "failed to get written annotation");
+
+        WCHAR nextCharacter = **ppwzCustomActionData;
+
+        hr = WcaReadStreamFromCaDataImpl(ppwzCustomActionData, ppbData, pcbData);
+        ExitOnFailure(hr, "failed to read stream from custom action data");
+
+        if (L'\x80' == nextCharacter)
+        {
+            WcaLog(LOGMSG_STANDARD, "%hs(%d) Read Stream (%hs) = \"<null stream string>\"", szFile, iLine, szVar);
+        }
+        else
+        {
+            WcaLog(LOGMSG_STANDARD, "%hs(%d) Read Stream (%hs) = \"Stream\"", szFile, iLine, szVar);
+        }
+
+        WcaLog(LOGMSG_STANDARD, "%ls", writtenAnnotation);
+    }
+
+LExit:
+    ReleaseStr(writtenAnnotation);
+    return hr;
+}
+
+extern "C" HRESULT WIXAPI WcaWriteAnnotatedStringToCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in_z LPCWSTR wzString,
+    __deref_inout_z_opt LPWSTR * ppwzCustomActionData
+)
+{
+    WCHAR wzBuffer[512];
+    HRESULT hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%hs(%d) Write String (%hs) = \"%ls\"", szFile, iLine, szVar, wzString);
+    ExitOnFailure(hr, "failed to write annotated string to ca data");
+
+    WcaLog(LOGMSG_STANDARD, "%ls", wzBuffer);
+
+    hr = WcaWriteStringToCaDataImpl(wzBuffer, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write annotated string to ca data");
+
+    hr = WcaWriteStringToCaDataImpl(wzString, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write annotated string to ca data");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT WIXAPI WcaWriteAnnotatedIntegerToCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in int i,
+    __deref_out_z_opt LPWSTR * ppwzCustomActionData
+)
+{
+    WCHAR wzBuffer[512];
+    HRESULT hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%hs(%d) Write Integer (%hs) = \"%d\"", szFile, iLine, szVar, i);
+    ExitOnFailure(hr, "failed to write annotated integer to ca data");
+
+    WcaLog(LOGMSG_STANDARD, "%ls", wzBuffer);
+
+    hr = WcaWriteStringToCaDataImpl(wzBuffer, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write annotated integer to ca data");
+
+    hr = WcaWriteIntegerToCaDataImpl(i, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write annotated integer to ca data");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT WIXAPI WcaWriteAnnotatedStreamToCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in_bcount(cbData) const BYTE * pbData,
+    __in SIZE_T cbData,
+    __deref_inout_z_opt LPWSTR * ppwzCustomActionData
+)
+{
+    HRESULT hr;
+    LPWSTR pwzData = NULL;
+
+    WCHAR wzBuffer[512];
+    hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%hs(%d) Write Stream (%hs) = \"Stream\"", szFile, iLine, szVar);
+    ExitOnFailure(hr, "failed to write annotated stream to ca data");
+
+    WcaLog(LOGMSG_STANDARD, "%ls", wzBuffer);
+
+    hr = WcaWriteStringToCaDataImpl(wzBuffer, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write annotated stream to ca data");
+
+    hr = WcaWriteStreamToCaDataImpl(pbData, cbData, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write annotated integer to ca data");
+
+LExit:
+    ReleaseStr(pwzData);
+    return hr;
+}
+#endif
+
+extern "C" VOID WIXAPI WcaCheckInImpl(
+    __in_z LPCSTR szFile,
+    __in int iLine
+)
+{
+    WcaLog(LOGMSG_STANDARD, "CheckIn %s(%d)", szFile, iLine);
+}
 
 /********************************************************************
 WcaAddTempRecord - adds a temporary record to the active database

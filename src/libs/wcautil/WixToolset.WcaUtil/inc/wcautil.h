@@ -23,6 +23,32 @@ extern "C" {
 #define MessageExitOnFailure(x, e, s, ...) MessageExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, e, s, __VA_ARGS__)
 #define MessageExitOnNullWithLastError(p, x, e, s, ...) MessageExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, e, s, __VA_ARGS__)
 
+#define ANNOTATE
+
+#ifdef ANNOTATE
+#define WcaReadStringFromCaData(d, s) WcaReadAnnotatedStringFromCaData(__FILE__, __LINE__, #s, d, s)
+#define WcaReadIntegerFromCaData(d, i) WcaReadAnnotatedIntegerFromCaData(__FILE__, __LINE__, #i, d, i)
+#define WcaReadStreamFromCaData(d, c, b) WcaReadAnnotatedStreamFromCaData(__FILE__, __LINE__, #b, d, c, b)
+#define WcaWriteStringToCaData(s, d) WcaWriteAnnotatedStringToCaData(__FILE__, __LINE__, #s, s, d)
+#define WcaWriteIntegerToCaData(i, d) WcaWriteAnnotatedIntegerToCaData(__FILE__, __LINE__, #i, i, d)
+#define WcaWriteStreamToCaData(c, b, d) WcaWriteAnnotatedStreamToCaData(__FILE__, __LINE__, #b, c, b, d)
+#else
+#define WcaReadStringFromCaData(d, s) WcaReadStringFromCaDataImpl(d, s)
+#define WcaReadIntegerFromCaData(d, i) WcaReadIntegerFromCaDataImpl(d, i)
+#define WcaReadStreamFromCaData(d, c, b) WcaReadStreamFromCaDataImpl(d, c, b)
+#define WcaWriteStringToCaData(s, d) WcaWriteStringToCaDataImpl(s, d)
+#define WcaWriteIntegerToCaData(i, d) WcaWriteIntegerToCaDataImpl(i, d)
+#define WcaWriteStreamToCaData(c, b, d) WcaWriteStreamToCaDataImpl(c, b, d)
+#endif
+
+#define CHECKIN
+
+#ifdef CHECKIN
+#define WcaCheckIn() WcaCheckInImpl(__FILE__, __LINE__)
+#else
+#define WcaCheckIn()
+#endif
+
 // Generic action enum.
 typedef enum WCA_ACTION
 {
@@ -264,32 +290,86 @@ DWORD WIXAPI WcaCountOfCustomActionDataRecords(
     __in_z LPCWSTR wzData
     );
 
-HRESULT WIXAPI WcaReadStringFromCaData(
+HRESULT WIXAPI WcaReadStringFromCaDataImpl(
     __deref_in LPWSTR* ppwzCustomActionData,
     __deref_out_z LPWSTR* ppwzString
     );
-HRESULT WIXAPI WcaReadIntegerFromCaData(
+HRESULT WIXAPI WcaReadIntegerFromCaDataImpl(
     __deref_in LPWSTR* ppwzCustomActionData,
     __out int* piResult
     );
-HRESULT WIXAPI WcaReadStreamFromCaData(
+HRESULT WIXAPI WcaReadStreamFromCaDataImpl(
     __deref_in LPWSTR* ppwzCustomActionData,
     __deref_out_bcount(*pcbData) BYTE** ppbData,
     __out DWORD_PTR* pcbData
     );
-HRESULT WIXAPI WcaWriteStringToCaData(
+HRESULT WIXAPI WcaWriteStringToCaDataImpl(
     __in_z LPCWSTR wzString,
     __deref_inout_z LPWSTR* ppwzCustomActionData
     );
-HRESULT WIXAPI WcaWriteIntegerToCaData(
+HRESULT WIXAPI WcaWriteIntegerToCaDataImpl(
     __in int i,
     __deref_out_z_opt LPWSTR* ppwzCustomActionData
     );
-HRESULT WIXAPI WcaWriteStreamToCaData(
+HRESULT WIXAPI WcaWriteStreamToCaDataImpl(
     __in_bcount(cbData) const BYTE* pbData,
     __in SIZE_T cbData,
     __deref_inout_z_opt LPWSTR* ppwzCustomActionData
     );
+
+#ifdef ANNOTATE
+HRESULT WIXAPI WcaReadAnnotatedStringFromCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __deref_in LPWSTR* ppwzCustomActionData,
+    __deref_out_z LPWSTR* ppwzString
+);
+HRESULT WIXAPI WcaReadAnnotatedIntegerFromCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __deref_in LPWSTR* ppwzCustomActionData,
+    __out int* piResult
+);
+HRESULT WIXAPI WcaReadAnnotatedStreamFromCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __deref_in LPWSTR* ppwzCustomActionData,
+    __deref_out_bcount(*pcbData) BYTE** ppbData,
+    __out DWORD_PTR* pcbData
+);
+HRESULT WIXAPI WcaWriteAnnotatedStringToCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in_z LPCWSTR wzString,
+    __deref_inout_z_opt LPWSTR* ppwzCustomActionData
+);
+HRESULT WIXAPI WcaWriteAnnotatedIntegerToCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in int i,
+    __deref_out_z_opt LPWSTR* ppwzCustomActionData
+);
+HRESULT WIXAPI WcaWriteAnnotatedStreamToCaData(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in_bcount(cbData) const BYTE* pbData,
+    __in SIZE_T cbData,
+    __deref_inout_z_opt LPWSTR* ppwzCustomActionData
+);
+#endif
+
+#ifdef CHECKIN
+VOID WIXAPI WcaCheckInImpl(
+    __in_z LPCSTR szFile,
+    __in int iLine
+);
+#endif
 
 HRESULT __cdecl WcaAddTempRecord(
     __inout MSIHANDLE* phTableView,
