@@ -235,12 +235,69 @@ LExit:
     return hr;
 }
 
-
 /********************************************************************
- WcaCaScriptWriteString() - writes a string to the ca script.
+ WcaCaScriptWriteAnnotatedString() - writes an annotated string to the ca script.
 
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaCaScriptWriteString(
+extern "C" HRESULT WIXAPI WcaCaScriptWriteAnnotatedString(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in WCA_CASCRIPT_HANDLE hScript,
+    __in_z LPCWSTR wzValue
+)
+{
+    WCHAR wzBuffer[512];
+    HRESULT hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%hs(%d) Write Script String (%hs) = \"%ls\"", szFile, iLine, szVar, wzValue);
+    ExitOnFailure(hr, "failed to write annotated string to ca scrippt");
+
+    WcaLog(LOGMSG_STANDARD, "%ls", wzBuffer);
+
+    hr = WcaCaScriptWriteStringImpl(hScript, wzBuffer);
+    ExitOnFailure(hr, "failed to write annotated string to ca script");
+
+    hr = WcaCaScriptWriteStringImpl(hScript, wzValue);
+    ExitOnFailure(hr, "failed to write annotated string to ca script");
+
+LExit:
+    return hr;
+}
+
+#ifdef ANNOTATE
+/********************************************************************
+ WcaCaScriptWriteAnnotatedNumber() - writes an annotated number to the ca script.
+
+********************************************************************/
+extern "C" HRESULT WIXAPI WcaCaScriptWriteAnnotatedNumber(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
+    __in WCA_CASCRIPT_HANDLE hScript,
+    __in DWORD dwValue
+)
+{
+    WCHAR wzBuffer[512];
+    HRESULT hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%hs(%d) Write Script Number (%hs) = \"%u\"", szFile, iLine, szVar, dwValue);
+    ExitOnFailure(hr, "failed to write annotated number to ca script");
+
+    WcaLog(LOGMSG_STANDARD, "%ls", wzBuffer);
+
+    hr = WcaCaScriptWriteStringImpl(hScript, wzBuffer);
+    ExitOnFailure(hr, "failed to write annotated integer to ca data");
+
+    hr = WcaCaScriptWriteNumberImpl(hScript, dwValue);
+    ExitOnFailure(hr, "failed to write annotated number to ca script");
+
+LExit:
+    return hr;
+}
+#endif
+
+/********************************************************************
+ WcaCaScriptWriteStringImpl() - writes a string to the ca script.
+
+********************************************************************/
+extern "C" HRESULT WIXAPI WcaCaScriptWriteStringImpl(
     __in WCA_CASCRIPT_HANDLE hScript,
     __in_z LPCWSTR wzValue
     )
@@ -274,12 +331,11 @@ LExit:
     return hr;
 }
 
-
 /********************************************************************
- WcaCaScriptWriteNumber() - writes a number to the ca script.
+ WcaCaScriptWriteNumberImpl() - writes a number to the ca script.
 
 ********************************************************************/
-extern "C" HRESULT WIXAPI WcaCaScriptWriteNumber(
+extern "C" HRESULT WIXAPI WcaCaScriptWriteNumberImpl(
     __in WCA_CASCRIPT_HANDLE hScript,
     __in DWORD dwValue
     )
@@ -290,7 +346,7 @@ extern "C" HRESULT WIXAPI WcaCaScriptWriteNumber(
     hr = ::StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%u", dwValue);
     ExitOnFailure(hr, "Failed to convert number into string.");
 
-    hr = WcaCaScriptWriteString(hScript, wzBuffer);
+    hr = WcaCaScriptWriteStringImpl(hScript, wzBuffer);
     ExitOnFailure(hr, "Failed to write number to script.");
 
 LExit:

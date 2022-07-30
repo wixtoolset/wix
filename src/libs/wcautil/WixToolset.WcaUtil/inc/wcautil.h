@@ -23,7 +23,14 @@ extern "C" {
 #define MessageExitOnFailure(x, e, s, ...) MessageExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, e, s, __VA_ARGS__)
 #define MessageExitOnNullWithLastError(p, x, e, s, ...) MessageExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, e, s, __VA_ARGS__)
 
-#define ANNOTATE
+// Uncomment the following line to annotate the writing of data to custom action scripts and the writing/reading
+// of data to/from custom action data. The log file will document the line of code that writes the data, the variable
+// from which the data is written, and the data written. Likewise, when the data is read, the log file will document
+// the line of code that reads the data, the variable into which the data is written, and the data read. In addition,
+// the write entry will be repeated immediateley after the read entry, thus linking together the lines of code used
+// to write and read the data. With this feature disabled, no extra information is logged or stored, and the code
+// flow is identical to what it would have been without this feature.
+//#define ANNOTATE
 
 #ifdef ANNOTATE
 #define WcaReadStringFromCaData(d, s) WcaReadAnnotatedStringFromCaData(__FILE__, __LINE__, #s, d, s)
@@ -32,6 +39,8 @@ extern "C" {
 #define WcaWriteStringToCaData(s, d) WcaWriteAnnotatedStringToCaData(__FILE__, __LINE__, #s, s, d)
 #define WcaWriteIntegerToCaData(i, d) WcaWriteAnnotatedIntegerToCaData(__FILE__, __LINE__, #i, i, d)
 #define WcaWriteStreamToCaData(c, b, d) WcaWriteAnnotatedStreamToCaData(__FILE__, __LINE__, #b, c, b, d)
+#define WcaCaScriptWriteString(h, s) WcaCaScriptWriteAnnotatedString(__FILE__, __LINE__, #s, h, s)
+#define WcaCaScriptWriteNumber(h, n) WcaCaScriptWriteAnnotatedNumber(__FILE__, __LINE__, #n, h, n)
 #else
 #define WcaReadStringFromCaData(d, s) WcaReadStringFromCaDataImpl(d, s)
 #define WcaReadIntegerFromCaData(d, i) WcaReadIntegerFromCaDataImpl(d, i)
@@ -39,9 +48,16 @@ extern "C" {
 #define WcaWriteStringToCaData(s, d) WcaWriteStringToCaDataImpl(s, d)
 #define WcaWriteIntegerToCaData(i, d) WcaWriteIntegerToCaDataImpl(i, d)
 #define WcaWriteStreamToCaData(c, b, d) WcaWriteStreamToCaDataImpl(c, b, d)
+#define WcaCaScriptWriteString(h, s) WcaCaScriptWriteStringImpl(h, s)
+#define WcaCaScriptWriteNumber(h, n) WcaCaScriptWriteNumberImpl(h, n)
 #endif
 
-#define CHECKIN
+// Uncomment the following line to enable a "Here I am" feature. You can intersperse "WcaCheckIn();" lines between
+// any two lines of code that fall logically between wca initialization and wca finalization, i.e. within a custom
+// action. This will allow you to trace the execution path taken within the custom action. With this feature disabled,
+// no extra code is generated. When more information is required, you can supplement this technique by adding calls to
+// WcaLog, but you will need to manage enabling and disabling of these calls, if required, yourself.
+//#define CHECKIN
 
 #ifdef CHECKIN
 #define WcaCheckIn() WcaCheckInImpl(__FILE__, __LINE__)
@@ -290,33 +306,6 @@ DWORD WIXAPI WcaCountOfCustomActionDataRecords(
     __in_z LPCWSTR wzData
     );
 
-HRESULT WIXAPI WcaReadStringFromCaDataImpl(
-    __deref_in LPWSTR* ppwzCustomActionData,
-    __deref_out_z LPWSTR* ppwzString
-    );
-HRESULT WIXAPI WcaReadIntegerFromCaDataImpl(
-    __deref_in LPWSTR* ppwzCustomActionData,
-    __out int* piResult
-    );
-HRESULT WIXAPI WcaReadStreamFromCaDataImpl(
-    __deref_in LPWSTR* ppwzCustomActionData,
-    __deref_out_bcount(*pcbData) BYTE** ppbData,
-    __out DWORD_PTR* pcbData
-    );
-HRESULT WIXAPI WcaWriteStringToCaDataImpl(
-    __in_z LPCWSTR wzString,
-    __deref_inout_z LPWSTR* ppwzCustomActionData
-    );
-HRESULT WIXAPI WcaWriteIntegerToCaDataImpl(
-    __in int i,
-    __deref_out_z_opt LPWSTR* ppwzCustomActionData
-    );
-HRESULT WIXAPI WcaWriteStreamToCaDataImpl(
-    __in_bcount(cbData) const BYTE* pbData,
-    __in SIZE_T cbData,
-    __deref_inout_z_opt LPWSTR* ppwzCustomActionData
-    );
-
 #ifdef ANNOTATE
 HRESULT WIXAPI WcaReadAnnotatedStringFromCaData(
     __in_z LPCSTR szFile,
@@ -363,6 +352,33 @@ HRESULT WIXAPI WcaWriteAnnotatedStreamToCaData(
     __deref_inout_z_opt LPWSTR* ppwzCustomActionData
 );
 #endif
+
+HRESULT WIXAPI WcaReadStringFromCaDataImpl(
+    __deref_in LPWSTR* ppwzCustomActionData,
+    __deref_out_z LPWSTR* ppwzString
+    );
+HRESULT WIXAPI WcaReadIntegerFromCaDataImpl(
+    __deref_in LPWSTR* ppwzCustomActionData,
+    __out int* piResult
+    );
+HRESULT WIXAPI WcaReadStreamFromCaDataImpl(
+    __deref_in LPWSTR* ppwzCustomActionData,
+    __deref_out_bcount(*pcbData) BYTE** ppbData,
+    __out DWORD_PTR* pcbData
+    );
+HRESULT WIXAPI WcaWriteStringToCaDataImpl(
+    __in_z LPCWSTR wzString,
+    __deref_inout_z LPWSTR* ppwzCustomActionData
+    );
+HRESULT WIXAPI WcaWriteIntegerToCaDataImpl(
+    __in int i,
+    __deref_out_z_opt LPWSTR* ppwzCustomActionData
+    );
+HRESULT WIXAPI WcaWriteStreamToCaDataImpl(
+    __in_bcount(cbData) const BYTE* pbData,
+    __in SIZE_T cbData,
+    __deref_inout_z_opt LPWSTR* ppwzCustomActionData
+    );
 
 #ifdef CHECKIN
 VOID WIXAPI WcaCheckInImpl(
@@ -419,15 +435,34 @@ HRESULT WIXAPI WcaCaScriptReadAsCustomActionData(
     __out LPWSTR* ppwzCustomActionData
     );
 
-HRESULT WIXAPI WcaCaScriptWriteString(
+
+#ifdef ANNOTATE
+HRESULT WIXAPI WcaCaScriptWriteAnnotatedString(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
     __in WCA_CASCRIPT_HANDLE hScript,
     __in_z LPCWSTR wzValue
     );
 
-HRESULT WIXAPI WcaCaScriptWriteNumber(
+HRESULT WIXAPI WcaCaScriptWriteAnnotatedNumber(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in_z LPCSTR szVar,
     __in WCA_CASCRIPT_HANDLE hScript,
     __in DWORD dwValue
     );
+#endif
+
+HRESULT WIXAPI WcaCaScriptWriteStringImpl(
+    __in WCA_CASCRIPT_HANDLE hScript,
+    __in_z LPCWSTR wzValue
+);
+
+HRESULT WIXAPI WcaCaScriptWriteNumberImpl(
+    __in WCA_CASCRIPT_HANDLE hScript,
+    __in DWORD dwValue
+);
 
 void WIXAPI WcaCaScriptFlush(
     __in WCA_CASCRIPT_HANDLE hScript
