@@ -190,9 +190,19 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             return this.bundleValidator.ValidateBundleMsiPropertyName(sourceLineNumbers, elementName, attributeName, propertyName);
         }
 
-        public bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, bool allowBuiltIn)
+        public bool ValidateBundleVariableNameDeclaration(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
         {
-            return this.bundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, attributeName, variableName, allowBuiltIn);
+            return this.bundleValidator.ValidateBundleVariableNameDeclaration(sourceLineNumbers, elementName, attributeName, variableName);
+        }
+
+        public bool ValidateBundleVariableNameValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, BundleVariableNameRule nameRule)
+        {
+            return this.bundleValidator.ValidateBundleVariableNameValue(sourceLineNumbers, elementName, attributeName, variableName, nameRule);
+        }
+
+        public bool ValidateBundleVariableNameTarget(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
+        {
+            return this.bundleValidator.ValidateBundleVariableNameTarget(sourceLineNumbers, elementName, attributeName, variableName);
         }
 
         public bool ValidateBundleCondition(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string condition, BundleConditionPhase phase)

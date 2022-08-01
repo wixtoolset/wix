@@ -13,5 +13,7 @@
             </ExePackage>
         </Chain>
         <SetVariable Id="Builtin" Condition="!(loc.NonsenseDetectCondition)" Variable="FOO" Value="1" />
+        <SetVariable Id="LogWellKnown" Variable="!(loc.BurnLogVariableName)" Value="2" />
+        <SetVariable Id="ReservedPrefix" Variable="!(loc.BurnReservedPrefixVariableName)" Value="3" />
     </Bundle>
 </Wix>

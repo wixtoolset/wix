@@ -163,6 +163,39 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void VariablesSetCustomWixVariableTest()
+        {
+            HRESULT hr = S_OK;
+            IXMLDOMElement* pixeBundle = NULL;
+            BURN_VARIABLES variables = { };
+
+            try
+            {
+                LPCWSTR wzDocument =
+                    L"<Bundle>"
+                    L"    <CommandLine Variables='upperCase' />"
+                    L"</Bundle>";
+
+                hr = VariableInitialize(&variables);
+                TestThrowOnFailure(hr, L"Failed to initialize variables.");
+
+                // load XML document
+                LoadBundleXmlHelper(wzDocument, &pixeBundle);
+
+                hr = VariablesParseFromXml(&variables, pixeBundle);
+                NativeAssert::Succeeded(hr, "Failed to parse variables from XML.");
+
+                hr = VariableSetString(&variables, L"WixCustomVariable", L"something", FALSE, FALSE);
+                NativeAssert::Succeeded(hr, "Failed to set 'WixCustomVariable' variable.");
+            }
+            finally
+            {
+                ReleaseObject(pixeBundle);
+                VariablesUninitialize(&variables);
+            }
+        }
+
+        [Fact]
         void VariablesFormatTest()
         {
             HRESULT hr = S_OK;

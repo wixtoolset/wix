@@ -36,9 +36,19 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.ProvidesKeyNotFound, "The provider key with identifier {0} was not found in the Wix4DependencyProvider table. Related registry rows will not be removed from authoring.", id);
         }
 
+        public static Message ReadonlyLogVariableTarget(SourceLineNumber sourceLineNumbers, string element, string attribute, string name)
+        {
+            return Message(sourceLineNumbers, Ids.ReadonlyLogVariableTarget, "The {0}/@{1} attribute's value references the well-known log Variable '{2}' to change its value. This variable is set by the engine and is intended to be read-only. Change your attribute's value to reference a custom variable.", element, attribute, name);
+        }
+
         public static Message RequiresKeyNotFound(SourceLineNumber sourceLineNumbers, string id)
         {
             return Message(sourceLineNumbers, Ids.RequiresKeyNotFound, "The dependency key with identifier {0} was not found in the Wix4Dependency table. Related registry rows will not be removed from authoring.", id);
+        }
+
+        public static Message ReservedBurnNamespaceWarning(SourceLineNumber sourceLineNumbers, string element, string attribute, string prefix)
+        {
+            return Message(sourceLineNumbers, Ids.ReservedBurnNamespaceWarning, "The {0}/@{1} attribute's value begins with the reserved prefix '{2}'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.", element, attribute, prefix);
         }
 
         public static Message Win64Component(SourceLineNumber sourceLineNumbers, string componentId)
@@ -60,6 +70,8 @@ namespace WixToolset.Core
             Win64Component = 5435,
             DirectoryRefStandardDirectoryDeprecated = 5436,
             DefiningStandardDirectoryDeprecated = 5437,
+            ReadonlyLogVariableTarget = 5438,
+            ReservedBurnNamespaceWarning = 5439,
         } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

@@ -246,8 +246,9 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <param name="nameRule">A rule for the contents of the value. If the contents do not follow the rule, an error is thrown.</param>
         /// <returns>The attribute's value.</returns>
-        string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
+        string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, BundleVariableNameRule nameRule = BundleVariableNameRule.CanBeWellKnown | BundleVariableNameRule.CanHaveReservedPrefix);
 
         /// <summary>
         /// Get a guid attribute value and displays an error for an illegal guid value.

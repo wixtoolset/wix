@@ -1,6 +1,8 @@
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
   <String Id="BuiltinMsiPropertyName">REINSTALLMODE</String>
   <String Id="BuiltinBurnVariableName">WixBundleInstalled</String>
+  <String Id="BurnLogVariableName">WixBundleLog</String>
+  <String Id="BurnReservedPrefixVariableName">WixCustomVariable</String>
   <String Id="NonsenseDetectCondition">WixBundleAction = 4</String>
   <String Id="NonsenseExecuteCondition">=</String>
   <String Id="NonsenseGlobalCondition">WixBundleInstalled &lt;&gt; 1</String>
