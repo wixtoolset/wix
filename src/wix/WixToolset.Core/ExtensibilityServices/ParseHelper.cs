@@ -246,9 +246,9 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, elementName, "Variable"));
             }
-            else
+            else if (!this.IsValidLocIdentifier(variable) && !Common.IsValidBinderVariable(variable))
             {
-                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, elementName, "Variable", variable, allowBuiltIn: false);
+                this.BundleValidator.ValidateBundleVariableNameValue(sourceLineNumbers, elementName, "Variable", variable, BundleVariableNameRule.CanBeWellKnown | BundleVariableNameRule.CanHaveReservedPrefix);
             }
 
             section.AddSymbol(new WixSearchSymbol(sourceLineNumbers, id)
@@ -322,19 +322,19 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (!String.IsNullOrEmpty(variableId?.Id))
             {
-                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableId.Id, allowBuiltIn: false);
+                this.BundleValidator.ValidateBundleVariableNameDeclaration(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableId.Id);
             }
 
             return variableId;
         }
 
-        public string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        public string GetAttributeBundleVariableNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, BundleVariableNameRule nameRule = BundleVariableNameRule.CanBeWellKnown | BundleVariableNameRule.CanHaveReservedPrefix)
         {
             var variableName = this.GetAttributeValue(sourceLineNumbers, attribute);
 
-            if (!String.IsNullOrEmpty(variableName))
+            if (!String.IsNullOrEmpty(variableName) && !this.IsValidLocIdentifier(variableName) && !Common.IsValidBinderVariable(variableName))
             {
-                this.BundleValidator.ValidateBundleVariableName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableName, allowBuiltIn: false);
+                this.BundleValidator.ValidateBundleVariableNameValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, variableName, nameRule);
             }
 
             return variableName;

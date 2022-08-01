@@ -109,6 +109,21 @@ namespace WixToolset.Core.ExtensibilityServices
                 "WixBundleVersion",
             });
 
+        // Well-known variables (from burn\engine\variable.cpp, "vrgWellKnownVariables", around line 304)
+        private static readonly List<string> WellKnownBundleVariables = new List<string>(
+            new string[] {
+                "WixBundleInProgressName",
+                "WixBundleLastUsedSource",
+                "WixBundleLayoutDirectory",
+                "WixBundleLog",
+                "WixBundleLog_*",
+                "WixBundleRollbackLog_*",
+                "WixBundleManufacturer",
+                "WixBundleName",
+                "WixBundleOriginalSource",
+                "WixBundleOriginalSourceFolder",
+            });
+
         private static readonly List<string> DisallowedMsiProperties = new List<string>(
             new string[] {
                 "ACTION",
@@ -156,7 +171,7 @@ namespace WixToolset.Core.ExtensibilityServices
             return relativePath;
         }
 
-        public bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, bool allowBuiltIn)
+        public bool ValidateBundleVariableNameDeclaration(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
         {
             if (String.IsNullOrEmpty(variableName))
             {
@@ -170,18 +185,117 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 return false;
             }
-            else if (!allowBuiltIn && BuiltinBundleVariables.Contains(variableName))
+            else if (BuiltinBundleVariables.Contains(variableName))
             {
                 var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
                 this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
 
                 return false;
             }
-            else if (!allowBuiltIn && variableName.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
+            else if (variableName.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
             {
                 this.Messaging.Write(ErrorMessages.ReservedBurnNamespaceViolation(sourceLineNumbers, elementName, attributeName, "Wix"));
 
                 return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool ValidateBundleVariableNameValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, BundleVariableNameRule nameRule)
+        {
+            if (String.IsNullOrEmpty(variableName))
+            {
+                this.Messaging.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, elementName, attributeName));
+
+                return false;
+            }
+            else if (!Common.IsBundleVariableName(variableName))
+            {
+                this.Messaging.Write(CompilerErrors.IllegalBundleVariableName(sourceLineNumbers, elementName, attributeName, variableName));
+
+                return false;
+            }
+            else if (BuiltinBundleVariables.Contains(variableName))
+            {
+                var allowed = nameRule.HasFlag(BundleVariableNameRule.CanBeBuiltIn);
+                if (!allowed)
+                {
+                    var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                }
+
+                return allowed;
+            }
+            else if (WellKnownBundleVariables.Contains(variableName) ||
+                variableName.StartsWith("WixBundleLog_", StringComparison.OrdinalIgnoreCase) ||
+                variableName.StartsWith("WixBundleRollbackLog_", StringComparison.OrdinalIgnoreCase))
+            {
+                var allowed = nameRule.HasFlag(BundleVariableNameRule.CanBeWellKnown);
+                if (!allowed)
+                {
+                    var illegalValues = CreateValueList(ValueListKind.Or, WellKnownBundleVariables);
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                }
+
+                return allowed;
+            }
+            else if (variableName.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
+            {
+                var allowed = nameRule.HasFlag(BundleVariableNameRule.CanHaveReservedPrefix);
+                if (!allowed)
+                {
+                    this.Messaging.Write(ErrorMessages.ReservedBurnNamespaceViolation(sourceLineNumbers, elementName, attributeName, "Wix"));
+                }
+
+                return allowed;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool ValidateBundleVariableNameTarget(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName)
+        {
+            if (String.IsNullOrEmpty(variableName))
+            {
+                this.Messaging.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, elementName, attributeName));
+
+                return false;
+            }
+            else if (!Common.IsBundleVariableName(variableName))
+            {
+                this.Messaging.Write(CompilerErrors.IllegalBundleVariableName(sourceLineNumbers, elementName, attributeName, variableName));
+
+                return false;
+            }
+            else if (BuiltinBundleVariables.Contains(variableName))
+            {
+                var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
+                this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+
+                return false;
+            }
+            else if (variableName.Equals("WixBundleLog", StringComparison.OrdinalIgnoreCase) ||
+                     variableName.StartsWith("WixBundleLog_", StringComparison.OrdinalIgnoreCase) ||
+                     variableName.StartsWith("WixBundleRollbackLog_", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Messaging.Write(CompilerWarnings.ReadonlyLogVariableTarget(sourceLineNumbers, elementName, attributeName, variableName));
+
+                return true;
+            }
+            else if (WellKnownBundleVariables.Contains(variableName))
+            {
+                return true;
+            }
+            else if (variableName.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Messaging.Write(CompilerWarnings.ReservedBurnNamespaceWarning(sourceLineNumbers, elementName, attributeName, "Wix"));
+
+                return true;
             }
             else
             {

@@ -33,15 +33,35 @@ namespace WixToolset.Extensibility.Services
         bool ValidateBundleMsiPropertyName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string propertyName);
 
         /// <summary>
-        /// Validates a Bundle variable name and displays an error for an illegal value.
+        /// Validates a Bundle variable name that is being used to declare a Variable in the bundle manifest and displays an error for an illegal value.
         /// </summary>
         /// <param name="sourceLineNumbers"></param>
         /// <param name="elementName"></param>
         /// <param name="attributeName"></param>
         /// <param name="variableName"></param>
-        /// <param name="allowBuiltIn">Whether to bypass checks for reserved values.</param>
         /// <returns>Whether the name is valid.</returns>
-        bool ValidateBundleVariableName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, bool allowBuiltIn);
+        bool ValidateBundleVariableNameDeclaration(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName);
+
+        /// <summary>
+        /// Validates a Bundle variable name that is being used to reference a Variable and displays an error for an illegal value.
+        /// </summary>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="elementName"></param>
+        /// <param name="attributeName"></param>
+        /// <param name="variableName"></param>
+        /// <param name="nameRule"></param>
+        /// <returns>Whether the name is valid.</returns>
+        bool ValidateBundleVariableNameValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName, BundleVariableNameRule nameRule);
+
+        /// <summary>
+        /// Validates a Bundle variable name that is being used to set its value and displays an error for an illegal value.
+        /// </summary>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="elementName"></param>
+        /// <param name="attributeName"></param>
+        /// <param name="variableName"></param>
+        /// <returns>Whether the name is valid.</returns>
+        bool ValidateBundleVariableNameTarget(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string variableName);
 
         /// <summary>
         /// Validates a bundle condition and displays an error for an illegal value.

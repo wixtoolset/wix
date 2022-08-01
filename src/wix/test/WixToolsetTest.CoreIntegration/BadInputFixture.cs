@@ -7,6 +7,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Data;
     using Xunit;
 
     public class BadInputFixture
@@ -179,12 +180,11 @@ namespace WixToolsetTest.CoreIntegration
 
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The SetVariable/@Variable attribute's value, '!(loc.BuiltinBurnVariableName)', is not a legal bundle variable name. Identifiers may contain ASCII characters A-Z, a-z, digits, or underscores (_). Every identifier must begin with either a letter or an underscore.",
                     "The Variable/@Name attribute was not found; it is required.",
                     "The Variable/@Name attribute's value, '!(loc.BuiltinBurnVariableName)', is not a legal identifier. Identifiers may contain ASCII characters A-Z, a-z, digits, underscores (_), or periods (.). Every identifier must begin with either a letter or an underscore.",
                 }, messages.ToArray());
 
-                Assert.Equal(6603, result.ExitCode);
+                Assert.Equal(10, result.ExitCode);
             }
         }
 
@@ -212,7 +212,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The SetVariable/@Variable attribute's value begins with the reserved prefix 'Wix'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.",
                     "The SetVariable/@Variable attribute's value, 'WixBundleInstalled', is one of the illegal options: 'AdminToolsFolder', 'AppDataFolder', 'CommonAppDataFolder', 'CommonFiles64Folder', 'CommonFiles6432Folder', 'CommonFilesFolder', 'CompatibilityMode', 'ComputerName', 'Date', 'DesktopFolder', 'FavoritesFolder', 'FontsFolder', 'InstallerName', 'InstallerVersion', 'LocalAppDataFolder', 'LogonUser', 'MyPicturesFolder', 'NativeMachine', 'NTProductType', 'NTSuiteBackOffice', 'NTSuiteDataCenter', 'NTSuiteEnterprise', 'NTSuitePersonal', 'NTSuiteSmallBusiness', 'NTSuiteSmallBusinessRestricted', 'NTSuiteWebServer', 'PersonalFolder', 'Privileged', 'ProcessorArchitecture', 'ProgramFiles64Folder', 'ProgramFiles6432Folder', 'ProgramFilesFolder', 'ProgramMenuFolder', 'RebootPending', 'SendToFolder', 'ServicePackLevel', 'StartMenuFolder', 'StartupFolder', 'System64Folder', 'SystemFolder', 'SystemLanguageID', 'TempFolder', 'TemplateFolder', 'TerminalServer', 'UserLanguageID', 'UserUILanguageID', 'VersionMsi', 'VersionNT', 'VersionNT64', 'WindowsBuildNumber', 'WindowsFolder', 'WindowsVolume', 'WixBundleAction', 'WixBundleActiveParent', 'WixBundleCommandLineAction', 'WixBundleElevated', 'WixBundleExecutePackageAction', 'WixBundleExecutePackageCacheFolder', 'WixBundleForcedRestartPackage', 'WixBundleInstalled', 'WixBundleProviderKey', 'WixBundleSourceProcessFolder', 'WixBundleSourceProcessPath', 'WixBundleTag', 'WixBundleUILevel', or 'WixBundleVersion'.",
                     "The Variable/@Name attribute's value begins with the reserved prefix 'Wix'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.",
                     "The Variable/@Name attribute's value, 'AppDataFolder', is one of the illegal options: 'AdminToolsFolder', 'AppDataFolder', 'CommonAppDataFolder', 'CommonFiles64Folder', 'CommonFiles6432Folder', 'CommonFilesFolder', 'CompatibilityMode', 'ComputerName', 'Date', 'DesktopFolder', 'FavoritesFolder', 'FontsFolder', 'InstallerName', 'InstallerVersion', 'LocalAppDataFolder', 'LogonUser', 'MyPicturesFolder', 'NativeMachine', 'NTProductType', 'NTSuiteBackOffice', 'NTSuiteDataCenter', 'NTSuiteEnterprise', 'NTSuitePersonal', 'NTSuiteSmallBusiness', 'NTSuiteSmallBusinessRestricted', 'NTSuiteWebServer', 'PersonalFolder', 'Privileged', 'ProcessorArchitecture', 'ProgramFiles64Folder', 'ProgramFiles6432Folder', 'ProgramFilesFolder', 'ProgramMenuFolder', 'RebootPending', 'SendToFolder', 'ServicePackLevel', 'StartMenuFolder', 'StartupFolder', 'System64Folder', 'SystemFolder', 'SystemLanguageID', 'TempFolder', 'TemplateFolder', 'TerminalServer', 'UserLanguageID', 'UserUILanguageID', 'VersionMsi', 'VersionNT', 'VersionNT64', 'WindowsBuildNumber', 'WindowsFolder', 'WindowsVolume', 'WixBundleAction', 'WixBundleActiveParent', 'WixBundleCommandLineAction', 'WixBundleElevated', 'WixBundleExecutePackageAction', 'WixBundleExecutePackageCacheFolder', 'WixBundleForcedRestartPackage', 'WixBundleInstalled', 'WixBundleProviderKey', 'WixBundleSourceProcessFolder', 'WixBundleSourceProcessPath', 'WixBundleTag', 'WixBundleUILevel', or 'WixBundleVersion'.",
@@ -232,7 +231,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(false, new[]
                 {
                     "build",
                     Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidLocValues.wxs"),
@@ -244,21 +243,30 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
-                var messages = result.Messages.Select(m => m.ToString()).ToList();
-                messages.Sort();
+                var warningMessages = result.Messages.Where(m => m.Level == MessageLevel.Warning).Select(m => m.ToString()).ToList();
+                warningMessages.Sort();
 
                 WixAssert.CompareLineByLine(new[]
                 {
                     "*Search/@Condition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "Bundle/@Condition contains the built-in Variable 'WixBundleInstalled', which is not available when it is evaluated. (Unavailable Variables are: 'RebootPending', 'WixBundleAction', or 'WixBundleInstalled'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "ExePackage/@DetectCondition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
+                    "The *Search/@Variable attribute's value begins with the reserved prefix 'Wix'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.",
+                    "The *Search/@Variable attribute's value references the well-known log Variable 'WixBundleLog' to change its value. This variable is set by the engine and is intended to be read-only. Change your attribute's value to reference a custom variable.",
+                }, warningMessages.ToArray());
+
+                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString()).ToList();
+                errorMessages.Sort();
+
+                WixAssert.CompareLineByLine(new[]
+                {
                     "The CommandLine/@Condition attribute's value '=' is not a valid bundle condition.",
                     "The MsiPackage/@InstallCondition attribute's value '=' is not a valid bundle condition.",
                     "The MsiProperty/@Condition attribute's value '=' is not a valid bundle condition.",
                     "The 'REINSTALLMODE' MsiProperty is controlled by the bootstrapper and cannot be authored. (Illegal properties are: 'ACTION', 'ADDLOCAL', 'ADDSOURCE', 'ADDDEFAULT', 'ADVERTISE', 'ALLUSERS', 'REBOOT', 'REINSTALL', 'REINSTALLMODE', or 'REMOVE'.) Remove the MsiProperty element.",
-                }, messages.ToArray());
+                }, errorMessages.ToArray());
 
-                Assert.Equal(1159, result.ExitCode);
+                Assert.Equal(409, result.ExitCode);
             }
         }
     }
