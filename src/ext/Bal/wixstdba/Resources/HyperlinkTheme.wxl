@@ -6,7 +6,8 @@
   <String Id="Caption">[WixBundleName] Setup</String>
   <String Id="Title">[WixBundleName]</String>
   <String Id="InstallHeader">Welcome</String>
-  <String Id="InstallMessage">Setup will install [WixBundleName] on your computer. Click install to continue, options to set the install directory or Close to exit.</String>
+  <String Id="InstallMessage">Setup will install [WixBundleName] on your computer. Click Install to continue or Cancel to exit.</String>
+  <String Id="InstallMessageOptions">Setup will install [WixBundleName] on your computer. Click Install to continue, Options to set installation options, or Cancel to exit.</String>
   <String Id="InstallVersion">Version [WixBundleVersion]</String>
   <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
   <String Id="ExecuteUpgradeRelatedBundleMessage">Previous version</String>

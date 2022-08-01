@@ -7,7 +7,7 @@
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
 
     <BootstrapperApplication>
-      <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" SuppressDowngradeFailure="yes" />
+      <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLargeLicense" SuppressOptionsUI="yes" SuppressDowngradeFailure="yes" />
     </BootstrapperApplication>
 
     <Chain>
