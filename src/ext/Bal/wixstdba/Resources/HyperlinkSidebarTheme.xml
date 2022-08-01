@@ -23,7 +23,8 @@
             <Label X="185" Y="11" Width="-11" Height="32" FontId="1" DisablePrefix="yes">#(loc.Title)</Label>
             <ImageControl X="11" Y="11" Width="165" Height="400" ImageFile="logoside.png"/>
             <Label X="185" Y="50" Width="-11" Height="32" FontId="2" DisablePrefix="yes">#(loc.InstallHeader)</Label>
-            <Label X="185" Y="91" Width="-11" Height="64" FontId="3" DisablePrefix="yes">#(loc.InstallMessage)</Label>
+            <Label X="185" Y="91" Width="-11" Height="64" FontId="3" VisibleCondition="WixStdBASuppressOptionsUI" DisablePrefix="yes">#(loc.InstallMessage)</Label>
+            <Label X="185" Y="91" Width="-11" Height="64" FontId="3" VisibleCondition="NOT WixStdBASuppressOptionsUI" DisablePrefix="yes">#(loc.InstallMessageOptions)</Label>
             <Hypertext Name="EulaHyperlink" X="185" Y="-111" Width="-11" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallLicenseLinkText)</Hypertext>
             <Label Name="InstallVersion" X="185" Y="-81" Width="-11" Height="17" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
             <Checkbox Name="EulaAcceptCheckbox" X="185" Y="-51" Width="-11" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
