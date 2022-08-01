@@ -28,6 +28,37 @@ static HRESULT GetNonSessionSpecificTempFolder(
 
 // function definitions
 
+extern "C" HRESULT LoggingParseFromXml(
+    __in BURN_LOGGING* pLog,
+    __in IXMLDOMNode* pixnBundle
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMNode* pixnLog = NULL;
+    BOOL fXmlFound = FALSE;
+
+    // parse the log element, if present.
+    hr = XmlSelectSingleNode(pixnBundle, L"Log", &pixnLog);
+    ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get Log element.");
+
+    if (fXmlFound)
+    {
+        hr = XmlGetAttributeEx(pixnLog, L"PathVariable", &pLog->sczPathVariable);
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get Log/@PathVariable.");
+
+        hr = XmlGetAttributeEx(pixnLog, L"Prefix", &pLog->sczPrefix);
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get Log/@Prefix attribute.");
+
+        hr = XmlGetAttributeEx(pixnLog, L"Extension", &pLog->sczExtension);
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get Log/@Extension attribute.");
+    }
+
+LExit:
+    ReleaseObject(pixnLog);
+
+    return hr;
+}
+
 extern "C" HRESULT LoggingOpen(
     __in BURN_LOGGING* pLog,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
@@ -244,7 +275,6 @@ extern "C" HRESULT LoggingSetCompatiblePackageVariable(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczLogPathVariable = NULL;
     LPWSTR sczLogPath = NULL;
 
     // Make sure that no package log files are created when logging has been disabled via Log element.
@@ -253,16 +283,12 @@ extern "C" HRESULT LoggingSetCompatiblePackageVariable(
         ExitFunction();
     }
 
-    if (pPackage->sczLogPathVariable && *pPackage->sczLogPathVariable)
+    if (pPackage->sczCompatibleLogPathVariable && *pPackage->sczCompatibleLogPathVariable)
     {
-        // Format a suitable log path variable from the original package.
-        hr = StrAllocFormatted(&sczLogPathVariable, L"%ls_Compatible", pPackage->sczLogPathVariable);
-        ExitOnFailure(hr, "Failed to format log path variable for compatible package.");
-
         hr = StrAllocFormatted(&sczLogPath, L"%ls_%03u_%ls_%ls.%ls", pLog->sczPrefix, vdwPackageSequence, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pLog->sczExtension);
         ExitOnFailure(hr, "Failed to allocate path for package log.");
 
-        hr = VariableSetString(pVariables, sczLogPathVariable, sczLogPath, FALSE, FALSE);
+        hr = VariableSetString(pVariables, pPackage->sczCompatibleLogPathVariable, sczLogPath, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set log path into variable.");
 
         if (psczLogPath)
@@ -273,7 +299,6 @@ extern "C" HRESULT LoggingSetCompatiblePackageVariable(
     }
 
 LExit:
-    ReleaseStr(sczLogPathVariable);
     ReleaseStr(sczLogPath);
 
     return hr;

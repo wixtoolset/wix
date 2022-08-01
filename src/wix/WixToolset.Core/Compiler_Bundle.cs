@@ -461,34 +461,6 @@ namespace WixToolset.Core
                     Name = "bundle-attached.cab",
                     Type = ContainerType.Attached,
                 });
-
-                var wellKnownVariableAttributes = WixBundleVariableAttributes.Persisted | WixBundleVariableAttributes.BuiltIn;
-
-                // Ensure that the bundle stores the well-known persisted values.
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_INPROGRESS_NAME))
-                {
-                    Attributes = wellKnownVariableAttributes,
-                });
-
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_NAME))
-                {
-                    Attributes = wellKnownVariableAttributes,
-                });
-
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
-                {
-                    Attributes = wellKnownVariableAttributes,
-                });
-
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
-                {
-                    Attributes = wellKnownVariableAttributes,
-                });
-
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
-                {
-                    Attributes = wellKnownVariableAttributes,
-                });
             }
         }
 

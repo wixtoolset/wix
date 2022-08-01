@@ -443,7 +443,7 @@ extern "C" HRESULT RegistrationSetDynamicVariables(
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_INSTALLED, llInstalled, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");
 
-    hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
+    hr = VariableSetNumeric(pVariables, VARIABLE_REBOOTPENDING, IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
 LExit:

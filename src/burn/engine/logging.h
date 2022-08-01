@@ -41,6 +41,10 @@ typedef struct _BURN_LOGGING
 
 // function declarations
 
+HRESULT LoggingParseFromXml(
+    __in BURN_LOGGING* pLog,
+    __in IXMLDOMNode* pixnBundle
+    );
 HRESULT LoggingOpen(
     __in BURN_LOGGING* pLog,
     __in BURN_ENGINE_COMMAND* pInternalCommand,

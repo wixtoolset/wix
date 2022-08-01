@@ -262,6 +262,7 @@ typedef struct _BURN_PACKAGE
 
     LPWSTR sczLogPathVariable;          // name of the variable that will be set to the log path.
     LPWSTR sczRollbackLogPathVariable;  // name of the variable that will be set to the rollback path.
+    LPWSTR sczCompatibleLogPathVariable;
 
     LPWSTR sczInstallCondition;
     LPWSTR sczRepairCondition;

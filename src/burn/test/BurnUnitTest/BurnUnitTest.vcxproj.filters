@@ -27,6 +27,9 @@
     <ClCompile Include="EmbeddedTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LoggingTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ManifestHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

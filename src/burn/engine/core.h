@@ -38,7 +38,6 @@ const LPCWSTR BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN = L"burn.splash.screen";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT = L"burn.system.component";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PREFIX = L"burn.";
 
-const LPCWSTR BURN_BUNDLE_LAYOUT_DIRECTORY = L"WixBundleLayoutDirectory";
 const LPCWSTR BURN_BUNDLE_ACTION = L"WixBundleAction";
 const LPCWSTR BURN_BUNDLE_ACTIVE_PARENT = L"WixBundleActiveParent";
 const LPCWSTR BURN_BUNDLE_COMMAND_LINE_ACTION = L"WixBundleCommandLineAction";
@@ -48,17 +47,17 @@ const LPCWSTR BURN_BUNDLE_FORCED_RESTART_PACKAGE = L"WixBundleForcedRestartPacka
 const LPCWSTR BURN_BUNDLE_INSTALLED = L"WixBundleInstalled";
 const LPCWSTR BURN_BUNDLE_ELEVATED = L"WixBundleElevated";
 const LPCWSTR BURN_BUNDLE_PROVIDER_KEY = L"WixBundleProviderKey";
-const LPCWSTR BURN_BUNDLE_MANUFACTURER = L"WixBundleManufacturer";
 const LPCWSTR BURN_BUNDLE_SOURCE_PROCESS_PATH = L"WixBundleSourceProcessPath";
 const LPCWSTR BURN_BUNDLE_SOURCE_PROCESS_FOLDER = L"WixBundleSourceProcessFolder";
 const LPCWSTR BURN_BUNDLE_TAG = L"WixBundleTag";
 const LPCWSTR BURN_BUNDLE_UILEVEL = L"WixBundleUILevel";
 const LPCWSTR BURN_BUNDLE_VERSION = L"WixBundleVersion";
-const LPCWSTR BURN_REBOOT_PENDING = L"RebootPending";
 
-// The following constants must stay in sync with src\api\wix\WixToolset.Data\Burn\BurnConstants.cs
+// The following well-known variables are settable by the BA.
+const LPCWSTR BURN_BUNDLE_LAYOUT_DIRECTORY = L"WixBundleLayoutDirectory";
 const LPCWSTR BURN_BUNDLE_NAME = L"WixBundleName";
 const LPCWSTR BURN_BUNDLE_INPROGRESS_NAME = L"WixBundleInProgressName";
+const LPCWSTR BURN_BUNDLE_MANUFACTURER = L"WixBundleManufacturer";
 const LPCWSTR BURN_BUNDLE_ORIGINAL_SOURCE = L"WixBundleOriginalSource";
 const LPCWSTR BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER = L"WixBundleOriginalSourceFolder";
 const LPCWSTR BURN_BUNDLE_LAST_USED_SOURCE = L"WixBundleLastUsedSource";
