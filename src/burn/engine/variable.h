@@ -13,6 +13,7 @@ const LPCWSTR VARIABLE_DATE = L"Date";
 const LPCWSTR VARIABLE_LOGONUSER = L"LogonUser";
 const LPCWSTR VARIABLE_INSTALLERNAME = L"InstallerName";
 const LPCWSTR VARIABLE_INSTALLERVERSION = L"InstallerVersion";
+const LPCWSTR VARIABLE_REBOOTPENDING = L"RebootPending";
 
 
 // typedefs

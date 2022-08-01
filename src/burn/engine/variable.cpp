@@ -14,6 +14,12 @@ typedef const struct _BUILT_IN_VARIABLE_DECLARATION
     BOOL fOverridable;
 } BUILT_IN_VARIABLE_DECLARATION;
 
+typedef const struct _WELL_KNOWN_VARIABLE_DECLARATION
+{
+    LPCWSTR wzVariable;
+    BOOL fPersist;
+} WELL_KNOWN_VARIABLE_DECLARATION;
+
 
 // constants
 
@@ -71,6 +77,11 @@ static HRESULT AddBuiltInVariable(
     __in BOOL fPersist,
     __in BOOL fOverridable
     );
+static HRESULT AddWellKnownVariable(
+    __in BURN_VARIABLES* pVariables,
+    __in LPCWSTR wzVariable,
+    __in BOOL fPersisted
+    );
 static HRESULT GetVariable(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
@@ -80,6 +91,11 @@ static HRESULT FindVariableIndexByName(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
     __out DWORD* piVariable
+    );
+static HRESULT InsertUserVariable(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __in DWORD iPosition
     );
 static HRESULT InsertVariable(
     __in BURN_VARIABLES* pVariables,
@@ -248,7 +264,7 @@ extern "C" HRESULT VariableInitialize(
 #endif
         {L"ProgramFiles6432Folder", InitializeVariable6432Folder, CSIDL_PROGRAM_FILES},
         {L"ProgramMenuFolder", InitializeVariableCsidlFolder, CSIDL_PROGRAMS},
-        {L"RebootPending", InitializeVariableNumeric, 0},
+        {VARIABLE_REBOOTPENDING, InitializeVariableNumeric, 0},
         {L"SendToFolder", InitializeVariableCsidlFolder, CSIDL_SENDTO},
         {L"ServicePackLevel", InitializeVariableVersionNT, OS_INFO_VARIABLE_ServicePackLevel},
         {L"StartMenuFolder", InitializeVariableCsidlFolder, CSIDL_STARTMENU},
@@ -283,12 +299,31 @@ extern "C" HRESULT VariableInitialize(
         {BURN_BUNDLE_VERSION, InitializeVariableVersion, (DWORD_PTR)L"0", FALSE, TRUE},
     };
 
+    const WELL_KNOWN_VARIABLE_DECLARATION vrgWellKnownVariableNames[] =
+    {
+        { BURN_BUNDLE_LAYOUT_DIRECTORY },
+        { BURN_BUNDLE_NAME, TRUE },
+        { BURN_BUNDLE_INPROGRESS_NAME, TRUE },
+        { BURN_BUNDLE_LAST_USED_SOURCE, TRUE },
+        { BURN_BUNDLE_MANUFACTURER, TRUE },
+        { BURN_BUNDLE_ORIGINAL_SOURCE, TRUE },
+        { BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER, TRUE },
+    };
+
     for (DWORD i = 0; i < countof(vrgBuiltInVariables); ++i)
     {
         BUILT_IN_VARIABLE_DECLARATION* pBuiltInVariable = &vrgBuiltInVariables[i];
 
         hr = AddBuiltInVariable(pVariables, pBuiltInVariable->wzVariable, pBuiltInVariable->pfnInitialize, pBuiltInVariable->dwpInitializeData, pBuiltInVariable->fPersist, pBuiltInVariable->fOverridable);
         ExitOnFailure(hr, "Failed to add built-in variable: %ls.", pBuiltInVariable->wzVariable);
+    }
+
+    for (DWORD i = 0; i < countof(vrgWellKnownVariableNames); ++i)
+    {
+        WELL_KNOWN_VARIABLE_DECLARATION* pWellKnownVariable = &vrgWellKnownVariableNames[i];
+
+        hr = AddWellKnownVariable(pVariables, pWellKnownVariable->wzVariable, pWellKnownVariable->fPersist);
+        ExitOnFailure(hr, "Failed to add well-known variable: %ls.", pWellKnownVariable->wzVariable);
     }
 
 LExit:
@@ -301,6 +336,7 @@ extern "C" HRESULT VariablesParseFromXml(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fXmlFound = FALSE;
     IXMLDOMNode* pixnCommandLine = NULL;
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
@@ -315,17 +351,13 @@ extern "C" HRESULT VariablesParseFromXml(
 
     ::EnterCriticalSection(&pVariables->csAccess);
 
-    // select registration node
+    // select command-line node
     hr = XmlSelectSingleNode(pixnBundle, L"CommandLine", &pixnCommandLine);
-    if (S_FALSE == hr)
-    {
-        hr = E_NOTFOUND;
-    }
-    ExitOnFailure(hr, "Failed to select CommandLine node.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to select CommandLine node.");
 
     // @Variables
     hr = XmlGetAttributeEx(pixnCommandLine, L"Variables", &scz);
-    ExitOnFailure(hr, "Failed to get CommandLine/@Variables.");
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get CommandLine/@Variables.");
 
     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"upperCase", -1))
     {
@@ -337,8 +369,7 @@ extern "C" HRESULT VariablesParseFromXml(
     }
     else
     {
-        hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Invalid value for CommandLine/@Variables: %ls", scz);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for CommandLine/@Variables: %ls", scz);
     }
 
     // select variable nodes
@@ -357,28 +388,28 @@ extern "C" HRESULT VariablesParseFromXml(
 
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &sczId);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
         // @Hidden
         hr = XmlGetYesNoAttribute(pixnNode, L"Hidden", &fHidden);
-        ExitOnFailure(hr, "Failed to get @Hidden.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Hidden.");
 
         // @Persisted
         hr = XmlGetYesNoAttribute(pixnNode, L"Persisted", &fPersisted);
-        ExitOnFailure(hr, "Failed to get @Persisted.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Persisted.");
 
         // @Value
         hr = XmlGetAttributeEx(pixnNode, L"Value", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Value.");
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Value.");
 
+        if (fXmlFound)
+        {
             hr = BVariantSetString(&value, scz, 0, FALSE);
             ExitOnFailure(hr, "Failed to set variant value.");
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            ExitOnFailure(hr, "Failed to get @Type.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
             {
@@ -414,8 +445,7 @@ extern "C" HRESULT VariablesParseFromXml(
             }
             else
             {
-                hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
         else
@@ -444,14 +474,18 @@ extern "C" HRESULT VariablesParseFromXml(
         // insert element if not found
         if (S_FALSE == hr)
         {
-            hr = InsertVariable(pVariables, sczId, iVariable);
+            hr = InsertUserVariable(pVariables, sczId, iVariable);
             ExitOnFailure(hr, "Failed to insert variable '%ls'.", sczId);
         }
         else if (BURN_VARIABLE_INTERNAL_TYPE_NORMAL < pVariables->rgVariables[iVariable].internalType)
         {
-            hr = E_INVALIDARG;
-            ExitOnRootFailure(hr, "Attempt to set built-in variable value: %ls", sczId);
+            ExitWithRootFailure(hr, E_INVALIDARG, "Attempt to add built-in variable: %ls", sczId);
         }
+        else
+        {
+            ExitWithRootFailure(hr, E_INVALIDARG, "Attempt to add variable again: %ls", sczId);
+        }
+
         pVariables->rgVariables[iVariable].fHidden = fHidden;
         pVariables->rgVariables[iVariable].fPersisted = fPersisted;
 
@@ -1409,13 +1443,54 @@ static HRESULT AddBuiltInVariable(
         hr = InsertVariable(pVariables, wzVariable, iVariable);
         ExitOnFailure(hr, "Failed to insert variable.");
     }
+    else
+    {
+        ExitWithRootFailure(hr, E_INVALIDSTATE, "Attempted to add built-in variable again: %ls", wzVariable);
+    }
 
-    // set variable values
+    // set variable details
     pVariable = &pVariables->rgVariables[iVariable];
     pVariable->fPersisted = fPersist;
     pVariable->internalType = fOverridable ? BURN_VARIABLE_INTERNAL_TYPE_OVERRIDABLE_BUILTIN : BURN_VARIABLE_INTERNAL_TYPE_BUILTIN;
     pVariable->pfnInitialize = pfnInitialize;
     pVariable->dwpInitializeData = dwpInitializeData;
+
+LExit:
+    return hr;
+}
+
+static HRESULT AddWellKnownVariable(
+    __in BURN_VARIABLES* pVariables,
+    __in LPCWSTR wzVariable,
+    __in BOOL fPersisted
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD iVariable = 0;
+    BURN_VARIABLE* pVariable = NULL;
+
+    hr = FindVariableIndexByName(pVariables, wzVariable, &iVariable);
+    ExitOnFailure(hr, "Failed to find variable value.");
+
+    // insert element if not found
+    if (S_FALSE == hr)
+    {
+        hr = InsertVariable(pVariables, wzVariable, iVariable);
+        ExitOnFailure(hr, "Failed to insert variable.");
+    }
+    else if (BURN_VARIABLE_INTERNAL_TYPE_NORMAL != pVariables->rgVariables[iVariable].internalType)
+    {
+        ExitWithRootFailure(hr, E_INVALIDSTATE, "Attempted to add built-in variable as a well-known variable: %ls", wzVariable);
+    }
+    else
+    {
+        ExitWithRootFailure(hr, E_INVALIDSTATE, "Attempted to add well-known variable again: %ls", wzVariable);
+    }
+
+    // set variable details
+    pVariable = &pVariables->rgVariables[iVariable];
+    pVariable->fPersisted = fPersisted;
+    pVariable->internalType = BURN_VARIABLE_INTERNAL_TYPE_NORMAL;
 
 LExit:
     return hr;
@@ -1492,6 +1567,25 @@ static HRESULT FindVariableIndexByName(
 
     *piVariable = iRangeFirst;
     hr = S_FALSE; // variable not found
+
+LExit:
+    return hr;
+}
+
+static HRESULT InsertUserVariable(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __in DWORD iPosition
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, wzVariable, 3, L"Wix", 3))
+    {
+            ExitWithRootFailure(hr, E_INVALIDARG, "Attempted to insert variable with reserved prefix: %ls", wzVariable);
+    }
+
+    hr = InsertVariable(pVariables, wzVariable, iPosition);
 
 LExit:
     return hr;

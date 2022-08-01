@@ -38,15 +38,17 @@ namespace WixToolset.Core.ExtensibilityServices
             Or,
         }
 
-        // Built-in variables (from burn\engine\variable.cpp, "vrgBuiltInVariables", around line 207)
+        // Built-in variables (from burn\engine\variable.cpp, "vrgBuiltInVariables", around line 225)
         private static readonly List<string> BuiltinBundleVariables = new List<string>(
             new string[] {
                 "AdminToolsFolder",
                 "AppDataFolder",
                 "CommonAppDataFolder",
                 "CommonFiles64Folder",
+                "CommonFiles6432Folder",
                 "CommonFilesFolder",
                 "CompatibilityMode",
+                "ComputerName",
                 "Date",
                 "DesktopFolder",
                 "FavoritesFolder",
@@ -67,6 +69,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 "NTSuiteWebServer",
                 "PersonalFolder",
                 "Privileged",
+                "ProcessorArchitecture",
                 "ProgramFiles64Folder",
                 "ProgramFiles6432Folder",
                 "ProgramFilesFolder",
@@ -78,6 +81,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 "StartupFolder",
                 "System64Folder",
                 "SystemFolder",
+                "SystemLanguageID",
                 "TempFolder",
                 "TemplateFolder",
                 "TerminalServer",
@@ -86,15 +90,22 @@ namespace WixToolset.Core.ExtensibilityServices
                 "VersionMsi",
                 "VersionNT",
                 "VersionNT64",
+                "WindowsBuildNumber",
                 "WindowsFolder",
                 "WindowsVolume",
                 "WixBundleAction",
+                "WixBundleActiveParent",
                 "WixBundleCommandLineAction",
-                "WixBundleForcedRestartPackage",
                 "WixBundleElevated",
+                "WixBundleExecutePackageAction",
+                "WixBundleExecutePackageCacheFolder",
+                "WixBundleForcedRestartPackage",
                 "WixBundleInstalled",
                 "WixBundleProviderKey",
+                "WixBundleSourceProcessFolder",
+                "WixBundleSourceProcessPath",
                 "WixBundleTag",
+                "WixBundleUILevel",
                 "WixBundleVersion",
             });
 

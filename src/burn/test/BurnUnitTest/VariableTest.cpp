@@ -132,6 +132,37 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void VariablesParseXmlFailureTest()
+        {
+            HRESULT hr = S_OK;
+            IXMLDOMElement* pixeBundle = NULL;
+            BURN_VARIABLES variables = { };
+
+            try
+            {
+                LPCWSTR wzDocument =
+                    L"<Bundle>"
+                    L"    <Variable Id='WixCustomVariable' Type='numeric' Value='1' Hidden='no' Persisted='no' />"
+                    L"    <CommandLine Variables='upperCase' />"
+                    L"</Bundle>";
+
+                hr = VariableInitialize(&variables);
+                TestThrowOnFailure(hr, L"Failed to initialize variables.");
+
+                // load XML document
+                LoadBundleXmlHelper(wzDocument, &pixeBundle);
+
+                hr = VariablesParseFromXml(&variables, pixeBundle);
+                NativeAssert::SpecificReturnCode(E_INVALIDARG, hr, "Should have failed due to 'WixCustomVariable' starting with Wix.");
+            }
+            finally
+            {
+                ReleaseObject(pixeBundle);
+                VariablesUninitialize(&variables);
+            }
+        }
+
+        [Fact]
         void VariablesFormatTest()
         {
             HRESULT hr = S_OK;
@@ -417,6 +448,8 @@ namespace Bootstrapper
                 VariableSetVersionHelper(&variables1, L"PROP3", L"1.1.1.1");
                 VariableSetStringHelper(&variables1, L"PROP4", L"VAL4", FALSE);
                 VariableSetStringHelper(&variables1, L"PROP5", L"[PROP1]", TRUE);
+                VariableSetStringHelper(&variables1, L"WixBundleName", L"DifferentName", FALSE);
+                VariableSetStringHelper(&variables1, L"WixBundleLog_PackageA", L"C:\\path\\[to]\\log", FALSE);
 
                 hr = VariableSerialize(&variables1, FALSE, &pbBuffer, &cbBuffer);
                 TestThrowOnFailure(hr, L"Failed to serialize variables.");
@@ -433,12 +466,16 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"1.1.1.1"), VariableGetVersionHelper(&variables2, L"PROP3"));
                 Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables2, L"PROP4"));
                 Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetStringHelper(&variables2, L"PROP5"));
+                Assert::Equal<String^>(gcnew String(L"DifferentName"), VariableGetStringHelper(&variables2, L"WixBundleName"));
+                Assert::Equal<String^>(gcnew String(L"C:\\path\\[to]\\log"), VariableGetStringHelper(&variables2, L"WixBundleLog_PackageA"));
 
                 Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables2, L"PROP1"));
                 Assert::Equal((int)BURN_VARIANT_TYPE_NUMERIC, VariableGetTypeHelper(&variables2, L"PROP2"));
                 Assert::Equal((int)BURN_VARIANT_TYPE_VERSION, VariableGetTypeHelper(&variables2, L"PROP3"));
                 Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables2, L"PROP4"));
                 Assert::Equal((int)BURN_VARIANT_TYPE_FORMATTED, VariableGetTypeHelper(&variables2, L"PROP5"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables2, L"WixBundleName"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables2, L"WixBundleLog_PackageA"));
             }
             finally
             {

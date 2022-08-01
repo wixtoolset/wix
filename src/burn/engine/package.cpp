@@ -174,6 +174,13 @@ extern "C" HRESULT PackagesParseFromXml(
         hr = XmlGetAttributeEx(pixnNode, L"RollbackLogPathVariable", &pPackage->sczRollbackLogPathVariable);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RollbackLogPathVariable.");
 
+        if (pPackage->sczLogPathVariable && *pPackage->sczLogPathVariable)
+        {
+            // Format a suitable log path variable from the original package.
+            hr = StrAllocFormatted(&pPackage->sczCompatibleLogPathVariable, L"%ls_Compatible", pPackage->sczLogPathVariable);
+            ExitOnFailure(hr, "Failed to format log path variable for compatible package.");
+        }
+
         // @InstallCondition
         hr = XmlGetAttributeEx(pixnNode, L"InstallCondition", &pPackage->sczInstallCondition);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallCondition.");
@@ -365,6 +372,7 @@ extern "C" void PackageUninitialize(
     ReleaseStr(pPackage->sczId);
     ReleaseStr(pPackage->sczLogPathVariable);
     ReleaseStr(pPackage->sczRollbackLogPathVariable);
+    ReleaseStr(pPackage->sczCompatibleLogPathVariable);
     ReleaseStr(pPackage->sczInstallCondition);
     ReleaseStr(pPackage->sczRepairCondition);
     ReleaseStr(pPackage->sczCacheId);

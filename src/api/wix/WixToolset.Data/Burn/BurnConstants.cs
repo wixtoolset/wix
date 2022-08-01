@@ -19,12 +19,5 @@ namespace WixToolset.Data.Burn
 
         public const string BootstrapperApplicationDataSymbolDefinitionTag = "WixBootstrapperApplicationData";
         public const string BundleExtensionSearchSymbolDefinitionTag = "WixBundleExtensionSearch";
-
-        // The following constants must stay in sync with src\burn\engine\core.h
-        public const string BURN_BUNDLE_INPROGRESS_NAME = "WixBundleInProgressName";
-        public const string BURN_BUNDLE_NAME = "WixBundleName";
-        public const string BURN_BUNDLE_ORIGINAL_SOURCE = "WixBundleOriginalSource";
-        public const string BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER = "WixBundleOriginalSourceFolder";
-        public const string BURN_BUNDLE_LAST_USED_SOURCE = "WixBundleLastUsedSource";
     }
 }

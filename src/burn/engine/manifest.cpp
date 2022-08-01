@@ -67,31 +67,14 @@ static HRESULT ParseFromXml(
 {
     HRESULT hr = S_OK;
     IXMLDOMElement* pixeBundle = NULL;
-    IXMLDOMNode* pixnLog = NULL;
     IXMLDOMNode* pixnChain = NULL;
 
     // get bundle element
     hr = pixdDocument->get_documentElement(&pixeBundle);
     ExitOnFailure(hr, "Failed to get bundle element.");
 
-    // parse the log element, if present.
-    hr = XmlSelectSingleNode(pixeBundle, L"Log", &pixnLog);
-    ExitOnFailure(hr, "Failed to get Log element.");
-
-    if (S_OK == hr)
-    {
-        hr = XmlGetAttributeEx(pixnLog, L"PathVariable", &pEngineState->log.sczPathVariable);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get Log/@PathVariable.");
-        }
-
-        hr = XmlGetAttributeEx(pixnLog, L"Prefix", &pEngineState->log.sczPrefix);
-        ExitOnFailure(hr, "Failed to get Log/@Prefix attribute.");
-
-        hr = XmlGetAttributeEx(pixnLog, L"Extension", &pEngineState->log.sczExtension);
-        ExitOnFailure(hr, "Failed to get Log/@Extension attribute.");
-    }
+    hr = LoggingParseFromXml(&pEngineState->log, pixeBundle);
+    ExitOnFailure(hr, "Failed to parse logging.");
 
     // get the chain element
     hr = XmlSelectSingleNode(pixeBundle, L"Chain", &pixnChain);
@@ -167,7 +150,6 @@ static HRESULT ParseFromXml(
 
 LExit:
     ReleaseObject(pixnChain);
-    ReleaseObject(pixnLog);
     ReleaseObject(pixeBundle);
     return hr;
 }

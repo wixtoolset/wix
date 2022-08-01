@@ -173,7 +173,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void ValidateVariable(WixBundleVariableSymbol symbol)
         {
-            this.BackendHelper.ValidateBundleVariableName(symbol.SourceLineNumbers, "Variable", "Name", symbol.Id.Id, allowBuiltIn: symbol.BuiltIn);
+            this.BackendHelper.ValidateBundleVariableName(symbol.SourceLineNumbers, "Variable", "Name", symbol.Id.Id, allowBuiltIn: false);
         }
     }
 }
