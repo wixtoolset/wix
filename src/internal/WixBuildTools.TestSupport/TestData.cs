@@ -9,6 +9,39 @@ namespace WixBuildTools.TestSupport
 
     public class TestData
     {
+        public static void CreateFile(string path, long size, bool fill = false)
+        {
+            // Ensure the directory exists.
+            path = Path.GetFullPath(path);
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (var file = File.OpenWrite(path))
+            {
+                if (fill)
+                {
+                    var random = new Random();
+                    var bytes = new byte[4096];
+                    var generated = 0L;
+
+                    // Put fill bytes in the file so it doesn't compress trivially.
+                    while (generated < size)
+                    {
+                        var generate = (int)Math.Min(size - generated, bytes.Length);
+
+                        random.NextBytes(bytes);
+
+                        file.Write(bytes, 0, generate);
+
+                        generated += generate;
+                    }
+                }
+                else
+                {
+                    file.SetLength(size);
+                }
+            }
+        }
+
         public static string Get(params string[] paths)
         {
             var localPath = Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath);

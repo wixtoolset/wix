@@ -3,8 +3,8 @@
 namespace WixToolsetTest.CoreNative
 {
     using System.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Core.Native;
-    using WixToolsetTest.CoreNative.Utility;
     using Xunit;
 
     public class CertificateHashesFixture

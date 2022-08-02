@@ -7,7 +7,7 @@ namespace WixTestTools
 
     public class TestExeTool : TestTool
     {
-        private static readonly string TestExePath32 = Path.Combine(TestData.Get(), "win-x86", "TestExe.exe");
+        private static readonly string TestExePath32 = TestData.Get("win-x86", "TestExe.exe");
 
         public TestExeTool()
             : base(TestExePath32)
