@@ -267,14 +267,14 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.EmptyAttributeValue, "The {0}/@{1} attribute's value cannot be an empty string.  If you want the value to be null or empty, simply remove the entire attribute.", elementName, attributeName);
         }
 
-        public static Message EmptyCabinet(SourceLineNumber sourceLineNumbers, string cabinetName)
-        {
-            return Message(sourceLineNumbers, Ids.EmptyCabinet, "The cabinet '{0}' does not contain any files.  If this installation contains no files, this warning can likely be safely ignored.  Otherwise, please add files to the cabinet or remove it.", cabinetName);
-        }
-
         public static Message EmptyCabinet(SourceLineNumber sourceLineNumbers, string cabinetName, bool isPatch)
         {
-            return Message(sourceLineNumbers, Ids.EmptyCabinet, "The cabinet '{0}' does not contain any files.  If this patch contains no files, this warning can likely be safely ignored.  Otherwise, try passing -p to torch.exe when first building the transforms, or add a ComponentRef to your PatchFamily authoring to pull changed files into the cabinet.", cabinetName, isPatch);
+            if (isPatch)
+            {
+                return Message(sourceLineNumbers, Ids.EmptyCabinet, "The cabinet '{0}' does not contain any files. If this patch contains no files, this warning can likely be safely ignored. Otherwise, try passing -p to torch.exe when first building the transforms, or add a ComponentRef to your PatchFamily authoring to pull changed files into the cabinet.", cabinetName, isPatch);
+            }
+
+            return Message(sourceLineNumbers, Ids.EmptyCabinet, "The cabinet '{0}' does not contain any files. If this installation contains no files, this warning can likely be safely ignored. Otherwise, please add files to the cabinet or remove it.", cabinetName);
         }
 
         public static Message ExpectedForeignRow(SourceLineNumber sourceLineNumbers, string tableName, string primaryKey, string columnName, string columnValue, string foreignTableName)

@@ -36,7 +36,8 @@ namespace WixToolset.Core.Native
         /// <param name="compressionLevel">Level of compression to apply.</param>
         /// <param name="maxSize">Maximum size of cabinet.</param>
         /// <param name="maxThresh">Maximum threshold for each cabinet.</param>
-        public void Compress(IEnumerable<CabinetCompressFile> files, CompressionLevel compressionLevel, int maxSize = 0, int maxThresh = 0)
+        /// <returns>>List of CabinetCreated.</returns>
+        public IReadOnlyCollection<CabinetCreated> Compress(IEnumerable<CabinetCompressFile> files, CompressionLevel compressionLevel, int maxSize = 0, int maxThresh = 0)
         {
             var compressionLevelVariable = Environment.GetEnvironmentVariable(CompressionLevelVariable);
 
@@ -56,7 +57,9 @@ namespace WixToolset.Core.Native
                 wixnative.AddStdinLine(file.ToWixNativeStdinLine());
             }
 
-            wixnative.Run();
+            var cabinetsCreated = wixnative.Run();
+
+            return ParseCreatedCabinets(cabinetsCreated);
         }
 
         /// <summary>
@@ -102,6 +105,25 @@ namespace WixToolset.Core.Native
 
             var wixnative = new WixNativeExe("extractcab", this.Path, outputFolder);
             return wixnative.Run().Where(output => !String.IsNullOrWhiteSpace(output));
+        }
+
+        private static IReadOnlyCollection<CabinetCreated> ParseCreatedCabinets(IReadOnlyCollection<string> cabinetsCreated)
+        {
+            var created = new List<CabinetCreated>();
+
+            foreach (var cabinetCreated in cabinetsCreated)
+            {
+                var data = cabinetCreated.Split(TextLineSplitter, StringSplitOptions.None);
+
+                if (data.Length != 3)
+                {
+                    continue;
+                }
+
+                created.Add(new CabinetCreated(data[1], data[2]));
+            }
+
+            return created;
         }
     }
 }

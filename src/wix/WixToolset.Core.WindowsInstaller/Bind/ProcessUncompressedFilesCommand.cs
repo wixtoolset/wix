@@ -17,30 +17,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class ProcessUncompressedFilesCommand
     {
-        public ProcessUncompressedFilesCommand(IntermediateSection section, IBackendHelper backendHelper, IPathResolver pathResolver)
+        public ProcessUncompressedFilesCommand(IntermediateSection section, IBackendHelper backendHelper, IPathResolver pathResolver, IEnumerable<IFileFacade> fileFacades, string outputPath, bool compressed, bool longNamesInImage, Func<MediaSymbol, string, string, string> resolveMedia)
         {
             this.Section = section;
             this.BackendHelper = backendHelper;
             this.PathResolver = pathResolver;
+
+            this.DatabasePath = outputPath;
+            this.LayoutDirectory = Path.GetDirectoryName(outputPath);
+            this.Compressed = compressed;
+            this.LongNamesInImage = longNamesInImage;
+
+            this.FileFacades = fileFacades;
+            this.ResolveMedia = resolveMedia;
         }
 
         private IntermediateSection Section { get; }
 
-        public IBackendHelper BackendHelper { get; }
+        private IBackendHelper BackendHelper { get; }
 
-        public IPathResolver PathResolver { get; }
+        private IPathResolver PathResolver { get; }
 
-        public string DatabasePath { private get; set; }
+        private string DatabasePath { get; }
 
-        public IEnumerable<IFileFacade> FileFacades { private get; set; }
+        private string LayoutDirectory { get; }
 
-        public string LayoutDirectory { private get; set; }
+        private bool Compressed { get; }
 
-        public bool Compressed { private get; set; }
+        private bool LongNamesInImage { get; }
 
-        public bool LongNamesInImage { private get; set; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
-        public Func<MediaSymbol, string, string, string> ResolveMedia { private get; set; }
+        private Func<MediaSymbol, string, string, string> ResolveMedia { get; }
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 

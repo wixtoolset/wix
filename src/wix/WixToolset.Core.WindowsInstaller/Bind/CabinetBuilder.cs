@@ -18,18 +18,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     internal sealed class CabinetBuilder
     {
         private readonly Queue<CabinetWorkItem> cabinetWorkItems;
-        private int threadCount;
+        private readonly List<CompletedCabinetWorkItem> completedCabinets;
 
-        // Address of Binder's callback function for Cabinet Splitting
-        private readonly IntPtr newCabNamesCallBackAddress;
-
-        /// <summary>
-        /// Instantiate a new CabinetBuilder.
-        /// </summary>
-        /// <param name="messaging"></param>
-        /// <param name="threadCount">number of threads to use</param>
-        /// <param name="newCabNamesCallBackAddress">Address of Binder's callback function for Cabinet Splitting</param>
-        public CabinetBuilder(IMessaging messaging, int threadCount, IntPtr newCabNamesCallBackAddress)
+        public CabinetBuilder(IMessaging messaging, int threadCount, int maximumCabinetSizeForLargeFileSplitting, int maximumUncompressedMediaSize)
         {
             if (0 >= threadCount)
             {
@@ -37,24 +28,32 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             this.cabinetWorkItems = new Queue<CabinetWorkItem>();
-            this.Messaging = messaging;
-            this.threadCount = threadCount;
+            this.completedCabinets = new List<CompletedCabinetWorkItem>();
 
-            // Set Address of Binder's callback function for Cabinet Splitting
-            this.newCabNamesCallBackAddress = newCabNamesCallBackAddress;
+            this.Messaging = messaging;
+            this.ThreadCount = threadCount;
+            this.MaximumCabinetSizeForLargeFileSplitting = maximumCabinetSizeForLargeFileSplitting;
+            this.MaximumUncompressedMediaSize = maximumUncompressedMediaSize;
         }
 
         private IMessaging Messaging { get; }
 
-        public int MaximumCabinetSizeForLargeFileSplitting { get; set; }
+        private int ThreadCount { get; }
 
-        public int MaximumUncompressedMediaSize { get; set; }
+        private int MaximumCabinetSizeForLargeFileSplitting { get; }
+
+        private int MaximumUncompressedMediaSize { get; }
+
+        public IReadOnlyCollection<CompletedCabinetWorkItem> CompletedCabinets => this.completedCabinets;
 
         /// <summary>
         /// Enqueues a CabinetWorkItem to the queue.
         /// </summary>
         /// <param name="cabinetWorkItem">cabinet work item</param>
-        public void Enqueue(CabinetWorkItem cabinetWorkItem) => this.cabinetWorkItems.Enqueue(cabinetWorkItem);
+        public void Enqueue(CabinetWorkItem cabinetWorkItem)
+        {
+            this.cabinetWorkItems.Enqueue(cabinetWorkItem);
+        }
 
         /// <summary>
         /// Create the queued cabinets.
@@ -62,8 +61,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <returns>error message number (zero if no error)</returns>
         public void CreateQueuedCabinets()
         {
+            if (this.cabinetWorkItems.Count == 0)
+            {
+                return;
+            }
+
+            var cabinetFolders = this.cabinetWorkItems.Select(c => Path.GetDirectoryName(c.CabinetFile)).Distinct(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var folder in cabinetFolders)
+            {
+                Directory.CreateDirectory(folder);
+            }
+
             // don't create more threads than the number of cabinets to build
-            var numberOfThreads = Math.Min(this.threadCount, this.cabinetWorkItems.Count);
+            var numberOfThreads = Math.Min(this.ThreadCount, this.cabinetWorkItems.Count);
 
             if (0 < numberOfThreads)
             {
@@ -107,8 +118,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         cabinetWorkItem = this.cabinetWorkItems.Dequeue();
                     }
 
-                    // create a cabinet
-                    this.CreateCabinet(cabinetWorkItem);
+                    // Create a cabinet.
+                    var created = this.CreateCabinet(cabinetWorkItem);
+
+                    // Update the cabinet work item to report back what cabinets were created.
+                    lock (this.completedCabinets)
+                    {
+                        this.completedCabinets.Add(new CompletedCabinetWorkItem(cabinetWorkItem.DiskId, created));
+                    }
                 }
             }
             catch (WixException we)
@@ -125,7 +142,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Creates a cabinet using the wixcab.dll interop layer.
         /// </summary>
         /// <param name="cabinetWorkItem">CabinetWorkItem containing information about the cabinet to create.</param>
-        private void CreateCabinet(CabinetWorkItem cabinetWorkItem)
+        private IReadOnlyCollection<CabinetCreated> CreateCabinet(CabinetWorkItem cabinetWorkItem)
         {
             this.Messaging.Write(VerboseMessages.CreateCabinet(cabinetWorkItem.CabinetFile));
 
@@ -163,7 +180,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 .ToList();
 
             var cab = new Cabinet(cabinetPath);
-            cab.Compress(files, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
+            var created = cab.Compress(files, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
 
             // Best effort check to see if the cabinet is too large for the Windows Installer.
             try
@@ -177,6 +194,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             catch
             {
             }
+
+            return created;
         }
     }
 }

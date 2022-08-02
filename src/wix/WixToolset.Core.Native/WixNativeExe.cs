@@ -49,8 +49,8 @@ namespace WixToolset.Core.Native
 
             using (var process = Process.Start(wixNativeInfo))
             {
-                process.OutputDataReceived += (s, a) => outputLines.Add(a.Data);
-                process.ErrorDataReceived += (s, a) => outputLines.Add(a.Data);
+                process.OutputDataReceived += (s, a) => { if (a.Data != null) { outputLines.Add(a.Data); } };
+                process.ErrorDataReceived += (s, a) => { if (a.Data != null) { outputLines.Add(a.Data); } };
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 

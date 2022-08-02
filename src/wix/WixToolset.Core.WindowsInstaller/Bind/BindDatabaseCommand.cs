@@ -410,7 +410,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var modularize = new ModularizeCommand(this.WindowsInstallerBackendHelper, data, modularizationSuffix, section.Symbols.OfType<WixSuppressModularizationSymbol>());
                 modularize.Execute();
 
-                // Ensure all sequence tables in place because, mergemod.dll requires them.
+                // Ensure all sequence tables in place because mergemod.dll requires them.
                 var unsuppress = new AddBackSuppressedSequenceTablesCommand(data, tableDefinitions);
                 suppressedTableNames = unsuppress.Execute();
             }
@@ -438,28 +438,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // create cabinet files and process uncompressed files
-            var layoutDirectory = Path.GetDirectoryName(this.OutputPath);
+            // Create cabinet files.
             if (!this.SuppressLayout || OutputType.Module == data.Type)
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                var mediaTemplate = section.Symbols.OfType<WixMediaTemplateSymbol>().FirstOrDefault();
-
-                var command = new CreateCabinetsCommand(this.ServiceProvider, this.WindowsInstallerBackendHelper, mediaTemplate);
-                command.CabbingThreadCount = this.CabbingThreadCount;
-                command.CabCachePath = this.CabCachePath;
-                command.DefaultCompressionLevel = this.DefaultCompressionLevel;
-                command.Data = data;
-                command.Messaging = this.Messaging;
-                command.BackendExtensions = this.BackendExtensions;
-                command.LayoutDirectory = layoutDirectory;
-                command.Compressed = compressed;
-                command.ModularizationSuffix = modularizationSuffix;
-                command.FileFacadesByCabinet = filesByCabinetMedia;
-                command.ResolveMedia = this.ResolveMedia;
-                command.TableDefinitions = tableDefinitions;
-                command.IntermediateFolder = this.IntermediateFolder;
+                var command = new CreateCabinetsCommand(this.ServiceProvider, this.Messaging, this.WindowsInstallerBackendHelper, this.BackendExtensions, section, this.CabCachePath, this.CabbingThreadCount, this.OutputPath, this.IntermediateFolder, this.DefaultCompressionLevel, compressed, modularizationSuffix, filesByCabinetMedia, data, tableDefinitions, this.ResolveMedia);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -523,13 +507,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Process uncompressed files.
             if (!this.SuppressLayout && uncompressedFiles.Any())
             {
-                var command = new ProcessUncompressedFilesCommand(section, this.WindowsInstallerBackendHelper, this.PathResolver);
-                command.Compressed = compressed;
-                command.FileFacades = uncompressedFiles;
-                command.LayoutDirectory = layoutDirectory;
-                command.LongNamesInImage = longNames;
-                command.ResolveMedia = this.ResolveMedia;
-                command.DatabasePath = this.OutputPath;
+                var command = new ProcessUncompressedFilesCommand(section, this.WindowsInstallerBackendHelper, this.PathResolver, uncompressedFiles, this.OutputPath, compressed, longNames, this.ResolveMedia);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);

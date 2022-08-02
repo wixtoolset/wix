@@ -167,6 +167,9 @@ namespace WixToolset.Core.ExtensibilityServices
         /// <summary>
         /// Allows direct access to the underlying FileRow as requried for patching.
         /// </summary>
-        public FileRow GetFileRow() => this.FileRow ?? throw new NotImplementedException();
+        public FileRow GetFileRow()
+        {
+            return this.FileRow ?? throw new NotImplementedException();
+        }
     }
 }

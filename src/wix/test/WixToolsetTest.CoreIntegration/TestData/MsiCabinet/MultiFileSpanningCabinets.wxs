@@ -1,0 +1,38 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="yes" InstallerVersion="200" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="Downgrade not allowed" />
+
+    <MediaTemplate CabinetTemplate="cab{0}.cab" CompressionLevel="none" MaximumUncompressedMediaSize="20" MaximumCabinetSizeForLargeFileSplitting="20" />
+
+    <Feature Id="ProductFeature">
+        <!-- The name of the files here are important to control order of the generated media and cabinets. -->
+        <Component Directory="INSTALLFOLDER">
+            <File Source="abc.gen" />
+        </Component>
+        <Component Directory="INSTALLFOLDER">
+            <File Source="ced.txt" />
+        </Component>
+        <Component Directory="INSTALLFOLDER">
+            <File Source="hij.txt" />
+        </Component>
+        <Component Directory="INSTALLFOLDER">
+            <File Source="mno.gen" />
+        </Component>
+        <Component Directory="INSTALLFOLDER">
+            <File Source="qrs.txt" />
+        </Component>
+        <Component Directory="INSTALLFOLDER">
+            <File Source="tuv.txt" />
+        </Component>
+        <Component Directory="INSTALLFOLDER">
+            <File Source="xyz.gen" />
+        </Component>
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

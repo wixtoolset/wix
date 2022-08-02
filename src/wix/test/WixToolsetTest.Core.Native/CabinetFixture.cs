@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreNative
 {
+    using System;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
@@ -19,12 +20,45 @@ namespace WixToolsetTest.CoreNative
                 var intermediateFolder = fs.GetFolder(true);
                 var cabPath = Path.Combine(intermediateFolder, "testout.cab");
 
-                var files = new[] { new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test.txt") };
+                var files = new[] { new CabinetCompressFile(TestData.Get(@"TestData", "test.txt"), "test.txt") };
 
                 var cabinet = new Cabinet(cabPath);
-                cabinet.Compress(files, CompressionLevel.Low);
+                var created = cabinet.Compress(files, CompressionLevel.Low);
 
                 Assert.True(File.Exists(cabPath));
+                Assert.Equal(new[]
+                {
+                    "testout.cab, test.txt"
+                }, created.Select(c => String.Join(", ", c.CabinetName, c.FirstFileToken)).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanCreateSpannedFileCabinet()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder(true);
+
+                // Put more than non-zero bytes in a file sized just under 3MB since there is
+                // some overhead in cabinets that prevent perfect packing on the megabyte boundary.
+                var threeMBPath = Path.Combine(intermediateFolder, "_3mb.dat");
+                TestData.CreateFile(threeMBPath, (long)(2.9 * 1024 * 1024), fill: true);
+
+                var cabPath = Path.Combine(intermediateFolder, "test.cab");
+
+                var files = new[] { new CabinetCompressFile(threeMBPath, Path.GetFileNameWithoutExtension(threeMBPath)) };
+
+                var cabinet = new Cabinet(cabPath);
+                var created = cabinet.Compress(files, CompressionLevel.None, maxSize: 1);
+
+                Assert.True(File.Exists(cabPath));
+                Assert.Equal(new[]
+                {
+                    "test.cab, _3mb",
+                    "testa.cab, _3mb",
+                    "testb.cab, _3mb"
+                }, created.Select(c => String.Join(", ", c.CabinetName, c.FirstFileToken)).ToArray());
             }
         }
 
@@ -58,8 +92,8 @@ namespace WixToolsetTest.CoreNative
                 // Compress.
                 {
                     var files = new[] {
-                        new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test1.txt"),
-                        new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test2.txt"),
+                        new CabinetCompressFile(TestData.Get(@"TestData", "test.txt"), "test1.txt"),
+                        new CabinetCompressFile(TestData.Get(@"TestData", "test.txt"), "test2.txt"),
                     };
 
                     var cabinet = new Cabinet(cabinetPath);

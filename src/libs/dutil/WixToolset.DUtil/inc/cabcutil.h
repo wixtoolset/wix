@@ -10,7 +10,7 @@
 // First argument is the name of splitting cabinet without extension e.g. "cab1"
 // Second argument is name of the new cabinet that would be formed by splitting e.g. "cab1b.cab"
 // Third argument is the file token of the first file present in the splitting cabinet
-typedef void (__stdcall * FileSplitCabNamesCallback)(LPWSTR, LPWSTR, LPWSTR);
+typedef void (__stdcall * FileSplitCabNamesCallback)(LPCWSTR, LPCWSTR, LPCWSTR);
 
 #define CAB_MAX_SIZE 0x7FFFFFFF   // (see KB: Q174866)
 
