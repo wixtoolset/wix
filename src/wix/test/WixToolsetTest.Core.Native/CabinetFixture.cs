@@ -4,9 +4,9 @@ namespace WixToolsetTest.CoreNative
 {
     using System.IO;
     using System.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolsetTest.CoreNative.Utility;
     using Xunit;
 
     public class CabinetFixture
