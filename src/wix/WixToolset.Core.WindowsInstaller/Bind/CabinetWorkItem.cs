@@ -15,14 +15,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Instantiate a new CabinetWorkItem.
         /// </summary>
         /// <param name="sourceLineNumber">Source line number that requires the cabinet creation.</param>
+        /// <param name="diskId"></param>
         /// <param name="fileFacades">The collection of files in this cabinet.</param>
         /// <param name="cabinetFile">The cabinet file.</param>
         /// <param name="maxThreshold">Maximum threshold for each cabinet.</param>
         /// <param name="compressionLevel">The compression level of the cabinet.</param>
         /// <param name="modularizationSuffix">Modularization suffix used when building a Merge Module.</param>
-        public CabinetWorkItem(SourceLineNumber sourceLineNumber, string cabinetFile, IEnumerable<IFileFacade> fileFacades, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix)
+        public CabinetWorkItem(SourceLineNumber sourceLineNumber, int diskId, string cabinetFile, IEnumerable<IFileFacade> fileFacades, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix)
         {
             this.SourceLineNumber = sourceLineNumber;
+            this.DiskId = diskId;
             this.CabinetFile = cabinetFile;
             this.CompressionLevel = compressionLevel;
             this.ModularizationSuffix = modularizationSuffix;
@@ -34,6 +36,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Source line that requires the cabinet creation.
         /// </summary>
         public SourceLineNumber SourceLineNumber { get; }
+
+        /// <summary>
+        /// Gets the Media symbol's DiskId that requires the cabinet.
+        /// </summary>
+        public int DiskId { get; }
 
         /// <summary>
         /// Gets the cabinet file.
@@ -56,7 +63,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Gets the collection of files in this cabinet.
         /// </summary>
         /// <value>The collection of files in this cabinet.</value>
-        public IEnumerable<IFileFacade> FileFacades { get;  }
+        public IEnumerable<IFileFacade> FileFacades { get; }
 
         /// <summary>
         /// Gets the max threshold.

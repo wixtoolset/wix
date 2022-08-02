@@ -2,8 +2,8 @@
 
 #include "precomp.h"
 
-static HRESULT CompressFiles(__in HANDLE hCab);
-static void __stdcall CabNamesCallback(__in_z LPWSTR wzFirstCabName, __in_z LPWSTR wzNewCabName, __in_z LPWSTR wzFileToken);
+static HRESULT CompressFiles(__in HANDLE hCab, __inout_z LPWSTR* psczFirstFileToken);
+static void __stdcall CabNamesCallback(__in_z LPCWSTR wzFirstCabName, __in_z LPCWSTR wzNewCabName, __in_z LPCWSTR wzFileToken);
 
 
 HRESULT SmartCabCommand(
@@ -20,6 +20,7 @@ HRESULT SmartCabCommand(
     UINT uiMaxThresh = 0;
     COMPRESSION_TYPE ct = COMPRESSION_TYPE_NONE;
     HANDLE hCab = NULL;
+    LPWSTR sczFirstFileToken = NULL;
 
     if (argc < 1)
     {
@@ -71,16 +72,22 @@ HRESULT SmartCabCommand(
         hr = WixNativeReadStdinPreamble();
         ExitOnFailure(hr, "failed to read stdin preamble before smartcabbing");
 
-        hr = CompressFiles(hCab);
+        hr = CompressFiles(hCab, &sczFirstFileToken);
         ExitOnFailure(hr, "failed to compress files into cabinet: %ls", sczCabPath);
+
+        CabNamesCallback(wzCabName, wzCabName, sczFirstFileToken);
+    }
+    else
+    {
+        CabNamesCallback(wzCabName, wzCabName, L"");
     }
 
     hr = CabCFinish(hCab, CabNamesCallback);
     hCab = NULL; // once finish is called, the handle is invalid.
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to compress cabinet: %ls", sczCabPath);
 
-
 LExit:
+    ReleaseStr(sczFirstFileToken);
     if (hCab)
     {
         CabCCancel(hCab);
@@ -93,7 +100,8 @@ LExit:
 
 
 static HRESULT CompressFiles(
-    __in HANDLE hCab
+    __in HANDLE hCab,
+    __inout_z LPWSTR* psczFirstFileToken
     )
 {
     HRESULT hr = S_OK;
@@ -138,6 +146,12 @@ static HRESULT CompressFiles(
             pHashInfo = &hashInfo;
         }
 
+        if (psczFirstFileToken && !*psczFirstFileToken)
+        {
+            hr = StrAllocString(psczFirstFileToken, wzToken, 0);
+            ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to allocate first file token: %ls", wzToken);
+        }
+
         hr = CabCAddFile(wzFilePath, wzToken, pHashInfo, hCab);
         ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to add file: %ls", wzFilePath);
 
@@ -157,9 +171,9 @@ LExit:
 // Second argument is name of the new cabinet that would be formed by splitting e.g. "cab1b.cab"
 // Third argument is the file token of the first file present in the splitting cabinet
 static void __stdcall CabNamesCallback(
-    __in_z LPWSTR wzFirstCabName,
-    __in_z LPWSTR wzNewCabName,
-    __in_z LPWSTR wzFileToken
+    __in_z LPCWSTR wzFirstCabName,
+    __in_z LPCWSTR wzNewCabName,
+    __in_z LPCWSTR wzFileToken
     )
 {
     ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls\t%ls\t%ls", wzFirstCabName, wzNewCabName, wzFileToken);
