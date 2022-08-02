@@ -20,6 +20,5 @@
 HRESULT WixNativeReadStdinPreamble();
 HRESULT CertificateHashesCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
 HRESULT SmartCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
-HRESULT ResetAclsCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
 HRESULT EnumCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);
 HRESULT ExtractCabCommand(__in int argc, __in_ecount(argc) LPWSTR argv[]);

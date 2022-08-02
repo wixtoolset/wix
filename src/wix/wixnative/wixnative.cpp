@@ -28,10 +28,6 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     {
         hr = CertificateHashesCommand(argc - 2, argv + 2);
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"resetacls", -1))
-    {
-        hr = ResetAclsCommand(argc - 2, argv + 2);
-    }
     else
     {
         ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Unknown command: %ls", argv[1]);
