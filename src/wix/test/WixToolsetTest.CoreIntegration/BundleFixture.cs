@@ -307,6 +307,43 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildSimpleBundleUsingInclude()
+        {
+            var folder = TestData.Get(@"TestData", "IncludePath");
+            var dataFolder = TestData.Get(@"TestData", "SimpleBundle", "data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Bundle.wxs"),
+                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
+                    "-bindpath", dataFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                using (var wixOutput = WixOutput.Read(pdbPath))
+                {
+
+                    var intermediate = Intermediate.Load(wixOutput);
+                    var section = intermediate.Sections.Single();
+
+                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+                    WixAssert.StringEqual("~IncludeTestBundle", bundleSymbol.Name);
+                }
+            }
+        }
+
+        [Fact]
         public void CanBuildSingleExeBundle()
         {
             var folder = TestData.Get(@"TestData");

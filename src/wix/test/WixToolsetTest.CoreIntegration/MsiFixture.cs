@@ -535,6 +535,9 @@ namespace WixToolsetTest.CoreIntegration
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
                 WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
                 WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+
+                var featureSymbol = Assert.Single(section.Symbols.OfType<FeatureSymbol>());
+                WixAssert.StringEqual("MsiPackage", featureSymbol.Title);
             }
         }
 
