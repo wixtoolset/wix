@@ -114,7 +114,7 @@ namespace WixToolsetTest.BurnE2E
         // Manual test for InternalUIBundle:
         //  1. Double click InternalUIBundle.exe on a machine that will prompt for elevation.
         //  2. Verify that the splash screen appeared but the prereq BA did not come up.
-        //  3. Verify that the elevation prompt came up immediately instead of flashing on the taskbar. (This is currently broken)
+        //  3. Verify that the elevation prompt came up immediately instead of flashing on the taskbar.
         //  4. Allow elevation.
         //  5. Verify that the MSI UI came up and the splash screen disappeared.
         //  6. Accept the two CA messages and click the install button.
