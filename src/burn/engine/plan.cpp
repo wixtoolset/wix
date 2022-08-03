@@ -2105,7 +2105,9 @@ static void ResetPlannedContainerState(
     pContainer->qwExtractSizeTotal = 0;
     pContainer->qwCommittedCacheProgress = 0;
     pContainer->qwCommittedExtractProgress = 0;
-    pContainer->hrExtract = S_OK;
+    pContainer->fExtracted = FALSE;
+    pContainer->fFailedVerificationFromAcquisition = FALSE;
+    ReleaseNullStr(pContainer->sczFailedLocalAcquisitionPath);
 }
 
 static void ResetPlannedPayloadsState(
@@ -2118,7 +2120,9 @@ static void ResetPlannedPayloadsState(
 
         pPayload->cRemainingInstances = 0;
         pPayload->state = BURN_PAYLOAD_STATE_NONE;
+        pPayload->fFailedVerificationFromAcquisition = FALSE;
         ReleaseNullStr(pPayload->sczLocalFilePath);
+        ReleaseNullStr(pPayload->sczFailedLocalAcquisitionPath);
     }
 }
 

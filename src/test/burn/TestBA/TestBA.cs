@@ -155,6 +155,9 @@ namespace WixToolset.Test.BA
                 this.quitAfterDetect = false;
             }
 
+            this.ImportContainerSources();
+            this.ImportPayloadSources();
+
             this.wait.WaitOne();
 
             if (this.action == LaunchAction.Help)
@@ -655,6 +658,54 @@ namespace WixToolset.Test.BA
             string message = String.Format(format, args);
 
             this.Engine.Log(LogLevel.Standard, String.Concat("TESTBA", relation, ": ", message));
+        }
+
+        private void ImportContainerSources()
+        {
+            string testName = this.Engine.GetVariableString("TestGroupName");
+            using (RegistryKey testKey = Registry.LocalMachine.OpenSubKey(String.Format(@"Software\WiX\Tests\TestBAControl\{0}\container", testName)))
+            {
+                if (testKey == null)
+                {
+                    return;
+                }
+
+                foreach (var containerId in testKey.GetSubKeyNames())
+                {
+                    using (RegistryKey subkey = testKey.OpenSubKey(containerId))
+                    {
+                        string initialSource = subkey == null ? null : subkey.GetValue("InitialLocalSource") as string;
+                        if (initialSource != null)
+                        {
+                            this.Engine.SetLocalSource(containerId, null, initialSource);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ImportPayloadSources()
+        {
+            string testName = this.Engine.GetVariableString("TestGroupName");
+            using (RegistryKey testKey = Registry.LocalMachine.OpenSubKey(String.Format(@"Software\WiX\Tests\TestBAControl\{0}\payload", testName)))
+            {
+                if (testKey == null)
+                {
+                    return;
+                }
+
+                foreach (var payloadId in testKey.GetSubKeyNames())
+                {
+                    using (RegistryKey subkey = testKey.OpenSubKey(payloadId))
+                    {
+                        string initialSource = subkey == null ? null : subkey.GetValue("InitialLocalSource") as string;
+                        if (initialSource != null)
+                        {
+                            this.Engine.SetLocalSource(null, payloadId, initialSource);
+                        }
+                    }
+                }
+            }
         }
 
         private List<string> ReadVerifyArguments()

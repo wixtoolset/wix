@@ -60,6 +60,9 @@ typedef struct _BURN_PAYLOAD
 
     LPWSTR sczUnverifiedPath;
     DWORD cRemainingInstances;
+
+    BOOL fFailedVerificationFromAcquisition;
+    LPWSTR sczFailedLocalAcquisitionPath;
 } BURN_PAYLOAD;
 
 typedef struct _BURN_PAYLOADS
