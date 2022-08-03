@@ -5,7 +5,7 @@
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
-    <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+    <Feature Id="ProductFeature" Title="$(var.FeatureTitleName)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
   </Package>

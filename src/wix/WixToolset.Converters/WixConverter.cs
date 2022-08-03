@@ -2274,15 +2274,17 @@ namespace WixToolset.Converters
         private static bool TryGetInnerText(XElement element, out string value)
         {
             value = null;
+            var found = false;
 
-            var nodes = element.Nodes();
+            var nodes = element.Nodes().ToList();
 
-            if (nodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
+            if (nodes.Any() && nodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
             {
                 value = String.Join(String.Empty, nodes.Cast<XText>().Select(TrimTextValue));
+                found = true;
             }
 
-            return !String.IsNullOrEmpty(value);
+            return found;
         }
 
         private static bool IsTextNode(XNode node, out XText text)

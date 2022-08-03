@@ -140,6 +140,115 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void FixEmptyCondition()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Condition Message='Empty new line'>",
+                "    </Condition>",
+                "    <Condition Message='Empty cdata'><![CDATA[]]></Condition>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Launch Condition=\"\" Message=\"Empty new line\" />",
+                "    <Launch Condition=\"\" Message=\"Empty cdata\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+
+            Assert.Equal(4, errors);
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void FixConditionWithComment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Condition Message='commented cdata'>",
+                "        <!-- commented condition -->",
+                "        <![CDATA[cdatacontent]]>",
+                "    </Condition>",
+                "  </Fragment>",
+                "</Wix>");
+
+            //TODO: expected value is not set in stone but must have replaced Condition element with Launch and should have kept the comment.
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Launch Condition=\"cdatacontent\" Message=\"commented cdata\" />",
+                "        <!-- commented condition -->",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+
+            Assert.Equal(2, errors);
+        }
+
+        [Fact]
+        public void FixConditionFromWxi()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Include xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Condition Message='from wxi'>",
+                "        wxicondition",
+                "    </Condition>",
+                "  </Fragment>",
+                "</Include>");
+
+            var expected = new[]
+            {
+                "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Launch Condition=\"wxicondition\" Message=\"from wxi\" />",
+                "  </Fragment>",
+                "</Include>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+
+            Assert.Equal(3, errors);
+        }
+
+        [Fact]
         public void FixFeatureCondition()
         {
             var parse = String.Join(Environment.NewLine,
