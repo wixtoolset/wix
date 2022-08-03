@@ -132,7 +132,7 @@ extern "C" HRESULT EngineRun(
 
     engineState.command.nCmdShow = nCmdShow;
 
-    if (BURN_MODE_ELEVATED != engineState.internalCommand.mode && BOOTSTRAPPER_DISPLAY_NONE < engineState.command.display && !engineState.command.hwndSplashScreen)
+    if (BURN_MODE_ELEVATED != engineState.internalCommand.mode && BOOTSTRAPPER_DISPLAY_NONE < engineState.command.display)
     {
         SplashScreenCreate(hInstance, NULL, &engineState.command.hwndSplashScreen);
     }

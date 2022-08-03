@@ -13,6 +13,7 @@ struct SPLASHSCREEN_INFO
     SIZE size;
     UINT nDpi;
     HWND hWnd;
+    HWND hwndPrevious;
 };
 
 struct SPLASHSCREEN_CONTEXT
@@ -258,6 +259,19 @@ static LRESULT CALLBACK WndProc(
     case WM_ERASEBKGND:
         OnEraseBkgnd(pSplashScreen, wParam);
         return 1;
+
+    case WM_ENTERIDLE:
+        lres = ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+
+        // We had to create our own splash screen so that Windows would automatically transfer focus from the other process's splash screen.
+        // Try to make sure new splash screen has painted before closing old one to avoid flickering.
+        if (pSplashScreen->hwndPrevious)
+        {
+            ::PostMessageW(pSplashScreen->hwndPrevious, WM_CLOSE, 0, 0);
+            pSplashScreen->hwndPrevious = NULL;
+        }
+
+        return lres;
     }
 
     return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
@@ -275,6 +289,11 @@ static HRESULT LoadSplashScreen(
     int y = 0;
     DPIU_MONITOR_CONTEXT* pMonitorContext = NULL;
     RECT* pMonitorRect = NULL;
+
+    if (::IsWindow(*pContext->pHwnd))
+    {
+        pSplashScreen->hwndPrevious = *pContext->pHwnd;
+    }
 
     pSplashScreen->nDpi = USER_DEFAULT_SCREEN_DPI;
     pSplashScreen->hBitmap = ::LoadBitmapW(pContext->hInstance, MAKEINTRESOURCEW(pContext->pSplashScreenConfiguration->wResourceId));
