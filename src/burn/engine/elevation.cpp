@@ -42,6 +42,7 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_BEGIN,
     BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_COMPLETE,
     BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS,
+    BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_FAILURE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROCESS_CANCEL,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROCESS_STARTED,
@@ -1792,9 +1793,17 @@ static HRESULT ProcessBurnCacheMessages(
     case BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS:
         // read message parameters
         hr = BuffReadNumber64((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.success.qwFileSize);
-        ExitOnFailure(hr, "Failed to read begin cache step.");
+        ExitOnFailure(hr, "Failed to read success file size.");
 
         message.type = BURN_CACHE_MESSAGE_SUCCESS;
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_FAILURE:
+        // read message parameters
+        hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, reinterpret_cast<DWORD*>(&message.failure.cacheStep));
+        ExitOnFailure(hr, "Failed to read failure cache step.");
+
+        message.type = BURN_CACHE_MESSAGE_FAILURE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_PROGRESS_ROUTINE:
@@ -3511,7 +3520,7 @@ static HRESULT CALLBACK BurnCacheMessageHandler(
     case BURN_CACHE_MESSAGE_BEGIN:
         // serialize message data
         hr = BuffWriteNumber(&pbData, &cbData, pMessage->begin.cacheStep);
-        ExitOnFailure(hr, "Failed to write progress percentage to message buffer.");
+        ExitOnFailure(hr, "Failed to write cache step to message buffer.");
 
         dwMessage = BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_BEGIN;
         break;
@@ -3526,9 +3535,17 @@ static HRESULT CALLBACK BurnCacheMessageHandler(
 
     case BURN_CACHE_MESSAGE_SUCCESS:
         hr = BuffWriteNumber64(&pbData, &cbData, pMessage->success.qwFileSize);
-        ExitOnFailure(hr, "Failed to count of files in use to message buffer.");
+        ExitOnFailure(hr, "Failed to write file size to message buffer.");
 
         dwMessage = BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS;
+        break;
+
+    case BURN_CACHE_MESSAGE_FAILURE:
+        // serialize message data
+        hr = BuffWriteNumber(&pbData, &cbData, pMessage->failure.cacheStep);
+        ExitOnFailure(hr, "Failed to write cache step to message buffer.");
+
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_FAILURE;
         break;
     }
 

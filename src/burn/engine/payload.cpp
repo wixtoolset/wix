@@ -240,6 +240,7 @@ extern "C" void PayloadUninitialize(
         ReleaseMem(pPayload->pbCertificateRootPublicKeyIdentifier);
         ReleaseStr(pPayload->sczSourcePath);
         ReleaseStr(pPayload->sczLocalFilePath);
+        ReleaseStr(pPayload->sczFailedLocalAcquisitionPath);
         ReleaseStr(pPayload->downloadSource.sczUrl);
         ReleaseStr(pPayload->downloadSource.sczUser);
         ReleaseStr(pPayload->downloadSource.sczPassword);

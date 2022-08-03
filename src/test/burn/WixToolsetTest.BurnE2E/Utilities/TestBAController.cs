@@ -183,6 +183,26 @@ namespace WixToolsetTest.BurnE2E
         }
 
         /// <summary>
+        /// At startup, set the payload's source path to the given path.
+        /// </summary>
+        /// <param name="payloadId"></param>
+        /// <param name="sourcePath"></param>
+        public void SetPayloadInitialLocalSource(string payloadId, string sourcePath)
+        {
+            this.SetPayloadState(payloadId, "InitialLocalSource", sourcePath);
+        }
+
+        /// <summary>
+        /// At startup, set the container's source path to the given path.
+        /// </summary>
+        /// <param name="containerId"></param>
+        /// <param name="sourcePath"></param>
+        public void SetContainerInitialLocalSource(string containerId, string sourcePath)
+        {
+            this.SetContainerState(containerId, "InitialLocalSource", sourcePath);
+        }
+
+        /// <summary>
         /// Sets the number of times to re-run the Detect phase.
         /// </summary>
         /// <param name="state">Number of times to run Detect (after the first, normal, Detect).</param>
@@ -204,7 +224,6 @@ namespace WixToolsetTest.BurnE2E
         public void SetVerifyArguments(string verifyArguments)
         {
             this.SetBurnTestValue("VerifyArguments", verifyArguments);
-
         }
 
         private void SetPackageState(string packageId, string name, string value)
@@ -219,6 +238,38 @@ namespace WixToolsetTest.BurnE2E
                 else
                 {
                     packageKey.SetValue(name, value);
+                }
+            }
+        }
+
+        private void SetContainerState(string containerId, string name, string value)
+        {
+            var key = String.Format(@"{0}\container\{1}", this.TestBaseRegKeyPath, containerId);
+            using (var containerKey = Registry.LocalMachine.CreateSubKey(key))
+            {
+                if (String.IsNullOrEmpty(value))
+                {
+                    containerKey.DeleteValue(name, false);
+                }
+                else
+                {
+                    containerKey.SetValue(name, value);
+                }
+            }
+        }
+
+        private void SetPayloadState(string payloadId, string name, string value)
+        {
+            var key = String.Format(@"{0}\payload\{1}", this.TestBaseRegKeyPath, payloadId ?? String.Empty);
+            using (var payloadKey = Registry.LocalMachine.CreateSubKey(key))
+            {
+                if (String.IsNullOrEmpty(value))
+                {
+                    payloadKey.DeleteValue(name, false);
+                }
+                else
+                {
+                    payloadKey.SetValue(name, value);
                 }
             }
         }

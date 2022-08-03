@@ -38,7 +38,7 @@ typedef struct _BURN_CACHE_CONTEXT
     LPWSTR* rgSearchPaths;
     DWORD cSearchPaths;
     DWORD cSearchPathsMax;
-    LPWSTR sczLastUsedFolderCandidate;
+    LPWSTR sczLocalAcquisitionSourcePath;
 } BURN_CACHE_CONTEXT;
 
 typedef struct _BURN_CACHE_PROGRESS_CONTEXT
@@ -91,6 +91,16 @@ static HRESULT ExecuteDependentRegistrationActions(
 static HRESULT ApplyCachePackage(
     __in BURN_CACHE_CONTEXT* pContext,
     __in BURN_PACKAGE* pPackage
+    );
+static void FinalizeContainerAcquisition(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer,
+    __in BOOL fSuccess
+    );
+static void FinalizePayloadAcquisition(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_PAYLOAD* pPayload,
+    __in BOOL fSuccess
     );
 static HRESULT ApplyExtractContainer(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -667,7 +677,7 @@ LExit:
         ReleaseNullStr(cacheContext.rgSearchPaths[i]);
     }
     ReleaseMem(cacheContext.rgSearchPaths);
-    ReleaseStr(cacheContext.sczLastUsedFolderCandidate);
+    ReleaseStr(cacheContext.sczLocalAcquisitionSourcePath);
 
     UserExperienceOnCacheComplete(pUX, hr);
     return hr;
@@ -1038,6 +1048,46 @@ LExit:
     return hr;
 }
 
+static void FinalizeContainerAcquisition(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer,
+    __in BOOL fSuccess
+    )
+{
+    ReleaseNullStr(pContainer->sczFailedLocalAcquisitionPath);
+
+    if (fSuccess)
+    {
+        ReleaseNullStr(pContext->sczLocalAcquisitionSourcePath);
+        pContainer->fFailedVerificationFromAcquisition = FALSE;
+    }
+    else if (pContext->sczLocalAcquisitionSourcePath)
+    {
+        pContainer->sczFailedLocalAcquisitionPath = pContext->sczLocalAcquisitionSourcePath;
+        pContext->sczLocalAcquisitionSourcePath = NULL;
+    }
+}
+
+static void FinalizePayloadAcquisition(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_PAYLOAD* pPayload,
+    __in BOOL fSuccess
+    )
+{
+    ReleaseNullStr(pPayload->sczFailedLocalAcquisitionPath);
+
+    if (fSuccess)
+    {
+        ReleaseNullStr(pContext->sczLocalAcquisitionSourcePath);
+        pPayload->fFailedVerificationFromAcquisition = FALSE;
+    }
+    else if (pContext->sczLocalAcquisitionSourcePath)
+    {
+        pPayload->sczFailedLocalAcquisitionPath = pContext->sczLocalAcquisitionSourcePath;
+        pContext->sczLocalAcquisitionSourcePath = NULL;
+    }
+}
+
 static HRESULT ApplyExtractContainer(
     __in BURN_CACHE_CONTEXT* pContext,
     __in BURN_CONTAINER* pContainer
@@ -1066,10 +1116,11 @@ static HRESULT ApplyExtractContainer(
     hr = ExtractContainer(pContext, pContainer);
     LogExitOnFailure(hr, MSG_FAILED_EXTRACT_CONTAINER, "Failed to extract payloads from container: %ls to working path: %ls", pContainer->sczId, pContainer->sczUnverifiedPath);
 
-    if (pContext->sczLastUsedFolderCandidate)
+    if (pContext->sczLocalAcquisitionSourcePath)
     {
         // We successfully copied from a source location, set that as the last used source.
-        CacheSetLastUsedSource(pContext->pVariables, pContext->sczLastUsedFolderCandidate, pContainer->sczFilePath);
+        CacheSetLastUsedSource(pContext->pVariables, pContext->sczLocalAcquisitionSourcePath, pContainer->sczFilePath);
+        ReleaseNullStr(pContext->sczLocalAcquisitionSourcePath);
     }
 
     if (pContainer->qwExtractSizeTotal < pContainer->qwCommittedExtractProgress)
@@ -1086,7 +1137,7 @@ static HRESULT ApplyExtractContainer(
     pContainer->qwCommittedExtractProgress = pContainer->qwExtractSizeTotal;
 
 LExit:
-    ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
+    FinalizeContainerAcquisition(pContext, pContainer, SUCCEEDED(hr));
 
     return hr;
 }
@@ -1157,13 +1208,13 @@ static HRESULT ApplyLayoutContainer(
             ++cTryAgainAttempts;
             pContext->qwSuccessfulCacheProgress -= pContainer->qwCommittedCacheProgress;
             pContainer->qwCommittedCacheProgress = 0;
-            ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
+            FinalizeContainerAcquisition(pContext, pContainer, FALSE);
             LogErrorId(hr, MSG_CACHE_RETRYING_CONTAINER, pContainer->sczId, NULL, NULL);
         }
     }
 
 LExit:
-    ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
+    FinalizeContainerAcquisition(pContext, pContainer, SUCCEEDED(hr));
 
     return hr;
 }
@@ -1230,13 +1281,13 @@ static HRESULT ApplyProcessPayload(
             ++cTryAgainAttempts;
             pContext->qwSuccessfulCacheProgress -= pPayloadGroupItem->qwCommittedCacheProgress;
             pPayloadGroupItem->qwCommittedCacheProgress = 0;
-            ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
+            FinalizePayloadAcquisition(pContext, pPayload, FALSE);
             LogErrorId(hr, MSG_CACHE_RETRYING_PAYLOAD, pPayload->sczKey, NULL, NULL);
         }
     }
 
 LExit:
-    ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
+    FinalizePayloadAcquisition(pContext, pPayload, SUCCEEDED(hr));
 
     return hr;
 }
@@ -1570,6 +1621,7 @@ static HRESULT AcquireContainerOrPayload(
     BOOL fPreferExtract = FALSE;
     DWORD64 qwFileSize = 0;
     BOOL fMinimumFileSize = FALSE;
+    BOOL fEqual = FALSE;
 
     if (pContainer)
     {
@@ -1615,21 +1667,44 @@ static HRESULT AcquireContainerOrPayload(
                 // When a payload comes from a container, the container has the highest chance of being correct.
                 // But we want to avoid extracting the container multiple times.
                 // So only consider the destination path, which means the container was already extracted.
-                if (IsValidLocalFile(pContext->rgSearchPaths[dwDestinationSearchPath], qwFileSize, fMinimumFileSize))
+                if (!pPayload->fFailedVerificationFromAcquisition && IsValidLocalFile(pContext->rgSearchPaths[dwDestinationSearchPath], qwFileSize, fMinimumFileSize))
                 {
                     fFoundLocal = TRUE;
                     dwChosenSearchPath = dwDestinationSearchPath;
                 }
-                else // don't prefer the container if extracting it already failed.
+                else // don't prefer the container if it was already extracted.
                 {
-                    fPreferExtract = SUCCEEDED(pPayload->pContainer->hrExtract);
+                    fPreferExtract = !pPayload->pContainer->fExtracted;
                 }
             }
 
             if (!fFoundLocal)
             {
+                BOOL fFailedVerificationFromAcquisition = pContainer ? pContainer->fFailedVerificationFromAcquisition : pPayload->fFailedVerificationFromAcquisition;
+                LPCWSTR wzFailedLocalAcquisitionPath = pContainer ? pContainer->sczFailedLocalAcquisitionPath : pPayload->sczFailedLocalAcquisitionPath;
+
                 for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
                 {
+                    // If the file failed verification from acquisition then certain paths should not be considered.
+                    if (fFailedVerificationFromAcquisition)
+                    {
+                        if (i == dwDestinationSearchPath)
+                        {
+                            continue;
+                        }
+
+                        if (wzFailedLocalAcquisitionPath)
+                        {
+                            hr = PathCompareCanonicalized(pContext->rgSearchPaths[i], wzFailedLocalAcquisitionPath, &fEqual);
+                            ExitOnFailure(hr, "Failed to compare '%ls' to '%ls'.", pContext->rgSearchPaths[i], wzFailedLocalAcquisitionPath);
+
+                            if (fEqual)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
                     // If the file exists locally with the correct size, choose it.
                     if (IsValidLocalFile(pContext->rgSearchPaths[i], qwFileSize, fMinimumFileSize))
                     {
@@ -1703,7 +1778,7 @@ static HRESULT AcquireContainerOrPayload(
             ExitOnFailure(hr, "Failed to copy payload: %ls", wzPayloadId);
 
             // Store the source path so it can be used as the LastUsedFolder if it passes verification.
-            pContext->sczLastUsedFolderCandidate = pContext->rgSearchPaths[dwChosenSearchPath];
+            pContext->sczLocalAcquisitionSourcePath = pContext->rgSearchPaths[dwChosenSearchPath];
             pContext->rgSearchPaths[dwChosenSearchPath] = NULL;
         }
 
@@ -1731,12 +1806,14 @@ static HRESULT AcquireContainerOrPayload(
 LExit:
     if (BOOTSTRAPPER_CACHE_OPERATION_EXTRACT == cacheOperation)
     {
-        if (FAILED(hr) && SUCCEEDED(pPayload->pContainer->hrExtract) &&
+        // If this was the first extraction attempt and it failed
+        // but there was a different method of acquisition available then recommend retrying.
+        if (FAILED(hr) && !pPayload->pContainer->fExtracted &&
             (fFoundLocal || pPayload->downloadSource.sczUrl && *pPayload->downloadSource.sczUrl))
         {
             *pfRetry = TRUE;
         }
-        pPayload->pContainer->hrExtract = hr;
+        pPayload->pContainer->fExtracted = TRUE;
     }
     UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, pfRetry);
 
@@ -2103,6 +2180,31 @@ static HRESULT CALLBACK CacheMessageHandler(
             hr = UserExperienceOnCacheContainerOrPayloadVerifyComplete(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, hr);
             break;
         }
+    case BURN_CACHE_MESSAGE_FAILURE:
+        switch (pMessage->failure.cacheStep)
+        {
+        case BURN_CACHE_STEP_HASH:
+            if (pProgress->pContainer)
+            {
+                LogStringLine(REPORT_DEBUG, "Verification failed on container: %ls", pProgress->pContainer->sczId);
+                pProgress->pContainer->fFailedVerificationFromAcquisition = TRUE;
+            }
+            else if (pProgress->pPayloadGroupItem)
+            {
+                LogStringLine(REPORT_DEBUG, "Verification failed on payload group item: %ls", pProgress->pPayloadGroupItem->pPayload->sczKey);
+                pProgress->pPayloadGroupItem->pPayload->fFailedVerificationFromAcquisition = TRUE;
+            }
+            else if (pProgress->pPayload)
+            {
+                LogStringLine(REPORT_DEBUG, "Verification failed on payload: %ls", pProgress->pPayload->sczKey);
+                pProgress->pPayload->fFailedVerificationFromAcquisition = TRUE;
+            }
+            else
+            {
+                LogStringLine(REPORT_DEBUG, "Verification failed on unknown item");
+            }
+            break;
+        }
     }
 
     return hr;
@@ -2159,10 +2261,11 @@ static HRESULT CompleteCacheProgress(
             pContext->pPayloadGroupItem->qwCommittedCacheProgress += qwFileSize;
         }
 
-        if (BURN_CACHE_PROGRESS_TYPE_FINALIZE == pContext->type && pContext->pCacheContext->sczLastUsedFolderCandidate)
+        if (BURN_CACHE_PROGRESS_TYPE_FINALIZE == pContext->type && pContext->pCacheContext->sczLocalAcquisitionSourcePath)
         {
             // We successfully copied from a source location, set that as the last used source.
-            CacheSetLastUsedSource(pContext->pCacheContext->pVariables, pContext->pCacheContext->sczLastUsedFolderCandidate, pContext->pContainer ? pContext->pContainer->sczFilePath : pContext->pPayloadGroupItem->pPayload->sczFilePath);
+            CacheSetLastUsedSource(pContext->pCacheContext->pVariables, pContext->pCacheContext->sczLocalAcquisitionSourcePath, pContext->pContainer ? pContext->pContainer->sczFilePath : pContext->pPayloadGroupItem->pPayload->sczFilePath);
+            ReleaseNullStr(pContext->pCacheContext->sczLocalAcquisitionSourcePath);
         }
     }
     else if (PROGRESS_CANCEL == dwResult)

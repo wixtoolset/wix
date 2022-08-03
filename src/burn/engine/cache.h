@@ -13,6 +13,7 @@ enum BURN_CACHE_MESSAGE_TYPE
     BURN_CACHE_MESSAGE_BEGIN,
     BURN_CACHE_MESSAGE_SUCCESS,
     BURN_CACHE_MESSAGE_COMPLETE,
+    BURN_CACHE_MESSAGE_FAILURE,
 };
 
 enum BURN_CACHE_STEP
@@ -68,6 +69,10 @@ typedef struct _BURN_CACHE_MESSAGE
         {
             HRESULT hrStatus;
         } complete;
+        struct
+        {
+            BURN_CACHE_STEP cacheStep;
+        } failure;
     };
 } BURN_CACHE_MESSAGE;
 

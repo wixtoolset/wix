@@ -12,7 +12,11 @@ static const DWORD FILE_OPERATION_RETRY_WAIT = 2000;
 static HRESULT CacheVerifyPayloadSignature(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
+    __in HANDLE hFile,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 static HRESULT CalculatePotentialBaseWorkingFolders(
     __in BURN_CACHE* pCache,
@@ -159,7 +163,11 @@ static HRESULT SendCacheCompleteMessage(
     __in LPVOID pContext,
     __in HRESULT hrStatus
     );
-
+static HRESULT SendCacheFailureMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in BURN_CACHE_STEP cacheStep
+    );
 
 extern "C" HRESULT CacheInitialize(
     __in BURN_CACHE* pCache,
@@ -1254,17 +1262,27 @@ LExit:
 static HRESULT CacheVerifyPayloadSignature(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
+    __in HANDLE hFile,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE /*pfnProgress*/,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
     LONG er = ERROR_SUCCESS;
+    BOOL fFailedVerification = FALSE;
 
     GUID guidAuthenticode = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     WINTRUST_FILE_INFO wfi = { };
     WINTRUST_DATA wtd = { };
     CRYPT_PROVIDER_DATA* pProviderData = NULL;
     CRYPT_PROVIDER_SGNR* pSigner = NULL;
+
+    hr = SendCacheBeginMessage(pfnCacheMessageHandler, pContext, cacheStep);
+    ExitOnFailure(hr, "Aborted cache verify payload signature begin.");
+
+    fFailedVerification = TRUE;
 
     // Verify the payload assuming online.
     wfi.cbStruct = sizeof(wfi);
@@ -1297,7 +1315,19 @@ static HRESULT CacheVerifyPayloadSignature(
     hr = VerifyPayloadAgainstCertChain(pPayload, pSigner->pChainContext);
     ExitOnFailure(hr, "Failed to verify expected payload against actual certificate chain.");
 
+    fFailedVerification = FALSE;
+
+    hr = SendCacheSuccessMessage(pfnCacheMessageHandler, pContext, pPayload->qwFileSize);
+
 LExit:
+    if (fFailedVerification)
+    {
+        // Make sure the BA process marks this payload as having failed verification.
+        SendCacheFailureMessage(pfnCacheMessageHandler, pContext, cacheStep);
+    }
+
+    SendCacheCompleteMessage(pfnCacheMessageHandler, pContext, hr);
+
     return hr;
 }
 
@@ -1744,7 +1774,7 @@ static HRESULT VerifyThenTransferPayload(
     switch (pPayload->verification)
     {
     case BURN_PAYLOAD_VERIFICATION_AUTHENTICODE:
-        hr = CacheVerifyPayloadSignature(pPayload, wzUnverifiedPayloadPath, hFile);
+        hr = CacheVerifyPayloadSignature(pPayload, wzUnverifiedPayloadPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify payload signature: %ls", wzCachedPath);
         break;
     case BURN_PAYLOAD_VERIFICATION_HASH:
@@ -1890,7 +1920,7 @@ static HRESULT VerifyFileAgainstPayload(
     switch (pPayload->verification)
     {
     case BURN_PAYLOAD_VERIFICATION_AUTHENTICODE:
-        hr = CacheVerifyPayloadSignature(pPayload, wzVerifyPath, hFile);
+        hr = CacheVerifyPayloadSignature(pPayload, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify signature of payload: %ls", pPayload->sczKey);
         break;
     case BURN_PAYLOAD_VERIFICATION_HASH:
@@ -2285,16 +2315,17 @@ static HRESULT VerifyHash(
     __in LPVOID pContext
     )
 {
-    UNREFERENCED_PARAMETER(wzUnverifiedPayloadPath);
-
     HRESULT hr = S_OK;
     BYTE rgbActualHash[SHA512_HASH_LEN] = { };
     DWORD64 qwHashedBytes = 0;
     LPWSTR pszExpected = NULL;
     LPWSTR pszActual = NULL;
+    BOOL fFailedVerification = FALSE;
 
     hr = SendCacheBeginMessage(pfnCacheMessageHandler, pContext, cacheStep);
     ExitOnFailure(hr, "Aborted cache verify hash begin.");
+
+    fFailedVerification = TRUE;
 
     if (fVerifyFileSize)
     {
@@ -2323,9 +2354,17 @@ static HRESULT VerifyHash(
         }
     }
 
+    fFailedVerification = FALSE;
+
     hr = SendCacheSuccessMessage(pfnCacheMessageHandler, pContext, qwFileSize);
 
 LExit:
+    if (fFailedVerification)
+    {
+        // Make sure the BA process marks this container or payload as having failed verification.
+        SendCacheFailureMessage(pfnCacheMessageHandler, pContext, cacheStep);
+    }
+
     SendCacheCompleteMessage(pfnCacheMessageHandler, pContext, hr);
 
     ReleaseStr(pszActual);
@@ -2443,6 +2482,23 @@ static HRESULT SendCacheCompleteMessage(
 
     message.type = BURN_CACHE_MESSAGE_COMPLETE;
     message.complete.hrStatus = hrStatus;
+
+    hr = pfnCacheMessageHandler(&message, pContext);
+
+    return hr;
+}
+
+static HRESULT SendCacheFailureMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in BURN_CACHE_STEP cacheStep
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_CACHE_MESSAGE message = { };
+
+    message.type = BURN_CACHE_MESSAGE_FAILURE;
+    message.failure.cacheStep = cacheStep;
 
     hr = pfnCacheMessageHandler(&message, pContext);
 

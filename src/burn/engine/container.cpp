@@ -173,6 +173,7 @@ extern "C" void ContainersUninitialize(
             ReleaseStr(pContainer->downloadSource.sczUser);
             ReleaseStr(pContainer->downloadSource.sczPassword);
             ReleaseStr(pContainer->sczUnverifiedPath);
+            ReleaseStr(pContainer->sczFailedLocalAcquisitionPath);
             ReleaseDict(pContainer->sdhPayloads);
         }
         MemFree(pContainers->rgContainers);
