@@ -46,7 +46,8 @@ namespace WixToolsetTest.ManagedHost
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder, x86: true);
                 var resultOutput = result.Output.ToArray();
 
-                if (resultOutput.Length > 0 && resultOutput[0] == "error from hostfxr: It was not possible to find any compatible framework version")
+                if (resultOutput.Length > 0 && (resultOutput[0] == "error from hostfxr: It was not possible to find any compatible framework version" ||
+                    resultOutput[0] == "error from hostfxr: You must install or update .NET to run this application."))
                 {
                     WixAssert.Skip(String.Join(Environment.NewLine, resultOutput));
                 }
