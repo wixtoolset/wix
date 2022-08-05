@@ -48,9 +48,15 @@ namespace WixToolset.Tools.Core
             }
         }
 
-        public void Write(string message) => Console.Out.WriteLine(message);
+        public void Write(string message)
+        {
+            Console.Out.WriteLine(message);
+        }
 
-        public MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel) => defaultMessageLevel;
+        public MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel)
+        {
+            return defaultMessageLevel;
+        }
 
         private static IList<string> GetFileNames(SourceLineNumber sourceLineNumbers)
         {
