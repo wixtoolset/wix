@@ -98,8 +98,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string IntermediateFolder { get; }
 
-        private bool SuppressValidation { get; }
-
         public IBindResult Execute()
         {
             if (!this.Intermediate.HasLevel(Data.IntermediateLevels.Linked) || !this.Intermediate.HasLevel(Data.IntermediateLevels.Resolved))
@@ -587,7 +585,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (1 != symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
+                throw new WixException($"Expected to find a single symbol of type {typeof(T).Name} but found {symbols.Count}");
             }
 
             return symbols[0];

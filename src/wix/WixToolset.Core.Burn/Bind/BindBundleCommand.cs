@@ -685,7 +685,7 @@ namespace WixToolset.Core.Burn
 
             if (0 == symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
+                throw new WixException(ErrorMessages.MissingBundleInformation(typeof(T).Name));
             }
 
             return symbols;
@@ -697,7 +697,7 @@ namespace WixToolset.Core.Burn
 
             if (1 != symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
+                throw new WixException(ErrorMessages.MissingBundleInformation(typeof(T).Name));
             }
 
             return symbols[0];
