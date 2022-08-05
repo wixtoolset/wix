@@ -93,7 +93,7 @@ namespace WixToolsetTest.CoreIntegration
                     "_SummaryInformation:Comments\tThis merge module contains the logic and data required to install MergeModule1.",
                     "_SummaryInformation:Template\tIntel;1033",
                     "_SummaryInformation:CodePage\t1252",
-                    "_SummaryInformation:PageCount\t200",
+                    "_SummaryInformation:PageCount\t500",
                     "_SummaryInformation:WordCount\t0",
                     "_SummaryInformation:CharacterCount\t0",
                     "_SummaryInformation:Security\t2",
@@ -309,6 +309,117 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     @"ICE46: Property 'Myproperty' referenced in column 'LaunchCondition'.'Condition' of row 'Myproperty' differs from a defined property by case only."
                 }, messages);
+            }
+        }
+
+        [Fact]
+        public void CanValidateArm64Msi()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin", "test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "arm64",
+                    Path.Combine(folder, "Validation", "PackageWithIceIssues.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath,
+                });
+
+                result.AssertSuccess();
+
+                var validationResult = WixRunner.Execute(warningsAsErrors: true, new[]
+                {
+                    "msi", "validate",
+                    "-intermediateFolder", intermediateFolder,
+                    msiPath
+                });
+
+                Assert.Equal(1, validationResult.ExitCode);
+
+                var messages = validationResult.Messages.Select(m => m.ToString()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "ICE12: CustomAction: CausesICE12Error is of type: 35. Therefore it must come after CostFinalize @ 1000 in Seq Table: InstallExecuteSequence. CA Seq#: 49",
+                    "ICE46: Property 'Myproperty' referenced in column 'LaunchCondition'.'Condition' of row 'Myproperty' differs from a defined property by case only.",
+                }, messages);
+            }
+        }
+
+        [Fact]
+        public void CanMergeArm64ModuleAndValidate()
+        {
+            var msmFolder = TestData.Get(@"TestData\SimpleModule");
+            var folder = TestData.Get(@"TestData\SimpleMerge");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var msiPath = Path.Combine(intermediateFolder, @"bin\test.msi");
+                var cabPath = Path.Combine(intermediateFolder, @"bin\cab1.cab");
+
+                var msmResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "arm64",
+                    Path.Combine(msmFolder, "Module.wxs"),
+                    "-loc", Path.Combine(msmFolder, "Module.en-us.wxl"),
+                    "-bindpath", Path.Combine(msmFolder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "test", "test.msm")
+                });
+
+                msmResult.AssertSuccess();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "arm64",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(intermediateFolder, "bin", "test"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var validationResult = WixRunner.Execute(new[]
+                {
+                    "msi", "validate",
+                    "-sice", "ICE80", // Prevent whinging about 32-bit directories.
+                    "-intermediateFolder", intermediateFolder,
+                    msiPath
+                });
+                validationResult.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+                Assert.Empty(section.Symbols.OfType<FileSymbol>());
+
+                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                Assert.Empty(data.Tables["File"].Rows);
+
+                var results = Query.QueryDatabase(msiPath, new[] { "File" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "File:File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tfile1.txt\t17\t\t\t512\t1",
+                    "File:File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent2.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tfile2.txt\t17\t\t\t512\t2",
+                }, results);
+
+                var files = Query.GetCabinetFiles(cabPath);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
+                    "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                }, files.Select(f => f.Name).ToArray());
             }
         }
     }
