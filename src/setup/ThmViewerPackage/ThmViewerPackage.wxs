@@ -2,7 +2,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="WiX Toolset Theme Viewer" Manufacturer="WiX Toolset" Language="1033" Version="!(bind.fileVersion.ThmViewerFile)" UpgradeCode="59c4b122-5167-445b-8fc4-09dcd4eced89">
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate EmbedCab="yes" />
+    <MediaTemplate />
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />
@@ -14,13 +14,14 @@
       <Component>
         <File Id="ThmViewerFile" Source="thmviewer.exe" />
         <Shortcut Name="!(bind.property.ProductName)" Directory="ShortcutFolder" Advertise="yes" />
+        <RemoveFolder Directory="ShortcutFolder" On="uninstall" />
       </Component>
     </ComponentGroup>
   </Fragment>
 
   <Fragment>
     <StandardDirectory Id="ProgramFilesFolder">
-      <Directory Id="INSTALLFOLDER" Name="WiX Toolset v4.0" />
+      <Directory Id="INSTALLFOLDER" Name="WiX Toolset v$(SetupMajorMinorVersion)" />
     </StandardDirectory>
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ShortcutFolder" Name="WiX Toolset" />

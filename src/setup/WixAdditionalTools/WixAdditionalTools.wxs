@@ -1,0 +1,27 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="!(loc.Name)" Version="$(SetupVersion)" UpgradeCode="fc48131d-214a-439b-9a31-ef2ea5c69ea5"
+          AboutUrl="!(loc.AboutUrl)" HelpUrl="!(loc.SupportUrl)" UpdateUrl="!(loc.UpdateUrl)">
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication
+        LicenseUrl="!(loc.LicenseUrl)"
+        Theme="hyperlinkLicense"
+        ShowVersion="true"
+        LogoFile="wix-logo-sq.png" />
+    </BootstrapperApplication>
+
+    <SetVariable Variable="InstallFolder" Value="[ProgramFilesFolder]WiX Toolset v$(SetupMajorMinorVersion)\" />
+    <!-- TODO: bring back SoftwareTag when #6854 fixed -->
+    <!-- <SoftwareTag Regid="!(loc.Regid)" InstallPath="[InstallFolder]" /> -->
+
+    <Update Location="!(loc.UpdateUrl)" />
+
+    <Chain>
+      <MsiPackage SourceFile="ThmViewerPackage.msi">
+        <MsiProperty Name="INSTALLFOLDER" Value="[InstallFolder]" />
+      </MsiPackage>
+    </Chain>
+  </Bundle>
+</Wix>
