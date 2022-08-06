@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "ThmViewerPackage", "ThmViewerPackage\ThmViewerPackage.wixproj", "{F8C12838-DEC5-4CA5-97A8-DFE2247564C5}"
+EndProject
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "WixAdditionalTools", "WixAdditionalTools\WixAdditionalTools.wixproj", "{59FF3AD3-339A-4048-9F0B-504EE74BC4AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8C12838-DEC5-4CA5-97A8-DFE2247564C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8C12838-DEC5-4CA5-97A8-DFE2247564C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8C12838-DEC5-4CA5-97A8-DFE2247564C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8C12838-DEC5-4CA5-97A8-DFE2247564C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59FF3AD3-339A-4048-9F0B-504EE74BC4AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59FF3AD3-339A-4048-9F0B-504EE74BC4AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59FF3AD3-339A-4048-9F0B-504EE74BC4AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59FF3AD3-339A-4048-9F0B-504EE74BC4AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -54,6 +54,11 @@ call tools\tools.cmd %_C% || exit /b
 call ext\ext.cmd %_C% || exit /b
 
 
+:: setup
+
+call setup\setup.cmd %_C% || exit /b
+
+
 :: integration tests
 
 call test\test.cmd %_C% || exit /b

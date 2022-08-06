@@ -1,0 +1,12 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl">
+    <String Id="Company" Overridable="yes">.NET Foundation</String>
+    <String Id="Copyright" Overridable="yes">Copyright (c) .NET Foundation and contributors. All rights reserved.</String>
+    <String Id="Name" Overridable="yes">WiX Toolset Additional Tools</String>
+    <String Id="Regid" Overridable="yes">wixtoolset.org</String>
+    <String Id="AboutUrl" Overridable="yes">https://wixtoolset.org/</String>
+    <String Id="LicenseUrl" Overridable="yes">https://wixtoolset.org/about/license/</String>
+    <String Id="SupportUrl" Overridable="yes">https://wixtoolset.org/documentation/</String>
+    <String Id="UpdateUrl" Overridable="yes">https://wixtoolset.org/releases/feed/v$(SetupMajorMinorVersion)</String>
+</WixLocalization>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk">
+  <ItemGroup>
+    <LinkerBindInputPaths Include="$(RootBuildFolder)tools\$(Configuration)\x86" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>

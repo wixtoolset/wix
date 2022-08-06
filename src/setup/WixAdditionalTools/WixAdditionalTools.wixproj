@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <OutputPath>$(PackageOutputPath)</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ThmViewerPackage\ThmViewerPackage.wixproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
