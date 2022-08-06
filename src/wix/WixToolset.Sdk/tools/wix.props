@@ -20,7 +20,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ProjectTypeGuids>B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0</ProjectTypeGuids>
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
     <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
   </PropertyGroup>
