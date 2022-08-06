@@ -701,6 +701,7 @@
       <ProjectDefineConstants>
         Configuration=$(ConfigurationName);
         OutDir=$(OutDir);
+        InstallerPlatform=$(InstallerPlatform);
         Platform=$(PlatformName);
         ProjectDir=$(ProjectDir);
         ProjectExt=$(ProjectExt);
