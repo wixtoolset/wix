@@ -33,9 +33,19 @@ namespace WixToolset.Extensibility.Data
         OutputType ExpectedOutputType { get; set; }
 
         /// <summary>
+        /// Intermediate folder.
+        /// </summary>
+        string IntermediateFolder { get; set; }
+
+        /// <summary>
         /// Collection of intermediates to link.
         /// </summary>
         IReadOnlyCollection<Intermediate> Intermediates { get; set; }
+
+        /// <summary>
+        /// Output path.
+        /// </summary>
+        string OutputPath { get; set; }
 
         /// <summary>
         /// Symbol definition creator used to load extension data.

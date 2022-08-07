@@ -43,9 +43,19 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<Localization> Localizations { get; set; }
 
         /// <summary>
+        /// Intermediate folder.
+        /// </summary>
+        string IntermediateFolder { get; set; }
+
+        /// <summary>
         /// Collection of intermediates to include in the library.
         /// </summary>
         IReadOnlyCollection<Intermediate> Intermediates { get; set; }
+
+        /// <summary>
+        /// Output path.
+        /// </summary>
+        string OutputPath { get; set; }
 
         /// <summary>
         /// Cancellation token.

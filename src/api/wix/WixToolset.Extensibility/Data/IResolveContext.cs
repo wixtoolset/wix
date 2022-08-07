@@ -58,6 +58,11 @@ namespace WixToolset.Extensibility.Data
         bool AllowUnresolvedVariables { get; set; }
 
         /// <summary>
+        /// Output path.
+        /// </summary>
+        string OutputPath { get; set; }
+
+        /// <summary>
         /// Cancellation token.
         /// </summary>
         CancellationToken CancellationToken { get; set; }

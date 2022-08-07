@@ -28,6 +28,16 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<string> IncludeSearchPaths { get; set; }
 
         /// <summary>
+        /// Intermediate folder.
+        /// </summary>
+        string IntermediateFolder { get; set; }
+
+        /// <summary>
+        /// Output path.
+        /// </summary>
+        string OutputPath { get; set; }
+
+        /// <summary>
         /// Gets the platform which the compiler will use when defaulting 64-bit attributes and elements.
         /// </summary>
         /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>

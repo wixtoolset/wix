@@ -49,6 +49,8 @@ namespace WixToolset.Core.CommandLine
 
         private string IntermediateFolder { get; set; }
 
+        private string OutputPath { get; set; }
+
         private Platform Platform { get; set; }
 
         private CompressionLevel? DefaultCompressionLevel { get; set; }
@@ -78,6 +80,8 @@ namespace WixToolset.Core.CommandLine
             var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
 
             var inputsOutputs = this.commandLine.CalculateInputsAndOutputs(creator);
+
+            this.OutputPath = inputsOutputs.OutputPath;
 
             if (this.Messaging.EncounteredError)
             {
@@ -117,7 +121,9 @@ namespace WixToolset.Core.CommandLine
                         if (String.IsNullOrEmpty(outputExtension) || ".wix" == outputExtension)
                         {
                             var entrySectionType = wixipl.Sections.Single().Type;
+
                             inputsOutputs.OutputPath = Path.ChangeExtension(inputsOutputs.OutputPath, DefaultExtensionForSectionType(entrySectionType));
+                            this.OutputPath = inputsOutputs.OutputPath;
                         }
 
                         if (inputsOutputs.OutputType == OutputType.IntermediatePostLink)
@@ -158,6 +164,8 @@ namespace WixToolset.Core.CommandLine
 
                 var context = this.ServiceProvider.GetService<ICompileContext>();
                 context.Extensions = this.ExtensionManager.GetServices<ICompilerExtension>();
+                context.IntermediateFolder = this.IntermediateFolder;
+                context.OutputPath = this.OutputPath;
                 context.Platform = this.Platform;
                 context.Source = document;
                 context.CancellationToken = cancellationToken;
@@ -198,7 +206,9 @@ namespace WixToolset.Core.CommandLine
             context.BindPaths = bindPaths;
             context.Extensions = this.ExtensionManager.GetServices<ILibrarianExtension>();
             context.Localizations = localizations;
+            context.IntermediateFolder = this.IntermediateFolder;
             context.Intermediates = intermediates.Concat(libraries).ToList();
+            context.OutputPath = this.OutputPath;
             context.CancellationToken = cancellationToken;
 
             try
@@ -210,7 +220,7 @@ namespace WixToolset.Core.CommandLine
                 {
                     result.Library.Save(outputPath);
 
-                    this.LayoutFiles(this.IntermediateFolder, result.TrackedFiles, null, cancellationToken);
+                    this.LayoutFiles(result.TrackedFiles, null, cancellationToken);
                 }
             }
             catch (WixException e)
@@ -232,7 +242,9 @@ namespace WixToolset.Core.CommandLine
             context.Extensions = this.ExtensionManager.GetServices<ILinkerExtension>();
             context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
             context.ExpectedOutputType = inputsOutputs.OutputType;
+            context.IntermediateFolder = this.IntermediateFolder;
             context.Intermediates = intermediates.Concat(libraries).ToList();
+            context.OutputPath = this.OutputPath;
             context.SymbolDefinitionCreator = creator;
             context.CancellationToken = cancellationToken;
 
@@ -242,12 +254,6 @@ namespace WixToolset.Core.CommandLine
 
         private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, IReadOnlyCollection<IBindPath> bindPaths, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
         {
-            var intermediateFolder = this.IntermediateFolder;
-            if (String.IsNullOrEmpty(intermediateFolder))
-            {
-                intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            }
-
             IResolveResult resolveResult;
             {
                 var context = this.ServiceProvider.GetService<IResolveContext>();
@@ -255,9 +261,10 @@ namespace WixToolset.Core.CommandLine
                 context.Extensions = this.ExtensionManager.GetServices<IResolverExtension>();
                 context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
                 context.FilterCultures = filterCultures;
-                context.IntermediateFolder = intermediateFolder;
+                context.IntermediateFolder = this.IntermediateFolder;
                 context.IntermediateRepresentation = output;
                 context.Localizations = localizations;
+                context.OutputPath = inputsOutputs.OutputPath;
                 context.CancellationToken = cancellationToken;
 
                 var resolver = this.ServiceProvider.GetService<IResolver>();
@@ -284,9 +291,9 @@ namespace WixToolset.Core.CommandLine
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
                     context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
                     context.FileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
-                    context.IntermediateFolder = intermediateFolder;
+                    context.IntermediateFolder = this.IntermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
-                    context.OutputPath = inputsOutputs.OutputPath;
+                    context.OutputPath = this.OutputPath;
                     context.PdbType = inputsOutputs.PdbType;
                     context.PdbPath = inputsOutputs.PdbPath;
                     context.CancellationToken = cancellationToken;
@@ -300,7 +307,7 @@ namespace WixToolset.Core.CommandLine
                     return;
                 }
 
-                this.LayoutFiles(intermediateFolder, bindResult.TrackedFiles, bindResult.FileTransfers, cancellationToken);
+                this.LayoutFiles(bindResult.TrackedFiles, bindResult.FileTransfers, cancellationToken);
             }
             finally
             {
@@ -308,13 +315,14 @@ namespace WixToolset.Core.CommandLine
             }
         }
 
-        private void LayoutFiles(string intermediateFolder, IReadOnlyCollection<ITrackedFile> trackedFiles, IReadOnlyCollection<IFileTransfer> fileTransfers, CancellationToken cancellationToken)
+        private void LayoutFiles(IReadOnlyCollection<ITrackedFile> trackedFiles, IReadOnlyCollection<IFileTransfer> fileTransfers, CancellationToken cancellationToken)
         {
             var context = this.ServiceProvider.GetService<ILayoutContext>();
             context.Extensions = this.ExtensionManager.GetServices<ILayoutExtension>();
             context.TrackedFiles = trackedFiles;
             context.FileTransfers = fileTransfers;
-            context.IntermediateFolder = intermediateFolder;
+            context.IntermediateFolder = this.IntermediateFolder;
+            context.OutputPath = this.OutputPath;
             context.TrackingFile = this.TrackingFile;
             context.ResetAcls = this.commandLine.ResetAcls;
             context.CancellationToken = cancellationToken;
@@ -368,6 +376,8 @@ namespace WixToolset.Core.CommandLine
             context.Extensions = this.ExtensionManager.GetServices<IPreprocessorExtension>();
             context.Platform = this.Platform;
             context.IncludeSearchPaths = includeSearchPaths;
+            context.IntermediateFolder = this.IntermediateFolder;
+            context.OutputPath = this.OutputPath;
             context.SourcePath = sourcePath;
             context.Variables = preprocessorVariables;
             context.CancellationToken = cancellationToken;
@@ -614,7 +624,14 @@ namespace WixToolset.Core.CommandLine
 
             public string CalculateIntermedateFolder()
             {
-                return String.IsNullOrEmpty(this.IntermediateFolder) ? Path.GetTempPath() : this.IntermediateFolder;
+                var intermediateFolder = this.IntermediateFolder;
+
+                if (String.IsNullOrEmpty(intermediateFolder))
+                {
+                    intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                }
+
+                return intermediateFolder;
             }
 
             public OutputType CalculateOutputType()

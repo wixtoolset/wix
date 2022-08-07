@@ -37,6 +37,11 @@ namespace WixToolset.Extensibility.Data
         string IntermediateFolder { get; set; }
 
         /// <summary>
+        /// Output path.
+        /// </summary>
+        string OutputPath { get; set; }
+
+        /// <summary>
         /// File to capture list of content, built output and copied output files.
         /// </summary>
         string TrackingFile { get; set; }
