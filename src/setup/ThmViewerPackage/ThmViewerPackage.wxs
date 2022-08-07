@@ -2,7 +2,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="WiX Toolset Theme Viewer" Manufacturer="WiX Toolset" Language="1033" Version="!(bind.fileVersion.ThmViewerFile)" UpgradeCode="59c4b122-5167-445b-8fc4-09dcd4eced89">
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate />
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />
