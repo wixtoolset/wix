@@ -24,6 +24,10 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<string> IncludeSearchPaths { get; set; }
 
+        public string IntermediateFolder { get; set; }
+
+        public string OutputPath { get; set; }
+
         public string SourcePath { get; set; }
 
         public IDictionary<string, string> Variables { get; set; }

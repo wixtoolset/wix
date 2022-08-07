@@ -32,7 +32,9 @@ namespace WixToolsetTest.CoreIntegration
             var context = serviceProvider.GetService<ILinkContext>();
             context.Extensions = Array.Empty<WixToolset.Extensibility.ILinkerExtension>();
             context.ExtensionData = Array.Empty<WixToolset.Extensibility.IExtensionData>();
+            context.IntermediateFolder = Path.GetTempPath();
             context.Intermediates = new[] { intermediate1, intermediate2 };
+            context.OutputPath = Path.Combine(context.IntermediateFolder, "test.msi");
             context.SymbolDefinitionCreator = creator;
 
             var linker = serviceProvider.GetService<ILinker>();

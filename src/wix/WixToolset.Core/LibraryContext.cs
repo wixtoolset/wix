@@ -31,7 +31,11 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<Localization> Localizations { get; set; }
 
+        public string IntermediateFolder { get; set; }
+
         public IReadOnlyCollection<Intermediate> Intermediates { get; set; }
+
+        public string OutputPath { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
     }

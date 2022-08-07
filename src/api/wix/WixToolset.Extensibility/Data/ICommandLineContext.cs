@@ -5,13 +5,24 @@ namespace WixToolset.Extensibility.Data
     using System;
     using WixToolset.Extensibility.Services;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Command-line context.
+    /// </summary>
     public interface ICommandLineContext
     {
+        /// <summary>
+        /// Service provider.
+        /// </summary>
         IServiceProvider ServiceProvider { get; }
 
+        /// <summary>
+        /// Extension manager.
+        /// </summary>
         IExtensionManager ExtensionManager { get; set; }
 
+        /// <summary>
+        /// Command-line arguments.
+        /// </summary>
         ICommandLineArguments Arguments { get; set; }
     }
 }

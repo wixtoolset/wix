@@ -23,6 +23,10 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<ICompilerExtension> Extensions { get; set; }
 
+        public string IntermediateFolder { get; set; }
+
+        public string OutputPath { get; set; }
+
         public Platform Platform { get; set; }
 
         public bool IsCurrentPlatform64Bit => this.Platform == Platform.ARM64 || this.Platform == Platform.X64;

@@ -31,6 +31,8 @@ namespace WixToolset.Core
 
         public bool ResetAcls { get; set; }
 
+        public string OutputPath { get; set; }
+
         public CancellationToken CancellationToken { get; set; }
     }
 }

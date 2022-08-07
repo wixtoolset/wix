@@ -24,7 +24,11 @@ namespace WixToolset.Core
 
         public OutputType ExpectedOutputType { get; set; }
 
+        public string IntermediateFolder { get; set; }
+
         public IReadOnlyCollection<Intermediate> Intermediates { get; set; }
+
+        public string OutputPath { get; set; }
 
         public ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
 

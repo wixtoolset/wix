@@ -37,6 +37,8 @@ namespace WixToolset.Core
 
         public bool AllowUnresolvedVariables { get; set; }
 
+        public string OutputPath { get; set; }
+
         public CancellationToken CancellationToken { get; set; }
     }
 }
