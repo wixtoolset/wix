@@ -17,7 +17,7 @@
 @echo Building tools %_C%
 
 :: Build
-msbuild -Restore tools.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:..\..\build\logs\tools_build.binlog || exit /b
+msbuild -Restore tools.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\tools_build.binlog || exit /b
 
 :: Publish
 msbuild publish_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\tools_publish.binlog || exit /b
@@ -26,7 +26,7 @@ msbuild publish_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\to
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.HeatTasks -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.HeatTasks.trx" || exit /b
 
 :: Pack
-msbuild -t:Pack WixToolset.Heat -p:Configuration=%_C% -p:NoBuild=true -nologo -m -warnaserror -bl:..\..\build\logs\tools_pack.binlog || exit /b
+msbuild -t:Pack WixToolset.Heat -p:Configuration=%_C% -p:NoBuild=true -nologo -m -warnaserror -bl:%_L%\tools_pack.binlog || exit /b
 
 @goto :end
 
