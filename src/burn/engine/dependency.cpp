@@ -279,19 +279,13 @@ extern "C" HRESULT DependencyDetectBundle(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fExists = FALSE;
 
     hr = DependencyDetectProviderKeyBundleId(pRegistration);
     ExitOnFailure(hr, "Failed to detect provider key bundle id.");
 
     hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
-    if (E_FILENOTFOUND != hr)
-    {
-        ExitOnFailure(hr, "Failed dependents check on bundle.");
-    }
-    else
-    {
-        hr = S_OK;
-    }
+    ExitOnPathFailure(hr, fExists, "Failed dependents check on bundle.");
 
     if (pDependencies->fSelfDependent || pDependencies->fActiveParent)
     {
@@ -813,6 +807,7 @@ extern "C" HRESULT DependencyProcessDependentRegistration(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fDeleted = FALSE;
 
     switch (pAction->type)
     {
@@ -823,12 +818,11 @@ extern "C" HRESULT DependencyProcessDependentRegistration(
 
     case BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER:
         hr = DepUnregisterDependent(pRegistration->hkRoot, pRegistration->sczProviderKey, pAction->sczDependentProviderKey);
-        ExitOnFailure(hr, "Failed to unregister dependent: %ls", pAction->sczDependentProviderKey);
+        ExitOnPathFailure(hr, fDeleted, "Failed to unregister dependent: %ls", pAction->sczDependentProviderKey);
         break;
 
     default:
-        hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Unrecognized registration action type: %d", pAction->type);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Unrecognized registration action type: %d", pAction->type);
     }
 
 LExit:
@@ -848,11 +842,11 @@ extern "C" void DependencyUnregisterBundle(
     {
         // Remove the bundle provider key.
         hr = DepUnregisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey);
-        if (SUCCEEDED(hr))
+        if (SUCCEEDED(hr) || E_FILENOTFOUND == hr)
         {
             LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED, pRegistration->sczProviderKey);
         }
-        else if (FAILED(hr) && E_FILENOTFOUND != hr)
+        else
         {
             LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED_FAILED, pRegistration->sczProviderKey, hr);
         }
@@ -961,13 +955,10 @@ static HRESULT DetectPackageDependents(
     for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
     {
         BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+        BOOL fExists = FALSE;
 
         hr = DepCheckDependents(hkHive, pProvider->sczKey, 0, NULL, &pProvider->rgDependents, &pProvider->cDependents);
-        if (E_FILENOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        ExitOnFailure(hr, "Failed dependents check on package provider: %ls", pProvider->sczKey);
+        ExitOnPathFailure(hr, fExists, "Failed dependents check on package provider: %ls", pProvider->sczKey);
 
         if (0 < pProvider->cDependents || GetProviderExists(hkHive, pProvider->sczKey))
         {
@@ -1366,11 +1357,11 @@ static void UnregisterPackageProvider(
     HRESULT hr = S_OK;
 
     hr = DepUnregisterDependency(hkRoot, pProvider->sczKey);
-    if (SUCCEEDED(hr))
+    if (SUCCEEDED(hr) || E_FILENOTFOUND == hr)
     {
         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED, pProvider->sczKey, wzPackageId);
     }
-    else if (FAILED(hr) && E_FILENOTFOUND != hr)
+    else
     {
         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_FAILED, pProvider->sczKey, wzPackageId, hr);
     }
@@ -1390,15 +1381,14 @@ static HRESULT RegisterPackageProviderDependent(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fExists = FALSE;
 
     LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_REGISTER_DEPENDENCY, wzDependentProviderKey, pProvider->sczKey, wzPackageId);
 
     hr = DepRegisterDependent(hkRoot, pProvider->sczKey, wzDependentProviderKey, NULL, NULL, 0);
-    if (E_FILENOTFOUND != hr)
-    {
-        ExitOnFailure(hr, "Failed to register the dependency on package dependency provider: %ls", pProvider->sczKey);
-    }
-    else
+    ExitOnPathFailure(hr, fExists, "Failed to register the dependency on package dependency provider: %ls", pProvider->sczKey);
+
+    if (!fExists)
     {
         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_SKIP_MISSING, pProvider->sczKey, wzPackageId);
     }
@@ -1454,11 +1444,11 @@ static void UnregisterPackageProviderDependent(
     HRESULT hr = S_OK;
 
     hr = DepUnregisterDependent(hkRoot, pProvider->sczKey, wzDependentProviderKey);
-    if (SUCCEEDED(hr))
+    if (SUCCEEDED(hr) || E_FILENOTFOUND == hr)
     {
         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_DEPENDENCY, wzDependentProviderKey, pProvider->sczKey, wzPackageId);
     }
-    else if (FAILED(hr) && E_FILENOTFOUND != hr)
+    else
     {
         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_UNREGISTERED_DEPENDENCY_FAILED, wzDependentProviderKey, pProvider->sczKey, wzPackageId, hr);
     }

@@ -427,6 +427,11 @@ extern "C" HRESULT DAPI WiuGetProductInfo(
 
         er = vpfnMsiGetProductInfoW(wzProductCode, wzProperty, *psczValue, &cch);
     }
+
+    if (ERROR_UNKNOWN_PRODUCT == er || ERROR_UNKNOWN_PROPERTY == er)
+    {
+        ExitFunction1(hr = HRESULT_FROM_WIN32(er));
+    }
     WiuExitOnWin32Error(er, hr, "Failed to get product info.");
 
 LExit:
@@ -449,7 +454,10 @@ extern "C" HRESULT DAPI WiuGetProductInfoEx(
     if (!vpfnMsiGetProductInfoExW)
     {
         hr = WiuGetProductInfo(wzProductCode, wzProperty, psczValue);
-        WiuExitOnFailure(hr, "Failed to get product info when extended info was not available.");
+        if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) != hr && HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) != hr)
+        {
+            WiuExitOnFailure(hr, "Failed to get product info when extended info was not available.");
+        }
 
         ExitFunction();
     }
@@ -465,6 +473,11 @@ extern "C" HRESULT DAPI WiuGetProductInfoEx(
         WiuExitOnFailure(hr, "Failed to reallocate string for extended product info.");
 
         er = vpfnMsiGetProductInfoExW(wzProductCode, wzUserSid, dwContext, wzProperty, *psczValue, &cch);
+    }
+
+    if (ERROR_UNKNOWN_PRODUCT == er || ERROR_UNKNOWN_PROPERTY == er)
+    {
+        ExitFunction1(hr = HRESULT_FROM_WIN32(er));
     }
     WiuExitOnWin32Error(er, hr, "Failed to get extended product info.");
 

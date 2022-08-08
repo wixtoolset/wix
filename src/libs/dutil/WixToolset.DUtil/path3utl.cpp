@@ -17,6 +17,7 @@
 #define PathExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, p, x, s, __VA_ARGS__)
 #define PathExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_PATHUTIL, e, x, s, __VA_ARGS__)
 #define PathExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PATHUTIL, g, x, s, __VA_ARGS__)
+#define PathExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_PATHUTIL, x, b, s, __VA_ARGS__)
 
 static HRESULT GetTempPathFromSystemEnvironmentVariable(
     __in HKEY hKey,
@@ -32,6 +33,7 @@ DAPI_(HRESULT) PathGetSystemTempPaths(
     HRESULT hr = S_OK;
     HMODULE hModule = NULL;
     BOOL fSystem = FALSE;
+    BOOL fExists = FALSE;
     HKEY hKey = NULL;
     LPWSTR sczTemp = NULL;
 
@@ -61,10 +63,10 @@ DAPI_(HRESULT) PathGetSystemTempPaths(
 
     // There is no documented API to get system environment variables, so read them from the registry.
     hr = RegOpen(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\Environment", KEY_READ, &hKey);
-    if (E_FILENOTFOUND != hr)
-    {
-        PathExitOnFailure(hr, "Failed to open system environment registry key.");
+    PathExitOnPathFailure(hr, fExists, "Failed to open system environment registry key.");
 
+    if (fExists)
+    {
         hr = GetTempPathFromSystemEnvironmentVariable(hKey, L"TMP", &sczTemp);
         PathExitOnFailure(hr, "Failed to get temp path from system TMP.");
 
@@ -118,14 +120,16 @@ static HRESULT GetTempPathFromSystemEnvironmentVariable(
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
     BOOL fNeedsExpansion = FALSE;
+    BOOL fExists = FALSE;
 
     // Read the value unexpanded so that it can be expanded with system environment variables.
     hr = RegReadUnexpandedString(hKey, wzName, &fNeedsExpansion, &sczValue);
-    if (E_FILENOTFOUND == hr)
+    PathExitOnPathFailure(hr, fExists, "Failed to get system '%ls' value.", wzName);
+
+    if (!fExists)
     {
         ExitFunction1(hr = S_FALSE);
     }
-    PathExitOnFailure(hr, "Failed to get system '%ls' value.", wzName);
 
     if (fNeedsExpansion)
     {

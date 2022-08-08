@@ -338,7 +338,7 @@ static HRESULT InitializeCoreClrPre5(
         {
             BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "%ls: %ls", rgPropertyKeys[i], rgPropertyValues[i]);
         }
-        BalExitOnFailure(hr = E_FILENOTFOUND, "Failed to locate coreclr.dll.");
+        BalExitWithRootFailure(hr, E_FILENOTFOUND, "Failed to locate coreclr.dll.");
     }
 
     hr = LoadCoreClr(pState, sczCoreClrPath);

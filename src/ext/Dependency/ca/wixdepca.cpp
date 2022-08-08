@@ -277,6 +277,7 @@ static HRESULT EnsureAbsentDependents(
     DEPENDENCY* rgDependents = NULL;
     UINT cDependents = 0;
     PMSIHANDLE hDependencyRec = NULL;
+    BOOL fExists = FALSE;
 
     // Skip the dependent check if the Wix4DependencyProvider table is missing (no dependency providers).
     hr = WcaTableExists(L"Wix4DependencyProvider");
@@ -338,11 +339,7 @@ static HRESULT EnsureAbsentDependents(
 
         // Check the registry to see if the provider has any dependents registered.
         hr = DepCheckDependents(hkHive, sczProviderKey, iAttributes, sdIgnoredDependents, &rgDependents, &cDependents);
-        if (E_FILENOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        ExitOnFailure(hr, "Failed dependents check for %ls.", sczId);
+        ExitOnPathFailure(hr, fExists, "Failed dependents check for %ls.", sczId);
     }
 
     if (E_NOMOREITEMS != hr)

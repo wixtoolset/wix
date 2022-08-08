@@ -1049,6 +1049,7 @@ static HRESULT DetectArpEntry(
 {
     HRESULT hr = S_OK;
     HKEY hKey = NULL;
+    BOOL fExists = FALSE;
     HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
     REG_KEY_BITNESS keyBitness = pPackage->Bundle.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT;
 
@@ -1065,20 +1066,17 @@ static HRESULT DetectArpEntry(
     }
 
     hr = RegOpenEx(hkRoot, pPackage->Bundle.sczArpKeyPath, KEY_READ, keyBitness, &hKey);
-    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    ExitOnPathFailure(hr, fExists, "Failed to open registry key: %ls.", pPackage->Bundle.sczArpKeyPath);
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to open registry key: %ls.", pPackage->Bundle.sczArpKeyPath);
 
     *pfRegistered = TRUE;
 
     hr = RegReadString(hKey, L"QuietUninstallString", psczQuietUninstallString);
-    if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
-    {
-        hr = S_OK;
-    }
-    ExitOnFailure(hr, "Failed to read QuietUninstallString.");
+    ExitOnPathFailure(hr, fExists, "Failed to read QuietUninstallString.");
 
 LExit:
     ReleaseRegKey(hKey);

@@ -228,31 +228,31 @@ static HRESULT GetAppDomain(
 
     // Create the setup information for a new AppDomain to set the app base and config.
     hr = pState->pCLRHost->CreateDomainSetup(&pUnk);
-    ExitOnRootFailure(hr, "Failed to create the AppDomainSetup object.");
+    BalExitOnRootFailure(hr, "Failed to create the AppDomainSetup object.");
 
     hr = pUnk->QueryInterface(__uuidof(IAppDomainSetup), reinterpret_cast<LPVOID*>(&pAppDomainSetup));
-    ExitOnRootFailure(hr, "Failed to query for the IAppDomainSetup interface.");
+    BalExitOnRootFailure(hr, "Failed to query for the IAppDomainSetup interface.");
     ReleaseNullObject(pUnk);
 
     // Set properties on the AppDomainSetup object.
     bstrAppBase = ::SysAllocString(pState->sczAppBase);
-    ExitOnNull(bstrAppBase, hr, E_OUTOFMEMORY, "Failed to allocate the application base path for the AppDomainSetup.");
+    BalExitOnNull(bstrAppBase, hr, E_OUTOFMEMORY, "Failed to allocate the application base path for the AppDomainSetup.");
 
     hr = pAppDomainSetup->put_ApplicationBase(bstrAppBase);
-    ExitOnRootFailure(hr, "Failed to set the application base path for the AppDomainSetup.");
+    BalExitOnRootFailure(hr, "Failed to set the application base path for the AppDomainSetup.");
 
     bstrConfigPath = ::SysAllocString(pState->sczConfigPath);
-    ExitOnNull(bstrConfigPath, hr, E_OUTOFMEMORY, "Failed to allocate the application configuration file for the AppDomainSetup.");
+    BalExitOnNull(bstrConfigPath, hr, E_OUTOFMEMORY, "Failed to allocate the application configuration file for the AppDomainSetup.");
 
     hr = pAppDomainSetup->put_ConfigurationFile(bstrConfigPath);
-    ExitOnRootFailure(hr, "Failed to set the configuration file path for the AppDomainSetup.");
+    BalExitOnRootFailure(hr, "Failed to set the configuration file path for the AppDomainSetup.");
 
     // Create the AppDomain to load the factory type.
     hr = pState->pCLRHost->CreateDomainEx(L"MBA", pAppDomainSetup, NULL, &pUnk);
-    ExitOnRootFailure(hr, "Failed to create the MBA AppDomain.");
+    BalExitOnRootFailure(hr, "Failed to create the MBA AppDomain.");
 
     hr = pUnk->QueryInterface(__uuidof(_AppDomain), reinterpret_cast<LPVOID*>(&pState->pAppDomain));
-    ExitOnRootFailure(hr, "Failed to query for the _AppDomain interface.");
+    BalExitOnRootFailure(hr, "Failed to query for the _AppDomain interface.");
 
 LExit:
     ReleaseBSTR(bstrConfigPath);
@@ -270,13 +270,13 @@ static HRESULT LoadModulePaths(
     LPWSTR sczFullPath = NULL;
 
     hr = PathForCurrentProcess(&sczFullPath, pState->hInstance);
-    ExitOnFailure(hr, "Failed to get the full host path.");
+    BalExitOnFailure(hr, "Failed to get the full host path.");
 
     hr = PathGetDirectory(sczFullPath, &pState->sczAppBase);
-    ExitOnFailure(hr, "Failed to get the directory of the full process path.");
+    BalExitOnFailure(hr, "Failed to get the directory of the full process path.");
 
     hr = PathConcat(pState->sczAppBase, MBA_CONFIG_FILE_NAME, &pState->sczConfigPath);
-    ExitOnFailure(hr, "Failed to get the full path to the application configuration file.");
+    BalExitOnFailure(hr, "Failed to get the full path to the application configuration file.");
 
 LExit:
     ReleaseStr(sczFullPath);
@@ -332,23 +332,23 @@ static HRESULT CheckSupportedFrameworks(
     BOOL fUpdatedManifest = FALSE;
 
     hr = XmlLoadDocumentFromFile(wzConfigPath, &pixdManifest);
-    ExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", wzConfigPath);
+    BalExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", wzConfigPath);
 
     hr = XmlSelectNodes(pixdManifest, L"/configuration/wix.bootstrapper/host/supportedFramework", &pNodeList);
-    ExitOnFailure(hr, "Failed to select all supportedFramework elements.");
+    BalExitOnFailure(hr, "Failed to select all supportedFramework elements.");
 
     hr = pNodeList->get_length(reinterpret_cast<long*>(&cSupportedFrameworks));
-    ExitOnFailure(hr, "Failed to get the supported framework count.");
+    BalExitOnFailure(hr, "Failed to get the supported framework count.");
 
     if (cSupportedFrameworks)
     {
         while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
         {
             hr = XmlGetAttributeEx(pNode, L"version", &sczSupportedFrameworkVersion);
-            ExitOnRequiredXmlQueryFailure(hr, "Failed to get supportedFramework/@version.");
+            BalExitOnRequiredXmlQueryFailure(hr, "Failed to get supportedFramework/@version.");
 
             hr = StrAllocFormatted(&sczFrameworkRegistryKey, L"SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\%ls", sczSupportedFrameworkVersion);
-            ExitOnFailure(hr, "Failed to allocate path to supported framework Install registry key.");
+            BalExitOnFailure(hr, "Failed to allocate path to supported framework Install registry key.");
 
             hr = RegOpen(HKEY_LOCAL_MACHINE, sczFrameworkRegistryKey, KEY_READ, &hkFramework);
             if (SUCCEEDED(hr))
@@ -367,19 +367,18 @@ static HRESULT CheckSupportedFrameworks(
         // If we looped through all the supported frameworks but didn't find anything, ensure we return a failure.
         if (S_FALSE == hr)
         {
-            hr = E_NOTFOUND;
-            ExitOnRootFailure(hr, "Failed to find a supported framework.");
+            BalExitWithRootFailure(hr, E_NOTFOUND, "Failed to find a supported framework.");
         }
 
         hr = UpdateSupportedRuntime(pixdManifest, pNode, &fUpdatedManifest);
-        ExitOnFailure(hr, "Failed to update supportedRuntime.");
+        BalExitOnFailure(hr, "Failed to update supportedRuntime.");
     }
     // else no supported frameworks specified, so the startup/supportedRuntime must be enough.
 
     if (fUpdatedManifest)
     {
         hr = XmlSaveDocument(pixdManifest, wzConfigPath);
-        ExitOnFailure(hr, "Failed to save updated manifest over config file: %ls", wzConfigPath);
+        BalExitOnFailure(hr, "Failed to save updated manifest over config file: %ls", wzConfigPath);
     }
 
 LExit:
@@ -410,7 +409,7 @@ static HRESULT UpdateSupportedRuntime(
 
     // If the runtime version attribute is not specified, don't update the manifest.
     hr = XmlGetAttributeEx(pixnSupportedFramework, L"runtimeVersion", &sczSupportedRuntimeVersion);
-    ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get supportedFramework/@runtimeVersion.");
+    BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get supportedFramework/@runtimeVersion.");
 
     if (!fXmlFound)
     {
@@ -420,17 +419,17 @@ static HRESULT UpdateSupportedRuntime(
     // Get the startup element. Fail if we can't find it since it'll be necessary to load the
     // correct runtime.
     hr = XmlSelectSingleNode(pixdManifest, L"/configuration/startup", &pixnStartup);
-    ExitOnRequiredXmlQueryFailure(hr, "Failed to get startup element.");
+    BalExitOnRequiredXmlQueryFailure(hr, "Failed to get startup element.");
 
     // Remove any pre-existing supported runtimes because they'll just get in the way and create our new one.
     hr = XmlRemoveChildren(pixnStartup, L"supportedRuntime");
-    ExitOnFailure(hr, "Failed to remove pre-existing supportedRuntime elements.");
+    BalExitOnFailure(hr, "Failed to remove pre-existing supportedRuntime elements.");
 
     hr = XmlCreateChild(pixnStartup, L"supportedRuntime", &pixnSupportedRuntime);
-    ExitOnFailure(hr, "Failed to create supportedRuntime element.");
+    BalExitOnFailure(hr, "Failed to create supportedRuntime element.");
 
     hr = XmlSetAttribute(pixnSupportedRuntime, L"version", sczSupportedRuntimeVersion);
-    ExitOnFailure(hr, "Failed to set supportedRuntime/@version to '%ls'.", sczSupportedRuntimeVersion);
+    BalExitOnFailure(hr, "Failed to set supportedRuntime/@version to '%ls'.", sczSupportedRuntimeVersion);
 
     *pfUpdatedManifest = TRUE;
 
@@ -465,14 +464,14 @@ static HRESULT LoadRuntime(
 
     // Check that the supported framework is installed.
     hr = CheckSupportedFrameworks(pState->sczConfigPath);
-    ExitOnFailure(hr, "Failed to find supported framework.");
+    BalExitOnFailure(hr, "Failed to find supported framework.");
 
     // Cache the CLR host to be shutdown later. This can occur on a different thread.
     // Disable message boxes from being displayed on error and blocking execution.
     ::SetErrorMode(uiMode | SEM_FAILCRITICALERRORS);
 
     hr = LoadSystemLibrary(L"mscoree.dll", &hModule);
-    ExitOnFailure(hr, "Failed to load mscoree.dll");
+    BalExitOnFailure(hr, "Failed to load mscoree.dll");
 
     pfnCLRCreateInstance = reinterpret_cast<CLRCreateInstanceFnPtr>(::GetProcAddress(hModule, "CLRCreateInstance"));
 
@@ -481,7 +480,7 @@ static HRESULT LoadRuntime(
         hr = pfnCLRCreateInstance(CLSID_CLRMetaHostPolicy, IID_ICLRMetaHostPolicy, reinterpret_cast<LPVOID*>(&pCLRMetaHostPolicy));
         if (E_NOTIMPL != hr)
         {
-            ExitOnRootFailure(hr, "Failed to create instance of ICLRMetaHostPolicy.");
+            BalExitOnRootFailure(hr, "Failed to create instance of ICLRMetaHostPolicy.");
 
             fFallbackToCorBindToCurrentRuntime = FALSE;
         }
@@ -490,19 +489,19 @@ static HRESULT LoadRuntime(
     if (fFallbackToCorBindToCurrentRuntime)
     {
         pfnCorBindToCurrentRuntime = reinterpret_cast<PFN_CORBINDTOCURRENTRUNTIME>(::GetProcAddress(hModule, "CorBindToCurrentRuntime"));
-        ExitOnNullWithLastError(pfnCorBindToCurrentRuntime, hr, "Failed to get procedure address for CorBindToCurrentRuntime.");
+        BalExitOnNullWithLastError(pfnCorBindToCurrentRuntime, hr, "Failed to get procedure address for CorBindToCurrentRuntime.");
 
         hr = pfnCorBindToCurrentRuntime(pState->sczConfigPath, CLSID_CorRuntimeHost, IID_ICorRuntimeHost, reinterpret_cast<LPVOID*>(&pState->pCLRHost));
-        ExitOnRootFailure(hr, "Failed to create the CLR host using the application configuration file path.");
+        BalExitOnRootFailure(hr, "Failed to create the CLR host using the application configuration file path.");
     }
     else
     {
 
         hr = SHCreateStreamOnFileEx(pState->sczConfigPath, STGM_READ | STGM_SHARE_DENY_WRITE, 0, FALSE, NULL, &pCfgStream);
-        ExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", pState->sczConfigPath);
+        BalExitOnFailure(hr, "Failed to load bootstrapper config file from path: %ls", pState->sczConfigPath);
 
         hr = pCLRMetaHostPolicy->GetRequestedRuntime(METAHOST_POLICY_HIGHCOMPAT, NULL, pCfgStream, NULL, &cchVersion, NULL, NULL, &dwConfigFlags, IID_ICLRRuntimeInfo, reinterpret_cast<LPVOID*>(&pCLRRuntimeInfo));
-        ExitOnRootFailure(hr, "Failed to get the CLR runtime info using the application configuration file path.");
+        BalExitOnRootFailure(hr, "Failed to get the CLR runtime info using the application configuration file path.");
 
         // .NET 4 RTM had a bug where it wouldn't set pcchVersion if pwzVersion was NULL.
         if (!cchVersion)
@@ -510,7 +509,7 @@ static HRESULT LoadRuntime(
             hr = pCLRRuntimeInfo->GetVersionString(NULL, &cchVersion);
             if (HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER) != hr)
             {
-                ExitOnFailure(hr, "Failed to get the length of the CLR version string.");
+                BalExitOnFailure(hr, "Failed to get the length of the CLR version string.");
             }
         }
 
@@ -523,21 +522,21 @@ static HRESULT LoadRuntime(
         if (CSTR_EQUAL == CompareString(LOCALE_NEUTRAL, 0, L"v4.0.30319", -1, pwzVersion, cchVersion))
         {
             hr = VerifyNET4RuntimeIsSupported();
-            ExitOnFailure(hr, "Found unsupported .NET 4 Runtime.");
+            BalExitOnFailure(hr, "Found unsupported .NET 4 Runtime.");
         }
 
         if (METAHOST_CONFIG_FLAGS_LEGACY_V2_ACTIVATION_POLICY_TRUE == (METAHOST_CONFIG_FLAGS_LEGACY_V2_ACTIVATION_POLICY_MASK & dwConfigFlags))
         {
             hr = pCLRRuntimeInfo->BindAsLegacyV2Runtime();
-            ExitOnRootFailure(hr, "Failed to bind as legacy V2 runtime.");
+            BalExitOnRootFailure(hr, "Failed to bind as legacy V2 runtime.");
         }
 
         hr = pCLRRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_ICorRuntimeHost, reinterpret_cast<LPVOID*>(&pState->pCLRHost));
-        ExitOnRootFailure(hr, "Failed to get instance of ICorRuntimeHost.");
+        BalExitOnRootFailure(hr, "Failed to get instance of ICorRuntimeHost.");
     }
 
     hr = pState->pCLRHost->Start();
-    ExitOnRootFailure(hr, "Failed to start the CLR host.");
+    BalExitOnRootFailure(hr, "Failed to start the CLR host.");
 
 LExit:
     ReleaseStr(pwzVersion);
@@ -567,10 +566,10 @@ static HRESULT CreateManagedBootstrapperApplication(
     IBootstrapperApplicationFactory* pAppFactory = NULL;
 
     hr = CreateManagedBootstrapperApplicationFactory(pAppDomain, &pAppFactory);
-    ExitOnFailure(hr, "Failed to create the factory to create the bootstrapper application.");
+    BalExitOnFailure(hr, "Failed to create the factory to create the bootstrapper application.");
 
     hr = pAppFactory->Create(pArgs, pResults);
-    ExitOnFailure(hr, "Failed to create the bootstrapper application.");
+    BalExitOnFailure(hr, "Failed to create the bootstrapper application.");
 
 LExit:
     ReleaseNullObject(pAppFactory);
@@ -593,20 +592,20 @@ static HRESULT CreateManagedBootstrapperApplicationFactory(
     ::VariantInit(&vtBAFactory);
 
     bstrAssemblyName = ::SysAllocString(MBA_ASSEMBLY_FULL_NAME);
-    ExitOnNull(bstrAssemblyName, hr, E_OUTOFMEMORY, "Failed to allocate the full assembly name for the bootstrapper application factory.");
+    BalExitOnNull(bstrAssemblyName, hr, E_OUTOFMEMORY, "Failed to allocate the full assembly name for the bootstrapper application factory.");
 
     bstrTypeName = ::SysAllocString(MBA_ENTRY_TYPE);
-    ExitOnNull(bstrTypeName, hr, E_OUTOFMEMORY, "Failed to allocate the full type name for the BA factory.");
+    BalExitOnNull(bstrTypeName, hr, E_OUTOFMEMORY, "Failed to allocate the full type name for the BA factory.");
 
     hr = pAppDomain->CreateInstance(bstrAssemblyName, bstrTypeName, &pObj);
-    ExitOnRootFailure(hr, "Failed to create the BA factory object.");
+    BalExitOnRootFailure(hr, "Failed to create the BA factory object.");
 
     hr = pObj->Unwrap(&vtBAFactory);
-    ExitOnRootFailure(hr, "Failed to unwrap the BA factory object into the host domain.");
-    ExitOnNull(vtBAFactory.punkVal, hr, E_UNEXPECTED, "The variant did not contain the expected IUnknown pointer.");
+    BalExitOnRootFailure(hr, "Failed to unwrap the BA factory object into the host domain.");
+    BalExitOnNull(vtBAFactory.punkVal, hr, E_UNEXPECTED, "The variant did not contain the expected IUnknown pointer.");
 
     hr = vtBAFactory.punkVal->QueryInterface(__uuidof(IBootstrapperApplicationFactory), reinterpret_cast<LPVOID*>(ppAppFactory));
-    ExitOnRootFailure(hr, "Failed to query for the bootstrapper app factory interface.");
+    BalExitOnRootFailure(hr, "Failed to query for the bootstrapper app factory interface.");
 
 LExit:
     ReleaseVariant(vtBAFactory);
@@ -632,13 +631,13 @@ static HRESULT CreatePrerequisiteBA(
     BalExitOnFailure(hr, "Failed to get path to pre-requisite BA.");
 
     hModule = ::LoadLibraryExW(sczMbapreqPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    ExitOnNullWithLastError(hModule, hr, "Failed to load pre-requisite BA DLL.");
+    BalExitOnNullWithLastError(hModule, hr, "Failed to load pre-requisite BA DLL.");
 
     PFN_PREQ_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = reinterpret_cast<PFN_PREQ_BOOTSTRAPPER_APPLICATION_CREATE>(::GetProcAddress(hModule, "PrereqBootstrapperApplicationCreate"));
-    ExitOnNullWithLastError(pfnCreate, hr, "Failed to get PrereqBootstrapperApplicationCreate entry-point from: %ls", sczMbapreqPath);
+    BalExitOnNullWithLastError(pfnCreate, hr, "Failed to get PrereqBootstrapperApplicationCreate entry-point from: %ls", sczMbapreqPath);
 
     hr = pfnCreate(&pState->prereqData, pEngine, pArgs, pResults);
-    ExitOnFailure(hr, "Failed to create prequisite bootstrapper app.");
+    BalExitOnFailure(hr, "Failed to create prequisite bootstrapper app.");
 
     pState->hMbapreqModule = hModule;
     hModule = NULL;
@@ -672,14 +671,14 @@ static HRESULT VerifyNET4RuntimeIsSupported(
         {
             ExitFunction1(hr = S_OK);
         }
-        ExitOnFailure(hr, "Failed to open registry key for .NET 4.");
+        BalExitOnFailure(hr, "Failed to open registry key for .NET 4.");
 
         er = ::RegQueryValueExW(hKey, L"Release", NULL, NULL, reinterpret_cast<LPBYTE>(&dwRelease), &cchRelease);
         if (ERROR_FILE_NOT_FOUND == er)
         {
             ExitFunction1(hr = S_OK);
         }
-        ExitOnWin32Error(er, hr, "Failed to get Release value.");
+        BalExitOnWin32Error(er, hr, "Failed to get Release value.");
 
         if (NET452_RELEASE <= dwRelease)
         {

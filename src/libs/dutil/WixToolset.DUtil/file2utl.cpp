@@ -16,6 +16,7 @@
 #define FileExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_FILEUTIL, p, x, s, __VA_ARGS__)
 #define FileExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_FILEUTIL, e, x, s, __VA_ARGS__)
 #define FileExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_FILEUTIL, g, x, s, __VA_ARGS__)
+#define FileExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_FILEUTIL, x, b, s, __VA_ARGS__)
 
 // constants
 
@@ -35,6 +36,7 @@ extern "C" BOOL DAPI FileExistsAfterRestart(
 {
     HRESULT hr = S_OK;
     BOOL fExists = FALSE;
+    BOOL fRegExists = FALSE;
     HKEY hkPendingFileRename = NULL;
     LPWSTR* rgsczRenames = NULL;
     DWORD cRenames = 0;
@@ -44,18 +46,20 @@ extern "C" BOOL DAPI FileExistsAfterRestart(
     if (fExists)
     {
         hr = RegOpen(HKEY_LOCAL_MACHINE, REGISTRY_PENDING_FILE_RENAME_KEY, KEY_QUERY_VALUE, &hkPendingFileRename);
-        if (E_FILENOTFOUND == hr)
+        FileExitOnPathFailure(hr, fRegExists, "Failed to open pending file rename registry key.");
+
+        if (!fRegExists)
         {
-            ExitFunction1(hr = S_OK);
+            ExitFunction();
         }
-        FileExitOnFailure(hr, "Failed to open pending file rename registry key.");
 
         hr = RegReadStringArray(hkPendingFileRename, REGISTRY_PENDING_FILE_RENAME_VALUE, &rgsczRenames, &cRenames);
-        if (E_FILENOTFOUND == hr)
+        FileExitOnPathFailure(hr, fRegExists, "Failed to read pending file renames.");
+
+        if (!fRegExists)
         {
-            ExitFunction1(hr = S_OK);
+            ExitFunction();
         }
-        FileExitOnFailure(hr, "Failed to read pending file renames.");
 
         // The pending file renames array is pairs of source and target paths. We only care
         // about checking the source paths so skip the target paths (i += 2).
@@ -95,6 +99,7 @@ extern "C" HRESULT DAPI FileRemoveFromPendingRename(
 {
     HRESULT hr = S_OK;
     HKEY hkPendingFileRename = NULL;
+    BOOL fExists = FALSE;
     LPWSTR* rgsczRenames = NULL;
     DWORD cRenames = 0;
     BOOL fPathEqual = FALSE;
@@ -102,18 +107,20 @@ extern "C" HRESULT DAPI FileRemoveFromPendingRename(
     DWORD cNewRenames = 0;
 
     hr = RegOpen(HKEY_LOCAL_MACHINE, REGISTRY_PENDING_FILE_RENAME_KEY, KEY_QUERY_VALUE | KEY_SET_VALUE, &hkPendingFileRename);
-    if (E_FILENOTFOUND == hr)
+    FileExitOnPathFailure(hr, fExists, "Failed to open pending file rename registry key.");
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    FileExitOnFailure(hr, "Failed to open pending file rename registry key.");
 
     hr = RegReadStringArray(hkPendingFileRename, REGISTRY_PENDING_FILE_RENAME_VALUE, &rgsczRenames, &cRenames);
-    if (E_FILENOTFOUND == hr)
+    FileExitOnPathFailure(hr, fExists, "Failed to read pending file renames.");
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    FileExitOnFailure(hr, "Failed to read pending file renames.");
 
     // The pending file renames array is pairs of source and target paths. We only care
     // about checking the source paths so skip the target paths (i += 2).

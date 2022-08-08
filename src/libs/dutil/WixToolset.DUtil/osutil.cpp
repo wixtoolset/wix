@@ -16,6 +16,7 @@
 #define OsExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_OSUTIL, p, x, s, __VA_ARGS__)
 #define OsExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_OSUTIL, e, x, s, __VA_ARGS__)
 #define OsExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_OSUTIL, g, x, s, __VA_ARGS__)
+#define OsExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_OSUTIL, x, b, s, __VA_ARGS__)
 
 typedef NTSTATUS(NTAPI* PFN_RTL_GET_VERSION)(_Out_ PRTL_OSVERSIONINFOEXW lpVersionInformation);
 
@@ -186,23 +187,26 @@ extern "C" HRESULT DAPI OsIsUacEnabled(
 {
     HRESULT hr = S_OK;
     HKEY hk = NULL;
+    BOOL fExists = FALSE;
     DWORD dwUacEnabled = 0;
 
     *pfUacEnabled = FALSE; // assume UAC not enabled.
 
     hr = RegOpen(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", KEY_READ, &hk);
-    if (E_FILENOTFOUND == hr)
+    OsExitOnPathFailure(hr, fExists, "Failed to open system policy key to detect UAC.");
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    OsExitOnFailure(hr, "Failed to open system policy key to detect UAC.");
 
     hr = RegReadNumber(hk, L"EnableLUA", &dwUacEnabled);
-    if (E_FILENOTFOUND == hr)
+    OsExitOnPathFailure(hr, fExists, "Failed to read registry value to detect UAC.");
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    OsExitOnFailure(hr, "Failed to read registry value to detect UAC.");
 
     *pfUacEnabled = (0 != dwUacEnabled);
 

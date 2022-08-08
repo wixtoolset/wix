@@ -15,6 +15,7 @@
 #define ButilExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_BUTIL, p, x, e, s, __VA_ARGS__)
 #define ButilExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_BUTIL, p, x, s, __VA_ARGS__)
 #define ButilExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_BUTIL, e, x, s, __VA_ARGS__)
+#define ButilExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_BUTIL, x, b, s, __VA_ARGS__)
 
 // constants
 // From engine/registration.h
@@ -81,19 +82,6 @@ static HRESULT LocateAndQueryBundleValue(
     __inout HKEY* phKey,
     __inout DWORD* pdwType,
     __out INTERNAL_BUNDLE_STATUS* pStatus
-    );
-
-/********************************************************************
-OpenBundleKey - Opens the bundle uninstallation key for a given bundle
-
-NOTE: caller is responsible for closing key
-********************************************************************/
-static HRESULT OpenBundleKey(
-    __in_z LPCWSTR wzBundleId,
-    __in BUNDLE_INSTALL_CONTEXT context,
-    __in_opt LPCWSTR wzSubKey,
-    __in REG_KEY_BITNESS kbKeyBitness,
-    __inout HKEY* phKey
     );
 static HRESULT CopyStringToBuffer(
     __in_z LPWSTR wzValue,
@@ -389,12 +377,12 @@ DAPI_(HRESULT) BundleQueryRelatedBundles(
     queryContext.regBitness = REG_KEY_32BIT;
 
     hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
-    ExitOnFailure(hr, "Failed to query 32-bit related bundles.");
+    ButilExitOnFailure(hr, "Failed to query 32-bit related bundles.");
 
     queryContext.regBitness = REG_KEY_64BIT;
 
     hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
-    ExitOnFailure(hr, "Failed to query 64-bit related bundles.");
+    ButilExitOnFailure(hr, "Failed to query 64-bit related bundles.");
 
 LExit:
     return hr;
@@ -407,15 +395,17 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
     HRESULT hr = S_OK;
     HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == pQueryContext->installContext ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
     HKEY hkUninstallKey = NULL;
+    BOOL fExists = FALSE;
     LPWSTR sczRelatedBundleId = NULL;
     BUNDLE_QUERY_CALLBACK_RESULT result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
 
     hr = RegOpenEx(hkRoot, BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, pQueryContext->regBitness, &hkUninstallKey);
-    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    ButilExitOnPathFailure(hr, fExists, "Failed to open uninstall registry key.");
+
+    if (!fExists)
     {
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed to open uninstall registry key.");
 
     for (DWORD dwIndex = 0; /* exit via break below */; ++dwIndex)
     {
@@ -425,7 +415,7 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
             hr = S_OK;
             break;
         }
-        ExitOnFailure(hr, "Failed to enumerate uninstall key for related bundles.");
+        ButilExitOnFailure(hr, "Failed to enumerate uninstall key for related bundles.");
 
         // Ignore failures here since we'll often find products that aren't actually
         // related bundles (or even bundles at all).
@@ -456,7 +446,7 @@ static HRESULT QueryPotentialRelatedBundle(
     BUNDLE_QUERY_RELATED_BUNDLE_RESULT bundle = { };
 
     hr = RegOpenEx(hkUninstallKey, wzRelatedBundleId, KEY_READ, pQueryContext->regBitness, &hkBundleId);
-    ExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", wzRelatedBundleId);
+    ButilExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", wzRelatedBundleId);
 
     hr = DetermineRelationType(pQueryContext, hkBundleId, &relationType);
     if (FAILED(hr))
@@ -506,7 +496,7 @@ static HRESULT DetermineRelationType(
         TraceError(hr, "Failed to read upgrade codes as REG_MULTI_SZ. Trying again as REG_SZ in case of older bundles.");
 
         rgsczUpgradeCodes = reinterpret_cast<LPWSTR*>(MemAlloc(sizeof(LPWSTR), TRUE));
-        ExitOnNull(rgsczUpgradeCodes, hr, E_OUTOFMEMORY, "Failed to allocate list for a single upgrade code from older bundle.");
+        ButilExitOnNull(rgsczUpgradeCodes, hr, E_OUTOFMEMORY, "Failed to allocate list for a single upgrade code from older bundle.");
 
         hr = RegReadString(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes[0]);
         if (SUCCEEDED(hr))
@@ -519,7 +509,7 @@ static HRESULT DetermineRelationType(
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdUpgradeCodes, rgsczUpgradeCodes, cUpgradeCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "upgrade codes");
+        ButilExitOnFailure(hr, "Failed to create string dictionary for %hs.", "upgrade codes");
 
         // Upgrade relationship: when their upgrade codes match our upgrade codes.
         hr = DictCompareStringListToArray(sdUpgradeCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzUpgradeCodes), pQueryContext->cUpgradeCodes);
@@ -529,7 +519,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for upgrade code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for upgrade code match.");
 
             *pRelationType = BUNDLE_RELATION_UPGRADE;
             ExitFunction();
@@ -543,7 +533,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for detect code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for detect code match.");
 
             *pRelationType = BUNDLE_RELATION_DETECT;
             ExitFunction();
@@ -557,7 +547,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for addon code match.");
 
             *pRelationType = BUNDLE_RELATION_DEPENDENT_ADDON;
             ExitFunction();
@@ -571,7 +561,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for patch code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for patch code match.");
 
             *pRelationType = BUNDLE_RELATION_DEPENDENT_PATCH;
             ExitFunction();
@@ -586,7 +576,7 @@ static HRESULT DetermineRelationType(
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdAddonCodes, rgsczAddonCodes, cAddonCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "addon codes");
+        ButilExitOnFailure(hr, "Failed to create string dictionary for %hs.", "addon codes");
 
         // Addon relationship: when their addon codes match our detect codes.
         hr = DictCompareStringListToArray(sdAddonCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
@@ -596,7 +586,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for addon code match.");
 
             *pRelationType = BUNDLE_RELATION_ADDON;
             ExitFunction();
@@ -610,7 +600,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for addon code match.");
 
             *pRelationType = BUNDLE_RELATION_ADDON;
             ExitFunction();
@@ -625,7 +615,7 @@ static HRESULT DetermineRelationType(
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdPatchCodes, rgsczPatchCodes, cPatchCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "patch codes");
+        ButilExitOnFailure(hr, "Failed to create string dictionary for %hs.", "patch codes");
 
         // Patch relationship: when their patch codes match our detect codes.
         hr = DictCompareStringListToArray(sdPatchCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
@@ -635,7 +625,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for patch code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for patch code match.");
 
             *pRelationType = BUNDLE_RELATION_PATCH;
             ExitFunction();
@@ -649,7 +639,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for patch code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for patch code match.");
 
             *pRelationType = BUNDLE_RELATION_PATCH;
             ExitFunction();
@@ -664,7 +654,7 @@ static HRESULT DetermineRelationType(
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdDetectCodes, rgsczDetectCodes, cDetectCodes, DICT_FLAG_CASEINSENSITIVE);
-        ExitOnFailure(hr, "Failed to create string dictionary for %hs.", "detect codes");
+        ButilExitOnFailure(hr, "Failed to create string dictionary for %hs.", "detect codes");
 
         // Detect relationship: when their detect codes match our detect codes.
         hr = DictCompareStringListToArray(sdDetectCodes, const_cast<LPCWSTR*>(pQueryContext->rgwzDetectCodes), pQueryContext->cDetectCodes);
@@ -674,7 +664,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for detect code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for detect code match.");
 
             *pRelationType = BUNDLE_RELATION_DETECT;
             ExitFunction();
@@ -688,7 +678,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for addon code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for addon code match.");
 
             *pRelationType = BUNDLE_RELATION_DEPENDENT_ADDON;
             ExitFunction();
@@ -702,7 +692,7 @@ static HRESULT DetermineRelationType(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to do array search for patch code match.");
+            ButilExitOnFailure(hr, "Failed to do array search for patch code match.");
 
             *pRelationType = BUNDLE_RELATION_DEPENDENT_PATCH;
             ExitFunction();
@@ -740,53 +730,10 @@ static HRESULT LocateAndQueryBundleValue(
     )
 {
     HRESULT hr = S_OK;
+    LPWSTR sczKeypath = NULL;
+    BOOL fExists = TRUE;
 
     *pStatus = INTERNAL_BUNDLE_STATUS_SUCCESS;
-
-    if (FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_MACHINE, wzSubKey, REG_KEY_32BIT, phKey)) &&
-        FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_MACHINE, wzSubKey, REG_KEY_64BIT, phKey)) &&
-        FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_USER, wzSubKey, REG_KEY_DEFAULT, phKey)))
-    {
-        if (E_FILENOTFOUND == hr)
-        {
-            *pStatus = INTERNAL_BUNDLE_STATUS_UNKNOWN_BUNDLE;
-            ExitFunction1(hr = S_OK);
-        }
-
-        ButilExitOnFailure(hr, "Failed to open bundle key.");
-    }
-
-    // If the bundle doesn't have the value defined, return ERROR_UNKNOWN_PROPERTY
-    hr = RegGetType(*phKey, wzValueName, pdwType);
-    if (FAILED(hr))
-    {
-        if (E_FILENOTFOUND == hr)
-        {
-            *pStatus = INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY;
-            ExitFunction1(hr = S_OK);
-        }
-
-        ButilExitOnFailure(hr, "Failed to read bundle value.");
-    }
-
-LExit:
-    return hr;
-}
-
-static HRESULT OpenBundleKey(
-    __in_z LPCWSTR wzBundleId,
-    __in BUNDLE_INSTALL_CONTEXT context,
-    __in_opt LPCWSTR wzSubKey,
-    __in REG_KEY_BITNESS kbKeyBitness,
-    __inout HKEY* phKey
-    )
-{
-    Assert(phKey && wzBundleId);
-    AssertSz(NULL == *phKey, "*key should be null");
-
-    HRESULT hr = S_OK;
-    HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == context ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
-    LPWSTR sczKeypath = NULL;
 
     if (wzSubKey)
     {
@@ -798,8 +745,24 @@ static HRESULT OpenBundleKey(
     }
     ButilExitOnFailure(hr, "Failed to allocate bundle uninstall key path.");
 
-    hr = RegOpenEx(hkRoot, sczKeypath, KEY_READ, kbKeyBitness, phKey);
-    ButilExitOnFailure(hr, "Failed to open bundle uninstall key path.");
+    if (FAILED(hr = RegOpenEx(HKEY_LOCAL_MACHINE, sczKeypath, KEY_READ, REG_KEY_32BIT, phKey)) &&
+        FAILED(hr = RegOpenEx(HKEY_LOCAL_MACHINE, sczKeypath, KEY_READ, REG_KEY_64BIT, phKey)) &&
+        FAILED(hr = RegOpenEx(HKEY_CURRENT_USER, sczKeypath, KEY_READ, REG_KEY_DEFAULT, phKey)))
+    {
+        ButilExitOnPathFailure(hr, fExists, "Failed to open bundle key.");
+
+        *pStatus = INTERNAL_BUNDLE_STATUS_UNKNOWN_BUNDLE;
+        ExitFunction1(hr = S_OK);
+    }
+
+    hr = RegGetType(*phKey, wzValueName, pdwType);
+    ButilExitOnPathFailure(hr, fExists, "Failed to read bundle value.");
+
+    if (!fExists)
+    {
+        *pStatus = INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY;
+        ExitFunction1(hr = S_OK);
+    }
 
 LExit:
     ReleaseStr(sczKeypath);

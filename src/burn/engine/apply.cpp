@@ -611,7 +611,7 @@ extern "C" HRESULT ApplyCache(
             ExitOnFailure(hr, "Failed cache action: %ls", L"layout bundle");
 
             hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, pContext);
-            LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"layout bundle");
+            LogExitOnRootFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"layout bundle");
 
             break;
 
@@ -637,7 +637,7 @@ extern "C" HRESULT ApplyCache(
             ExitOnFailure(hr, "Failed cache action: %ls", L"cache package");
 
             hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, pContext);
-            LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"cache package");
+            LogExitOnRootFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"cache package");
 
             break;
 
@@ -1038,7 +1038,7 @@ static HRESULT ApplyCachePackage(
         }
         else if (fCanceledBegin)
         {
-            LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls: %ls", L"begin cache package", pPackage->sczId);
+            LogExitOnRootFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls: %ls", L"begin cache package", pPackage->sczId);
         }
 
         break;
@@ -1796,8 +1796,7 @@ static HRESULT AcquireContainerOrPayload(
 
         break;
     default:
-        hr = E_FILENOTFOUND;
-        LogExitOnFailure(hr, MSG_RESOLVE_SOURCE_FAILED, "Failed to resolve source, payload: %ls, package: %ls, container: %ls", wzPayloadId, pPackage ? pPackage->sczId : NULL, pContainer ? pContainer->sczId : NULL);
+        LogExitWithRootFailure(hr, E_FILENOTFOUND, MSG_RESOLVE_SOURCE_FAILED, "Failed to resolve source, payload: %ls, package: %ls, container: %ls", wzPayloadId, pPackage ? pPackage->sczId : NULL, pContainer ? pContainer->sczId : NULL);
     }
 
     // Send 100% complete here. This is sometimes the only progress sent to the BA.
@@ -1965,17 +1964,12 @@ static HRESULT PreparePayloadDestinationPath(
             dwFileAttributes &= ~FILE_ATTRIBUTE_READONLY;
             if (!::SetFileAttributes(wzDestinationPath, dwFileAttributes))
             {
-                ExitWithLastError(hr, "Failed to clear readonly bit on payload destination path: %ls", wzDestinationPath);
+                ExitWithPathLastError(hr, "Failed to clear readonly bit on payload destination path: %ls", wzDestinationPath);
             }
         }
     }
 
 LExit:
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-
     return hr;
 }
 

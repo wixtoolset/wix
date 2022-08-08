@@ -131,6 +131,8 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #define ExitOnOptionalXmlQueryFailureSource(d, x, b, s, ...) { { if (S_FALSE == x || E_NOTFOUND == x) { b = FALSE; x = S_OK; } else { b = SUCCEEDED(x); } }; ExitOnRootFailureSource(d, x, s, __VA_ARGS__); }
 #define ExitOnRequiredXmlQueryFailureSource(d, x, s, ...) { if (S_FALSE == x) { x = E_NOTFOUND; } ExitOnRootFailureSource(d, x, s, __VA_ARGS__); }
 #define ExitOnWaitObjectFailureSource(d, x, b, s, ...) { { if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == x) { b = TRUE; x = S_OK; } else { b = FALSE; } }; ExitOnFailureSource(d, x, s, __VA_ARGS__); }
+#define ExitOnPathFailureSource(d, x, b, s, ...) { { if (E_PATHNOTFOUND == x || E_FILENOTFOUND == x) { b = FALSE; x = S_OK; } else { b = SUCCEEDED(x); } }; ExitOnFailureSource(d, x, s, __VA_ARGS__); }
+#define ExitWithPathLastErrorSource(d, x, s, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } else if (E_PATHNOTFOUND == x || E_FILENOTFOUND == x) { x = S_OK; } ExitOnRootFailureSource(d, x, s, __VA_ARGS__); }
 
 #define ExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
 #define ExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
@@ -147,6 +149,8 @@ void DAPI Dutil_RootFailure(__in_z LPCSTR szFile, __in int iLine, __in HRESULT h
 #define ExitOnOptionalXmlQueryFailure(x, b, s, ...) ExitOnOptionalXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, b, s, __VA_ARGS__)
 #define ExitOnRequiredXmlQueryFailure(x, s, ...) ExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
 #define ExitOnWaitObjectFailure(x, b, s, ...) ExitOnWaitObjectFailureSource(DUTIL_SOURCE_DEFAULT, x, b, s, __VA_ARGS__)
+#define ExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_DEFAULT, x, b, s, __VA_ARGS__)
+#define ExitWithPathLastError(x, s, ...) ExitWithPathLastErrorSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__)
 
 // release macros
 #define ReleaseObject(x) if (x) { x->Release(); }
