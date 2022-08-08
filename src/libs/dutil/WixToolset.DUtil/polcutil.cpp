@@ -16,6 +16,7 @@
 #define PolcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_POLCUTIL, p, x, s, __VA_ARGS__)
 #define PolcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_POLCUTIL, e, x, s, __VA_ARGS__)
 #define PolcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_POLCUTIL, g, x, s, __VA_ARGS__)
+#define PolcExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_POLCUTIL, x, b, s, __VA_ARGS__)
 
 const LPCWSTR REGISTRY_POLICIES_KEY = L"SOFTWARE\\Policies\\";
 
@@ -34,25 +35,28 @@ extern "C" HRESULT DAPI PolcReadNumber(
 {
     HRESULT hr = S_OK;
     HKEY hk = NULL;
+    BOOL fExists = FALSE;
 
     hr = OpenPolicyKey(wzPolicyPath, &hk);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
-    {
-        ExitFunction1(hr = S_FALSE);
-    }
     PolcExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
 
-    hr = RegReadNumber(hk, wzPolicyName, pdw);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    if (!hk)
     {
         ExitFunction1(hr = S_FALSE);
     }
-    PolcExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+    hr = RegReadNumber(hk, wzPolicyName, pdw);
+    PolcExitOnPathFailure(hr, fExists, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+    if (!fExists)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
 
 LExit:
     ReleaseRegKey(hk);
 
-    if (S_FALSE == hr || FAILED(hr))
+    if (!fExists)
     {
         *pdw = dwDefault;
     }
@@ -69,25 +73,28 @@ extern "C" HRESULT DAPI PolcReadString(
 {
     HRESULT hr = S_OK;
     HKEY hk = NULL;
+    BOOL fExists = FALSE;
 
     hr = OpenPolicyKey(wzPolicyPath, &hk);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
-    {
-        ExitFunction1(hr = S_FALSE);
-    }
     PolcExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
 
-    hr = RegReadString(hk, wzPolicyName, pscz);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    if (!hk)
     {
         ExitFunction1(hr = S_FALSE);
     }
-    PolcExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+    hr = RegReadString(hk, wzPolicyName, pscz);
+    PolcExitOnPathFailure(hr, fExists, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+    if (!fExists)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
 
 LExit:
     ReleaseRegKey(hk);
 
-    if (S_FALSE == hr || FAILED(hr))
+    if (!fExists)
     {
         if (NULL == wzDefault)
         {
@@ -112,25 +119,28 @@ extern "C" HRESULT DAPI PolcReadUnexpandedString(
 {
     HRESULT hr = S_OK;
     HKEY hk = NULL;
+    BOOL fExists = FALSE;
 
     hr = OpenPolicyKey(wzPolicyPath, &hk);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
-    {
-        ExitFunction1(hr = S_FALSE);
-    }
     PolcExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
 
-    hr = RegReadUnexpandedString(hk, wzPolicyName, pfNeedsExpansion, pscz);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    if (!hk)
     {
         ExitFunction1(hr = S_FALSE);
     }
-    PolcExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+    hr = RegReadUnexpandedString(hk, wzPolicyName, pfNeedsExpansion, pscz);
+    PolcExitOnPathFailure(hr, fExists, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+
+    if (!fExists)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
 
 LExit:
     ReleaseRegKey(hk);
 
-    if (S_FALSE == hr || FAILED(hr))
+    if (!fExists)
     {
         if (NULL == wzDefault)
         {
@@ -155,12 +165,18 @@ static HRESULT OpenPolicyKey(
 {
     HRESULT hr = S_OK;
     LPWSTR sczPath = NULL;
+    BOOL fExists = FALSE;
 
     hr = PathConcat(REGISTRY_POLICIES_KEY, wzPolicyPath, &sczPath);
     PolcExitOnFailure(hr, "Failed to combine logging path with root path.");
 
     hr = RegOpen(HKEY_LOCAL_MACHINE, sczPath, KEY_READ, phk);
-    PolcExitOnFailure(hr, "Failed to open policy registry key.");
+    PolcExitOnPathFailure(hr, fExists, "Failed to open policy registry key.");
+
+    if (!fExists)
+    {
+        ReleaseRegKey(*phk);
+    }
 
 LExit:
     ReleaseStr(sczPath);

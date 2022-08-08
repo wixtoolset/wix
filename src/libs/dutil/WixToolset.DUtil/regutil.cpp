@@ -17,6 +17,7 @@
 #define RegExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_REGUTIL, p, x, s, __VA_ARGS__)
 #define RegExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_REGUTIL, e, x, s, __VA_ARGS__)
 #define RegExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_REGUTIL, g, x, s, __VA_ARGS__)
+#define RegExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_REGUTIL, x, b, s, __VA_ARGS__)
 
 static PFN_REGCREATEKEYEXW vpfnRegCreateKeyExW = ::RegCreateKeyExW;
 static PFN_REGOPENKEYEXW vpfnRegOpenKeyExW = ::RegOpenKeyExW;
@@ -179,7 +180,7 @@ DAPI_(HRESULT) RegOpen(
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
     __out HKEY* phk
-)
+    )
 {
     return RegOpenEx(hkRoot, wzSubKey, dwAccess, REG_KEY_DEFAULT, phk);
 }
@@ -191,18 +192,18 @@ DAPI_(HRESULT) RegOpenEx(
     __in DWORD dwAccess,
     __in REG_KEY_BITNESS kbKeyBitness,
     __out HKEY* phk
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
 
     REGSAM samDesired = RegTranslateKeyBitness(kbKeyBitness);
     er = vpfnRegOpenKeyExW(hkRoot, wzSubKey, 0, dwAccess | samDesired, phk);
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    if (ERROR_PATH_NOT_FOUND == er || ERROR_FILE_NOT_FOUND == er)
     {
-        ExitFunction1(hr = E_FILENOTFOUND);
+        ExitFunction1(hr = HRESULT_FROM_WIN32(er));
     }
-    RegExitOnWin32Error(er, hr, "Failed to open registry key.");
+    RegExitOnWin32Error(er, hr, "Failed to open registry key, root: %x, subkey: %ls.", hkRoot, wzSubKey);
 
 LExit:
     return hr;
@@ -221,6 +222,7 @@ DAPI_(HRESULT) RegDelete(
     LPWSTR pszEnumeratedSubKey = NULL;
     LPWSTR pszRecursiveSubKey = NULL;
     HKEY hkKey = NULL;
+    BOOL fExists = FALSE;
 
     if (!vfRegInitialized && REG_KEY_DEFAULT != kbKeyBitness)
     {
@@ -231,9 +233,9 @@ DAPI_(HRESULT) RegDelete(
     if (fDeleteTree)
     {
         hr = RegOpenEx(hkRoot, wzSubKey, KEY_READ, kbKeyBitness, &hkKey);
-        if (E_FILENOTFOUND == hr)
+        if (E_PATHNOTFOUND == hr || E_FILENOTFOUND == hr)
         {
-            ExitFunction1(hr = S_OK);
+            ExitFunction();
         }
         RegExitOnFailure(hr, "Failed to open this key for enumerating subkeys: %ls", wzSubKey);
 
@@ -246,28 +248,31 @@ DAPI_(HRESULT) RegDelete(
             RegExitOnFailure(hr, "Failed to concatenate paths while recursively deleting subkeys. Path1: %ls, Path2: %ls", wzSubKey, pszEnumeratedSubKey);
 
             hr = RegDelete(hkRoot, pszRecursiveSubKey, kbKeyBitness, fDeleteTree);
-            RegExitOnFailure(hr, "Failed to recursively delete subkey: %ls", pszRecursiveSubKey);
+            RegExitOnPathFailure(hr, fExists, "Failed to recursively delete subkey: %ls", pszRecursiveSubKey);
         }
 
         hr = S_OK;
+
+        // Release the handle to make sure it's deleted immediately.
+        ReleaseRegKey(hkKey);
     }
 
     if (NULL != vpfnRegDeleteKeyExW)
     {
         REGSAM samDesired = RegTranslateKeyBitness(kbKeyBitness);
         er = vpfnRegDeleteKeyExW(hkRoot, wzSubKey, samDesired, 0);
-        if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+        if (ERROR_PATH_NOT_FOUND == er || ERROR_FILE_NOT_FOUND == er)
         {
-            ExitFunction1(hr = E_FILENOTFOUND);
+            ExitFunction1(hr = HRESULT_FROM_WIN32(er));
         }
         RegExitOnWin32Error(er, hr, "Failed to delete registry key (ex).");
     }
     else
     {
         er = vpfnRegDeleteKeyW(hkRoot, wzSubKey);
-        if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+        if (ERROR_PATH_NOT_FOUND == er || ERROR_FILE_NOT_FOUND == er)
         {
-            ExitFunction1(hr = E_FILENOTFOUND);
+            ExitFunction1(hr = HRESULT_FROM_WIN32(er));
         }
         RegExitOnWin32Error(er, hr, "Failed to delete registry key.");
     }
@@ -772,7 +777,7 @@ DAPI_(HRESULT) RegReadNumber(
     DWORD cb = sizeof(DWORD);
 
     er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(pdwValue), &cb);
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    if (ERROR_FILE_NOT_FOUND == er)
     {
         ExitFunction1(hr = E_FILENOTFOUND);
     }
@@ -801,7 +806,7 @@ DAPI_(HRESULT) RegReadQword(
     DWORD cb = sizeof(DWORD64);
 
     er = vpfnRegQueryValueExW(hk, wzName, NULL, &dwType, reinterpret_cast<LPBYTE>(pqwValue), &cb);
-    if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+    if (ERROR_FILE_NOT_FOUND == er)
     {
         ExitFunction1(hr = E_FILENOTFOUND);
     }
@@ -1015,9 +1020,17 @@ DAPI_(HRESULT) RegKeyReadNumber(
     HKEY hkKey = NULL;
 
     hr = RegOpenEx(hk, wzSubKey, KEY_READ, kbKeyBitness, &hkKey);
+    if (E_PATHNOTFOUND == hr || E_FILENOTFOUND == hr)
+    {
+        ExitFunction();
+    }
     RegExitOnFailure(hr, "Failed to open key: %ls", wzSubKey);
 
     hr = RegReadNumber(hkKey, wzName, pdwValue);
+    if (E_FILENOTFOUND == hr)
+    {
+        ExitFunction();
+    }
     RegExitOnFailure(hr, "Failed to read value: %ls/@%ls", wzSubKey, wzName);
 
 LExit:
@@ -1038,9 +1051,17 @@ DAPI_(BOOL) RegValueExists(
     DWORD dwType = 0;
 
     hr = RegOpenEx(hk, wzSubKey, KEY_READ, kbKeyBitness, &hkKey);
+    if (E_PATHNOTFOUND == hr || E_FILENOTFOUND == hr)
+    {
+        ExitFunction();
+    }
     RegExitOnFailure(hr, "Failed to open key: %ls", wzSubKey);
 
     hr = RegGetType(hkKey, wzName, &dwType);
+    if (E_FILENOTFOUND == hr)
+    {
+        ExitFunction();
+    }
     RegExitOnFailure(hr, "Failed to read value type: %ls/@%ls", wzSubKey, wzName);
 
 LExit:

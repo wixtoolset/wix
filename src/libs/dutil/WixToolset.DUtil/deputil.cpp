@@ -16,6 +16,7 @@
 #define DepExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DEPUTIL, p, x, s, __VA_ARGS__)
 #define DepExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DEPUTIL, e, x, s, __VA_ARGS__)
 #define DepExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DEPUTIL, g, x, s, __VA_ARGS__)
+#define DepExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_DEPUTIL, x, b, s, __VA_ARGS__)
 
 #define ARRAY_GROWTH_SIZE 5
 
@@ -54,6 +55,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
     HRESULT hr = S_OK;
     LPWSTR sczKey = NULL;
     HKEY hkKey = NULL;
+    BOOL fExists = FALSE;
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
@@ -61,43 +63,32 @@ DAPI_(HRESULT) DepGetProviderInformation(
 
     // Try to open the dependency key.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkKey);
-    if (E_FILENOTFOUND == hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
+
+    if (!fExists)
     {
         ExitFunction1(hr = E_NOTFOUND);
     }
-    DepExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
 
     // Get the Id if requested and available.
     if (psczId)
     {
         hr = RegReadString(hkKey, NULL, psczId);
-        if (E_FILENOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        DepExitOnFailure(hr, "Failed to get the id for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnPathFailure(hr, fExists, "Failed to get the id for the dependency \"%ls\".", wzProviderKey);
     }
 
     // Get the DisplayName if requested and available.
     if (psczName)
     {
         hr = RegReadString(hkKey, vcszDisplayNameValue, psczName);
-        if (E_FILENOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        DepExitOnFailure(hr, "Failed to get the name for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnPathFailure(hr, fExists, "Failed to get the name for the dependency \"%ls\".", wzProviderKey);
     }
 
     // Get the Version if requested and available.
     if (psczVersion)
     {
         hr = RegReadString(hkKey, vcszVersionValue, psczVersion);
-        if (E_FILENOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        DepExitOnFailure(hr, "Failed to get the version for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnPathFailure(hr, fExists, "Failed to get the version for the dependency \"%ls\".", wzProviderKey);
     }
 
 LExit:
@@ -121,6 +112,7 @@ DAPI_(HRESULT) DepCheckDependency(
     HRESULT hr = S_OK;
     LPWSTR sczKey = NULL;
     HKEY hkKey = NULL;
+    BOOL fExists = FALSE;
     VERUTIL_VERSION* pVersion = NULL;
     VERUTIL_VERSION* pMinVersion = NULL;
     VERUTIL_VERSION* pMaxVersion = NULL;
@@ -134,20 +126,17 @@ DAPI_(HRESULT) DepCheckDependency(
 
     // Try to open the key. If that fails, add the missing dependency key to the dependency array if it doesn't already exist.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkKey);
-    if (E_FILENOTFOUND != hr)
-    {
-        DepExitOnFailure(hr, "Failed to open the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnPathFailure(hr, fExists, "Failed to open the registry key for dependency \"%ls\".", wzProviderKey);
 
+    if (fExists)
+    {
         // If there are no registry values, consider the key orphaned and treat it as missing.
         hr = RegReadWixVersion(hkKey, vcszVersionValue, &pVersion);
-        if (E_FILENOTFOUND != hr)
-        {
-            DepExitOnFailure(hr, "Failed to read the %ls registry value for dependency \"%ls\".", vcszVersionValue, wzProviderKey);
-        }
+        DepExitOnPathFailure(hr, fExists, "Failed to read the %ls registry value for dependency \"%ls\".", vcszVersionValue, wzProviderKey);
     }
 
     // If the key was not found or the Version value was not found, add the missing dependency key to the dependency array.
-    if (E_FILENOTFOUND == hr)
+    if (!fExists)
     {
         hr = DictKeyExists(sdDependencies, wzProviderKey);
         if (E_NOTFOUND != hr)
@@ -190,7 +179,7 @@ DAPI_(HRESULT) DepCheckDependency(
                 else
                 {
                     hr = RegReadString(hkKey, vcszDisplayNameValue, &sczName);
-                    DepExitOnFailure(hr, "Failed to get the display name of the older dependency \"%ls\".", wzProviderKey);
+                    DepExitOnPathFailure(hr, fExists, "Failed to get the display name of the older dependency \"%ls\".", wzProviderKey);
 
                     hr = DepDependencyArrayAlloc(prgDependencies, pcDependencies, wzProviderKey, sczName);
                     DepExitOnFailure(hr, "Failed to add the older dependency \"%ls\" to the dependencies array.", wzProviderKey);
@@ -228,7 +217,7 @@ DAPI_(HRESULT) DepCheckDependency(
                 else
                 {
                     hr = RegReadString(hkKey, vcszDisplayNameValue, &sczName);
-                    DepExitOnFailure(hr, "Failed to get the display name of the newer dependency \"%ls\".", wzProviderKey);
+                    DepExitOnPathFailure(hr, fExists, "Failed to get the display name of the newer dependency \"%ls\".", wzProviderKey);
 
                     hr = DepDependencyArrayAlloc(prgDependencies, pcDependencies, wzProviderKey, sczName);
                     DepExitOnFailure(hr, "Failed to add the newer dependency \"%ls\" to the dependencies array.", wzProviderKey);
@@ -267,6 +256,7 @@ DAPI_(HRESULT) DepCheckDependents(
     LPWSTR sczKey = NULL;
     HKEY hkProviderKey = NULL;
     HKEY hkDependentsKey = NULL;
+    BOOL fExists = FALSE;
     LPWSTR sczDependentKey = NULL;
     LPWSTR sczDependentName = NULL;
     BOOL fIgnore = FALSE;
@@ -277,15 +267,18 @@ DAPI_(HRESULT) DepCheckDependents(
 
     // Try to open the key. If that fails, the dependency information is corrupt.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkProviderKey);
-    DepExitOnFailure(hr, "Failed to open the registry key \"%ls\". The dependency store is corrupt.", sczKey);
+    DepExitOnPathFailure(hr, fExists, "Failed to open the registry key \"%ls\". The dependency store is corrupt.", sczKey);
+
+    if (!fExists)
+    {
+        ExitFunction1(hr = S_OK);
+    }
 
     // Try to open the dependencies key. If that does not exist, there are no dependents.
     hr = RegOpen(hkProviderKey, vsczRegistryDependents, KEY_READ, &hkDependentsKey);
-    if (E_FILENOTFOUND != hr)
-    {
-        DepExitOnFailure(hr, "Failed to open the registry key for dependents of \"%ls\".", wzProviderKey);
-    }
-    else
+    DepExitOnPathFailure(hr, fExists, "Failed to open the registry key for dependents of \"%ls\".", wzProviderKey);
+
+    if (!fExists)
     {
         ExitFunction1(hr = S_OK);
     }
@@ -399,15 +392,18 @@ DAPI_(HRESULT) DepDependentExists(
     HRESULT hr = S_OK;
     LPWSTR sczDependentKey = NULL;
     HKEY hkDependentKey = NULL;
+    BOOL fExists = FALSE;
 
     // Format the provider dependents registry key.
     hr = StrAllocFormatted(&sczDependentKey, L"%ls%ls\\%ls\\%ls", vsczRegistryRoot, wzDependencyProviderKey, vsczRegistryDependents, wzProviderKey);
     DepExitOnFailure(hr, "Failed to format registry key to dependent.");
 
     hr = RegOpen(hkHive, sczDependentKey, KEY_READ, &hkDependentKey);
-    if (E_FILENOTFOUND != hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to open the dependent registry key at: \"%ls\".", sczDependentKey);
+
+    if (!fExists)
     {
-        DepExitOnFailure(hr, "Failed to open the dependent registry key at: \"%ls\".", sczDependentKey);
+        hr = E_FILENOTFOUND;
     }
 
 LExit:
@@ -480,6 +476,7 @@ DAPI_(HRESULT) DepUnregisterDependency(
     HRESULT hr = S_OK;
     LPWSTR sczKey = NULL;
     HKEY hkKey = NULL;
+    BOOL fExists = FALSE;
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
@@ -487,9 +484,11 @@ DAPI_(HRESULT) DepUnregisterDependency(
 
     // Delete the entire key including all sub-keys.
     hr = RegDelete(hkHive, sczKey, REG_KEY_DEFAULT, TRUE);
-    if (E_FILENOTFOUND != hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to delete the key \"%ls\".", sczKey);
+
+    if (!fExists)
     {
-        DepExitOnFailure(hr, "Failed to delete the key \"%ls\".", sczKey);
+        hr = E_FILENOTFOUND;
     }
 
 LExit:
@@ -506,6 +505,7 @@ DAPI_(HRESULT) DepUnregisterDependent(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fExists = FALSE;
     HKEY hkRegistryRoot = NULL;
     HKEY hkDependencyProviderKey = NULL;
     HKEY hkRegistryDependents = NULL;
@@ -514,40 +514,39 @@ DAPI_(HRESULT) DepUnregisterDependent(
 
     // Open the root key. We may delete the wzDependencyProviderKey during clean up.
     hr = RegOpen(hkHive, vsczRegistryRoot, KEY_READ, &hkRegistryRoot);
-    if (E_FILENOTFOUND != hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to open root registry key \"%ls\".", vsczRegistryRoot);
+
+    if (!fExists)
     {
-        DepExitOnFailure(hr, "Failed to open root registry key \"%ls\".", vsczRegistryRoot);
-    }
-    else
-    {
-        ExitFunction();
+        ExitFunction1(hr = E_FILENOTFOUND);
     }
 
     // Try to open the dependency key. If that does not exist, simply return.
     hr = RegOpen(hkRegistryRoot, wzDependencyProviderKey, KEY_READ, &hkDependencyProviderKey);
-    if (E_FILENOTFOUND != hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to open the registry key for the dependency \"%ls\".", wzDependencyProviderKey);
+
+    if (!fExists)
     {
-        DepExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzDependencyProviderKey);
-    }
-    else
-    {
-        ExitFunction();
+        ExitFunction1(hr = E_FILENOTFOUND);
     }
 
     // Try to open the dependents subkey to enumerate.
     hr = RegOpen(hkDependencyProviderKey, vsczRegistryDependents, KEY_READ, &hkRegistryDependents);
-    if (E_FILENOTFOUND != hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to open the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
+
+    if (!fExists)
     {
-        DepExitOnFailure(hr, "Failed to open the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
-    }
-    else
-    {
-        ExitFunction();
+        ExitFunction1(hr = E_FILENOTFOUND);
     }
 
     // Delete the wzProviderKey dependent sub-key.
     hr = RegDelete(hkRegistryDependents, wzProviderKey, REG_KEY_DEFAULT, TRUE);
-    DepExitOnFailure(hr, "Failed to delete the dependent \"%ls\" under the dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
+    DepExitOnPathFailure(hr, fExists, "Failed to delete the dependent \"%ls\" under the dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
+
+    if (!fExists)
+    {
+        ExitFunction1(hr = E_FILENOTFOUND);
+    }
 
     // If there are no remaining dependents, delete the Dependents subkey.
     hr = RegQueryKey(hkRegistryDependents, &cSubKeys, NULL);
@@ -563,7 +562,12 @@ DAPI_(HRESULT) DepUnregisterDependent(
 
     // Fail if there are any subkeys since we just checked.
     hr = RegDelete(hkDependencyProviderKey, vsczRegistryDependents, REG_KEY_DEFAULT, FALSE);
-    DepExitOnFailure(hr, "Failed to delete the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
+    DepExitOnPathFailure(hr, fExists, "Failed to delete the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
+
+    if (!fExists)
+    {
+        ExitFunction1(hr = E_FILENOTFOUND);
+    }
 
     // If there are no values, delete the provider dependency key.
     hr = RegQueryKey(hkDependencyProviderKey, NULL, &cValues);
@@ -576,7 +580,12 @@ DAPI_(HRESULT) DepUnregisterDependent(
 
         // Fail if there are any subkeys since we just checked.
         hr = RegDelete(hkRegistryRoot, wzDependencyProviderKey, REG_KEY_DEFAULT, FALSE);
-        DepExitOnFailure(hr, "Failed to delete the dependency \"%ls\".", wzDependencyProviderKey);
+        DepExitOnPathFailure(hr, fExists, "Failed to delete the dependency \"%ls\".", wzDependencyProviderKey);
+
+        if (!fExists)
+        {
+            ExitFunction1(hr = E_FILENOTFOUND);
+        }
     }
 
 LExit:
@@ -685,6 +694,7 @@ static HRESULT GetDependencyNameFromKey(
     HRESULT hr = S_OK;
     LPWSTR sczKey = NULL;
     HKEY hkKey = NULL;
+    BOOL fExists = FALSE;
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
@@ -692,25 +702,16 @@ static HRESULT GetDependencyNameFromKey(
 
     // Try to open the dependency key.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkKey);
-    if (E_FILENOTFOUND != hr)
+    DepExitOnPathFailure(hr, fExists, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
+
+    if (!fExists)
     {
-        DepExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
-    }
-    else
-    {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
 
     // Get the DisplayName if available.
     hr = RegReadString(hkKey, vcszDisplayNameValue, psczName);
-    if (E_FILENOTFOUND != hr)
-    {
-        DepExitOnFailure(hr, "Failed to get the dependency name for the dependency \"%ls\".", wzProviderKey);
-    }
-    else
-    {
-        ExitFunction1(hr = S_OK);
-    }
+    DepExitOnPathFailure(hr, fExists, "Failed to get the dependency name for the dependency \"%ls\".", wzProviderKey);
 
 LExit:
     ReleaseRegKey(hkKey);

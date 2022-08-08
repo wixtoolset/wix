@@ -17,6 +17,8 @@
 #define DirExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DIRUTIL, p, x, s, __VA_ARGS__)
 #define DirExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DIRUTIL, e, x, s, __VA_ARGS__)
 #define DirExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DIRUTIL, g, x, s, __VA_ARGS__)
+#define DirExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_DIRUTIL, x, b, s, __VA_ARGS__)
+#define DirExitWithPathLastError(x, s, ...) ExitWithPathLastErrorSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
 
 
 /*******************************************************************
@@ -184,13 +186,9 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
 
     if (-1 == (dwAttrib = ::GetFileAttributesW(wzPath)))
     {
-        er = ::GetLastError();
-        if (ERROR_FILE_NOT_FOUND == er) // change "file not found" to "path not found" since we were looking for a directory.
-        {
-            er = ERROR_PATH_NOT_FOUND;
-        }
-        hr = HRESULT_FROM_WIN32(er);
-        DirExitOnRootFailure(hr, "Failed to get attributes for path: %ls", wzPath);
+        DirExitWithPathLastError(hr, "Failed to get attributes for path: %ls", wzPath);
+
+        ExitFunction1(hr = E_PATHNOTFOUND);
     }
 
     if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
@@ -199,7 +197,9 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
         {
             if (!::SetFileAttributesW(wzPath, FILE_ATTRIBUTE_NORMAL))
             {
-                DirExitWithLastError(hr, "Failed to remove read-only attribute from path: %ls", wzPath);
+                DirExitWithPathLastError(hr, "Failed to remove read-only attribute from path: %ls", wzPath);
+
+                ExitFunction1(hr = E_PATHNOTFOUND);
             }
         }
 
@@ -245,9 +245,12 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                     hr = DirEnsureDeleteEx(sczDelete, dwFlags); // recursive call
                     if (FAILED(hr))
                     {
-                      // if we failed to delete a subdirectory, keep trying to finish any remaining files
-                      ExitTraceSource(DUTIL_SOURCE_DIRUTIL, hr, "Failed to delete subdirectory; continuing: %ls", sczDelete);
-                      hr = S_OK;
+                        // if we failed to delete a subdirectory, keep trying to finish any remaining files
+                        if (E_PATHNOTFOUND != hr)
+                        {
+                            ExitTraceSource(DUTIL_SOURCE_DIRUTIL, hr, "Failed to delete subdirectory; continuing: %ls", sczDelete);
+                        }
+                        hr = S_OK;
                     }
                 }
                 else if (fDeleteFiles)  // this is a file, just delete it
@@ -256,7 +259,8 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                     {
                         if (!::SetFileAttributesW(sczDelete, FILE_ATTRIBUTE_NORMAL))
                         {
-                            DirExitWithLastError(hr, "Failed to remove attributes from file: %ls", sczDelete);
+                            DirExitWithPathLastError(hr, "Failed to remove attributes from file: %ls", sczDelete);
+                            continue;
                         }
                     }
 
@@ -280,7 +284,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                         }
                         else
                         {
-                            DirExitWithLastError(hr, "Failed to delete file: %ls", sczDelete);
+                            DirExitWithPathLastError(hr, "Failed to delete file: %ls", sczDelete);
                         }
                     }
                 }
@@ -308,13 +312,21 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                 }
             }
 
+            if (E_PATHNOTFOUND == hr || E_FILENOTFOUND == hr)
+            {
+                ExitFunction1(hr = E_PATHNOTFOUND);
+            }
+            else if (HRESULT_FROM_WIN32(ERROR_DIR_NOT_EMPTY) == hr && !fDeleteFiles && !fRecurse)
+            {
+                ExitFunction();
+            }
+
             DirExitOnRootFailure(hr, "Failed to remove directory: %ls", wzPath);
         }
     }
     else
     {
-        hr = E_UNEXPECTED;
-        DirExitOnFailure(hr, "Directory delete cannot delete file: %ls", wzPath);
+        DirExitWithRootFailure(hr, E_UNEXPECTED, "Directory delete cannot delete file: %ls", wzPath);
     }
 
     Assert(S_OK == hr);

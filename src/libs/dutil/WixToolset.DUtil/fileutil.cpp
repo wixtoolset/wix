@@ -443,6 +443,7 @@ extern "C" HRESULT DAPI FileSize(
     )
 {
     HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
     HANDLE hFile = INVALID_HANDLE_VALUE;
 
     FileExitOnNull(pwzFileName, hr, E_INVALIDARG, "Attempted to check filename, but no filename was provided");
@@ -450,6 +451,11 @@ extern "C" HRESULT DAPI FileSize(
     hFile = ::CreateFileW(pwzFileName, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (INVALID_HANDLE_VALUE == hFile)
     {
+        er = ::GetLastError();
+        if (ERROR_PATH_NOT_FOUND == er || ERROR_FILE_NOT_FOUND == er)
+        {
+            ExitFunction1(hr = HRESULT_FROM_WIN32(er));
+        }
         FileExitWithLastError(hr, "Failed to open file %ls while checking file size", pwzFileName);
     }
 
@@ -617,11 +623,11 @@ extern "C" HRESULT DAPI FileReadPartialEx(
     if (INVALID_HANDLE_VALUE == hFile)
     {
         er = ::GetLastError();
-        if (E_FILENOTFOUND == HRESULT_FROM_WIN32(er))
+        if (ERROR_PATH_NOT_FOUND == er || ERROR_FILE_NOT_FOUND == er)
         {
-            ExitFunction1(hr = E_FILENOTFOUND);
+            ExitFunction1(hr = HRESULT_FROM_WIN32(er));
         }
-        FileExitOnWin32Error(er, hr, "Failed to open file: %ls", wzSrcPath);
+        FileExitWithLastError(hr, "Failed to open file: %ls", wzSrcPath);
     }
 
     if (!::GetFileSizeEx(hFile, &liFileSize))

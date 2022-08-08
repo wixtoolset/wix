@@ -610,6 +610,7 @@ static HRESULT DirectorySearchExists(
     )
 {
     HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
     LPWSTR sczPath = NULL;
     BOOL fExists = FALSE;
 
@@ -629,20 +630,24 @@ static HRESULT DirectorySearchExists(
     DWORD dwAttributes = ::GetFileAttributesW(sczPath);
     if (INVALID_FILE_ATTRIBUTES == dwAttributes)
     {
-        hr = HRESULT_FROM_WIN32(::GetLastError());
-        if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+        er = ::GetLastError();
+        if (ERROR_FILE_NOT_FOUND == er || ERROR_PATH_NOT_FOUND == er)
         {
-            hr = S_OK; // didn't find file, fExists still is false.
+            LogStringLine(REPORT_STANDARD, "Directory search: %ls, did not find path: %ls", pSearch->sczKey, pSearch->DirectorySearch.sczPath);
+        }
+        else
+        {
+            ExitOnWin32Error(er, hr, "Directory search: %ls, failed get to directory attributes. '%ls'", pSearch->sczKey, pSearch->DirectorySearch.sczPath);
         }
     }
-    else if (dwAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    else if (FILE_ATTRIBUTE_DIRECTORY != (dwAttributes & FILE_ATTRIBUTE_DIRECTORY))
+    {
+        LogStringLine(REPORT_STANDARD, "Directory search: %ls, found file at path: %ls", pSearch->sczKey, pSearch->DirectorySearch.sczPath);
+    }
+    else
     {
         fExists = TRUE;
     }
-
-    // else must have found a file.
-    // What if there is a hidden variable in sczPath?
-    ExitOnFailure(hr, "Failed while searching directory search: %ls, for path: %ls", pSearch->sczKey, sczPath);
 
     // set variable
     hr = VariableSetNumeric(pVariables, pSearch->sczVariable, fExists, FALSE);
@@ -694,13 +699,12 @@ static HRESULT DirectorySearchPath(
         hr = E_PATHNOTFOUND;
     }
 
-    // What if there is a hidden variable in sczPath?
     if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
     {
-        LogStringLine(REPORT_STANDARD, "Directory search: %ls, did not find path: %ls, reason: 0x%x", pSearch->sczKey, sczPath, hr);
+        LogStringLine(REPORT_STANDARD, "Directory search: %ls, did not find path: %ls, reason: 0x%x", pSearch->sczKey, pSearch->DirectorySearch.sczPath, hr);
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed while searching directory search: %ls, for path: %ls", pSearch->sczKey, sczPath);
+    ExitOnFailure(hr, "Failed while searching directory search: %ls, for path: %ls", pSearch->sczKey, pSearch->DirectorySearch.sczPath);
 
 LExit:
 #if !defined(_WIN64)
@@ -742,15 +746,18 @@ static HRESULT FileSearchExists(
         er = ::GetLastError();
         if (ERROR_FILE_NOT_FOUND == er || ERROR_PATH_NOT_FOUND == er)
         {
-            // What if there is a hidden variable in sczPath?
-            LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, sczPath);
+            LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, pSearch->FileSearch.sczPath);
         }
         else
         {
-            ExitOnWin32Error(er, hr, "Failed get to file attributes. '%ls'", pSearch->FileSearch.sczPath);
+            ExitOnWin32Error(er, hr, "File search: %ls, failed get to file attributes. '%ls'", pSearch->sczKey, pSearch->FileSearch.sczPath);
         }
     }
-    else if (FILE_ATTRIBUTE_DIRECTORY != (dwAttributes & FILE_ATTRIBUTE_DIRECTORY))
+    else if (FILE_ATTRIBUTE_DIRECTORY == (dwAttributes & FILE_ATTRIBUTE_DIRECTORY))
+    {
+        LogStringLine(REPORT_STANDARD, "File search: %ls, found directory at path: %ls", pSearch->sczKey, pSearch->FileSearch.sczPath);
+    }
+    else
     {
         fExists = TRUE;
     }
@@ -795,8 +802,7 @@ static HRESULT FileSearchVersion(
     hr = FileVersion(sczPath, &uliVersion.HighPart, &uliVersion.LowPart);
     if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
     {
-        // What if there is a hidden variable in sczPath?
-        LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, sczPath);
+        LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, pSearch->FileSearch.sczPath);
         ExitFunction1(hr = S_OK);
     }
     ExitOnFailure(hr, "Failed to get file version.");
@@ -854,13 +860,12 @@ static HRESULT FileSearchPath(
         ExitOnFailure(hr, "Failed to set variable to file search path.");
     }
 
-    // What if there is a hidden variable in sczPath?
     if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
     {
-        LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, sczPath);
+        LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, pSearch->FileSearch.sczPath);
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed while searching file search: %ls, for path: %ls", pSearch->sczKey, sczPath);
+    ExitOnFailure(hr, "Failed while searching file search: %ls, for path: %ls", pSearch->sczKey, pSearch->FileSearch.sczPath);
 
 LExit:
 #if !defined(_WIN64)
@@ -891,24 +896,13 @@ static HRESULT RegistrySearchExists(
 
     // open key
     hr = RegOpenEx(pSearch->RegistrySearch.hRoot, sczKey, KEY_QUERY_VALUE, pSearch->RegistrySearch.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
-    if (SUCCEEDED(hr))
-    {
-        fExists = TRUE;
-    }
-    else if (E_FILENOTFOUND == hr)
-    {
-        // What if there is a hidden variable in sczKey?
-        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", sczKey);
-        fExists = FALSE;
-        hr = S_OK;
-    }
-    else
-    {
-        // What if there is a hidden variable in sczKey?
-        ExitOnFailure(hr, "Failed to open registry key. Key = '%ls'", sczKey);
-    }
+    ExitOnPathFailure(hr, fExists, "Failed to open registry key. Key = '%ls'", pSearch->RegistrySearch.sczKey);
 
-    if (fExists && pSearch->RegistrySearch.sczValue)
+    if (!fExists)
+    {
+        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+    }
+    else if (pSearch->RegistrySearch.sczValue)
     {
         // format value string
         hr = VariableFormatString(pVariables, pSearch->RegistrySearch.sczValue, &sczValue, NULL);
@@ -922,8 +916,7 @@ static HRESULT RegistrySearchExists(
             fExists = TRUE;
             break;
         case ERROR_FILE_NOT_FOUND:
-            // What if there is a hidden variable in sczKey or sczValue?
-            LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", sczKey, sczValue);
+            LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
             fExists = FALSE;
             break;
         default:
@@ -938,8 +931,7 @@ static HRESULT RegistrySearchExists(
 LExit:
     if (FAILED(hr))
     {
-        // What if there is a hidden variable in sczKey?
-        LogStringLine(REPORT_STANDARD, "RegistrySearchExists failed: ID '%ls', HRESULT 0x%x", sczKey, hr);
+        LogStringLine(REPORT_STANDARD, "RegistrySearchExists failed: ID '%ls', HRESULT 0x%x", pSearch->sczKey, hr);
     }
 
     StrSecureZeroFreeString(sczKey);
@@ -958,6 +950,7 @@ static HRESULT RegistrySearchValue(
     LPWSTR sczKey = NULL;
     LPWSTR sczValue = NULL;
     HKEY hKey = NULL;
+    BOOL fExists = FALSE;
     DWORD dwType = 0;
     SIZE_T cbData = 0;
     LPBYTE pData = NULL;
@@ -978,21 +971,20 @@ static HRESULT RegistrySearchValue(
 
     // open key
     hr = RegOpenEx(pSearch->RegistrySearch.hRoot, sczKey, KEY_QUERY_VALUE, pSearch->RegistrySearch.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
-    if (E_FILENOTFOUND == hr)
-    {
-        // What if there is a hidden variable in sczKey?
-        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", sczKey);
+    ExitOnPathFailure(hr, fExists, "Failed to open registry key.");
 
-        ExitFunction1(hr = S_OK);
+    if (!fExists)
+    {
+        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to open registry key.");
 
     // get value
     hr = RegReadValue(hKey, sczValue, pSearch->RegistrySearch.fExpandEnvironment, &pData, &cbData, &dwType);
     if (E_FILENOTFOUND == hr)
     {
-        // What if there is a hidden variable in sczKey or sczValue?
-        LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", sczKey, sczValue);
+        LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
 
         ExitFunction1(hr = S_OK);
     }
@@ -1034,8 +1026,7 @@ static HRESULT RegistrySearchValue(
 LExit:
     if (FAILED(hr))
     {
-        // What if there is a hidden variable in sczKey?
-        LogStringLine(REPORT_STANDARD, "RegistrySearchValue failed: ID '%ls', HRESULT 0x%x", sczKey, hr);
+        LogStringLine(REPORT_STANDARD, "RegistrySearchValue failed: ID '%ls', HRESULT 0x%x", pSearch->sczKey, hr);
     }
 
     StrSecureZeroFreeString(sczKey);

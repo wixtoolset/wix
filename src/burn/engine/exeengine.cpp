@@ -1040,6 +1040,7 @@ static HRESULT DetectArpEntry(
 {
     HRESULT hr = S_OK;
     HKEY hKey = NULL;
+    BOOL fExists = FALSE;
     VERUTIL_VERSION* pVersion = NULL;
     int nCompareResult = 0;
     HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
@@ -1052,18 +1053,20 @@ static HRESULT DetectArpEntry(
     }
 
     hr = RegOpenEx(hkRoot, pPackage->Exe.sczArpKeyPath, KEY_READ, keyBitness, &hKey);
-    if (HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND) == hr || HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    ExitOnPathFailure(hr, fExists, "Failed to open registry key: %ls.", pPackage->Exe.sczArpKeyPath);
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to open registry key: %ls.", pPackage->Exe.sczArpKeyPath);
 
     hr = RegReadWixVersion(hKey, L"DisplayVersion", &pVersion);
-    if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
+    ExitOnPathFailure(hr, fExists, "Failed to read DisplayVersion.");
+
+    if (!fExists)
     {
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to read DisplayVersion.");
 
     if (pVersion->fInvalid)
     {
@@ -1089,11 +1092,7 @@ static HRESULT DetectArpEntry(
     if (psczQuietUninstallString)
     {
         hr = RegReadString(hKey, L"QuietUninstallString", psczQuietUninstallString);
-        if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
-        {
-            hr = S_OK;
-        }
-        ExitOnFailure(hr, "Failed to read QuietUninstallString.");
+        ExitOnPathFailure(hr, fExists, "Failed to read QuietUninstallString.");
     }
 
 LExit:

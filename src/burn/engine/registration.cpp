@@ -492,25 +492,28 @@ extern "C" HRESULT RegistrationDetectResumeType(
 {
     HRESULT hr = S_OK;
     HKEY hkRegistration = NULL;
+    BOOL fExists = FALSE;
     DWORD dwResume = 0;
 
     // open registration key
     hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    ExitOnPathFailure(hr, fExists, "Failed to open registration key.");
+
+    if (!fExists)
     {
         *pResumeType = BOOTSTRAPPER_RESUME_TYPE_NONE;
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to open registration key.");
 
     // read Resume value
     hr = RegReadNumber(hkRegistration, L"Resume", &dwResume);
-    if (E_FILENOTFOUND == hr)
+    ExitOnPathFailure(hr, fExists, "Failed to read Resume value.");
+
+    if (!fExists)
     {
         *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INVALID;
-        ExitFunction1(hr = S_OK);
+        ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to read Resume value.");
 
     switch (dwResume)
     {
@@ -855,6 +858,7 @@ extern "C" HRESULT RegistrationSessionEnd(
 {
     HRESULT hr = S_OK;
     HKEY hkRegistration = NULL;
+    BOOL fDeleted = FALSE;
 
     // If no resume mode, then remove the bundle registration.
     if (BURN_RESUME_MODE_NONE == resumeMode)
@@ -874,10 +878,7 @@ extern "C" HRESULT RegistrationSessionEnd(
 
         // Delete registration key.
         hr = RegDelete(pRegistration->hkRoot, pRegistration->sczRegistrationKey, REG_KEY_DEFAULT, TRUE);
-        if (E_FILENOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to delete registration key: %ls", pRegistration->sczRegistrationKey);
-        }
+        ExitOnPathFailure(hr, fDeleted, "Failed to delete registration key: %ls", pRegistration->sczRegistrationKey);
 
         CacheRemoveBundle(pCache, pRegistration->fPerMachine, pRegistration->sczId);
     }
@@ -967,7 +968,10 @@ extern "C" HRESULT RegistrationSaveState(
         ExitOnFailure(hr, "Failed to enumerate value %u", i);
 
         er = ::RegDeleteValueW(hkRegistration, sczValueName);
-        ExitOnWin32Error(er, hr, "Failed to delete registration variable value.");
+        if (ERROR_FILE_NOT_FOUND != er)
+        {
+            ExitOnWin32Error(er, hr, "Failed to delete registration variable value.");
+        }
     }
 
     // Write variables.
@@ -1486,6 +1490,7 @@ static HRESULT RemoveUpdateRegistration(
     LPWSTR sczPackageVersion = NULL;
     HKEY hkKey = NULL;
     BOOL fDeleteRegKey = TRUE;
+    BOOL fDeleted = FALSE;
 
     hr = FormatUpdateRegistrationKey(pRegistration, &sczKey);
     ExitOnFailure(hr, "Failed to format key for update registration.");
@@ -1513,10 +1518,7 @@ static HRESULT RemoveUpdateRegistration(
     if (fDeleteRegKey)
     {
         hr = RegDelete(pRegistration->hkRoot, sczKey, REG_KEY_DEFAULT, FALSE);
-        if (E_FILENOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to remove update registration key: %ls", sczKey);
-        }
+        ExitOnPathFailure(hr, fDeleted, "Failed to remove update registration key: %ls", sczKey);
     }
 
 LExit:

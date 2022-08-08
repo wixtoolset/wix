@@ -322,6 +322,7 @@ static HRESULT LoadRelatedBundleFromKey(
     LPWSTR sczCachePath = NULL;
     BOOL fCached = FALSE;
     DWORD64 qwFileSize = 0;
+    BOOL fExists = FALSE;
     BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
     BURN_DEPENDENCY_PROVIDER* pBundleDependencyProvider = NULL;
 
@@ -369,10 +370,7 @@ static HRESULT LoadRelatedBundleFromKey(
     pRelatedBundle->fPlannable = fCached;
 
     hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_PROVIDER_KEY, &dependencyProvider.sczKey);
-    if (E_FILENOTFOUND != hr)
-    {
-        ExitOnFailure(hr, "Failed to read provider key from registry for bundle: %ls", wzRelatedBundleId);
-    }
+    ExitOnPathFailure(hr, fExists, "Failed to read provider key from registry for bundle: %ls", wzRelatedBundleId);
 
     if (dependencyProvider.sczKey && *dependencyProvider.sczKey)
     {
@@ -384,18 +382,11 @@ static HRESULT LoadRelatedBundleFromKey(
         ExitOnFailure(hr, "Failed to copy version for bundle: %ls", wzRelatedBundleId);
 
         hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_DISPLAY_NAME, &dependencyProvider.sczDisplayName);
-        if (E_FILENOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to copy display name for bundle: %ls", wzRelatedBundleId);
-        }
+        ExitOnPathFailure(hr, fExists, "Failed to copy display name for bundle: %ls", wzRelatedBundleId);
     }
 
     hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_TAG, &pRelatedBundle->sczTag);
-    if (E_FILENOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    ExitOnFailure(hr, "Failed to read tag from registry for bundle: %ls", wzRelatedBundleId);
+    ExitOnPathFailure(hr, fExists, "Failed to read tag from registry for bundle: %ls", wzRelatedBundleId);
 
     pRelatedBundle->detectRelationType = relationType;
 

@@ -17,6 +17,7 @@
 #define MonExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_MONUTIL, e, x, s, __VA_ARGS__)
 #define MonExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_MONUTIL, g, x, s, __VA_ARGS__)
 #define MonExitOnWaitObjectFailure(x, b, s, ...) ExitOnWaitObjectFailureSource(DUTIL_SOURCE_MONUTIL, x, b, s, __VA_ARGS__)
+#define MonExitOnPathFailure(x, b, s, ...) ExitOnPathFailureSource(DUTIL_SOURCE_MONUTIL, x, b, s, __VA_ARGS__)
 
 const int MON_THREAD_GROWTH = 5;
 const int MON_ARRAY_GROWTH = 40;
@@ -982,6 +983,7 @@ static HRESULT InitiateWait(
     DWORD dwIndex = 0;
     HKEY hk = NULL;
     HANDLE hTemp = INVALID_HANDLE_VALUE;
+    BOOL fExists = FALSE;
 
     if (pRequest->hNotify)
     {
@@ -1025,11 +1027,12 @@ static HRESULT InitiateWait(
             case MON_REGKEY:
                 ReleaseRegKey(pRequest->regkey.hkSubKey);
                 hr = RegOpen(pRequest->regkey.hkRoot, pRequest->rgsczPathHierarchy[dwIndex], KEY_NOTIFY | GetRegKeyBitness(pRequest), &pRequest->regkey.hkSubKey);
-                if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+                MonExitOnPathFailure(hr, fExists, "Failed to open regkey %ls", pRequest->rgsczPathHierarchy[dwIndex]);
+
+                if (!fExists)
                 {
                     continue;
                 }
-                MonExitOnFailure(hr, "Failed to open regkey %ls", pRequest->rgsczPathHierarchy[dwIndex]);
 
                 er = ::RegNotifyChangeKeyValue(pRequest->regkey.hkSubKey, GetRecursiveFlag(pRequest, dwIndex), REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_CHANGE_SECURITY, *pHandle, TRUE);
                 ReleaseRegKey(hk);
@@ -1038,12 +1041,9 @@ static HRESULT InitiateWait(
                 {
                     continue;
                 }
-                else
-                {
-                    MonExitOnWin32Error(er, hr, "Failed to wait on subkey %ls", pRequest->rgsczPathHierarchy[dwIndex]);
+                MonExitOnFailure(hr, "Failed to wait on subkey %ls", pRequest->rgsczPathHierarchy[dwIndex]);
 
-                    fHandleFound = TRUE;
-                }
+                fHandleFound = TRUE;
 
                 break;
             default:

@@ -1144,8 +1144,7 @@ extern "C" HRESULT CacheCompletePayload(
     }
     else // if the working path and unverified path do not exist, nothing we can do.
     {
-        hr = E_FILENOTFOUND;
-        ExitOnFailure(hr, "Failed to find payload: %ls in working path: %ls and unverified path: %ls", pPayload->sczKey, wzWorkingPayloadPath, sczUnverifiedPayloadPath);
+        ExitWithRootFailure(hr, E_FILENOTFOUND, "Failed to find payload: %ls in working path: %ls and unverified path: %ls", pPayload->sczKey, wzWorkingPayloadPath, sczUnverifiedPayloadPath);
     }
 
     hr = ResetPathPermissions(fPerMachine, sczUnverifiedPayloadPath);
