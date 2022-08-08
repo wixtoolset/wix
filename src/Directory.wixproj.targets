@@ -8,7 +8,7 @@
     <PropertyGroup>
       <DefineConstants>
         $(DefineConstants);
-        SetupVersion=$(FileVersion);
+        SetupVersion=$(PackageVersion);
         SetupMajorMinorVersion=$(GitBaseVersionMajor).$(GitBaseVersionMinor);
       </DefineConstants>
     </PropertyGroup>

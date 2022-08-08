@@ -3,7 +3,8 @@
 
 <Project>
   <PropertyGroup>
-    <!-- TODO: changing the .wixpdb folder does not actually work until issue #6857 is resolved -->
+    <!-- TODO: changing the .wixpdb folder does not actually work until issue #6857 is resolved
     <PdbOutputDir>$(PdbsFolder)</PdbOutputDir>
+    -->
   </PropertyGroup>
 </Project>

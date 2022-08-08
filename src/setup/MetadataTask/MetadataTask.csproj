@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <DebugType>embedded</DebugType>
+    <!-- https://github.com/Microsoft/msbuild/issues/2360 -->
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="WixToolset.Data" />
+  </ItemGroup>
+</Project>
