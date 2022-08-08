@@ -14,4 +14,9 @@
     <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
+  <UsingTask TaskName="GenerateMetadata" AssemblyFile="$(BaseOutputPath)$(Configuration)\net472\MetadataTask.dll" />
+
+  <Target Name="GenerateMetadata" AfterTargets="AfterBuild">
+    <GenerateMetadata TargetFile="$(TargetPath)" WixpdbFile="$(TargetPdbPath)" />
+  </Target>
 </Project>

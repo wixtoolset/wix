@@ -47,6 +47,7 @@
     <PackageVersion Include="System.Reflection.Metadata" Version="1.6.0" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="4.7.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.6.0" />
+    <PackageVersion Include="System.Text.Json" Version="4.6.0" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
