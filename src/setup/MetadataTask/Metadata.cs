@@ -17,26 +17,6 @@ namespace WixToolset.Tasks
         X86,
     }
 
-    //{
-    //  "id": [PackageSymbolId] | [BundleSymbolId],
-    //  "type": "msi" | "burn"
-    //  "name": [ProductName] | [BundleName]
-    //  "locale": [ProductLanguage] | [BundleLanguage]
-    //  "publisher": [Manufacturer]
-    //  "aboutUrl": [ARPURLINFOABOUT] | [AboutUrl]
-    //  "supportUrl": [ARPHELPLINK] | [SupportUrl]
-    //  "description": [ARPCOMMENTS] | "Installation for" + [BundleName]
-    //  "license": [ProductLicense] | [BundleLicense]
-    //  "architecture": "x86" | "x64" | "arm64"
-    //  "size": ####
-    //  "sha256": hex,
-    //  "file": <filename>
-    //  "created": <ISO timestamp>
-    //  "productCode": [ProductCode]
-    //  "bundleCode": [BundleId]
-    //  "upgradeCode": [UpgradeCode]
-    //}
-
     public class Metadata
     {
         public string Id { get; set; }
