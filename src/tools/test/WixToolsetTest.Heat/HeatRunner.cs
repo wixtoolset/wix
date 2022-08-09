@@ -7,7 +7,6 @@ namespace WixToolsetTest.Harvesters
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core;
-    using WixToolset.Core.Burn;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
