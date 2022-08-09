@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Core" />
-    <PackageReference Include="WixToolset.Core.Burn" />
   </ItemGroup>
 
   <ItemGroup>
