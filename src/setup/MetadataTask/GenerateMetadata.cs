@@ -104,8 +104,8 @@ namespace WixToolset.Tasks
             switch (platform)
             {
                 case Platform.X86: return ArchitectureType.X86;
-                case Platform.X64: return ArchitectureType.X86;
-                case Platform.ARM64: return ArchitectureType.X86;
+                case Platform.X64: return ArchitectureType.X64;
+                case Platform.ARM64: return ArchitectureType.Arm64;
                 default: throw new ArgumentException($"Unknown platform {platform}");
             }
         }
