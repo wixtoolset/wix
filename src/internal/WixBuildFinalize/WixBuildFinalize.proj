@@ -13,7 +13,7 @@
   <Target Name="ZipPdbs" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="AfterBuild">
     <ZipDirectory
         SourceDirectory="$(PdbsFolder)"
-        DestinationFile="$(ArtifactsFolder)\wix$(Version)-pdbs.zip"
+        DestinationFile="$(ArtifactsFolder)\wix-pdbs.$(Version).zip"
         Overwrite="true" />
   </Target>
 </Project>
