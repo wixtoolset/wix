@@ -469,5 +469,35 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(10, result.ExitCode);
             }
         }
+
+        [Fact]
+        public void CannotBuildBundleWithExePackageWithoutSourceOrHashOrCertificate()
+        {
+            var dotDatafolder = TestData.Get(@"TestData", ".Data");
+            var folder = TestData.Get(@"TestData", "ExePackage");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ExePackageWithoutSourceHashOrCertificate.wxs"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-bindpath", dotDatafolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, "bin", "test.exe")
+                });
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The ExePackagePayload/@Description attribute can only be specified with one of the following attributes: Hash or CertificatePublicKey present.",
+                    "The ExePackagePayload/@Size attribute can only be specified with one of the following attributes: Hash or CertificatePublicKey present.",
+                    "The ExePackagePayload/@Version attribute can only be specified with one of the following attributes: Hash or CertificatePublicKey present.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+            }
+        }
     }
 }
