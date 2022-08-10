@@ -115,22 +115,22 @@ namespace WixToolset.Core
 
                     if (!String.IsNullOrEmpty(this.Description))
                     {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Description", "SourceFile"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "Description", "Hash", "CertificatePublicKey"));
                     }
 
                     if (!String.IsNullOrEmpty(this.ProductName))
                     {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "ProductName", "SourceFile"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "ProductName", "Hash", "CertificatePublicKey"));
                     }
 
                     if (this.Size.HasValue)
                     {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "SourceFile"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "Hash", "CertificatePublicKey"));
                     }
 
                     if (!String.IsNullOrEmpty(this.Version))
                     {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Version", "SourceFile"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "Version", "Hash", "CertificatePublicKey"));
                     }
                 }
                 else
