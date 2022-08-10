@@ -13,7 +13,9 @@ namespace WixToolset.Core.ExtensibilityServices
         private readonly HashSet<int> suppressedWarnings = new HashSet<int>();
         private readonly HashSet<int> warningsAsErrors = new HashSet<int>();
 
-        public bool EncounteredError { get; private set; }
+        public bool EncounteredError => this.ErrorCount > 0;
+
+        public int ErrorCount { get; private set; }
 
         public int LastErrorNumber { get; private set; }
 
@@ -49,7 +51,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (level == MessageLevel.Error)
             {
-                this.EncounteredError = true;
+                ++this.ErrorCount;
                 this.LastErrorNumber = message.Id;
             }
 

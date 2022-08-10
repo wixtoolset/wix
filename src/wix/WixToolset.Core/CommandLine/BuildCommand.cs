@@ -157,7 +157,7 @@ namespace WixToolset.Core.CommandLine
             {
                 var document = this.Preprocess(preprocessorVariables, sourceFile, includeSearchPaths, cancellationToken);
 
-                if (this.Messaging.EncounteredError)
+                if (document == null)
                 {
                     continue;
                 }
@@ -358,7 +358,7 @@ namespace WixToolset.Core.CommandLine
             {
                 var document = this.Preprocess(preprocessorVariables, loc, includeSearchPaths, cancellationToken);
 
-                if (this.Messaging.EncounteredError)
+                if (document == null)
                 {
                     continue;
                 }

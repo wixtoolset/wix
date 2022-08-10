@@ -12,7 +12,9 @@ namespace WixToolsetTest.Converters.Mocks
     {
         public List<Message> Messages { get; } = new List<Message>();
 
-        public bool EncounteredError { get; private set; }
+        public bool EncounteredError => this.ErrorCount > 0;
+
+        public int ErrorCount { get; private set; }
 
         public int LastErrorNumber { get; }
 
@@ -22,18 +24,33 @@ namespace WixToolsetTest.Converters.Mocks
 
         public bool WarningsAsError { get; set; }
 
-        public void ElevateWarningMessage(int warningNumber) => throw new NotImplementedException();
+        public void ElevateWarningMessage(int warningNumber)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void SetListener(IMessageListener listener) => throw new NotImplementedException();
+        public void SetListener(IMessageListener listener)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void SuppressWarningMessage(int warningNumber) => throw new NotImplementedException();
+        public void SuppressWarningMessage(int warningNumber)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Write(Message message)
         {
             this.Messages.Add(message);
-            this.EncounteredError |= message.Level == MessageLevel.Error;
+            if (message.Level == MessageLevel.Error)
+            {
+                ++this.ErrorCount;
+            }
         }
 
-        public void Write(string message, bool verbose = false) => throw new NotImplementedException();
+        public void Write(string message, bool verbose = false)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
