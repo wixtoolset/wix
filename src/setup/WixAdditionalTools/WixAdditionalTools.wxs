@@ -13,8 +13,7 @@
     </BootstrapperApplication>
 
     <SetVariable Variable="InstallFolder" Value="[ProgramFilesFolder]WiX Toolset v$(SetupMajorMinorVersion)\" />
-    <!-- TODO: bring back SoftwareTag when #6854 fixed -->
-    <!-- <SoftwareTag Regid="!(loc.Regid)" InstallPath="[InstallFolder]" /> -->
+    <SoftwareTag Regid="!(loc.Regid)" InstallPath="[InstallFolder]" />
 
     <Update Location="!(loc.UpdateUrl)" />
 
