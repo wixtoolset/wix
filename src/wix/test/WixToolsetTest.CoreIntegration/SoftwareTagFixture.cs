@@ -13,7 +13,7 @@ namespace WixToolsetTest.CoreIntegration
     public class SoftwareTagFixture
     {
         private static readonly XNamespace BurnManifestNamespace = "http://wixtoolset.org/schemas/v4/2008/Burn";
-        private static readonly XNamespace SwidTagNamespace = "http://standards.iso.org/iso/19770/-2/2009/schema.xsd";
+        private static readonly XNamespace SwidTagNamespace = "http://standards.iso.org/iso/19770/-2/2015/schema.xsd";
 
         [Fact]
         public void CanBuildPackageWithTag()
@@ -87,6 +87,55 @@ namespace WixToolsetTest.CoreIntegration
                     var version = docTag.Root.Attribute("version").Value;
                     Assert.Equal("~TagTestBundle", title);
                     Assert.Equal("4.3.2.1", version);
+
+                    var msiLink = docTag.Root.Elements(SwidTagNamespace + "Link").Single();
+                    Assert.Equal("component", msiLink.Attribute("rel").Value);
+                    Assert.StartsWith("swid:msi:package/", msiLink.Attribute("href").Value);
+                }
+            }
+        }
+
+        [Fact]
+        public void CanBuildBundleWithTagWhereMsiDoesNotHaveTag()
+        {
+            var testDataFolder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(testDataFolder, "BundleTag", "BundleWithTag.wxs"),
+                    "-bindpath", Path.Combine(testDataFolder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+
+                using (var ouput = WixOutput.Read(Path.Combine(baseFolder, @"bin\test.wixpdb")))
+                {
+                    var badata = ouput.GetDataStream("wix-burndata.xml");
+                    var doc = XDocument.Load(badata);
+
+                    var swidTag = doc.Root.Element(BurnManifestNamespace + "Registration").Element(BurnManifestNamespace + "SoftwareTag").Value;
+
+                    var swidTagPath = Path.Combine(baseFolder, "test.swidtag");
+                    File.WriteAllText(swidTagPath, swidTag);
+
+                    var docTag = XDocument.Load(swidTagPath);
+                    var title = docTag.Root.Attribute("name").Value;
+                    var version = docTag.Root.Attribute("version").Value;
+                    Assert.Equal("~TagTestBundle", title);
+                    Assert.Equal("4.3.2.1", version);
+
+                    Assert.Empty(docTag.Root.Elements(SwidTagNamespace + "Link"));
                 }
             }
         }

@@ -71,11 +71,14 @@ namespace WixToolset.Core.Burn.Bind
 
                     using (var db = new Database(payload.SourceFile.Path, OpenDatabase.ReadOnly))
                     {
-                        using (var view = db.OpenExecuteView("SELECT `Regid`, `TagId` FROM `SoftwareIdentificationTag`"))
+                        if (db.TableExists("SoftwareIdentificationTag"))
                         {
-                            foreach (var record in view.Records)
+                            using (var view = db.OpenExecuteView("SELECT `Regid`, `TagId` FROM `SoftwareIdentificationTag`"))
                             {
-                                tags.Add(new SoftwareTag { Regid = record.GetString(1), Id = record.GetString(2) });
+                                foreach (var record in view.Records)
+                                {
+                                    tags.Add(new SoftwareTag { Regid = record.GetString(1), Id = record.GetString(2) });
+                                }
                             }
                         }
                     }
