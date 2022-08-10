@@ -16,6 +16,12 @@ namespace WixToolset.Extensibility.Services
         bool EncounteredError { get; }
 
         /// <summary>
+        /// Gets the number of errors encountered thus far.
+        /// </summary>
+        /// <value>The number of errors encountered.</value>
+        int ErrorCount { get; }
+
+        /// <summary>
         /// Gets the last error code encountered during messaging.
         /// </summary>
         /// <value>The exit code for the process.</value>

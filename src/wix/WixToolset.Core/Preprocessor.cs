@@ -141,6 +141,8 @@ namespace WixToolset.Core
         {
             state.CurrentFileStack.Push(state.Helper.GetVariableValue(state.Context, "sys", "SOURCEFILEDIR"));
 
+            var beforeErrorCount = this.Messaging.ErrorCount;
+
             // Process the reader into the output.
             IPreprocessResult result = null;
             try
@@ -150,7 +152,7 @@ namespace WixToolset.Core
                 // Fire event with post-processed document.
                 this.ProcessedStream?.Invoke(this, new ProcessedStreamEventArgs(state.Context.SourcePath, state.Output));
 
-                if (!this.Messaging.EncounteredError)
+                if (beforeErrorCount == this.Messaging.ErrorCount)
                 {
                     result = this.ServiceProvider.GetService<IPreprocessResult>();
                     result.Document = state.Output;
@@ -292,7 +294,7 @@ namespace WixToolset.Core
                 if (XmlNodeType.ProcessingInstruction == reader.NodeType)
                 {
                     var ignore = false;
-                    string name = null;
+                    string name;
 
                     switch (reader.LocalName)
                     {
@@ -423,7 +425,6 @@ namespace WixToolset.Core
                                 break;
                             }
                         }
-
                     }
                     //else
                     //{
@@ -826,7 +827,7 @@ namespace WixToolset.Core
         private string GetNextToken(ProcessingState state, string originalExpression, ref string expression, out bool stringLiteral)
         {
             stringLiteral = false;
-            var token = String.Empty;
+            string token;
             expression = expression.Trim();
             if (0 == expression.Length)
             {
@@ -1280,7 +1281,7 @@ namespace WixToolset.Core
         /// <returns>Boolean to indicate if the expression is true or false</returns>
         private bool EvaluateExpressionRecurse(ProcessingState state, string originalExpression, ref string expression, PreprocessorOperation prevResultOperation, bool prevResult)
         {
-            var expressionValue = false;
+            bool expressionValue;
             expression = expression.Trim();
             if (expression.Length == 0)
             {
