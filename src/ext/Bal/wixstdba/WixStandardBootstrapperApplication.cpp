@@ -1145,26 +1145,19 @@ public: // IBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
+        LPWSTR sczPath = NULL;
 
         if (BOOTSTRAPPER_CACHE_RESOLVE_NONE == *pAction && BOOTSTRAPPER_DISPLAY_FULL == m_command.display) // prompt to change the source location.
         {
-            OPENFILENAMEW ofn = { };
-            WCHAR wzFile[MAX_PATH] = { };
-
-            ::StringCchCopyW(wzFile, countof(wzFile), rgSearchPaths[dwRecommendedSearchPath]);
-
-            ofn.lStructSize = sizeof(ofn);
-            ofn.hwndOwner = m_hWnd;
-            ofn.lpstrFile = wzFile;
-            ofn.nMaxFile = countof(wzFile);
-            ofn.lpstrFilter = L"All Files\0*.*\0";
-            ofn.nFilterIndex = 1;
-            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-            ofn.lpstrTitle = m_pTheme->sczCaption;
-
-            if (::GetOpenFileNameW(&ofn))
+            static COMDLG_FILTERSPEC vrgFilters[] =
             {
-                hr = m_pEngine->SetLocalSource(wzPackageOrContainerId, wzPayloadId, ofn.lpstrFile);
+                { L"All Files", L"*.*" },
+            };
+
+            hr = WnduShowOpenFileDialog(m_hWnd, TRUE, TRUE, m_pTheme->sczCaption, vrgFilters, countof(vrgFilters), 1, rgSearchPaths[dwRecommendedSearchPath], &sczPath);
+            if (SUCCEEDED(hr))
+            {
+                hr = m_pEngine->SetLocalSource(wzPackageOrContainerId, wzPayloadId, sczPath);
                 *pAction = BOOTSTRAPPER_CACHE_RESOLVE_RETRY;
             }
             else
@@ -1175,6 +1168,9 @@ public: // IBootstrapperApplication
         // else there's nothing more we can do in non-interactive mode
 
         *pfCancel |= CheckCanceled();
+
+        ReleaseStr(sczPath);
+
         return hr;
     }
 

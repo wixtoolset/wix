@@ -4992,54 +4992,47 @@ static void OnBrowseDirectory(
     )
 {
     HRESULT hr = S_OK;
-    WCHAR wzPath[MAX_PATH] = { };
-    BROWSEINFOW browseInfo = { };
-    PIDLIST_ABSOLUTE pidl = NULL;
+    LPWSTR sczPath = NULL;
+    THEME_CONTROL* pTargetControl = NULL;
+    BOOL fSetVariable = NULL != pTheme->pfnSetStringVariable;
 
-    browseInfo.hwndOwner = pTheme->hwndParent;
-    browseInfo.pszDisplayName = wzPath;
-    browseInfo.lpszTitle = pTheme->sczCaption;
-    browseInfo.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
-    pidl = ::SHBrowseForFolderW(&browseInfo);
-    if (pidl && ::SHGetPathFromIDListW(pidl, wzPath))
+    hr = WnduShowOpenFolderDialog(pTheme->hwndParent, TRUE, pTheme->sczCaption, &sczPath);
+    if (HRESULT_FROM_WIN32(ERROR_CANCELLED) == hr)
     {
-        // Since editbox changes aren't immediately saved off, we have to treat them differently.
-        THEME_CONTROL* pTargetControl = NULL;
-        BOOL fSetVariable = NULL != pTheme->pfnSetStringVariable;
-
-        for (DWORD i = 0; i < pTheme->cControls; ++i)
-        {
-            THEME_CONTROL* pControl = pTheme->rgControls + i;
-
-            if ((!pControl->wPageId || pControl->wPageId == pTheme->dwCurrentPageId) &&
-                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pControl->sczName, -1, pAction->BrowseDirectory.sczVariableName, -1))
-            {
-                pTargetControl = pControl;
-                break;
-            }
-        }
-
-        if (pTargetControl && !pTargetControl->fDisableAutomaticFunctionality && (!fSetVariable || THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type))
-        {
-            fSetVariable = FALSE;
-            hr = ThemeSetTextControl(pTargetControl, wzPath);
-            ThmExitOnFailure(hr, "Failed to set text on control: %ls", pTargetControl->sczName);
-        }
-
-        if (fSetVariable)
-        {
-            hr = pTheme->pfnSetStringVariable(pAction->BrowseDirectory.sczVariableName, wzPath, FALSE, pTheme->pvVariableContext);
-            ThmExitOnFailure(hr, "Failed to set variable: %ls", pAction->BrowseDirectory.sczVariableName);
-        }
-
-        ThemeShowPageEx(pTheme, pTheme->dwCurrentPageId, SW_SHOW, THEME_SHOW_PAGE_REASON_REFRESH);
+        ExitFunction();
     }
+    ThmExitOnFailure(hr, "Failed to prompt user for directory.");
+
+    for (DWORD i = 0; i < pTheme->cControls; ++i)
+    {
+        THEME_CONTROL* pControl = pTheme->rgControls + i;
+
+        if ((!pControl->wPageId || pControl->wPageId == pTheme->dwCurrentPageId) &&
+            CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pControl->sczName, -1, pAction->BrowseDirectory.sczVariableName, -1))
+        {
+            pTargetControl = pControl;
+            break;
+        }
+    }
+
+    // Since editbox changes aren't immediately saved off, we have to treat them differently.
+    if (pTargetControl && !pTargetControl->fDisableAutomaticFunctionality && (!fSetVariable || THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type))
+    {
+        fSetVariable = FALSE;
+        hr = ThemeSetTextControl(pTargetControl, sczPath);
+        ThmExitOnFailure(hr, "Failed to set text on control: %ls", pTargetControl->sczName);
+    }
+
+    if (fSetVariable)
+    {
+        hr = pTheme->pfnSetStringVariable(pAction->BrowseDirectory.sczVariableName, sczPath, FALSE, pTheme->pvVariableContext);
+        ThmExitOnFailure(hr, "Failed to set variable: %ls", pAction->BrowseDirectory.sczVariableName);
+    }
+
+    ThemeShowPageEx(pTheme, pTheme->dwCurrentPageId, SW_SHOW, THEME_SHOW_PAGE_REASON_REFRESH);
 
 LExit:
-    if (pidl)
-    {
-        ::CoTaskMemFree(pidl);
-    }
+    ReleaseStr(sczPath);
 }
 
 static BOOL OnButtonClicked(
