@@ -296,7 +296,7 @@ static HRESULT OnLoadingControl(
     __in THEME* pTheme,
     __in const THEME_CONTROL* pControl,
     __inout WORD* pwId,
-    __inout BOOL* pfDisableAutomaticFunctionality
+    __inout DWORD* pdwAutomaticBehaviorType
     );
 static HRESULT LoadControls(
     __in THEME* pTheme,
@@ -5016,7 +5016,7 @@ static void OnBrowseDirectory(
     }
 
     // Since editbox changes aren't immediately saved off, we have to treat them differently.
-    if (pTargetControl && !pTargetControl->fDisableAutomaticFunctionality && (!fSetVariable || THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type))
+    if (pTargetControl && pTargetControl->fAutomaticValue && THEME_CONTROL_TYPE_EDITBOX == pTargetControl->type)
     {
         fSetVariable = FALSE;
         hr = ThemeSetTextControl(pTargetControl, sczPath);
@@ -5045,7 +5045,7 @@ static BOOL OnButtonClicked(
 
     if (THEME_CONTROL_TYPE_BUTTON == pControl->type || THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
     {
-        if (!pControl->fDisableAutomaticFunctionality && pControl->cActions)
+        if (pControl->fAutomaticAction && pControl->cActions)
         {
             fHandled = TRUE;
             THEME_ACTION* pChosenAction = pControl->pDefaultAction;
@@ -5103,7 +5103,7 @@ static BOOL OnButtonClicked(
             }
         }
     }
-    else if (!pControl->fDisableAutomaticFunctionality && (pTheme->pfnSetNumericVariable || pTheme->pfnSetStringVariable))
+    else if (pControl->fAutomaticValue && (pTheme->pfnSetNumericVariable || pTheme->pfnSetStringVariable))
     {
         BOOL fRefresh = FALSE;
 
@@ -5558,7 +5558,7 @@ static HRESULT ShowControl(
     THEME_PAGE* pPage = ThemeGetPage(pTheme, dwPageId);
 
     // Save the editbox value if necessary (other control types save their values immediately).
-    if (pTheme->pfnSetStringVariable && !pControl->fDisableAutomaticFunctionality &&
+    if (pTheme->pfnSetStringVariable && pControl->fAutomaticValue &&
         fSaveEditboxes && THEME_CONTROL_TYPE_EDITBOX == pControl->type && pControl->sczName && *pControl->sczName)
     {
         hr = ThemeGetTextControl(pControl, &sczText);
@@ -5585,102 +5585,102 @@ static HRESULT ShowControl(
     BOOL fEnabled = !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_DISABLED);
     BOOL fVisible = !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_HIDDEN);
 
-    if (!pControl->fDisableAutomaticFunctionality)
+    if (pTheme->pfnEvaluateCondition)
     {
-        if (pTheme->pfnEvaluateCondition)
+        // If the control has a VisibleCondition, check if it's true.
+        if (pControl->sczVisibleCondition && pControl->fAutomaticVisible)
         {
-            // If the control has a VisibleCondition, check if it's true.
-            if (pControl->sczVisibleCondition)
-            {
-                hr = pTheme->pfnEvaluateCondition(pControl->sczVisibleCondition, &fVisible, pTheme->pvVariableContext);
-                ThmExitOnFailure(hr, "Failed to evaluate VisibleCondition: %ls", pControl->sczVisibleCondition);
-            }
-
-            // If the control has an EnableCondition, check if it's true.
-            if (pControl->sczEnableCondition)
-            {
-                hr = pTheme->pfnEvaluateCondition(pControl->sczEnableCondition, &fEnabled, pTheme->pvVariableContext);
-                ThmExitOnFailure(hr, "Failed to evaluate EnableCondition: %ls", pControl->sczEnableCondition);
-            }
+            hr = pTheme->pfnEvaluateCondition(pControl->sczVisibleCondition, &fVisible, pTheme->pvVariableContext);
+            ThmExitOnFailure(hr, "Failed to evaluate VisibleCondition: %ls", pControl->sczVisibleCondition);
         }
 
-        // Try to format each control's text based on context, except for editboxes since their text comes from the user.
-        if (pTheme->pfnFormatString && ((pControl->sczText && *pControl->sczText) || pControl->cConditionalText) && THEME_CONTROL_TYPE_EDITBOX != pControl->type)
+        // If the control has an EnableCondition, check if it's true.
+        if (pControl->sczEnableCondition && pControl->fAutomaticEnabled)
         {
-            LPCWSTR wzText = pControl->sczText;
-            LPCWSTR wzNote = pControl->sczNote;
+            hr = pTheme->pfnEvaluateCondition(pControl->sczEnableCondition, &fEnabled, pTheme->pvVariableContext);
+            ThmExitOnFailure(hr, "Failed to evaluate EnableCondition: %ls", pControl->sczEnableCondition);
+        }
+    }
 
-            if (pTheme->pfnEvaluateCondition)
+    // Try to format each control's text based on context, except for editboxes since their text comes from the user.
+    if (pTheme->pfnFormatString && pControl->fAutomaticText && ((pControl->sczText && *pControl->sczText) || pControl->cConditionalText) && THEME_CONTROL_TYPE_EDITBOX != pControl->type)
+    {
+        LPCWSTR wzText = pControl->sczText;
+        LPCWSTR wzNote = pControl->sczNote;
+
+        if (pTheme->pfnEvaluateCondition)
+        {
+            // As documented in the xsd, if there are multiple conditions that are true at the same time then the behavior is undefined.
+            // This is the current implementation and can change at any time.
+            for (DWORD j = 0; j < pControl->cConditionalText; ++j)
             {
-                // As documented in the xsd, if there are multiple conditions that are true at the same time then the behavior is undefined.
-                // This is the current implementation and can change at any time.
-                for (DWORD j = 0; j < pControl->cConditionalText; ++j)
-                {
-                    THEME_CONDITIONAL_TEXT* pConditionalText = pControl->rgConditionalText + j;
+                THEME_CONDITIONAL_TEXT* pConditionalText = pControl->rgConditionalText + j;
 
-                    if (pConditionalText->sczCondition)
+                if (pConditionalText->sczCondition)
+                {
+                    BOOL fCondition = FALSE;
+
+                    hr = pTheme->pfnEvaluateCondition(pConditionalText->sczCondition, &fCondition, pTheme->pvVariableContext);
+                    ThmExitOnFailure(hr, "Failed to evaluate condition: %ls", pConditionalText->sczCondition);
+
+                    if (fCondition)
+                    {
+                        wzText = pConditionalText->sczText;
+                        break;
+                    }
+                }
+            }
+
+            if (THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
+            {
+                for (DWORD j = 0; j < pControl->CommandLink.cConditionalNotes; ++j)
+                {
+                    THEME_CONDITIONAL_TEXT* pConditionalNote = pControl->CommandLink.rgConditionalNotes + j;
+
+                    if (pConditionalNote->sczCondition)
                     {
                         BOOL fCondition = FALSE;
 
-                        hr = pTheme->pfnEvaluateCondition(pConditionalText->sczCondition, &fCondition, pTheme->pvVariableContext);
-                        ThmExitOnFailure(hr, "Failed to evaluate condition: %ls", pConditionalText->sczCondition);
+                        hr = pTheme->pfnEvaluateCondition(pConditionalNote->sczCondition, &fCondition, pTheme->pvVariableContext);
+                        ThmExitOnFailure(hr, "Failed to evaluate note condition: %ls", pConditionalNote->sczCondition);
 
                         if (fCondition)
                         {
-                            wzText = pConditionalText->sczText;
+                            wzNote = pConditionalNote->sczText;
                             break;
                         }
                     }
                 }
-
-                if (THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
-                {
-                    for (DWORD j = 0; j < pControl->CommandLink.cConditionalNotes; ++j)
-                    {
-                        THEME_CONDITIONAL_TEXT* pConditionalNote = pControl->CommandLink.rgConditionalNotes + j;
-
-                        if (pConditionalNote->sczCondition)
-                        {
-                            BOOL fCondition = FALSE;
-
-                            hr = pTheme->pfnEvaluateCondition(pConditionalNote->sczCondition, &fCondition, pTheme->pvVariableContext);
-                            ThmExitOnFailure(hr, "Failed to evaluate note condition: %ls", pConditionalNote->sczCondition);
-
-                            if (fCondition)
-                            {
-                                wzNote = pConditionalNote->sczText;
-                                break;
-                            }
-                        }
-                    }
-                }
             }
-
-            if (wzText && *wzText)
-            {
-                hr = pTheme->pfnFormatString(wzText, &sczText, pTheme->pvVariableContext);
-                ThmExitOnFailure(hr, "Failed to format string: %ls", wzText);
-            }
-            else
-            {
-                ReleaseNullStr(sczText);
-            }
-
-            ThemeSetTextControl(pControl, sczText);
-
-            if (wzNote && *wzNote)
-            {
-                hr = pTheme->pfnFormatString(wzNote, &sczText, pTheme->pvVariableContext);
-                ThmExitOnFailure(hr, "Failed to format note: %ls", wzNote);
-            }
-            else
-            {
-                ReleaseNullStr(sczText);
-            }
-
-            ::SendMessageW(pControl->hWnd, BCM_SETNOTE, 0, reinterpret_cast<WPARAM>(sczText));
         }
 
+        if (wzText && *wzText)
+        {
+            hr = pTheme->pfnFormatString(wzText, &sczText, pTheme->pvVariableContext);
+            ThmExitOnFailure(hr, "Failed to format string: %ls", wzText);
+        }
+        else
+        {
+            ReleaseNullStr(sczText);
+        }
+
+        ThemeSetTextControl(pControl, sczText);
+
+        if (wzNote && *wzNote)
+        {
+            hr = pTheme->pfnFormatString(wzNote, &sczText, pTheme->pvVariableContext);
+            ThmExitOnFailure(hr, "Failed to format note: %ls", wzNote);
+        }
+        else
+        {
+            ReleaseNullStr(sczText);
+        }
+
+        ::SendMessageW(pControl->hWnd, BCM_SETNOTE, 0, reinterpret_cast<WPARAM>(sczText));
+    }
+
+    if (pControl->fAutomaticValue)
+    {
         // If this is a named control, do variable magic.
         if (pControl->sczName && *pControl->sczName)
         {
@@ -6010,7 +6010,7 @@ static HRESULT OnLoadingControl(
     __in THEME* pTheme,
     __in const THEME_CONTROL* pControl,
     __inout WORD* pwId,
-    __inout BOOL* pfDisableAutomaticFunctionality
+    __inout DWORD* pdwAutomaticBehaviorType
     )
 {
     HRESULT hr = S_OK;
@@ -6030,7 +6030,7 @@ static HRESULT OnLoadingControl(
         if (SUCCEEDED(hr))
         {
             *pwId = loadingControlResults.wId;
-            *pfDisableAutomaticFunctionality = loadingControlResults.fDisableAutomaticFunctionality;
+            *pdwAutomaticBehaviorType = loadingControlResults.dwAutomaticBehaviorType;
         }
     }
 
@@ -6232,8 +6232,15 @@ static HRESULT LoadControls(
 
         // Default control ids to the next id, unless there is a specific id to assign to a control.
         WORD wControlId = THEME_FIRST_AUTO_ASSIGN_CONTROL_ID;
-        hr = OnLoadingControl(pTheme, pControl, &wControlId, &pControl->fDisableAutomaticFunctionality);
+        DWORD dwAutomaticBehaviorType = THEME_CONTROL_AUTOMATIC_BEHAVIOR_ALL;
+        hr = OnLoadingControl(pTheme, pControl, &wControlId, &dwAutomaticBehaviorType);
         ThmExitOnFailure(hr, "ThmLoadingControl failed.");
+
+        pControl->fAutomaticEnabled = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ENABLED != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ENABLED & dwAutomaticBehaviorType);
+        pControl->fAutomaticVisible = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VISIBLE != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VISIBLE & dwAutomaticBehaviorType);
+        pControl->fAutomaticAction = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ACTION != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ACTION & dwAutomaticBehaviorType);
+        pControl->fAutomaticText = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_TEXT != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_TEXT & dwAutomaticBehaviorType);
+        pControl->fAutomaticValue = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE & dwAutomaticBehaviorType);
 
         // This range is reserved for thmutil. The process will run out of available window handles before reaching the end of the range.
         if (THEME_FIRST_AUTO_ASSIGN_CONTROL_ID <= wControlId && THEME_FIRST_ASSIGN_CONTROL_ID > wControlId)
@@ -6250,7 +6257,7 @@ static HRESULT LoadControls(
         BOOL fDisabled = pControl->dwStyle & WS_DISABLED;
 
         // If the control is supposed to be initially visible and it has a VisibleCondition, check if it's true.
-        if (fVisible && pControl->sczVisibleCondition && pTheme->pfnEvaluateCondition && !pControl->fDisableAutomaticFunctionality)
+        if (fVisible && pControl->sczVisibleCondition && pTheme->pfnEvaluateCondition && pControl->fAutomaticVisible)
         {
             hr = pTheme->pfnEvaluateCondition(pControl->sczVisibleCondition, &fVisible, pTheme->pvVariableContext);
             ThmExitOnFailure(hr, "Failed to evaluate VisibleCondition: %ls", pControl->sczVisibleCondition);
@@ -6269,7 +6276,7 @@ static HRESULT LoadControls(
         }
 
         // If the control is supposed to be initially enabled and it has an EnableCondition, check if it's true.
-        if (!fDisabled && pControl->sczEnableCondition && pTheme->pfnEvaluateCondition && !pControl->fDisableAutomaticFunctionality)
+        if (!fDisabled && pControl->sczEnableCondition && pTheme->pfnEvaluateCondition && pControl->fAutomaticEnabled)
         {
             BOOL fEnable = TRUE;
 

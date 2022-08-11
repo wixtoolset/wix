@@ -947,7 +947,7 @@ public: // IBAFunctions
         __in LPCWSTR /*wzName*/,
         __inout BOOL* /*pfProcessed*/,
         __inout WORD* /*pwId*/,
-        __inout BOOL* /*pfDisableAutomaticFunctionality*/
+        __inout DWORD* /*pdwAutomaticBehaviorType*/
         )
     {
         return S_OK;
