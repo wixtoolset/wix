@@ -30,7 +30,7 @@ static HRESULT BalBaseBAFunctionsProcOnThemeControlLoading(
     __inout BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnThemeControlLoading(pArgs->wzName, &pResults->fProcessed, &pResults->wId, &pResults->fDisableAutomaticFunctionality);
+    return pBAFunctions->OnThemeControlLoading(pArgs->wzName, &pResults->fProcessed, &pResults->wId, &pResults->dwAutomaticBehaviorType);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnThemeControlWmCommand(

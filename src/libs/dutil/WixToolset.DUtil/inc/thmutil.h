@@ -57,6 +57,20 @@ typedef enum THEME_CONTROL_DATA
     THEME_CONTROL_DATA_HOVER = 1,
 } THEME_CONTROL_DATA;
 
+typedef enum THEME_CONTROL_AUTOMATIC_BEHAVIOR_TYPE
+{
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_ALL = 0x0,
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ENABLED = 0x1,
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VISIBLE = 0x2,
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ACTION = 0x4,
+    // For form controls like editboxes and checkboxes,
+    // the value will not be automatically persisted to a variable and
+    // the control's value will only be changed by the user.
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE = 0x8,
+    // This has no effect on editboxes since their text is their value.
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_TEXT = 0x10,
+} THEME_CONTROL_AUTOMATIC_BEHAVIOR_TYPE;
+
 typedef enum THEME_CONTROL_TYPE
 {
     THEME_CONTROL_TYPE_UNKNOWN,
@@ -196,7 +210,7 @@ struct THEME_ASSIGN_CONTROL_ID
     WORD wId;       // id to apply to control
     LPCWSTR wzName; // name of control to match
     const THEME_CONTROL** ppControl;
-    BOOL fDisableAutomaticFunctionality; // prevent declarative functionality from interfering with the application's imperative code
+    DWORD dwAutomaticBehaviorType; // prevent declarative functionality from interfering with the application's imperative code
 };
 
 const WORD THEME_FIRST_ASSIGN_CONTROL_ID = 0x4000; // Recommended first control id to be assigned.
@@ -224,7 +238,12 @@ typedef struct _THEME_CONTROL
 
     LPWSTR sczEnableCondition;
     LPWSTR sczVisibleCondition;
-    BOOL fDisableAutomaticFunctionality;
+
+    BOOL fAutomaticEnabled;
+    BOOL fAutomaticVisible;
+    BOOL fAutomaticAction;
+    BOOL fAutomaticValue;
+    BOOL fAutomaticText;
 
     union
     {
@@ -472,7 +491,7 @@ typedef struct _THEME_LOADINGCONTROL_RESULTS
     // Due to this value being packed into 16 bits for many system window messages, this is restricted to a WORD.
     WORD wId;
     // Used to prevent declarative functionality from interfering with the application's imperative code.
-    BOOL fDisableAutomaticFunctionality;
+    DWORD dwAutomaticBehaviorType;
 } THEME_LOADINGCONTROL_RESULTS;
 
 
