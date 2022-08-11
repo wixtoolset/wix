@@ -118,6 +118,12 @@ namespace WixToolset.Core.CommandLine
                 extension.PostParse();
             }
 
+            // If we hit an error, do not return a command.
+            if (!String.IsNullOrEmpty(parser.ErrorArgument))
+            {
+                return null;
+            }
+
             return command ?? new HelpCommand(extensions, branding);
         }
 
