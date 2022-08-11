@@ -35,6 +35,33 @@ HRESULT DAPI WnduGetControlText(
     __inout_z LPWSTR* psczText
     );
 
+/********************************************************************
+ WnduShowOpenFileDialog - shows the system dialog to select a file for opening.
+
+*******************************************************************/
+HRESULT DAPI WnduShowOpenFileDialog(
+    __in_opt HWND hwndParent,
+    __in BOOL fForcePathExists,
+    __in BOOL fForceFileExists,
+    __in_opt LPCWSTR wzTitle,
+    __in_opt COMDLG_FILTERSPEC* rgFilters,
+    __in DWORD cFilters,
+    __in DWORD dwDefaultFilter,
+    __in_opt LPCWSTR wzDefaultPath,
+    __inout LPWSTR* psczPath
+    );
+
+/********************************************************************
+ WnduShowOpenFolderDialog - shows the system dialog to select a folder.
+
+*******************************************************************/
+HRESULT DAPI WnduShowOpenFolderDialog(
+    __in_opt HWND hwndParent,
+    __in BOOL fForceFileSystem,
+    __in_opt LPCWSTR wzTitle,
+    __inout LPWSTR* psczPath
+    );
+
 #ifdef __cplusplus
 }
 #endif

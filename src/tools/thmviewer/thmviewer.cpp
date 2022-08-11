@@ -66,6 +66,13 @@ static void CALLBACK ThmviewerTraceError(
     __in va_list args
     );
 
+static COMDLG_FILTERSPEC vrgFilters[] =
+{
+    { L"Theme Files (*.thm)", L"*.thm" },
+    { L"XML Files (*.xml)", L"*.xml" },
+    { L"All Files (*.*)", L"*.*" },
+};
+
 
 int WINAPI wWinMain(
     __in HINSTANCE hInstance,
@@ -110,24 +117,8 @@ int WINAPI wWinMain(
     if (!sczThemeFile)
     {
         // Prompt for a path to the theme file.
-        OPENFILENAMEW ofn = { };
-        WCHAR wzFile[MAX_PATH] = { };
-
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = hWnd;
-        ofn.lpstrFile = wzFile;
-        ofn.nMaxFile = countof(wzFile);
-        ofn.lpstrFilter = L"Theme Files (*.thm)\0*.thm\0XML Files (*.xml)\0*.xml\0All Files (*.*)\0*.*\0";
-        ofn.nFilterIndex = 1;
-        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-        ofn.lpstrTitle = vpTheme->sczCaption;
-
-        if (::GetOpenFileNameW(&ofn))
-        {
-            hr = StrAllocString(&sczThemeFile, wzFile, 0);
-            ExitOnFailure(hr, "Failed to copy opened file to theme file.");
-        }
-        else
+        hr = WnduShowOpenFileDialog(hWnd, TRUE, TRUE, vpTheme->sczCaption, vrgFilters, countof(vrgFilters), 1, NULL, &sczThemeFile);
+        if (FAILED(hr))
         {
             ::MessageBoxW(hWnd, L"Must specify a path to theme file.", vpTheme->sczCaption, MB_OK | MB_ICONERROR);
             ExitFunction1(hr = E_INVALIDARG);

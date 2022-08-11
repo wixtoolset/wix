@@ -161,6 +161,163 @@ LExit:
 }
 
 
+DAPI_(HRESULT) WnduShowOpenFileDialog(
+    __in_opt HWND hwndParent,
+    __in BOOL fForcePathExists,
+    __in BOOL fForceFileExists,
+    __in_opt LPCWSTR wzTitle,
+    __in COMDLG_FILTERSPEC* rgFilters,
+    __in DWORD cFilters,
+    __in DWORD dwDefaultFilter,
+    __in_opt LPCWSTR wzDefaultPath,
+    __inout LPWSTR* psczPath
+    )
+{
+    HRESULT hr = S_OK;
+    IFileOpenDialog* pFileOpenDialog = NULL;
+    FILEOPENDIALOGOPTIONS fos = 0;
+    FILEOPENDIALOGOPTIONS additionalFlags = FOS_NOCHANGEDIR;
+    IShellItem* psi = NULL;
+    LPWSTR sczDefaultDirectory = NULL;
+    LPWSTR sczPath = NULL;
+
+    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileOpenDialog));
+    WnduExitOnFailure(hr, "Failed to create FileOpenDialog object.");
+
+    hr = pFileOpenDialog->SetTitle(wzTitle);
+    WnduExitOnFailure(hr, "Failed to set FileOpenDialog title.");
+
+    hr = pFileOpenDialog->GetOptions(&fos);
+    WnduExitOnFailure(hr, "Failed to get FileOpenDialog options.");
+
+    if (fForcePathExists)
+    {
+        additionalFlags |= FOS_PATHMUSTEXIST;
+    }
+
+    if (fForceFileExists)
+    {
+        additionalFlags |= FOS_FILEMUSTEXIST;
+    }
+
+    hr = pFileOpenDialog->SetOptions(fos | additionalFlags);
+    WnduExitOnFailure(hr, "Failed to set FileOpenDialog options.");
+
+    hr = pFileOpenDialog->SetFileTypes(cFilters, rgFilters);
+    WnduExitOnFailure(hr, "Failed to set FileOpenDialog file types.");
+
+    hr = pFileOpenDialog->SetFileTypeIndex(dwDefaultFilter);
+    WnduExitOnFailure(hr, "Failed to set FileOpenDialog default file type.");
+
+    if (wzDefaultPath && *wzDefaultPath)
+    {
+        hr = PathGetDirectory(wzDefaultPath, &sczDefaultDirectory);
+        if (SUCCEEDED(hr))
+        {
+            hr = ::SHCreateItemFromParsingName(sczDefaultDirectory, NULL, IID_PPV_ARGS(&psi));
+            if (SUCCEEDED(hr))
+            {
+                hr = pFileOpenDialog->SetFolder(psi);
+                WnduExitOnFailure(hr, "Failed to set FileOpenDialog folder.");
+            }
+
+            ReleaseNullObject(psi);
+        }
+
+        hr = pFileOpenDialog->SetFileName(wzDefaultPath);
+        WnduExitOnFailure(hr, "Failed to set FileOpenDialog file name.");
+    }
+
+    hr = pFileOpenDialog->Show(hwndParent);
+    if (HRESULT_FROM_WIN32(ERROR_CANCELLED) == hr)
+    {
+        ExitFunction();
+    }
+    WnduExitOnFailure(hr, "Failed to show FileOpenDialog for file.");
+
+    hr = pFileOpenDialog->GetResult(&psi);
+    WnduExitOnFailure(hr, "Failed to get FileOpenDialog result.");
+
+    hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &sczPath);
+    WnduExitOnFailure(hr, "Failed to get FileOpenDialog result path.");
+
+    hr = StrAllocString(psczPath, sczPath, 0);
+    WnduExitOnFailure(hr, "Failed to copy FileOpenDialog result path.");
+
+LExit:
+    if (sczPath)
+    {
+        ::CoTaskMemFree(sczPath);
+    }
+
+    ReleaseStr(sczDefaultDirectory);
+    ReleaseObject(psi);
+    ReleaseObject(pFileOpenDialog);
+
+    return hr;
+}
+
+
+DAPI_(HRESULT) WnduShowOpenFolderDialog(
+    __in_opt HWND hwndParent,
+    __in BOOL fForceFileSystem,
+    __in_opt LPCWSTR wzTitle,
+    __inout LPWSTR* psczPath
+    )
+{
+    HRESULT hr = S_OK;
+    IFileOpenDialog* pFileOpenDialog = NULL;
+    FILEOPENDIALOGOPTIONS fos = 0;
+    FILEOPENDIALOGOPTIONS additionalFlags = FOS_PICKFOLDERS | FOS_NOCHANGEDIR;
+    IShellItem* psi = NULL;
+    LPWSTR sczPath = NULL;
+
+    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileOpenDialog));
+    WnduExitOnFailure(hr, "Failed to create FileOpenDialog object.");
+
+    hr = pFileOpenDialog->SetTitle(wzTitle);
+    WnduExitOnFailure(hr, "Failed to set FileOpenDialog title.");
+
+    hr = pFileOpenDialog->GetOptions(&fos);
+    WnduExitOnFailure(hr, "Failed to get FileOpenDialog options.");
+
+    if (fForceFileSystem)
+    {
+        additionalFlags |= FOS_FORCEFILESYSTEM;
+    }
+
+    hr = pFileOpenDialog->SetOptions(fos | additionalFlags);
+    WnduExitOnFailure(hr, "Failed to set FileOpenDialog options.");
+
+    hr = pFileOpenDialog->Show(hwndParent);
+    if (HRESULT_FROM_WIN32(ERROR_CANCELLED) == hr)
+    {
+        ExitFunction();
+    }
+    WnduExitOnFailure(hr, "Failed to show FileOpenDialog for folder.");
+
+    hr = pFileOpenDialog->GetResult(&psi);
+    WnduExitOnFailure(hr, "Failed to get FileOpenDialog result.");
+
+    hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &sczPath);
+    WnduExitOnFailure(hr, "Failed to get FileOpenDialog result path.");
+
+    hr = StrAllocString(psczPath, sczPath, 0);
+    WnduExitOnFailure(hr, "Failed to copy FileOpenDialog result path.");
+
+LExit:
+    if (sczPath)
+    {
+        ::CoTaskMemFree(sczPath);
+    }
+
+    ReleaseObject(psi);
+    ReleaseObject(pFileOpenDialog);
+
+    return hr;
+}
+
+
 static DWORD CALLBACK RichEditStreamFromFileHandleCallback(
     __in DWORD_PTR dwCookie,
     __in_bcount(cb) LPBYTE pbBuff,
