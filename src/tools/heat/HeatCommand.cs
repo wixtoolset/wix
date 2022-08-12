@@ -11,13 +11,16 @@ namespace WixToolset.Harvesters
     using System.Threading.Tasks;
     using System.Xml;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Harvesters.Extensibility;
     using Wix = WixToolset.Harvesters.Serialize;
 
-    internal class HeatCommand : ICommandLineCommand
+    internal class HeatCommand : BaseCommandLineCommand
     {
+        private bool showLogo;
+
         public HeatCommand(string harvestType, IList<IHeatExtension> extensions, IServiceProvider serviceProvider)
         {
             this.Extensions = extensions;
@@ -28,11 +31,7 @@ namespace WixToolset.Harvesters
             this.ExtensionOptions.Add(harvestType);
         }
 
-        public bool ShowHelp { get; set; }
-
-        public bool ShowLogo { get; set; }
-
-        public bool StopParsing { get; private set; }
+        public override bool ShowLogo => this.showLogo;
 
         private string ExtensionArgument { get; set; }
 
@@ -50,13 +49,18 @@ namespace WixToolset.Harvesters
 
         private IServiceProvider ServiceProvider { get; }
 
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return null;
+        }
+
+        public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             var exitCode = this.Harvest();
             return Task.FromResult(exitCode);
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string arg)
+        public override bool TryParseArgument(ICommandLineParser parser, string arg)
         {
             if (this.ExtensionArgument == null)
             {
@@ -67,7 +71,7 @@ namespace WixToolset.Harvesters
                 string parameter = arg.Substring(1);
                 if ("nologo" == parameter)
                 {
-                    this.ShowLogo = false;
+                    this.showLogo = false;
                 }
                 else if ("o" == parameter || "out" == parameter)
                 {

@@ -5,6 +5,7 @@ namespace WixToolset.Core.CommandLine
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -12,18 +13,18 @@ namespace WixToolset.Core.CommandLine
     {
         private const string ExpectedArgument = "expected argument";
 
+        public CommandLineParser(IMessaging messaging, string[] arguments, string errorArgument)
+        {
+            this.Messaging = messaging;
+            this.RemainingArguments = new Queue<string>(arguments.Where(a => !String.IsNullOrWhiteSpace(a))); // skip blank arguments.
+            this.ErrorArgument = errorArgument;
+        }
+
         public string ErrorArgument { get; private set; }
 
         private Queue<string> RemainingArguments { get; }
 
         private IMessaging Messaging { get; }
-
-        public CommandLineParser(IMessaging messaging, string[] arguments, string errorArgument)
-        {
-            this.Messaging = messaging;
-            this.RemainingArguments = new Queue<string>(arguments);
-            this.ErrorArgument = errorArgument;
-        }
 
         public bool IsSwitch(string arg)
         {
@@ -132,15 +133,15 @@ namespace WixToolset.Core.CommandLine
             this.ErrorArgument = argument;
         }
 
-        public bool TryGetNextSwitchOrArgument(out string arg)
+        public bool TryGetNextSwitchOrArgument(out string argument)
         {
             if (this.RemainingArguments.Count > 0)
             {
-                arg = this.RemainingArguments.Dequeue();
+                argument = this.RemainingArguments.Dequeue();
                 return true;
             }
 
-            arg = null;
+            argument = null;
             return false;
         }
 

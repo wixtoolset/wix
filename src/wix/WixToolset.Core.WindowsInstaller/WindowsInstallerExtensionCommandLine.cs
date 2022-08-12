@@ -3,7 +3,6 @@
 namespace WixToolset.Core.WindowsInstaller
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Core.WindowsInstaller.CommandLine;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -22,10 +21,16 @@ namespace WixToolset.Core.WindowsInstaller
 
         private IServiceProvider ServiceProvider { get; }
 
-        public override IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            new ExtensionCommandLineSwitch { Switch = "msi", Description = "Windows Installer specialized operations." },
-        };
+            return new CommandLineHelp("Specialized operations for manipulating Windows Installer databases.")
+            {
+                Commands = new[]
+                {
+                    new CommandLineHelpCommand("msi", "Windows Installer specialized operations."),
+                }
+            };
+        }
 
         public override bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {

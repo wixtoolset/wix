@@ -9,6 +9,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
     using System.Threading.Tasks;
     using WixToolset.Core.WindowsInstaller.Validate;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class ValidateSubcommand : WindowsInstallerSubcommandBase
@@ -34,6 +35,18 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         private List<string> Ices { get; } = new List<string>();
 
         private List<string> SuppressIces { get; } = new List<string>();
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Validates MSI database using standard or custom ICEs.", "msi validate [options] inputfile", new[]
+            {
+                new CommandLineHelpSwitch("-cub", "Optional path to a custom validation .CUBe file."),
+                new CommandLineHelpSwitch("-ice", "Validates only with the specified ICE. May be provided multiple times."),
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-pdb", "Optional path to .wixpdb for source line information. If not provided, will check next to the input file."),
+                new CommandLineHelpSwitch("-sice", "Suppresses an ICE validator."),
+            });
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {

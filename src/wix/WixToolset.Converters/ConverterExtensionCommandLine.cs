@@ -3,7 +3,6 @@
 namespace WixToolset.Converters
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -21,11 +20,17 @@ namespace WixToolset.Converters
 
         private IServiceProvider ServiceProvider { get; }
 
-        public override IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            new ExtensionCommandLineSwitch { Switch = "convert", Description = "Convert v3 source code to v4 source code." },
-            new ExtensionCommandLineSwitch { Switch = "format", Description = "Ensures consistent formatting of source code." },
-        };
+            return new CommandLineHelp("Source code converter and formatter.")
+            {
+                Commands = new[]
+                {
+                    new CommandLineHelpCommand("convert", "Convert v3 source code to v4 source code."),
+                    new CommandLineHelpCommand("format", "Ensures consistent formatting of source code."),
+                }
+            };
+        }
 
         public override bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {

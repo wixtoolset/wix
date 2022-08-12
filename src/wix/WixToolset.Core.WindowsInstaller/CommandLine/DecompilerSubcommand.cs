@@ -42,6 +42,22 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
         private bool SuppressUI { get; set; }
 
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Converts a Windows Installer database back into source code.", "msi decompile [options] inputfile", new[]
+            {
+                new CommandLineHelpSwitch("-cub", "Optional path to a custom validation .CUBe file."),
+                new CommandLineHelpSwitch("-sct", "Suppress decompiling custom tables."),
+                new CommandLineHelpSwitch("-sdet", "Suppress dropping empty tables."),
+                new CommandLineHelpSwitch("-sras", "Suppress relative action sequencing."),
+                new CommandLineHelpSwitch("-sui", "Suppress decompiling UI tables."),
+                new CommandLineHelpSwitch("-type", "Optional specify the input file type: msi or msm. If not specified, type will be inferred by file extension."),
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-out", "-o", "Path to output the decompiled .wxs file. If not specified, outputs next to inputfile"),
+                new CommandLineHelpSwitch("-x", "Folder to export embedded binaries and icons to."),
+            });
+        }
+
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (String.IsNullOrEmpty(this.InputPath))

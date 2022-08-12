@@ -12,6 +12,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class TransformSubcommand : WindowsInstallerSubcommandBase
@@ -50,6 +51,52 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         private bool OutputAsWixout { get; set; }
 
         private TransformFlags ValidationFlags { get; set; }
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Creates an MST transform file.", "msi transform [options] target.msi [updated.msi] -out output.mst")
+            {
+                Switches = new[]
+                {
+                    new CommandLineHelpSwitch("-a", "Admin image, generates source file information in the transform."),
+                    new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                    new CommandLineHelpSwitch("-p", "Preserve unchanged rows."),
+                    new CommandLineHelpSwitch("-pedantic", "Show pedantic messages."),
+                    new CommandLineHelpSwitch("-serr <flags>", "Suppress error when applying transform; see Error flags below"),
+                    new CommandLineHelpSwitch("-t <type>", "Use default validation flags for the transform type; see Transform types below"),
+                    new CommandLineHelpSwitch("-val <flags>", "Validation flags for the transform; see Validation flags below"),
+                    new CommandLineHelpSwitch("-x", "Folder to extract binaries."),
+                    new CommandLineHelpSwitch("-xo", "Output transfrom as a WiX output instead of an MST file."),
+                    new CommandLineHelpSwitch("-out", "-o", "Path to output the transform file."),
+                },
+                Notes = String.Join(Environment.NewLine,
+                    "Error flags:",
+                    "   a          Ignore errors when adding an existing row",
+                    "   b          Ignore errors when deleting a missing row",
+                    "   c          Ignore errors when adding an existing table",
+                    "   d          Ignore errors when deleting a missing table",
+                    "   e          Ignore errors when modifying a missing row",
+                    "   f          Ignore errors when changing the code page",
+                    String.Empty,
+                    "Validation flags:",
+                    "   g          UpgradeCode must match",
+                    "   l          Language must match",
+                    "   r          Product ID must match",
+                    "   s          Check major version only",
+                    "   t          Check major and minor versions",
+                    "   u          Check major, minor, and upgrade versions",
+                    "   v          Upgrade version < target version",
+                    "   w          Upgrade version <= target version",
+                    "   x          Upgrade version = target version",
+                    "   y          Upgrade version > target version",
+                    "   z          Upgrade version >= target version",
+                    String.Empty,
+                    "Transform types:",
+                    "   language   Default flags for a language transform",
+                    "   instance   Default flags for an instance transform",
+                    "   patch      Default flags for a patch transform")
+            };
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {

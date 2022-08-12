@@ -13,19 +13,17 @@ namespace WixToolset.Harvesters
 
     internal class HeatCommandLine : IHeatCommandLine
     {
-        private readonly List<IHeatExtension> extensions;
-        private readonly IMessaging messaging;
         private readonly IServiceProvider serviceProvider;
+        private readonly List<IHeatExtension> extensions;
 
         public HeatCommandLine(IServiceProvider serviceProvider, IEnumerable<IHeatExtension> heatExtensions)
         {
+            this.serviceProvider = serviceProvider;
             this.extensions = new List<IHeatExtension> { new IIsHeatExtension(), new UtilHeatExtension(serviceProvider), new VSHeatExtension() };
             if (heatExtensions != null)
             {
                 this.extensions.AddRange(heatExtensions);
             }
-            this.messaging = serviceProvider.GetService<IMessaging>();
-            this.serviceProvider = serviceProvider;
         }
 
         public ICommandLineCommand ParseStandardCommandLine(ICommandLineArguments arguments)

@@ -22,10 +22,9 @@ namespace WixToolsetTest.CoreIntegration
             WixAssert.CompareLineByLine(new[]
             {
                 "-bindpath is expected to be followed by a value. See -? for additional detail.",
-                "Additional argument '-bindpath' was unexpected.  Remove the argument and add the '-?' switch for more information.",
-                "No source files specified."
+                "Additional argument '-bindpath' was unexpected.  Remove the argument and add the '-?' switch for more information."
             }, result.Messages.Select(m => m.ToString()).ToArray());
-            Assert.Equal(391, result.ExitCode);
+            Assert.Equal(1, result.ExitCode);
         }
 
         [Fact]

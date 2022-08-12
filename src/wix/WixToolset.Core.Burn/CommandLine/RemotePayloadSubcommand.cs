@@ -15,6 +15,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class RemotePayloadSubcommand : BurnSubcommandBase
@@ -65,6 +66,36 @@ namespace WixToolset.Core.Burn.CommandLine
         private bool Recurse { get; set; }
 
         private bool UseCertificate { get; set; }
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Generate source code for a remote payload", "burn remotepayload [options] payloadfile [payloadfile ...]", new[]
+            {
+                new CommandLineHelpSwitch("-basepath", "-bp", "Folder as base to make payloads relative."),
+                new CommandLineHelpSwitch("-bundlepayloadgeneration", "Sets the package payload generation option; see the Payload Generation Types below."),
+                new CommandLineHelpSwitch("-downloadurl", "-du", "Set the DownloadUrl attribute on the generated payloads."),
+                new CommandLineHelpSwitch("-out", "-o", "Path to output the source code file."),
+                new CommandLineHelpSwitch("-recurse", "-r", "Indicates to add all payloads in directory recursively."),
+                new CommandLineHelpSwitch("-intermediatefolder", "Optional working folder. If not specified %TMP% folder will be created."),
+                new CommandLineHelpSwitch("-packagetype", "Explicitly set package type; see the Pacakge Types below."),
+                new CommandLineHelpSwitch("-usecertificate", "Use certificate to validate signed payloads. This option is not recommended."),
+            })
+            {
+                Notes = String.Join(Environment.NewLine,
+                    "Payload Generation Types:",
+                    "  none",
+                    "  externalwithoutdownloadurl",
+                    "  external",
+                    "  all",
+                    String.Empty,
+                    "Package Types:",
+                    "  bundle",
+                    "  exe",
+                    "  msi",
+                    "  msp",
+                    "  msu")
+            };
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {

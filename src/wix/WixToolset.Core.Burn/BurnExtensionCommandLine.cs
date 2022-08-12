@@ -3,7 +3,6 @@
 namespace WixToolset.Core.Burn
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Core.Burn.CommandLine;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -22,10 +21,13 @@ namespace WixToolset.Core.Burn
 
         private IServiceProvider ServiceProvider { get; }
 
-        public override IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            new ExtensionCommandLineSwitch { Switch = "burn", Description = "Burn specialized operations." },
-        };
+            return new CommandLineHelp(null)
+            {
+                Commands = new[] { new CommandLineHelpCommand("burn", "Specialized operations for manipulating Burn-based bundles.") }
+            };
+        }
 
         public override bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {

@@ -8,12 +8,13 @@ namespace WixToolset.Harvesters
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Harvesters.Data;
     using WixToolset.Harvesters.Extensibility;
 
-    internal class HelpCommand : ICommandLineCommand
+    internal class HelpCommand : BaseCommandLineCommand
     {
         const string HelpMessageOptionFormat = "   {0,-7}  {1}";
 
@@ -24,17 +25,12 @@ namespace WixToolset.Harvesters
 
         private IList<IHeatExtension> Extensions { get; }
 
-        public bool ShowHelp { get; set; }
-
-        public bool ShowLogo
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            get => false;
-            set { }
+            return null;
         }
 
-        public bool StopParsing => true;
-
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             var exitCode = this.DisplayHelp();
             return Task.FromResult(exitCode);
@@ -50,8 +46,9 @@ namespace WixToolset.Harvesters
             Console.WriteLine();
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        public override bool TryParseArgument(ICommandLineParser parser, string argument)
         {
+            this.StopParsing = true;
             return true;
         }
 

@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Inscribe;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class ReattachSubcommand : BurnSubcommandBase
@@ -28,6 +29,15 @@ namespace WixToolset.Core.Burn.CommandLine
         private string IntermediateFolder { get; set; }
 
         private string OutputPath { get; set; }
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Reattaches a signed burn engine to a bundle.", "burn reattach [options] original.exe signed.exe -o final.exe", new[]
+            {
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-out", "-o", "Output bundle with signed engine attached."),
+            });
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
