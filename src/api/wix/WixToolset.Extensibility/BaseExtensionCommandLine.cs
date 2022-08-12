@@ -2,8 +2,6 @@
 
 namespace WixToolset.Extensibility
 {
-    using System;
-    using System.Collections.Generic;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -13,9 +11,12 @@ namespace WixToolset.Extensibility
     public abstract class BaseExtensionCommandLine : IExtensionCommandLine
     {
         /// <summary>
-        /// See <see cref="IExtensionCommandLine.CommandLineSwitches" />
+        /// See <see cref="IExtensionCommandLine.GetCommandLineHelp" />
         /// </summary>
-        public virtual IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => Array.Empty<ExtensionCommandLineSwitch>();
+        public virtual CommandLineHelp GetCommandLineHelp()
+        {
+            return null;
+        }
 
         /// <summary>
         /// See <see cref="IExtensionCommandLine.PostParse" />

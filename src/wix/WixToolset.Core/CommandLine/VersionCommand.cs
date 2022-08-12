@@ -5,18 +5,18 @@ namespace WixToolset.Core.CommandLine
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    internal class VersionCommand : ICommandLineCommand
+    internal class VersionCommand : BaseCommandLineCommand
     {
-        public bool ShowHelp { get; set; }
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return null;
+        }
 
-        public bool ShowLogo { get; set; }
-
-        public bool StopParsing => true;
-
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             // $(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(Commit)
             Console.WriteLine("{0}.{1}.{2}{3}+{4}", ThisAssembly.Git.BaseVersion.Major
@@ -27,7 +27,7 @@ namespace WixToolset.Core.CommandLine
             return Task.FromResult(0);
         }
 
-        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
+        public override bool TryParseArgument(ICommandLineParser parseHelper, string argument)
         {
             return true; // eat any arguments
         }

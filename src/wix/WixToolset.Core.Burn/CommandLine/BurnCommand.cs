@@ -5,41 +5,50 @@ namespace WixToolset.Core.Burn.CommandLine
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Burn specialized command.
     /// </summary>
-    internal class BurnCommand : ICommandLineCommand
+    internal class BurnCommand : BaseCommandLineCommand
     {
         public BurnCommand(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public bool ShowHelp { get; set; }
-
-        public bool ShowLogo { get; set; }
-
-        public bool StopParsing { get; set; }
-
         private IServiceProvider ServiceProvider { get; }
 
         private BurnSubcommandBase Subcommand { get; set; }
 
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            if (this.ShowHelp || this.Subcommand is null)
+            return this.Subcommand?.GetCommandLineHelp() ?? new CommandLineHelp("Specialized operations for manipulating Burn-based bundles.", "burn detach|extract|reattach|remotepayload")
             {
-                DisplayHelp();
+                Commands = new[]
+                {
+                    new CommandLineHelpCommand("detach", "Detaches the burn engine from a bundle so it can be signed."),
+                    new CommandLineHelpCommand("extract", "Extracts the internals of a bundle to a folder."),
+                    new CommandLineHelpCommand("reattach", "Reattaches a signed burn engine to a bundle."),
+                    new CommandLineHelpCommand("remotepayload", "Extracts the internals of a bundle."),
+                }
+            };
+        }
+
+        public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            if (this.Subcommand is null)
+            {
+                Console.Error.WriteLine("A subcommand is required for the \"burn\" command. Add -h to for help.");
                 return Task.FromResult(1);
             }
 
             return this.Subcommand.ExecuteAsync(cancellationToken);
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        public override bool TryParseArgument(ICommandLineParser parser, string argument)
         {
             if (this.Subcommand is null)
             {
@@ -66,21 +75,6 @@ namespace WixToolset.Core.Burn.CommandLine
             }
 
             return this.Subcommand.TryParseArgument(parser, argument);
-        }
-
-        private static void DisplayHelp()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Usage: wix burn detach|reattach bundle.exe -out engine.exe");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  -h|--help         Show command line help.");
-            Console.WriteLine("  --nologo          Suppress displaying the logo information.");
-            Console.WriteLine();
-            Console.WriteLine("Commands:");
-            Console.WriteLine();
-            Console.WriteLine("  detach            Detaches the burn engine from a bundle so it can be signed.");
-            Console.WriteLine("  reattach          Reattaches a signed burn engine to a bundle.");
         }
     }
 }

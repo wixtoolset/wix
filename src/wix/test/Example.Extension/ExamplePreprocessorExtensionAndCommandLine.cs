@@ -3,7 +3,6 @@
 namespace Example.Extension
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -12,7 +11,13 @@ namespace Example.Extension
     {
         private string exampleValueFromCommandLine;
 
-        public IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => throw new NotImplementedException();
+        public CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Example command line extension", "example value", new[]
+            {
+                new CommandLineHelpSwitch("-example", "Sets an example value")
+            });
+        }
 
         public ExamplePreprocessorExtensionAndCommandLine()
         {

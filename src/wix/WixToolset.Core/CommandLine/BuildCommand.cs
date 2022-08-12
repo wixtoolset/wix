@@ -14,7 +14,7 @@ namespace WixToolset.Core.CommandLine
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    internal class BuildCommand : ICommandLineCommand
+    internal class BuildCommand : BaseCommandLineCommand
     {
         private readonly CommandLine commandLine;
 
@@ -25,21 +25,6 @@ namespace WixToolset.Core.CommandLine
             this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
             this.commandLine = new CommandLine(this.ServiceProvider, this.Messaging);
         }
-
-        public bool ShowHelp
-        {
-            get { return this.commandLine.ShowHelp; }
-            set { this.commandLine.ShowHelp = value; }
-        }
-
-        public bool ShowLogo
-        {
-            get { return this.commandLine.ShowLogo; }
-            set { this.commandLine.ShowLogo = value; }
-        }
-
-        // Stop parsing when we've decided to show help.
-        public bool StopParsing => this.commandLine.ShowHelp;
 
         private IServiceProvider ServiceProvider { get; }
 
@@ -57,14 +42,40 @@ namespace WixToolset.Core.CommandLine
 
         private string TrackingFile { get; set; }
 
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            if (this.commandLine.ShowHelp)
+            return new CommandLineHelp("", "build [options] sourcevile [sourcefile ...] -out output.ext", new[]
             {
-                Console.WriteLine("TODO: Show build command help");
-                return Task.FromResult(-1);
-            }
+                new CommandLineHelpSwitch("-arch", "Set the architecture of the output."),
+                new CommandLineHelpSwitch("-bindfiles", "-bf", "Bind files into an output .wixlib. Ignored if not building a .wixlib."),
+                new CommandLineHelpSwitch("-bindpath", "Bind path to search for content files."),
+                new CommandLineHelpSwitch("-cabcache", "-cc", "Set a folder to cache cabinets across builds."),
+                new CommandLineHelpSwitch("-culture", "Adds a culture to filter localization files."),
+                new CommandLineHelpSwitch("-define", "-d", "Sets a preprocessor variable."),
+                new CommandLineHelpSwitch("-defaultcompressionlevel", "-dcl", "Default compression level; see Compression levels below."),
+                new CommandLineHelpSwitch("-include", "-i", "Folder to search for include files."),
+                new CommandLineHelpSwitch("-intermediatefolder", "Optional working folder. If not specified a folder in %TMP% will be created."),
+                new CommandLineHelpSwitch("-loc", "Localization file to use in the build. By default, .wxl files are recognized as localization."),
+                new CommandLineHelpSwitch("-lib", "Library file to use in the build. By default, .wixlb files are recognized as libraries."),
+                new CommandLineHelpSwitch("-src", "Source file to use in the build. By default, .wxs files are recognized as source code."),
+                new CommandLineHelpSwitch("-out", "-o", "Path to output the build to."),
+                new CommandLineHelpSwitch("-outputtype", "Explicitly set the output type if it cannot be determined from the output."),
+                new CommandLineHelpSwitch("-pdb", "Optional path to output .wixpdb. Default will write .wixpdb beside output path."),
+                new CommandLineHelpSwitch("-pdbtype", "Switch to disable creation of .wixpdb. Types: full or none."),
+            })
+            {
+                Notes = String.Join(Environment.NewLine,
+                    "Compression levels:",
+                    "  none        Use no compression",
+                    "  low         Use low compression",
+                    "  medium      Use medium compression",
+                    "  high        Use high compression",
+                    "  mszip       Use ms-zip compression")
+            };
+        }
 
+        public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
             this.IntermediateFolder = this.commandLine.CalculateIntermedateFolder();
 
             this.Platform = this.commandLine.Platform;
@@ -144,7 +155,7 @@ namespace WixToolset.Core.CommandLine
             return Task.FromResult(this.Messaging.LastErrorNumber);
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        public override bool TryParseArgument(ICommandLineParser parser, string argument)
         {
             return this.commandLine.TryParseArgument(argument, parser);
         }
@@ -465,17 +476,13 @@ namespace WixToolset.Core.CommandLine
 
             public List<string> SourceFilePaths { get; } = new List<string>();
 
-            public List<string> UnevaluatedInputFilePaths { get; } = new List<string>();
+            public List<string> UnclassifiedInputFilePaths { get; } = new List<string>();
 
             public Platform Platform { get; private set; }
 
             public string PdbFile { get; private set; }
 
             public PdbType PdbType { get; private set; }
-
-            public bool ShowLogo { get; set; }
-
-            public bool ShowHelp { get; set; }
 
             public string IntermediateFolder { get; private set; }
 
@@ -535,6 +542,7 @@ namespace WixToolset.Core.CommandLine
                         }
 
                         case "cc":
+                        case "cabcache":
                             this.CabCachePath = parser.GetNextArgumentOrError(arg);
                             return true;
 
@@ -617,7 +625,7 @@ namespace WixToolset.Core.CommandLine
                 }
                 else
                 {
-                    parser.GetArgumentAsFilePathOrError(arg, "input file", this.UnevaluatedInputFilePaths);
+                    parser.GetArgumentAsFilePathOrError(arg, "input file", this.UnclassifiedInputFilePaths);
                     return true;
                 }
             }
@@ -737,7 +745,7 @@ namespace WixToolset.Core.CommandLine
                 var outputPath = this.OutputFile;
                 var outputType = this.CalculateOutputType();
 
-                foreach (var path in this.UnevaluatedInputFilePaths)
+                foreach (var path in this.UnclassifiedInputFilePaths)
                 {
                     var extension = Path.GetExtension(path);
 

@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Inscribe;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class DetachSubcommand : BurnSubcommandBase
@@ -26,6 +27,15 @@ namespace WixToolset.Core.Burn.CommandLine
         private string IntermediateFolder { get; set; }
 
         private string EngineOutputPath { get; set; }
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Detaches the burn engine from a bundle so it can be signed.", "burn detach [options] original.exe -engine engine.exe", new[]
+            {
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-engine", "Path to extract bundle's engine file to."),
+            });
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {

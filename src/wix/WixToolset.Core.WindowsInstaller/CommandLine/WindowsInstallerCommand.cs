@@ -5,41 +5,50 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Windows Installer specialized command.
     /// </summary>
-    internal class WindowsInstallerCommand : ICommandLineCommand
+    internal class WindowsInstallerCommand : BaseCommandLineCommand
     {
         public WindowsInstallerCommand(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public bool ShowHelp { get; set; }
-
-        public bool ShowLogo { get; set; }
-
-        public bool StopParsing { get; set; }
-
         private IServiceProvider ServiceProvider { get; }
 
         private WindowsInstallerSubcommandBase Subcommand { get; set; }
 
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            if (this.ShowHelp || this.Subcommand is null)
+            return this.Subcommand?.GetCommandLineHelp() ?? new CommandLineHelp("Specialized operations for manipulating Windows Installer databases.", "msi decompile|inscribe|transform|validate")
             {
-                DisplayHelp();
+                Commands = new[]
+                {
+                    new CommandLineHelpCommand("decompile", "Converts a Windows Installer database back into source code."),
+                    new CommandLineHelpCommand("inscribe", "Updates MSI database with cabinet signature information."),
+                    new CommandLineHelpCommand("transform", "Creates an MST transform file."),
+                    new CommandLineHelpCommand("validate", "Validates MSI database using standard or custom ICEs."),
+                }
+            };
+        }
+
+        public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            if (this.Subcommand is null)
+            {
+                Console.Error.WriteLine("A subcommand is required for the \"msi\" command. Add -h to for help.");
                 return Task.FromResult(1);
             }
 
             return this.Subcommand.ExecuteAsync(cancellationToken);
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        public override bool TryParseArgument(ICommandLineParser parser, string argument)
         {
             if (this.Subcommand is null)
             {
@@ -66,22 +75,6 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             }
 
             return this.Subcommand.TryParseArgument(parser, argument);
-        }
-
-        private static void DisplayHelp()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Usage: wix msi inscribe input.msi [-intermedidateFolder folder] [-out output.msi]");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  -h|--help         Show command line help.");
-            Console.WriteLine("  --nologo          Suppress displaying the logo information.");
-            Console.WriteLine();
-            Console.WriteLine("Commands:");
-            Console.WriteLine();
-            Console.WriteLine("  inscribe          Updates MSI database with cabinet signature information.");
-            Console.WriteLine("  transform         Creates an MST transform file.");
-            Console.WriteLine("  validate          Validates MSI database using standard or custom ICEs.");
         }
     }
 }

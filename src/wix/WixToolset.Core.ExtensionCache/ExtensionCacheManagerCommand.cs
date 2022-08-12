@@ -7,13 +7,14 @@ namespace WixToolset.Core.ExtensionCache
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Extension cache manager command.
     /// </summary>
-    internal class ExtensionCacheManagerCommand : ICommandLineCommand
+    internal class ExtensionCacheManagerCommand : BaseCommandLineCommand
     {
         private enum CacheSubcommand
         {
@@ -29,12 +30,6 @@ namespace WixToolset.Core.ExtensionCache
             this.ExtensionReferences = new List<string>();
         }
 
-        public bool ShowHelp { get; set; }
-
-        public bool ShowLogo { get; set; }
-
-        public bool StopParsing { get; set; }
-
         private IMessaging Messaging { get; }
 
         private IExtensionManager ExtensionManager { get; }
@@ -45,12 +40,30 @@ namespace WixToolset.Core.ExtensionCache
 
         private List<string> ExtensionReferences { get; }
 
-        public async Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            if (this.ShowHelp || !this.Subcommand.HasValue)
+            return new CommandLineHelp("Manage the extension cache.", "extension add|remove|list [options] [extensionRef]")
             {
-                DisplayHelp();
-                return 1;
+                Switches = new[]
+                {
+                    new CommandLineHelpSwitch("--global", "-g", "Add/remove the extension for the current user."),
+                },
+                Commands = new[]
+                {
+                    new CommandLineHelpCommand("add", "Add extension to the cache."),
+                    new CommandLineHelpCommand("list", "List extensions in the cache."),
+                    new CommandLineHelpCommand("remove", "Remove extension from the cache."),
+                },
+                Notes = "  extensionRef format: extensionId/version (the version is optional)"
+            };
+        }
+
+        public override async Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            if (!this.Subcommand.HasValue)
+            {
+                Console.Error.WriteLine("A subcommand is required for the \"extension\" command. Use -h to for help.");
+                return -1;
             }
 
             var success = false;
@@ -74,7 +87,7 @@ namespace WixToolset.Core.ExtensionCache
             return success ? 0 : 2;
         }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        public override bool TryParseArgument(ICommandLineParser parser, string argument)
         {
             if (!parser.IsSwitch(argument))
             {
@@ -98,19 +111,6 @@ namespace WixToolset.Core.ExtensionCache
             var parameter = argument.Substring(1);
             switch (parameter.ToLowerInvariant())
             {
-                case "?":
-                case "h":
-                case "-help":
-                    this.ShowHelp = true;
-                    this.ShowLogo = true;
-                    this.StopParsing = true;
-                    return true;
-
-                case "nologo":
-                case "-nologo":
-                    this.ShowLogo = false;
-                    return true;
-
                 case "g":
                 case "-global":
                     this.Global = true;
@@ -160,25 +160,6 @@ namespace WixToolset.Core.ExtensionCache
             }
 
             return found;
-        }
-
-        private static void DisplayHelp()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Usage: wix extension add|remove|list [extensionRef]");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  -h|--help         Show command line help.");
-            Console.WriteLine("  -g|--global       Add/remove the extension for the current user.");
-            Console.WriteLine("  --nologo          Suppress displaying the logo information.");
-            Console.WriteLine();
-            Console.WriteLine("Commands:");
-            Console.WriteLine();
-            Console.WriteLine("  add               Add extension to the cache.");
-            Console.WriteLine("  list              List extensions in the cache.");
-            Console.WriteLine("  remove            Remove extension from the cache.");
-            Console.WriteLine();
-            Console.WriteLine("  extensionRef format: extensionId/version (the version is optional)");
         }
     }
 }

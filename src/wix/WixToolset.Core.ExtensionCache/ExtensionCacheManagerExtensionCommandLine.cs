@@ -3,7 +3,6 @@
 namespace WixToolset.Core.ExtensionCache
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -21,10 +20,13 @@ namespace WixToolset.Core.ExtensionCache
 
         private IServiceProvider ServiceProvider { get; }
 
-        public override IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        public override CommandLineHelp GetCommandLineHelp()
         {
-            new ExtensionCommandLineSwitch { Switch = "extension", Description = "Manage extension cache." },
-        };
+            return new CommandLineHelp("Manage the extension cache.")
+            {
+                Commands = new[] { new CommandLineHelpCommand("extension", "Manage extension cache.") }
+            };
+        }
 
         public override bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {

@@ -7,6 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.WindowsInstaller.Inscribe;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class InscribeSubcommand : WindowsInstallerSubcommandBase
@@ -26,6 +27,15 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         private string IntermediateFolder { get; set; }
 
         private string OutputPath { get; set; }
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Updates MSI database with cabinet signature information.", "msi inscribe [options] input.msi [-out inscribed.msi]", new[]
+            {
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-out", "-o", "Path to output the inscribed MSI. If not provided, the input MSI is updated in place."),
+            });
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {

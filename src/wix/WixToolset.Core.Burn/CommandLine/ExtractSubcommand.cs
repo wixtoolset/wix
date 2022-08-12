@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Bundles;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class ExtractSubcommand : BurnSubcommandBase
@@ -26,6 +27,15 @@ namespace WixToolset.Core.Burn.CommandLine
         private string IntermediateFolder { get; set; }
 
         private string ExtractPath { get; set; }
+
+        public override CommandLineHelp GetCommandLineHelp()
+        {
+            return new CommandLineHelp("Extracts the internals of a bundle to a folder.", "burn extract [options] bundle.exe -o outputfolder ", new[]
+            {
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-out", "-o", "Folder to extract the bundle contents to."),
+            });
+        }
 
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -77,6 +87,7 @@ namespace WixToolset.Core.Burn.CommandLine
                         return true;
 
                     case "o":
+                    case "out":
                         this.ExtractPath = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
                 }

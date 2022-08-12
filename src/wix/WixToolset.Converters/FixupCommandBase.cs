@@ -6,15 +6,17 @@ namespace WixToolset.Converters
     using System.Collections.Generic;
     using System.IO;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Xml;
-    using WixToolset.Extensibility.Data;
+    using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    internal abstract class FixupCommandBase : ICommandLineCommand
+    internal abstract class FixupCommandBase : BaseCommandLineCommand
     {
-        protected FixupCommandBase()
+        protected FixupCommandBase(IServiceProvider serviceProvider)
         {
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+
             this.IndentationAmount = 4; // default indentation amount
             this.ErrorsAsWarnings = new HashSet<string>();
             this.ExemptFiles = new HashSet<string>();
@@ -23,11 +25,7 @@ namespace WixToolset.Converters
             this.SearchPatterns = new List<string>();
         }
 
-        public bool ShowHelp { get; set; }
-
-        public bool ShowLogo { get; set; }
-
-        public bool StopParsing { get; set; }
+        protected IMessaging Messaging { get; }
 
         protected CustomTableTarget CustomTableSetting { get; set; }
 
@@ -43,15 +41,15 @@ namespace WixToolset.Converters
 
         protected bool Recurse { get; set; }
 
-        private HashSet<string> SearchPatternResults { get; } 
+        private HashSet<string> SearchPatternResults { get; }
 
-        private List<string> SearchPatterns { get; } 
+        private List<string> SearchPatterns { get; }
 
         private string SettingsFile1 { get; set; }
 
         private string SettingsFile2 { get; set; }
 
-        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        public override bool TryParseArgument(ICommandLineParser parser, string argument)
         {
             if (!parser.IsSwitch(argument))
             {
@@ -62,14 +60,6 @@ namespace WixToolset.Converters
             var parameter = argument.Substring(1);
             switch (parameter.ToLowerInvariant())
             {
-                case "?":
-                case "h":
-                case "-help":
-                    this.ShowHelp = true;
-                    this.ShowLogo = true;
-                    this.StopParsing = true;
-                    return true;
-
                 case "-custom-table":
                     var customTableSetting = parser.GetNextArgumentOrError(argument);
                     switch (customTableSetting)
@@ -89,11 +79,6 @@ namespace WixToolset.Converters
                 case "n":
                 case "-dry-run":
                     this.DryRun = true;
-                    return true;
-
-                case "nologo":
-                case "-nologo":
-                    this.ShowLogo = false;
                     return true;
 
                 case "s":
@@ -131,8 +116,6 @@ namespace WixToolset.Converters
             }
         }
 
-        public abstract Task<int> ExecuteAsync(CancellationToken cancellationToken);
-
         protected void ParseSettings(string defaultSettingsFile)
         {
             // parse the settings if any were specified
@@ -157,7 +140,7 @@ namespace WixToolset.Converters
             {
                 if (!this.SearchPatternResults.Contains(searchPattern))
                 {
-                    Console.Error.WriteLine("Could not find file \"{0}\"", searchPattern);
+                    this.Messaging.Write(ErrorMessages.FileNotFound(null, searchPattern));
                     errors++;
                 }
             }

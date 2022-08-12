@@ -2,7 +2,6 @@
 
 namespace WixToolset.Extensibility
 {
-    using System.Collections.Generic;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -12,10 +11,9 @@ namespace WixToolset.Extensibility
     public interface IExtensionCommandLine
     {
         /// <summary>
-        /// Gets the supported command line types for this extension.
+        /// Gets the help for this extension.
         /// </summary>
-        /// <value>The supported command line types for this extension.</value>
-        IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches { get; }
+        CommandLineHelp GetCommandLineHelp();
 
         /// <summary>
         /// Called before the command-line is parsed.

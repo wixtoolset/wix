@@ -4,10 +4,13 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal abstract class WindowsInstallerSubcommandBase
     {
+        public abstract CommandLineHelp GetCommandLineHelp();
+
         public abstract bool TryParseArgument(ICommandLineParser parser, string argument);
 
         public abstract Task<int> ExecuteAsync(CancellationToken cancellationToken);
