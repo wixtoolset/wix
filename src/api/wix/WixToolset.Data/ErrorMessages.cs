@@ -10,12 +10,12 @@ namespace WixToolset.Data
     {
         public static Message ActionCircularDependency(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName1, string actionName2)
         {
-            return Message(sourceLineNumbers, Ids.ActionCircularDependency, "The {0} table contains an action '{1}' that is scheduled to come before or after action '{2}', which is also scheduled to come before or after action '{1}'.  Please remove this circular dependency by changing the Before or After attribute for one of the actions.", sequenceTableName, actionName1, actionName2);
+            return Message(sourceLineNumbers, Ids.ActionCircularDependency, "The {0} table contains an action '{1}' that is scheduled to come before or after action '{2}', which is also scheduled to come before or after action '{1}'. Please remove this circular dependency by changing the Before or After attribute for one of the actions.", sequenceTableName, actionName1, actionName2);
         }
 
         public static Message ActionCollision(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.ActionCollision, "The {0} table contains an action '{1}' that is declared in two different locations.  Please remove one of the actions or set the Overridable='yes' attribute on one of their elements.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.ActionCollision, "The {0} table contains an action '{1}' that is declared in two different locations. Please remove one of the actions or set the Overridable='yes' attribute on one of their elements.", sequenceTableName, actionName);
         }
 
         public static Message ActionCollision2(SourceLineNumber sourceLineNumbers)
@@ -25,12 +25,12 @@ namespace WixToolset.Data
 
         public static Message ActionScheduledRelativeToItself(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeValue)
         {
-            return Message(sourceLineNumbers, Ids.ActionScheduledRelativeToItself, "The {0}/@{1} attribute's value '{2}' is invalid because it would make this action dependent upon itself.  Please change the value to the name of a different action.", elementName, attributeName, attributeValue);
+            return Message(sourceLineNumbers, Ids.ActionScheduledRelativeToItself, "The {0}/@{1} attribute's value '{2}' is invalid because it would make this action dependent upon itself. Please change the value to the name of a different action.", elementName, attributeName, attributeValue);
         }
 
         public static Message ActionScheduledRelativeToTerminationAction(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName1, string actionName2)
         {
-            return Message(sourceLineNumbers, Ids.ActionScheduledRelativeToTerminationAction, "The {0} table contains an action '{1}' that is scheduled to come before or after action '{2}', which is a special action which only occurs when the installer terminates.  These special actions can be identified by their negative sequence numbers.  Please schedule the action '{1}' to come before or after a different action.", sequenceTableName, actionName1, actionName2);
+            return Message(sourceLineNumbers, Ids.ActionScheduledRelativeToTerminationAction, "The {0} table contains an action '{1}' that is scheduled to come before or after action '{2}', which is a special action which only occurs when the installer terminates. These special actions can be identified by their negative sequence numbers. Please schedule the action '{1}' to come before or after a different action.", sequenceTableName, actionName1, actionName2);
         }
 
         public static Message ActionScheduledRelativeToTerminationAction2(SourceLineNumber sourceLineNumbers)
@@ -40,7 +40,7 @@ namespace WixToolset.Data
 
         public static Message AdditionalArgumentUnexpected(string argument)
         {
-            return Message(null, Ids.AdditionalArgumentUnexpected, "Additional argument '{0}' was unexpected.  Remove the argument and add the '-?' switch for more information.", argument);
+            return Message(null, Ids.AdditionalArgumentUnexpected, "Additional argument '{0}' was unexpected. Remove the argument and add the '-?' switch for more information.", argument);
         }
 
         public static Message AdminImageRequired(string productCode)
@@ -55,7 +55,7 @@ namespace WixToolset.Data
 
         public static Message AppIdIncompatibleAdvertiseState(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string parentValue)
         {
-            return Message(sourceLineNumbers, Ids.AppIdIncompatibleAdvertiseState, "The {0}/@(1) attribute's value, '{2}' does not match the advertise state on its parent element: '{3}'.  (Note: AppIds nested under Fragment, Module, or Product elements must be advertised.)", elementName, attributeName, value, parentValue);
+            return Message(sourceLineNumbers, Ids.AppIdIncompatibleAdvertiseState, "The {0}/@(1) attribute's value, '{2}' does not match the advertise state on its parent element: '{3}'. (Note: AppIds nested under Fragment, Module, or Product elements must be advertised.)", elementName, attributeName, value, parentValue);
         }
 
         public static Message BaselineRequired()
@@ -78,34 +78,14 @@ namespace WixToolset.Data
             return Message(null, Ids.BundleTooNew, "Unable to read bundle executable '{0}', because this bundle was created with a newer version of WiX (bundle version '{1}'). You must use a newer version of WiX in order to read this bundle.", bundleExecutable, bundleVersion);
         }
 
-        public static Message CabClosureFailed(string cabinet)
-        {
-            return Message(null, Ids.CabClosureFailed, "Failed to close cab '{0}'.", cabinet);
-        }
-
-        public static Message CabClosureFailed(string cabinet, int error)
-        {
-            return Message(null, Ids.CabClosureFailed, "Failed to close cab '{0}', error: {1}.", cabinet, error);
-        }
-
-        public static Message CabCreationFailed(string cabName, string fileName, int error)
-        {
-            return Message(null, Ids.CabCreationFailed, "Failed to create cab '{0}' while compressing file '{1}' with error 0x{2:X8}.", cabName, fileName, error);
-        }
-
-        public static Message CabCreationFailed(string cabName, int error)
-        {
-            return Message(null, Ids.CabCreationFailed, "Failed to create cab '{0}' with error 0x{1:X8}.", cabName, error);
-        }
-
         public static Message CabExtractionFailed(string cabName, string directoryName)
         {
-            return Message(null, Ids.CabExtractionFailed, "Failed to extract cab '{0}' to directory '{1}'.  This is most likely due to a lack of available disk space on the destination drive.", cabName, directoryName);
+            return Message(null, Ids.CabExtractionFailed, "Failed to extract cab '{0}' to directory '{1}'. This is most likely due to a lack of available disk space on the destination drive.", cabName, directoryName);
         }
 
         public static Message CabExtractionFailed(string cabName, string mergeModulePath, string directoryName)
         {
-            return Message(null, Ids.CabExtractionFailed, "Failed to extract cab '{0}' from merge module '{1}' to directory '{2}'.  This is most likely due to a lack of available disk space on the destination drive.", cabName, mergeModulePath, directoryName);
+            return Message(null, Ids.CabExtractionFailed, "Failed to extract cab '{0}' from merge module '{1}' to directory '{2}'. This is most likely due to a lack of available disk space on the destination drive.", cabName, mergeModulePath, directoryName);
         }
 
         public static Message CabFileDoesNotExist(string cabName, string mergeModulePath, string directoryName)
@@ -115,7 +95,7 @@ namespace WixToolset.Data
 
         public static Message CannotAuthorSpecialProperties(SourceLineNumber sourceLineNumbers, string propertyName)
         {
-            return Message(sourceLineNumbers, Ids.CannotAuthorSpecialProperties, "The {0} property was specified. Special MSI properties cannot be authored.  Use the attributes on the Property element instead.", propertyName);
+            return Message(sourceLineNumbers, Ids.CannotAuthorSpecialProperties, "The {0} property was specified. Special MSI properties cannot be authored. Use the attributes on the Property element instead.", propertyName);
         }
 
         public static Message CannotDefaultComponentId(SourceLineNumber sourceLineNumbers)
@@ -125,7 +105,7 @@ namespace WixToolset.Data
 
         public static Message CannotDefaultMismatchedAdvertiseStates(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.CannotDefaultMismatchedAdvertiseStates, "MIME element cannot be marked as the default when its advertise state differs from its parent element.  Ensure that the advertise state of the MIME element matches its parents element or remove the Mime/@Advertise attribute completely.");
+            return Message(sourceLineNumbers, Ids.CannotDefaultMismatchedAdvertiseStates, "MIME element cannot be marked as the default when its advertise state differs from its parent element. Ensure that the advertise state of the MIME element matches its parents element or remove the Mime/@Advertise attribute completely.");
         }
 
         public static Message CannotFindFile(SourceLineNumber sourceLineNumbers, string fileId, string fileName, string filePath)
@@ -136,16 +116,6 @@ namespace WixToolset.Data
         public static Message CanNotHaveTwoParents(SourceLineNumber sourceLineNumbers, string directorySearch, string parentAttribute, string parentElement)
         {
             return Message(sourceLineNumbers, Ids.CanNotHaveTwoParents, "The DirectorySearchRef {0} can not have a Parent attribute {1} and also be nested under parent element {2}", directorySearch, parentAttribute, parentElement);
-        }
-
-        public static Message CannotLoadBinderFileManager(string binderFileManager, string currentBinderFileManager)
-        {
-            return Message(null, Ids.CannotLoadBinderFileManager, "Cannot load binder file manager: {0}. Light can only load one binder file manager and has already loaded binder file manager: {1}.", binderFileManager, currentBinderFileManager);
-        }
-
-        public static Message CannotLoadLinkerExtension(string linkerExtension, string currentLinkerExtension)
-        {
-            return Message(null, Ids.CannotLoadLinkerExtension, "Cannot load linker extension: {0}. Light can only load one link extension and has already loaded link extension: {1}.", linkerExtension, currentLinkerExtension);
         }
 
         public static Message CannotOpenMergeModule(SourceLineNumber sourceLineNumbers, string mergeModuleIdentifier, string mergeModuleFile)
@@ -168,14 +138,24 @@ namespace WixToolset.Data
             return Message(null, Ids.CircularSearchReference, "A circular reference of search ordering constraints was detected: {0}. Search ordering references must form a directed acyclic graph.", chain);
         }
 
+        public static Message CommandLineCommandRequired()
+        {
+            return Message(null, Ids.CommandLineCommandRequired, "A command is required. Add -h for list of available subcommands.");
+        }
+
+        public static Message CommandLineCommandRequired(string command)
+        {
+            return Message(null, Ids.CommandLineCommandRequired, "A subcommand is required for the \"{0}\" command. Add -h for list of available commands.", command);
+        }
+
         public static Message ComponentExpectedFeature(SourceLineNumber sourceLineNumbers, string component, string type, string target)
         {
-            return Message(sourceLineNumbers, Ids.ComponentExpectedFeature, "The component '{0}' is not assigned to a feature.  The component's {1} '{2}' requires it to be assigned to at least one feature.", component, type, target);
+            return Message(sourceLineNumbers, Ids.ComponentExpectedFeature, "The component '{0}' is not assigned to a feature. The component's {1} '{2}' requires it to be assigned to at least one feature.", component, type, target);
         }
 
         public static Message ComponentMultipleKeyPaths(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string fileElementName, string registryElementName, string odbcDataSourceElementName)
         {
-            return Message(sourceLineNumbers, Ids.ComponentMultipleKeyPaths, "The {0} element has multiple key paths set.  The key path may only be set to '{2}' in extension elements that support it or one of the following locations: {0}/@{1}, {3}/@{1}, {4}/@{1}, or {5}/@{1}.", elementName, attributeName, value, fileElementName, registryElementName, odbcDataSourceElementName);
+            return Message(sourceLineNumbers, Ids.ComponentMultipleKeyPaths, "The {0} element has multiple key paths set. The key path may only be set to '{2}' in extension elements that support it or one of the following locations: {0}/@{1}, {3}/@{1}, {4}/@{1}, or {5}/@{1}.", elementName, attributeName, value, fileElementName, registryElementName, odbcDataSourceElementName);
         }
 
         public static Message ComponentReferencedTwice(SourceLineNumber sourceLineNumbers, string crefChildId)
@@ -185,7 +165,7 @@ namespace WixToolset.Data
 
         public static Message ConditionExpected(SourceLineNumber sourceLineNumbers, string elementName)
         {
-            return Message(sourceLineNumbers, Ids.ConditionExpected, "The {0} element's inner text cannot be an empty string or completely whitespace.  If you don't want a condition, then simply remove the entire {0} element.", elementName);
+            return Message(sourceLineNumbers, Ids.ConditionExpected, "The {0} element's inner text cannot be an empty string or completely whitespace. If you don't want a condition, then simply remove the entire {0} element.", elementName);
         }
 
         public static Message CorruptFileFormat(string path, string format)
@@ -210,42 +190,37 @@ namespace WixToolset.Data
 
         public static Message CubeFileNotFound(string cubeFile)
         {
-            return Message(null, Ids.CubeFileNotFound, "The cube file '{0}' cannot be found.  This file is required for MSI validation.", cubeFile);
-        }
-
-        public static Message CustomActionIllegalInnerText(SourceLineNumber sourceLineNumbers, string elementName, string innerText, string attributeName)
-        {
-            return Message(sourceLineNumbers, Ids.CustomActionIllegalInnerText, "The {0} element contains illegal inner text: '{1}'.  It may not contain inner text unless the {2} attribute is specified.", elementName, innerText, attributeName);
+            return Message(null, Ids.CubeFileNotFound, "The cube file '{0}' cannot be found. This file is required for MSI validation.", cubeFile);
         }
 
         public static Message CustomActionMultipleSources(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeName1, string attributeName2, string attributeName3, string attributeName4, string attributeName5)
         {
-            return Message(sourceLineNumbers, Ids.CustomActionMultipleSources, "The {0}/@{1} attribute cannot coexist with a previously specified attribute on this element.  The {0} element may only have one of the following source attributes specified at a time: {2}, {3}, {4}, {5}, or {6}.", elementName, attributeName, attributeName1, attributeName2, attributeName3, attributeName4, attributeName5);
+            return Message(sourceLineNumbers, Ids.CustomActionMultipleSources, "The {0}/@{1} attribute cannot coexist with a previously specified attribute on this element. The {0} element may only have one of the following source attributes specified at a time: {2}, {3}, {4}, {5}, or {6}.", elementName, attributeName, attributeName1, attributeName2, attributeName3, attributeName4, attributeName5);
         }
 
         public static Message CustomActionMultipleTargets(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeName1, string attributeName2, string attributeName3, string attributeName4, string attributeName5, string attributeName6, string attributeName7)
         {
-            return Message(sourceLineNumbers, Ids.CustomActionMultipleTargets, "The {0}/@{1} attribute cannot coexist with a previously specified attribute on this element.  The {0} element may only have one of the following target attributes specified at a time: {2}, {3}, {4}, {5}, {6}, {7}, or {8}.", elementName, attributeName, attributeName1, attributeName2, attributeName3, attributeName4, attributeName5, attributeName6, attributeName7);
+            return Message(sourceLineNumbers, Ids.CustomActionMultipleTargets, "The {0}/@{1} attribute cannot coexist with a previously specified attribute on this element. The {0} element may only have one of the following target attributes specified at a time: {2}, {3}, {4}, {5}, {6}, {7}, or {8}.", elementName, attributeName, attributeName1, attributeName2, attributeName3, attributeName4, attributeName5, attributeName6, attributeName7);
         }
 
         public static Message CustomActionSequencedInModule(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.CustomActionSequencedInModule, "The {0} table contains a custom action '{1}' that has a sequence number specified.  The Sequence attribute is not allowed for custom actions in a merge module.  Please remove the action or use the Before or After attributes to specify where this action should be sequenced relative to another action.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.CustomActionSequencedInModule, "The {0} table contains a custom action '{1}' that has a sequence number specified. The Sequence attribute is not allowed for custom actions in a merge module. Please remove the action or use the Before or After attributes to specify where this action should be sequenced relative to another action.", sequenceTableName, actionName);
         }
 
         public static Message CustomTableIllegalColumnWidth(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, int value)
         {
-            return Message(sourceLineNumbers, Ids.CustomTableIllegalColumnWidth, "The {0}/@{1} attribute's value, '{2}', is not a valid column width.  Valid column widths are 2 or 4.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.CustomTableIllegalColumnWidth, "The {0}/@{1} attribute's value, '{2}', is not a valid column width. Valid column widths are 2 or 4.", elementName, attributeName, value);
         }
 
         public static Message CustomTableMissingPrimaryKey(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.CustomTableMissingPrimaryKey, "The CustomTable is missing a Column element with the PrimaryKey attribute set to 'yes'.  At least one column must be marked as the primary key.");
+            return Message(sourceLineNumbers, Ids.CustomTableMissingPrimaryKey, "The CustomTable is missing a Column element with the PrimaryKey attribute set to 'yes'. At least one column must be marked as the primary key.");
         }
 
         public static Message CustomTableNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.CustomTableNameTooLong, "The {0}/@{1} attribute's value, '{2}', is too long for a table name.  It cannot be more than than 31 characters long.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.CustomTableNameTooLong, "The {0}/@{1} attribute's value, '{2}', is too long for a table name. It cannot be more than than 31 characters long.", elementName, attributeName, value);
         }
 
         public static Message DatabaseSchemaMismatch(SourceLineNumber sourceLineNumbers, string tableName)
@@ -300,17 +275,17 @@ namespace WixToolset.Data
 
         public static Message DuplicateExtensionPreprocessorType(string extension, string variablePrefix, string collidingExtension)
         {
-            return Message(null, Ids.DuplicateExtensionPreprocessorType, "The extension '{0}' uses the same preprocessor variable prefix, '{1}', as previously loaded extension '{2}'.  Please remove one of the extensions or rename the prefix to avoid the collision.", extension, variablePrefix, collidingExtension);
+            return Message(null, Ids.DuplicateExtensionPreprocessorType, "The extension '{0}' uses the same preprocessor variable prefix, '{1}', as previously loaded extension '{2}'. Please remove one of the extensions or rename the prefix to avoid the collision.", extension, variablePrefix, collidingExtension);
         }
 
         public static Message DuplicateExtensionTable(string extension, string tableName)
         {
-            return Message(null, Ids.DuplicateExtensionTable, "The extension '{0}' contains a definition for table '{1}' that collides with a previously loaded table definition.  Please remove one of the conflicting extensions or rename one of the tables to avoid the collision.", extension, tableName);
+            return Message(null, Ids.DuplicateExtensionTable, "The extension '{0}' contains a definition for table '{1}' that collides with a previously loaded table definition. Please remove one of the conflicting extensions or rename one of the tables to avoid the collision.", extension, tableName);
         }
 
         public static Message DuplicateExtensionXmlSchemaNamespace(string extension, string extensionXmlSchemaNamespace, string collidingExtension)
         {
-            return Message(null, Ids.DuplicateExtensionXmlSchemaNamespace, "The extension '{0}' uses the same xml schema namespace, '{1}', as previously loaded extension '{2}'.  Please either remove one of the extensions or rename the xml schema namespace to avoid the collision.", extension, extensionXmlSchemaNamespace, collidingExtension);
+            return Message(null, Ids.DuplicateExtensionXmlSchemaNamespace, "The extension '{0}' uses the same xml schema namespace, '{1}', as previously loaded extension '{2}'. Please either remove one of the extensions or rename the xml schema namespace to avoid the collision.", extension, extensionXmlSchemaNamespace, collidingExtension);
         }
 
         public static Message DuplicateFileId(string fileId)
@@ -320,22 +295,22 @@ namespace WixToolset.Data
 
         public static Message DuplicateLocalizationIdentifier(SourceLineNumber sourceLineNumbers, string localizationId)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateLocalizationIdentifier, "The localization identifier '{0}' has been duplicated in multiple locations.  Please resolve the conflict.", localizationId);
+            return Message(sourceLineNumbers, Ids.DuplicateLocalizationIdentifier, "The localization identifier '{0}' has been duplicated in multiple locations. Please resolve the conflict.", localizationId);
         }
 
         public static Message DuplicateModuleCaseInsensitiveFileIdentifier(SourceLineNumber sourceLineNumbers, string moduleId, string fileId1, string fileId2)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateModuleCaseInsensitiveFileIdentifier, "The merge module '{0}' contains 2 or more file identifiers that only differ by case: '{1}' and '{2}'.  The WiX toolset extracts merge module files to the file system using these identifiers.  Since most file systems are not case-sensitive a collision is likely.  Please contact the owner of the merge module for a fix.", moduleId, fileId1, fileId2);
+            return Message(sourceLineNumbers, Ids.DuplicateModuleCaseInsensitiveFileIdentifier, "The merge module '{0}' contains 2 or more file identifiers that only differ by case: '{1}' and '{2}'. The WiX toolset extracts merge module files to the file system using these identifiers. Since most file systems are not case-sensitive a collision is likely. Please contact the owner of the merge module for a fix.", moduleId, fileId1, fileId2);
         }
 
         public static Message DuplicateModuleFileIdentifier(SourceLineNumber sourceLineNumbers, string moduleId, string fileId)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateModuleFileIdentifier, "The merge module '{0}' contains a file identifier, '{1}', that is duplicated either in another merge module or in a File/@Id attribute.  File identifiers must be unique.  Please change one of the file identifiers to a different value.", moduleId, fileId);
+            return Message(sourceLineNumbers, Ids.DuplicateModuleFileIdentifier, "The merge module '{0}' contains a file identifier, '{1}', that is duplicated either in another merge module or in a File/@Id attribute. File identifiers must be unique. Please change one of the file identifiers to a different value.", moduleId, fileId);
         }
 
         public static Message DuplicatePrimaryKey(SourceLineNumber sourceLineNumbers, string primaryKey, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.DuplicatePrimaryKey, "The primary key '{0}' is duplicated in table '{1}'.  Please remove one of the entries or rename a part of the primary key to avoid the collision.", primaryKey, tableName);
+            return Message(sourceLineNumbers, Ids.DuplicatePrimaryKey, "The primary key '{0}' is duplicated in table '{1}'. Please remove one of the entries or rename a part of the primary key to avoid the collision.", primaryKey, tableName);
         }
 
         public static Message DuplicateProviderDependencyKey(string providerKey, string packageId)
@@ -345,7 +320,7 @@ namespace WixToolset.Data
 
         public static Message DuplicateSourcesForOutput(string sourceList, string outputFile)
         {
-            return Message(null, Ids.DuplicateSourcesForOutput, "Multiple source files ({0}) have resulted in the same output file '{1}'.  This is likely because the source files only differ in extension or path.  Rename the source files to avoid this problem.", sourceList, outputFile);
+            return Message(null, Ids.DuplicateSourcesForOutput, "Multiple source files ({0}) have resulted in the same output file '{1}'. This is likely because the source files only differ in extension or path. Rename the source files to avoid this problem.", sourceList, outputFile);
         }
 
         public static Message DuplicateSymbol(SourceLineNumber sourceLineNumbers, string symbolName)
@@ -375,7 +350,7 @@ namespace WixToolset.Data
 
         public static Message ExampleGuid(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.ExampleGuid, "The {0}/@{1} attribute's value, '{2}', is not a legal Guid value.  A Guid needs to be generated and put in place of '{2}' in the source file.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.ExampleGuid, "The {0}/@{1} attribute's value, '{2}', is not a legal Guid value. A Guid needs to be generated and put in place of '{2}' in the source file.", elementName, attributeName, value);
         }
 
         public static Message ExpectedArgument(string argument)
@@ -515,7 +490,7 @@ namespace WixToolset.Data
 
         public static Message ExpectedBinaryCategory(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.ExpectedBinaryCategory, "The Column element specifies a binary column but does not have the correct Category specified.  Windows Installer requires binary columns to specify their category as binary.  Please set the Category attribute's value to 'Binary'.");
+            return Message(sourceLineNumbers, Ids.ExpectedBinaryCategory, "The Column element specifies a binary column but does not have the correct Category specified. Windows Installer requires binary columns to specify their category as binary. Please set the Category attribute's value to 'Binary'.");
         }
 
         public static Message ExpectedClientPatchIdInWixMsp()
@@ -585,7 +560,7 @@ namespace WixToolset.Data
 
         public static Message ExpectedMediaCabinet(SourceLineNumber sourceLineNumbers, string fileId, int diskId)
         {
-            return Message(sourceLineNumbers, Ids.ExpectedMediaCabinet, "The file '{0}' should be compressed but is not part of a compressed media. Files will be compressed if either the File/@Compressed or Package/@Compressed attributes are set to 'yes'.  This can be fixed by setting the Media/@Cabinet attribute for media '{1}'.", fileId, diskId);
+            return Message(sourceLineNumbers, Ids.ExpectedMediaCabinet, "The file '{0}' should be compressed but is not part of a compressed media. Files will be compressed if either the File/@Compressed or Package/@Compressed attributes are set to 'yes'. This can be fixed by setting the Media/@Cabinet attribute for media '{1}'.", fileId, diskId);
         }
 
         public static Message ExpectedMediaRowsInWixMsp()
@@ -605,12 +580,12 @@ namespace WixToolset.Data
 
         public static Message ExpectedRowInPatchCreationPackage(string tableName)
         {
-            return Message(null, Ids.ExpectedRowInPatchCreationPackage, "Could not find a row in the '{0}' table for this patch creation package.  Patch creation packages must contain at least one row in the '{0}' table.", tableName);
+            return Message(null, Ids.ExpectedRowInPatchCreationPackage, "Could not find a row in the '{0}' table for this patch creation package. Patch creation packages must contain at least one row in the '{0}' table.", tableName);
         }
 
         public static Message ExpectedSignedCabinetName(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.ExpectedSignedCabinetName, "The Media/@Cabinet attribute was not found; it is required when this element contains a DigitalSignature child element.  This is because Windows Installer can only verify the digital signatures of external cabinets.  Please either remove the DigitalSignature element or specify a valid external cabinet name via the Cabinet attribute.");
+            return Message(sourceLineNumbers, Ids.ExpectedSignedCabinetName, "The Media/@Cabinet attribute was not found; it is required when this element contains a DigitalSignature child element. This is because Windows Installer can only verify the digital signatures of external cabinets. Please either remove the DigitalSignature element or specify a valid external cabinet name via the Cabinet attribute.");
         }
 
         public static Message ExpectedTableInMergeModule(string identifier)
@@ -625,32 +600,32 @@ namespace WixToolset.Data
 
         public static Message ExpectedWixVariableValue(string variableId)
         {
-            return Message(null, Ids.ExpectedWixVariableValue, "The WiX variable '{0}' was declared without a value.  Please specify a value for the variable.", variableId);
+            return Message(null, Ids.ExpectedWixVariableValue, "The WiX variable '{0}' was declared without a value. Please specify a value for the variable.", variableId);
         }
 
         public static Message FamilyNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, int length)
         {
-            return Message(sourceLineNumbers, Ids.FamilyNameTooLong, "The {0}/@{1} attribute's value, '{2}', is {3} characters long.  This is too long for a family name because the maximum allowed length is 8 characters long.", elementName, attributeName, value, length);
+            return Message(sourceLineNumbers, Ids.FamilyNameTooLong, "The {0}/@{1} attribute's value, '{2}', is {3} characters long. This is too long for a family name because the maximum allowed length is 8 characters long.", elementName, attributeName, value, length);
         }
 
         public static Message FeatureCannotFavorAndDisallowAdvertise(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string otherAttributeName, string otherValue)
         {
-            return Message(sourceLineNumbers, Ids.FeatureCannotFavorAndDisallowAdvertise, "The {0}/@{1} attribute's value, '{2}', cannot coexist with the {3} attribute's value of '{4}'.  These options would ask the installer to disallow the advertised state for this feature while at the same time favoring it.", elementName, attributeName, value, otherAttributeName, otherValue);
+            return Message(sourceLineNumbers, Ids.FeatureCannotFavorAndDisallowAdvertise, "The {0}/@{1} attribute's value, '{2}', cannot coexist with the {3} attribute's value of '{4}'. These options would ask the installer to disallow the advertised state for this feature while at the same time favoring it.", elementName, attributeName, value, otherAttributeName, otherValue);
         }
 
         public static Message FeatureCannotFollowParentAndFavorLocalOrSource(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName, string otherValue)
         {
-            return Message(sourceLineNumbers, Ids.FeatureCannotFollowParentAndFavorLocalOrSource, "The {0}/@{1} attribute cannot be specified if the {2} attribute's value is '{3}'.  These options would ask the installer to force this feature to follow the parent installation state and simultaneously favor a particular installation state just for this feature.", elementName, attributeName, otherAttributeName, otherValue);
+            return Message(sourceLineNumbers, Ids.FeatureCannotFollowParentAndFavorLocalOrSource, "The {0}/@{1} attribute cannot be specified if the {2} attribute's value is '{3}'. These options would ask the installer to force this feature to follow the parent installation state and simultaneously favor a particular installation state just for this feature.", elementName, attributeName, otherAttributeName, otherValue);
         }
 
         public static Message FeatureConfigurableDirectoryNotUppercase(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.FeatureConfigurableDirectoryNotUppercase, "The {0}/@{1} attribute's value, '{2}', contains lowercase characters.  Since this directory is user-configurable, it needs to be a public property.  This means the value must be completely uppercase.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.FeatureConfigurableDirectoryNotUppercase, "The {0}/@{1} attribute's value, '{2}', contains lowercase characters. Since this directory is user-configurable, it needs to be a public property. This means the value must be completely uppercase.", elementName, attributeName, value);
         }
 
         public static Message FeatureNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeValue)
         {
-            return Message(sourceLineNumbers, Ids.FeatureNameTooLong, "The {0}/@{1} attribute with value '{2}', is too long for a feature name.  Due to limitations in the Windows Installer, feature names cannot be longer than 38 characters in length.", elementName, attributeName, attributeValue);
+            return Message(sourceLineNumbers, Ids.FeatureNameTooLong, "The {0}/@{1} attribute with value '{2}', is too long for a feature name. Due to limitations in the Windows Installer, feature names cannot be longer than 38 characters in length.", elementName, attributeName, attributeValue);
         }
 
         public static Message FileIdentifierNotFound(SourceLineNumber sourceLineNumbers, string fileIdentifier)
@@ -681,12 +656,17 @@ namespace WixToolset.Data
 
         public static Message FileOrDirectoryPathRequired(string parameter)
         {
-            return Message(null, Ids.FileOrDirectoryPathRequired, "The parameter '{0}' must be followed by a file or directory path.  To specify a directory path the string must end with a backslash, for example: \"C:\\Path\\\".", parameter);
+            return Message(null, Ids.FileOrDirectoryPathRequired, "The parameter '{0}' must be followed by a file or directory path. To specify a directory path the string must end with a backslash, for example: \"C:\\Path\\\".", parameter);
         }
 
-        public static Message FilePathRequired(string parameter)
+        public static Message FilePathRequired(string filePurpose)
         {
-            return Message(null, Ids.FilePathRequired, "The parameter '{0}' must be followed by a file path.", parameter);
+            return Message(null, Ids.FilePathRequired, "The path to {0} is required.", filePurpose);
+        }
+
+        public static Message FilePathRequired(string parameter, string filePurpose)
+        {
+            return Message(null, Ids.FilePathRequired, "The parameter '{0}' must be followed by a file path for {1}.", parameter, filePurpose);
         }
 
         public static Message FileTooLarge(SourceLineNumber sourceLineNumbers, string fileName)
@@ -726,7 +706,7 @@ namespace WixToolset.Data
 
         public static Message GuidContainsLowercaseLetters(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.GuidContainsLowercaseLetters, "The {0}/@{1} attribute's value, '{2}', is a mixed-case guid.  All letters in a guid value should be uppercase.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.GuidContainsLowercaseLetters, "The {0}/@{1} attribute's value, '{2}', is a mixed-case guid. All letters in a guid value should be uppercase.", elementName, attributeName, value);
         }
 
         public static Message HarvestSourceNotSpecified()
@@ -751,7 +731,7 @@ namespace WixToolset.Data
 
         public static Message IdentifierTooLongError(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, int maxLength)
         {
-            return Message(sourceLineNumbers, Ids.IdentifierTooLongError, "The {0}/@{1} attribute's value, '{2}', is too long.  {0}/@{1} attribute's must be {3} characters long or less.", elementName, attributeName, value, maxLength);
+            return Message(sourceLineNumbers, Ids.IdentifierTooLongError, "The {0}/@{1} attribute's value, '{2}', is too long. {0}/@{1} attribute's must be {3} characters long or less.", elementName, attributeName, value, maxLength);
         }
 
         public static Message IllegalAttributeExceptOnElement(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string expectedElementName)
@@ -901,12 +881,13 @@ namespace WixToolset.Data
 
         public static Message IllegalColumnName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalColumnName, "The {0}/@{1} attribute's value, '{2}', is not a legal column name.  It will collide with the sentinel values used in the _TransformView table.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalColumnName, "The {0}/@{1} attribute's value, '{2}', is not a legal column name. It will collide with the sentinel values used in the _TransformView table.", elementName, attributeName, value);
         }
 
-        public static Message IllegalCommandlineArgumentCombination(string arg1, string arg2)
+        public static Message IllegalCommandLineArgumentValue(string arg, string value, IEnumerable<string> validValues)
         {
-            return Message(null, Ids.IllegalCommandlineArgumentCombination, "'-{0}' cannot be specfied in combination with '-{1}'.", arg1, arg2);
+            var combinedValidValues = String.Join(", ", validValues);
+            return Message(null, Ids.IllegalCommandLineArgumentValue, "The argument {0} value '{1}' is invalid. Use one of the following values {2}", arg, value, combinedValidValues);
         }
 
         public static Message IllegalComponentWithAutoGeneratedGuid(SourceLineNumber sourceLineNumbers)
@@ -926,7 +907,7 @@ namespace WixToolset.Data
 
         public static Message IllegalDefineStatement(SourceLineNumber sourceLineNumbers, string defineStatement)
         {
-            return Message(sourceLineNumbers, Ids.IllegalDefineStatement, "The define statement '<?define {0}?>' is not well-formed.  Define statements should be in the form <?define variableName = \"variable value\"?>.", defineStatement);
+            return Message(sourceLineNumbers, Ids.IllegalDefineStatement, "The define statement '<?define {0}?>' is not well-formed. Define statements should be in the form <?define variableName = \"variable value\"?>.", defineStatement);
         }
 
         public static Message IllegalEmptyAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
@@ -936,7 +917,7 @@ namespace WixToolset.Data
 
         public static Message IllegalEmptyAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string defaultValue)
         {
-            return Message(sourceLineNumbers, Ids.IllegalEmptyAttributeValue, "The {0}/@{1} attribute's value cannot be an empty string.  To use the default value \"{2}\", simply remove the entire attribute.", elementName, attributeName, defaultValue);
+            return Message(sourceLineNumbers, Ids.IllegalEmptyAttributeValue, "The {0}/@{1} attribute's value cannot be an empty string. To use the default value \"{2}\", simply remove the entire attribute.", elementName, attributeName, defaultValue);
         }
 
         public static Message IllegalEnvironmentVariable(string environmentVariable, string value)
@@ -946,7 +927,7 @@ namespace WixToolset.Data
 
         public static Message IllegalFamilyName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalFamilyName, "The {0}/@{1} attribute's value, '{2}', contains illegal characters for a family name.  Legal values include letters, numbers, and underscores.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalFamilyName, "The {0}/@{1} attribute's value, '{2}', contains illegal characters for a family name. Legal values include letters, numbers, and underscores.", elementName, attributeName, value);
         }
 
         public static Message IllegalFileCompressionAttributes(SourceLineNumber sourceLineNumbers)
@@ -956,7 +937,7 @@ namespace WixToolset.Data
 
         public static Message IllegalForeach(SourceLineNumber sourceLineNumbers, string foreachStatement)
         {
-            return Message(sourceLineNumbers, Ids.IllegalForeach, "The foreach statement '{0}' is illegal.  The proper format for foreach is <?foreach varName in valueList?>.", foreachStatement);
+            return Message(sourceLineNumbers, Ids.IllegalForeach, "The foreach statement '{0}' is illegal. The proper format for foreach is <?foreach varName in valueList?>.", foreachStatement);
         }
 
         public static Message IllegalGeneratedGuidComponentUnversionedKeypath(SourceLineNumber sourceLineNumbers)
@@ -1001,7 +982,7 @@ namespace WixToolset.Data
 
         public static Message IllegalInlineLocVariable(SourceLineNumber sourceLineNumbers, string variableName, string variableValue)
         {
-            return Message(sourceLineNumbers, Ids.IllegalInlineLocVariable, "The localization variable '{0}' specifies an illegal inline default value of '{1}'.  Localization variables cannot specify default values inline, instead the value should be specified in a WiX localization (.wxl) file.", variableName, variableValue);
+            return Message(sourceLineNumbers, Ids.IllegalInlineLocVariable, "The localization variable '{0}' specifies an illegal inline default value of '{1}'. Localization variables cannot specify default values inline, instead the value should be specified in a WiX localization (.wxl) file.", variableName, variableValue);
         }
 
         public static Message IllegalIntegerInExpression(SourceLineNumber sourceLineNumbers, string expression)
@@ -1011,7 +992,7 @@ namespace WixToolset.Data
 
         public static Message IllegalIntegerValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalIntegerValue, "The {0}/@{1} attribute's value, '{2}', is not a legal integer value.  Legal integer values are from -2,147,483,648 to 2,147,483,647.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalIntegerValue, "The {0}/@{1} attribute's value, '{2}', is not a legal integer value. Legal integer values are from -2,147,483,648 to 2,147,483,647.", elementName, attributeName, value);
         }
 
         public static Message IllegalLongFilename(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
@@ -1026,7 +1007,7 @@ namespace WixToolset.Data
 
         public static Message IllegalLongValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalLongValue, "The {0}/@{1} attribute's value, '{2}', is not a legal long value.  Legal long values are from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalLongValue, "The {0}/@{1} attribute's value, '{2}', is not a legal long value. Legal long values are from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", elementName, attributeName, value);
         }
 
         public static Message IllegalModuleExclusionLanguageAttributes(SourceLineNumber sourceLineNumbers)
@@ -1041,7 +1022,7 @@ namespace WixToolset.Data
 
         public static Message IllegalPathForGeneratedComponentGuid(SourceLineNumber sourceLineNumbers, string componentName, string keyFilePath)
         {
-            return Message(sourceLineNumbers, Ids.IllegalPathForGeneratedComponentGuid, "The component '{0}' has a key file with path '{1}'.  Since this path is not rooted in one of the standard directories (like ProgramFilesFolder), this component does not fit the criteria for having an automatically generated guid.  (This error may also occur if a path contains a likely standard directory such as nesting a directory with name \"Common Files\" under ProgramFilesFolder.)", componentName, keyFilePath);
+            return Message(sourceLineNumbers, Ids.IllegalPathForGeneratedComponentGuid, "The component '{0}' has a key file with path '{1}'. Since this path is not rooted in one of the standard directories (like ProgramFilesFolder), this component does not fit the criteria for having an automatically generated guid. (This error may also occur if a path contains a likely standard directory such as nesting a directory with name \"Common Files\" under ProgramFilesFolder.)", componentName, keyFilePath);
         }
 
         public static Message IllegalPropertyCustomActionAttributes(SourceLineNumber sourceLineNumbers)
@@ -1051,12 +1032,12 @@ namespace WixToolset.Data
 
         public static Message IllegalRelativeLongFilename(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalRelativeLongFilename, "The {0}/@{1} attribute's value, '{2}', is not a valid relative long name because it contains illegal characters.  Legal relative long names contain no more than 260 characters and must contain at least one non-period character.  Any character except for the follow may be used: ? | > < : / * \".", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalRelativeLongFilename, "The {0}/@{1} attribute's value, '{2}', is not a valid relative long name because it contains illegal characters. Legal relative long names contain no more than 260 characters and must contain at least one non-period character. Any character except for the follow may be used: ? | > < : / * \".", elementName, attributeName, value);
         }
 
         public static Message IllegalRootDirectory(SourceLineNumber sourceLineNumbers, string directoryId)
         {
-            return Message(sourceLineNumbers, Ids.IllegalRootDirectory, "The Directory with Id '{0}' is not a valid root directory.  There may only be a single root directory per product or module and its Id attribute value must be 'TARGETDIR' and its Name attribute value must be 'SourceDir'.", directoryId);
+            return Message(sourceLineNumbers, Ids.IllegalRootDirectory, "The Directory with Id '{0}' is not a valid root directory. There may only be a single root directory per product or module and its Id attribute value must be 'TARGETDIR' and its Name attribute value must be 'SourceDir'.", directoryId);
         }
 
         public static Message IllegalSearchIdForParentDepth(SourceLineNumber sourceLineNumbers, string id, string parentId)
@@ -1066,7 +1047,7 @@ namespace WixToolset.Data
 
         public static Message IllegalShortFilename(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalShortFilename, "The {0}/@{1} attribute's value, '{2}', is not a valid 8.3-compliant name.  Legal names contain no more than 8 non-period characters followed by an optional period and extension of no more than 3 non-period characters.  Any character except for the follow may be used: \\ ? | > < : / * \" + , ; = [ ] (space).", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalShortFilename, "The {0}/@{1} attribute's value, '{2}', is not a valid 8.3-compliant name. Legal names contain no more than 8 non-period characters followed by an optional period and extension of no more than 3 non-period characters. Any character except for the follow may be used: \\ ? | > < : / * \" + , ; = [ ] (space).", elementName, attributeName, value);
         }
 
         public static Message IllegalSuppressWarningId(string suppressedId)
@@ -1076,7 +1057,7 @@ namespace WixToolset.Data
 
         public static Message IllegalTargetDirDefaultDir(SourceLineNumber sourceLineNumbers, string defaultDir)
         {
-            return Message(sourceLineNumbers, Ids.IllegalTargetDirDefaultDir, "The 'TARGETDIR' directory has an illegal DefaultDir value of '{0}'.  The DefaultDir value is created from the *Name attributes of the Directory element.  The TARGETDIR directory is a special directory which must have its Name attribute set to 'SourceDir'.", defaultDir);
+            return Message(sourceLineNumbers, Ids.IllegalTargetDirDefaultDir, "The 'TARGETDIR' directory has an illegal DefaultDir value of '{0}'. The DefaultDir value is created from the *Name attributes of the Directory element. The TARGETDIR directory is a special directory which must have its Name attribute set to 'SourceDir'.", defaultDir);
         }
 
         public static Message IllegalTerminalServerCustomActionAttributes(SourceLineNumber sourceLineNumbers)
@@ -1101,27 +1082,27 @@ namespace WixToolset.Data
 
         public static Message IllegalWixVariablePrefix(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.IllegalWixVariablePrefix, "The WiX variable $(wix.{0}) uses an illegal prefix '$'.  Please use the '!' prefix instead.", variableId);
+            return Message(sourceLineNumbers, Ids.IllegalWixVariablePrefix, "The WiX variable $(wix.{0}) uses an illegal prefix '$'. Please use the '!' prefix instead.", variableId);
         }
 
         public static Message IllegalYesNoAlwaysValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalYesNoAlwaysValue, "The {0}/@{1} attribute's value, '{2}', is not a legal yes/no/always value.  The only legal values are 'always', 'no' or 'yes'.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalYesNoAlwaysValue, "The {0}/@{1} attribute's value, '{2}', is not a legal yes/no/always value. The only legal values are 'always', 'no' or 'yes'.", elementName, attributeName, value);
         }
 
         public static Message IllegalYesNoDefaultValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalYesNoDefaultValue, "The {0}/@{1} attribute's value, '{2}', is not a legal yes/no/default value.  The only legal values are 'default', 'no' or 'yes'.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalYesNoDefaultValue, "The {0}/@{1} attribute's value, '{2}', is not a legal yes/no/default value. The only legal values are 'default', 'no' or 'yes'.", elementName, attributeName, value);
         }
 
         public static Message IllegalYesNoValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalYesNoValue, "The {0}/@{1} attribute's value, '{2}', is not a legal yes/no value.  The only legal values are 'no' and 'yes'.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IllegalYesNoValue, "The {0}/@{1} attribute's value, '{2}', is not a legal yes/no value. The only legal values are 'no' and 'yes'.", elementName, attributeName, value);
         }
 
         public static Message ImplicitComponentKeyPath(SourceLineNumber sourceLineNumbers, string componentId)
         {
-            return Message(sourceLineNumbers, Ids.ImplicitComponentKeyPath, "The component '{0}' does not have an explicit key path specified.  If the ordering of the elements under the Component element changes, the key path will also change.  To prevent accidental changes, the key path should be set to 'yes' in one of the following locations: Component/@KeyPath, File/@KeyPath, ODBCDataSource/@KeyPath, or Registry/@KeyPath.", componentId);
+            return Message(sourceLineNumbers, Ids.ImplicitComponentKeyPath, "The component '{0}' does not have an explicit key path specified. If the ordering of the elements under the Component element changes, the key path will also change. To prevent accidental changes, the key path should be set to 'yes' in one of the following locations: Component/@KeyPath, File/@KeyPath, ODBCDataSource/@KeyPath, or Registry/@KeyPath.", componentId);
         }
 
         public static Message InlineDirectorySyntaxRequiresPath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string identifier)
@@ -1156,12 +1137,12 @@ namespace WixToolset.Data
 
         public static Message IntegralValueOutOfRange(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, int value, int minimum, int maximum)
         {
-            return Message(sourceLineNumbers, Ids.IntegralValueOutOfRange, "The {0}/@{1} attribute's value, '{2}', is not in the range of legal values.  Legal values for this attribute are from {3} to {4}.", elementName, attributeName, value, minimum, maximum);
+            return Message(sourceLineNumbers, Ids.IntegralValueOutOfRange, "The {0}/@{1} attribute's value, '{2}', is not in the range of legal values. Legal values for this attribute are from {3} to {4}.", elementName, attributeName, value, minimum, maximum);
         }
 
         public static Message IntegralValueOutOfRange(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, long value, long minimum, long maximum)
         {
-            return Message(sourceLineNumbers, Ids.IntegralValueOutOfRange, "The {0}/@{1} attribute's value, '{2}', is not in the range of legal values.  Legal values for this attribute are from {3} to {4}.", elementName, attributeName, value, minimum, maximum);
+            return Message(sourceLineNumbers, Ids.IntegralValueOutOfRange, "The {0}/@{1} attribute's value, '{2}', is not in the range of legal values. Legal values for this attribute are from {3} to {4}.", elementName, attributeName, value, minimum, maximum);
         }
 
         public static Message IntegralValueSentinelCollision(SourceLineNumber sourceLineNumbers, int value)
@@ -1181,7 +1162,7 @@ namespace WixToolset.Data
 
         public static Message InvalidAssemblyFile(SourceLineNumber sourceLineNumbers, string assemblyFile, string moreInformation)
         {
-            return Message(sourceLineNumbers, Ids.InvalidAssemblyFile, "The assembly file '{0}' appears to be invalid.  Please ensure this is a valid assembly file and that the user has the appropriate access rights to this file.  More information: {1}", assemblyFile, moreInformation);
+            return Message(sourceLineNumbers, Ids.InvalidAssemblyFile, "The assembly file '{0}' appears to be invalid. Please ensure this is a valid assembly file and that the user has the appropriate access rights to this file. More information: {1}", assemblyFile, moreInformation);
         }
 
         public static Message InvalidBundle(string bundleExecutable)
@@ -1191,7 +1172,7 @@ namespace WixToolset.Data
 
         public static Message InvalidCabinetTemplate(SourceLineNumber sourceLineNumbers, string cabinetTemplate)
         {
-            return Message(sourceLineNumbers, Ids.InvalidCabinetTemplate, "CabinetTemplate attribute's value '{0}' must contain '{{0}}' and should contain no more than 8 characters followed by an optional extension of no more than 3 characters.  Any character except for the follow may be used: \\ ? | > < : / * \" + , ; = [ ] (space).  The Windows Installer team has recommended following the 8.3 format for external cabinet files and any other naming scheme is officially unsupported (which means it is not guaranteed to work on all platforms).", cabinetTemplate);
+            return Message(sourceLineNumbers, Ids.InvalidCabinetTemplate, "CabinetTemplate attribute's value '{0}' must contain '{{0}}' and should contain no more than 8 characters followed by an optional extension of no more than 3 characters. Any character except for the follow may be used: \\ ? | > < : / * \" + , ; = [ ] (space). The Windows Installer team has recommended following the 8.3 format for external cabinet files and any other naming scheme is officially unsupported (which means it is not guaranteed to work on all platforms).", cabinetTemplate);
         }
 
         public static Message InvalidCommandLineFileName(string fileName, string error)
@@ -1211,7 +1192,7 @@ namespace WixToolset.Data
 
         public static Message InvalidDocumentElement(SourceLineNumber sourceLineNumbers, string elementName, string fileType, string expectedElementName)
         {
-            return Message(sourceLineNumbers, Ids.InvalidDocumentElement, "The document element name '{0}' is invalid.  A WiX {1} file must use '{2}' as the document element name.", elementName, fileType, expectedElementName);
+            return Message(sourceLineNumbers, Ids.InvalidDocumentElement, "The document element name '{0}' is invalid. A WiX {1} file must use '{2}' as the document element name.", elementName, fileType, expectedElementName);
         }
 
         public static Message InvalidEmbeddedUIFileName(SourceLineNumber sourceLineNumbers, string codepage)
@@ -1236,12 +1217,12 @@ namespace WixToolset.Data
 
         public static Message InvalidExtension(string extension, string extensionType, string expectedType)
         {
-            return Message(null, Ids.InvalidExtension, "The extension '{0}' is the wrong type: '{1}'.  The expected type was '{2}'.", extension, extensionType, expectedType);
+            return Message(null, Ids.InvalidExtension, "The extension '{0}' is the wrong type: '{1}'. The expected type was '{2}'.", extension, extensionType, expectedType);
         }
 
         public static Message InvalidExtension(string extension, string extensionType, string expectedType1, string expectedType2)
         {
-            return Message(null, Ids.InvalidExtension, "The extension '{0}' is the wrong type: '{1}'.  The expected type was '{2}' or '{3}'.", extension, extensionType, expectedType1, expectedType2);
+            return Message(null, Ids.InvalidExtension, "The extension '{0}' is the wrong type: '{1}'. The expected type was '{2}' or '{3}'.", extension, extensionType, expectedType1, expectedType2);
         }
 
         public static Message InvalidExtensionType(string extension, string attributeType)
@@ -1276,7 +1257,7 @@ namespace WixToolset.Data
 
         public static Message InvalidKeyColumn(string tableName, string columnName, string foreignTableName, int foreignColumnNumber)
         {
-            return Message(null, Ids.InvalidKeyColumn, "The definition for the '{0}' table's '{1}' column is an invalid foreign key relationship to the {2} table's column number {3}.  It is not a valid foreign key table column number because it is too small (less than 1) or greater than the count of columns in the foreign table's definition.", tableName, columnName, foreignTableName, foreignColumnNumber);
+            return Message(null, Ids.InvalidKeyColumn, "The definition for the '{0}' table's '{1}' column is an invalid foreign key relationship to the {2} table's column number {3}. It is not a valid foreign key table column number because it is too small (less than 1) or greater than the count of columns in the foreign table's definition.", tableName, columnName, foreignTableName, foreignColumnNumber);
         }
 
         public static Message InvalidKeypathChange(SourceLineNumber sourceLineNumbers, string component, string transformPath)
@@ -1291,7 +1272,7 @@ namespace WixToolset.Data
 
         public static Message InvalidMergeLanguage(SourceLineNumber sourceLineNumbers, string mergeId, string mergeLanguage)
         {
-            return Message(sourceLineNumbers, Ids.InvalidMergeLanguage, "The Merge element '{0}' specified an invalid language '{1}'.  Verify that localization tokens are being properly resolved to a numeric LCID.", mergeId, mergeLanguage);
+            return Message(sourceLineNumbers, Ids.InvalidMergeLanguage, "The Merge element '{0}' specified an invalid language '{1}'. Verify that localization tokens are being properly resolved to a numeric LCID.", mergeId, mergeLanguage);
         }
 
         public static Message InvalidFourPartVersion(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string version)
@@ -1301,12 +1282,12 @@ namespace WixToolset.Data
 
         public static Message InvalidPlatformValue(SourceLineNumber sourceLineNumbers, string value)
         {
-            return Message(sourceLineNumbers, Ids.InvalidPlatformValue, "The Platform attribute has an invalid value {0}.  Possible values are x86, x64, or arm64.", value);
+            return Message(sourceLineNumbers, Ids.InvalidPlatformValue, "The Platform attribute has an invalid value {0}. Possible values are x86, x64, or arm64.", value);
         }
 
         public static Message InvalidPreprocessorFunction(SourceLineNumber sourceLineNumbers, string variable)
         {
-            return Message(sourceLineNumbers, Ids.InvalidPreprocessorFunction, "Ill-formed preprocessor function '${0}'.  Functions must have a prefix (like 'fun.'), a name at least 1 character long, and matching opening and closing parentheses.", variable);
+            return Message(sourceLineNumbers, Ids.InvalidPreprocessorFunction, "Ill-formed preprocessor function '${0}'. Functions must have a prefix (like 'fun.'), a name at least 1 character long, and matching opening and closing parentheses.", variable);
         }
 
         public static Message InvalidPreprocessorFunctionAutoVersion(SourceLineNumber sourceLineNumbers)
@@ -1321,7 +1302,7 @@ namespace WixToolset.Data
 
         public static Message InvalidPreprocessorVariable(SourceLineNumber sourceLineNumbers, string variable)
         {
-            return Message(sourceLineNumbers, Ids.InvalidPreprocessorVariable, "Ill-formed preprocessor variable '$({0})'.  Variables must have a prefix (like 'var.', 'env.', or 'sys.') and a name at least 1 character long. If the literal string '$({0})' is desired, use '$$({0})'.", variable);
+            return Message(sourceLineNumbers, Ids.InvalidPreprocessorVariable, "Ill-formed preprocessor variable '$({0})'. Variables must have a prefix (like 'var.', 'env.', or 'sys.') and a name at least 1 character long. If the literal string '$({0})' is desired, use '$$({0})'.", variable);
         }
 
         public static Message InvalidProductVersion(SourceLineNumber sourceLineNumbers, string version)
@@ -1366,7 +1347,7 @@ namespace WixToolset.Data
 
         public static Message InvalidVariableDefinition(string variableDefinition)
         {
-            return Message(null, Ids.InvalidVariableDefinition, "The variable definition '{0}' is not valid.  Variable definitions should be in the form -dname=value where the value is optional.", variableDefinition);
+            return Message(null, Ids.InvalidVariableDefinition, "The variable definition '{0}' is not valid. Variable definitions should be in the form -dname=value where the value is optional.", variableDefinition);
         }
 
         public static Message InvalidWixTransform(string fileName)
@@ -1376,12 +1357,12 @@ namespace WixToolset.Data
 
         public static Message InvalidWixXmlNamespace(SourceLineNumber sourceLineNumbers, string wixElementName, string wixNamespace)
         {
-            return Message(sourceLineNumbers, Ids.InvalidWixXmlNamespace, "The {0} element has no namespace.  Please make the {0} element look like the following: <{0} xmlns=\"{1}\">.", wixElementName, wixNamespace);
+            return Message(sourceLineNumbers, Ids.InvalidWixXmlNamespace, "The {0} element has no namespace. Please make the {0} element look like the following: <{0} xmlns=\"{1}\">.", wixElementName, wixNamespace);
         }
 
         public static Message InvalidWixXmlNamespace(SourceLineNumber sourceLineNumbers, string wixElementName, string elementNamespace, string wixNamespace)
         {
-            return Message(sourceLineNumbers, Ids.InvalidWixXmlNamespace, "The {0} element has an incorrect namespace of '{1}'.  Please make the {0} element look like the following: <{0} xmlns=\"{2}\">.", wixElementName, elementNamespace, wixNamespace);
+            return Message(sourceLineNumbers, Ids.InvalidWixXmlNamespace, "The {0} element has an incorrect namespace of '{1}'. Please make the {0} element look like the following: <{0} xmlns=\"{2}\">.", wixElementName, elementNamespace, wixNamespace);
         }
 
         public static Message InvalidXml(SourceLineNumber sourceLineNumbers, string fileType, string detail)
@@ -1391,7 +1372,7 @@ namespace WixToolset.Data
 
         public static Message LocalizationVariableUnknown(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.LocalizationVariableUnknown, "The localization variable !(loc.{0}) is unknown.  Please ensure the variable is defined.", variableId);
+            return Message(sourceLineNumbers, Ids.LocalizationVariableUnknown, "The localization variable !(loc.{0}) is unknown. Please ensure the variable is defined.", variableId);
         }
 
         public static Message MaximumCabinetSizeForLargeFileSplittingTooLarge(SourceLineNumber sourceLineNumbers, int maximumCabinetSizeForLargeFileSplitting, int maxValueOfMaxCabSizeForLargeFileSplitting)
@@ -1406,7 +1387,7 @@ namespace WixToolset.Data
 
         public static Message MediaEmbeddedCabinetNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, int length)
         {
-            return Message(sourceLineNumbers, Ids.MediaEmbeddedCabinetNameTooLong, "The {0}/@{1} attribute's value, '{2}', is {3} characters long.  The name is too long for an embedded cabinet.  It cannot be more than than 62 characters long.", elementName, attributeName, value, length);
+            return Message(sourceLineNumbers, Ids.MediaEmbeddedCabinetNameTooLong, "The {0}/@{1} attribute's value, '{2}', is {3} characters long. The name is too long for an embedded cabinet. It cannot be more than than 62 characters long.", elementName, attributeName, value, length);
         }
 
         public static Message MediaTableCollision(SourceLineNumber sourceLineNumbers)
@@ -1421,7 +1402,7 @@ namespace WixToolset.Data
 
         public static Message MergeFeatureRequired(SourceLineNumber sourceLineNumbers, string tableName, string primaryKeys, string mergeModuleFile, string mergeId)
         {
-            return Message(sourceLineNumbers, Ids.MergeFeatureRequired, "The {0} table contains a row with primary key(s) '{1}' which requires a feature to properly merge from the merge module '{2}'.  Nest a MergeRef element with an Id attribute set to the value '{3}' under a Feature element to fix this error.", tableName, primaryKeys, mergeModuleFile, mergeId);
+            return Message(sourceLineNumbers, Ids.MergeFeatureRequired, "The {0} table contains a row with primary key(s) '{1}' which requires a feature to properly merge from the merge module '{2}'. Nest a MergeRef element with an Id attribute set to the value '{3}' under a Feature element to fix this error.", tableName, primaryKeys, mergeModuleFile, mergeId);
         }
 
         public static Message MergeLanguageFailed(SourceLineNumber sourceLineNumbers, short language, string mergeModuleFile)
@@ -1431,12 +1412,12 @@ namespace WixToolset.Data
 
         public static Message MergeLanguageUnsupported(SourceLineNumber sourceLineNumbers, short language, string mergeModuleFile)
         {
-            return Message(sourceLineNumbers, Ids.MergeLanguageUnsupported, "Could not locate language '{0}' (or a transform for this language) in the merge module '{1}'.  This is likely due to an incorrectly authored Merge/@Language attribute.", language, mergeModuleFile);
+            return Message(sourceLineNumbers, Ids.MergeLanguageUnsupported, "Could not locate language '{0}' (or a transform for this language) in the merge module '{1}'. This is likely due to an incorrectly authored Merge/@Language attribute.", language, mergeModuleFile);
         }
 
         public static Message MergeModuleExpectedFeature(SourceLineNumber sourceLineNumbers, string mergeId)
         {
-            return Message(sourceLineNumbers, Ids.MergeModuleExpectedFeature, "The merge module '{0}' is not assigned to a feature.  All merge modules must be assigned to at least one feature.", mergeId);
+            return Message(sourceLineNumbers, Ids.MergeModuleExpectedFeature, "The merge module '{0}' is not assigned to a feature. All merge modules must be assigned to at least one feature.", mergeId);
         }
 
         public static Message MergePlatformMismatch(SourceLineNumber sourceLineNumbers, string mergeModuleFile)
@@ -1491,7 +1472,7 @@ namespace WixToolset.Data
 
         public static Message MissingTableDefinition(string tableName)
         {
-            return Message(null, Ids.MissingTableDefinition, "Cannot find the table definitions for the '{0}' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", tableName);
+            return Message(null, Ids.MissingTableDefinition, "Cannot find the table definitions for the '{0}' table. This is likely due to a typing error or missing extension. Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", tableName);
         }
 
         public static Message MissingTypeLibFile(SourceLineNumber sourceLineNumbers, string elementName, string fileElementName)
@@ -1526,7 +1507,7 @@ namespace WixToolset.Data
 
         public static Message MultipleEntrySections(SourceLineNumber sourceLineNumbers, string sectionName1, string sectionName2)
         {
-            return Message(sourceLineNumbers, Ids.MultipleEntrySections, "Multiple entry sections '{0}' and '{1}' found.  Only one entry section may be present in a single target.", sectionName1, sectionName2);
+            return Message(sourceLineNumbers, Ids.MultipleEntrySections, "Multiple entry sections '{0}' and '{1}' found. Only one entry section may be present in a single target.", sectionName1, sectionName2);
         }
 
         public static Message MultipleEntrySections2(SourceLineNumber sourceLineNumbers)
@@ -1536,12 +1517,12 @@ namespace WixToolset.Data
 
         public static Message MultipleFilesMatchedWithOutputSpecification(string sourceSpecification, string sourceList)
         {
-            return Message(null, Ids.MultipleFilesMatchedWithOutputSpecification, "A per-source file output specification has been provided ('{0}'), but multiple source files match the source specification ({1}).  Specifying a unique output requires that only a single source file match.", sourceSpecification, sourceList);
+            return Message(null, Ids.MultipleFilesMatchedWithOutputSpecification, "A per-source file output specification has been provided ('{0}'), but multiple source files match the source specification ({1}). Specifying a unique output requires that only a single source file match.", sourceSpecification, sourceList);
         }
 
         public static Message MultipleIdentifiersFound(SourceLineNumber sourceLineNumbers, string elementName, string identifier, string mismatchIdentifier)
         {
-            return Message(sourceLineNumbers, Ids.MultipleIdentifiersFound, "Under a '{0}' element, multiple identifiers were found: '{1}' and '{2}'.  All search elements under this element must have the same id.", elementName, identifier, mismatchIdentifier);
+            return Message(sourceLineNumbers, Ids.MultipleIdentifiersFound, "Under a '{0}' element, multiple identifiers were found: '{1}' and '{2}'. All search elements under this element must have the same id.", elementName, identifier, mismatchIdentifier);
         }
 
         public static Message MultiplePackagePayloads(SourceLineNumber sourceLineNumbers, string packageId, string packagePayloadId1, string packagePayloadId2)
@@ -1581,7 +1562,7 @@ namespace WixToolset.Data
 
         public static Message NoDataForColumn(SourceLineNumber sourceLineNumbers, string columnName, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.NoDataForColumn, "There is no data for column '{0}' in a contained row of custom table '{1}'.  A non-null value must be supplied for this column.", columnName, tableName);
+            return Message(sourceLineNumbers, Ids.NoDataForColumn, "There is no data for column '{0}' in a contained row of custom table '{1}'. A non-null value must be supplied for this column.", columnName, tableName);
         }
 
         public static Message NoDifferencesInTransform(SourceLineNumber sourceLineNumbers)
@@ -1601,7 +1582,7 @@ namespace WixToolset.Data
 
         public static Message NoUniqueActionSequenceNumber(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName1, string actionName2)
         {
-            return Message(sourceLineNumbers, Ids.NoUniqueActionSequenceNumber, "The {0} table contains an action '{1}' which cannot have a unique sequence number because it is scheduled before or after action '{2}'.  There is not enough room before or after this action to assign a unique sequence number.  Please schedule one of the actions differently so that it will be in a position with more sequence numbers available.  Please note that sequence numbers must be an integer in the range 1 - 32767 (inclusive).", sequenceTableName, actionName1, actionName2);
+            return Message(sourceLineNumbers, Ids.NoUniqueActionSequenceNumber, "The {0} table contains an action '{1}' which cannot have a unique sequence number because it is scheduled before or after action '{2}'. There is not enough room before or after this action to assign a unique sequence number. Please schedule one of the actions differently so that it will be in a position with more sequence numbers available. Please note that sequence numbers must be an integer in the range 1 - 32767 (inclusive).", sequenceTableName, actionName1, actionName2);
         }
 
         public static Message NoUniqueActionSequenceNumber2(SourceLineNumber sourceLineNumbers)
@@ -1611,7 +1592,7 @@ namespace WixToolset.Data
 
         public static Message OpenDatabaseFailed(string databaseFile)
         {
-            return Message(null, Ids.OpenDatabaseFailed, "Failed to open database '{0}'.  Ensure it is a valid database, and it is not open by another process.", databaseFile);
+            return Message(null, Ids.OpenDatabaseFailed, "Failed to open database '{0}'. Ensure it is a valid database, and it is not open by another process.", databaseFile);
         }
 
         public static Message OrderingReferenceLoopDetected(SourceLineNumber sourceLineNumbers, string loopList)
@@ -1621,12 +1602,12 @@ namespace WixToolset.Data
 
         public static Message OrphanedComponent(SourceLineNumber sourceLineNumbers, string componentName)
         {
-            return Message(sourceLineNumbers, Ids.OrphanedComponent, "Found orphaned Component '{0}'.  If this is a Package, every Component must have at least one parent Feature.  To include a Component in a Module, you must include it directly as a Component element of the Module element or indirectly via ComponentRef, ComponentGroup, or ComponentGroupRef elements.", componentName);
+            return Message(sourceLineNumbers, Ids.OrphanedComponent, "Found orphaned Component '{0}'. If this is a Package, every Component must have at least one parent Feature. To include a Component in a Module, you must include it directly as a Component element of the Module element or indirectly via ComponentRef, ComponentGroup, or ComponentGroupRef elements.", componentName);
         }
 
         public static Message OutputCodepageMismatch(SourceLineNumber sourceLineNumbers, int beforeCodepage, int afterCodepage)
         {
-            return Message(sourceLineNumbers, Ids.OutputCodepageMismatch, "The code pages of the outputs do not match.  One output's code page is '{0}' while the other is '{1}'.", beforeCodepage, afterCodepage);
+            return Message(sourceLineNumbers, Ids.OutputCodepageMismatch, "The code pages of the outputs do not match. One output's code page is '{0}' while the other is '{1}'.", beforeCodepage, afterCodepage);
         }
 
         public static Message OutputCodepageMismatch2(SourceLineNumber sourceLineNumbers)
@@ -1641,12 +1622,12 @@ namespace WixToolset.Data
 
         public static Message OutputTypeMismatch(SourceLineNumber sourceLineNumbers, string beforeOutputType, string afterOutputType)
         {
-            return Message(sourceLineNumbers, Ids.OutputTypeMismatch, "The types of the outputs do not match.  One output's type is '{0}' while the other is '{1}'.", beforeOutputType, afterOutputType);
+            return Message(sourceLineNumbers, Ids.OutputTypeMismatch, "The types of the outputs do not match. One output's type is '{0}' while the other is '{1}'.", beforeOutputType, afterOutputType);
         }
 
         public static Message OverridableActionCollision(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.OverridableActionCollision, "The {0} table contains an action '{1}' that is declared overridable in two different locations.  Please remove one of the actions or the Overridable='yes' attribute from one of the actions.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.OverridableActionCollision, "The {0} table contains an action '{1}' that is declared overridable in two different locations. Please remove one of the actions or the Overridable='yes' attribute from one of the actions.", sequenceTableName, actionName);
         }
 
         public static Message OverridableActionCollision2(SourceLineNumber sourceLineNumbers)
@@ -1716,7 +1697,7 @@ namespace WixToolset.Data
 
         public static Message PreprocessorExtensionForParameterMissing(SourceLineNumber sourceLineNumbers, string parameterName, string parameterPrefix)
         {
-            return Message(sourceLineNumbers, Ids.PreprocessorExtensionForParameterMissing, "Could not find the preprocessor extension for parameter '{0}'.  A preprocessor extension is expected because the parameter prefix, '{1}', is not one of the standard types: 'env', 'res', 'sys', or 'var'.", parameterName, parameterPrefix);
+            return Message(sourceLineNumbers, Ids.PreprocessorExtensionForParameterMissing, "Could not find the preprocessor extension for parameter '{0}'. A preprocessor extension is expected because the parameter prefix, '{1}', is not one of the standard types: 'env', 'res', 'sys', or 'var'.", parameterName, parameterPrefix);
         }
 
         public static Message PreprocessorExtensionGetVariableValueFailed(SourceLineNumber sourceLineNumbers, string prefix, string variable, string message)
@@ -1751,7 +1732,7 @@ namespace WixToolset.Data
 
         public static Message RadioButtonBitmapAndIconDisallowed(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.RadioButtonBitmapAndIconDisallowed, "RadioButtonGroup elements that contain RadioButton elements with Bitmap or Icon attributes set to \"yes\" can only be specified under a Control element.  Move your RadioButtonGroup element as a child of the appropriate Control element.");
+            return Message(sourceLineNumbers, Ids.RadioButtonBitmapAndIconDisallowed, "RadioButtonGroup elements that contain RadioButton elements with Bitmap or Icon attributes set to \"yes\" can only be specified under a Control element. Move your RadioButtonGroup element as a child of the appropriate Control element.");
         }
 
         public static Message RadioButtonTypeInconsistent(SourceLineNumber sourceLineNumbers)
@@ -1766,7 +1747,7 @@ namespace WixToolset.Data
 
         public static Message RealTableMissingPrimaryKeyColumn(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.RealTableMissingPrimaryKeyColumn, "The table '{0}' does not contain any primary key columns.  At least one column must be marked as the primary key to ensure this table can be patched.", tableName);
+            return Message(sourceLineNumbers, Ids.RealTableMissingPrimaryKeyColumn, "The table '{0}' does not contain any primary key columns. At least one column must be marked as the primary key to ensure this table can be patched.", tableName);
         }
 
         public static Message RecursiveAction(string action, string tableName)
@@ -1781,17 +1762,17 @@ namespace WixToolset.Data
 
         public static Message RegistryMultipleValuesWithoutMultiString(SourceLineNumber sourceLineNumbers, string registryElementName, string valueAttributeName, string registryValueElementName, string typeAttributeName)
         {
-            return Message(sourceLineNumbers, Ids.RegistryMultipleValuesWithoutMultiString, "The {0}/@{1} attribute and a {0}/{2} element cannot both be specified.  Only one may be specified if the {3} attribute's value is not 'multiString'.", registryElementName, valueAttributeName, registryValueElementName, typeAttributeName);
+            return Message(sourceLineNumbers, Ids.RegistryMultipleValuesWithoutMultiString, "The {0}/@{1} attribute and a {0}/{2} element cannot both be specified. Only one may be specified if the {3} attribute's value is not 'multiString'.", registryElementName, valueAttributeName, registryValueElementName, typeAttributeName);
         }
 
         public static Message RegistryNameValueIncorrect(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.RegistryNameValueIncorrect, "The {0}/@{1} attribute's value, '{2}', is incorrect.  It should not contain values of '+', '-', or '*' when the {0}/@Value attribute is empty.  Instead, use the proper element and attributes: for Name='+' use RegistryKey/@Action='createKey', for Name='-' use RemoveRegistryKey/@Action='removeOnUninstall', for Name='*' use RegistryKey/@Action='createAndRemoveOnUninstall'.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.RegistryNameValueIncorrect, "The {0}/@{1} attribute's value, '{2}', is incorrect. It should not contain values of '+', '-', or '*' when the {0}/@Value attribute is empty. Instead, use the proper element and attributes: for Name='+' use RegistryKey/@Action='createKey', for Name='-' use RemoveRegistryKey/@Action='removeOnUninstall', for Name='*' use RegistryKey/@Action='createAndRemoveOnUninstall'.", elementName, attributeName, value);
         }
 
         public static Message RegistryRootInvalid(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.RegistryRootInvalid, "Registry/@Root attribute is invalid on a nested Registry element.  Either remove the Root attribute or move the Registry element so it is not nested under another Registry element.");
+            return Message(sourceLineNumbers, Ids.RegistryRootInvalid, "Registry/@Root attribute is invalid on a nested Registry element. Either remove the Root attribute or move the Registry element so it is not nested under another Registry element.");
         }
 
         public static Message RegistrySubElementCannotBeRemoved(SourceLineNumber sourceLineNumbers, string registryElementName, string registryValueElementName, string actionAttributeName, string removeValue, string removeKeyOnInstallValue)
@@ -1816,7 +1797,7 @@ namespace WixToolset.Data
 
         public static Message RootFeatureCannotFollowParent(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.RootFeatureCannotFollowParent, "The Feature element specifies a root feature with an illegal InstallDefault value of 'followParent'.  Root features cannot follow their parent feature's install state because they don't have a parent feature.  Please remove or change the value of the InstallDefault attribute.");
+            return Message(sourceLineNumbers, Ids.RootFeatureCannotFollowParent, "The Feature element specifies a root feature with an illegal InstallDefault value of 'followParent'. Root features cannot follow their parent feature's install state because they don't have a parent feature. Please remove or change the value of the InstallDefault attribute.");
         }
 
         public static Message SameFileIdDifferentSource(SourceLineNumber sourceLineNumbers, string fileId, string sourcePath1, string sourcePath2)
@@ -1846,37 +1827,22 @@ namespace WixToolset.Data
 
         public static Message SearchPropertyNotUppercase(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.SearchPropertyNotUppercase, "The {0}/@{1} attribute's value, '{2}', cannot contain lowercase characters.  Since this is a search property, it must also be a public property.  This means the Property/@Id value must be completely uppercase.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.SearchPropertyNotUppercase, "The {0}/@{1} attribute's value, '{2}', cannot contain lowercase characters. Since this is a search property, it must also be a public property. This means the Property/@Id value must be completely uppercase.", elementName, attributeName, value);
         }
 
         public static Message SecurePropertyNotUppercase(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string propertyId)
         {
-            return Message(sourceLineNumbers, Ids.SecurePropertyNotUppercase, "The {0}/@{1} attribute's value, '{2}', cannot contain lowercase characters.  Since this is a secure property, it must also be a public property.  This means the Property/@Id value must be completely uppercase.", elementName, attributeName, propertyId);
+            return Message(sourceLineNumbers, Ids.SecurePropertyNotUppercase, "The {0}/@{1} attribute's value, '{2}', cannot contain lowercase characters. Since this is a secure property, it must also be a public property. This means the Property/@Id value must be completely uppercase.", elementName, attributeName, propertyId);
         }
 
         public static Message SignedEmbeddedCabinet(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.SignedEmbeddedCabinet, "The DigitalSignature element cannot be nested under a Media element which specifies EmbedCab='yes'.  This is because Windows Installer can only verify the digital signatures of external cabinets.  Please either remove the DigitalSignature element or change the value of the Media/@EmbedCab attribute to 'no'.");
+            return Message(sourceLineNumbers, Ids.SignedEmbeddedCabinet, "The DigitalSignature element cannot be nested under a Media element which specifies EmbedCab='yes'. This is because Windows Installer can only verify the digital signatures of external cabinets. Please either remove the DigitalSignature element or change the value of the Media/@EmbedCab attribute to 'no'.");
         }
 
         public static Message SingleExtensionSupported()
         {
             return Message(null, Ids.SingleExtensionSupported, "Multiple extensions were specified on the command line, only a single extension is supported.");
-        }
-
-        public static Message SmokeMalformedPath()
-        {
-            return Message(null, Ids.SmokeMalformedPath, "Path contains one or more invalid characters.");
-        }
-
-        public static Message SmokeUnknownFileExtension()
-        {
-            return Message(null, Ids.SmokeUnknownFileExtension, "Unknown input file format - expected a .msi or .msm file.");
-        }
-
-        public static Message SmokeUnsupportedFileExtension()
-        {
-            return Message(null, Ids.SmokeUnsupportedFileExtension, "Files with an extension of .msp are not currently supported.");
         }
 
         public static Message SpecifiedBinderNotFound(string binderClass)
@@ -1889,11 +1855,6 @@ namespace WixToolset.Data
             return Message(null, Ids.SplitCabinetCopyRegistrationFailed, "Failed to register the copy command for cabinet '{0}' formed by splitting cabinet '{1}'.", newCabName, firstCabName);
         }
 
-        public static Message SplitCabinetInsertionFailed(string newCabName, string firstCabName, string lastCabinetOfThisSequence)
-        {
-            return Message(null, Ids.SplitCabinetInsertionFailed, "Could not find the last split cabinet '{2}' in the Media Table. So failed to add new cabinet '{0}' formed by splitting cabinet '{1}' to the installer package.", newCabName, firstCabName, lastCabinetOfThisSequence);
-        }
-
         public static Message SplitCabinetNameCollision(string newCabName, string firstCabName)
         {
             return Message(null, Ids.SplitCabinetNameCollision, "The cabinet name '{0}' collides with the new cabinet formed by splitting cabinet '{1}', consider renaming cabinet '{0}'.", newCabName, firstCabName);
@@ -1901,17 +1862,17 @@ namespace WixToolset.Data
 
         public static Message StandardActionRelativelyScheduledInModule(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.StandardActionRelativelyScheduledInModule, "The {0} table contains a standard action '{1}' that does not have a sequence number specified.  The Sequence attribute is required for standard actions in a merge module.  Please remove the action or use the Sequence attribute.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.StandardActionRelativelyScheduledInModule, "The {0} table contains a standard action '{1}' that does not have a sequence number specified. The Sequence attribute is required for standard actions in a merge module. Please remove the action or use the Sequence attribute.", sequenceTableName, actionName);
         }
 
         public static Message StreamNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, int length, int maximumLength)
         {
-            return Message(sourceLineNumbers, Ids.StreamNameTooLong, "The {0}/@{1} attribute's value, '{2}', is {3} characters long.  This is too long because it will be used to create a stream name.  It cannot be more than than {4} characters long.", elementName, attributeName, value, length, maximumLength);
+            return Message(sourceLineNumbers, Ids.StreamNameTooLong, "The {0}/@{1} attribute's value, '{2}', is {3} characters long. This is too long because it will be used to create a stream name. It cannot be more than than {4} characters long.", elementName, attributeName, value, length, maximumLength);
         }
 
         public static Message StreamNameTooLong(SourceLineNumber sourceLineNumbers, string tableName, string streamName, int streamLength)
         {
-            return Message(sourceLineNumbers, Ids.StreamNameTooLong, "The binary value in table '{0}' will be stored with a stream name, '{1}', that is {2} characters long.  This is too long because the maximum allowed length for a stream name is 62 characters long.  Since the stream name is created by concatenating the table name and values of the primary key for a row (delimited by periods), this error can be resolved by shortening a value that is part of the primary key.", tableName, streamName, streamLength);
+            return Message(sourceLineNumbers, Ids.StreamNameTooLong, "The binary value in table '{0}' will be stored with a stream name, '{1}', that is {2} characters long. This is too long because the maximum allowed length for a stream name is 62 characters long. Since the stream name is created by concatenating the table name and values of the primary key for a row (delimited by periods), this error can be resolved by shortening a value that is part of the primary key.", tableName, streamName, streamLength);
         }
 
         public static Message StubMissingWixburnSection(string filename)
@@ -1926,7 +1887,7 @@ namespace WixToolset.Data
 
         public static Message SuppressNonoverridableAction(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.SuppressNonoverridableAction, "The {0} table contains an action '{1}' that cannot be suppressed because it is not declared overridable in the base definition.  Please stop suppressing the action or make it overridable in its base declaration.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.SuppressNonoverridableAction, "The {0} table contains an action '{1}' that cannot be suppressed because it is not declared overridable in the base definition. Please stop suppressing the action or make it overridable in its base declaration.", sequenceTableName, actionName);
         }
 
         public static Message SuppressNonoverridableAction2(SourceLineNumber sourceLineNumbers)
@@ -1946,7 +1907,7 @@ namespace WixToolset.Data
 
         public static Message TableNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.TableNameTooLong, "The {0}/@{1} attribute's value, '{2}', is too long for a table name.  It cannot be more than than 31 characters long.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.TableNameTooLong, "The {0}/@{1} attribute's value, '{2}', is too long for a table name. It cannot be more than than 31 characters long.", elementName, attributeName, value);
         }
 
         public static Message TooDeeplyIncluded(SourceLineNumber sourceLineNumbers, int depth)
@@ -1956,17 +1917,17 @@ namespace WixToolset.Data
 
         public static Message TooManyChildren(SourceLineNumber sourceLineNumbers, string elementName, string childElementName)
         {
-            return Message(sourceLineNumbers, Ids.TooManyChildren, "The {0} element contains multiple {1} child elements.  There can only be one {1} child element per {0} element.", elementName, childElementName);
+            return Message(sourceLineNumbers, Ids.TooManyChildren, "The {0} element contains multiple {1} child elements. There can only be one {1} child element per {0} element.", elementName, childElementName);
         }
 
         public static Message TooManyColumnsInRealTable(string tableName, int columnCount, int supportedColumnCount)
         {
-            return Message(null, Ids.TooManyColumnsInRealTable, "The table '{0}' contains {1} columns which is not supported by Windows Installer.  Windows Installer supports a maximum of {2} columns.", tableName, columnCount, supportedColumnCount);
+            return Message(null, Ids.TooManyColumnsInRealTable, "The table '{0}' contains {1} columns which is not supported by Windows Installer. Windows Installer supports a maximum of {2} columns.", tableName, columnCount, supportedColumnCount);
         }
 
         public static Message TooManyElements(SourceLineNumber sourceLineNumbers, string elementName, string childElementName, int expectedInstances)
         {
-            return Message(sourceLineNumbers, Ids.TooManyElements, "The {0} element contains an unexpected child element '{1}'.  The '{1}' element may only occur {2} time(s) under the {0} element.", elementName, childElementName, expectedInstances);
+            return Message(sourceLineNumbers, Ids.TooManyElements, "The {0} element contains an unexpected child element '{1}'. The '{1}' element may only occur {2} time(s) under the {0} element.", elementName, childElementName, expectedInstances);
         }
 
         public static Message TooManySearchElements(SourceLineNumber sourceLineNumbers, string elementName)
@@ -1981,17 +1942,17 @@ namespace WixToolset.Data
 
         public static Message TypeSpecificationForExtensionRequired(string parameter)
         {
-            return Message(null, Ids.TypeSpecificationForExtensionRequired, "The parameter '{0}' must be followed by the extension's type specification.  The type specification should be a fully qualified class and assembly identity, for example: \"MyNamespace.MyClass,myextension.dll\".", parameter);
+            return Message(null, Ids.TypeSpecificationForExtensionRequired, "The parameter '{0}' must be followed by the extension's type specification. The type specification should be a fully qualified class and assembly identity, for example: \"MyNamespace.MyClass,myextension.dll\".", parameter);
         }
 
         public static Message UnableToGetAuthenticodeCertOfFile(string filePath, string moreInformation)
         {
-            return Message(null, Ids.UnableToGetAuthenticodeCertOfFile, "Unable to get the authenticode certificate of '{0}'.  More information: {1}", filePath, moreInformation);
+            return Message(null, Ids.UnableToGetAuthenticodeCertOfFile, "Unable to get the authenticode certificate of '{0}'. More information: {1}", filePath, moreInformation);
         }
 
         public static Message UnableToGetAuthenticodeCertOfFileDownlevelOS(string filePath, string moreInformation)
         {
-            return Message(null, Ids.UnableToGetAuthenticodeCertOfFileDownlevelOS, "Unable to get the authenticode certificate of '{0}'. The cryptography API has limitations on Windows XP and Windows Server 2003.  More information: {1}", filePath, moreInformation);
+            return Message(null, Ids.UnableToGetAuthenticodeCertOfFileDownlevelOS, "Unable to get the authenticode certificate of '{0}'. The cryptography API has limitations on Windows XP and Windows Server 2003. More information: {1}", filePath, moreInformation);
         }
 
         public static Message UnableToConvertFieldToNumber(string value)
@@ -2121,27 +2082,27 @@ namespace WixToolset.Data
 
         public static Message UnexpectedTableInMergeModule(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.UnexpectedTableInMergeModule, "An unexpected row in the '{0}' table was found in this merge module.  Merge modules cannot contain the '{0}' table.", tableName);
+            return Message(sourceLineNumbers, Ids.UnexpectedTableInMergeModule, "An unexpected row in the '{0}' table was found in this merge module. Merge modules cannot contain the '{0}' table.", tableName);
         }
 
         public static Message UnexpectedTableInPatch(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.UnexpectedTableInPatch, "An unexpected row in the '{0}' table was found in this patch.  Patches cannot contain the '{0}' table.", tableName);
+            return Message(sourceLineNumbers, Ids.UnexpectedTableInPatch, "An unexpected row in the '{0}' table was found in this patch. Patches cannot contain the '{0}' table.", tableName);
         }
 
         public static Message UnexpectedTableInPatchCreationPackage(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.UnexpectedTableInPatchCreationPackage, "An unexpected row in the '{0}' table was found in this patch creation package.  Patch creation packages cannot contain the '{0}' table.", tableName);
+            return Message(sourceLineNumbers, Ids.UnexpectedTableInPatchCreationPackage, "An unexpected row in the '{0}' table was found in this patch creation package. Patch creation packages cannot contain the '{0}' table.", tableName);
         }
 
         public static Message UnhandledExtensionAttribute(SourceLineNumber sourceLineNumbers, string elementName, string extensionAttributeName, string extensionNamespace)
         {
-            return Message(sourceLineNumbers, Ids.UnhandledExtensionAttribute, "The {0} element contains an unhandled extension attribute '{1}'.  Please ensure that the extension for attributes in the '{2}' namespace has been provided.", elementName, extensionAttributeName, extensionNamespace);
+            return Message(sourceLineNumbers, Ids.UnhandledExtensionAttribute, "The {0} element contains an unhandled extension attribute '{1}'. Please ensure that the extension for attributes in the '{2}' namespace has been provided.", elementName, extensionAttributeName, extensionNamespace);
         }
 
         public static Message UnhandledExtensionElement(SourceLineNumber sourceLineNumbers, string elementName, string extensionElementName, string extensionNamespace)
         {
-            return Message(sourceLineNumbers, Ids.UnhandledExtensionElement, "The {0} element contains an unhandled extension element '{1}'.  Please ensure that the extension for elements in the '{2}' namespace has been provided.", elementName, extensionElementName, extensionNamespace);
+            return Message(sourceLineNumbers, Ids.UnhandledExtensionElement, "The {0} element contains an unhandled extension element '{1}'. Please ensure that the extension for elements in the '{2}' namespace has been provided.", elementName, extensionElementName, extensionNamespace);
         }
 
         public static Message UniqueFileSearchIdRequired(SourceLineNumber sourceLineNumbers, string id, string elementName)
@@ -2191,12 +2152,12 @@ namespace WixToolset.Data
 
         public static Message UnsupportedExtensionAttribute(SourceLineNumber sourceLineNumbers, string elementName, string extensionElementName)
         {
-            return Message(sourceLineNumbers, Ids.UnsupportedExtensionAttribute, "The {0} element contains an unsupported extension attribute '{1}'.  The {0} element does not currently support extension attributes. Is the {1} attribute using the correct XML namespace?", elementName, extensionElementName);
+            return Message(sourceLineNumbers, Ids.UnsupportedExtensionAttribute, "The {0} element contains an unsupported extension attribute '{1}'. The {0} element does not currently support extension attributes. Is the {1} attribute using the correct XML namespace?", elementName, extensionElementName);
         }
 
         public static Message UnsupportedExtensionElement(SourceLineNumber sourceLineNumbers, string elementName, string extensionElementName)
         {
-            return Message(sourceLineNumbers, Ids.UnsupportedExtensionElement, "The {0} element contains an unsupported extension element '{1}'.  The {0} element does not currently support extension elements. Is the {1} element using the correct XML namespace?", elementName, extensionElementName);
+            return Message(sourceLineNumbers, Ids.UnsupportedExtensionElement, "The {0} element contains an unsupported extension element '{1}'. The {0} element does not currently support extension elements. Is the {1} element using the correct XML namespace?", elementName, extensionElementName);
         }
 
         public static Message UnsupportedPlatformForElement(SourceLineNumber sourceLineNumbers, string platform, string elementName)
@@ -2246,7 +2207,7 @@ namespace WixToolset.Data
 
         public static Message VersionIndependentProgIdsCannotHaveIcons(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.VersionIndependentProgIdsCannotHaveIcons, "Version independent ProgIds cannot have Icons.  Remove the Icon and/or IconIndex attributes from your ProgId element.");
+            return Message(sourceLineNumbers, Ids.VersionIndependentProgIdsCannotHaveIcons, "Version independent ProgIds cannot have Icons. Remove the Icon and/or IconIndex attributes from your ProgId element.");
         }
 
         public static Message VersionMismatch(SourceLineNumber sourceLineNumbers, string fileType, string version, string expectedVersion)
@@ -2271,17 +2232,12 @@ namespace WixToolset.Data
 
         public static Message WixVariableCollision(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.WixVariableCollision, "The WiX variable '{0}' is declared in more than one location.  Please remove one of the declarations.", variableId);
+            return Message(sourceLineNumbers, Ids.WixVariableCollision, "The WiX variable '{0}' is declared in more than one location. Please remove one of the declarations.", variableId);
         }
 
         public static Message WixVariableUnknown(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.WixVariableUnknown, "The WiX variable !(wix.{0}) is unknown.  Please ensure the variable is declared on the command line for light.exe, via a WixVariable element, or inline using the syntax !(wix.{0}=some value which doesn't contain parenthesis).", variableId);
-        }
-
-        public static Message WrongFileExtensionForNumberOfInputs(string inputExtension, string input)
-        {
-            return Message(null, Ids.WrongFileExtensionForNumberOfInputs, "The extension '{0}' on the input specified '{1}' does not match the number of inputs required to handle an input with this extension. Check if you are missing an input or have too many.", inputExtension, input);
+            return Message(sourceLineNumbers, Ids.WixVariableUnknown, "The WiX variable !(wix.{0}) is unknown. Please ensure the variable is declared on the command line for light.exe, via a WixVariable element, or inline using the syntax !(wix.{0}=some value which doesn't contain parenthesis).", variableId);
         }
 
         public static Message NoSourceFiles()
@@ -2341,7 +2297,7 @@ namespace WixToolset.Data
             StreamNameTooLong = 13,
             IllegalIdentifier = 14,
             IllegalYesNoValue = 15,
-            CabCreationFailed = 16,
+            CommandLineCommandRequired = 16,
             CabExtractionFailed = 17,
             AppIdIncompatibleAdvertiseState = 18,
             IllegalAttributeWhenAdvertised = 19,
@@ -2349,7 +2305,6 @@ namespace WixToolset.Data
             IllegalAttributeValue = 21,
             CustomActionMultipleSources = 22,
             CustomActionMultipleTargets = 23,
-            CustomActionIllegalInnerText = 24,
             IllegalShortFilename = 26,
             IllegalLongFilename = 27,
             TableNameTooLong = 28,
@@ -2367,7 +2322,6 @@ namespace WixToolset.Data
             ExampleGuid = 40,
             TooManyChildren = 41,
             ComponentMultipleKeyPaths = 42,
-            CabClosureFailed = 43,
             ExpectedAttributes = 44,
             ExpectedAttributesWithOtherAttribute = 45,
             ExpectedAttributesWithoutOtherAttribute = 46,
@@ -2586,7 +2540,7 @@ namespace WixToolset.Data
             InvalidPlatformValue = 265,
             IllegalValidationArguments = 266,
             OrphanedComponent = 267,
-            IllegalCommandlineArgumentCombination = 268,
+            IllegalCommandLineArgumentValue = 268,
             ProductCodeInvalidForTransform = 269,
             InsertInvalidSequenceActionOrder = 270,
             InsertSequenceNoSpace = 271,
@@ -2641,8 +2595,6 @@ namespace WixToolset.Data
             BothUpgradeCodesRequired = 322,
             IllegalBinderClassName = 323,
             SpecifiedBinderNotFound = 324,
-            CannotLoadBinderFileManager = 325,
-            CannotLoadLinkerExtension = 326,
             UnableToGetAuthenticodeCertOfFile = 327,
             UnableToGetAuthenticodeCertOfFileDownlevelOS = 328,
             ReadOnlyOutputFile = 329,
@@ -2650,9 +2602,6 @@ namespace WixToolset.Data
             ParentElementAttributeRequired = 331,
             PreprocessorExtensionPragmaFailed = 333,
             InvalidPreprocessorPragma = 334,
-            SmokeUnknownFileExtension = 335,
-            SmokeUnsupportedFileExtension = 336,
-            SmokeMalformedPath = 337,
             InvalidStubExe = 338,
             StubMissingWixburnSection = 339,
             StubWixburnSectionTooSmall = 340,
@@ -2671,7 +2620,6 @@ namespace WixToolset.Data
             MultipleFilesMatchedWithOutputSpecification = 353,
             InvalidBundle = 354,
             BundleTooNew = 355,
-            WrongFileExtensionForNumberOfInputs = 356,
             MediaTableCollision = 357,
             InvalidCabinetTemplate = 358,
             MaximumUncompressedMediaSizeTooLarge = 359,
@@ -2691,7 +2639,6 @@ namespace WixToolset.Data
             MaximumCabinetSizeForLargeFileSplittingTooLarge = 375,
             SplitCabinetCopyRegistrationFailed = 376,
             SplitCabinetNameCollision = 377,
-            SplitCabinetInsertionFailed = 378,
             InvalidPreprocessorFunctionAutoVersion = 379,
             InvalidFourPartVersion = 380,
             UnsupportedPlatformForElement = 381,

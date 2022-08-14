@@ -102,33 +102,34 @@ namespace WixToolset.Core.Burn.CommandLine
             var inputPaths = this.ExpandInputPaths();
             if (inputPaths.Count == 0)
             {
-                Console.Error.WriteLine("Path to a remote payload is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("a remote payload"));
             }
-
-            // Reverse sort to ensure longest paths are matched first.
-            this.BasePaths.Sort();
-            this.BasePaths.Reverse();
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
-            }
+                // Reverse sort to ensure longest paths are matched first.
+                this.BasePaths.Sort();
+                this.BasePaths.Reverse();
 
-            var element = this.HarvestPackageElement(inputPaths);
-
-            if (!this.Messaging.EncounteredError)
-            {
-                if (!String.IsNullOrEmpty(this.OutputPath))
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
                 {
-                    var outputFolder = Path.GetDirectoryName(this.OutputPath);
-                    Directory.CreateDirectory(outputFolder);
-
-                    File.WriteAllText(this.OutputPath, element.ToString());
+                    this.IntermediateFolder = Path.GetTempPath();
                 }
-                else
+
+                var element = this.HarvestPackageElement(inputPaths);
+
+                if (!this.Messaging.EncounteredError)
                 {
-                    Console.WriteLine(element.ToString());
+                    if (!String.IsNullOrEmpty(this.OutputPath))
+                    {
+                        var outputFolder = Path.GetDirectoryName(this.OutputPath);
+                        Directory.CreateDirectory(outputFolder);
+
+                        File.WriteAllText(this.OutputPath, element.ToString());
+                    }
+                    else
+                    {
+                        Console.WriteLine(element.ToString());
+                    }
                 }
             }
 
@@ -149,12 +150,16 @@ namespace WixToolset.Core.Burn.CommandLine
 
                     case "bundlepayloadgeneration":
                         var bundlePayloadGenerationValue = parser.GetNextArgumentOrError(argument);
-                        if (Enum.TryParse<BundlePackagePayloadGenerationType>(bundlePayloadGenerationValue, ignoreCase: true, out var bundlePayloadGeneration))
+                        if (Enum.TryParse(bundlePayloadGenerationValue, ignoreCase: true, out BundlePackagePayloadGenerationType bundlePayloadGeneration))
                         {
                             this.BundlePayloadGeneration = bundlePayloadGeneration;
-                            return true;
                         }
-                        break;
+                        else if (!String.IsNullOrEmpty(bundlePayloadGenerationValue))
+                        {
+                            parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, bundlePayloadGenerationValue, Enum.GetNames(typeof(BundlePackagePayloadGenerationType)).Select(s => s.ToLowerInvariant())));
+                        }
+
+                        return true;
 
                     case "du":
                     case "downloadurl":
@@ -167,16 +172,20 @@ namespace WixToolset.Core.Burn.CommandLine
 
                     case "packagetype":
                         var packageTypeValue = parser.GetNextArgumentOrError(argument);
-                        if (Enum.TryParse<WixBundlePackageType>(packageTypeValue, ignoreCase: true, out var packageType))
+                        if (Enum.TryParse(packageTypeValue, ignoreCase: true, out WixBundlePackageType packageType))
                         {
                             this.PackageType = packageType;
-                            return true;
                         }
-                        break;
+                        else if (!String.IsNullOrEmpty(packageTypeValue))
+                        {
+                            parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, packageTypeValue, Enum.GetNames(typeof(WixBundlePackageType)).Select(s => s.ToLowerInvariant())));
+                        }
+
+                        return true;
 
                     case "o":
                     case "out":
-                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument, "output file");
                         return true;
 
                     case "r":

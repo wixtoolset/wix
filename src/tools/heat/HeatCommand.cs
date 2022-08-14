@@ -75,7 +75,7 @@ namespace WixToolset.Harvesters
                 }
                 else if ("o" == parameter || "out" == parameter)
                 {
-                    this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                    this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg, "output source file");
 
                     if (String.IsNullOrEmpty(this.OutputFile))
                     {

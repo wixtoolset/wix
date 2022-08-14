@@ -5,6 +5,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -17,9 +18,12 @@ namespace WixToolset.Core.Burn.CommandLine
         public BurnCommand(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private BurnSubcommandBase Subcommand { get; set; }
 
@@ -41,8 +45,8 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             if (this.Subcommand is null)
             {
-                Console.Error.WriteLine("A subcommand is required for the \"burn\" command. Add -h to for help.");
-                return Task.FromResult(1);
+                this.Messaging.Write(ErrorMessages.CommandLineCommandRequired("burn"));
+                return Task.FromResult(this.Messaging.LastErrorNumber);
             }
 
             return this.Subcommand.ExecuteAsync(cancellationToken);

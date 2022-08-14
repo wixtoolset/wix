@@ -753,7 +753,7 @@ namespace WixToolsetTest.CoreIntegration
                     first =>
                     {
                         Assert.Equal(MessageLevel.Error, first.Level);
-                        WixAssert.StringEqual("Cannot find the table definitions for the 'TableDefinitionNotExposedByExtension' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", first.ToString());
+                        WixAssert.StringEqual("Cannot find the table definitions for the 'TableDefinitionNotExposedByExtension' table. This is likely due to a typing error or missing extension. Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", first.ToString());
                     });
 
                 Assert.False(File.Exists(msiPath));

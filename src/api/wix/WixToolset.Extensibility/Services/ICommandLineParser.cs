@@ -73,8 +73,9 @@ namespace WixToolset.Extensibility.Services
         /// Gets the next argument as a file or displays an error.
         /// </summary>
         /// <param name="argument">Current argument used in the error message if necessary.</param>
+        /// <param name="filePurpose">Purpose of the required file.</param>
         /// <returns>The fully expanded path if the argument is a file path, otherwise null.</returns>
-        string GetNextArgumentAsFilePathOrError(string argument);
+        string GetNextArgumentAsFilePathOrError(string argument, string filePurpose);
 
         /// <summary>
         /// Adds the next argument as a file to the list or displays an error.

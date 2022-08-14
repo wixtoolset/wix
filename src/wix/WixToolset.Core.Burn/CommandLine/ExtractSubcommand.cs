@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Bundles;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -41,34 +42,33 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             if (String.IsNullOrEmpty(this.InputPath))
             {
-                Console.Error.WriteLine("Path to input bundle is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input bundle"));
             }
-
-            if (String.IsNullOrEmpty(this.ExtractPath))
+            else if (String.IsNullOrEmpty(this.ExtractPath))
             {
-                Console.Error.WriteLine("Path to output the extracted bundle is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("output the extracted bundle"));
             }
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
-            }
-
-            var uxExtractPath = Path.Combine(this.ExtractPath, "BA");
-
-            using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputPath))
-            {
-                reader.ExtractUXContainer(uxExtractPath, this.IntermediateFolder);
-
-                try
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
                 {
-                    reader.ExtractAttachedContainers(this.ExtractPath, this.IntermediateFolder);
+                    this.IntermediateFolder = Path.GetTempPath();
                 }
-                catch
+
+                var uxExtractPath = Path.Combine(this.ExtractPath, "BA");
+
+                using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputPath))
                 {
-                    this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new Data.SourceLineNumber(this.ExtractPath)));
+                    reader.ExtractUXContainer(uxExtractPath, this.IntermediateFolder);
+
+                    try
+                    {
+                        reader.ExtractAttachedContainers(this.ExtractPath, this.IntermediateFolder);
+                    }
+                    catch
+                    {
+                        this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new Data.SourceLineNumber(this.ExtractPath)));
+                    }
                 }
             }
 

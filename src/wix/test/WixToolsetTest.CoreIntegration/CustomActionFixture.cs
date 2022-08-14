@@ -33,7 +33,7 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 Assert.Equal(176, result.ExitCode);
-                WixAssert.StringEqual("The InstallExecuteSequence table contains an action 'Action1' that is scheduled to come before or after action 'Action3', which is also scheduled to come before or after action 'Action1'.  Please remove this circular dependency by changing the Before or After attribute for one of the actions.", result.Messages[0].ToString());
+                WixAssert.StringEqual("The InstallExecuteSequence table contains an action 'Action1' that is scheduled to come before or after action 'Action3', which is also scheduled to come before or after action 'Action1'. Please remove this circular dependency by changing the Before or After attribute for one of the actions.", result.Messages[0].ToString());
             }
         }
 
@@ -60,7 +60,7 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 Assert.Equal(176, result.ExitCode);
-                WixAssert.StringEqual("The InstallExecuteSequence table contains an action 'Action2' that is scheduled to come before or after action 'Action4', which is also scheduled to come before or after action 'Action2'.  Please remove this circular dependency by changing the Before or After attribute for one of the actions.", result.Messages[0].ToString());
+                WixAssert.StringEqual("The InstallExecuteSequence table contains an action 'Action2' that is scheduled to come before or after action 'Action4', which is also scheduled to come before or after action 'Action2'. Please remove this circular dependency by changing the Before or After attribute for one of the actions.", result.Messages[0].ToString());
             }
         }
 
