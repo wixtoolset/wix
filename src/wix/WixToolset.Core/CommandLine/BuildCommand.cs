@@ -520,9 +520,13 @@ namespace WixToolset.Core.CommandLine
                             if (Enum.TryParse(value, true, out Platform platform))
                             {
                                 this.Platform = platform;
-                                return true;
                             }
-                            break;
+                            else if (!String.IsNullOrEmpty(value))
+                            {
+                                parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(Platform)).Select(s => s.ToLowerInvariant())));
+                            }
+
+                            return true;
                         }
 
                         case "bf":
@@ -536,9 +540,8 @@ namespace WixToolset.Core.CommandLine
                             if (value != null && this.TryParseBindPath(value, out var bindPath))
                             {
                                 this.BindPaths.Add(bindPath);
-                                return true;
                             }
-                            return false;
+                            return true;
                         }
 
                         case "cc":
@@ -551,7 +554,7 @@ namespace WixToolset.Core.CommandLine
                             return true;
 
                         case "trackingfile":
-                            this.TrackingFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            this.TrackingFile = parser.GetNextArgumentAsFilePathOrError(arg, "tracking file");
                             return true;
 
                         case "d":
@@ -566,9 +569,13 @@ namespace WixToolset.Core.CommandLine
                             if (Enum.TryParse(value, true, out CompressionLevel compressionLevel))
                             {
                                 this.DefaultCompressionLevel = compressionLevel;
-                                return true;
                             }
-                            return false;
+                            else if (!String.IsNullOrEmpty(value))
+                            {
+                                parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(CompressionLevel)).Select(s => s.ToLowerInvariant())));
+                            }
+
+                            return true;
                         }
 
                         case "i":
@@ -594,7 +601,7 @@ namespace WixToolset.Core.CommandLine
 
                         case "o":
                         case "out":
-                            this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg, "output file");
                             return true;
 
                         case "outputtype":
@@ -602,7 +609,7 @@ namespace WixToolset.Core.CommandLine
                             return true;
 
                         case "pdb":
-                            this.PdbFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            this.PdbFile = parser.GetNextArgumentAsFilePathOrError(arg, "wixpdb file");
                             return true;
 
                         case "pdbtype":
@@ -611,9 +618,13 @@ namespace WixToolset.Core.CommandLine
                                 if (Enum.TryParse(value, true, out PdbType pdbType))
                                 {
                                     this.PdbType = pdbType;
-                                    return true;
                                 }
-                                return false;
+                                else if (!String.IsNullOrEmpty(value))
+                                {
+                                    parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(PdbType)).Select(s => s.ToLowerInvariant())));
+                                }
+
+                                return true;
                             }
 
                         case "resetacls":

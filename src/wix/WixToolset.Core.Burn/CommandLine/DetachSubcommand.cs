@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Inscribe;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -41,23 +42,22 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             if (String.IsNullOrEmpty(this.InputPath))
             {
-                Console.Error.WriteLine("Path to input bundle is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input bundle"));
             }
-
-            if (String.IsNullOrEmpty(this.EngineOutputPath))
+            else if (String.IsNullOrEmpty(this.EngineOutputPath))
             {
-                Console.Error.WriteLine("Path to output the bundle engine is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("output the bundle engine"));
             }
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
-            }
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
+                {
+                    this.IntermediateFolder = Path.GetTempPath();
+                }
 
-            var command = new InscribeBundleEngineCommand(this.ServiceProvider, this.InputPath, this.EngineOutputPath, this.IntermediateFolder);
-            command.Execute();
+                var command = new InscribeBundleEngineCommand(this.ServiceProvider, this.InputPath, this.EngineOutputPath, this.IntermediateFolder);
+                command.Execute();
+            }
 
             return Task.FromResult(this.Messaging.LastErrorNumber);
         }
@@ -74,7 +74,7 @@ namespace WixToolset.Core.Burn.CommandLine
                         return true;
 
                     case "engine":
-                        this.EngineOutputPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.EngineOutputPath = parser.GetNextArgumentAsFilePathOrError(argument, "output the bundle engine");
                         return true;
                 }
             }

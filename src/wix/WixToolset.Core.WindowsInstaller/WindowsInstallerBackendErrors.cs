@@ -29,6 +29,16 @@ namespace WixToolset.Core.WindowsInstaller
             return Message(originalLineNumber, Ids.InvalidModuleVersion, "The Module/@Version was not be able to be used as a four-part version. A valid four-part version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", version);
         }
 
+        public static Message UnknownDecompileType(string decompileType, string filePath)
+        {
+            return Message(null, Ids.UnknownDecompileType, "Unknown decompile type '{0}' from input: {1}", decompileType, filePath);
+        }
+
+        public static Message UnknownValidationTargetFileExtension(string fileExtension)
+        {
+            return Message(null, Ids.UnknownValidationTargetFileExtension, "Unknown file extension: {0}. Use the -cub switch to specify the path to the ICE CUBe file", fileExtension);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -40,6 +50,8 @@ namespace WixToolset.Core.WindowsInstaller
             InvalidModuleVersion = 7501,
             ExceededMaximumAllowedComponentsInMsi = 7502,
             ExceededMaximumAllowedFeatureDepthInMsi = 7503,
+            UnknownDecompileType = 7504,
+            UnknownValidationTargetFileExtension = 7505,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }

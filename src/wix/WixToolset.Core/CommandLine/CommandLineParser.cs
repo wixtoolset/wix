@@ -31,20 +31,20 @@ namespace WixToolset.Core.CommandLine
             return !String.IsNullOrEmpty(arg) && '-' == arg[0];
         }
 
-        public string GetArgumentAsFilePathOrError(string argument, string fileType)
+        public string GetArgumentAsFilePathOrError(string argument, string filePurpose)
         {
             if (!File.Exists(argument))
             {
-                this.Messaging.Write(ErrorMessages.FileNotFound(null, argument, fileType));
+                this.Messaging.Write(ErrorMessages.FileNotFound(null, argument, filePurpose));
                 return null;
             }
 
             return argument;
         }
 
-        public bool GetArgumentAsFilePathOrError(string argument, string fileType, IList<string> paths)
+        public bool GetArgumentAsFilePathOrError(string argument, string filePurpose, IList<string> paths)
         {
-            var files = this.GetFiles(argument, fileType);
+            var files = this.GetFiles(argument, filePurpose);
 
             foreach (var path in files)
             {
@@ -100,9 +100,9 @@ namespace WixToolset.Core.CommandLine
             return false;
         }
 
-        public string GetNextArgumentAsFilePathOrError(string commandLineSwitch)
+        public string GetNextArgumentAsFilePathOrError(string commandLineSwitch, string filePurpose)
         {
-            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetFile(commandLineSwitch, arg, out var path))
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetFile(commandLineSwitch, arg, filePurpose, out var path))
             {
                 return path;
             }
@@ -189,13 +189,13 @@ namespace WixToolset.Core.CommandLine
             return directory != null;
         }
 
-        private bool TryGetFile(string commandlineSwitch, string arg, out string path)
+        private bool TryGetFile(string commandlineSwitch, string arg, string purpose, out string path)
         {
             path = null;
 
             if (String.IsNullOrEmpty(arg) || '-' == arg[0])
             {
-                this.Messaging.Write(ErrorMessages.FilePathRequired(commandlineSwitch));
+                this.Messaging.Write(ErrorMessages.FilePathRequired(commandlineSwitch, purpose));
             }
             else if (Directory.Exists(arg))
             {

@@ -62,58 +62,57 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             if (String.IsNullOrEmpty(this.InputPath))
             {
-                Console.Error.WriteLine("Input MSI or MSM database is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input MSI or MSM database"));
             }
-
-            if (!this.TryCalculateDecompileType(out var decompileType))
+            else if (!this.TryCalculateDecompileType(out var decompileType))
             {
-                Console.Error.WriteLine("Unknown output type '{0}' from input: {1}", decompileType, this.InputPath);
-                return Task.FromResult(-1);
+                this.Messaging.Write(WindowsInstallerBackendErrors.UnknownDecompileType(this.DecompileType, this.InputPath));
             }
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
-            }
-
-            if (String.IsNullOrEmpty(this.OutputPath))
-            {
-                this.OutputPath = Path.ChangeExtension(this.InputPath, ".wxs");
-            }
-
-            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
-            var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
-
-            var context = this.ServiceProvider.GetService<IWindowsInstallerDecompileContext>();
-            context.Extensions = extensionManager.GetServices<IWindowsInstallerDecompilerExtension>();
-            context.ExtensionData = extensionManager.GetServices<IExtensionData>();
-            context.DecompilePath = this.InputPath;
-            context.DecompileType = decompileType;
-            context.IntermediateFolder = this.IntermediateFolder;
-            context.SymbolDefinitionCreator = creator;
-            context.OutputPath = this.OutputPath;
-
-            context.ExtractFolder = this.ExportBasePath ?? this.IntermediateFolder;
-            context.SuppressCustomTables = this.SuppressCustomTables;
-            context.SuppressDroppingEmptyTables = this.SuppressDroppingEmptyTables;
-            context.SuppressRelativeActionSequencing = this.SuppressRelativeActionSequencing;
-            context.SuppressUI = this.SuppressUI;
-
-            try
-            {
-                var decompiler = this.ServiceProvider.GetService<IWindowsInstallerDecompiler>();
-                var result = decompiler.Decompile(context);
-
-                if (!this.Messaging.EncounteredError)
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(context.OutputPath)));
-                    result.Document.Save(context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
+                    this.IntermediateFolder = Path.GetTempPath();
                 }
-            }
-            catch (WixException e)
-            {
-                this.Messaging.Write(e.Error);
+
+                if (String.IsNullOrEmpty(this.OutputPath))
+                {
+                    this.OutputPath = Path.ChangeExtension(this.InputPath, ".wxs");
+                }
+
+                var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+                var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
+
+                var context = this.ServiceProvider.GetService<IWindowsInstallerDecompileContext>();
+                context.Extensions = extensionManager.GetServices<IWindowsInstallerDecompilerExtension>();
+                context.ExtensionData = extensionManager.GetServices<IExtensionData>();
+                context.DecompilePath = this.InputPath;
+                context.DecompileType = decompileType;
+                context.IntermediateFolder = this.IntermediateFolder;
+                context.SymbolDefinitionCreator = creator;
+                context.OutputPath = this.OutputPath;
+
+                context.ExtractFolder = this.ExportBasePath ?? this.IntermediateFolder;
+                context.SuppressCustomTables = this.SuppressCustomTables;
+                context.SuppressDroppingEmptyTables = this.SuppressDroppingEmptyTables;
+                context.SuppressRelativeActionSequencing = this.SuppressRelativeActionSequencing;
+                context.SuppressUI = this.SuppressUI;
+
+                try
+                {
+                    var decompiler = this.ServiceProvider.GetService<IWindowsInstallerDecompiler>();
+                    var result = decompiler.Decompile(context);
+
+                    if (!this.Messaging.EncounteredError)
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(context.OutputPath)));
+                        result.Document.Save(context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
+                    }
+                }
+                catch (WixException e)
+                {
+                    this.Messaging.Write(e.Error);
+                }
             }
 
             return Task.FromResult(this.Messaging.LastErrorNumber);
@@ -132,7 +131,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
                     case "o":
                     case "out":
-                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument, "output file");
                         return true;
 
                     case "sct":

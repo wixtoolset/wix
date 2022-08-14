@@ -102,29 +102,28 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             if (String.IsNullOrEmpty(this.TargetPath))
             {
-                Console.Error.WriteLine("Input file required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input file"));
             }
-
-            if (String.IsNullOrEmpty(this.OutputPath))
+            else if (String.IsNullOrEmpty(this.OutputPath))
             {
-                Console.Error.WriteLine("Output file required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("output file"));
             }
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
+                {
+                    this.IntermediateFolder = Path.GetTempPath();
+                }
+
+                var transform = this.LoadTransform();
+
+                if (!this.Messaging.EncounteredError)
+                {
+                    this.SaveTransform(transform);
+                }
             }
 
-            var transform = this.LoadTransform();
-
-            if (!this.Messaging.EncounteredError)
-            {
-                this.SaveTransform(transform);
-            }
-
-            return Task.FromResult(this.Messaging.EncounteredError ? 1 : 0);
+            return Task.FromResult(this.Messaging.LastErrorNumber);
         }
 
         public override bool TryParseArgument(ICommandLineParser parser, string argument)
@@ -144,7 +143,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
                     case "o":
                     case "out":
-                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument, "output file");
                         return true;
 
                     case "p":
@@ -158,6 +157,10 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                     case "serr":
                     {
                         var serr = parser.GetNextArgumentOrError(argument);
+                        if (String.IsNullOrEmpty(serr))
+                        {
+                            return true;
+                        }
 
                         switch (serr.ToLowerInvariant())
                         {
@@ -186,7 +189,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                                 return true;
 
                             default:
-                                this.Messaging.Write(ErrorMessages.ExpectedArgument(serr));
+                                parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, serr, new[] { "a", "b", "c", "d", "e", "f" }));
                                 return true;
                         }
                     }
@@ -194,6 +197,10 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                     case "val":
                     {
                         var val = parser.GetNextArgumentOrError(argument);
+                        if (String.IsNullOrEmpty(val))
+                        {
+                            return true;
+                        }
 
                         switch (val.ToLowerInvariant())
                         {
@@ -254,7 +261,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                                 return true;
 
                             default:
-                                this.Messaging.Write(ErrorMessages.ExpectedArgument(val));
+                                parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, val, new[] { "language", "instance", "patch", "g", "l", "r", "s", "t", "u", "v", "w", "x", "y", "z" }));
                                 return true;
                         }
                     }

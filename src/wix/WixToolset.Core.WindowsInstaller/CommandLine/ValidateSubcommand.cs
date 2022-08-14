@@ -8,6 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.WindowsInstaller.Validate;
+    using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -54,11 +55,9 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
             if (String.IsNullOrEmpty(this.DatabasePath))
             {
-                Console.Error.WriteLine("Input MSI or MSM database is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input MSI or MSM database"));
             }
-
-            if (this.CubeFiles.Count == 0)
+            else if (this.CubeFiles.Count == 0)
             {
                 var ext = Path.GetExtension(this.DatabasePath);
                 switch (ext.ToLowerInvariant())
@@ -72,30 +71,33 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                         break;
 
                     default:
-                        Console.Error.WriteLine("Unknown extension: {0}. Use the -cub switch to specify the path to the ICE CUBe file", ext);
-                        return Task.FromResult(-1);
+                        this.Messaging.Write(WindowsInstallerBackendErrors.UnknownValidationTargetFileExtension(ext));
+                        break;
                 }
             }
 
-            if (String.IsNullOrEmpty(this.WixpdbPath))
+            if (!this.Messaging.EncounteredError)
             {
-                this.WixpdbPath = Path.ChangeExtension(this.DatabasePath, ".wixpdb");
+                if (String.IsNullOrEmpty(this.WixpdbPath))
+                {
+                    this.WixpdbPath = Path.ChangeExtension(this.DatabasePath, ".wixpdb");
+                }
+
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
+                {
+                    this.IntermediateFolder = Path.GetTempPath();
+                }
+
+                if (File.Exists(this.WixpdbPath))
+                {
+                    data = WindowsInstallerData.Load(this.WixpdbPath);
+                }
+
+                var command = new ValidateDatabaseCommand(this.Messaging, this.FileSystem, this.IntermediateFolder, this.DatabasePath, data, this.CubeFiles, this.Ices, this.SuppressIces);
+                command.Execute();
             }
 
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
-            {
-                this.IntermediateFolder = Path.GetTempPath();
-            }
-
-            if (File.Exists(this.WixpdbPath))
-            {
-                data = WindowsInstallerData.Load(this.WixpdbPath);
-            }
-
-            var command = new ValidateDatabaseCommand(this.Messaging, this.FileSystem, this.IntermediateFolder, this.DatabasePath, data, this.CubeFiles, this.Ices, this.SuppressIces);
-            command.Execute();
-
-            return Task.FromResult(this.Messaging.EncounteredError ? 1 : 0);
+            return Task.FromResult(this.Messaging.LastErrorNumber);
         }
 
         public override bool TryParseArgument(ICommandLineParser parser, string argument)
@@ -106,33 +108,24 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 switch (parameter.ToLowerInvariant())
                 {
                     case "cub":
-                    {
-                        var value = parser.GetNextArgumentOrError(argument);
-                        this.CubeFiles.Add(value);
+                        parser.GetNextArgumentOrError(argument, this.CubeFiles);
                         return true;
-                    }
 
                     case "ice":
-                    {
-                        var value = parser.GetNextArgumentOrError(argument);
-                        this.Ices.Add(value);
+                        parser.GetNextArgumentOrError(argument, this.Ices);
                         return true;
-                    }
 
                     case "intermediatefolder":
                         this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
 
                     case "pdb":
-                        this.WixpdbPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.WixpdbPath = parser.GetNextArgumentAsFilePathOrError(argument, "wixpdb path");
                         return true;
 
                     case "sice":
-                    {
-                        var value = parser.GetNextArgumentOrError(argument);
-                        this.SuppressIces.Add(value);
+                        parser.GetNextArgumentOrError(argument, this.SuppressIces);
                         return true;
-                    }
                 }
             }
             else if (String.IsNullOrEmpty(this.DatabasePath))

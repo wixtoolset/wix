@@ -7,6 +7,7 @@ namespace WixToolset.Core.ExtensionCache
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -62,8 +63,8 @@ namespace WixToolset.Core.ExtensionCache
         {
             if (!this.Subcommand.HasValue)
             {
-                Console.Error.WriteLine("A subcommand is required for the \"extension\" command. Use -h to for help.");
-                return -1;
+                this.Messaging.Write(ErrorMessages.CommandLineCommandRequired("extension"));
+                return this.Messaging.LastErrorNumber;
             }
 
             var success = false;

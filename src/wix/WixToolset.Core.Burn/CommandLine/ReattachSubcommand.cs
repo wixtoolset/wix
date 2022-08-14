@@ -7,6 +7,7 @@ namespace WixToolset.Core.Burn.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Inscribe;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -32,7 +33,7 @@ namespace WixToolset.Core.Burn.CommandLine
 
         public override CommandLineHelp GetCommandLineHelp()
         {
-            return new CommandLineHelp("Reattaches a signed burn engine to a bundle.", "burn reattach [options] original.exe signed.exe -o final.exe", new[]
+            return new CommandLineHelp("Reattaches a signed burn engine to a bundle.", "burn reattach [options] original.exe -engine signed.exe -o final.exe", new[]
             {
                 new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
                 new CommandLineHelpSwitch("-out", "-o", "Output bundle with signed engine attached."),
@@ -43,39 +44,39 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             if (String.IsNullOrEmpty(this.InputPath))
             {
-                Console.Error.WriteLine("Path to input bundle is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input bundle"));
             }
-
-            if (String.IsNullOrEmpty(this.SignedEnginePath))
+            else if (String.IsNullOrEmpty(this.SignedEnginePath))
             {
-                Console.Error.WriteLine("Path to detached signed bundle engine is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("detached signed bundle bundle"));
             }
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
+                {
+                    this.IntermediateFolder = Path.GetTempPath();
+                }
+
+                if (String.IsNullOrEmpty(this.OutputPath))
+                {
+                    this.OutputPath = this.InputPath;
+                }
+
+                var command = new InscribeBundleCommand(this.ServiceProvider, this.InputPath, this.SignedEnginePath, this.OutputPath, this.IntermediateFolder);
+                var didWork = command.Execute();
+
+                // If the detach subcommand did not encounter an error but did no work
+                // then return the special exit code that indicates no work was done (-1000).
+                var exitCode = this.Messaging.LastErrorNumber;
+
+                if (!didWork && exitCode == 0)
+                {
+                    exitCode = -1000;
+                    return Task.FromResult(exitCode);
+                }
             }
 
-            if (String.IsNullOrEmpty(this.OutputPath))
-            {
-                this.OutputPath = this.InputPath;
-            }
-
-            var command = new InscribeBundleCommand(this.ServiceProvider, this.InputPath, this.SignedEnginePath, this.OutputPath, this.IntermediateFolder);
-            var didWork = command.Execute();
-
-            // If the detach subcommand did not encounter an error but did no work
-            // then return the special exit code that indicates no work was done (-1000).
-            var exitCode = this.Messaging.LastErrorNumber;
-
-            if (!didWork && exitCode == 0)
-            {
-                exitCode = -1000;
-            }
-
-            return Task.FromResult(exitCode);
+            return Task.FromResult(this.Messaging.LastErrorNumber);
         }
 
         public override bool TryParseArgument(ICommandLineParser parser, string argument)
@@ -86,7 +87,7 @@ namespace WixToolset.Core.Burn.CommandLine
                 switch (parameter.ToLowerInvariant())
                 {
                     case "engine":
-                        this.SignedEnginePath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.SignedEnginePath = parser.GetNextArgumentAsFilePathOrError(argument, "detached signed bundle bundle");
                         return true;
 
                     case "intermediatefolder":
@@ -95,7 +96,7 @@ namespace WixToolset.Core.Burn.CommandLine
 
                     case "o":
                     case "out":
-                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument, "output bundle");
                         return true;
                 }
             }

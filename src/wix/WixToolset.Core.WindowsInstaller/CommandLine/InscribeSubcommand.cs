@@ -7,6 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.WindowsInstaller.Inscribe;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -41,22 +42,23 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             if (String.IsNullOrEmpty(this.InputPath))
             {
-                Console.Error.WriteLine("Input MSI database is required");
-                return Task.FromResult(-1);
+                this.Messaging.Write(ErrorMessages.FilePathRequired("input MSI database"));
             }
-
-            if (String.IsNullOrEmpty(this.IntermediateFolder))
+            else
             {
-                this.IntermediateFolder = Path.GetTempPath();
-            }
+                if (String.IsNullOrEmpty(this.IntermediateFolder))
+                {
+                    this.IntermediateFolder = Path.GetTempPath();
+                }
 
-            if (String.IsNullOrEmpty(this.OutputPath))
-            {
-                this.OutputPath = this.InputPath;
-            }
+                if (String.IsNullOrEmpty(this.OutputPath))
+                {
+                    this.OutputPath = this.InputPath;
+                }
 
-            var command = new InscribeMsiPackageCommand(this.ServiceProvider, this.InputPath, this.IntermediateFolder, this.OutputPath);
-            command.Execute();
+                var command = new InscribeMsiPackageCommand(this.ServiceProvider, this.InputPath, this.IntermediateFolder, this.OutputPath);
+                command.Execute();
+            }
 
             return Task.FromResult(this.Messaging.LastErrorNumber);
         }
@@ -74,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
                     case "o":
                     case "out":
-                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument);
+                        this.OutputPath = parser.GetNextArgumentAsFilePathOrError(argument, "output file");
                         return true;
                 }
             }
