@@ -832,12 +832,16 @@ public: // IBootstrapperApplication
         __in DWORD dwCode,
         __in_z LPCWSTR wzError,
         __in DWORD dwUIHint,
-        __in DWORD /*cData*/,
-        __in_ecount_z_opt(cData) LPCWSTR* /*rgwzData*/,
-        __in int /*nRecommendation*/,
+        __in DWORD cData,
+        __in_ecount_z_opt(cData) LPCWSTR* rgwzData,
+        __in int nRecommendation,
         __inout int* pResult
         )
     {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnError() - package: %ls, code: %d, ui hint: %d, message: %ls", wzPackageId, dwCode, dwUIHint, wzError);
+#endif
+
         HRESULT hr = S_OK;
         int nResult = *pResult;
         LPWSTR sczError = NULL;
@@ -887,8 +891,14 @@ public: // IBootstrapperApplication
         }
 
         ReleaseStr(sczError);
+
         *pResult = nResult;
-        return hr;
+
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnError() - package: %ls, hr: 0x%0x, result: %d", wzPackageId, hr, nResult);
+#endif
+
+        return FAILED(hr) ? hr : __super::OnError(errorType, wzPackageId, dwCode, wzError, dwUIHint, cData, rgwzData, nRecommendation, pResult);
     }
 
 
@@ -906,12 +916,16 @@ public: // IBootstrapperApplication
 #ifdef DEBUG
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnExecuteMsiMessage() - package: %ls, message: %ls", wzPackageId, wzMessage);
 #endif
+
         if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display && (INSTALLMESSAGE_WARNING == messageType || INSTALLMESSAGE_USER == messageType))
         {
             if (!m_fShowingInternalUiThisPackage)
             {
                 int nResult = ::MessageBoxW(m_hWnd, wzMessage, m_pTheme->sczCaption, dwUIHint);
-                return nResult;
+
+                *pResult = nResult;
+
+                return __super::OnExecuteMsiMessage(wzPackageId, messageType, dwUIHint, wzMessage, cData, rgwzData, nRecommendation, pResult);
             }
         }
 
