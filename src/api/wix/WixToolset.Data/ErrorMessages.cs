@@ -1444,9 +1444,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.MergePlatformMismatch, "'{0}' is a 64-bit merge module but the product consuming it is 32-bit. 32-bit products can consume only 32-bit merge modules.", mergeModuleFile);
         }
 
-        public static Message MissingBundleInformation(string data)
+        public static Message MissingBundleInformation(string friendlyName)
         {
-            return Message(null, Ids.MissingBundleInformation, "The Bundle is missing '{0}' data, and cannot continue.", data);
+            return Message(null, Ids.MissingBundleInformation, "The Bundle is missing {0} data, and cannot continue.", friendlyName);
         }
 
         public static Message MissingBundleSearch(SourceLineNumber sourceLineNumbers, string searchId)

@@ -730,5 +730,37 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(7004, result.ExitCode);
             }
         }
+
+        [Fact]
+        public void CannotBuildWithMissingBootstrapperApplication()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                try
+                {
+                    WixRunner.Execute(new[]
+                    {
+                    "build",
+                    Path.Combine(folder, "BundleWithInvalid", "BundleWithMissingBA.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                    });
+                }
+                catch (WixException we)
+                {
+                    Assert.Equal(341, we.Error.Id);
+                    return;
+                }
+
+                Assert.False(true, "Expected exception not accepted.");
+            }
+        }
     }
 }
