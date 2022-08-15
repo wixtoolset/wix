@@ -96,9 +96,7 @@ namespace WixToolset.Core.Burn
             var wixGroupSymbols = this.GetRequiredSymbols<WixGroupSymbol>();
 
             // Ensure there is one and only one WixBundleSymbol.
-            // The compiler and linker behavior should have colluded to get
-            // this behavior.
-            var bundleSymbol = this.GetSingleSymbol<WixBundleSymbol>();
+            var bundleSymbol = this.GetSingleSymbol<WixBundleSymbol>("bundle");
 
             bundleSymbol.ProviderKey = bundleSymbol.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
@@ -107,14 +105,10 @@ namespace WixToolset.Core.Burn
             this.NormalizeRelatedBundles(bundleSymbol, section);
 
             // Ensure there is one and only one WixBootstrapperApplicationDllSymbol.
-            // The compiler and linker behavior should have colluded to get
-            // this behavior.
-            var bundleApplicationDllSymbol = this.GetSingleSymbol<WixBootstrapperApplicationDllSymbol>();
+            var bundleApplicationDllSymbol = this.GetSingleSymbol<WixBootstrapperApplicationDllSymbol>("bootstrapper application");
 
             // Ensure there is one and only one WixChainSymbol.
-            // The compiler and linker behavior should have colluded to get
-            // this behavior.
-            var chainSymbol = this.GetSingleSymbol<WixChainSymbol>();
+            var chainSymbol = this.GetSingleSymbol<WixChainSymbol>("package chain");
 
             if (this.Messaging.EncounteredError)
             {
@@ -317,7 +311,7 @@ namespace WixToolset.Core.Burn
                 if (0 == uxPayloadIndex)
                 {
                     // If we didn't get any UX payloads, it's an error!
-                    throw new WixException(ErrorMessages.MissingBundleInformation("BootstrapperApplication"));
+                    throw new WixException(ErrorMessages.MissingBundleInformation("bootstrapper application"));
                 }
 
                 // Give the embedded payloads without an embedded id yet an embedded id.
@@ -691,13 +685,13 @@ namespace WixToolset.Core.Burn
             return symbols;
         }
 
-        private T GetSingleSymbol<T>() where T : IntermediateSymbol
+        private T GetSingleSymbol<T>(string elementName) where T : IntermediateSymbol
         {
             var symbols = this.Output.Sections.Single().Symbols.OfType<T>().ToList();
 
             if (1 != symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(typeof(T).Name));
+                throw new WixException(ErrorMessages.MissingBundleInformation(elementName));
             }
 
             return symbols[0];
