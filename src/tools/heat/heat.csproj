@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" />
     <PackageReference Include="System.DirectoryServices" />
   </ItemGroup>
