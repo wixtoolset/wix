@@ -35,9 +35,7 @@ namespace WixToolset.Harvesters
             component.KeyPath = Wix.YesNoType.yes;
             component.AddChild(perf);
 
-            Wix.Directory directory = new Wix.Directory();
-            directory.Id = "TARGETDIR";
-            //directory.Name = directory.Id;
+            var directory = DirectoryHelper.CreateDirectory("TARGETDIR");
             directory.AddChild(component);
 
             Wix.Fragment fragment = new Wix.Fragment();

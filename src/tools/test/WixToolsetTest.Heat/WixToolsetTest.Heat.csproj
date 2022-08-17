@@ -3,13 +3,23 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <IsPackable>false</IsPackable>
+    <DebugType>embedded</DebugType>
+    <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixBuildTools.TestSupport" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\heat\heat.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Core.TestPackage" />
   </ItemGroup>
 
   <ItemGroup>

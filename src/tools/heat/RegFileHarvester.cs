@@ -63,8 +63,7 @@ namespace WixToolset.Harvesters
                 throw new WixException(HarvesterErrors.FileNotFound(path));
             }
 
-            Wix.Directory directory = new Wix.Directory();
-            directory.Id = "TARGETDIR";
+            var directory = DirectoryHelper.CreateDirectory("TARGETDIR");
 
             // Use absolute paths
             path = Path.GetFullPath(path);
@@ -119,7 +118,7 @@ namespace WixToolset.Harvesters
         /// <param name="directory">A WiX directory reference.</param>
         /// <param name="root">The root key.</param>
         /// <param name="line">The current line.</param>
-        private void ConvertKey(StreamReader sr, ref Wix.Directory directory, Wix.RegistryRootType root, string line)
+        private void ConvertKey(StreamReader sr, ref Wix.DirectoryBase directory, Wix.RegistryRootType root, string line)
         {
             Wix.Component component = new Wix.Component();
 

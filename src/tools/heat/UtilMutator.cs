@@ -398,8 +398,7 @@ namespace WixToolset.Harvesters
                     this.fragments.Add(String.Concat("Component:", (null != component.Id ? component.Id : this.fragments.Count.ToString())), fragment);
 
                     // create a new DirectoryRef
-                    Wix.DirectoryRef directoryRef = new Wix.DirectoryRef();
-                    directoryRef.Id = directory.Id;
+                    var directoryRef = DirectoryHelper.CreateDirectoryReference(directory.Id);
                     fragment.AddChild(directoryRef);
 
                     // move the Component from the the Directory to the DirectoryRef
@@ -438,7 +437,7 @@ namespace WixToolset.Harvesters
                 {
                     if (directory.ParentElement is Wix.Directory)
                     {
-                        Wix.Directory parentDirectory = (Wix.Directory)directory.ParentElement;
+                        var parentDirectory = (Wix.DirectoryBase)directory.ParentElement;
 
                         // parent directory must have an identifier to create a reference to it
                         if (null == parentDirectory.Id)
@@ -451,8 +450,7 @@ namespace WixToolset.Harvesters
                         this.fragments.Add(String.Concat("Directory:", ("TARGETDIR" == directory.Id ? null : (null != directory.Id ? directory.Id : this.fragments.Count.ToString()))), fragment);
 
                         // create a new DirectoryRef
-                        Wix.DirectoryRef directoryRef = new Wix.DirectoryRef();
-                        directoryRef.Id = parentDirectory.Id;
+                        var directoryRef = DirectoryHelper.CreateDirectoryReference(parentDirectory.Id);
                         fragment.AddChild(directoryRef);
 
                         // move the Directory from the parent Directory to DirectoryRef

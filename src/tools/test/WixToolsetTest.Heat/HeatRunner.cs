@@ -1,17 +1,14 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.Harvesters
+namespace WixToolsetTest.Heat
 {
-    using System;
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Harvesters;
+    using WixToolset.Tools.Heat;
 
     /// <summary>
     /// Utility class to emulate heat.exe.
@@ -66,8 +63,6 @@ namespace WixToolsetTest.Harvesters
         /// <returns></returns>
         public static Task<int> Execute(string[] args, IWixToolsetCoreServiceProvider coreProvider, out List<Message> messages, bool warningsAsErrors = true)
         {
-            coreProvider.AddBundleBackend();
-
             var listener = new TestMessageListener();
 
             messages = listener.Messages;
@@ -80,12 +75,8 @@ namespace WixToolsetTest.Harvesters
                 messaging.WarningsAsError = true;
             }
 
-            var arguments = coreProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(args);
-
-            var commandLine = HeatCommandLineFactory.CreateCommandLine(coreProvider);
-            var command = commandLine.ParseStandardCommandLine(arguments);
-            return command?.ExecuteAsync(CancellationToken.None) ?? Task.FromResult(1);
+            var program = new Program();
+            return program.Run(coreProvider, listener, args);
         }
     }
 }
