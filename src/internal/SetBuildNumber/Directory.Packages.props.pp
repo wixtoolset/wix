@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
     <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
