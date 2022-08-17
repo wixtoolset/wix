@@ -24,20 +24,20 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum BurnContainerType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         attached,
-        
+
         detached,
     }
-    
+
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Enums
     {
-        
+
         /// <summary>
         /// Parses a BurnContainerType from a string.
         /// </summary>
@@ -47,7 +47,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseBurnContainerType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a BurnContainerType from a string.
         /// </summary>
@@ -76,7 +76,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a BurnExeProtocolType from a string.
         /// </summary>
@@ -86,7 +86,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseBurnExeProtocolType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a BurnExeProtocolType from a string.
         /// </summary>
@@ -122,7 +122,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a YesNoType from a string.
         /// </summary>
@@ -132,7 +132,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseYesNoType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a YesNoType from a string.
         /// </summary>
@@ -161,7 +161,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a YesNoButtonType from a string.
         /// </summary>
@@ -171,7 +171,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseYesNoButtonType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a YesNoButtonType from a string.
         /// </summary>
@@ -207,7 +207,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a YesNoDefaultType from a string.
         /// </summary>
@@ -217,7 +217,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseYesNoDefaultType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a YesNoDefaultType from a string.
         /// </summary>
@@ -262,7 +262,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryBundleCacheType(value, out var parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a YesNoAlwaysType from a string.
         /// </summary>
@@ -298,7 +298,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a RegistryRootType from a string.
         /// </summary>
@@ -308,7 +308,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseRegistryRootType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a RegistryRootType from a string.
         /// </summary>
@@ -358,7 +358,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a ExitType from a string.
         /// </summary>
@@ -368,7 +368,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseExitType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ExitType from a string.
         /// </summary>
@@ -411,7 +411,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a InstallUninstallType from a string.
         /// </summary>
@@ -421,7 +421,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseInstallUninstallType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a InstallUninstallType from a string.
         /// </summary>
@@ -457,7 +457,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a SequenceType from a string.
         /// </summary>
@@ -467,7 +467,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseSequenceType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a SequenceType from a string.
         /// </summary>
@@ -510,7 +510,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a CompressionLevelType from a string.
         /// </summary>
@@ -520,7 +520,7 @@ namespace WixToolset.Harvesters.Serialize
             Enums.TryParseCompressionLevelType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a CompressionLevelType from a string.
         /// </summary>
@@ -571,86 +571,86 @@ namespace WixToolset.Harvesters.Serialize
             return true;
         }
     }
-    
+
     /// <summary>
     /// The list of communcation protocols with executable packages Burn supports.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum BurnExeProtocolType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         /// <summary>
         /// The executable package does not support a communication protocol.
         /// </summary>
         none,
-        
+
         /// <summary>
         /// The executable package is another Burn bundle and supports the Burn communication protocol.
         /// </summary>
         burn,
-        
+
         /// <summary>
         /// The executable package implements the .NET Framework v4.0 communication protocol.
         /// </summary>
         netfx4,
     }
-    
+
     /// <summary>
     /// Values of this type will either be "yes" or "no".
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum YesNoType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         no,
-        
+
         yes,
     }
-    
+
     /// <summary>
     /// Values of this type will either be "button", "yes" or "no".
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum YesNoButtonType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         no,
-        
+
         yes,
-        
+
         button,
     }
-    
+
     /// <summary>
     /// Values of this type will either be "default", "yes", or "no".
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum YesNoDefaultType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         @default,
-        
+
         no,
-        
+
         yes,
     }
-    
+
     /// <summary>
     /// Values of this type will either be "always", "yes", or "no".
     /// </summary>
@@ -658,55 +658,55 @@ namespace WixToolset.Harvesters.Serialize
     public enum BundleCacheType
     {
         NotSet = -1,
-        
+
         force,
-        
+
         remove,
-        
+
         keep,
     }
-    
+
     /// <summary>
     /// Values of this type represent possible registry roots.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum RegistryRootType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         /// <summary>
         /// A per-user installation will make the operation occur under HKEY_CURRENT_USER.
         /// A per-machine installation will make the operation occur under HKEY_LOCAL_MACHINE.
         /// </summary>
         HKMU,
-        
+
         /// <summary>
         /// Operation occurs under HKEY_CLASSES_ROOT.  When using Windows 2000 or later, the installer writes or removes the value
         /// from the HKCU\Software\Classes hive during per-user installations.  When using Windows 2000 or later operating systems,
         /// the installer writes or removes the value from the HKLM\Software\Classes hive during per-machine installations.
         /// </summary>
         HKCR,
-        
+
         /// <summary>
         /// Operation occurs under HKEY_CURRENT_USER.  It is recommended to set the KeyPath='yes' attribute when setting this value for writing values
         /// in order to ensure that the installer writes the necessary registry entries when there are multiple users on the same computer.
         /// </summary>
         HKCU,
-        
+
         /// <summary>
         /// Operation occurs under HKEY_LOCAL_MACHINE.
         /// </summary>
         HKLM,
-        
+
         /// <summary>
         /// Operation occurs under HKEY_USERS.
         /// </summary>
         HKU,
     }
-    
+
     /// <summary>
     /// Value indicates that this action is executed if the installer returns the associated exit type. Each exit type can be used with no more than one action.
     /// Multiple actions can have exit types assigned, but every action and exit type must be different. Exit types are typically used with dialog boxes.
@@ -714,131 +714,131 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum ExitType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         success,
-        
+
         cancel,
-        
+
         error,
-        
+
         suspend,
     }
-    
+
     /// <summary>
     /// Specifies whether an action occur on install, uninstall or both.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum InstallUninstallType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         /// <summary>
         /// The action should happen during install (msiInstallStateLocal or msiInstallStateSource).
         /// </summary>
         install,
-        
+
         /// <summary>
         /// The action should happen during uninstall (msiInstallStateAbsent).
         /// </summary>
         uninstall,
-        
+
         /// <summary>
         /// The action should happen during both install and uninstall.
         /// </summary>
         both,
     }
-    
+
     /// <summary>
     /// Controls which sequences the item assignment is sequenced in.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum SequenceType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         /// <summary>
         /// Schedules the assignment in the InstallUISequence and the InstallExecuteSequence.
         /// </summary>
         both,
-        
+
         /// <summary>
         /// Schedules the assignment to run in the InstallUISequence or the InstallExecuteSequence if the InstallUISequence is skipped.
         /// </summary>
         first,
-        
+
         /// <summary>
         /// Schedules the assignment only in the the InstallExecuteSequence.
         /// </summary>
         execute,
-        
+
         /// <summary>
         /// Schedules the assignment only in the the InstallUISequence.
         /// </summary>
         ui,
     }
-    
+
     /// <summary>
     /// Indicates the compression level for a cabinet.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public enum CompressionLevelType
     {
-        
+
         IllegalValue = int.MaxValue,
-        
+
         NotSet = -1,
-        
+
         high,
-        
+
         low,
-        
+
         medium,
-        
+
         mszip,
-        
+
         none,
     }
-    
+
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public abstract class ActionModuleSequenceType : ISchemaElement, ISetAttributes
     {
-        
+
         private string afterField;
-        
+
         private bool afterFieldSet;
-        
+
         private string beforeField;
-        
+
         private bool beforeFieldSet;
-        
+
         private YesNoType overridableField;
-        
+
         private bool overridableFieldSet;
-        
+
         private int sequenceField;
-        
+
         private bool sequenceFieldSet;
-        
+
         private YesNoType suppressField;
-        
+
         private bool suppressFieldSet;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The name of an action that this action should come after.
         /// </summary>
@@ -854,7 +854,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.afterField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of an action that this action should come before.
         /// </summary>
@@ -870,7 +870,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.beforeField = value;
             }
         }
-        
+
         /// <summary>
         /// If "yes", the sequencing of this action may be overridden by sequencing elsewhere.
         /// </summary>
@@ -886,7 +886,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.overridableField = value;
             }
         }
-        
+
         /// <summary>
         /// A value used to indicate the position of this action in a sequence.
         /// </summary>
@@ -902,7 +902,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sequenceField = value;
             }
         }
-        
+
         /// <summary>
         /// If yes, this action will not occur.
         /// </summary>
@@ -918,7 +918,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.suppressField = value;
             }
         }
-        
+
         /// <summary>
         /// Text node specifies the condition of the action.
         /// </summary>
@@ -934,7 +934,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -946,7 +946,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -995,7 +995,7 @@ namespace WixToolset.Harvesters.Serialize
                 writer.WriteString(this.contentField);
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -1035,25 +1035,25 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public abstract class ActionSequenceType : ISchemaElement, ISetAttributes
     {
-        
+
         private int sequenceField;
-        
+
         private bool sequenceFieldSet;
-        
+
         private YesNoType suppressField;
-        
+
         private bool suppressFieldSet;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// A value used to indicate the position of this action in a sequence.
         /// </summary>
@@ -1069,7 +1069,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sequenceField = value;
             }
         }
-        
+
         /// <summary>
         /// If yes, this action will not occur.
         /// </summary>
@@ -1085,7 +1085,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.suppressField = value;
             }
         }
-        
+
         public string Content
         {
             get
@@ -1098,7 +1098,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -1110,7 +1110,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -1140,7 +1140,7 @@ namespace WixToolset.Harvesters.Serialize
                 writer.WriteString(this.contentField);
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -1177,15 +1177,15 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Wix : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string requiredVersionField;
-        
+
         private bool requiredVersionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Wix()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -1201,7 +1201,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(PatchCreation)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -1209,7 +1209,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -1218,7 +1218,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Required version of the WiX toolset to compile this input file.
         /// </summary>
@@ -1234,7 +1234,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.requiredVersionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -1246,7 +1246,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -1256,7 +1256,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -1266,7 +1266,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -1306,7 +1306,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -1321,14 +1321,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("RequiredVersion", this.requiredVersionField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -1343,25 +1343,25 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// This is the top-level container element for every wxi file.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Include : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Include()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -1369,7 +1369,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -1378,7 +1378,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -1390,7 +1390,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -1400,7 +1400,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -1410,7 +1410,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -1425,7 +1425,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -1436,14 +1436,14 @@ namespace WixToolset.Harvesters.Serialize
                 throw new ArgumentNullException("writer");
             }
             writer.WriteStartElement("Include", "http://wixtoolset.org/schemas/v4/wxs");
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -1453,90 +1453,90 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// The root element for creating bundled packages.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Bundle : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string aboutUrlField;
-        
+
         private bool aboutUrlFieldSet;
-        
+
         private string copyrightField;
-        
+
         private bool copyrightFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private YesNoButtonType disableModifyField;
-        
+
         private bool disableModifyFieldSet;
-        
+
         private YesNoType disableRemoveField;
-        
+
         private bool disableRemoveFieldSet;
-        
+
         private YesNoType disableRepairField;
-        
+
         private bool disableRepairFieldSet;
-        
+
         private string helpTelephoneField;
-        
+
         private bool helpTelephoneFieldSet;
-        
+
         private string helpUrlField;
-        
+
         private bool helpUrlFieldSet;
-        
+
         private string iconSourceFileField;
-        
+
         private bool iconSourceFileFieldSet;
-        
+
         private string manufacturerField;
-        
+
         private bool manufacturerFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string parentNameField;
-        
+
         private bool parentNameFieldSet;
-        
+
         private string splashScreenSourceFileField;
-        
+
         private bool splashScreenSourceFileFieldSet;
-        
+
         private string tagField;
-        
+
         private bool tagFieldSet;
-        
+
         private string updateUrlField;
-        
+
         private bool updateUrlFieldSet;
-        
+
         private string upgradeCodeField;
-        
+
         private bool upgradeCodeFieldSet;
-        
+
         private string versionField;
-        
+
         private bool versionFieldSet;
-        
+
         private string conditionField;
-        
+
         private bool conditionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Bundle()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -1558,7 +1558,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -1566,7 +1566,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -1575,7 +1575,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// A URL for more information about the bundle to display in Programs and Features (also
         /// known as Add/Remove Programs).
@@ -1592,7 +1592,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.aboutUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// The legal copyright found in the version resources of final bundle executable. If
         /// this attribute is not provided the copyright will be set to "Copyright (c) [Bundle/@Manufacturer]. All rights reserved.".
@@ -1609,7 +1609,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.copyrightField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether Packages and Payloads not assigned to a container should be added to the default attached container or if they should be external. The default is yes.
         /// </summary>
@@ -1625,7 +1625,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines whether the bundle can be modified via the Programs and Features (also known as
         /// Add/Remove Programs). If the value is "button" then Programs and Features will show a single
@@ -1646,7 +1646,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableModifyField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines whether the bundle can be removed via the Programs and Features (also
         /// known as Add/Remove Programs). If the value is "yes" then the "Uninstall" button will
@@ -1667,7 +1667,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableRemoveField = value;
             }
         }
-        
+
         public YesNoType DisableRepair
         {
             get
@@ -1680,7 +1680,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableRepairField = value;
             }
         }
-        
+
         /// <summary>
         /// A telephone number for help to display in Programs and Features (also known as
         /// Add/Remove Programs).
@@ -1697,7 +1697,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.helpTelephoneField = value;
             }
         }
-        
+
         /// <summary>
         /// A URL to the help for the bundle to display in Programs and Features (also known as
         /// Add/Remove Programs).
@@ -1714,7 +1714,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.helpUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// Path to an icon that will replace the default icon in the final Bundle executable.
         /// This icon will also be displayed in Programs and Features (also known as Add/Remove
@@ -1732,7 +1732,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconSourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The publisher of the bundle to display in Programs and Features (also known as
         /// Add/Remove Programs).
@@ -1749,7 +1749,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the bundle to display in Programs and Features (also known as Add/Remove
         /// Programs). This name can be accessed and overwritten by a BootstrapperApplication
@@ -1767,7 +1767,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the parent bundle to display in Installed Updates (also known as Add/Remove
         /// Programs). This name is used to nest or group bundles that will appear as updates.
@@ -1785,7 +1785,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Path to a bitmap that will be shown as the bootstrapper application is being loaded. If this attribute is not specified, no splash screen will be displayed.
         /// </summary>
@@ -1801,7 +1801,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.splashScreenSourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this string to uniquely identify this bundle to its own BA, and to related bundles. The value of this string only matters to the BA, and its value has no direct effect on engine functionality.
         /// </summary>
@@ -1817,7 +1817,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.tagField = value;
             }
         }
-        
+
         /// <summary>
         /// A URL for updates of the bundle to display in Programs and Features (also
         /// known as Add/Remove Programs).
@@ -1834,7 +1834,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.updateUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for a family of bundles. If two bundles have the same UpgradeCode the
         /// bundle with the highest version will be installed.
@@ -1851,7 +1851,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.upgradeCodeField = value;
             }
         }
-        
+
         /// <summary>
         /// The version of the bundle. Newer versions upgrade earlier versions of the bundles
         /// with matching UpgradeCodes.  If the bundle is registered in Programs and Features
@@ -1869,7 +1869,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionField = value;
             }
         }
-        
+
         /// <summary>
         /// The condition of the bundle. If the condition is not met, the bundle will
         /// refuse to run. Conditions are checked before the bootstrapper application is loaded
@@ -1888,7 +1888,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.conditionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -1900,7 +1900,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -1910,7 +1910,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -1920,7 +1920,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -1996,7 +1996,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -2116,14 +2116,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Condition", this.conditionField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -2224,32 +2224,32 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Provides information about an .exe so that the BA can request the engine to run it elevated from any secure location.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ApprovedExeForElevation : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private YesNoType win64Field;
-        
+
         private bool win64FieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the ApprovedExeForElevation element.
         /// </summary>
@@ -2265,7 +2265,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The key path.
         /// For security purposes, the root key will be HKLM and Variables are not supported.
@@ -2282,7 +2282,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// The value name.
         /// For security purposes, Variables are not supported.
@@ -2299,7 +2299,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         /// <summary>
         /// Instructs the search to look in the 64-bit registry when the value is 'yes'.
         /// When the value is 'no', the search looks in the 32-bit registry.
@@ -2317,7 +2317,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.win64Field = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -2329,7 +2329,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -2365,7 +2365,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -2395,32 +2395,32 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Overrides the default log settings for a bundle.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Log : ISchemaElement, ISetAttributes
     {
-        
+
         private YesNoType disableField;
-        
+
         private bool disableFieldSet;
-        
+
         private string pathVariableField;
-        
+
         private bool pathVariableFieldSet;
-        
+
         private string prefixField;
-        
+
         private bool prefixFieldSet;
-        
+
         private string extensionField;
-        
+
         private bool extensionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Disables the default logging in the Bundle. The end user can still generate a
         /// log file by specifying the "-l" command-line argument when installing the
@@ -2438,7 +2438,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file. An empty value
         /// will cause the variable to not be set. The default is "WixBundleLog".
@@ -2455,7 +2455,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.pathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// File name and optionally a relative path to use as the prefix for the log file. The
         /// default is to use the Bundle/@Name or, if Bundle/@Name is not specified, the value
@@ -2473,7 +2473,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.prefixField = value;
             }
         }
-        
+
         /// <summary>
         /// The extension to use for the log. The default is ".log".
         /// </summary>
@@ -2489,7 +2489,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.extensionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -2501,7 +2501,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -2537,7 +2537,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -2567,24 +2567,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specify one or more catalog files that will be used to verify the contents of the bundle.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Catalog : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the catalog element.
         /// </summary>
@@ -2600,7 +2600,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The catalog file
         /// </summary>
@@ -2616,7 +2616,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -2628,7 +2628,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -2649,7 +2649,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -2669,30 +2669,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Contains all the relevant information about the setup UI.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class BootstrapperApplication : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public BootstrapperApplication()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -2701,7 +2701,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -2709,7 +2709,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -2718,7 +2718,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The identifier of the BootstrapperApplication element. Only required if you want to reference this element using a BootstrapperApplicationRef element.
         /// </summary>
@@ -2734,7 +2734,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The DLL with the bootstrapper application entry function.
         /// </summary>
@@ -2750,7 +2750,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The relative destination path and file name for the bootstrapper application DLL. The default is the source file name. Use this attribute to rename the bootstrapper application DLL or extract it into a subfolder. The use of '..' directories is not allowed.
         /// </summary>
@@ -2766,7 +2766,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -2778,7 +2778,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -2788,7 +2788,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -2798,7 +2798,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -2821,7 +2821,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -2844,14 +2844,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Name", this.nameField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -2876,22 +2876,22 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Used to reference a BootstrapperApplication element and optionally add additional payloads to the bootstrapper application.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class BootstrapperApplicationRef : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public BootstrapperApplicationRef()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -2900,7 +2900,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -2908,7 +2908,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -2917,7 +2917,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The identifier of the BootstrapperApplication element to reference.
         /// </summary>
@@ -2933,7 +2933,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -2945,7 +2945,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -2955,7 +2955,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -2965,7 +2965,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -2988,7 +2988,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -3003,14 +3003,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -3025,30 +3025,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// This element has been deprecated. Use the BootstrapperApplication element instead.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class UX : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string splashScreenSourceFileField;
-        
+
         private bool splashScreenSourceFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public UX()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -3056,7 +3056,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(PayloadGroupRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -3064,7 +3064,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -3073,7 +3073,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// See the BootstrapperApplication instead.
         /// </summary>
@@ -3089,7 +3089,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// See the BootstrapperApplication instead.
         /// </summary>
@@ -3105,7 +3105,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// See the BootstrapperApplication instead.
         /// </summary>
@@ -3121,7 +3121,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.splashScreenSourceFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -3133,7 +3133,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -3143,7 +3143,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -3153,7 +3153,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -3176,7 +3176,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -3199,14 +3199,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("SplashScreenSourceFile", this.splashScreenSourceFileField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -3231,7 +3231,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Writes additional information to the Windows registry that can be used to detect the bundle.
     /// This registration is intended primarily for update to an existing product.
@@ -3239,29 +3239,29 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class OptionalUpdateRegistration : ISchemaElement, ISetAttributes
     {
-        
+
         private string manufacturerField;
-        
+
         private bool manufacturerFieldSet;
-        
+
         private string departmentField;
-        
+
         private bool departmentFieldSet;
-        
+
         private string productFamilyField;
-        
+
         private bool productFamilyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string classificationField;
-        
+
         private bool classificationFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The name of the manufacturer. The default is the Bundle/@Manufacturer attribute,
         /// but may also be a short form, ex: Acme instead of Acme Corporation.
@@ -3279,7 +3279,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the department or division publishing the update bundle.
         /// The PublishingGroup registry value is not written if this attribute is not specified.
@@ -3296,7 +3296,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.departmentField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the family of products being updated. The default is the Bundle/@ParentName attribute.
         /// The corresponding registry key is not created if neither attribute is specified.
@@ -3313,7 +3313,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productFamilyField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the bundle. The default is the Bundle/@Name attribute,
         /// but may also be a short form, ex: KB12345 instead of Update to Product (KB12345).
@@ -3331,7 +3331,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The release type of the update bundle, such as Update, Security Update, Service Pack, etc.
         /// The default value is Update.
@@ -3348,7 +3348,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.classificationField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -3360,7 +3360,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -3393,7 +3393,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -3428,30 +3428,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Contains the chain of packages to install.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Chain : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private YesNoType disableRollbackField;
-        
+
         private bool disableRollbackFieldSet;
-        
+
         private YesNoType disableSystemRestoreField;
-        
+
         private bool disableSystemRestoreFieldSet;
-        
+
         private YesNoType parallelCacheField;
-        
+
         private bool parallelCacheFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Chain()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -3463,7 +3463,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(PackageGroupRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -3471,7 +3471,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -3480,7 +3480,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the bundle will attempt to rollback packages
         /// executed in the chain. If "yes" is specified then when a vital
@@ -3501,7 +3501,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableRollbackField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the bundle will attempt to create a system
         /// restore point when executing the chain. If "yes" is specified then
@@ -3522,7 +3522,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableSystemRestoreField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the bundle will start installing packages
         /// while other packages are still being cached. If "yes",
@@ -3542,7 +3542,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parallelCacheField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -3554,7 +3554,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -3564,7 +3564,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -3574,7 +3574,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -3614,7 +3614,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -3658,14 +3658,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("ParallelCache", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -3690,102 +3690,102 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a single msi package to install.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MsiPackage : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string downloadUrlField;
-        
+
         private bool downloadUrlFieldSet;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string afterField;
-        
+
         private bool afterFieldSet;
-        
+
         private string installSizeField;
-        
+
         private bool installSizeFieldSet;
-        
+
         private string installConditionField;
-        
+
         private bool installConditionFieldSet;
-        
+
         private BundleCacheType cacheField;
-        
+
         private bool cacheFieldSet;
-        
+
         private string cacheIdField;
-        
+
         private bool cacheIdFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string logPathVariableField;
-        
+
         private bool logPathVariableFieldSet;
-        
+
         private string rollbackLogPathVariableField;
-        
+
         private bool rollbackLogPathVariableFieldSet;
-        
+
         private YesNoType permanentField;
-        
+
         private bool permanentFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private YesNoType enableSignatureVerificationField;
-        
+
         private bool enableSignatureVerificationFieldSet;
-        
+
         private YesNoType enableFeatureSelectionField;
-        
+
         private bool enableFeatureSelectionFieldSet;
-        
+
         private YesNoType forcePerMachineField;
-        
+
         private bool forcePerMachineFieldSet;
-        
+
         private YesNoType suppressLooseFilePayloadGenerationField;
-        
+
         private bool suppressLooseFilePayloadGenerationFieldSet;
-        
+
         private YesNoType visibleField;
-        
+
         private bool visibleFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public MsiPackage()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -3796,7 +3796,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -3804,7 +3804,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -3813,7 +3813,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Location of the package to add to the bundle. The default value is the Name attribute, if provided.
         /// At a minimum, the SourceFile or Name attribute must be specified.
@@ -3830,7 +3830,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The destination path and file name for this chain payload. Use this attribute to rename the
         /// chain entry point or extract it into a subfolder. The default value is the file name from the
@@ -3849,7 +3849,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         public string DownloadUrl
         {
             get
@@ -3862,7 +3862,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.downloadUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier for this package, for ordering and cross-referencing. The default is the Name attribute
         /// modified to be suitable as an identifier (i.e. invalid characters are replaced with underscores).
@@ -3879,7 +3879,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier of another package that this one should be installed after. By default the After
         /// attribute is set to the previous sibling package in the Chain or PackageGroup element. If this
@@ -3897,7 +3897,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.afterField = value;
             }
         }
-        
+
         /// <summary>
         /// The size this package will take on disk in bytes after it is installed. By default, the binder will
         /// calculate the install size by scanning the package (File table for MSIs, Payloads for EXEs)
@@ -3915,7 +3915,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// A condition to evaluate before installing the package. The package will only be installed if the condition evaluates to true. If the condition evaluates to false and the bundle is being installed, repaired, or modified, the package will be uninstalled.
         /// </summary>
@@ -3931,7 +3931,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installConditionField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether to cache the package. The default is "yes".
         /// </summary>
@@ -3947,7 +3947,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier to use when caching the package.
         /// </summary>
@@ -3963,7 +3963,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the display name to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the ProductName field from the version information, MsiPackages use the ProductName property, and MspPackages use
@@ -3982,7 +3982,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the description to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the FileName field from the version information, MsiPackages use the ARPCOMMENTS property, and MspPackages use
@@ -4001,7 +4001,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file. An empty value will cause the variable to not
         /// be set. The default is "WixBundleLog_[PackageId]" except for MSU packages which default to no logging.
@@ -4018,7 +4018,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.logPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file used during rollback. An empty value will cause
         /// the variable to not be set. The default is "WixBundleRollbackLog_[PackageId]" except for MSU packages which
@@ -4036,7 +4036,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rollbackLogPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package can be uninstalled. The default is "no".
         /// </summary>
@@ -4052,7 +4052,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.permanentField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package must succeed for the chain to continue. The default "yes"
         /// indicates that if the package fails then the chain will fail and rollback or stop. If
@@ -4070,7 +4070,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the package payload should be embedded in a container or left as an external payload.
         /// </summary>
@@ -4086,7 +4086,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// By default, a Bundle will use the hash of a package to verify its contents. If this attribute is set to "yes"
         /// and the package is signed with an Authenticode signature the Bundle will verify the contents of the package using the
@@ -4105,7 +4105,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enableSignatureVerificationField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the bundle will allow individual control over the installation state of Features inside
         /// the msi package. Managing feature selection requires special care to ensure the install, modify, update and
@@ -4123,7 +4123,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enableFeatureSelectionField = value;
             }
         }
-        
+
         /// <summary>
         /// Override the automatic per-machine detection of MSI packages and force the package to be per-machine.
         /// The default is "no", which allows the tools to detect the expected value.
@@ -4140,7 +4140,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.forcePerMachineField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute has been deprecated. When the value is "yes", the Binder will not read the MSI package
         /// to detect uncompressed files that would otherwise be automatically included in the Bundle as Payloads.
@@ -4158,7 +4158,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.suppressLooseFilePayloadGenerationField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the MSI will be displayed in Programs and Features (also known as Add/Remove Programs). If "yes" is
         /// specified the MSI package information will be displayed in Programs and Features. The default "no" indicates the MSI
@@ -4176,7 +4176,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.visibleField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -4188,7 +4188,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -4198,7 +4198,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -4208,7 +4208,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -4239,7 +4239,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -4406,14 +4406,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Visible", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -4529,94 +4529,94 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a single msp package to install.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MspPackage : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string downloadUrlField;
-        
+
         private bool downloadUrlFieldSet;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string afterField;
-        
+
         private bool afterFieldSet;
-        
+
         private string installSizeField;
-        
+
         private bool installSizeFieldSet;
-        
+
         private string installConditionField;
-        
+
         private bool installConditionFieldSet;
-        
+
         private BundleCacheType cacheField;
-        
+
         private bool cacheFieldSet;
-        
+
         private string cacheIdField;
-        
+
         private bool cacheIdFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string logPathVariableField;
-        
+
         private bool logPathVariableFieldSet;
-        
+
         private string rollbackLogPathVariableField;
-        
+
         private bool rollbackLogPathVariableFieldSet;
-        
+
         private YesNoType permanentField;
-        
+
         private bool permanentFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private YesNoType enableSignatureVerificationField;
-        
+
         private bool enableSignatureVerificationFieldSet;
-        
+
         private YesNoDefaultType perMachineField;
-        
+
         private bool perMachineFieldSet;
-        
+
         private YesNoType slipstreamField;
-        
+
         private bool slipstreamFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public MspPackage()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -4626,7 +4626,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -4634,7 +4634,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -4643,7 +4643,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Location of the package to add to the bundle. The default value is the Name attribute, if provided.
         /// At a minimum, the SourceFile or Name attribute must be specified.
@@ -4660,7 +4660,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The destination path and file name for this chain payload. Use this attribute to rename the
         /// chain entry point or extract it into a subfolder. The default value is the file name from the
@@ -4679,7 +4679,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         public string DownloadUrl
         {
             get
@@ -4692,7 +4692,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.downloadUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier for this package, for ordering and cross-referencing. The default is the Name attribute
         /// modified to be suitable as an identifier (i.e. invalid characters are replaced with underscores).
@@ -4709,7 +4709,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier of another package that this one should be installed after. By default the After
         /// attribute is set to the previous sibling package in the Chain or PackageGroup element. If this
@@ -4727,7 +4727,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.afterField = value;
             }
         }
-        
+
         /// <summary>
         /// The size this package will take on disk in bytes after it is installed. By default, the binder will
         /// calculate the install size by scanning the package (File table for MSIs, Payloads for EXEs)
@@ -4745,7 +4745,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// A condition to evaluate before installing the package. The package will only be installed if the condition evaluates to true. If the condition evaluates to false and the bundle is being installed, repaired, or modified, the package will be uninstalled.
         /// </summary>
@@ -4761,7 +4761,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installConditionField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether to cache the package. The default is "keep".
         /// </summary>
@@ -4777,7 +4777,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier to use when caching the package.
         /// </summary>
@@ -4793,7 +4793,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the display name to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the ProductName field from the version information, MsiPackages use the ProductName property, and MspPackages use
@@ -4812,7 +4812,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the description to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the FileName field from the version information, MsiPackages use the ARPCOMMENTS property, and MspPackages use
@@ -4831,7 +4831,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file. An empty value will cause the variable to not
         /// be set. The default is "WixBundleLog_[PackageId]" except for MSU packages which default to no logging.
@@ -4848,7 +4848,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.logPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file used during rollback. An empty value will cause
         /// the variable to not be set. The default is "WixBundleRollbackLog_[PackageId]" except for MSU packages which
@@ -4866,7 +4866,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rollbackLogPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package can be uninstalled. The default is "no".
         /// </summary>
@@ -4882,7 +4882,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.permanentField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package must succeed for the chain to continue. The default "yes"
         /// indicates that if the package fails then the chain will fail and rollback or stop. If
@@ -4900,7 +4900,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the package payload should be embedded in a container or left as an external payload.
         /// </summary>
@@ -4916,7 +4916,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// By default, a Bundle will use the hash of a package to verify its contents. If this attribute is set to "yes"
         /// and the package is signed with an Authenticode signature the Bundle will verify the contents of the package using the
@@ -4935,7 +4935,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enableSignatureVerificationField = value;
             }
         }
-        
+
         /// <summary>
         /// Indicates the package must be executed elevated. The default is "no".
         /// </summary>
@@ -4951,7 +4951,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.perMachineField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to automatically slipstream the patch for any target msi packages in the chain. The default is "no".
         /// Even when the value is "no", you can still author the SlipstreamMsp element under MsiPackage elements as desired.
@@ -4968,7 +4968,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.slipstreamField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -4980,7 +4980,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -4990,7 +4990,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -5000,7 +5000,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -5027,7 +5027,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -5176,14 +5176,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Slipstream", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -5289,94 +5289,94 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a single msu package to install.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MsuPackage : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string downloadUrlField;
-        
+
         private bool downloadUrlFieldSet;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string afterField;
-        
+
         private bool afterFieldSet;
-        
+
         private string installSizeField;
-        
+
         private bool installSizeFieldSet;
-        
+
         private string installConditionField;
-        
+
         private bool installConditionFieldSet;
-        
+
         private BundleCacheType cacheField;
-        
+
         private bool cacheFieldSet;
-        
+
         private string cacheIdField;
-        
+
         private bool cacheIdFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string logPathVariableField;
-        
+
         private bool logPathVariableFieldSet;
-        
+
         private string rollbackLogPathVariableField;
-        
+
         private bool rollbackLogPathVariableFieldSet;
-        
+
         private YesNoType permanentField;
-        
+
         private bool permanentFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private YesNoType enableSignatureVerificationField;
-        
+
         private bool enableSignatureVerificationFieldSet;
-        
+
         private string detectConditionField;
-        
+
         private bool detectConditionFieldSet;
-        
+
         private string kBField;
-        
+
         private bool kBFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public MsuPackage()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -5386,7 +5386,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -5394,7 +5394,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -5403,7 +5403,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Location of the package to add to the bundle. The default value is the Name attribute, if provided.
         /// At a minimum, the SourceFile or Name attribute must be specified.
@@ -5420,7 +5420,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The destination path and file name for this chain payload. Use this attribute to rename the
         /// chain entry point or extract it into a subfolder. The default value is the file name from the
@@ -5439,7 +5439,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         public string DownloadUrl
         {
             get
@@ -5452,7 +5452,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.downloadUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier for this package, for ordering and cross-referencing. The default is the Name attribute
         /// modified to be suitable as an identifier (i.e. invalid characters are replaced with underscores).
@@ -5469,7 +5469,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier of another package that this one should be installed after. By default the After
         /// attribute is set to the previous sibling package in the Chain or PackageGroup element. If this
@@ -5487,7 +5487,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.afterField = value;
             }
         }
-        
+
         /// <summary>
         /// The size this package will take on disk in bytes after it is installed. By default, the binder will
         /// calculate the install size by scanning the package (File table for MSIs, Payloads for EXEs)
@@ -5505,7 +5505,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// A condition to evaluate before installing the package. The package will only be installed if the condition evaluates to true. If the condition evaluates to false and the bundle is being installed, repaired, or modified, the package will be uninstalled.
         /// </summary>
@@ -5521,7 +5521,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installConditionField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether to cache the package. The default is "yes".
         /// </summary>
@@ -5537,7 +5537,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier to use when caching the package.
         /// </summary>
@@ -5553,7 +5553,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the display name to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the ProductName field from the version information, MsiPackages use the ProductName property, and MspPackages use
@@ -5572,7 +5572,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the description to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the FileName field from the version information, MsiPackages use the ARPCOMMENTS property, and MspPackages use
@@ -5591,7 +5591,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file. An empty value will cause the variable to not
         /// be set. The default is "WixBundleLog_[PackageId]" except for MSU packages which default to no logging.
@@ -5608,7 +5608,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.logPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file used during rollback. An empty value will cause
         /// the variable to not be set. The default is "WixBundleRollbackLog_[PackageId]" except for MSU packages which
@@ -5626,7 +5626,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rollbackLogPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package can be uninstalled. The default is "no".
         /// </summary>
@@ -5642,7 +5642,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.permanentField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package must succeed for the chain to continue. The default "yes"
         /// indicates that if the package fails then the chain will fail and rollback or stop. If
@@ -5660,7 +5660,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the package payload should be embedded in a container or left as an external payload.
         /// </summary>
@@ -5676,7 +5676,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// By default, a Bundle will use the hash of a package to verify its contents. If this attribute is set to "yes"
         /// and the package is signed with an Authenticode signature the Bundle will verify the contents of the package using the
@@ -5695,7 +5695,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enableSignatureVerificationField = value;
             }
         }
-        
+
         /// <summary>
         /// A condition that determines if the package is present on the target system. This condition can use built-in
         /// variables and variables returned by searches. This condition is necessary because Windows doesn't provide a
@@ -5715,7 +5715,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.detectConditionField = value;
             }
         }
-        
+
         /// <summary>
         /// The knowledge base identifier for the MSU. The KB attribute must be specified to enable the MSU package to
         /// be uninstalled. Even then MSU uninstallation is only supported on Windows 7 and later. When the KB attribute
@@ -5733,7 +5733,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.kBField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -5745,7 +5745,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -5755,7 +5755,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -5765,7 +5765,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -5792,7 +5792,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -5923,14 +5923,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("KB", this.kBField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -6036,110 +6036,110 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a single exe package to install.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ExePackage : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string downloadUrlField;
-        
+
         private bool downloadUrlFieldSet;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string afterField;
-        
+
         private bool afterFieldSet;
-        
+
         private string installSizeField;
-        
+
         private bool installSizeFieldSet;
-        
+
         private string installConditionField;
-        
+
         private bool installConditionFieldSet;
-        
+
         private BundleCacheType cacheField;
-        
+
         private bool cacheFieldSet;
-        
+
         private string cacheIdField;
-        
+
         private bool cacheIdFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string logPathVariableField;
-        
+
         private bool logPathVariableFieldSet;
-        
+
         private string rollbackLogPathVariableField;
-        
+
         private bool rollbackLogPathVariableFieldSet;
-        
+
         private YesNoType permanentField;
-        
+
         private bool permanentFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private YesNoType enableSignatureVerificationField;
-        
+
         private bool enableSignatureVerificationFieldSet;
-        
+
         private string detectConditionField;
-        
+
         private bool detectConditionFieldSet;
-        
+
         private string installCommandField;
-        
+
         private bool installCommandFieldSet;
-        
+
         private string repairCommandField;
-        
+
         private bool repairCommandFieldSet;
-        
+
         private string uninstallCommandField;
-        
+
         private bool uninstallCommandFieldSet;
-        
+
         private YesNoDefaultType perMachineField;
-        
+
         private bool perMachineFieldSet;
-        
+
         private BurnExeProtocolType protocolField;
-        
+
         private bool protocolFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ExePackage()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -6151,7 +6151,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -6159,7 +6159,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -6168,7 +6168,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Location of the package to add to the bundle. The default value is the Name attribute, if provided.
         /// At a minimum, the SourceFile or Name attribute must be specified.
@@ -6185,7 +6185,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The destination path and file name for this chain payload. Use this attribute to rename the
         /// chain entry point or extract it into a subfolder. The default value is the file name from the
@@ -6204,7 +6204,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         public string DownloadUrl
         {
             get
@@ -6217,7 +6217,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.downloadUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier for this package, for ordering and cross-referencing. The default is the Name attribute
         /// modified to be suitable as an identifier (i.e. invalid characters are replaced with underscores).
@@ -6234,7 +6234,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier of another package that this one should be installed after. By default the After
         /// attribute is set to the previous sibling package in the Chain or PackageGroup element. If this
@@ -6252,7 +6252,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.afterField = value;
             }
         }
-        
+
         /// <summary>
         /// The size this package will take on disk in bytes after it is installed. By default, the binder will
         /// calculate the install size by scanning the package (File table for MSIs, Payloads for EXEs)
@@ -6270,7 +6270,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// A condition to evaluate before installing the package. The package will only be installed if the condition evaluates to true. If the condition evaluates to false and the bundle is being installed, repaired, or modified, the package will be uninstalled.
         /// </summary>
@@ -6286,7 +6286,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installConditionField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether to cache the package. The default is "yes".
         /// </summary>
@@ -6302,7 +6302,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier to use when caching the package.
         /// </summary>
@@ -6318,7 +6318,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cacheIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the display name to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the ProductName field from the version information, MsiPackages use the ProductName property, and MspPackages use
@@ -6337,7 +6337,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the description to place in the bootstrapper application data manifest for the package. By default, ExePackages
         /// use the FileName field from the version information, MsiPackages use the ARPCOMMENTS property, and MspPackages use
@@ -6356,7 +6356,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file. An empty value will cause the variable to not
         /// be set. The default is "WixBundleLog_[PackageId]" except for MSU packages which default to no logging.
@@ -6373,7 +6373,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.logPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a Variable that will hold the path to the log file used during rollback. An empty value will cause
         /// the variable to not be set. The default is "WixBundleRollbackLog_[PackageId]" except for MSU packages which
@@ -6391,7 +6391,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rollbackLogPathVariableField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package can be uninstalled. The default is "no".
         /// </summary>
@@ -6407,7 +6407,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.permanentField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the package must succeed for the chain to continue. The default "yes"
         /// indicates that if the package fails then the chain will fail and rollback or stop. If
@@ -6425,7 +6425,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the package payload should be embedded in a container or left as an external payload.
         /// </summary>
@@ -6441,7 +6441,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// By default, a Bundle will use the hash of a package to verify its contents. If this attribute is set to "yes"
         /// and the package is signed with an Authenticode signature the Bundle will verify the contents of the package using the
@@ -6460,7 +6460,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enableSignatureVerificationField = value;
             }
         }
-        
+
         /// <summary>
         /// A condition that determines if the package is present on the target system. This condition can use built-in
         /// variables and variables returned by searches. This condition is necessary because Windows doesn't provide a
@@ -6480,7 +6480,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.detectConditionField = value;
             }
         }
-        
+
         /// <summary>
         /// The command-line arguments provided to the ExePackage during install. If this attribute is absent the executable will be launched with no command-line arguments.
         /// </summary>
@@ -6496,7 +6496,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installCommandField = value;
             }
         }
-        
+
         /// <summary>
         /// The command-line arguments to specify to indicate a repair. If the executable package can be repaired but
         /// does not require any special command-line arguments to do so then set the attribute's value to blank. To
@@ -6514,7 +6514,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.repairCommandField = value;
             }
         }
-        
+
         /// <summary>
         /// The command-line arguments provided to the ExePackage during uninstall. If this attribute is absent the executable will be launched with no command-line arguments. To prevent an ExePackage from being uninstalled set the Permanent attribute to "yes".
         /// </summary>
@@ -6530,7 +6530,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.uninstallCommandField = value;
             }
         }
-        
+
         /// <summary>
         /// Indicates the package must be executed elevated. The default is "no".
         /// </summary>
@@ -6546,7 +6546,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.perMachineField = value;
             }
         }
-        
+
         /// <summary>
         /// Indicates the communication protocol the package supports for extended progress and error reporting. The default is "none".
         /// </summary>
@@ -6562,7 +6562,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.protocolField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -6574,7 +6574,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -6584,7 +6584,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -6594,7 +6594,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -6629,7 +6629,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -6798,14 +6798,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Protocol", "netfx4");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -6931,37 +6931,37 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a rollback boundary in the chain.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RollbackBoundary : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private YesNoType transactionField;
-        
+
         private bool transactionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public RollbackBoundary()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -6969,7 +6969,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -6978,7 +6978,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for this rollback boundary, for ordering and cross-referencing. If this attribute is
         /// not provided a stable identifier will be generated.
@@ -6995,7 +6995,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the rollback boundary aborts the chain. The default "yes" indicates that if
         /// the rollback boundary is encountered then the chain will fail and rollback or stop. If "no"
@@ -7013,7 +7013,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the rollback boundary is wrapped in an MSI transaction. The default is "no"
         /// </summary>
@@ -7029,7 +7029,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.transactionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7041,7 +7041,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -7051,7 +7051,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -7061,7 +7061,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -7076,7 +7076,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -7113,14 +7113,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Transaction", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -7145,22 +7145,22 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a package group to a bootstrapper.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PackageGroup : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PackageGroup()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -7172,7 +7172,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(PackageGroupRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -7180,7 +7180,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -7189,7 +7189,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for package group.
         /// </summary>
@@ -7205,7 +7205,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7217,7 +7217,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -7227,7 +7227,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -7237,7 +7237,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -7277,7 +7277,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -7292,14 +7292,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -7314,24 +7314,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to PackageGroup element that exists inside a Bundle or Fragment element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PackageGroupRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string afterField;
-        
+
         private bool afterFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the PackageGroup element to reference.
         /// </summary>
@@ -7347,7 +7347,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier of a package that this group should be installed after.
         /// </summary>
@@ -7363,7 +7363,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.afterField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7375,7 +7375,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -7396,7 +7396,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -7416,24 +7416,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Allows an MSI property to be set based on the value of a burn engine expression.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MsiProperty : ISchemaElement, ISetAttributes
     {
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The name of the MSI property to set. Burn controls the follow MSI properties so they cannot be set with MsiProperty: ACTION, ALLUSERS, REBOOT, REINSTALL, REINSTALLMODE
         /// </summary>
@@ -7449,7 +7449,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The value to set the property to. This string is evaluated by the burn engine and can be as simple as a burn engine variable reference or as complex as a full expression.
         /// </summary>
@@ -7465,7 +7465,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7477,7 +7477,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -7498,7 +7498,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -7518,20 +7518,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specifies a patch included in the same bundle that is installed when the parent MSI package is installed.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class SlipstreamMsp : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier for a MspPackage in the bundle.
         /// </summary>
@@ -7547,7 +7547,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7559,7 +7559,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -7576,7 +7576,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -7591,36 +7591,36 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a burn engine variable to define.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Variable : ISchemaElement, ISetAttributes
     {
-        
+
         private YesNoType hiddenField;
-        
+
         private bool hiddenFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private YesNoType persistedField;
-        
+
         private bool persistedFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Whether the value of the variable should be hidden.
         /// </summary>
@@ -7636,7 +7636,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hiddenField = value;
             }
         }
-        
+
         /// <summary>
         /// The name for the variable.
         /// </summary>
@@ -7652,7 +7652,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the variable should be persisted.
         /// </summary>
@@ -7668,7 +7668,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.persistedField = value;
             }
         }
-        
+
         /// <summary>
         /// Starting value for the variable.
         /// </summary>
@@ -7684,7 +7684,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         /// <summary>
         /// Type of the variable, inferred from the value if not specified.
         /// </summary>
@@ -7700,7 +7700,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7712,7 +7712,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -7722,7 +7722,7 @@ namespace WixToolset.Harvesters.Serialize
             Variable.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -7758,7 +7758,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -7816,7 +7816,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -7850,57 +7850,57 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             @string,
-            
+
             numeric,
-            
+
             version,
         }
     }
-    
+
     /// <summary>
     /// Representation of a file that contains one or more files.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Container : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string downloadUrlField;
-        
+
         private bool downloadUrlFieldSet;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private BurnContainerType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Container()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(PackageGroupRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -7908,7 +7908,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -7917,7 +7917,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public string DownloadUrl
         {
             get
@@ -7930,7 +7930,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.downloadUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// The unique identifier for the container. If this attribute is not specified the Name attribute will be used.
         /// </summary>
@@ -7946,7 +7946,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The file name for this container. A relative path may be provided to place the container in a sub-folder of the bundle.
         /// </summary>
@@ -7962,7 +7962,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Indicates whether the container is "attached" to the bundle executable or placed external to the bundle extecutable as "detached". If
         /// this attribute is not specified, the default is to create a detached container.
@@ -7979,7 +7979,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -7991,7 +7991,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -8001,7 +8001,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -8011,7 +8011,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -8030,7 +8030,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8064,14 +8064,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Type", "detached");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8101,20 +8101,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to an existing Container element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ContainerRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of Container element to reference.
         /// </summary>
@@ -8130,7 +8130,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -8142,7 +8142,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8159,7 +8159,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8174,24 +8174,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes map of exit code returned from executable package to a bootstrapper behavior.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ExitCode : ISchemaElement, ISetAttributes
     {
-        
+
         private int valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private BehaviorType behaviorField;
-        
+
         private bool behaviorFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Exit code returned from executable package. If no value is provided it means all values not explicitly set default to this behavior.
         /// </summary>
@@ -8207,7 +8207,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         /// <summary>
         /// Choose one of the supported behaviors error codes: success, error, scheduleReboot, forceReboot.
         /// </summary>
@@ -8223,7 +8223,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.behaviorField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -8235,7 +8235,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a BehaviorType from a string.
         /// </summary>
@@ -8245,7 +8245,7 @@ namespace WixToolset.Harvesters.Serialize
             ExitCode.TryParseBehaviorType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a BehaviorType from a string.
         /// </summary>
@@ -8288,7 +8288,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8324,7 +8324,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8343,50 +8343,50 @@ namespace WixToolset.Harvesters.Serialize
                 this.behaviorFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum BehaviorType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             success,
-            
+
             error,
-            
+
             scheduleReboot,
-            
+
             forceReboot,
         }
     }
-    
+
     /// <summary>
     /// Describes additional, conditional command-line arguments for an ExePackage.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class CommandLine : ISchemaElement, ISetAttributes
     {
-        
+
         private string installArgumentField;
-        
+
         private bool installArgumentFieldSet;
-        
+
         private string uninstallArgumentField;
-        
+
         private bool uninstallArgumentFieldSet;
-        
+
         private string repairArgumentField;
-        
+
         private bool repairArgumentFieldSet;
-        
+
         private string conditionField;
-        
+
         private bool conditionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Additional command-line arguments to apply during package installation if Condition is true.
         /// </summary>
@@ -8402,7 +8402,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installArgumentField = value;
             }
         }
-        
+
         /// <summary>
         /// Additional command-line arguments to apply during package uninstallation if Condition is true.
         /// </summary>
@@ -8418,7 +8418,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.uninstallArgumentField = value;
             }
         }
-        
+
         /// <summary>
         /// Additional command-line arguments to apply during package repair if Condition is true.
         /// </summary>
@@ -8434,7 +8434,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.repairArgumentField = value;
             }
         }
-        
+
         /// <summary>
         /// The condition that controls whether the command-line arguments specified in the
         /// InstallArgument, UninstallArgument, or RepairArgument attributes are appended to the
@@ -8455,7 +8455,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.conditionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -8467,7 +8467,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8496,7 +8496,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8526,40 +8526,40 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a payload to a bootstrapper.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Payload : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string downloadUrlField;
-        
+
         private bool downloadUrlFieldSet;
-        
+
         private YesNoType enableSignatureVerificationField;
-        
+
         private bool enableSignatureVerificationFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of Payload element.
         /// </summary>
@@ -8575,7 +8575,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the payload should be embedded in a container or left as an external payload.
         /// </summary>
@@ -8591,7 +8591,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// Location of the source file.
         /// </summary>
@@ -8607,7 +8607,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         /// <summary>
         /// The destination path and file name for this payload. The default is the source file name. The use of '..' directories is not allowed.
         /// </summary>
@@ -8623,7 +8623,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         public string DownloadUrl
         {
             get
@@ -8636,7 +8636,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.downloadUrlField = value;
             }
         }
-        
+
         /// <summary>
         /// By default, a Bundle will use the hash of a package to verify its contents. If this attribute is set to "yes"
         /// and the package is signed with an Authenticode signature the Bundle will verify the contents of the package using the
@@ -8655,7 +8655,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enableSignatureVerificationField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -8667,7 +8667,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8722,7 +8722,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8762,7 +8762,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Describes a payload group to a bootstrapper. PayloadGroups referenced from within a Bundle are tied to the Bundle.
     /// PayloadGroups referenced from a Fragment are tied to the context of whatever references them such as an ExePackage or MsiPackage.
@@ -8771,15 +8771,15 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PayloadGroup : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PayloadGroup()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -8787,7 +8787,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(PayloadGroupRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -8795,7 +8795,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -8804,7 +8804,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for payload group.
         /// </summary>
@@ -8820,7 +8820,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -8832,7 +8832,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -8842,7 +8842,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -8852,7 +8852,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -8875,7 +8875,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8890,14 +8890,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8912,20 +8912,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to PayloadGroup element that exists inside a Bundle or Fragment element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PayloadGroupRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the PayloadGroup element to reference.
         /// </summary>
@@ -8941,7 +8941,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -8953,7 +8953,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -8970,7 +8970,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -8995,7 +8995,7 @@ namespace WixToolset.Harvesters.Serialize
     {
         public MsuPackagePayload() : base("MsuPackagePayload") { }
     }
-    
+
     /// <summary>
     /// Describes information about a remote file payload that is not available at the time of building the bundle.
     /// The parent must specify DownloadUrl and must not specify SourceFile when using this element.
@@ -9009,29 +9009,29 @@ namespace WixToolset.Harvesters.Serialize
         {
             this.elementName = elementName;
         }
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string hashField;
-        
+
         private bool hashFieldSet;
-        
+
         private string productNameField;
-        
+
         private bool productNameFieldSet;
-        
+
         private long sizeField;
-        
+
         private bool sizeFieldSet;
-        
+
         private string versionField;
-        
+
         private bool versionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Description of the file from version resources.
         /// </summary>
@@ -9047,7 +9047,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// SHA-1 hash of the RemotePayload.  Include this attribute if the remote file is unsigned or SuppressSignatureVerification is set to Yes.
         /// </summary>
@@ -9063,7 +9063,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hashField = value;
             }
         }
-        
+
         /// <summary>
         /// Product name of the file from version resouces.
         /// </summary>
@@ -9079,7 +9079,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Size of the remote file in bytes.
         /// </summary>
@@ -9095,7 +9095,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sizeField = value;
             }
         }
-        
+
         /// <summary>
         /// Version of the remote file
         /// </summary>
@@ -9111,7 +9111,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -9123,7 +9123,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -9157,7 +9157,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -9192,24 +9192,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a RelatedBundle element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RelatedBundle : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the RelatedBundle group.
         /// </summary>
@@ -9225,7 +9225,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The action to take on bundles related to this one. Detect is the default.
         /// </summary>
@@ -9241,7 +9241,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -9253,7 +9253,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -9263,7 +9263,7 @@ namespace WixToolset.Harvesters.Serialize
             RelatedBundle.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -9306,7 +9306,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -9342,7 +9342,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -9361,38 +9361,38 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             Detect,
-            
+
             Upgrade,
-            
+
             Addon,
-            
+
             Patch,
         }
     }
-    
+
     /// <summary>
     /// Defines the update for a Bundle.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Update : ISchemaElement, ISetAttributes
     {
-        
+
         private string locationField;
-        
+
         private bool locationFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The absolute path or URL to check for an update bundle. Currently the engine provides this value
         /// in the IBootstrapperApplication::OnDetectUpdateBegin() and otherwise ignores the value. In the
@@ -9411,7 +9411,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.locationField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -9423,7 +9423,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -9440,7 +9440,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -9463,39 +9463,39 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Package : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string codepageField;
-        
+
         private bool codepageFieldSet;
-        
+
         private string languageField;
-        
+
         private bool languageFieldSet;
-        
+
         private string manufacturerField;
-        
+
         private bool manufacturerFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string upgradeCodeField;
-        
+
         private bool upgradeCodeFieldSet;
-        
+
         private string versionField;
-        
+
         private bool versionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Package()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -9546,7 +9546,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -9554,7 +9554,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -9563,7 +9563,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The product code GUID for the product.
         /// </summary>
@@ -9579,7 +9579,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The code page integer value or web name for the resulting MSI. See remarks for more information.
         /// </summary>
@@ -9595,7 +9595,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.codepageField = value;
             }
         }
-        
+
         /// <summary>
         /// The decimal language ID (LCID) for the product.
         /// </summary>
@@ -9611,7 +9611,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languageField = value;
             }
         }
-        
+
         /// <summary>
         /// The manufacturer of the product.
         /// </summary>
@@ -9627,7 +9627,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerField = value;
             }
         }
-        
+
         /// <summary>
         /// The descriptive name of the product.
         /// </summary>
@@ -9643,7 +9643,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The upgrade code GUID for the product.
         /// </summary>
@@ -9659,7 +9659,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.upgradeCodeField = value;
             }
         }
-        
+
         /// <summary>
         /// The product's version string.
         /// </summary>
@@ -9675,7 +9675,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -9687,7 +9687,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -9697,7 +9697,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -9707,7 +9707,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -9883,7 +9883,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -9923,14 +9923,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Version", this.versionField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -9975,7 +9975,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// The Module element is analogous to the main function in a C program.  When linking, only
     /// one Module section can be given to the linker to produce a successful result.  Using this
@@ -9984,31 +9984,31 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Module : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string codepageField;
-        
+
         private bool codepageFieldSet;
-        
+
         private string guidField;
-        
+
         private bool guidFieldSet;
-        
+
         private string languageField;
-        
+
         private bool languageFieldSet;
-        
+
         private string versionField;
-        
+
         private bool versionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Module()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -10053,7 +10053,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -10061,7 +10061,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -10070,7 +10070,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The name of the merge module (not the file name).
         /// </summary>
@@ -10086,7 +10086,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The code page integer value or web name for the resulting MSM. See remarks for more information.
         /// </summary>
@@ -10102,7 +10102,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.codepageField = value;
             }
         }
-        
+
         /// <summary>
         /// The modularizaion Guid.
         /// </summary>
@@ -10118,7 +10118,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.guidField = value;
             }
         }
-        
+
         /// <summary>
         /// The decimal language ID (LCID) of the merge module.
         /// </summary>
@@ -10134,7 +10134,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languageField = value;
             }
         }
-        
+
         /// <summary>
         /// The major and minor versions of the merge module.
         /// </summary>
@@ -10150,7 +10150,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -10162,7 +10162,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -10172,7 +10172,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -10182,7 +10182,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -10334,7 +10334,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -10365,14 +10365,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Version", this.versionField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -10407,28 +10407,28 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Declares a dependency on another merge module.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Dependency : ISchemaElement, ISetAttributes
     {
-        
+
         private string requiredIdField;
-        
+
         private bool requiredIdFieldSet;
-        
+
         private int requiredLanguageField;
-        
+
         private bool requiredLanguageFieldSet;
-        
+
         private string requiredVersionField;
-        
+
         private bool requiredVersionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier of the merge module required by the merge module.
         /// </summary>
@@ -10444,7 +10444,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.requiredIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Numeric language ID of the merge module in RequiredID.
         /// </summary>
@@ -10460,7 +10460,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.requiredLanguageField = value;
             }
         }
-        
+
         /// <summary>
         /// Version of the merge module in RequiredID.
         /// </summary>
@@ -10476,7 +10476,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.requiredVersionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -10488,7 +10488,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -10513,7 +10513,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -10538,36 +10538,36 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Declares a merge module with which this merge module is incompatible.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Exclusion : ISchemaElement, ISetAttributes
     {
-        
+
         private string excludedIdField;
-        
+
         private bool excludedIdFieldSet;
-        
+
         private int excludeExceptLanguageField;
-        
+
         private bool excludeExceptLanguageFieldSet;
-        
+
         private int excludeLanguageField;
-        
+
         private bool excludeLanguageFieldSet;
-        
+
         private string excludedMinVersionField;
-        
+
         private bool excludedMinVersionFieldSet;
-        
+
         private string excludedMaxVersionField;
-        
+
         private bool excludedMaxVersionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier of the merge module that is incompatible.
         /// </summary>
@@ -10583,7 +10583,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.excludedIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Numeric language ID of the merge module in ExcludedID. All except this language will be excluded. Only one of ExcludeExceptLanguage and ExcludeLanguage may be specified.
         /// </summary>
@@ -10599,7 +10599,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.excludeExceptLanguageField = value;
             }
         }
-        
+
         /// <summary>
         /// Numeric language ID of the merge module in ExcludedID. The specified language will be excluded. Only one of ExcludeExceptLanguage and ExcludeLanguage may be specified.
         /// </summary>
@@ -10615,7 +10615,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.excludeLanguageField = value;
             }
         }
-        
+
         /// <summary>
         /// Minimum version excluded from a range. If not set, all versions before max are excluded. If neither max nor min, no exclusion based on version.
         /// </summary>
@@ -10631,7 +10631,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.excludedMinVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// Maximum version excluded from a range. If not set, all versions after min are excluded. If neither max nor min, no exclusion based on version.
         /// </summary>
@@ -10647,7 +10647,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.excludedMaxVersionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -10659,7 +10659,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -10692,7 +10692,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -10727,60 +10727,60 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Defines the configurable attributes of merge module.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Configuration : ISchemaElement, ISetAttributes
     {
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private FormatType formatField;
-        
+
         private bool formatFieldSet;
-        
+
         private string typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private string contextDataField;
-        
+
         private bool contextDataFieldSet;
-        
+
         private string defaultValueField;
-        
+
         private bool defaultValueFieldSet;
-        
+
         private YesNoType keyNoOrphanField;
-        
+
         private bool keyNoOrphanFieldSet;
-        
+
         private YesNoType nonNullableField;
-        
+
         private bool nonNullableFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string helpLocationField;
-        
+
         private bool helpLocationFieldSet;
-        
+
         private string helpKeywordField;
-        
+
         private bool helpKeywordFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Defines the name of the configurable item.
         /// </summary>
@@ -10796,7 +10796,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the format of the data being changed.
         /// </summary>
@@ -10812,7 +10812,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.formatField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the type of the data being changed.
         /// </summary>
@@ -10828,7 +10828,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies a semantic context for the requested data.
         /// </summary>
@@ -10844,7 +10844,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contextDataField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies a default value for the item in this record if the merge tool declines to provide a value.
         /// </summary>
@@ -10860,7 +10860,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.defaultValueField = value;
             }
         }
-        
+
         /// <summary>
         /// Does not merge rule according to rules in MSI SDK.
         /// </summary>
@@ -10876,7 +10876,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyNoOrphanField = value;
             }
         }
-        
+
         /// <summary>
         /// If yes, null is not a valid entry.
         /// </summary>
@@ -10892,7 +10892,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nonNullableField = value;
             }
         }
-        
+
         /// <summary>
         /// Display name for authoring.
         /// </summary>
@@ -10908,7 +10908,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Description for authoring.
         /// </summary>
@@ -10924,7 +10924,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Location of chm file for authoring.
         /// </summary>
@@ -10940,7 +10940,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.helpLocationField = value;
             }
         }
-        
+
         /// <summary>
         /// Keyword into chm file for authoring.
         /// </summary>
@@ -10956,7 +10956,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.helpKeywordField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -10968,7 +10968,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a FormatType from a string.
         /// </summary>
@@ -10978,7 +10978,7 @@ namespace WixToolset.Harvesters.Serialize
             Configuration.TryParseFormatType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a FormatType from a string.
         /// </summary>
@@ -11021,7 +11021,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -11108,7 +11108,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -11173,50 +11173,50 @@ namespace WixToolset.Harvesters.Serialize
                 this.helpKeywordFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum FormatType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             Text,
-            
+
             Key,
-            
+
             Integer,
-            
+
             Bitfield,
         }
     }
-    
+
     /// <summary>
     /// Specifies the configurable fields of a module database and provides a template for the configuration of each field.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Substitution : ISchemaElement, ISetAttributes
     {
-        
+
         private string tableField;
-        
+
         private bool tableFieldSet;
-        
+
         private string rowField;
-        
+
         private bool rowFieldSet;
-        
+
         private string columnField;
-        
+
         private bool columnFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Specifies the name of the table being modified in the module database.
         /// </summary>
@@ -11232,7 +11232,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.tableField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the primary keys of the target row in the table named in the Table column. If multiple keys, separated by semicolons.
         /// </summary>
@@ -11248,7 +11248,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rowField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the target column in the row named in the Row column.
         /// </summary>
@@ -11264,7 +11264,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.columnField = value;
             }
         }
-        
+
         /// <summary>
         /// Provides a formatting template for the data being substituted into the target field specified by Table, Row, and Column.
         /// </summary>
@@ -11280,7 +11280,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -11292,7 +11292,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -11321,7 +11321,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -11351,7 +11351,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specifies a table from the merge module that is not merged into an .msi file.
     /// If the table already exists in an .msi file, it is not modified by the merge.
@@ -11363,13 +11363,13 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class IgnoreTable : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The name of the table in the merge module that is not to be merged into the .msi file.
         /// </summary>
@@ -11385,7 +11385,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -11397,7 +11397,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -11414,7 +11414,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -11429,7 +11429,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// The Fragment element is the building block of creating an installer database in WiX.  Once defined,
     /// the Fragment becomes an immutable, atomic unit which can either be completely included or excluded
@@ -11442,15 +11442,15 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Fragment : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Fragment()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -11505,7 +11505,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -11513,7 +11513,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -11522,7 +11522,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Optional identifier for a Fragment.  Should only be set by advanced users to tag sections.
         /// </summary>
@@ -11538,7 +11538,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -11550,7 +11550,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -11560,7 +11560,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -11570,7 +11570,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -11770,7 +11770,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -11785,14 +11785,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -11807,7 +11807,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// The Patch element is analogous to the main function in a C program.  When linking, only one Patch section
     /// can be given to the linker to produce a successful result.  Using this element creates an MSP file.
@@ -11815,79 +11815,79 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Patch : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string codepageField;
-        
+
         private bool codepageFieldSet;
-        
+
         private YesNoType allowRemovalField;
-        
+
         private bool allowRemovalFieldSet;
-        
+
         private string classificationField;
-        
+
         private bool classificationFieldSet;
-        
+
         private string clientPatchIdField;
-        
+
         private bool clientPatchIdFieldSet;
-        
+
         private YesNoType apiPatchingSymbolNoImagehlpFlagField;
-        
+
         private bool apiPatchingSymbolNoImagehlpFlagFieldSet;
-        
+
         private YesNoType apiPatchingSymbolNoFailuresFlagField;
-        
+
         private bool apiPatchingSymbolNoFailuresFlagFieldSet;
-        
+
         private YesNoType apiPatchingSymbolUndecoratedTooFlagField;
-        
+
         private bool apiPatchingSymbolUndecoratedTooFlagFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string commentsField;
-        
+
         private bool commentsFieldSet;
-        
+
         private string manufacturerField;
-        
+
         private bool manufacturerFieldSet;
-        
+
         private YesNoType minorUpdateTargetRTMField;
-        
+
         private bool minorUpdateTargetRTMFieldSet;
-        
+
         private string moreInfoURLField;
-        
+
         private bool moreInfoURLFieldSet;
-        
+
         private YesNoType optimizedInstallModeField;
-        
+
         private bool optimizedInstallModeFieldSet;
-        
+
         private string targetProductNameField;
-        
+
         private bool targetProductNameFieldSet;
-        
+
         private YesNoType optimizePatchSizeForLargeFilesField;
-        
+
         private bool optimizePatchSizeForLargeFilesFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Patch()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -11905,7 +11905,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -11913,7 +11913,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -11922,7 +11922,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Patch code for this patch.
         /// </summary>
@@ -11938,7 +11938,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The code page integer value or web name for the resulting MSP. See remarks for more information.
         /// </summary>
@@ -11954,7 +11954,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.codepageField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether this is an uninstallable patch.
         /// </summary>
@@ -11970,7 +11970,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.allowRemovalField = value;
             }
         }
-        
+
         /// <summary>
         /// Category of updates. Recommended values are Critical Update, Hotfix, Security Rollup, Security Update, Service Pack, Update, Update Rollup.
         /// </summary>
@@ -11986,7 +11986,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.classificationField = value;
             }
         }
-        
+
         /// <summary>
         /// An easily referenced identity unique to a patch that can be used in product authoring. See remarks for more information.
         /// </summary>
@@ -12002,7 +12002,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.clientPatchIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Flag used when creating a binary file patch. Default is "no". Don't use imagehlp.dll.
         /// </summary>
@@ -12018,7 +12018,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.apiPatchingSymbolNoImagehlpFlagField = value;
             }
         }
-        
+
         /// <summary>
         /// Flag used when creating a binary file patch. Default is "no". Don't fail patch due to imagehlp failures.
         /// </summary>
@@ -12034,7 +12034,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.apiPatchingSymbolNoFailuresFlagField = value;
             }
         }
-        
+
         /// <summary>
         /// Flag used when creating a binary file patch. Default is "no". After matching decorated symbols, try to match remaining by undecorated names.
         /// </summary>
@@ -12050,7 +12050,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.apiPatchingSymbolUndecoratedTooFlagField = value;
             }
         }
-        
+
         /// <summary>
         /// Description of the patch.
         /// </summary>
@@ -12066,7 +12066,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// A title for the patch that is suitable for public display. In Add/Remove Programs from XP SP2 on.
         /// </summary>
@@ -12082,7 +12082,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Optional comments for browsing.
         /// </summary>
@@ -12098,7 +12098,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.commentsField = value;
             }
         }
-        
+
         /// <summary>
         /// Vendor releasing the package
         /// </summary>
@@ -12114,7 +12114,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerField = value;
             }
         }
-        
+
         /// <summary>
         /// Indicates that the patch targets the RTM version of the product or the most recent major
         /// upgrade patch.  Author this optional property in minor update patches that contain sequencing
@@ -12135,7 +12135,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.minorUpdateTargetRTMField = value;
             }
         }
-        
+
         /// <summary>
         /// A URL that provides information specific to this patch.  In Add/Remove Programs from XP SP2 on.
         /// </summary>
@@ -12152,7 +12152,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.moreInfoURLField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes' in all the patches to be applied in a transaction, the
         /// application of the patch is optimized if possible.  Available beginning with Windows Installer 3.1.
@@ -12169,7 +12169,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.optimizedInstallModeField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of the application or target product suite.
         /// </summary>
@@ -12185,7 +12185,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetProductNameField = value;
             }
         }
-        
+
         /// <summary>
         /// When this attribute is set, patches for files greater than approximately 4 MB in size may be made smaller.
         /// </summary>
@@ -12201,7 +12201,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.optimizePatchSizeForLargeFilesField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -12213,7 +12213,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -12223,7 +12223,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -12233,7 +12233,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -12285,7 +12285,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -12414,14 +12414,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("OptimizePatchSizeForLargeFiles", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -12517,60 +12517,60 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Sets information in the patch transform that determines if the transform applies to an installed product and what errors should be ignored when applying the patch transform.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Validate : ISchemaElement, ISetAttributes
     {
-        
+
         private YesNoType productIdField;
-        
+
         private bool productIdFieldSet;
-        
+
         private YesNoType productLanguageField;
-        
+
         private bool productLanguageFieldSet;
-        
+
         private ProductVersionType productVersionField;
-        
+
         private bool productVersionFieldSet;
-        
+
         private ProductVersionOperatorType productVersionOperatorField;
-        
+
         private bool productVersionOperatorFieldSet;
-        
+
         private YesNoType upgradeCodeField;
-        
+
         private bool upgradeCodeFieldSet;
-        
+
         private YesNoType ignoreAddExistingRowField;
-        
+
         private bool ignoreAddExistingRowFieldSet;
-        
+
         private YesNoType ignoreAddExistingTableField;
-        
+
         private bool ignoreAddExistingTableFieldSet;
-        
+
         private YesNoType ignoreDeleteMissingRowField;
-        
+
         private bool ignoreDeleteMissingRowFieldSet;
-        
+
         private YesNoType ignoreDeleteMissingTableField;
-        
+
         private bool ignoreDeleteMissingTableFieldSet;
-        
+
         private YesNoType ignoreUpdateMissingRowField;
-        
+
         private bool ignoreUpdateMissingRowFieldSet;
-        
+
         private YesNoType ignoreChangingCodePageField;
-        
+
         private bool ignoreChangingCodePageFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Requires that the installed ProductCode match the target ProductCode used to create the transform. The default is 'yes'.
         /// </summary>
@@ -12586,7 +12586,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Requires that the installed ProductLanguage match the target ProductLanguage used to create the transform. The default is 'no'.
         /// </summary>
@@ -12602,7 +12602,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productLanguageField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines how many fields of the installed ProductVersion to compare. See remarks for more information. The default is 'Update'.
         /// </summary>
@@ -12618,7 +12618,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines how the installed ProductVersion is compared to the target ProductVersion used to create the transform. See remarks for more information. The default is 'Equal'.
         /// </summary>
@@ -12634,7 +12634,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productVersionOperatorField = value;
             }
         }
-        
+
         /// <summary>
         /// Requires that the installed UpgradeCode match the target UpgradeCode used to create the transform. The default is 'yes'.
         /// </summary>
@@ -12650,7 +12650,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.upgradeCodeField = value;
             }
         }
-        
+
         /// <summary>
         /// Ignore errors when adding existing rows. The default is 'yes'.
         /// </summary>
@@ -12666,7 +12666,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreAddExistingRowField = value;
             }
         }
-        
+
         /// <summary>
         /// Ignore errors when adding existing tables. The default is 'yes'.
         /// </summary>
@@ -12682,7 +12682,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreAddExistingTableField = value;
             }
         }
-        
+
         /// <summary>
         /// Ignore errors when deleting missing rows. The default is 'yes'.
         /// </summary>
@@ -12698,7 +12698,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreDeleteMissingRowField = value;
             }
         }
-        
+
         /// <summary>
         /// Ignore errors when deleting missing tables. The default is 'yes'.
         /// </summary>
@@ -12714,7 +12714,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreDeleteMissingTableField = value;
             }
         }
-        
+
         /// <summary>
         /// Ignore errors when updating missing rows. The default is 'yes'.
         /// </summary>
@@ -12730,7 +12730,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreUpdateMissingRowField = value;
             }
         }
-        
+
         /// <summary>
         /// Ignore errors when changing the database code page. The default is 'no'.
         /// </summary>
@@ -12746,7 +12746,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreChangingCodePageField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -12758,7 +12758,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a ProductVersionType from a string.
         /// </summary>
@@ -12768,7 +12768,7 @@ namespace WixToolset.Harvesters.Serialize
             Validate.TryParseProductVersionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ProductVersionType from a string.
         /// </summary>
@@ -12804,7 +12804,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a ProductVersionOperatorType from a string.
         /// </summary>
@@ -12814,7 +12814,7 @@ namespace WixToolset.Harvesters.Serialize
             Validate.TryParseProductVersionOperatorType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ProductVersionOperatorType from a string.
         /// </summary>
@@ -12864,7 +12864,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -13015,7 +13015,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -13080,87 +13080,87 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreChangingCodePageFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ProductVersionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Checks the major version.
             /// </summary>
             Major,
-            
+
             /// <summary>
             /// Checks the major and minor versions.
             /// </summary>
             Minor,
-            
+
             /// <summary>
             /// Checks the major, minor, and update versions.
             /// </summary>
             Update,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ProductVersionOperatorType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Installed ProductVersion &lt; target ProductVersion.
             /// </summary>
             Lesser,
-            
+
             /// <summary>
             /// Installed ProductVersion &lt;= target ProductVersion.
             /// </summary>
             LesserOrEqual,
-            
+
             /// <summary>
             /// Installed ProductVersion = target ProductVersion.
             /// </summary>
             Equal,
-            
+
             /// <summary>
             /// Installed ProductVersion &gt;= target ProductVersion.
             /// </summary>
             GreaterOrEqual,
-            
+
             /// <summary>
             /// Installed ProductVersion &gt; target ProductVersion.
             /// </summary>
             Greater,
         }
     }
-    
+
     /// <summary>
     /// Indicates whether custom actions can be skipped when applying the patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class OptimizeCustomActions : ISchemaElement, ISetAttributes
     {
-        
+
         private YesNoType skipAssignmentField;
-        
+
         private bool skipAssignmentFieldSet;
-        
+
         private YesNoType skipImmediateField;
-        
+
         private bool skipImmediateFieldSet;
-        
+
         private YesNoType skipDeferredField;
-        
+
         private bool skipDeferredFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Skip property (type 51) and directory (type 35) assignment custom actions.
         /// </summary>
@@ -13176,7 +13176,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.skipAssignmentField = value;
             }
         }
-        
+
         /// <summary>
         /// Skip immediate custom actions that are not property or directory assignment custom actions.
         /// </summary>
@@ -13192,7 +13192,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.skipImmediateField = value;
             }
         }
-        
+
         /// <summary>
         /// Skip custom actions that run within the script.
         /// </summary>
@@ -13208,7 +13208,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.skipDeferredField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -13220,7 +13220,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -13266,7 +13266,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -13291,29 +13291,29 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Identifies a set of product versions.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchBaseline : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PatchBaseline()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Validate)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -13321,7 +13321,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -13330,7 +13330,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for a set of product versions.
         /// </summary>
@@ -13346,7 +13346,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -13358,7 +13358,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -13368,7 +13368,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -13378,7 +13378,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -13397,7 +13397,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -13412,14 +13412,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -13434,34 +13434,34 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Collection of items that should be kept from the differences between two products.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchFamily : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string productCodeField;
-        
+
         private bool productCodeFieldSet;
-        
+
         private string versionField;
-        
+
         private bool versionFieldSet;
-        
+
         private YesNoType supersedeField;
-        
+
         private bool supersedeFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PatchFamily()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -13480,7 +13480,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -13488,7 +13488,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -13497,7 +13497,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier which indicates a sequence family to which this patch belongs.
         /// </summary>
@@ -13513,7 +13513,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the ProductCode of the product that this family applies to.
         /// </summary>
@@ -13529,7 +13529,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productCodeField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to populate the sequence column of the MsiPatchSequence table in the final MSP file. Specified in x.x.x.x format. See documentation for Sequence column of MsiPatchSequence table in MSI SDK.
         /// </summary>
@@ -13545,7 +13545,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to 'yes' to indicate that this patch will supersede all previous patches in this patch family.
         /// The default value is 'no'.
@@ -13562,7 +13562,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.supersedeField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -13574,7 +13574,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -13584,7 +13584,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -13594,7 +13594,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -13650,7 +13650,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -13684,14 +13684,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Supersede", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -13721,22 +13721,22 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Groups together multiple patch families to be used in other locations.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchFamilyGroup : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PatchFamilyGroup()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -13746,7 +13746,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -13754,7 +13754,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -13763,7 +13763,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for the PatchFamilyGroup.
         /// </summary>
@@ -13779,7 +13779,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -13791,7 +13791,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -13801,7 +13801,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -13811,7 +13811,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -13838,7 +13838,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -13853,14 +13853,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -13875,20 +13875,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to a PatchFamilyGroup in another Fragment.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchFamilyGroupRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the PatchFamilyGroup to reference.
         /// </summary>
@@ -13904,7 +13904,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -13916,7 +13916,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -13933,7 +13933,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -13948,7 +13948,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// The PatchCreation element is analogous to the main function in a C program.  When linking, only one PatchCreation section
     /// can be given to the linker to produce a successful result.  Using this element creates a pcp file.
@@ -13956,47 +13956,47 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchCreation : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType allowMajorVersionMismatchesField;
-        
+
         private bool allowMajorVersionMismatchesFieldSet;
-        
+
         private YesNoType allowProductCodeMismatchesField;
-        
+
         private bool allowProductCodeMismatchesFieldSet;
-        
+
         private YesNoType cleanWorkingFolderField;
-        
+
         private bool cleanWorkingFolderFieldSet;
-        
+
         private string codepageField;
-        
+
         private bool codepageFieldSet;
-        
+
         private string outputPathField;
-        
+
         private bool outputPathFieldSet;
-        
+
         private string sourceListField;
-        
+
         private bool sourceListFieldSet;
-        
+
         private int symbolFlagsField;
-        
+
         private bool symbolFlagsFieldSet;
-        
+
         private YesNoType wholeFilesOnlyField;
-        
+
         private bool wholeFilesOnlyFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PatchCreation()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -14011,7 +14011,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -14019,7 +14019,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -14028,7 +14028,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// PatchCreation identifier; this is the primary key for identifying patches.
         /// </summary>
@@ -14044,7 +14044,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Use this to set whether the major versions between the upgrade and target images match. See
         /// </summary>
@@ -14060,7 +14060,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.allowMajorVersionMismatchesField = value;
             }
         }
-        
+
         /// <summary>
         /// Use this to set whether the product code between the upgrade and target images match. See
         /// </summary>
@@ -14076,7 +14076,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.allowProductCodeMismatchesField = value;
             }
         }
-        
+
         /// <summary>
         /// Use this to set whether Patchwiz should clean the temp folder when finished. See
         /// </summary>
@@ -14092,7 +14092,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.cleanWorkingFolderField = value;
             }
         }
-        
+
         /// <summary>
         /// The code page integer value or web name for the resulting PCP. See remarks for more information.
         /// </summary>
@@ -14108,7 +14108,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.codepageField = value;
             }
         }
-        
+
         /// <summary>
         /// The full path, including file name, of the patch package file that is to be generated. See
         /// </summary>
@@ -14124,7 +14124,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.outputPathField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to locate the .msp file for the patch if the cached copy is unavailable. See
         /// </summary>
@@ -14140,7 +14140,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceListField = value;
             }
         }
-        
+
         /// <summary>
         /// An 8-digit hex integer representing the combination of patch symbol usage flags to use when creating a binary file patch. See
         /// </summary>
@@ -14156,7 +14156,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.symbolFlagsField = value;
             }
         }
-        
+
         /// <summary>
         /// Use this to set whether changing files should be included in their entirety. See
         /// </summary>
@@ -14172,7 +14172,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.wholeFilesOnlyField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -14184,7 +14184,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -14194,7 +14194,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -14204,7 +14204,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -14248,7 +14248,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -14324,14 +14324,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("WholeFilesOnly", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -14387,60 +14387,60 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Properties about the patch to be placed in the Summary Information Stream.  These are visible from COM through the IStream interface, and these properties can be seen on the package in Explorer.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchInformation : ISchemaElement, ISetAttributes
     {
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string platformsField;
-        
+
         private bool platformsFieldSet;
-        
+
         private string languagesField;
-        
+
         private bool languagesFieldSet;
-        
+
         private string manufacturerField;
-        
+
         private bool manufacturerFieldSet;
-        
+
         private string keywordsField;
-        
+
         private bool keywordsFieldSet;
-        
+
         private string commentsField;
-        
+
         private bool commentsFieldSet;
-        
+
         private YesNoDefaultType readOnlyField;
-        
+
         private bool readOnlyFieldSet;
-        
+
         private string summaryCodepageField;
-        
+
         private bool summaryCodepageFieldSet;
-        
+
         private YesNoType shortNamesField;
-        
+
         private bool shortNamesFieldSet;
-        
+
         private YesNoType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private YesNoType adminImageField;
-        
+
         private bool adminImageFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// A short description of the patch that includes the name of the product.
         /// </summary>
@@ -14456,7 +14456,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         public string Platforms
         {
             get
@@ -14469,7 +14469,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.platformsField = value;
             }
         }
-        
+
         public string Languages
         {
             get
@@ -14482,7 +14482,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languagesField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the manufacturer of the patch package.
         /// </summary>
@@ -14498,7 +14498,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerField = value;
             }
         }
-        
+
         /// <summary>
         /// A semicolon-delimited list of network or URL locations for alternate sources of the patch. The default is "Installer,Patching,PCP,Database".
         /// </summary>
@@ -14514,7 +14514,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keywordsField = value;
             }
         }
-        
+
         /// <summary>
         /// General purpose of the patch package. For example, "This patch contains the logic and data required to install
         /// </summary>
@@ -14530,7 +14530,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.commentsField = value;
             }
         }
-        
+
         /// <summary>
         /// The value of this attribute conveys whether the package should be opened as read-only.
         /// A database editing tool should not modify a read-only enforced database and should
@@ -14548,7 +14548,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readOnlyField = value;
             }
         }
-        
+
         /// <summary>
         /// The code page integer value or web name for summary info strings only.  The default is 1252.  See remarks for more information.
         /// </summary>
@@ -14564,7 +14564,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.summaryCodepageField = value;
             }
         }
-        
+
         public YesNoType ShortNames
         {
             get
@@ -14577,7 +14577,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNamesField = value;
             }
         }
-        
+
         public YesNoType Compressed
         {
             get
@@ -14590,7 +14590,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         public YesNoType AdminImage
         {
             get
@@ -14603,7 +14603,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.adminImageField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -14615,7 +14615,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -14705,7 +14705,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -14771,58 +14771,58 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Properties about the patch to be placed in the PatchMetadata table.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchMetadata : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private YesNoType allowRemovalField;
-        
+
         private bool allowRemovalFieldSet;
-        
+
         private string classificationField;
-        
+
         private bool classificationFieldSet;
-        
+
         private string creationTimeUTCField;
-        
+
         private bool creationTimeUTCFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private string manufacturerNameField;
-        
+
         private bool manufacturerNameFieldSet;
-        
+
         private string minorUpdateTargetRTMField;
-        
+
         private bool minorUpdateTargetRTMFieldSet;
-        
+
         private string moreInfoURLField;
-        
+
         private bool moreInfoURLFieldSet;
-        
+
         private YesNoType optimizedInstallModeField;
-        
+
         private bool optimizedInstallModeFieldSet;
-        
+
         private string targetProductNameField;
-        
+
         private bool targetProductNameFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PatchMetadata()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -14832,7 +14832,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -14840,7 +14840,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -14849,7 +14849,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Whether this is an uninstallable patch.
         /// </summary>
@@ -14865,7 +14865,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.allowRemovalField = value;
             }
         }
-        
+
         /// <summary>
         /// Category of updates. Recommended values are Critical Update, Hotfix, Security Rollup, Security Update, Service Pack, Update, Update Rollup.
         /// </summary>
@@ -14881,7 +14881,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.classificationField = value;
             }
         }
-        
+
         /// <summary>
         /// Creation time of the .msp file in the form mm-dd-yy HH:MM (month-day-year hour:minute).
         /// </summary>
@@ -14898,7 +14898,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.creationTimeUTCField = value;
             }
         }
-        
+
         /// <summary>
         /// Description of the patch.
         /// </summary>
@@ -14914,7 +14914,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// A title for the patch that is suitable for public display. In Add/Remove Programs from XP SP2 on.
         /// </summary>
@@ -14930,7 +14930,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of the manufacturer.
         /// </summary>
@@ -14946,7 +14946,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Indicates that the patch targets the RTM version of the product or the most recent major
         /// upgrade patch.  Author this optional property in minor update patches that contain sequencing
@@ -14967,7 +14967,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.minorUpdateTargetRTMField = value;
             }
         }
-        
+
         /// <summary>
         /// A URL that provides information specific to this patch.  In Add/Remove Programs from XP SP2 on.
         /// </summary>
@@ -14984,7 +14984,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.moreInfoURLField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes' in all the patches to be applied in a transaction, the
         /// application of the patch is optimized if possible.  Available beginning with Windows Installer 3.1.
@@ -15001,7 +15001,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.optimizedInstallModeField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of the application or target product suite.
         /// </summary>
@@ -15017,7 +15017,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetProductNameField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15029,7 +15029,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -15039,7 +15039,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -15049,7 +15049,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -15072,7 +15072,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15138,14 +15138,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("TargetProductName", this.targetProductNameField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -15206,28 +15206,28 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// A custom property for the PatchMetadata table.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class CustomProperty : ISchemaElement, ISetAttributes
     {
-        
+
         private string companyField;
-        
+
         private bool companyFieldSet;
-        
+
         private string propertyField;
-        
+
         private bool propertyFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The name of the company.
         /// </summary>
@@ -15243,7 +15243,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.companyField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the metadata property.
         /// </summary>
@@ -15259,7 +15259,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.propertyField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of the metadata property.
         /// </summary>
@@ -15275,7 +15275,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15287,7 +15287,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15312,7 +15312,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -15337,20 +15337,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// A patch that is deprecated by this patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ReplacePatch : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Patch GUID to be unregistered if it exists on the machine targeted by this patch.
         /// </summary>
@@ -15366,7 +15366,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15378,7 +15378,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15395,7 +15395,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -15410,29 +15410,29 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// The product codes for products that can accept the patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class TargetProductCodes : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private YesNoType replaceField;
-        
+
         private bool replaceFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public TargetProductCodes()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(TargetProductCode)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -15440,7 +15440,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -15449,7 +15449,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Whether to replace the product codes that can accept the patch from the target packages with the child elements.
         /// </summary>
@@ -15465,7 +15465,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.replaceField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15477,7 +15477,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -15487,7 +15487,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -15497,7 +15497,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -15516,7 +15516,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15538,14 +15538,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Replace", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -15560,20 +15560,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// A product code for a product that can accept the patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class TargetProductCode : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The product code for a product that can accept the patch. This can be '*'. See remarks for more information.
         /// </summary>
@@ -15589,7 +15589,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15601,7 +15601,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15618,7 +15618,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -15633,28 +15633,28 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// A property for this patch database.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchProperty : ISchemaElement, ISetAttributes
     {
-        
+
         private string companyField;
-        
+
         private bool companyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Name of the company for a custom metadata property.
         /// </summary>
@@ -15670,7 +15670,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.companyField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of the patch property.
         /// </summary>
@@ -15686,7 +15686,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of the patch property.
         /// </summary>
@@ -15702,7 +15702,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15714,7 +15714,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15739,7 +15739,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -15764,40 +15764,40 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Sequence information for this patch database. Sequence information is generated automatically in most cases, and rarely needs to be set explicitly.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchSequence : ISchemaElement, ISetAttributes
     {
-        
+
         private string patchFamilyField;
-        
+
         private bool patchFamilyFieldSet;
-        
+
         private string productCodeField;
-        
+
         private bool productCodeFieldSet;
-        
+
         private string sequenceField;
-        
+
         private bool sequenceFieldSet;
-        
+
         private YesNoType supersedeField;
-        
+
         private bool supersedeFieldSet;
-        
+
         private string targetField;
-        
+
         private bool targetFieldSet;
-        
+
         private string targetImageField;
-        
+
         private bool targetImageFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier which indicates a sequence family to which this patch belongs.
         /// </summary>
@@ -15813,7 +15813,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.patchFamilyField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the ProductCode of the product that this family applies to.
         /// This attribute cannot the specified if the TargetImage attribute is specified.
@@ -15830,7 +15830,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.productCodeField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to populate the sequence column of the MsiPatchSequence table in the final MSP file. Specified in x.x.x.x format. See documentation for Sequence column of MsiPatchSequence table in MSI SDK.
         /// </summary>
@@ -15846,7 +15846,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sequenceField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to 'yes' to indicate that this patch will supersede all previous patches in this patch family.
         /// The default value is 'no'.
@@ -15863,7 +15863,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.supersedeField = value;
             }
         }
-        
+
         public string Target
         {
             get
@@ -15876,7 +15876,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the TargetImage that this family applies to.
         /// This attribute cannot the specified if the ProductCode attribute is specified.
@@ -15893,7 +15893,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetImageField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -15905,7 +15905,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -15949,7 +15949,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -15989,42 +15989,42 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Group of one or more upgraded images of a product.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Family : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string diskIdField;
-        
+
         private bool diskIdFieldSet;
-        
+
         private string diskPromptField;
-        
+
         private bool diskPromptFieldSet;
-        
+
         private string mediaSrcPropField;
-        
+
         private bool mediaSrcPropFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private int sequenceStartField;
-        
+
         private bool sequenceStartFieldSet;
-        
+
         private string volumeLabelField;
-        
+
         private bool volumeLabelFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Family()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -16035,7 +16035,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -16043,7 +16043,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -16052,7 +16052,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Entered into the DiskId field of the new Media table record.
         /// </summary>
@@ -16068,7 +16068,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Value to display in the "[1]" of the DiskPrompt Property.  Using this attribute will require you to define a DiskPrompt Property.
         /// </summary>
@@ -16084,7 +16084,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskPromptField = value;
             }
         }
-        
+
         /// <summary>
         /// Entered into the Source field of the new Media table entry of the upgraded image.
         /// </summary>
@@ -16100,7 +16100,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.mediaSrcPropField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier for the family.
         /// </summary>
@@ -16116,7 +16116,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Sequence number for the starting file.
         /// </summary>
@@ -16132,7 +16132,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sequenceStartField = value;
             }
         }
-        
+
         /// <summary>
         /// Entered into the VolumeLabel field of the new Media table record.
         /// </summary>
@@ -16148,7 +16148,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.volumeLabelField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -16160,7 +16160,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16170,7 +16170,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16180,7 +16180,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -16207,7 +16207,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -16243,14 +16243,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("VolumeLabel", this.volumeLabelField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -16290,38 +16290,38 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Contains information about the upgraded images of the product.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class UpgradeImage : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
+
         private string sourcePatchField;
-        
+
         private bool sourcePatchFieldSet;
-        
+
         private string srcPatchField;
-        
+
         private bool srcPatchFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public UpgradeImage()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -16332,7 +16332,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -16340,7 +16340,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -16349,7 +16349,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier to connect target images with upgraded image.
         /// </summary>
@@ -16365,7 +16365,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Full path to location of msi file for upgraded image.
         /// </summary>
@@ -16381,7 +16381,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -16395,7 +16395,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
+
         /// <summary>
         /// Modified copy of the upgraded installation database that contains additional authoring specific to patching.
         /// </summary>
@@ -16411,7 +16411,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourcePatchField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string srcPatch
         {
@@ -16425,7 +16425,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcPatchField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -16437,7 +16437,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16447,7 +16447,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16457,7 +16457,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -16484,7 +16484,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -16515,14 +16515,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("srcPatch", this.srcPatchField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -16557,42 +16557,42 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Contains information about the target images of the product.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class TargetImage : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
+
         private int orderField;
-        
+
         private bool orderFieldSet;
-        
+
         private string validationField;
-        
+
         private bool validationFieldSet;
-        
+
         private YesNoType ignoreMissingFilesField;
-        
+
         private bool ignoreMissingFilesFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public TargetImage()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -16600,7 +16600,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(TargetFile)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -16608,7 +16608,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -16617,7 +16617,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for the target image.
         /// </summary>
@@ -16633,7 +16633,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Full path to the location of the msi file for the target image.
         /// </summary>
@@ -16649,7 +16649,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -16663,7 +16663,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
+
         /// <summary>
         /// Relative order of the target image.
         /// </summary>
@@ -16679,7 +16679,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.orderField = value;
             }
         }
-        
+
         /// <summary>
         /// Product checking to avoid applying irrelevant transforms.
         /// </summary>
@@ -16695,7 +16695,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.validationField = value;
             }
         }
-        
+
         /// <summary>
         /// Files missing from the target image are ignored by the installer.
         /// </summary>
@@ -16711,7 +16711,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreMissingFilesField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -16723,7 +16723,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16733,7 +16733,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16743,7 +16743,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -16766,7 +16766,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -16809,14 +16809,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("IgnoreMissingFiles", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -16856,22 +16856,22 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Information about specific files in a target image.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class TargetFile : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public TargetFile()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -16882,7 +16882,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -16890,7 +16890,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -16899,7 +16899,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Foreign key into the File table.
         /// </summary>
@@ -16915,7 +16915,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -16927,7 +16927,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16937,7 +16937,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -16947,7 +16947,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -16974,7 +16974,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -16989,14 +16989,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Id", this.idField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17011,24 +17011,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specifies part of a file that is to be ignored during patching.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class IgnoreRange : ISchemaElement, ISetAttributes
     {
-        
+
         private int offsetField;
-        
+
         private bool offsetFieldSet;
-        
+
         private int lengthField;
-        
+
         private bool lengthFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Offset of the start of the range.
         /// </summary>
@@ -17044,7 +17044,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.offsetField = value;
             }
         }
-        
+
         /// <summary>
         /// Length of the range.
         /// </summary>
@@ -17060,7 +17060,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.lengthField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -17072,7 +17072,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -17093,7 +17093,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17113,24 +17113,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specifies part of a file that cannot be overwritten during patching.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ProtectRange : ISchemaElement, ISetAttributes
     {
-        
+
         private int offsetField;
-        
+
         private bool offsetFieldSet;
-        
+
         private int lengthField;
-        
+
         private bool lengthFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Offset of the start of the range.
         /// </summary>
@@ -17146,7 +17146,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.offsetField = value;
             }
         }
-        
+
         /// <summary>
         /// Length of the range.
         /// </summary>
@@ -17162,7 +17162,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.lengthField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -17174,7 +17174,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -17195,7 +17195,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17215,29 +17215,29 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specifies a file to be protected.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ProtectFile : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string fileField;
-        
+
         private bool fileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ProtectFile()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ProtectRange)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -17245,7 +17245,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -17254,7 +17254,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Foreign key into the File table.
         /// </summary>
@@ -17270,7 +17270,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -17282,7 +17282,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -17292,7 +17292,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -17302,7 +17302,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -17321,7 +17321,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -17336,14 +17336,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("File", this.fileField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17358,34 +17358,34 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Contains information about specific files that are not part of a regular target image.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ExternalFile : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string fileField;
-        
+
         private bool fileFieldSet;
-        
+
         private string sourceField;
-        
+
         private bool sourceFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
+
         private int orderField;
-        
+
         private bool orderFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ExternalFile()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -17396,7 +17396,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddCollection(childCollection1);
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -17404,7 +17404,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -17413,7 +17413,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Foreign key into the File table.
         /// </summary>
@@ -17429,7 +17429,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileField = value;
             }
         }
-        
+
         /// <summary>
         /// Full path of the external file.
         /// </summary>
@@ -17445,7 +17445,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -17459,7 +17459,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the order of the external files to use when creating the patch.
         /// </summary>
@@ -17475,7 +17475,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.orderField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -17487,7 +17487,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -17497,7 +17497,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -17507,7 +17507,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -17534,7 +17534,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -17561,14 +17561,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Order", this.orderField.ToString(CultureInfo.InvariantCulture));
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17598,41 +17598,41 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Specifies files to either ignore or to specify optional data about a file.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class UpgradeFile : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string fileField;
-        
+
         private bool fileFieldSet;
-        
+
         private YesNoType ignoreField;
-        
+
         private bool ignoreFieldSet;
-        
+
         private YesNoType allowIgnoreOnErrorField;
-        
+
         private bool allowIgnoreOnErrorFieldSet;
-        
+
         private YesNoType wholeFileField;
-        
+
         private bool wholeFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public UpgradeFile()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(SymbolPath)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -17640,7 +17640,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -17649,7 +17649,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Foreign key into the File table.
         /// </summary>
@@ -17665,7 +17665,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileField = value;
             }
         }
-        
+
         /// <summary>
         /// If yes, the file is ignored during patching, and the next two attributes are ignored.
         /// </summary>
@@ -17681,7 +17681,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.ignoreField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether patching this file is vital.
         /// </summary>
@@ -17697,7 +17697,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.allowIgnoreOnErrorField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether the whole file should be installed, rather than creating a binary patch.
         /// </summary>
@@ -17713,7 +17713,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.wholeFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -17725,7 +17725,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -17735,7 +17735,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -17745,7 +17745,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -17764,7 +17764,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -17812,14 +17812,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("WholeFile", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17849,20 +17849,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// A path to symbols.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class SymbolPath : ISchemaElement, ISetAttributes
     {
-        
+
         private string pathField;
-        
+
         private bool pathFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The path.
         /// </summary>
@@ -17878,7 +17878,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.pathField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -17890,7 +17890,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -17907,7 +17907,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -17922,7 +17922,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Properties about the package to be placed in the Summary Information Stream.  These are
     /// visible from COM through the IStream interface, and these properties can be seen on the package in Explorer.
@@ -17930,73 +17930,73 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class SummaryInformation : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType adminImageField;
-        
+
         private bool adminImageFieldSet;
-        
+
         private string commentsField;
-        
+
         private bool commentsFieldSet;
-        
+
         private YesNoType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private InstallPrivilegesType installPrivilegesField;
-        
+
         private bool installPrivilegesFieldSet;
-        
+
         private InstallScopeType installScopeField;
-        
+
         private bool installScopeFieldSet;
-        
+
         private int installerVersionField;
-        
+
         private bool installerVersionFieldSet;
-        
+
         private string keywordsField;
-        
+
         private bool keywordsFieldSet;
-        
+
         private string languagesField;
-        
+
         private bool languagesFieldSet;
-        
+
         private string manufacturerField;
-        
+
         private bool manufacturerFieldSet;
-        
+
         private string platformsField;
-        
+
         private bool platformsFieldSet;
-        
+
         private PlatformType platformField;
-        
+
         private bool platformFieldSet;
-        
+
         private YesNoDefaultType readOnlyField;
-        
+
         private bool readOnlyFieldSet;
-        
+
         private YesNoType shortNamesField;
-        
+
         private bool shortNamesFieldSet;
-        
+
         private string summaryCodepageField;
-        
+
         private bool summaryCodepageFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The package code GUID for a product or merge module.
         /// When compiling a product, this attribute should not be set in order to allow the package
@@ -18015,7 +18015,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to 'yes' if the source is an admin image.
         /// </summary>
@@ -18031,7 +18031,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.adminImageField = value;
             }
         }
-        
+
         /// <summary>
         /// Optional comments for browsing.
         /// </summary>
@@ -18047,7 +18047,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.commentsField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to 'yes' to have compressed files in the source.
         /// This attribute cannot be set for merge modules.
@@ -18064,7 +18064,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// The product full name or description.
         /// </summary>
@@ -18080,7 +18080,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Use this attribute to specify the priviliges required to install the package on Windows Vista and above.
         /// </summary>
@@ -18096,7 +18096,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installPrivilegesField = value;
             }
         }
-        
+
         /// <summary>
         /// Use this attribute to specify the installation scope of this package: per-machine or per-user.
         /// </summary>
@@ -18112,7 +18112,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installScopeField = value;
             }
         }
-        
+
         /// <summary>
         /// The minimum version of the Windows Installer required to install this package. Take the major version of the required Windows Installer
         /// and multiply by a 100 then add the minor version of the Windows Installer. For example, "200" would represent Windows Installer 2.0 and
@@ -18131,7 +18131,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.installerVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// Optional keywords for browsing.
         /// </summary>
@@ -18147,7 +18147,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keywordsField = value;
             }
         }
-        
+
         /// <summary>
         /// The list of language IDs (LCIDs) supported in the package.
         /// </summary>
@@ -18163,7 +18163,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languagesField = value;
             }
         }
-        
+
         /// <summary>
         /// The vendor releasing the package.
         /// </summary>
@@ -18179,7 +18179,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.manufacturerField = value;
             }
         }
-        
+
         /// <summary>
         /// The list of platforms supported by the package. This attribute has been deprecated.
         /// Specify the -arch switch at the candle.exe command line or the InstallerPlatform
@@ -18197,7 +18197,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.platformsField = value;
             }
         }
-        
+
         /// <summary>
         /// The platform supported by the package. Use of this attribute is discouraged; instead,
         /// specify the -arch switch at the candle.exe command line or the InstallerPlatform
@@ -18215,7 +18215,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.platformField = value;
             }
         }
-        
+
         /// <summary>
         /// The value of this attribute conveys whether the package should be opened as read-only.
         /// A database editing tool should not modify a read-only enforced database and should
@@ -18233,7 +18233,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readOnlyField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to 'yes' to have short filenames in the source.
         /// </summary>
@@ -18249,7 +18249,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNamesField = value;
             }
         }
-        
+
         /// <summary>
         /// The code page integer value or web name for summary info strings only.  See remarks for more information.
         /// </summary>
@@ -18265,7 +18265,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.summaryCodepageField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -18277,7 +18277,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a InstallPrivilegesType from a string.
         /// </summary>
@@ -18287,7 +18287,7 @@ namespace WixToolset.Harvesters.Serialize
             SummaryInformation.TryParseInstallPrivilegesType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a InstallPrivilegesType from a string.
         /// </summary>
@@ -18316,7 +18316,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a InstallScopeType from a string.
         /// </summary>
@@ -18326,7 +18326,7 @@ namespace WixToolset.Harvesters.Serialize
             SummaryInformation.TryParseInstallScopeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a InstallScopeType from a string.
         /// </summary>
@@ -18355,7 +18355,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a PlatformType from a string.
         /// </summary>
@@ -18365,7 +18365,7 @@ namespace WixToolset.Harvesters.Serialize
             SummaryInformation.TryParsePlatformType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a PlatformType from a string.
         /// </summary>
@@ -18422,7 +18422,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -18569,7 +18569,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -18659,91 +18659,91 @@ namespace WixToolset.Harvesters.Serialize
                 this.summaryCodepageFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum InstallPrivilegesType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Set this value to declare that the package does not require elevated privileges to install.
             /// </summary>
             limited,
-            
+
             /// <summary>
             /// Set this value to declare that the package requires elevated privileges to install.
             /// This is the default value.
             /// </summary>
             elevated,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum InstallScopeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Set this value to declare that the package is a per-machine installation and requires elevated privileges to install.
             /// Sets the ALLUSERS property to 1.
             /// </summary>
             perMachine,
-            
+
             /// <summary>
             /// Set this value to declare that the package is a per-user installation and does not require elevated privileges to install.
             /// Sets the package's InstallPrivileges attribute to "limited."
             /// </summary>
             perUser,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum PlatformType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Set this value to declare that the package is an x86 package.
             /// </summary>
             x86,
-            
+
             /// <summary>
             /// Set this value to declare that the package is an ia64 package.
             /// This value requires that the InstallerVersion property be set to 200 or greater.
             /// </summary>
             ia64,
-            
+
             /// <summary>
             /// Set this value to declare that the package is an x64 package.
             /// This value requires that the InstallerVersion property be set to 200 or greater.
             /// </summary>
             x64,
-            
+
             /// <summary>
             /// Set this value to declare that the package is an arm package.
             /// This value requires that the InstallerVersion property be set to 500 or greater.
             /// </summary>
             arm,
-            
+
             /// <summary>
             /// This value has been deprecated. Use "x86" instead.
             /// </summary>
             intel,
-            
+
             /// <summary>
             /// This value has been deprecated. Use "ia64" instead.
             /// </summary>
             intel64,
         }
     }
-    
+
     /// <summary>
     /// The MsiAssemblyName table specifies the schema for the elements of a strong assembly cache name for a .NET Framework or Win32 assembly.
     /// Consider using the Assembly attribute on File element to have the toolset populate these entries automatically.
@@ -18751,17 +18751,17 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class AssemblyName : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Name of the attribute associated with the value specified in the Value column.
         /// </summary>
@@ -18777,7 +18777,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Value associated with the name specified in the Name column.
         /// </summary>
@@ -18793,7 +18793,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -18805,7 +18805,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -18826,7 +18826,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -18846,25 +18846,25 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Identifies the possible signer certificates used to digitally sign patches.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PatchCertificates : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PatchCertificates()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(DigitalCertificate)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -18872,7 +18872,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -18881,7 +18881,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -18893,7 +18893,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -18903,7 +18903,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -18913,7 +18913,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -18932,7 +18932,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -18943,14 +18943,14 @@ namespace WixToolset.Harvesters.Serialize
                 throw new ArgumentNullException("writer");
             }
             writer.WriteStartElement("PatchCertificates", "http://wixtoolset.org/schemas/v4/wxs");
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -18960,25 +18960,25 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Digital signatures that identify installation packages in a multi-product transaction.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PackageCertificates : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PackageCertificates()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(DigitalCertificate)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -18986,7 +18986,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -18995,7 +18995,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19007,7 +19007,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -19017,7 +19017,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -19027,7 +19027,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -19046,7 +19046,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19057,14 +19057,14 @@ namespace WixToolset.Harvesters.Serialize
                 throw new ArgumentNullException("writer");
             }
             writer.WriteStartElement("PackageCertificates", "http://wixtoolset.org/schemas/v4/wxs");
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -19074,24 +19074,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Adds a digital certificate.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class DigitalCertificate : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier for a certificate file.
         /// </summary>
@@ -19107,7 +19107,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The path to the certificate file.
         /// </summary>
@@ -19123,7 +19123,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19135,7 +19135,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19156,7 +19156,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -19176,7 +19176,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Reference to a DigitalCertificate element.  This will force the entire referenced Fragment's contents
     /// to be included in the installer database. This is only used for references when patching.
@@ -19184,13 +19184,13 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class DigitalCertificateRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public string Id
         {
             get
@@ -19203,7 +19203,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19215,7 +19215,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19232,7 +19232,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -19247,29 +19247,29 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Adds a digital signature.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class DigitalSignature : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public DigitalSignature()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(DigitalCertificate)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -19277,7 +19277,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -19286,7 +19286,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The path to signature's optional hash file.
         /// </summary>
@@ -19302,7 +19302,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19314,7 +19314,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -19324,7 +19324,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -19334,7 +19334,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -19353,7 +19353,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19368,14 +19368,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("SourceFile", this.sourceFileField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -19390,30 +19390,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Adds a system file protection update catalog file
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class SFPCatalog : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string dependencyField;
-        
+
         private bool dependencyFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public SFPCatalog()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -19421,7 +19421,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(SFPFile)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -19429,7 +19429,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -19438,7 +19438,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Filename for catalog file when installed.
         /// </summary>
@@ -19454,7 +19454,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to define dependency outside of the package.
         /// </summary>
@@ -19470,7 +19470,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.dependencyField = value;
             }
         }
-        
+
         /// <summary>
         /// Path to catalog file in binary.
         /// </summary>
@@ -19486,7 +19486,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19498,7 +19498,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -19508,7 +19508,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -19518,7 +19518,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -19541,7 +19541,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19564,14 +19564,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("SourceFile", this.sourceFileField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -19596,20 +19596,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Provides a many-to-many mapping from the SFPCatalog table to the File table
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class SFPFile : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Primary Key to File Table.
         /// </summary>
@@ -19625,7 +19625,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19637,7 +19637,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19654,7 +19654,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -19669,48 +19669,48 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Adds or removes .ini file entries.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class IniFile : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string sectionField;
-        
+
         private bool sectionFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier for ini file.
         /// </summary>
@@ -19726,7 +19726,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The type of modification to be made.
         /// </summary>
@@ -19742,7 +19742,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of a property, the value of which is the full path of the folder containing the .ini file. Can be name of a directory in the Directory table, a property set by the AppSearch table, or any other property representing a full path.
         /// </summary>
@@ -19758,7 +19758,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable .ini file key within the section.
         /// </summary>
@@ -19774,7 +19774,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// In prior versions of the WiX toolset, this attribute specified the short name.
         /// This attribute's value may now be either a short or long name.
@@ -19796,7 +19796,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable .ini file section.
         /// </summary>
@@ -19812,7 +19812,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sectionField = value;
             }
         }
-        
+
         /// <summary>
         /// The short name of the in 8.3 format.
         /// This attribute should only be set if there is a conflict between generated short names
@@ -19830,7 +19830,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable value to be written or deleted.  This attribute must be set if
         /// the Action attribute's value is "addLine", "addTag", or "createLine".
@@ -19847,7 +19847,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -19859,7 +19859,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -19869,7 +19869,7 @@ namespace WixToolset.Harvesters.Serialize
             IniFile.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -19919,7 +19919,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -19984,7 +19984,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -20034,80 +20034,80 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Creates or updates an .ini entry.
             /// </summary>
             addLine,
-            
+
             /// <summary>
             /// Creates a new entry or appends a new comma-separated value to an existing entry.
             /// </summary>
             addTag,
-            
+
             /// <summary>
             /// Creates an .ini entry only if the entry does no already exist.
             /// </summary>
             createLine,
-            
+
             /// <summary>
             /// Removes an .ini entry.
             /// </summary>
             removeLine,
-            
+
             /// <summary>
             /// Removes a tag from an .ini entry.
             /// </summary>
             removeTag,
         }
     }
-    
+
     /// <summary>
     /// ODBCDataSource for a Component
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ODBCDataSource : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string driverNameField;
-        
+
         private bool driverNameFieldSet;
-        
+
         private RegistrationType registrationField;
-        
+
         private bool registrationFieldSet;
-        
+
         private YesNoType keyPathField;
-        
+
         private bool keyPathFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ODBCDataSource()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
             childCollection0.AddItem(new ElementCollection.SequenceItem(typeof(Property)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -20115,7 +20115,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -20124,7 +20124,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier of the data source.
         /// </summary>
@@ -20140,7 +20140,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Name for the data source.
         /// </summary>
@@ -20156,7 +20156,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Required if not found as child of ODBCDriver element
         /// </summary>
@@ -20172,7 +20172,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.driverNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Scope for which the data source should be registered.
         /// </summary>
@@ -20188,7 +20188,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.registrationField = value;
             }
         }
-        
+
         /// <summary>
         /// Set 'yes' to force this file to be key path for parent Component
         /// </summary>
@@ -20204,7 +20204,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -20216,7 +20216,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -20226,7 +20226,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -20236,7 +20236,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -20255,7 +20255,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a RegistrationType from a string.
         /// </summary>
@@ -20265,7 +20265,7 @@ namespace WixToolset.Harvesters.Serialize
             ODBCDataSource.TryParseRegistrationType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a RegistrationType from a string.
         /// </summary>
@@ -20294,7 +20294,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -20339,14 +20339,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("KeyPath", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -20380,54 +20380,54 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum RegistrationType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Data source is registered per machine.
             /// </summary>
             machine,
-            
+
             /// <summary>
             /// Data source is registered per user.
             /// </summary>
             user,
         }
     }
-    
+
     /// <summary>
     /// ODBCDriver for a Component
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ODBCDriver : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string fileField;
-        
+
         private bool fileFieldSet;
-        
+
         private string setupFileField;
-        
+
         private bool setupFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ODBCDriver()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -20435,7 +20435,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.SequenceItem(typeof(ODBCDataSource)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -20443,7 +20443,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -20452,7 +20452,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for the driver.
         /// </summary>
@@ -20468,7 +20468,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Name for the driver.
         /// </summary>
@@ -20484,7 +20484,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Required if not found as child of File element
         /// </summary>
@@ -20500,7 +20500,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileField = value;
             }
         }
-        
+
         /// <summary>
         /// Required if not found as child of File element or different from File attribute above
         /// </summary>
@@ -20516,7 +20516,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.setupFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -20528,7 +20528,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -20538,7 +20538,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -20548,7 +20548,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -20571,7 +20571,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -20598,14 +20598,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("SetupFile", this.setupFileField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -20635,32 +20635,32 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// ODBCTranslator for a Component
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ODBCTranslator : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string fileField;
-        
+
         private bool fileFieldSet;
-        
+
         private string setupFileField;
-        
+
         private bool setupFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier for the translator.
         /// </summary>
@@ -20676,7 +20676,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Name for the translator.
         /// </summary>
@@ -20692,7 +20692,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Required if not found as child of File element
         /// </summary>
@@ -20708,7 +20708,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileField = value;
             }
         }
-        
+
         /// <summary>
         /// Required if not found as child of File element or different from File attribute above
         /// </summary>
@@ -20724,7 +20724,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.setupFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -20736,7 +20736,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -20765,7 +20765,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -20795,56 +20795,56 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Searches for file and assigns to fullpath value of parent Property
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class FileSearch : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private int minSizeField;
-        
+
         private bool minSizeFieldSet;
-        
+
         private int maxSizeField;
-        
+
         private bool maxSizeFieldSet;
-        
+
         private string minVersionField;
-        
+
         private bool minVersionFieldSet;
-        
+
         private string maxVersionField;
-        
+
         private bool maxVersionFieldSet;
-        
+
         private DateTime minDateField;
-        
+
         private bool minDateFieldSet;
-        
+
         private DateTime maxDateField;
-        
+
         private bool maxDateFieldSet;
-        
+
         private string languagesField;
-        
+
         private bool languagesFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Unique identifier for the file search and external key into the Signature table. If this attribute value is not set then the parent element's @Id attribute is used.
         /// </summary>
@@ -20860,7 +20860,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// In prior versions of the WiX toolset, this attribute specified the short file name.
         /// This attribute's value may now be either a short or long file name.
@@ -20880,7 +20880,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The short file name of the file in 8.3 format.
         /// There is a Windows Installer bug which prevents the FileSearch functionality from working
@@ -20900,7 +20900,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// The minimum size of the file.
         /// </summary>
@@ -20916,7 +20916,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.minSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// The maximum size of the file.
         /// </summary>
@@ -20932,7 +20932,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.maxSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// The minimum version of the file.
         /// </summary>
@@ -20948,7 +20948,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.minVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// The maximum version of the file.
         /// </summary>
@@ -20964,7 +20964,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.maxVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// The minimum modification date and time of the file. Formatted as YYYY-MM-DDTHH:mm:ss, where YYYY is the year, MM is month, DD is day, 'T' is literal, HH is hour, mm is minute and ss is second.
         /// </summary>
@@ -20980,7 +20980,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.minDateField = value;
             }
         }
-        
+
         /// <summary>
         /// The maximum modification date and time of the file. Formatted as YYYY-MM-DDTHH:mm:ss, where YYYY is the year, MM is month, DD is day, 'T' is literal, HH is hour, mm is minute and ss is second.
         /// </summary>
@@ -20996,7 +20996,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.maxDateField = value;
             }
         }
-        
+
         /// <summary>
         /// The languages supported by the file.
         /// </summary>
@@ -21012,7 +21012,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languagesField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -21024,7 +21024,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -21078,7 +21078,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -21139,20 +21139,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// References an existing FileSearch element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class FileSearchRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Specify the Id to the FileSearch to reference.
         /// </summary>
@@ -21168,7 +21168,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -21180,7 +21180,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -21197,7 +21197,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -21212,34 +21212,34 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Searches for directory and assigns to value of parent Property.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class DirectorySearch : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string pathField;
-        
+
         private bool pathFieldSet;
-        
+
         private int depthField;
-        
+
         private bool depthFieldSet;
-        
+
         private YesNoType assignToPropertyField;
-        
+
         private bool assignToPropertyFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public DirectorySearch()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -21249,7 +21249,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(FileSearchRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -21257,7 +21257,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -21266,7 +21266,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for the directory search.
         /// </summary>
@@ -21282,7 +21282,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Path on the user's system. Either absolute, or relative to containing directories.
         /// </summary>
@@ -21298,7 +21298,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.pathField = value;
             }
         }
-        
+
         /// <summary>
         /// Depth below the path that the installer searches for the file or directory specified by the search. See remarks for more information.
         /// </summary>
@@ -21314,7 +21314,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.depthField = value;
             }
         }
-        
+
         /// <summary>
         /// Set the value of the outer Property to the result of this search. See remarks for more information.
         /// </summary>
@@ -21330,7 +21330,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.assignToPropertyField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -21342,7 +21342,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -21352,7 +21352,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -21362,7 +21362,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -21393,7 +21393,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -21427,14 +21427,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("AssignToProperty", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -21464,30 +21464,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// References an existing DirectorySearch element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class DirectorySearchRef : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string parentField;
-        
+
         private bool parentFieldSet;
-        
+
         private string pathField;
-        
+
         private bool pathFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public DirectorySearchRef()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -21497,7 +21497,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(FileSearchRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -21505,7 +21505,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -21514,7 +21514,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Id of the search being referred to.
         /// </summary>
@@ -21530,7 +21530,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute is the signature of the parent directory of the file or directory in the Signature_ column. If this field is null, and the Path column does not expand to a full path, then all the fixed drives of the user's system are searched by using the Path.  This field is a key into one of the following tables: the RegLocator, the IniLocator, the CompLocator, or the DrLocator tables.
         /// </summary>
@@ -21546,7 +21546,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentField = value;
             }
         }
-        
+
         /// <summary>
         /// Path on the user's system. Either absolute, or relative to containing directories.
         /// </summary>
@@ -21562,7 +21562,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.pathField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -21574,7 +21574,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -21584,7 +21584,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -21594,7 +21594,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -21625,7 +21625,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -21648,14 +21648,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Path", this.pathField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -21680,30 +21680,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Searches for file or directory and assigns to value of parent Property.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ComponentSearch : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string guidField;
-        
+
         private bool guidFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ComponentSearch()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -21713,7 +21713,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(FileSearchRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -21721,7 +21721,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -21730,7 +21730,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public string Id
         {
             get
@@ -21743,7 +21743,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The component ID of the component whose key path is to be used for the search.
         /// </summary>
@@ -21759,7 +21759,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.guidField = value;
             }
         }
-        
+
         /// <summary>
         /// Must be file if last child is FileSearch element and must be directory if last child is DirectorySearch element.
         /// </summary>
@@ -21775,7 +21775,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -21787,7 +21787,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -21797,7 +21797,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -21807,7 +21807,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -21838,7 +21838,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -21848,7 +21848,7 @@ namespace WixToolset.Harvesters.Serialize
             ComponentSearch.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -21877,7 +21877,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -21907,14 +21907,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Type", "file");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -21938,66 +21938,66 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The key path of the component is a directory.
             /// </summary>
             directory,
-            
+
             /// <summary>
             /// The key path of the component is a file.  This is the default value.
             /// </summary>
             file,
         }
     }
-    
+
     /// <summary>
     /// Searches for file, directory or registry key and assigns to value of parent Property
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class IniFileSearch : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private int fieldField;
-        
+
         private bool fieldFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string sectionField;
-        
+
         private bool sectionFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public IniFileSearch()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -22007,7 +22007,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(FileSearchRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -22015,7 +22015,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -22024,7 +22024,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// External key into the Signature table.
         /// </summary>
@@ -22040,7 +22040,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The field in the .ini line. If field is Null or 0, the entire line is read.
         /// </summary>
@@ -22056,7 +22056,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fieldField = value;
             }
         }
-        
+
         /// <summary>
         /// The key value within the section.
         /// </summary>
@@ -22072,7 +22072,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// In prior versions of the WiX toolset, this attribute specified the short name.
         /// This attribute's value may now be either a short or long name.
@@ -22094,7 +22094,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable .ini file section.
         /// </summary>
@@ -22110,7 +22110,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sectionField = value;
             }
         }
-        
+
         /// <summary>
         /// The short name of the file in 8.3 format.
         /// This attribute should only be set if the user wants to manually specify the short name.
@@ -22127,7 +22127,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Must be file if last child is FileSearch element and must be directory if last child is DirectorySearch element.
         /// </summary>
@@ -22143,7 +22143,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -22155,7 +22155,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -22165,7 +22165,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -22175,7 +22175,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -22206,7 +22206,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -22216,7 +22216,7 @@ namespace WixToolset.Harvesters.Serialize
             IniFileSearch.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -22252,7 +22252,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -22303,14 +22303,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Type", "raw");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -22354,67 +22354,67 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// A directory location.
             /// </summary>
             directory,
-            
+
             /// <summary>
             /// A file location.  This is the default value.
             /// </summary>
             file,
-            
+
             /// <summary>
             /// A raw .ini value.
             /// </summary>
             raw,
         }
     }
-    
+
     /// <summary>
     /// Searches for file, directory or registry key and assigns to value of parent Property
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RegistrySearch : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private RootType rootField;
-        
+
         private bool rootFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private YesNoType win64Field;
-        
+
         private bool win64FieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public RegistrySearch()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -22424,7 +22424,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(FileSearchRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -22432,7 +22432,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -22441,7 +22441,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Signature to be used for the file, directory or registry key being searched for.
         /// </summary>
@@ -22457,7 +22457,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Root key for the registry value.
         /// </summary>
@@ -22473,7 +22473,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootField = value;
             }
         }
-        
+
         /// <summary>
         /// Key for the registry value.
         /// </summary>
@@ -22489,7 +22489,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// Registry value name. If this value is null, then the value from the key's unnamed or default value, if any, is retrieved.
         /// </summary>
@@ -22505,7 +22505,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The value must be 'file' if the child is a FileSearch element, and must be 'directory' if child is a DirectorySearch element.
         /// </summary>
@@ -22521,7 +22521,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         /// <summary>
         /// Instructs the search to look in the 64-bit registry when the value is 'yes'. When the value is 'no', the search looks in the 32-bit registry.
         /// The default value is based on the platform set by the -arch switch to candle.exe
@@ -22541,7 +22541,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.win64Field = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -22553,7 +22553,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -22563,7 +22563,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -22573,7 +22573,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -22604,7 +22604,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a RootType from a string.
         /// </summary>
@@ -22614,7 +22614,7 @@ namespace WixToolset.Harvesters.Serialize
             RegistrySearch.TryParseRootType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a RootType from a string.
         /// </summary>
@@ -22657,7 +22657,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -22667,7 +22667,7 @@ namespace WixToolset.Harvesters.Serialize
             RegistrySearch.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -22703,7 +22703,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -22772,14 +22772,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Win64", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -22818,74 +22818,74 @@ namespace WixToolset.Harvesters.Serialize
                 this.win64FieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum RootType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// HKEY_CLASSES_ROOT
             /// </summary>
             HKCR,
-            
+
             /// <summary>
             /// HKEY_CURRENT_USER
             /// </summary>
             HKCU,
-            
+
             /// <summary>
             /// HKEY_LOCAL_MACHINE
             /// </summary>
             HKLM,
-            
+
             /// <summary>
             /// HKEY_USERS
             /// </summary>
             HKU,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The registry value contains the path to a directory.
             /// </summary>
             directory,
-            
+
             /// <summary>
             /// The registry value contains the path to a file. To return the full file path you must add a FileSearch element as a child of this element; otherwise, the parent directory of the file path is returned.
             /// </summary>
             file,
-            
+
             /// <summary>
             /// Sets the raw value from the registry value.  Please note that this value will contain a prefix as follows:
             /// </summary>
             raw,
         }
     }
-    
+
     /// <summary>
     /// References an existing RegistrySearch element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RegistrySearchRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Specify the Id of the RegistrySearch to reference.
         /// </summary>
@@ -22901,7 +22901,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -22913,7 +22913,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -22930,7 +22930,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -22945,18 +22945,18 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Sets the parent of a nested DirectorySearch element to CCP_DRIVE.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ComplianceDrive : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ComplianceDrive()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -22964,7 +22964,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(DirectorySearchRef)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -22972,7 +22972,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -22981,7 +22981,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -22993,7 +22993,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -23003,7 +23003,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -23013,7 +23013,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -23036,7 +23036,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -23047,14 +23047,14 @@ namespace WixToolset.Harvesters.Serialize
                 throw new ArgumentNullException("writer");
             }
             writer.WriteStartElement("ComplianceDrive", "http://wixtoolset.org/schemas/v4/wxs");
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -23064,18 +23064,18 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Adds a row to the CCPSearch table.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ComplianceCheck : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ComplianceCheck()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -23089,7 +23089,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -23097,7 +23097,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -23106,7 +23106,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -23118,7 +23118,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -23128,7 +23128,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -23138,7 +23138,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -23173,7 +23173,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -23184,14 +23184,14 @@ namespace WixToolset.Harvesters.Serialize
                 throw new ArgumentNullException("writer");
             }
             writer.WriteStartElement("ComplianceCheck", "http://wixtoolset.org/schemas/v4/wxs");
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -23208,39 +23208,39 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Property : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private YesNoType complianceCheckField;
-        
+
         private bool complianceCheckFieldSet;
-        
+
         private YesNoType adminField;
-        
+
         private bool adminFieldSet;
-        
+
         private YesNoType secureField;
-        
+
         private bool secureFieldSet;
-        
+
         private YesNoType hiddenField;
-        
+
         private bool hiddenFieldSet;
-        
+
         private YesNoType suppressModularizationField;
-        
+
         private bool suppressModularizationFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Property()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -23257,7 +23257,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -23265,7 +23265,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -23274,7 +23274,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for Property.
         /// </summary>
@@ -23290,7 +23290,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Sets a default value for the property.  The value will be overwritten if the Property is used for a search.
         /// </summary>
@@ -23306,7 +23306,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         /// <summary>
         /// Adds a row to the CCPSearch table.  This attribute is only valid when this Property contains a search element.
         /// </summary>
@@ -23322,7 +23322,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.complianceCheckField = value;
             }
         }
-        
+
         /// <summary>
         /// Denotes that the Property is saved during
         /// </summary>
@@ -23338,7 +23338,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.adminField = value;
             }
         }
-        
+
         /// <summary>
         /// Denotes that the Property can be passed to the server side when doing a managed installation with elevated privileges. See the
         /// </summary>
@@ -23354,7 +23354,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.secureField = value;
             }
         }
-        
+
         /// <summary>
         /// Denotes that the Property is not logged during installation. See the
         /// </summary>
@@ -23370,7 +23370,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hiddenField = value;
             }
         }
-        
+
         /// <summary>
         /// Use to suppress modularization of this property identifier in merge modules.
         /// Using this functionality is strongly discouraged; it should only be
@@ -23388,7 +23388,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.suppressModularizationField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -23400,7 +23400,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -23410,7 +23410,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -23420,7 +23420,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -23468,7 +23468,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -23543,14 +23543,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("SuppressModularization", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -23595,20 +23595,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Reference to a Property value.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PropertyRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Identifier of Property to reference.
         /// </summary>
@@ -23624,7 +23624,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -23636,7 +23636,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -23653,7 +23653,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -23668,86 +23668,86 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Shortcut, default target is parent File, CreateFolder, or Component's Directory
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Shortcut : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private string targetField;
-        
+
         private bool targetFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string argumentsField;
-        
+
         private bool argumentsFieldSet;
-        
+
         private int hotkeyField;
-        
+
         private bool hotkeyFieldSet;
-        
+
         private string iconField;
-        
+
         private bool iconFieldSet;
-        
+
         private int iconIndexField;
-        
+
         private bool iconIndexFieldSet;
-        
+
         private ShowType showField;
-        
+
         private bool showFieldSet;
-        
+
         private string workingDirectoryField;
-        
+
         private bool workingDirectoryFieldSet;
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private string displayResourceDllField;
-        
+
         private bool displayResourceDllFieldSet;
-        
+
         private int displayResourceIdField;
-        
+
         private bool displayResourceIdFieldSet;
-        
+
         private string descriptionResourceDllField;
-        
+
         private bool descriptionResourceDllFieldSet;
-        
+
         private int descriptionResourceIdField;
-        
+
         private bool descriptionResourceIdFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Shortcut()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -23755,7 +23755,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ShortcutProperty)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -23763,7 +23763,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -23772,7 +23772,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for the shortcut. This value will serve as the primary key for the row.
         /// </summary>
@@ -23788,7 +23788,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier reference to Directory element where shortcut is to be created. When nested under a Component element, this attribute's value will default to the parent directory. Otherwise, this attribute is required.
         /// </summary>
@@ -23804,7 +23804,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// In prior versions of the WiX toolset, this attribute specified the short name.
         /// This attribute's value may now be either a short or long name.
@@ -23826,7 +23826,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The short name of the shortcut in 8.3 format.
         /// This attribute should only be set if there is a conflict between generated short names
@@ -23844,7 +23844,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute can only be set if this Shortcut element is nested under a Component element.
         /// When nested under a Component element, this attribute's value will default to the parent directory.
@@ -23864,7 +23864,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable description for the shortcut.
         /// </summary>
@@ -23880,7 +23880,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// The command-line arguments for the shortcut. Note that the resolution of properties
         /// in the Arguments field is limited. A property formatted as [Property] in this field can only be resolved if the
@@ -23900,7 +23900,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.argumentsField = value;
             }
         }
-        
+
         /// <summary>
         /// The hotkey for the shortcut. The low-order byte contains the virtual-key code for
         /// the key, and the high-order byte contains modifier flags. This must be a non-negative number. Authors of
@@ -23920,7 +23920,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hotkeyField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier reference to Icon element. The Icon identifier should have the same extension
         /// as the file that it points at.  For example, a shortcut to an executable (e.g. "my.exe") should reference an Icon with identifier
@@ -23938,7 +23938,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifier reference to Icon element.
         /// </summary>
@@ -23954,7 +23954,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconIndexField = value;
             }
         }
-        
+
         public ShowType Show
         {
             get
@@ -23967,7 +23967,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.showField = value;
             }
         }
-        
+
         /// <summary>
         /// Directory identifier (or Property identifier that resolves to a directory) that resolves
         /// to the path of the working directory for the shortcut.
@@ -23984,7 +23984,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.workingDirectoryField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies if the shortcut should be advertised or not. Note that advertised shortcuts
         /// always point at a particular application, identified by a ProductCode, and should not be shared between applications.
@@ -24003,7 +24003,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         /// <summary>
         /// The Formatted string providing the full path to the language neutral file containing the MUI Manifest.   Generally
         /// authored using [#filekey] form.  When this attribute is specified, the DisplayResourceId attribute must also
@@ -24025,7 +24025,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayResourceDllField = value;
             }
         }
-        
+
         /// <summary>
         /// The display name index for the shortcut. This must be a non-negative number.  When this attribute is specified, the
         /// DisplayResourceDll attribute must also be provided.
@@ -24046,7 +24046,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayResourceIdField = value;
             }
         }
-        
+
         /// <summary>
         /// The Formatted string providing the full path to the language neutral file containing the MUI Manifest.   Generally
         /// authored using [#filekey] form.  When this attribute is specified, the DescriptionResourceId attribute must also
@@ -24068,7 +24068,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionResourceDllField = value;
             }
         }
-        
+
         /// <summary>
         /// The description name index for the shortcut. This must be a non-negative number.  When this attribute is specified,
         /// the DescriptionResourceDll attribute must also be populated.
@@ -24089,7 +24089,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionResourceIdField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -24101,7 +24101,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -24111,7 +24111,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -24121,7 +24121,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -24144,7 +24144,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a ShowType from a string.
         /// </summary>
@@ -24154,7 +24154,7 @@ namespace WixToolset.Harvesters.Serialize
             Shortcut.TryParseShowType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ShowType from a string.
         /// </summary>
@@ -24190,7 +24190,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -24288,14 +24288,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("DescriptionResourceId", this.descriptionResourceIdField.ToString(CultureInfo.InvariantCulture));
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -24390,53 +24390,53 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionResourceIdFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ShowType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The shortcut target will be displayed using the SW_SHOWNORMAL attribute.
             /// </summary>
             normal,
-            
+
             /// <summary>
             /// The shortcut target will be displayed using the SW_SHOWMINNOACTIVE attribute.
             /// </summary>
             minimized,
-            
+
             /// <summary>
             /// The shortcut target will be displayed using the SW_SHOWMAXIMIZED attribute.
             /// </summary>
             maximized,
         }
     }
-    
+
     /// <summary>
     /// Property values for a shortcut. This element's functionality is available starting with MSI 5.0.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ShortcutProperty : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Unique identifier for MsiShortcutProperty table. If omitted, a stable identifier will be generated from the parent shortcut identifier and Key value.
         /// </summary>
@@ -24452,7 +24452,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// A formatted string identifying the property to be set.
         /// </summary>
@@ -24468,7 +24468,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// A formatted string supplying the value of the property.
         /// </summary>
@@ -24484,7 +24484,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -24496,7 +24496,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -24521,7 +24521,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -24546,7 +24546,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Sets ACLs on File, Registry, or CreateFolder.  When under a Registry element, this cannot be used
     /// if the Action attribute's value is remove or removeKeyOnInstall.  This element has no Id attribute.
@@ -24555,125 +24555,125 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Permission : ISchemaElement, ISetAttributes
     {
-        
+
         private string domainField;
-        
+
         private bool domainFieldSet;
-        
+
         private string userField;
-        
+
         private bool userFieldSet;
-        
+
         private YesNoType readField;
-        
+
         private bool readFieldSet;
-        
+
         private YesNoType deleteField;
-        
+
         private bool deleteFieldSet;
-        
+
         private YesNoType readPermissionField;
-        
+
         private bool readPermissionFieldSet;
-        
+
         private YesNoType changePermissionField;
-        
+
         private bool changePermissionFieldSet;
-        
+
         private YesNoType takeOwnershipField;
-        
+
         private bool takeOwnershipFieldSet;
-        
+
         private YesNoType specificRightsAllField;
-        
+
         private bool specificRightsAllFieldSet;
-        
+
         private YesNoType readAttributesField;
-        
+
         private bool readAttributesFieldSet;
-        
+
         private YesNoType writeAttributesField;
-        
+
         private bool writeAttributesFieldSet;
-        
+
         private YesNoType readExtendedAttributesField;
-        
+
         private bool readExtendedAttributesFieldSet;
-        
+
         private YesNoType writeExtendedAttributesField;
-        
+
         private bool writeExtendedAttributesFieldSet;
-        
+
         private YesNoType synchronizeField;
-        
+
         private bool synchronizeFieldSet;
-        
+
         private YesNoType createFileField;
-        
+
         private bool createFileFieldSet;
-        
+
         private YesNoType createChildField;
-        
+
         private bool createChildFieldSet;
-        
+
         private YesNoType deleteChildField;
-        
+
         private bool deleteChildFieldSet;
-        
+
         private YesNoType traverseField;
-        
+
         private bool traverseFieldSet;
-        
+
         private YesNoType appendField;
-        
+
         private bool appendFieldSet;
-        
+
         private YesNoType executeField;
-        
+
         private bool executeFieldSet;
-        
+
         private YesNoType fileAllRightsField;
-        
+
         private bool fileAllRightsFieldSet;
-        
+
         private YesNoType writeField;
-        
+
         private bool writeFieldSet;
-        
+
         private YesNoType createSubkeysField;
-        
+
         private bool createSubkeysFieldSet;
-        
+
         private YesNoType enumerateSubkeysField;
-        
+
         private bool enumerateSubkeysFieldSet;
-        
+
         private YesNoType notifyField;
-        
+
         private bool notifyFieldSet;
-        
+
         private YesNoType createLinkField;
-        
+
         private bool createLinkFieldSet;
-        
+
         private YesNoType genericAllField;
-        
+
         private bool genericAllFieldSet;
-        
+
         private YesNoType genericExecuteField;
-        
+
         private bool genericExecuteFieldSet;
-        
+
         private YesNoType genericWriteField;
-        
+
         private bool genericWriteFieldSet;
-        
+
         private YesNoType genericReadField;
-        
+
         private bool genericReadFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public string Domain
         {
             get
@@ -24686,7 +24686,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.domainField = value;
             }
         }
-        
+
         public string User
         {
             get
@@ -24699,7 +24699,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.userField = value;
             }
         }
-        
+
         public YesNoType Read
         {
             get
@@ -24712,7 +24712,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readField = value;
             }
         }
-        
+
         public YesNoType Delete
         {
             get
@@ -24725,7 +24725,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.deleteField = value;
             }
         }
-        
+
         public YesNoType ReadPermission
         {
             get
@@ -24738,7 +24738,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readPermissionField = value;
             }
         }
-        
+
         public YesNoType ChangePermission
         {
             get
@@ -24751,7 +24751,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.changePermissionField = value;
             }
         }
-        
+
         public YesNoType TakeOwnership
         {
             get
@@ -24764,7 +24764,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.takeOwnershipField = value;
             }
         }
-        
+
         /// <summary>
         /// Bit mask for SPECIFIC_RIGHTS_ALL from WinNT.h (0x0000FFFF).
         /// </summary>
@@ -24780,7 +24780,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.specificRightsAllField = value;
             }
         }
-        
+
         public YesNoType ReadAttributes
         {
             get
@@ -24793,7 +24793,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readAttributesField = value;
             }
         }
-        
+
         public YesNoType WriteAttributes
         {
             get
@@ -24806,7 +24806,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.writeAttributesField = value;
             }
         }
-        
+
         public YesNoType ReadExtendedAttributes
         {
             get
@@ -24819,7 +24819,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readExtendedAttributesField = value;
             }
         }
-        
+
         public YesNoType WriteExtendedAttributes
         {
             get
@@ -24832,7 +24832,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.writeExtendedAttributesField = value;
             }
         }
-        
+
         public YesNoType Synchronize
         {
             get
@@ -24845,7 +24845,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.synchronizeField = value;
             }
         }
-        
+
         /// <summary>
         /// For a directory, the right to create a file in the directory.  Only valid under a 'CreateFolder' parent.
         /// </summary>
@@ -24861,7 +24861,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.createFileField = value;
             }
         }
-        
+
         /// <summary>
         /// For a directory, the right to create a subdirectory.  Only valid under a 'CreateFolder' parent.
         /// </summary>
@@ -24877,7 +24877,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.createChildField = value;
             }
         }
-        
+
         /// <summary>
         /// For a directory, the right to delete a directory and all the files it contains, including read-only files.  Only valid under a 'CreateFolder' parent.
         /// </summary>
@@ -24893,7 +24893,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.deleteChildField = value;
             }
         }
-        
+
         /// <summary>
         /// For a directory, the right to traverse the directory.  By default, users are assigned the BYPASS_TRAVERSE_CHECKING privilege, which ignores the FILE_TRAVERSE access right.  Only valid under a 'CreateFolder' parent.
         /// </summary>
@@ -24909,7 +24909,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.traverseField = value;
             }
         }
-        
+
         public YesNoType Append
         {
             get
@@ -24922,7 +24922,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.appendField = value;
             }
         }
-        
+
         public YesNoType Execute
         {
             get
@@ -24935,7 +24935,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.executeField = value;
             }
         }
-        
+
         /// <summary>
         /// Bit mask for FILE_ALL_ACCESS from WinNT.h (0x001F01FF).
         /// </summary>
@@ -24951,7 +24951,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileAllRightsField = value;
             }
         }
-        
+
         public YesNoType Write
         {
             get
@@ -24964,7 +24964,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.writeField = value;
             }
         }
-        
+
         public YesNoType CreateSubkeys
         {
             get
@@ -24977,7 +24977,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.createSubkeysField = value;
             }
         }
-        
+
         public YesNoType EnumerateSubkeys
         {
             get
@@ -24990,7 +24990,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.enumerateSubkeysField = value;
             }
         }
-        
+
         public YesNoType Notify
         {
             get
@@ -25003,7 +25003,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.notifyField = value;
             }
         }
-        
+
         public YesNoType CreateLink
         {
             get
@@ -25016,7 +25016,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.createLinkField = value;
             }
         }
-        
+
         public YesNoType GenericAll
         {
             get
@@ -25029,7 +25029,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.genericAllField = value;
             }
         }
-        
+
         public YesNoType GenericExecute
         {
             get
@@ -25042,7 +25042,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.genericExecuteField = value;
             }
         }
-        
+
         public YesNoType GenericWrite
         {
             get
@@ -25055,7 +25055,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.genericWriteField = value;
             }
         }
-        
+
         /// <summary>
         /// specifying this will fail to grant read access
         /// </summary>
@@ -25071,7 +25071,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.genericReadField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -25083,7 +25083,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -25402,7 +25402,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -25558,7 +25558,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Sets ACLs on File, Registry, or CreateFolder.  When under a Registry element, this cannot be used
     /// if the Action attribute's value is remove or removeKeyOnInstall.  This element is only available
@@ -25568,26 +25568,26 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class PermissionEx : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string sddlField;
-        
+
         private bool sddlFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public PermissionEx()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
             childCollection0.AddItem(new ElementCollection.SequenceItem(typeof(Condition)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -25595,7 +25595,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -25604,7 +25604,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry. If this is not specified the parent element's Id attribute
         /// will be used instead.
@@ -25621,7 +25621,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Security descriptor to apply to parent object.
         /// </summary>
@@ -25637,7 +25637,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sddlField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -25649,7 +25649,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -25659,7 +25659,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -25669,7 +25669,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -25688,7 +25688,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -25707,14 +25707,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Sddl", this.sddlField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -25734,7 +25734,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Copy or move an existing file on the target machine, or copy a file that is being installed, to another destination.  When
     /// this element is nested under a File element, the parent file will be installed, then copied to the specified destination
@@ -25749,49 +25749,49 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class CopyFile : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string fileIdField;
-        
+
         private bool fileIdFieldSet;
-        
+
         private string sourceDirectoryField;
-        
+
         private bool sourceDirectoryFieldSet;
-        
+
         private string sourcePropertyField;
-        
+
         private bool sourcePropertyFieldSet;
-        
+
         private string sourceNameField;
-        
+
         private bool sourceNameFieldSet;
-        
+
         private string destinationDirectoryField;
-        
+
         private bool destinationDirectoryFieldSet;
-        
+
         private string destinationPropertyField;
-        
+
         private bool destinationPropertyFieldSet;
-        
+
         private string destinationNameField;
-        
+
         private bool destinationNameFieldSet;
-        
+
         private string destinationShortNameField;
-        
+
         private bool destinationShortNameFieldSet;
-        
+
         private YesNoType deleteField;
-        
+
         private bool deleteFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.
         /// </summary>
@@ -25807,7 +25807,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute cannot be specified if the element is nested under a File element.  Set this attribute's value to the identifier
         /// of a file from a different component to copy it based on the install state of the parent component.
@@ -25824,7 +25824,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileIdField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute cannot be specified if the element is nested under a File element or the FileId attribute is specified.  Set
         /// this value to the source directory from which to copy or move an existing file on the target machine.  This Directory must
@@ -25842,7 +25842,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceDirectoryField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute cannot be specified if the element is nested under a File element or the FileId attribute is specified.  Set
         /// this value to a property that will have a value that resolves to the full path of the source directory (or full path
@@ -25862,7 +25862,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourcePropertyField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute cannot be specified if the element is nested under a File element or the FileId attribute is specified.  Set
         /// this value to the localizable name of the file(s) to be copied or moved.  All of the files that
@@ -25885,7 +25885,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to the destination directory where an existing file on the target machine should be moved or copied to.  This
         /// Directory must exist in the installer database at creation time.  This attribute cannot be specified in conjunction with
@@ -25903,7 +25903,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.destinationDirectoryField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to a property that will have a value that resolves to the full path of the destination directory.  The property
         /// does not have to exist in the installer database at creation time; it could be created at installation time by a custom
@@ -25921,7 +25921,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.destinationPropertyField = value;
             }
         }
-        
+
         /// <summary>
         /// In prior versions of the WiX toolset, this attribute specified the short file name.
         /// Now set this value to the localizable name to be given to the original file after it is moved or copied.
@@ -25944,7 +25944,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.destinationNameField = value;
             }
         }
-        
+
         /// <summary>
         /// The short file name of the file in 8.3 format.
         /// This attribute should only be set if there is a conflict between generated short file names
@@ -25962,7 +25962,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.destinationShortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute cannot be specified if the element is nested under a File element or the FileId attribute is specified.  In other
         /// cases, if the attribute is not specified, the default value is "no" and the file is copied, not moved.  Set the value to "yes"
@@ -25980,7 +25980,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.deleteField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -25992,7 +25992,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -26053,7 +26053,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -26114,134 +26114,134 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// File specification for File table, must be child node of Component.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class File : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string companionFileField;
-        
+
         private bool companionFileFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private YesNoType keyPathField;
-        
+
         private bool keyPathFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private YesNoType readOnlyField;
-        
+
         private bool readOnlyFieldSet;
-        
+
         private YesNoType hiddenField;
-        
+
         private bool hiddenFieldSet;
-        
+
         private YesNoType systemField;
-        
+
         private bool systemFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private YesNoType checksumField;
-        
+
         private bool checksumFieldSet;
-        
+
         private YesNoDefaultType compressedField;
-        
+
         private bool compressedFieldSet;
-        
+
         private string bindPathField;
-        
+
         private bool bindPathFieldSet;
-        
+
         private int selfRegCostField;
-        
+
         private bool selfRegCostFieldSet;
-        
+
         private YesNoType trueTypeField;
-        
+
         private bool trueTypeFieldSet;
-        
+
         private string fontTitleField;
-        
+
         private bool fontTitleFieldSet;
-        
+
         private string defaultLanguageField;
-        
+
         private bool defaultLanguageFieldSet;
-        
+
         private int defaultSizeField;
-        
+
         private bool defaultSizeFieldSet;
-        
+
         private string defaultVersionField;
-        
+
         private bool defaultVersionFieldSet;
-        
+
         private AssemblyType assemblyField;
-        
+
         private bool assemblyFieldSet;
-        
+
         private string assemblyManifestField;
-        
+
         private bool assemblyManifestFieldSet;
-        
+
         private string assemblyApplicationField;
-        
+
         private bool assemblyApplicationFieldSet;
-        
+
         private ProcessorArchitectureType processorArchitectureField;
-        
+
         private bool processorArchitectureFieldSet;
-        
+
         private string diskIdField;
-        
+
         private bool diskIdFieldSet;
-        
+
         private string sourceField;
-        
+
         private bool sourceFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
+
         private int patchGroupField;
-        
+
         private bool patchGroupFieldSet;
-        
+
         private YesNoType patchIgnoreField;
-        
+
         private bool patchIgnoreFieldSet;
-        
+
         private YesNoType patchAllowIgnoreOnErrorField;
-        
+
         private bool patchAllowIgnoreOnErrorFieldSet;
-        
+
         private YesNoType patchWholeFileField;
-        
+
         private bool patchWholeFileFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public File()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -26259,7 +26259,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -26267,7 +26267,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -26276,7 +26276,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The unique identifier for this File element. If you omit Id, it defaults to the file name portion of the Source attribute, if specified. May be referenced as a Property by specifying [#value].
         /// </summary>
@@ -26292,7 +26292,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to make this file a companion child of another file.  The installation
         /// state of a companion file depends not on its own file versioning information, but on the versioning of its
@@ -26312,7 +26312,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.companionFileField = value;
             }
         }
-        
+
         /// <summary>
         /// In prior versions of the WiX toolset, this attribute specified the short file name.
         /// This attribute's value may now be either a short or long file name.
@@ -26337,7 +26337,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to yes in order to force this file to be the key path for the parent component.
         /// </summary>
@@ -26353,7 +26353,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathField = value;
             }
         }
-        
+
         /// <summary>
         /// The short file name of the file in 8.3 format.
         /// This attribute should only be set if there is a conflict between generated short file names
@@ -26371,7 +26371,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to yes in order to have the file's read-only attribute set when it is installed on the target machine.
         /// </summary>
@@ -26387,7 +26387,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.readOnlyField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to yes in order to have the file's hidden attribute set when it is installed on the target machine.
         /// </summary>
@@ -26403,7 +26403,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hiddenField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to yes in order to have the file's system attribute set when it is installed on the target machine.
         /// </summary>
@@ -26419,7 +26419,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.systemField = value;
             }
         }
-        
+
         /// <summary>
         /// If a file is vital, then installation cannot proceed unless the file is successfully installed.  The user will have no option to ignore an error installing this file.  If an error occurs, they can merely retry to install the file or abort the installation. The default is "yes," unless the -sfdvital switch (candle.exe) or SuppressFileDefaultVital property (.wixproj) is used.
         /// </summary>
@@ -26435,7 +26435,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute should be set to "yes" for every executable file in the installation that has a valid checksum stored in the Portable Executable (PE) file header.  Only those files that have this attribute set will be verified for valid checksum during a reinstall.
         /// </summary>
@@ -26451,7 +26451,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.checksumField = value;
             }
         }
-        
+
         /// <summary>
         /// Sets the file's source type compression.  A setting of "yes" or "no" will override the setting in the Word Count Summary Property.
         /// </summary>
@@ -26467,7 +26467,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.compressedField = value;
             }
         }
-        
+
         /// <summary>
         /// A list of paths, separated by semicolons, that represent the paths to be searched to find the imported DLLs. The list is usually a list of properties, with each property enclosed inside square brackets. The value may be set to an empty string. Including this attribute will cause an entry to be generated for the file in the BindImage table.
         /// </summary>
@@ -26483,7 +26483,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.bindPathField = value;
             }
         }
-        
+
         /// <summary>
         /// The cost of registering the file in bytes. This must be a non-negative number. Including this attribute will cause an entry to be generated for the file in the SelfReg table.
         /// </summary>
@@ -26499,7 +26499,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.selfRegCostField = value;
             }
         }
-        
+
         /// <summary>
         /// Causes an entry to be generated for the file in the Font table with no FontTitle specified. This attribute is intended to be used to register the file as a TrueType font.
         /// </summary>
@@ -26515,7 +26515,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.trueTypeField = value;
             }
         }
-        
+
         /// <summary>
         /// Causes an entry to be generated for the file in the Font table with the specified FontTitle. This attribute is intended to be used to register the file as a non-TrueType font.
         /// </summary>
@@ -26531,7 +26531,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fontTitleField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the default language of this file.  The linker will replace this value from the value in the file if the suppress files option is not used.
         /// </summary>
@@ -26547,7 +26547,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.defaultLanguageField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the default size of this file.  The linker will replace this value from the value in the file if the suppress files option is not used.
         /// </summary>
@@ -26563,7 +26563,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.defaultSizeField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the default version of this file.  The linker will replace this value from the value in the file if the suppress files option is not used.
         /// </summary>
@@ -26579,7 +26579,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.defaultVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies if this File is a Win32 Assembly or .NET Assembly that needs to be installed into the
         /// Global Assembly Cache (GAC).  If the value is '.net' or 'win32', this file must also be the key path of the Component.
@@ -26596,7 +26596,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.assemblyField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the file identifier of the manifest file that describes this assembly.
         /// The manifest file should be in the same component as the assembly it describes.
@@ -26614,7 +26614,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.assemblyManifestField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the file identifier of the application file.  This assembly will be isolated
         /// to the same directory as the application file.
@@ -26633,7 +26633,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.assemblyApplicationField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the architecture for this assembly. This attribute should only be used on .NET Framework 2.0 or higher assemblies.
         /// </summary>
@@ -26649,7 +26649,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.processorArchitectureField = value;
             }
         }
-        
+
         /// <summary>
         /// The value of this attribute should correspond to the Id attribute of a Media
         /// element authored elsewhere.  By creating this connection between a file and
@@ -26672,7 +26672,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the path to the File in the build process. Overrides default source path set by parent directories and Name attribute. This attribute must be set if no source information can be gathered from parent directories. For more information, see
         /// </summary>
@@ -26688,7 +26688,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -26702,7 +26702,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute must be set for patch-added files.  Each patch should be assigned a different patch group number.  Patch groups
         /// numbers must be greater 0 and should be assigned consecutively.  For example, the first patch should use PatchGroup='1', the
@@ -26720,7 +26720,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.patchGroupField = value;
             }
         }
-        
+
         /// <summary>
         /// Prevents the updating of the file that is in fact changed in the upgraded image relative to the target images.
         /// </summary>
@@ -26736,7 +26736,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.patchIgnoreField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to indicate that the patch is non-vital.
         /// </summary>
@@ -26752,7 +26752,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.patchAllowIgnoreOnErrorField = value;
             }
         }
-        
+
         /// <summary>
         /// Set if the entire file should be installed rather than creating a binary patch.
         /// </summary>
@@ -26768,7 +26768,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.patchWholeFileField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -26780,7 +26780,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -26790,7 +26790,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -26800,7 +26800,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -26860,7 +26860,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a AssemblyType from a string.
         /// </summary>
@@ -26870,7 +26870,7 @@ namespace WixToolset.Harvesters.Serialize
             File.TryParseAssemblyType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a AssemblyType from a string.
         /// </summary>
@@ -26906,7 +26906,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a ProcessorArchitectureType from a string.
         /// </summary>
@@ -26916,7 +26916,7 @@ namespace WixToolset.Harvesters.Serialize
             File.TryParseProcessorArchitectureType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ProcessorArchitectureType from a string.
         /// </summary>
@@ -26959,7 +26959,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -27194,14 +27194,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("PatchWholeFile", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -27356,61 +27356,61 @@ namespace WixToolset.Harvesters.Serialize
                 this.patchWholeFileFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum AssemblyType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The file is a .NET Framework assembly.
             /// </summary>
             net,
-            
+
             /// <summary>
             /// The file is not a .NET Framework or Win32 assembly. This is the default value.
             /// </summary>
             no,
-            
+
             /// <summary>
             /// The file is a Win32 assembly.
             /// </summary>
             win32,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ProcessorArchitectureType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The file is a .NET Framework assembly that is processor-neutral.
             /// </summary>
             msil,
-            
+
             /// <summary>
             /// The file is a .NET Framework assembly for the x86 processor.
             /// </summary>
             x86,
-            
+
             /// <summary>
             /// The file is a .NET Framework assembly for the x64 processor.
             /// </summary>
             x64,
-            
+
             /// <summary>
             /// The file is a .NET Framework assembly for the ia64 processor.
             /// </summary>
             ia64,
         }
     }
-    
+
     /// <summary>
     /// Use several of these elements to specify each registry value in a multiString registry value.  This element
     /// cannot be used if the Value attribute is specified unless the Type attribute is set to 'multiString'.  The
@@ -27419,13 +27419,13 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MultiStringValue : ISetAttributes, ISchemaElement
     {
-        
+
         private ISchemaElement parentElement;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -27437,7 +27437,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Use several of these elements to specify each registry value in a multiString registry value.  This element
         /// cannot be used if the Value attribute is specified unless the Type attribute is set to 'multiString'.  The
@@ -27455,7 +27455,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -27469,7 +27469,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentFieldSet = true;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -27487,7 +27487,7 @@ namespace WixToolset.Harvesters.Serialize
             writer.WriteEndElement();
         }
     }
-    
+
     /// <summary>
     /// Used for organization of child RegistryValue elements or to create a registry key
     /// (and optionally remove it during uninstallation).
@@ -27495,35 +27495,35 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RegistryKey : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private YesNoType forceCreateOnInstallField;
-        
+
         private bool forceCreateOnInstallFieldSet;
-        
+
         private YesNoType forceDeleteOnUninstallField;
-        
+
         private bool forceDeleteOnUninstallFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private RegistryRootType rootField;
-        
+
         private bool rootFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public RegistryKey()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -27534,7 +27534,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -27542,7 +27542,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -27551,7 +27551,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.  If this attribute is not specified, an identifier will be
         /// generated by hashing the parent Component identifier, Root, Key, and Name.
@@ -27568,7 +27568,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The Action attribute has been deprecated. In most cases, you can simply omit @Action.  If you need to force Windows Installer
         /// to create an empty key or recursively delete the key, use the ForceCreateOnInstall or ForceDeleteOnUninstall attributes instead.
@@ -27585,7 +27585,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' to create an empty key, if absent, when the parent component is installed.
         /// This value is needed only to create an empty key with no subkeys or values. Windows Installer creates
@@ -27603,7 +27603,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.forceCreateOnInstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' to remove the key with all its values and subkeys when the parent component is uninstalled.
         /// Note that this value is useful only if your program creates additional values or subkeys under this key and you want an uninstall to remove them. MSI already
@@ -27622,7 +27622,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.forceDeleteOnUninstallField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable key for the registry value.
         /// If the parent element is a RegistryKey, this value may be omitted to use the
@@ -27640,7 +27640,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// The predefined root key for the registry value.
         /// </summary>
@@ -27656,7 +27656,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -27668,7 +27668,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -27678,7 +27678,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -27688,7 +27688,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -27719,7 +27719,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -27729,7 +27729,7 @@ namespace WixToolset.Harvesters.Serialize
             RegistryKey.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -27765,7 +27765,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -27845,14 +27845,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Root", "HKU");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -27891,27 +27891,27 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Creates the key, if absent, when the parent component is installed.
             /// </summary>
             create,
-            
+
             /// <summary>
             /// Creates the key, if absent, when the parent component is installed then remove the key with all its values and subkeys when the parent component is uninstalled.
             /// Note that this value is useful only if your program creates additional values or subkeys under this key and you want an uninstall to remove them. MSI already
             /// removes all values and subkeys that it creates, so this option just adds additional overhead to uninstall.
             /// </summary>
             createAndRemoveOnUninstall,
-            
+
             /// <summary>
             /// Does nothing; this element is used merely in WiX authoring for organization and does nothing to the final output.
             /// This is the default value.
@@ -27919,7 +27919,7 @@ namespace WixToolset.Harvesters.Serialize
             none,
         }
     }
-    
+
     /// <summary>
     /// Used to create a registry value.  For multi-string values, this can be used to prepend or append values.
     /// 
@@ -27930,43 +27930,43 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RegistryValue : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private RegistryRootType rootField;
-        
+
         private bool rootFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private YesNoType keyPathField;
-        
+
         private bool keyPathFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public RegistryValue()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -27976,7 +27976,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -27984,7 +27984,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -27993,7 +27993,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.  If this attribute is not specified, an identifier will be
         /// generated by hashing the parent Component identifier, Root, Key, and Name.
@@ -28010,7 +28010,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The predefined root key for the registry value.
         /// </summary>
@@ -28026,7 +28026,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable key for the registry value.
         /// If the parent element is a RegistryKey, this value may be omitted to use the
@@ -28044,7 +28044,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable registry value name.  If this attribute is not provided the default value for the registry key will
         /// be set instead.  The Windows Installer allows several special values to be set for this attribute.  You should not
@@ -28062,7 +28062,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to the localizable registry value.  This value is formatted.  The Windows Installer allows
         /// several special values to be set for this attribute.  You should not use them in WiX.  Instead use appropriate
@@ -28080,7 +28080,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to the type of the desired registry key.  This attribute must be specified whenever the Value
         /// attribute or a child RegistryValue element is specified.    This attribute
@@ -28098,7 +28098,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the action that will be taken for this registry value.
         /// </summary>
@@ -28114,7 +28114,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' to make this registry key the KeyPath of the parent component.
         /// Only one resource (registry, file, etc) can be the KeyPath of a component.
@@ -28131,7 +28131,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -28143,7 +28143,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -28153,7 +28153,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -28163,7 +28163,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -28190,7 +28190,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -28200,7 +28200,7 @@ namespace WixToolset.Harvesters.Serialize
             RegistryValue.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -28250,7 +28250,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -28260,7 +28260,7 @@ namespace WixToolset.Harvesters.Serialize
             RegistryValue.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -28296,7 +28296,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -28396,14 +28396,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("KeyPath", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -28453,35 +28453,35 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The value is interpreted and stored as a string (REG_SZ).
             /// </summary>
             @string,
-            
+
             /// <summary>
             /// The value is interpreted and stored as an integer (REG_DWORD).
             /// </summary>
             integer,
-            
+
             /// <summary>
             /// The value is interpreted and stored as a hexadecimal value (REG_BINARY).
             /// </summary>
             binary,
-            
+
             /// <summary>
             /// The value is interpreted and stored as an expandable string (REG_EXPAND_SZ).
             /// </summary>
             expandable,
-            
+
             /// <summary>
             /// The value is interpreted and stored as a multiple strings (REG_MULTI_SZ).
             /// Please note that this value will only result in a multi-string value if there is more than one registry value
@@ -28489,57 +28489,57 @@ namespace WixToolset.Harvesters.Serialize
             /// </summary>
             multiString,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Appends the specified value(s) to a multiString registry value.
             /// </summary>
             append,
-            
+
             /// <summary>
             /// Prepends the specified value(s) to a multiString registry value.
             /// </summary>
             prepend,
-            
+
             /// <summary>
             /// Writes a registry value.  This is the default value.
             /// </summary>
             write,
         }
     }
-    
+
     /// <summary>
     /// Used for removing registry keys and all child keys either during install or uninstall.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RemoveRegistryKey : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private RegistryRootType rootField;
-        
+
         private bool rootFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.  If this attribute is not specified, an identifier will be
         /// generated by hashing the parent Component identifier, Root, Key, and Name.
@@ -28556,7 +28556,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the action that will be taken for this registry value.
         /// </summary>
@@ -28572,7 +28572,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable key for the registry value.
         /// </summary>
@@ -28588,7 +28588,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// The predefined root key for the registry value.
         /// </summary>
@@ -28604,7 +28604,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -28616,7 +28616,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -28626,7 +28626,7 @@ namespace WixToolset.Harvesters.Serialize
             RemoveRegistryKey.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -28655,7 +28655,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -28710,7 +28710,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -28739,27 +28739,27 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Removes a key with all its values and subkeys when the parent component is installed.
             /// </summary>
             removeOnInstall,
-            
+
             /// <summary>
             /// Removes a key with all its values and subkeys when the parent component is uninstalled.
             /// </summary>
             removeOnUninstall,
         }
     }
-    
+
     /// <summary>
     /// Used to remove a registry value during installation.
     /// There is no standard way to remove a single registry value during uninstall (but you can remove an entire key with RemoveRegistryKey).
@@ -28767,25 +28767,25 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RemoveRegistryValue : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private RegistryRootType rootField;
-        
+
         private bool rootFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.  If this attribute is not specified, an identifier will be
         /// generated by hashing the parent Component identifier, Root, Key, and Name.
@@ -28802,7 +28802,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable key for the registry value.
         /// If the parent element is a RegistryKey, this value may be omitted to use the
@@ -28820,7 +28820,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable registry value name.  If this attribute is not provided the default value for the registry key will
         /// be set instead.  The Windows Installer allows several special values to be set for this attribute.  You should not
@@ -28838,7 +28838,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The predefined root key for the registry value.
         /// </summary>
@@ -28854,7 +28854,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -28866,7 +28866,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -28914,7 +28914,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -28944,47 +28944,47 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Registry : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private string keyField;
-        
+
         private bool keyFieldSet;
-        
+
         private YesNoType keyPathField;
-        
+
         private bool keyPathFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private RegistryRootType rootField;
-        
+
         private bool rootFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Registry()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -28995,7 +28995,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -29003,7 +29003,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -29012,7 +29012,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.  If this attribute is not specified, an identifier will be
         /// generated by hashing the parent Component identifier, Root, Key, and Name.
@@ -29029,7 +29029,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the action that will be taken for this registry key.
         /// </summary>
@@ -29045,7 +29045,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable key for the registry value.
         /// </summary>
@@ -29061,7 +29061,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' to make this registry key the KeyPath of the parent component.  Only one resource (registry,
         /// file, etc) can be the KeyPath of a component.
@@ -29078,7 +29078,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable registry value name.  If this attribute is not provided the default value for the registry key will
         /// be set instead.  The Windows Installer allows several special values to be set for this attribute.  You should not
@@ -29096,7 +29096,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The predefined root key for the registry value.
         /// </summary>
@@ -29112,7 +29112,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rootField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to the type of the desired registry key.  This attribute must be specified whenever the Value
         /// attribute or a child RegistryValue element is specified.    This attribute
@@ -29130,7 +29130,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to the localizable registry value.  This value is formatted.  The Windows Installer allows
         /// several special values to be set for this attribute.  You should not use them in WiX.  Instead use appropriate
@@ -29149,7 +29149,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -29161,7 +29161,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -29171,7 +29171,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -29181,7 +29181,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -29212,7 +29212,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -29222,7 +29222,7 @@ namespace WixToolset.Harvesters.Serialize
             Registry.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -29293,7 +29293,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -29303,7 +29303,7 @@ namespace WixToolset.Harvesters.Serialize
             Registry.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -29353,7 +29353,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -29473,14 +29473,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Value", this.valueField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -29530,84 +29530,84 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Appends the specified value(s) to a multiString registry key.
             /// </summary>
             append,
-            
+
             /// <summary>
             /// Creates the key, if absent, when the parent component is installed.
             /// </summary>
             createKey,
-            
+
             /// <summary>
             /// Creates the key, if absent, when the parent component is installed then remove the key with all its values and subkeys when the parent component is uninstalled.
             /// </summary>
             createKeyAndRemoveKeyOnUninstall,
-            
+
             /// <summary>
             /// Prepends the specified value(s) to a multiString registry key.
             /// </summary>
             prepend,
-            
+
             /// <summary>
             /// Removes a registry name when the parent component is installed.
             /// </summary>
             remove,
-            
+
             /// <summary>
             /// Removes a key with all its values and subkeys when the parent component is installed.
             /// </summary>
             removeKeyOnInstall,
-            
+
             /// <summary>
             /// Removes a key with all its values and subkeys when the parent component is uninstalled.
             /// </summary>
             removeKeyOnUninstall,
-            
+
             /// <summary>
             /// Writes a registry value.
             /// </summary>
             write,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The value is interpreted and stored as a string (REG_SZ).
             /// </summary>
             @string,
-            
+
             /// <summary>
             /// The value is interpreted and stored as an integer (REG_DWORD).
             /// </summary>
             integer,
-            
+
             /// <summary>
             /// The value is interpreted and stored as a hexadecimal value (REG_BINARY).
             /// </summary>
             binary,
-            
+
             /// <summary>
             /// The value is interpreted and stored as an expandable string (REG_EXPAND_SZ).
             /// </summary>
             expandable,
-            
+
             /// <summary>
             /// The value is interpreted and stored as a multiple strings (REG_MULTI_SZ).
             /// Please note that this value will only result in a multi-string value if there is more than one registry value
@@ -29616,7 +29616,7 @@ namespace WixToolset.Harvesters.Serialize
             multiString,
         }
     }
-    
+
     /// <summary>
     /// Remove a file(s) if the parent component is selected for installation or removal.  Multiple files can be removed
     /// by specifying a wildcard for the value of the Name attribute.  By default, the source
@@ -29628,33 +29628,33 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RemoveFile : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private string propertyField;
-        
+
         private bool propertyFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private InstallUninstallType onField;
-        
+
         private bool onFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.
         /// </summary>
@@ -29670,7 +29670,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Overrides the directory of the parent component with a specific Directory.  This Directory must exist in the
         /// installer database at creation time.  This attribute cannot be specified in conjunction with the Property attribute.
@@ -29687,7 +29687,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// Overrides the directory of the parent component with the value of the specified property.  The property
         /// should have a value that resolves to the full path of the source directory.  The property does not have
@@ -29706,7 +29706,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.propertyField = value;
             }
         }
-        
+
         /// <summary>
         /// This value should be set to the localizable name of the file(s) to be removed.  All of the files that
         /// match the wild card will be removed from the specified directory.  The value is a filename that may also
@@ -29730,7 +29730,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The short file name of the file in 8.3 format.
         /// This attribute should only be set if you want to manually specify the short file name.
@@ -29747,7 +29747,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// This value determines the time at which the file(s) may be removed. For 'install', the file will
         /// be removed only when the parent component is being installed (msiInstallStateLocal or
@@ -29766,7 +29766,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -29778,7 +29778,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -29826,7 +29826,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -29866,7 +29866,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Remove an empty folder if the parent component is selected for installation or removal.  By default, the folder
     /// is the directory of the parent component.  This can be overridden by specifying the Directory attribute
@@ -29876,25 +29876,25 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RemoveFolder : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private string propertyField;
-        
+
         private bool propertyFieldSet;
-        
+
         private InstallUninstallType onField;
-        
+
         private bool onFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Primary key used to identify this particular entry.
         /// </summary>
@@ -29910,7 +29910,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Overrides the directory of the parent component with a specific Directory.  This Directory must exist in the
         /// installer database at creation time.  This attribute cannot be specified in conjunction with the Property attribute.
@@ -29927,7 +29927,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// Overrides the directory of the parent component with the value of the specified property.  The property
         /// should have a value that resolves to the full path of the source directory.  The property does not have
@@ -29946,7 +29946,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.propertyField = value;
             }
         }
-        
+
         /// <summary>
         /// This value determines the time at which the folder may be removed, based on the install/uninstall of the parent component.
         /// For 'install', the folder will be removed only when the parent component is being installed (msiInstallStateLocal or
@@ -29965,7 +29965,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -29977,7 +29977,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -30017,7 +30017,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -30047,22 +30047,22 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create folder as part of parent Component.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class CreateFolder : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public CreateFolder()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -30072,7 +30072,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -30080,7 +30080,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -30089,7 +30089,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier of Directory to create.  Defaults to Directory of parent Component.
         /// </summary>
@@ -30105,7 +30105,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -30117,7 +30117,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -30127,7 +30127,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -30137,7 +30137,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -30164,7 +30164,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -30179,14 +30179,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Directory", this.directoryField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -30201,20 +30201,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Optional way for defining AppData, generally used for complex CDATA.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class AppData : ISetAttributes, ISchemaElement
     {
-        
+
         private ISchemaElement parentElement;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -30226,7 +30226,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Optional way for defining AppData, generally used for complex CDATA.
         /// </summary>
@@ -30242,7 +30242,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -30256,7 +30256,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentFieldSet = true;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -30274,41 +30274,41 @@ namespace WixToolset.Harvesters.Serialize
             writer.WriteEndElement();
         }
     }
-    
+
     /// <summary>
     /// Qualified published component for parent Component
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Category : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string qualifierField;
-        
+
         private bool qualifierFieldSet;
-        
+
         private string appDataField;
-        
+
         private bool appDataFieldSet;
-        
+
         private string featureField;
-        
+
         private bool featureFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Category()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
             childCollection0.AddItem(new ElementCollection.SequenceItem(typeof(AppData)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -30316,7 +30316,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -30325,7 +30325,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// A string GUID that represents the category of components being grouped together.
         /// </summary>
@@ -30341,7 +30341,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// A text string that qualifies the value in the Id attribute.  A qualifier is used to distinguish multiple forms of the same Component, such as a Component that is implemented in multiple languages.
         /// </summary>
@@ -30357,7 +30357,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.qualifierField = value;
             }
         }
-        
+
         /// <summary>
         /// An optional localizable text describing the category.  The string is commonly parsed by the application and can be displayed to the user.  It should describe the category.
         /// </summary>
@@ -30373,7 +30373,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.appDataField = value;
             }
         }
-        
+
         /// <summary>
         /// Feature that controls the advertisement of the category.  Defaults to the primary Feature for the parent Component .
         /// </summary>
@@ -30389,7 +30389,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.featureField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -30401,7 +30401,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -30411,7 +30411,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -30421,7 +30421,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -30440,7 +30440,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -30467,14 +30467,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Feature", this.featureField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -30504,32 +30504,32 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// MIME content-type for an Extension
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MIME : ISchemaElement, ISetAttributes
     {
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private string contentTypeField;
-        
+
         private bool contentTypeFieldSet;
-        
+
         private string classField;
-        
+
         private bool classFieldSet;
-        
+
         private YesNoType defaultField;
-        
+
         private bool defaultFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Whether this MIME is to be advertised. The default is to match whatever the parent extension element uses.  If the parent element is not advertised, then this element cannot be advertised either.
         /// </summary>
@@ -30545,7 +30545,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         /// <summary>
         /// This is the identifier for the MIME content.  It is commonly written in the form of type/format.
         /// </summary>
@@ -30561,7 +30561,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentTypeField = value;
             }
         }
-        
+
         /// <summary>
         /// Class ID for the COM server that is to be associated with the MIME content.
         /// </summary>
@@ -30577,7 +30577,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.classField = value;
             }
         }
-        
+
         /// <summary>
         /// If 'yes', become the content type for the parent Extension.  The default value is 'no'.
         /// </summary>
@@ -30593,7 +30593,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.defaultField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -30605,7 +30605,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -30648,7 +30648,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -30678,44 +30678,44 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Verb definition for an Extension.  When advertised, this element creates a row in the
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Verb : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string commandField;
-        
+
         private bool commandFieldSet;
-        
+
         private string argumentField;
-        
+
         private bool argumentFieldSet;
-        
+
         private int sequenceField;
-        
+
         private bool sequenceFieldSet;
-        
+
         private string targetField;
-        
+
         private bool targetFieldSet;
-        
+
         private string targetFileField;
-        
+
         private bool targetFileFieldSet;
-        
+
         private string targetPropertyField;
-        
+
         private bool targetPropertyFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The verb for the command.
         /// </summary>
@@ -30731,7 +30731,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The localized text displayed on the context menu.
         /// </summary>
@@ -30747,7 +30747,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.commandField = value;
             }
         }
-        
+
         /// <summary>
         /// Value for the command arguments.  Note that the resolution of properties in the
         /// Argument field is limited. A property formatted as [Property] in this field can only be resolved if the property
@@ -30767,7 +30767,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.argumentField = value;
             }
         }
-        
+
         /// <summary>
         /// The sequence of the commands. Only verbs for which the Sequence is specified
         /// are used to prepare an ordered list for the default value of the shell key. The Verb with the lowest value in this
@@ -30785,7 +30785,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sequenceField = value;
             }
         }
-        
+
         public string Target
         {
             get
@@ -30798,7 +30798,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetField = value;
             }
         }
-        
+
         /// <summary>
         /// Either this attribute or the TargetProperty attribute must be specified for a non-advertised verb.
         /// The value should be the identifier of the target file to be executed for the verb.
@@ -30815,7 +30815,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetFileField = value;
             }
         }
-        
+
         /// <summary>
         /// Either this attribute or the TargetFile attribute must be specified for a non-advertised verb.
         /// The value should be the identifier of the property which will resolve to the path to the target file to be executed for the verb.
@@ -30832,7 +30832,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.targetPropertyField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -30844,7 +30844,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -30886,7 +30886,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -30931,30 +30931,30 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Extension for a Component
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Extension : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string contentTypeField;
-        
+
         private bool contentTypeFieldSet;
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Extension()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -30962,7 +30962,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Verb)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -30970,7 +30970,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -30979,7 +30979,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// This is simply the file extension, like "doc" or "xml".  Do not include the preceding period.
         /// </summary>
@@ -30995,7 +30995,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The MIME type that is to be written.
         /// </summary>
@@ -31011,7 +31011,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentTypeField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether this extension is to be advertised. The default is "no".
         /// </summary>
@@ -31027,7 +31027,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -31039,7 +31039,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -31049,7 +31049,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -31059,7 +31059,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -31082,7 +31082,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -31112,14 +31112,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Advertise", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -31144,7 +31144,7 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Register a type library (TypeLib).  Please note that in order to properly use this
     /// non-advertised, you will need use this element with Advertise='no' and also author the
@@ -31153,63 +31153,63 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class TypeLib : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private YesNoType controlField;
-        
+
         private bool controlFieldSet;
-        
+
         private int costField;
-        
+
         private bool costFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private YesNoType hasDiskImageField;
-        
+
         private bool hasDiskImageFieldSet;
-        
+
         private string helpDirectoryField;
-        
+
         private bool helpDirectoryFieldSet;
-        
+
         private YesNoType hiddenField;
-        
+
         private bool hiddenFieldSet;
-        
+
         private int languageField;
-        
+
         private bool languageFieldSet;
-        
+
         private int majorVersionField;
-        
+
         private bool majorVersionFieldSet;
-        
+
         private int minorVersionField;
-        
+
         private bool minorVersionFieldSet;
-        
+
         private int resourceIdField;
-        
+
         private bool resourceIdFieldSet;
-        
+
         private YesNoType restrictedField;
-        
+
         private bool restrictedFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public TypeLib()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -31218,7 +31218,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Interface)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -31226,7 +31226,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -31235,7 +31235,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The GUID that identifes the type library.
         /// </summary>
@@ -31251,7 +31251,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of 'yes' will create a row in the TypeLib table.
         /// Value of 'no' will create rows in the Registry table.
@@ -31269,7 +31269,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of 'yes' means the type library describes controls, and should not be displayed in type browsers intended for nonvisual objects.
         /// This attribute can only be set if Advertise='no'.
@@ -31286,7 +31286,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.controlField = value;
             }
         }
-        
+
         /// <summary>
         /// The cost associated with the registration of the type library in bytes.  This attribute cannot be set if Advertise='no'.
         /// </summary>
@@ -31302,7 +31302,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.costField = value;
             }
         }
-        
+
         /// <summary>
         /// The localizable description of the type library.
         /// </summary>
@@ -31318,7 +31318,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of 'yes' means the type library exists in a persisted form on disk.  This attribute can only be set if Advertise='no'.
         /// </summary>
@@ -31334,7 +31334,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hasDiskImageField = value;
             }
         }
-        
+
         /// <summary>
         /// The identifier of the Directory element for the help directory.
         /// </summary>
@@ -31350,7 +31350,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.helpDirectoryField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of 'yes' means the type library should not be displayed to users, although its use is not restricted.
         /// Should be used by controls.  Hosts should create a new type library that wraps the control with extended properties.
@@ -31368,7 +31368,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.hiddenField = value;
             }
         }
-        
+
         /// <summary>
         /// The language of the type library.  This must be a non-negative integer.
         /// </summary>
@@ -31384,7 +31384,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languageField = value;
             }
         }
-        
+
         /// <summary>
         /// The major version of the type library.  The value should be an integer from 0 - 255.
         /// </summary>
@@ -31400,7 +31400,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.majorVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// The minor version of the type library.  The value should be an integer from 0 - 255.
         /// </summary>
@@ -31416,7 +31416,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.minorVersionField = value;
             }
         }
-        
+
         /// <summary>
         /// The resource id of a typelib.  The value is appended to the end of the typelib path in the registry.
         /// </summary>
@@ -31432,7 +31432,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.resourceIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Value of 'yes' means the type library is restricted, and should not be displayed to users.  This attribute can only be set if Advertise='no'.
         /// </summary>
@@ -31448,7 +31448,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.restrictedField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -31460,7 +31460,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -31470,7 +31470,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -31480,7 +31480,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -31507,7 +31507,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -31606,14 +31606,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Restricted", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -31689,42 +31689,42 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// ProgId registration for parent Component.  If ProgId has an associated Class, it must be a child of that element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ProgId : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string iconField;
-        
+
         private bool iconFieldSet;
-        
+
         private int iconIndexField;
-        
+
         private bool iconIndexFieldSet;
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private string noOpenField;
-        
+
         private bool noOpenFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ProgId()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
@@ -31732,7 +31732,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.SequenceItem(typeof(Extension)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -31740,7 +31740,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -31749,7 +31749,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public string Id
         {
             get
@@ -31762,7 +31762,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public string Description
         {
             get
@@ -31775,7 +31775,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// For an advertised ProgId, the Id of an Icon element. For a non-advertised ProgId, this is the Id of a file containing an icon resource.
         /// </summary>
@@ -31791,7 +31791,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconField = value;
             }
         }
-        
+
         public int IconIndex
         {
             get
@@ -31804,7 +31804,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconIndexField = value;
             }
         }
-        
+
         public YesNoType Advertise
         {
             get
@@ -31817,7 +31817,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies that the associated ProgId should not be opened by users. The value is presented as a warning to users. An empty string is also valid for this attribute.
         /// </summary>
@@ -31833,7 +31833,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.noOpenField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -31845,7 +31845,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -31855,7 +31855,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -31865,7 +31865,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -31888,7 +31888,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -31931,14 +31931,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("NoOpen", this.noOpenField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -31987,54 +31987,54 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class AppId : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private YesNoType activateAtStorageField;
-        
+
         private bool activateAtStorageFieldSet;
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string dllSurrogateField;
-        
+
         private bool dllSurrogateFieldSet;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string localServiceField;
-        
+
         private bool localServiceFieldSet;
-        
+
         private string remoteServerNameField;
-        
+
         private bool remoteServerNameFieldSet;
-        
+
         private YesNoType runAsInteractiveUserField;
-        
+
         private bool runAsInteractiveUserFieldSet;
-        
+
         private string serviceParametersField;
-        
+
         private bool serviceParametersFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public AppId()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Class)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -32042,7 +32042,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -32051,7 +32051,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Set this value to 'yes' to configure the client to activate on the same system as persistent storage.
         /// </summary>
@@ -32067,7 +32067,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.activateAtStorageField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to 'yes' in order to create a normal AppId table row.  Set this value to 'no' in order to
         /// generate Registry rows that perform similar registration (without the often problematic Windows Installer
@@ -32085,7 +32085,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to the description of the AppId.  It can only be specified when the AppId is not being advertised.
         /// </summary>
@@ -32101,7 +32101,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to specify that the class is a DLL that is to be activated in a surrogate EXE
         /// process, and the surrogate process to be used is the path of a surrogate EXE file specified by the value.
@@ -32118,7 +32118,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.dllSurrogateField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to the AppID GUID that corresponds to the named executable.
         /// </summary>
@@ -32134,7 +32134,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to the name of a service to allow the object to be installed as a Win32 service.
         /// </summary>
@@ -32150,7 +32150,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.localServiceField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to the name of the remote server to configure the client to request the object
         /// be run at a particular machine whenever an activation function is called for which a COSERVERINFO
@@ -32168,7 +32168,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.remoteServerNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to 'yes' to configure a class to run under the identity of the user currently
         /// logged on and connected to the interactive desktop when activated by a remote client without
@@ -32186,7 +32186,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.runAsInteractiveUserField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to the parameters to be passed to a LocalService on invocation.
         /// </summary>
@@ -32202,7 +32202,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.serviceParametersField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -32214,7 +32214,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -32224,7 +32224,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -32234,7 +32234,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -32253,7 +32253,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -32322,14 +32322,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("ServiceParameters", this.serviceParametersField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -32385,98 +32385,98 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// COM Class registration for parent Component.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Class : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ContextType contextField;
-        
+
         private bool contextFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private string appIdField;
-        
+
         private bool appIdFieldSet;
-        
+
         private string iconField;
-        
+
         private bool iconFieldSet;
-        
+
         private int iconIndexField;
-        
+
         private bool iconIndexFieldSet;
-        
+
         private string handlerField;
-        
+
         private bool handlerFieldSet;
-        
+
         private string argumentField;
-        
+
         private bool argumentFieldSet;
-        
+
         private YesNoType relativePathField;
-        
+
         private bool relativePathFieldSet;
-        
+
         private YesNoType advertiseField;
-        
+
         private bool advertiseFieldSet;
-        
+
         private ThreadingModelType threadingModelField;
-        
+
         private bool threadingModelFieldSet;
-        
+
         private string versionField;
-        
+
         private bool versionFieldSet;
-        
+
         private YesNoType insertableField;
-        
+
         private bool insertableFieldSet;
-        
+
         private YesNoType programmableField;
-        
+
         private bool programmableFieldSet;
-        
+
         private string foreignServerField;
-        
+
         private bool foreignServerFieldSet;
-        
+
         private string serverField;
-        
+
         private bool serverFieldSet;
-        
+
         private YesNoType shortPathField;
-        
+
         private bool shortPathFieldSet;
-        
+
         private YesNoType safeForScriptingField;
-        
+
         private bool safeForScriptingFieldSet;
-        
+
         private YesNoType safeForInitializingField;
-        
+
         private bool safeForInitializingFieldSet;
-        
+
         private YesNoType controlField;
-        
+
         private bool controlFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Class()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -32485,7 +32485,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Interface)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -32493,7 +32493,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -32502,7 +32502,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The Class identifier (CLSID) of a COM server.
         /// </summary>
@@ -32518,7 +32518,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The server context(s) for this COM server. This attribute is optional for VB6 libraries that are marked "PublicNotCreateable".
         /// Class elements marked Advertised must specify at least one server context. It is most common for there to be a single value
@@ -32536,7 +32536,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contextField = value;
             }
         }
-        
+
         /// <summary>
         /// Localized description associated with the Class ID and Program ID.
         /// </summary>
@@ -32571,7 +32571,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.appIdField = value;
             }
         }
-        
+
         /// <summary>
         /// The file providing the icon associated with this CLSID.  Reference to an Icon element
         /// (should match the Id attribute of an Icon element).  This is currently not supported if the
@@ -32589,7 +32589,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconField = value;
             }
         }
-        
+
         /// <summary>
         /// Icon index into the icon file.
         /// </summary>
@@ -32605,7 +32605,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.iconIndexField = value;
             }
         }
-        
+
         /// <summary>
         /// The default inproc handler.  May be optionally provided only for Context = LocalServer or
         /// LocalServer32.  Value of "1" creates a 16-bit InprocHandler (appearing as the InprocHandler
@@ -32625,7 +32625,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.handlerField = value;
             }
         }
-        
+
         /// <summary>
         /// This column is optional only when the Context column is set to "LocalServer"
         /// or "LocalServer32" server context. The text is registered as the argument against
@@ -32648,7 +32648,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.argumentField = value;
             }
         }
-        
+
         /// <summary>
         /// When the value is "yes", the bare file name can be used for COM servers. The installer
         /// registers the file name only instead of the complete path.  This enables the server in
@@ -32666,7 +32666,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.relativePathField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this value to "yes" in order to create a normal Class table row.  Set this value to
         /// "no" in order to generate Registry rows that perform similar registration (without the
@@ -32684,7 +32684,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.advertiseField = value;
             }
         }
-        
+
         /// <summary>
         /// Threading model for the CLSID.
         /// </summary>
@@ -32700,7 +32700,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.threadingModelField = value;
             }
         }
-        
+
         /// <summary>
         /// Version for the CLSID.
         /// </summary>
@@ -32716,7 +32716,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the CLSID may be insertable.
         /// </summary>
@@ -32732,7 +32732,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.insertableField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the CLSID may be programmable.
         /// </summary>
@@ -32748,7 +32748,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.programmableField = value;
             }
         }
-        
+
         /// <summary>
         /// May only be specified if the value of the Advertise attribute is "no" and Server has not been specified. In addition, it may only
         /// be used when the Class element is directly under the Component element. The value can be
@@ -32766,7 +32766,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.foreignServerField = value;
             }
         }
-        
+
         /// <summary>
         /// May only be specified if the value of the Advertise attribute is "no" and the ForeignServer attribute is not specified.  File Id of the
         /// COM server file.  If this element is nested under a File element, this value defaults to
@@ -32784,7 +32784,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.serverField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether or not to use the short path for the COM server.  This can only apply when Advertise is set to 'no'.  The default is 'no' meaning that it will use the long file name for the COM server.
         /// </summary>
@@ -32800,7 +32800,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortPathField = value;
             }
         }
-        
+
         /// <summary>
         /// May only be specified if the value of the Advertise attribute is "no".
         /// </summary>
@@ -32816,7 +32816,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.safeForScriptingField = value;
             }
         }
-        
+
         /// <summary>
         /// May only be specified if the value of the Advertise attribute is "no".
         /// </summary>
@@ -32832,7 +32832,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.safeForInitializingField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute's value to 'yes' to identify an object as an ActiveX Control.  The default value is 'no'.
         /// </summary>
@@ -32848,7 +32848,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.controlField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -32860,7 +32860,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -32870,7 +32870,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -32880,7 +32880,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -32907,7 +32907,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ContextType from a string.
         /// </summary>
@@ -32919,7 +32919,7 @@ namespace WixToolset.Harvesters.Serialize
                 return false;
             }
             string[] splitValue = value.Split(" \t\r\n".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries);
-            for (System.Collections.IEnumerator enumerator = splitValue.GetEnumerator(); enumerator.MoveNext(); 
+            for (System.Collections.IEnumerator enumerator = splitValue.GetEnumerator(); enumerator.MoveNext();
             )
             {
                 string currentValue = ((string)(enumerator.Current));
@@ -32956,7 +32956,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a ThreadingModelType from a string.
         /// </summary>
@@ -32966,7 +32966,7 @@ namespace WixToolset.Harvesters.Serialize
             Class.TryParseThreadingModelType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ThreadingModelType from a string.
         /// </summary>
@@ -33023,7 +33023,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -33042,7 +33042,7 @@ namespace WixToolset.Harvesters.Serialize
             if (this.contextFieldSet)
             {
                 string outputValue = "";
-                if (((this.contextField & ContextType.LocalServer) 
+                if (((this.contextField & ContextType.LocalServer)
                             != 0))
                 {
                     if ((outputValue.Length != 0))
@@ -33051,7 +33051,7 @@ namespace WixToolset.Harvesters.Serialize
                     }
                     outputValue = (outputValue + "LocalServer");
                 }
-                if (((this.contextField & ContextType.LocalServer32) 
+                if (((this.contextField & ContextType.LocalServer32)
                             != 0))
                 {
                     if ((outputValue.Length != 0))
@@ -33060,7 +33060,7 @@ namespace WixToolset.Harvesters.Serialize
                     }
                     outputValue = (outputValue + "LocalServer32");
                 }
-                if (((this.contextField & ContextType.InprocServer) 
+                if (((this.contextField & ContextType.InprocServer)
                             != 0))
                 {
                     if ((outputValue.Length != 0))
@@ -33069,7 +33069,7 @@ namespace WixToolset.Harvesters.Serialize
                     }
                     outputValue = (outputValue + "InprocServer");
                 }
-                if (((this.contextField & ContextType.InprocServer32) 
+                if (((this.contextField & ContextType.InprocServer32)
                             != 0))
                 {
                     if ((outputValue.Length != 0))
@@ -33231,14 +33231,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Control", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -33348,94 +33348,94 @@ namespace WixToolset.Harvesters.Serialize
                 this.controlFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         [Flags()]
         public enum ContextType
         {
-            
+
             None = 0,
-            
+
             /// <summary>
             /// A 16-bit local server application.
             /// </summary>
             LocalServer = 1,
-            
+
             /// <summary>
             /// A 32-bit local server application.
             /// </summary>
             LocalServer32 = 2,
-            
+
             /// <summary>
             /// A 16-bit in-process server DLL.
             /// </summary>
             InprocServer = 4,
-            
+
             /// <summary>
             /// A 32-bit in-process server DLL.
             /// </summary>
             InprocServer32 = 8,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ThreadingModelType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             apartment,
-            
+
             free,
-            
+
             both,
-            
+
             neutral,
-            
+
             single,
-            
+
             rental,
         }
     }
-    
+
     /// <summary>
     /// COM Interface registration for parent TypeLib.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Interface : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string baseInterfaceField;
-        
+
         private bool baseInterfaceFieldSet;
-        
+
         private string proxyStubClassIdField;
-        
+
         private bool proxyStubClassIdFieldSet;
-        
+
         private string proxyStubClassId32Field;
-        
+
         private bool proxyStubClassId32FieldSet;
-        
+
         private int numMethodsField;
-        
+
         private bool numMethodsFieldSet;
-        
+
         private YesNoType versionedField;
-        
+
         private bool versionedFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// GUID identifier for COM Interface.
         /// </summary>
@@ -33451,7 +33451,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Name for COM Interface.
         /// </summary>
@@ -33467,7 +33467,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifies the interface from which the current interface is derived.
         /// </summary>
@@ -33483,7 +33483,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.baseInterfaceField = value;
             }
         }
-        
+
         /// <summary>
         /// GUID CLSID for proxy stub to COM Interface.
         /// </summary>
@@ -33499,7 +33499,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.proxyStubClassIdField = value;
             }
         }
-        
+
         /// <summary>
         /// GUID CLSID for 32-bit proxy stub to COM Interface.
         /// </summary>
@@ -33515,7 +33515,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.proxyStubClassId32Field = value;
             }
         }
-        
+
         /// <summary>
         /// Number of methods implemented on COM Interface.
         /// </summary>
@@ -33531,7 +33531,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.numMethodsField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines whether a Typelib version entry should be created with the other COM Interface registry keys.  Default is 'yes'.
         /// </summary>
@@ -33547,7 +33547,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.versionedField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -33559,7 +33559,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -33608,7 +33608,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -33653,28 +33653,28 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// FileType data for class Id registration.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class FileTypeMask : ISchemaElement, ISetAttributes
     {
-        
+
         private int offsetField;
-        
+
         private bool offsetFieldSet;
-        
+
         private string maskField;
-        
+
         private bool maskFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Offset into file. If positive, offset is from the beginning; if negative, offset is from the end.
         /// </summary>
@@ -33690,7 +33690,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.offsetField = value;
             }
         }
-        
+
         /// <summary>
         /// Hex value that is AND'd against the bytes in the file at Offset.
         /// </summary>
@@ -33706,7 +33706,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.maskField = value;
             }
         }
-        
+
         /// <summary>
         /// If the result of the AND'ing of Mask with the bytes in the file is Value, the file is a match for this File Type.
         /// </summary>
@@ -33722,7 +33722,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -33734,7 +33734,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -33759,7 +33759,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -33784,24 +33784,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Service or group of services that must start before the parent service.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ServiceDependency : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType groupField;
-        
+
         private bool groupFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The value of this attribute should be one of the following:
         /// </summary>
@@ -33817,7 +33817,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set to 'yes' to indicate that the value in the Id attribute is the name of a group of services.
         /// </summary>
@@ -33833,7 +33833,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.groupField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -33845,7 +33845,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -33873,7 +33873,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -33893,74 +33893,74 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Adds services for parent Component.  Use the ServiceControl element to remove services.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ServiceInstall : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string displayNameField;
-        
+
         private bool displayNameFieldSet;
-        
+
         private TypeType typeField;
-        
+
         private bool typeFieldSet;
-        
+
         private YesNoType interactiveField;
-        
+
         private bool interactiveFieldSet;
-        
+
         private StartType startField;
-        
+
         private bool startFieldSet;
-        
+
         private ErrorControlType errorControlField;
-        
+
         private bool errorControlFieldSet;
-        
+
         private YesNoType vitalField;
-        
+
         private bool vitalFieldSet;
-        
+
         private string loadOrderGroupField;
-        
+
         private bool loadOrderGroupFieldSet;
-        
+
         private string accountField;
-        
+
         private bool accountFieldSet;
-        
+
         private string passwordField;
-        
+
         private bool passwordFieldSet;
-        
+
         private string argumentsField;
-        
+
         private bool argumentsFieldSet;
-        
+
         private string descriptionField;
-        
+
         private bool descriptionFieldSet;
-        
+
         private YesNoType eraseDescriptionField;
-        
+
         private bool eraseDescriptionFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ServiceInstall()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -33971,7 +33971,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -33979,7 +33979,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -33988,7 +33988,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for this service configuration. This value will default to the Name attribute if not
         /// specified.
@@ -34005,7 +34005,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This column is the string that gives the service name to install.
         /// </summary>
@@ -34021,7 +34021,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// This column is the localizable string that user interface programs use to identify the service.
         /// </summary>
@@ -34037,7 +34037,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.displayNameField = value;
             }
         }
-        
+
         /// <summary>
         /// The Windows Installer does not currently support kernelDriver or systemDriver.
         /// </summary>
@@ -34053,7 +34053,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.typeField = value;
             }
         }
-        
+
         /// <summary>
         /// Whether or not the service interacts with the desktop.
         /// </summary>
@@ -34069,7 +34069,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.interactiveField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines when the service should be started. The Windows Installer does not support boot or system.
         /// </summary>
@@ -34085,7 +34085,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.startField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines what action should be taken on an error.
         /// </summary>
@@ -34101,7 +34101,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.errorControlField = value;
             }
         }
-        
+
         /// <summary>
         /// The overall install should fail if this service fails to install.
         /// </summary>
@@ -34117,7 +34117,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.vitalField = value;
             }
         }
-        
+
         /// <summary>
         /// The load ordering group that this service should be a part of.
         /// </summary>
@@ -34133,7 +34133,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.loadOrderGroupField = value;
             }
         }
-        
+
         /// <summary>
         /// Fully qualified names must be used even for local accounts, e.g.: ".\LOCAL_ACCOUNT". Valid only when ServiceType is ownProcess.
         /// </summary>
@@ -34149,7 +34149,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.accountField = value;
             }
         }
-        
+
         /// <summary>
         /// The password for the account. Valid only when the account has a password.
         /// </summary>
@@ -34165,7 +34165,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.passwordField = value;
             }
         }
-        
+
         /// <summary>
         /// Contains any command line arguments or properties required to run the service.
         /// </summary>
@@ -34181,7 +34181,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.argumentsField = value;
             }
         }
-        
+
         /// <summary>
         /// Sets the description of the service.
         /// </summary>
@@ -34197,7 +34197,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.descriptionField = value;
             }
         }
-        
+
         /// <summary>
         /// Determines whether the existing service description will be ignored. If 'yes', the service description will be null, even if the Description attribute is set.
         /// </summary>
@@ -34213,7 +34213,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.eraseDescriptionField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -34225,7 +34225,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -34235,7 +34235,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -34245,7 +34245,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -34276,7 +34276,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a TypeType from a string.
         /// </summary>
@@ -34286,7 +34286,7 @@ namespace WixToolset.Harvesters.Serialize
             ServiceInstall.TryParseTypeType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a TypeType from a string.
         /// </summary>
@@ -34329,7 +34329,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a StartType from a string.
         /// </summary>
@@ -34339,7 +34339,7 @@ namespace WixToolset.Harvesters.Serialize
             ServiceInstall.TryParseStartType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a StartType from a string.
         /// </summary>
@@ -34389,7 +34389,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a ErrorControlType from a string.
         /// </summary>
@@ -34399,7 +34399,7 @@ namespace WixToolset.Harvesters.Serialize
             ServiceInstall.TryParseErrorControlType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ErrorControlType from a string.
         /// </summary>
@@ -34435,7 +34435,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -34569,14 +34569,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("EraseDescription", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -34656,108 +34656,108 @@ namespace WixToolset.Harvesters.Serialize
                 this.eraseDescriptionFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum TypeType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// A Win32 service that runs its own process.
             /// </summary>
             ownProcess,
-            
+
             /// <summary>
             /// A Win32 service that shares a process.
             /// </summary>
             shareProcess,
-            
+
             /// <summary>
             /// A kernel driver service. This value is not currently supported by the Windows Installer.
             /// </summary>
             kernelDriver,
-            
+
             /// <summary>
             /// A file system driver service. This value is not currently supported by the Windows Installer.
             /// </summary>
             systemDriver,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum StartType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// The service will start during startup of the system.
             /// </summary>
             auto,
-            
+
             /// <summary>
             /// The service will start when the service control manager calls the StartService function.
             /// </summary>
             demand,
-            
+
             /// <summary>
             /// The service can no longer be started.
             /// </summary>
             disabled,
-            
+
             /// <summary>
             /// The service is a device driver that will be started by the operating system boot loader. This value is not currently supported by the Windows Installer.
             /// </summary>
             boot,
-            
+
             /// <summary>
             /// The service is a device driver that will be started by the IoInitSystem function. This value is not currently supported by the Windows Installer.
             /// </summary>
             system,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ErrorControlType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Logs the error and continues with the startup operation.
             /// </summary>
             ignore,
-            
+
             /// <summary>
             /// Logs the error, displays a message box and continues the startup operation.
             /// </summary>
             normal,
-            
+
             /// <summary>
             /// Logs the error if it is possible and the system is restarted with the last configuration known to be good. If the last-known-good configuration is being started, the startup operation fails.
             /// </summary>
             critical,
         }
     }
-    
+
     /// <summary>
     /// Argument used in ServiceControl parent
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ServiceArgument : ISetAttributes, ISchemaElement
     {
-        
+
         private ISchemaElement parentElement;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -34769,7 +34769,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Argument used in ServiceControl parent
         /// </summary>
@@ -34785,7 +34785,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -34799,7 +34799,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentFieldSet = true;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -34817,7 +34817,7 @@ namespace WixToolset.Harvesters.Serialize
             writer.WriteEndElement();
         }
     }
-    
+
     /// <summary>
     /// Starts, stops, and removes services for parent Component. This element is used to control the state
     /// of a service installed by the MSI or MSM file by using the start, stop and remove attributes.
@@ -34827,42 +34827,42 @@ namespace WixToolset.Harvesters.Serialize
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ServiceControl : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private InstallUninstallType startField;
-        
+
         private bool startFieldSet;
-        
+
         private InstallUninstallType stopField;
-        
+
         private bool stopFieldSet;
-        
+
         private InstallUninstallType removeField;
-        
+
         private bool removeFieldSet;
-        
+
         private YesNoType waitField;
-        
+
         private bool waitFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ServiceControl()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Sequence);
             childCollection0.AddItem(new ElementCollection.SequenceItem(typeof(ServiceArgument)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -34870,7 +34870,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -34879,7 +34879,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         public string Id
         {
             get
@@ -34892,7 +34892,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of the service.
         /// </summary>
@@ -34908,7 +34908,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the service should be started by the StartServices action on install, uninstall or both.
         /// For 'install', the service will be started only when the parent component is being installed (msiInstallStateLocal or
@@ -34927,7 +34927,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.startField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the service should be stopped by the StopServices action on install, uninstall or both.
         /// For 'install', the service will be stopped only when the parent component is being installed (msiInstallStateLocal or
@@ -34946,7 +34946,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.stopField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the service should be removed by the DeleteServices action on install, uninstall or both.
         /// For 'install', the service will be removed only when the parent component is being installed (msiInstallStateLocal or
@@ -34965,7 +34965,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.removeField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether or not to wait for the service to complete before continuing. The default is 'yes'.
         /// </summary>
@@ -34981,7 +34981,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.waitField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -34993,7 +34993,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -35003,7 +35003,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -35013,7 +35013,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -35032,7 +35032,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -35108,14 +35108,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Wait", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -35155,20 +35155,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Privilege required by service configured by ServiceConfig parent. Valid values are a
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class RequiredPrivilege : ISetAttributes, ISchemaElement
     {
-        
+
         private ISchemaElement parentElement;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -35180,7 +35180,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Privilege required by service configured by ServiceConfig parent. Valid values are a
         /// </summary>
@@ -35196,7 +35196,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -35210,7 +35210,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentFieldSet = true;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -35228,61 +35228,61 @@ namespace WixToolset.Harvesters.Serialize
             writer.WriteEndElement();
         }
     }
-    
+
     /// <summary>
     /// Configures a service being installed or one that already exists. This element's functionality is available starting with MSI 5.0.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ServiceConfig : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string delayedAutoStartField;
-        
+
         private bool delayedAutoStartFieldSet;
-        
+
         private string failureActionsWhenField;
-        
+
         private bool failureActionsWhenFieldSet;
-        
+
         private string preShutdownDelayField;
-        
+
         private bool preShutdownDelayFieldSet;
-        
+
         private YesNoType onInstallField;
-        
+
         private bool onInstallFieldSet;
-        
+
         private YesNoType onReinstallField;
-        
+
         private bool onReinstallFieldSet;
-        
+
         private YesNoType onUninstallField;
-        
+
         private bool onUninstallFieldSet;
-        
+
         private string serviceNameField;
-        
+
         private bool serviceNameFieldSet;
-        
+
         private string serviceSidField;
-        
+
         private bool serviceSidFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ServiceConfig()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(RequiredPrivilege)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -35290,7 +35290,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -35299,7 +35299,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for this service configuration. This value will default to the ServiceName attribute if not
         /// specified.
@@ -35316,7 +35316,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute specifies whether an auto-start service should delay its start until after all other auto-start
         /// services. This attribute only affects auto-start services. Allowed values are "yes", "no" or a Formatted property that
@@ -35334,7 +35334,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.delayedAutoStartField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute specifies when failure actions should be applied. Allowed values are "failedToStop", "failedToStopOrReturnedError"
         /// or a Formatted property that resolves to "1" (for "failedToStopOrReturnedError") or "0" (for "failedToStop").  If this attribute
@@ -35352,7 +35352,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.failureActionsWhenField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute specifies time in milliseconds that the Service Control Manager (SCM) waits after notifying the service of a system
         /// shutdown.  If this attribute is not present the default value, 3 minutes, is used.
@@ -35369,7 +35369,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.preShutdownDelayField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to configure the service when the parent Component is installed. This attribute may be combined with OnReinstall
         /// and OnUninstall.
@@ -35386,7 +35386,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onInstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to configure the service when the parent Component is reinstalled. This attribute may be combined with OnInstall
         /// and OnUninstall.
@@ -35403,7 +35403,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onReinstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to configure the service when the parent Component is uninstalled. This attribute may be combined with OnInstall
         /// and OnReinstall.
@@ -35420,7 +35420,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onUninstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the name of the service to configure. This value will default to the ServiceInstall/@Name attribute when nested under
         /// a ServiceInstall element.
@@ -35437,7 +35437,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.serviceNameField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the service SID to apply to the service. Valid values are "none", "restricted", "unrestricted" or a Formatted property
         /// that resolves to "0" (for "none"), "3" (for "restricted") or "1" (for "unrestricted"). If this attribute is not present the
@@ -35455,7 +35455,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.serviceSidField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -35467,7 +35467,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -35477,7 +35477,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -35487,7 +35487,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -35506,7 +35506,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -35575,14 +35575,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("ServiceSid", this.serviceSidField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -35638,24 +35638,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Failure action for a ServiceConfigFailureActions element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Failure : ISchemaElement, ISetAttributes
     {
-        
+
         private string actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private string delayField;
-        
+
         private bool delayFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Specifies the action to take when the service fails. Valid values are "none", "restartComputer", "restartService", "runCommand" or a Formatted property
         /// that resolves to "0" (for "none"), "1" (for "restartService"), "2" (for "restartComputer") or "3" (for "runCommand").
@@ -35672,7 +35672,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the time in milliseconds to wait before performing the value from the Action attribute.
         /// </summary>
@@ -35688,7 +35688,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.delayField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -35700,7 +35700,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -35721,7 +35721,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -35741,57 +35741,57 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Configures the failure actions for a service being installed or one that already exists. This element's functionality is available starting with MSI 5.0.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ServiceConfigFailureActions : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string commandField;
-        
+
         private bool commandFieldSet;
-        
+
         private YesNoType onInstallField;
-        
+
         private bool onInstallFieldSet;
-        
+
         private YesNoType onReinstallField;
-        
+
         private bool onReinstallFieldSet;
-        
+
         private YesNoType onUninstallField;
-        
+
         private bool onUninstallFieldSet;
-        
+
         private string rebootMessageField;
-        
+
         private bool rebootMessageFieldSet;
-        
+
         private string resetPeriodField;
-        
+
         private bool resetPeriodFieldSet;
-        
+
         private string serviceNameField;
-        
+
         private bool serviceNameFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ServiceConfigFailureActions()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Failure)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -35799,7 +35799,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -35808,7 +35808,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Unique identifier for this service configuration. This value will default to the ServiceName attribute if not
         /// specified.
@@ -35825,7 +35825,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute specifies command to execute when a "runCommand" failure action hit.  If an empty string is provided it clears
         /// the existing command. If this attribute is not present the setting is not changed.
@@ -35842,7 +35842,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.commandField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to configure the service when the parent Component is installed. This attribute may be combined with OnReinstall
         /// and OnUninstall.
@@ -35859,7 +35859,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onInstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to configure the service when the parent Component is reinstalled. This attribute may be combined with OnInstall
         /// and OnUninstall.
@@ -35876,7 +35876,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onReinstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether to configure the service when the parent Component is uninstalled. This attribute may be combined with OnInstall
         /// and OnReinstall.
@@ -35893,7 +35893,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.onUninstallField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the message to show for a reboot failure action. If an empty string is provided it clears any existing reboot message. If this
         /// attribute is not present the setting is not changed.
@@ -35910,7 +35910,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.rebootMessageField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the time in seconds to reset the failure count. If this attribute is not present the failure count will not be reset.
         /// </summary>
@@ -35926,7 +35926,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.resetPeriodField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the name of the service to configure. This value will default to the ServiceInstall/@Name attribute when nested under
         /// a ServiceInstall element.
@@ -35943,7 +35943,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.serviceNameField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -35955,7 +35955,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -35965,7 +35965,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -35975,7 +35975,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -35994,7 +35994,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -36059,14 +36059,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("ServiceName", this.serviceNameField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -36117,48 +36117,48 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Environment variables added or removed for the parent component.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Environment : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private string separatorField;
-        
+
         private bool separatorFieldSet;
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private PartType partField;
-        
+
         private bool partFieldSet;
-        
+
         private YesNoType permanentField;
-        
+
         private bool permanentFieldSet;
-        
+
         private YesNoType systemField;
-        
+
         private bool systemFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Unique identifier for environment entry.
         /// </summary>
@@ -36174,7 +36174,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Name of the environment variable.
         /// </summary>
@@ -36190,7 +36190,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The value to set into the environment variable.
         /// If this attribute is not set, the environment variable is removed during installation if it exists on the machine.
@@ -36207,7 +36207,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         /// <summary>
         /// Optional attribute to change the separator used between values.  By default a semicolon is used.
         /// </summary>
@@ -36223,7 +36223,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.separatorField = value;
             }
         }
-        
+
         /// <summary>
         /// Specfies whether the environmental variable should be created, set or removed when the parent component is installed.
         /// </summary>
@@ -36239,7 +36239,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         public PartType Part
         {
             get
@@ -36252,7 +36252,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.partField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies that the environment variable should not be removed on uninstall.
         /// </summary>
@@ -36268,7 +36268,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.permanentField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies that the environment variable should be added to the system environment space.  The default
         /// is 'no' which indicates the environment variable is added to the user environment space.
@@ -36285,7 +36285,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.systemField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -36297,7 +36297,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -36307,7 +36307,7 @@ namespace WixToolset.Harvesters.Serialize
             Environment.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -36343,7 +36343,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Parses a PartType from a string.
         /// </summary>
@@ -36353,7 +36353,7 @@ namespace WixToolset.Harvesters.Serialize
             Environment.TryParsePartType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a PartType from a string.
         /// </summary>
@@ -36389,7 +36389,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -36471,7 +36471,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -36521,25 +36521,25 @@ namespace WixToolset.Harvesters.Serialize
                 this.systemFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Creates the environment variable if it does not exist, then set it during installation. This has no effect on the value of the environment variable if it already exists.
             /// </summary>
             create,
-            
+
             /// <summary>
             /// Creates the environment variable if it does not exist, and then set it during installation. If the environment variable exists, set it during the installation.
             /// </summary>
             set,
-            
+
             /// <summary>
             /// Removes the environment variable during an installation.
             /// The installer only removes an environment variable during an installation if the name and value
@@ -36548,57 +36548,57 @@ namespace WixToolset.Harvesters.Serialize
             /// </summary>
             remove,
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum PartType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// This value is the entire environmental variable.  This is the default.
             /// </summary>
             all,
-            
+
             /// <summary>
             /// This value is prefixed.
             /// </summary>
             first,
-            
+
             /// <summary>
             /// This value is appended.
             /// </summary>
             last,
         }
     }
-    
+
     /// <summary>
     /// Conditions for components, controls, features, and products. The condition is specified in the inner text of the element.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Condition : ISchemaElement, ISetAttributes
     {
-        
+
         private ActionType actionField;
-        
+
         private bool actionFieldSet;
-        
+
         private int levelField;
-        
+
         private bool levelFieldSet;
-        
+
         private string messageField;
-        
+
         private bool messageFieldSet;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Used only under Control elements and is required.  Allows specific actions to be applied to a control based
         /// on the result of this condition.
@@ -36615,7 +36615,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.actionField = value;
             }
         }
-        
+
         /// <summary>
         /// Used only under Feature elements and is required.  Allows modifying the level of a Feature based on the
         /// result of this condition.
@@ -36667,7 +36667,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -36679,7 +36679,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Parses a ActionType from a string.
         /// </summary>
@@ -36689,7 +36689,7 @@ namespace WixToolset.Harvesters.Serialize
             Condition.TryParseActionType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a ActionType from a string.
         /// </summary>
@@ -36739,7 +36739,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -36787,7 +36787,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -36816,55 +36816,55 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentFieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum ActionType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Set the Control as the default. Only used under Control elements.
             /// </summary>
             @default,
-            
+
             /// <summary>
             /// Enable the Control. Only used under Control elements.
             /// </summary>
             enable,
-            
+
             /// <summary>
             /// Disable the Control. Only used under Control elements.
             /// </summary>
             disable,
-            
+
             /// <summary>
             /// Hide the Control. Only used under Control elements.
             /// </summary>
             hide,
-            
+
             /// <summary>
             /// Display the Control. Only used under Control elements.
             /// </summary>
             show,
         }
     }
-    
+
     /// <summary>
     /// Shared Component to be privately replicated in folder of parent Component
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class IsolateComponent : ISchemaElement, ISetAttributes
     {
-        
+
         private string sharedField;
-        
+
         private bool sharedFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Shared Component for this application Component.
         /// </summary>
@@ -36880,7 +36880,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sharedField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -36892,7 +36892,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -36909,7 +36909,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -36924,32 +36924,32 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Disk cost to reserve in a folder for running locally and/or from source.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ReserveCost : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private int runFromSourceField;
-        
+
         private bool runFromSourceFieldSet;
-        
+
         private int runLocalField;
-        
+
         private bool runLocalFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// A primary key that uniquely identifies this ReserveCost entry.
         /// </summary>
@@ -36965,7 +36965,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Adds the amount of disk space specified in RunFromSource or RunLocal to the volume cost of the device containing the directory.
         /// If this attribute is not set, it will default to the directory of parent component.
@@ -36982,7 +36982,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// The number of bytes of disk space to reserve if the component is installed to run from source.
         /// </summary>
@@ -36998,7 +36998,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.runFromSourceField = value;
             }
         }
-        
+
         /// <summary>
         /// The number of bytes of disk space to reserve if the component is installed to run locally.
         /// </summary>
@@ -37014,7 +37014,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.runLocalField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -37026,7 +37026,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -37055,7 +37055,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -37085,86 +37085,86 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Component for parent Directory
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Component : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private int comPlusFlagsField;
-        
+
         private bool comPlusFlagsFieldSet;
-        
+
         private YesNoType disableRegistryReflectionField;
-        
+
         private bool disableRegistryReflectionFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private string diskIdField;
-        
+
         private bool diskIdFieldSet;
-        
+
         private string featureField;
-        
+
         private bool featureFieldSet;
-        
+
         private string guidField;
-        
+
         private bool guidFieldSet;
-        
+
         private YesNoType keyPathField;
-        
+
         private bool keyPathFieldSet;
-        
+
         private LocationType locationField;
-        
+
         private bool locationFieldSet;
-        
+
         private YesNoType multiInstanceField;
-        
+
         private bool multiInstanceFieldSet;
-        
+
         private YesNoType neverOverwriteField;
-        
+
         private bool neverOverwriteFieldSet;
-        
+
         private YesNoType permanentField;
-        
+
         private bool permanentFieldSet;
-        
+
         private YesNoType sharedField;
-        
+
         private bool sharedFieldSet;
-        
+
         private YesNoType sharedDllRefCountField;
-        
+
         private bool sharedDllRefCountFieldSet;
-        
+
         private YesNoType transitiveField;
-        
+
         private bool transitiveFieldSet;
-        
+
         private YesNoType uninstallWhenSupersededField;
-        
+
         private bool uninstallWhenSupersededFieldSet;
-        
+
         private YesNoType win64Field;
-        
+
         private bool win64FieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Component()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -37202,7 +37202,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -37210,7 +37210,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -37219,7 +37219,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Component identifier; this is the primary key for identifying components. If omitted,
         /// the compiler defaults the identifier to the identifier of the resource that is the
@@ -37238,7 +37238,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to create a ComPlus entry.  The value should be the export flags used
         /// during the generation of the .msi file.  For more information see the COM+ documentation
@@ -37256,7 +37256,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.comPlusFlagsField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' in order to disable registry reflection on all existing and
         /// new registry keys affected by this component.
@@ -37276,7 +37276,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.disableRegistryReflectionField = value;
             }
         }
-        
+
         /// <summary>
         /// Sets the Directory of the Component.  If this element is nested under a Directory element,
         /// this value defaults to the value of the parent Directory/@Id.
@@ -37293,7 +37293,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// This attribute provides a default DiskId attribute for all child File elements. Specifying
         /// the DiskId on a Component element will override any DiskId attributes set by parent Directory
@@ -37312,7 +37312,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Identifies a feature to which this component belongs, as a shorthand for a child
         /// ComponentRef element of the Feature element. The value of this attribute should
@@ -37332,7 +37332,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.featureField = value;
             }
         }
-        
+
         /// <summary>
         /// This value should be a guid that uniquely identifies this component's contents, language, platform, and version.
         /// If omitted, the default value is '*' which indicates that the linker should generate a stable guid.
@@ -37355,7 +37355,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.guidField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute's value is set to 'yes', then the Directory of this Component is used
         /// as the KeyPath. To set a Registry value or File as the KeyPath of a component, set the
@@ -37378,7 +37378,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.keyPathField = value;
             }
         }
-        
+
         /// <summary>
         /// Optional value that specifies the location that the component can be run from.
         /// </summary>
@@ -37394,7 +37394,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.locationField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes', a new Component/@Guid will be generated for each
         /// instance transform. Ensure that all of the resources contained in a multi-instance
@@ -37413,7 +37413,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.multiInstanceField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes', the installer does not install or reinstall the
         /// component if a key path file or a key path registry entry for the component already
@@ -37434,7 +37434,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.neverOverwriteField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes', the installer does not remove the component during
         /// an uninstall. The installer registers an extra system client for the component in
@@ -37455,7 +37455,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.permanentField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute's value is set to 'yes', enables advanced patching semantics for
         /// Components that are shared across multiple Products.  Specifically, the Windows Installer
@@ -37474,7 +37474,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sharedField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute's value is set to 'yes', the installer increments the reference count
         /// in the shared DLL registry of the component's key file.  If this bit is not set, the
@@ -37492,7 +37492,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sharedDllRefCountField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes', the installer reevaluates the value of the statement
         /// in the Condition upon a reinstall.  If the value was previously False and has changed to
@@ -37512,7 +37512,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.transitiveField = value;
             }
         }
-        
+
         /// <summary>
         /// If this attribute is set to 'yes', the installer will uninstall the Component's files
         /// and registry keys when it is superseded by a patch.  This functionality is available in
@@ -37530,7 +37530,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.uninstallWhenSupersededField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' to mark this as a 64-bit component. This attribute facilitates
         /// the installation of packages that include both 32-bit and 64-bit components.  If this is a 64-bit
@@ -37552,7 +37552,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.win64Field = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -37564,7 +37564,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -37574,7 +37574,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -37584,7 +37584,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
@@ -37724,7 +37724,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Parses a LocationType from a string.
         /// </summary>
@@ -37734,7 +37734,7 @@ namespace WixToolset.Harvesters.Serialize
             Component.TryParseLocationType(value, out parsedValue);
             return parsedValue;
         }
-        
+
         /// <summary>
         /// Tries to parse a LocationType from a string.
         /// </summary>
@@ -37770,7 +37770,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -37931,14 +37931,14 @@ namespace WixToolset.Harvesters.Serialize
                     writer.WriteAttributeString("Win64", "yes");
                 }
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         void ISetAttributes.SetAttribute(string name, string value)
@@ -38033,55 +38033,55 @@ namespace WixToolset.Harvesters.Serialize
                 this.win64FieldSet = true;
             }
         }
-        
+
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
         public enum LocationType
         {
-            
+
             IllegalValue = int.MaxValue,
-            
+
             NotSet = -1,
-            
+
             /// <summary>
             /// Prevents the component from running from the source or the network (this is the default behavior if this attribute is not set).
             /// </summary>
             local,
-            
+
             /// <summary>
             /// Enforces that the component can only be run from the source (it cannot be run from the user's computer).
             /// </summary>
             source,
-            
+
             /// <summary>
             /// Allows the component to run from source or locally.
             /// </summary>
             either,
         }
     }
-    
+
     /// <summary>
     /// Groups together multiple components to be used in other locations.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ComponentGroup : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string directoryField;
-        
+
         private bool directoryFieldSet;
-        
+
         private string sourceField;
-        
+
         private bool sourceFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public ComponentGroup()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
@@ -38091,7 +38091,7 @@ namespace WixToolset.Harvesters.Serialize
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -38099,7 +38099,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -38108,7 +38108,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// Identifier for the ComponentGroup.
         /// </summary>
@@ -38124,7 +38124,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Sets the default directory identifier for child Component elements.
         /// </summary>
@@ -38140,7 +38140,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.directoryField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to set the default file system source for child Component elements. For more information, see
         /// </summary>
@@ -38156,7 +38156,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38168,7 +38168,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -38178,7 +38178,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -38188,7 +38188,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -38215,7 +38215,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38238,14 +38238,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("Source", this.sourceField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -38270,24 +38270,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to a ComponentGroup in another Fragment.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ComponentGroupRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType primaryField;
-        
+
         private bool primaryFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the ComponentGroup to reference.
         /// </summary>
@@ -38303,7 +38303,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' in order to make the parent feature of this component
         /// the primary feature for this component.  Components may belong to multiple features.
@@ -38326,7 +38326,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.primaryField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38338,7 +38338,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38366,7 +38366,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -38386,20 +38386,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Used only for PatchFamilies to include all changes between the baseline and upgraded packages in a patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class All : ISetAttributes, ISchemaElement
     {
-        
+
         private ISchemaElement parentElement;
-        
+
         private string contentField;
-        
+
         private bool contentFieldSet;
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38411,7 +38411,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Used only for PatchFamilies to include all changes between the baseline and upgraded packages in a patch.
         /// </summary>
@@ -38427,7 +38427,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -38441,7 +38441,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.contentFieldSet = true;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38459,20 +38459,20 @@ namespace WixToolset.Harvesters.Serialize
             writer.WriteEndElement();
         }
     }
-    
+
     /// <summary>
     /// Used only for PatchFamilies to include only a binary table entry in a patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class BinaryRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the Binary element to reference.
         /// </summary>
@@ -38488,7 +38488,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38500,7 +38500,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38517,7 +38517,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -38532,20 +38532,20 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Used only for PatchFamilies to include only a icon table entry in a patch.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class IconRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the Icon element to reference.
         /// </summary>
@@ -38561,7 +38561,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38573,7 +38573,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38590,7 +38590,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -38605,24 +38605,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to a Feature element in another Fragment.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ComponentRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType primaryField;
-        
+
         private bool primaryFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The identifier of the Component element to reference.
         /// </summary>
@@ -38638,7 +38638,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Set this attribute to 'yes' in order to make the parent feature of this component
         /// the primary feature for this component.  Components may belong to multiple features.
@@ -38661,7 +38661,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.primaryField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38673,7 +38673,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38701,7 +38701,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -38721,49 +38721,49 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Merge directive to bring in a merge module that will be redirected to the parent directory.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class Merge : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
     {
-        
+
         private ElementCollection children;
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private string diskIdField;
-        
+
         private bool diskIdFieldSet;
-        
+
         private YesNoType fileCompressionField;
-        
+
         private bool fileCompressionFieldSet;
-        
+
         private string languageField;
-        
+
         private bool languageFieldSet;
-        
+
         private string sourceFileField;
-        
+
         private bool sourceFileFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         public Merge()
         {
             ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
             childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ConfigurationData)));
             this.children = childCollection0;
         }
-        
+
         public virtual IEnumerable Children
         {
             get
@@ -38771,7 +38771,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
         public virtual IEnumerable this[System.Type childType]
         {
@@ -38780,7 +38780,7 @@ namespace WixToolset.Harvesters.Serialize
                 return this.children.Filter(childType);
             }
         }
-        
+
         /// <summary>
         /// The unique identifier for the Merge element in the source code.  Referenced by the MergeRef/@Id.
         /// </summary>
@@ -38796,7 +38796,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// The value of this attribute should correspond to the Id attribute of a
         /// Media element authored elsewhere.  By creating this connection between the merge module and Media
@@ -38815,7 +38815,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies if the files in the merge module should be compressed.
         /// </summary>
@@ -38831,7 +38831,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileCompressionField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies the decimal LCID or localization token for the language to merge the Module in as.
         /// </summary>
@@ -38847,7 +38847,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.languageField = value;
             }
         }
-        
+
         /// <summary>
         /// Path to the source location of the merge module.
         /// </summary>
@@ -38863,7 +38863,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceFileField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -38877,7 +38877,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -38889,7 +38889,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         public virtual void AddChild(ISchemaElement child)
         {
             if ((null == child))
@@ -38899,7 +38899,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
+
         public virtual void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
@@ -38909,7 +38909,7 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         ISchemaElement ICreateChildren.CreateChild(string childName)
         {
@@ -38928,7 +38928,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -38971,14 +38971,14 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("src", this.srcField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -39018,24 +39018,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Merge reference to connect a Merge Module to parent Feature
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class MergeRef : ISchemaElement, ISetAttributes
     {
-        
+
         private string idField;
-        
+
         private bool idFieldSet;
-        
+
         private YesNoType primaryField;
-        
+
         private bool primaryFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// The unique identifier for the Merge element to be referenced.
         /// </summary>
@@ -39051,7 +39051,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.idField = value;
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the feature containing this MergeRef is the primary feature for advertising the merge module's components.
         /// </summary>
@@ -39067,7 +39067,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.primaryField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -39079,7 +39079,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -39107,7 +39107,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -39127,24 +39127,24 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Data to use as input to a configurable merge module.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class ConfigurationData : ISchemaElement, ISetAttributes
     {
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string valueField;
-        
+
         private bool valueFieldSet;
-        
+
         private ISchemaElement parentElement;
-        
+
         /// <summary>
         /// Name of the item in the ModuleConfiguration table.
         /// </summary>
@@ -39160,7 +39160,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// Value to be passed to configurable merge module.
         /// </summary>
@@ -39176,7 +39176,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.valueField = value;
             }
         }
-        
+
         public virtual ISchemaElement ParentElement
         {
             get
@@ -39188,7 +39188,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.parentElement = value;
             }
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
@@ -39209,7 +39209,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         void ISetAttributes.SetAttribute(string name, string value)
         {
@@ -39229,98 +39229,50 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Directory layout for the product.  Also specifies the mappings between source and target directories.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
-    public class Directory : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
+    public class Directory : DirectoryBase
     {
-        
-        private ElementCollection children;
-        
-        private string idField;
-        
-        private bool idFieldSet;
-        
         private string componentGuidGenerationSeedField;
-        
+
         private bool componentGuidGenerationSeedFieldSet;
-        
+
         private string diskIdField;
-        
+
         private bool diskIdFieldSet;
-        
+
         private string fileSourceField;
-        
+
         private bool fileSourceFieldSet;
-        
+
         private string nameField;
-        
+
         private bool nameFieldSet;
-        
+
         private string shortNameField;
-        
+
         private bool shortNameFieldSet;
-        
+
         private string shortSourceNameField;
-        
+
         private bool shortSourceNameFieldSet;
-        
+
         private string sourceNameField;
-        
+
         private bool sourceNameFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
-        private ISchemaElement parentElement;
-        
+
         public Directory()
         {
-            ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Component)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Directory)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Merge)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(SymbolPath)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
-            this.children = childCollection0;
+
         }
-        
-        public virtual IEnumerable Children
-        {
-            get
-            {
-                return this.children;
-            }
-        }
-        
-        [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
-        public virtual IEnumerable this[System.Type childType]
-        {
-            get
-            {
-                return this.children.Filter(childType);
-            }
-        }
-        
-        /// <summary>
-        /// This value is the unique identifier of the directory entry.
-        /// </summary>
-        public string Id
-        {
-            get
-            {
-                return this.idField;
-            }
-            set
-            {
-                this.idFieldSet = true;
-                this.idField = value;
-            }
-        }
-        
+
         /// <summary>
         /// The Component Guid Generation Seed is a guid that must be used when a Component with the generate guid directive ("*")
         /// is not rooted in a standard Windows Installer directory (for example, ProgramFilesFolder or CommonFilesFolder).
@@ -39341,7 +39293,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.componentGuidGenerationSeedField = value;
             }
         }
-        
+
         /// <summary>
         /// Sets the default disk identifier for the files contained in this directory.
         /// This attribute's value may be overridden by a child Component, Directory,
@@ -39360,7 +39312,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to set the file system source for this directory's child elements. For more information, see
         /// </summary>
@@ -39376,7 +39328,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileSourceField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the directory.
         /// 
@@ -39395,7 +39347,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.nameField = value;
             }
         }
-        
+
         /// <summary>
         /// The short name of the directory in 8.3 format.
         /// This attribute should only be set if there is a conflict between generated short directory names
@@ -39413,7 +39365,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortNameField = value;
             }
         }
-        
+
         /// <summary>
         /// The short name of the directory on the source media in 8.3 format.
         /// This attribute should only be set if there is a conflict between generated short directory names
@@ -39431,7 +39383,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.shortSourceNameField = value;
             }
         }
-        
+
         /// <summary>
         /// The name of the directory on the source media.
         /// If this attribute is not specified, Windows Installer will default to the Name attribute.
@@ -39457,7 +39409,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.sourceNameField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -39471,20 +39423,8 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
-        public virtual ISchemaElement ParentElement
-        {
-            get
-            {
-                return this.parentElement;
-            }
-            set
-            {
-                this.parentElement = value;
-            }
-        }
-        
-        public virtual void AddChild(ISchemaElement child)
+
+        public override void AddChild(ISchemaElement child)
         {
             if ((null == child))
             {
@@ -39493,8 +39433,8 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
-        public virtual void RemoveChild(ISchemaElement child)
+
+        public override void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
             {
@@ -39503,9 +39443,9 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
-        ISchemaElement ICreateChildren.CreateChild(string childName)
+        public override ISchemaElement CreateChild(string childName)
         {
             if (String.IsNullOrEmpty(childName))
             {
@@ -39534,12 +39474,12 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        public virtual void OutputXml(XmlWriter writer)
+        public override void OutputXml(XmlWriter writer)
         {
             if ((null == writer))
             {
@@ -39582,17 +39522,17 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("src", this.srcField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        void ISetAttributes.SetAttribute(string name, string value)
+        public override void SetAttribute(string name, string value)
         {
             if (String.IsNullOrEmpty(name))
             {
@@ -39645,77 +39585,25 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
     /// <summary>
     /// Create a reference to a Directory element in another Fragment.
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
-    public class DirectoryRef : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
+    public class DirectoryRef : DirectoryBase
     {
-        
-        private ElementCollection children;
-        
-        private string idField;
-        
-        private bool idFieldSet;
-        
         private string diskIdField;
-        
+
         private bool diskIdFieldSet;
-        
+
         private string fileSourceField;
-        
+
         private bool fileSourceFieldSet;
-        
+
         private string srcField;
-        
+
         private bool srcFieldSet;
-        
-        private ISchemaElement parentElement;
-        
-        public DirectoryRef()
-        {
-            ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Component)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Directory)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Merge)));
-            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
-            this.children = childCollection0;
-        }
-        
-        public virtual IEnumerable Children
-        {
-            get
-            {
-                return this.children;
-            }
-        }
-        
-        [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
-        public virtual IEnumerable this[System.Type childType]
-        {
-            get
-            {
-                return this.children.Filter(childType);
-            }
-        }
-        
-        /// <summary>
-        /// The identifier of the Directory element to reference.
-        /// </summary>
-        public string Id
-        {
-            get
-            {
-                return this.idField;
-            }
-            set
-            {
-                this.idFieldSet = true;
-                this.idField = value;
-            }
-        }
-        
+
         /// <summary>
         /// Sets the default disk identifier for the files contained in this directory.
         /// This attribute's value may be overridden by a child Component, Directory,
@@ -39734,7 +39622,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.diskIdField = value;
             }
         }
-        
+
         /// <summary>
         /// Used to set the file system source for this DirectoryRef's child elements. For more information, see
         /// </summary>
@@ -39750,7 +39638,7 @@ namespace WixToolset.Harvesters.Serialize
                 this.fileSourceField = value;
             }
         }
-        
+
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public string src
         {
@@ -39764,20 +39652,8 @@ namespace WixToolset.Harvesters.Serialize
                 this.srcField = value;
             }
         }
-        
-        public virtual ISchemaElement ParentElement
-        {
-            get
-            {
-                return this.parentElement;
-            }
-            set
-            {
-                this.parentElement = value;
-            }
-        }
-        
-        public virtual void AddChild(ISchemaElement child)
+
+        public override void AddChild(ISchemaElement child)
         {
             if ((null == child))
             {
@@ -39786,8 +39662,8 @@ namespace WixToolset.Harvesters.Serialize
             this.children.AddElement(child);
             child.ParentElement = this;
         }
-        
-        public virtual void RemoveChild(ISchemaElement child)
+
+        public override void RemoveChild(ISchemaElement child)
         {
             if ((null == child))
             {
@@ -39796,9 +39672,9 @@ namespace WixToolset.Harvesters.Serialize
             this.children.RemoveElement(child);
             child.ParentElement = null;
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
-        ISchemaElement ICreateChildren.CreateChild(string childName)
+        public override ISchemaElement CreateChild(string childName)
         {
             if (String.IsNullOrEmpty(childName))
             {
@@ -39823,11 +39699,11 @@ namespace WixToolset.Harvesters.Serialize
             }
             return childValue;
         }
-        
+
         /// <summary>
         /// Processes this element and all child elements into an XmlWriter.
         /// </summary>
-        public virtual void OutputXml(XmlWriter writer)
+        public override void OutputXml(XmlWriter writer)
         {
             if ((null == writer))
             {
@@ -39850,16 +39726,16 @@ namespace WixToolset.Harvesters.Serialize
             {
                 writer.WriteAttributeString("src", this.srcField);
             }
-            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext(); )
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
             {
                 ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
                 childElement.OutputXml(writer);
             }
             writer.WriteEndElement();
         }
-        
+
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
-        void ISetAttributes.SetAttribute(string name, string value)
+        public override void SetAttribute(string name, string value)
         {
             if (String.IsNullOrEmpty(name))
             {
@@ -39887,7 +39763,157 @@ namespace WixToolset.Harvesters.Serialize
             }
         }
     }
-    
+
+    /// <summary>
+    /// Create a reference to a Directory element in another Fragment.
+    /// </summary>
+    public class StandardDirectory : DirectoryBase
+    {
+        public override void AddChild(ISchemaElement child)
+        {
+            if ((null == child))
+            {
+                throw new ArgumentNullException("child");
+            }
+            this.children.AddElement(child);
+            child.ParentElement = this;
+        }
+
+        public override void RemoveChild(ISchemaElement child)
+        {
+            if ((null == child))
+            {
+                throw new ArgumentNullException("child");
+            }
+            this.children.RemoveElement(child);
+            child.ParentElement = null;
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        public override ISchemaElement CreateChild(string childName)
+        {
+            if (String.IsNullOrEmpty(childName))
+            {
+                throw new ArgumentNullException("childName");
+            }
+            ISchemaElement childValue = null;
+            if (("Component" == childName))
+            {
+                childValue = new Component();
+            }
+            if (("Directory" == childName))
+            {
+                childValue = new Directory();
+            }
+            if (("Merge" == childName))
+            {
+                childValue = new Merge();
+            }
+            if ((null == childValue))
+            {
+                throw new InvalidOperationException(String.Concat(childName, " is not a valid child name."));
+            }
+            return childValue;
+        }
+
+        /// <summary>
+        /// Processes this element and all child elements into an XmlWriter.
+        /// </summary>
+        public override void OutputXml(XmlWriter writer)
+        {
+            if ((null == writer))
+            {
+                throw new ArgumentNullException("writer");
+            }
+            writer.WriteStartElement("StandardDirectory", "http://wixtoolset.org/schemas/v4/wxs");
+            if (this.idFieldSet)
+            {
+                writer.WriteAttributeString("Id", this.idField);
+            }
+            for (IEnumerator enumerator = this.children.GetEnumerator(); enumerator.MoveNext();)
+            {
+                ISchemaElement childElement = ((ISchemaElement)(enumerator.Current));
+                childElement.OutputXml(writer);
+            }
+            writer.WriteEndElement();
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        public override void SetAttribute(string name, string value)
+        {
+            if (String.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException("name");
+            }
+            if (("Id" == name))
+            {
+                this.idField = value;
+                this.idFieldSet = true;
+            }
+        }
+    }
+
+    public abstract class DirectoryBase : IParentElement, ICreateChildren, ISchemaElement, ISetAttributes
+    {
+        protected ElementCollection children;
+
+        protected string idField;
+
+        protected bool idFieldSet;
+
+        protected ISchemaElement parentElement;
+
+        public DirectoryBase()
+        {
+            ElementCollection childCollection0 = new ElementCollection(ElementCollection.CollectionType.Choice);
+            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Component)));
+            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Directory)));
+            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(Merge)));
+            childCollection0.AddItem(new ElementCollection.ChoiceItem(typeof(ISchemaElement)));
+            this.children = childCollection0;
+        }
+
+        public virtual IEnumerable Children
+        {
+            get { return this.children; }
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
+        public virtual IEnumerable this[System.Type childType]
+        {
+            get { return this.children.Filter(childType); }
+        }
+
+        /// <summary>
+        /// The identifier of the Directory element to reference.
+        /// </summary>
+        public string Id
+        {
+            get { return this.idField; }
+            set
+            {
+                this.idFieldSet = true;
+                this.idField = value;
+            }
+        }
+
+        public ISchemaElement ParentElement
+        {
+            get { return this.parentElement; }
+            set { this.parentElement = value; }
+        }
+
+        public abstract void AddChild(ISchemaElement child);
+
+        public abstract ISchemaElement CreateChild(string childName);
+
+        public abstract void RemoveChild(ISchemaElement child);
+
+        public abstract void OutputXml(XmlWriter writer);
+
+        public abstract void SetAttribute(string name, string value);
+    }
+
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
     public class UpgradeVersion : ISchemaElement, ISetAttributes
     {

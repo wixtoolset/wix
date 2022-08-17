@@ -80,8 +80,7 @@ namespace WixToolset.Harvesters
 
             string fullPath = Path.GetFullPath(argument);
 
-            Wix.DirectoryRef directoryRef = new Wix.DirectoryRef();
-            directoryRef.Id = this.rootedDirectoryRef;
+            var directoryRef = DirectoryHelper.CreateDirectoryReference(this.rootedDirectoryRef);
 
             Wix.File file = this.HarvestFile(fullPath);
 

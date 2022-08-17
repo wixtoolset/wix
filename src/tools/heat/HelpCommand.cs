@@ -97,7 +97,7 @@ namespace WixToolset.Harvesters
             Console.WriteLine(HelpMessageOptionFormat, "-? | -help", "this help information");
             Console.WriteLine("For more information see: https://wixtoolset.org/");
 
-            return 0;
+            return 1;
         }
     }
 }

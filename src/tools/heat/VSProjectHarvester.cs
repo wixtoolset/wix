@@ -334,21 +334,23 @@ namespace WixToolset.Harvesters
             }
             else
             {
-                Wix.DirectoryRef directoryRef = new Wix.DirectoryRef();
-                harvestParent = directoryRef;
+                string directoryRefId;
 
                 if (!String.IsNullOrEmpty(this.directoryIds))
                 {
-                    directoryRef.Id = this.directoryIds;
+                    directoryRefId = this.directoryIds;
                 }
                 else if (this.setUniqueIdentifiers)
                 {
-                    directoryRef.Id = String.Format(CultureInfo.InvariantCulture, DirectoryIdFormat, sanitizedProjectName, pog.Name);
+                    directoryRefId = String.Format(CultureInfo.InvariantCulture, DirectoryIdFormat, sanitizedProjectName, pog.Name);
                 }
                 else
                 {
-                    directoryRef.Id = this.Core.CreateIdentifierFromFilename(String.Format(CultureInfo.InvariantCulture, DirectoryIdFormat, sanitizedProjectName, pog.Name));
+                    directoryRefId = this.Core.CreateIdentifierFromFilename(String.Format(CultureInfo.InvariantCulture, DirectoryIdFormat, sanitizedProjectName, pog.Name));
                 }
+
+                var directoryRef = DirectoryHelper.CreateDirectoryReference(directoryRefId);
+                harvestParent = directoryRef;
 
                 this.directoryRefSeed = this.Core.GenerateIdentifier(DirectoryPrefix, this.projectGUID, pog.Name);
             }

@@ -5,6 +5,7 @@ namespace WixToolset.Harvesters
     using System;
     using System.IO;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Harvesters.Data;
     using WixToolset.Harvesters.Extensibility;
     using Wix = WixToolset.Harvesters.Serialize;
@@ -14,7 +15,7 @@ namespace WixToolset.Harvesters
     /// </summary>
     public sealed class DirectoryHarvester : BaseHarvesterExtension
     {
-        private FileHarvester fileHarvester;
+        private readonly FileHarvester fileHarvester;
 
         private const string ComponentPrefix = "cmp";
         private const string DirectoryPrefix = "dir";
@@ -84,8 +85,7 @@ namespace WixToolset.Harvesters
             {
                 Wix.Directory directory = (Wix.Directory)harvestParent;
 
-                Wix.DirectoryRef directoryRef = new Wix.DirectoryRef();
-                directoryRef.Id = this.RootedDirectoryRef;
+                var directoryRef = DirectoryHelper.CreateDirectoryReference(this.RootedDirectoryRef);
 
                 if (this.SuppressRootDirectory)
                 {
@@ -208,7 +208,7 @@ namespace WixToolset.Harvesters
         private int HarvestDirectory(string path, string relativePath, Wix.IParentElement harvestParent, GenerateType generateType)
         {
             int fileCount = 0;
-            Wix.Directory directory = generateType != GenerateType.PayloadGroup ? (Wix.Directory)harvestParent : null;
+            Wix.DirectoryBase directory = generateType != GenerateType.PayloadGroup ? (Wix.DirectoryBase)harvestParent : null;
 
             // harvest the child directories
             foreach (string childDirectoryPath in Directory.GetDirectories(path))

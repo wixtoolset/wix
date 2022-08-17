@@ -24,6 +24,7 @@ msbuild -Restore tools.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L
 msbuild publish_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\tools_publish.binlog || exit /b
 
 :: Test
+dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Heat -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Heat.trx" || exit /b
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.HeatTasks -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.HeatTasks.trx" || exit /b
 
 :: Pack

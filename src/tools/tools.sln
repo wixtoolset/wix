@@ -16,6 +16,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.HeatTasks", "Wix
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.HeatTasks", "test\WixToolsetTest.HeatTasks\WixToolsetTest.HeatTasks.csproj", "{3FB7F972-31A6-4929-B6BF-EACEC659A7D3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Heat", "test\WixToolsetTest.Heat\WixToolsetTest.Heat.csproj", "{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,12 +74,21 @@ Global
 		{3FB7F972-31A6-4929-B6BF-EACEC659A7D3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3FB7F972-31A6-4929-B6BF-EACEC659A7D3}.Release|x86.ActiveCfg = Release|Any CPU
 		{3FB7F972-31A6-4929-B6BF-EACEC659A7D3}.Release|x86.Build.0 = Release|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Debug|x86.Build.0 = Debug|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Release|x86.ActiveCfg = Release|Any CPU
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3FB7F972-31A6-4929-B6BF-EACEC659A7D3} = {F7A815A5-37AE-4EC4-A6D6-B29565055668}
+		{AF77C94C-5B4B-45E7-A642-A3C1F94F106D} = {F7A815A5-37AE-4EC4-A6D6-B29565055668}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {537F1116-39FE-4AED-A9A2-35030E5750D5}
