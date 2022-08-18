@@ -22,8 +22,10 @@
         </Page>
         <Page Name="Install">
             <Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.InstallHeader)</Label>
-            <Label X="11" Y="121" Width="-11" Height="-129" FontId="3" VisibleCondition="WixStdBASuppressOptionsUI" DisablePrefix="yes">#(loc.InstallMessage)</Label>
-            <Label X="11" Y="121" Width="-11" Height="-129" FontId="3" VisibleCondition="NOT WixStdBASuppressOptionsUI" DisablePrefix="yes">#(loc.InstallMessageOptions)</Label>
+            <Label X="11" Y="121" Width="-11" Height="-129" FontId="3" DisablePrefix="yes">
+                <Text Condition="WixStdBASuppressOptionsUI">#(loc.InstallMessage)</Text>
+                <Text Condition="NOT WixStdBASuppressOptionsUI">#(loc.InstallMessageOptions)</Text>
+            </Label>
             <Hypertext Name="EulaHyperlink" X="11" Y="-107" Width="-11" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallLicenseLinkText)</Hypertext>
             <Label Name="InstallVersion" X="11" Y="-73" Width="246" Height="17" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
             <Checkbox Name="EulaAcceptCheckbox" X="-11" Y="-41" Width="260" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
