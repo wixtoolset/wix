@@ -183,7 +183,6 @@ DAPI_(HRESULT) BalRetryEndPackage(
                 1335 == dwError ||
                 1402 == dwError ||
                 1406 == dwError ||
-                1606 == dwError ||
                 1706 == dwError ||
                 1719 == dwError ||
                 1723 == dwError ||
