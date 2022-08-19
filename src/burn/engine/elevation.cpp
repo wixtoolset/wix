@@ -189,7 +189,8 @@ static HRESULT ElevatedProcessDetect(
     );
 static HRESULT OnApplyUninitialize(
     __in HANDLE* phLock,
-    __in BOOL* pfApplying
+    __in BOOL* pfApplying,
+    __in BOOL* pfDisabledAutomaticUpdates
     );
 static HRESULT OnSessionBegin(
     __in BURN_CACHE* pCache,
@@ -1543,7 +1544,6 @@ extern "C" HRESULT ElevationChildPumpMessages(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __out HANDLE* phLock,
-    __out BOOL* pfDisabledAutomaticUpdates,
     __out DWORD* pdwChildExitCode,
     __out BOOL* pfRestart,
     __out BOOL* pfApplying
@@ -1554,6 +1554,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
     BURN_ELEVATION_CHILD_MESSAGE_CONTEXT context = { };
     HANDLE hCacheThread = NULL;
     BURN_PIPE_RESULT result = { };
+    BOOL fDisabledAutomaticUpdates = FALSE;
 
     cacheContext.dwLoggingTlsId = dwLoggingTlsId;
     cacheContext.hPipe = hCachePipe;
@@ -1568,7 +1569,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
     context.dwLoggingTlsId = dwLoggingTlsId;
     context.hPipe = hPipe;
     context.phLock = phLock;
-    context.pfDisabledAutomaticUpdates = pfDisabledAutomaticUpdates;
+    context.pfDisabledAutomaticUpdates = &fDisabledAutomaticUpdates;
     context.pfApplying = pfApplying;
     context.pApprovedExes = pApprovedExes;
     context.pCache = pCache;
@@ -1594,6 +1595,11 @@ extern "C" HRESULT ElevationChildPumpMessages(
 
 LExit:
     ReleaseHandle(hCacheThread);
+
+    if (fDisabledAutomaticUpdates)
+    {
+        ElevationChildResumeAutomaticUpdates();
+    }
 
     return hr;
 }
@@ -2128,7 +2134,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE:
-        hrResult = OnApplyUninitialize(pContext->phLock, pContext->pfApplying);
+        hrResult = OnApplyUninitialize(pContext->phLock, pContext->pfApplying, pContext->pfDisabledAutomaticUpdates);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN:
@@ -2433,7 +2439,8 @@ LExit:
 
 static HRESULT OnApplyUninitialize(
     __in HANDLE* phLock,
-    __in BOOL* pfApplying
+    __in BOOL* pfApplying,
+    __in BOOL* pfDisabledAutomaticUpdates
     )
 {
     Assert(phLock);
@@ -2441,6 +2448,13 @@ static HRESULT OnApplyUninitialize(
     // TODO: end system restore point.
 
     *pfApplying = FALSE;
+
+    if (*pfDisabledAutomaticUpdates)
+    {
+        *pfDisabledAutomaticUpdates = FALSE;
+
+        ElevationChildResumeAutomaticUpdates();
+    }
 
     if (*phLock)
     {
