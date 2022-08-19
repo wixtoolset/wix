@@ -152,7 +152,7 @@ typedef struct _BURN_ENGINE_STATE
 
     BURN_PLAN plan;
 
-    DWORD dwElevatedLoggingTlsId;
+    HANDLE hUnelevatedLoggingThread;
 
     LPWSTR sczBundleEngineWorkingPath;
     BURN_PIPE_CONNECTION companionConnection;

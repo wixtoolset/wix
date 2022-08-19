@@ -166,7 +166,6 @@ HRESULT ElevationLaunchApprovedExe(
 
 // Child (per-machine process) side functions.
 HRESULT ElevationChildPumpMessages(
-    __in DWORD dwLoggingTlsId,
     __in HANDLE hPipe,
     __in HANDLE hCachePipe,
     __in BURN_APPROVED_EXES* pApprovedExes,

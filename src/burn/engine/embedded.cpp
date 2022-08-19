@@ -51,7 +51,6 @@ extern "C" HRESULT EmbeddedRunBundle(
 {
     HRESULT hr = S_OK;
     DWORD dwCurrentProcessId = ::GetCurrentProcessId();
-    HANDLE hCreatedPipesEvent = NULL;
     LPWSTR sczCommand = NULL;
     PROCESS_INFORMATION pi = { };
     BURN_PIPE_RESULT result = { };
@@ -65,7 +64,7 @@ extern "C" HRESULT EmbeddedRunBundle(
     hr = PipeCreateNameAndSecret(&pConnection->sczName, &pConnection->sczSecret);
     ExitOnFailure(hr, "Failed to create embedded pipe name and client token.");
 
-    hr = PipeCreatePipes(pConnection, FALSE, &hCreatedPipesEvent);
+    hr = PipeCreatePipes(pConnection, FALSE);
     ExitOnFailure(hr, "Failed to create embedded pipe.");
 
     hr = StrAllocFormatted(&sczCommand, L"%ls -%ls %ls %ls %u", sczBaseCommand, BURN_COMMANDLINE_SWITCH_EMBEDDED, pConnection->sczName, pConnection->sczSecret, dwCurrentProcessId);
@@ -100,7 +99,6 @@ LExit:
     ReleaseHandle(pi.hProcess);
 
     StrSecureZeroFreeString(sczCommand);
-    ReleaseHandle(hCreatedPipesEvent);
     PipeConnectionUninitialize(pConnection);
 
     return hr;

@@ -107,18 +107,6 @@ static DWORD WINAPI ThreadProc(
     BURN_ENGINE_STATE* pEngineState = pContext->pEngineState;
     BOOL fElevatedEngine = BURN_MODE_ELEVATED == pContext->pEngineState->internalCommand.mode;
 
-    // If elevated, set up the thread local storage to store the correct pipe to communicate logging.
-    if (fElevatedEngine)
-    {
-        Assert(TLS_OUT_OF_INDEXES != pEngineState->dwElevatedLoggingTlsId);
-
-        if (!::TlsSetValue(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe))
-        {
-            // If the function failed we cannot write to the pipe so just terminate.
-            ExitFunction1(hr = E_INVALIDSTATE);
-        }
-    }
-
     wc.lpfnWndProc = WndProc;
     wc.hInstance = pContext->hInstance;
     wc.lpszClassName = BURN_UITHREAD_CLASS_WINDOW;

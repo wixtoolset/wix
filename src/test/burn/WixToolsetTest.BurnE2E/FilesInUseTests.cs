@@ -34,7 +34,7 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(false);
         }
 
-        [RuntimeFact]
+        [LongRuntimeFact]
         public void WixStdBAFailsWithLockedFile()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

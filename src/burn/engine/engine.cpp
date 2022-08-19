@@ -3,6 +3,15 @@
 #include "precomp.h"
 
 
+typedef struct _REDIRECTED_LOGGING_CONTEXT
+{
+    CRITICAL_SECTION csBuffer;
+    LPSTR sczBuffer;
+    HANDLE hPipe;
+    HANDLE hLogEvent;
+    HANDLE hFinishedEvent;
+} REDIRECTED_LOGGING_CONTEXT;
+
 // constants
 
 const DWORD RESTART_RETRIES = 10;
@@ -48,6 +57,20 @@ static HRESULT ProcessMessage(
 static HRESULT DAPI RedirectLoggingOverPipe(
     __in_z LPCSTR szString,
     __in_opt LPVOID pvContext
+    );
+static HRESULT LogStringOverPipe(
+    __in_z LPCSTR szString,
+    __in HANDLE hPipe
+    );
+static DWORD WINAPI ElevatedLoggingThreadProc(
+    __in LPVOID lpThreadParameter
+    );
+static HRESULT WaitForElevatedLoggingThread(
+    __in REDIRECTED_LOGGING_CONTEXT* pContext,
+    __in HANDLE hLoggingThread
+    );
+static HRESULT WaitForUnelevatedLoggingThread(
+    __in HANDLE hUnelevatedLoggingThread
     );
 static HRESULT Restart();
 static void CALLBACK BurnTraceError(
@@ -361,7 +384,6 @@ static HRESULT InitializeEngineState(
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
 
     pEngineState->internalCommand.automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
-    pEngineState->dwElevatedLoggingTlsId = TLS_OUT_OF_INDEXES;
     ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
     PipeConnectionInitialize(&pEngineState->companionConnection);
     PipeConnectionInitialize(&pEngineState->embeddedConnection);
@@ -433,11 +455,6 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->log.sczPrefix);
     ReleaseStr(pEngineState->log.sczPath);
     ReleaseStr(pEngineState->log.sczPathVariable);
-
-    if (TLS_OUT_OF_INDEXES != pEngineState->dwElevatedLoggingTlsId)
-    {
-        ::TlsFree(pEngineState->dwElevatedLoggingTlsId);
-    }
 
     // clear struct
     memset(pEngineState, 0, sizeof(BURN_ENGINE_STATE));
@@ -624,6 +641,8 @@ LExit:
     if (INVALID_HANDLE_VALUE != pEngineState->companionConnection.hPipe)
     {
         PipeTerminateChildProcess(&pEngineState->companionConnection, pEngineState->userExperience.dwExitCode, FALSE);
+
+        WaitForUnelevatedLoggingThread(pEngineState->hUnelevatedLoggingThread);
     }
 
     // If the splash screen is still around, close it.
@@ -646,6 +665,9 @@ static HRESULT RunElevated(
 {
     HRESULT hr = S_OK;
     HANDLE hLock = NULL;
+    HANDLE hLoggingThread = NULL;
+    REDIRECTED_LOGGING_CONTEXT loggingContext = { };
+    BOOL fDeleteLoggingCs = FALSE;
 
     // Initialize logging.
     hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
@@ -655,20 +677,23 @@ static HRESULT RunElevated(
     hr = PipeChildConnect(&pEngineState->companionConnection, TRUE);
     ExitOnFailure(hr, "Failed to connect to unelevated process.");
 
-    // Set up the thread local storage to store the correct pipe to communicate logging then
+    // Set up the context for the logging thread then
     // override logging to write over the pipe.
-    pEngineState->dwElevatedLoggingTlsId = ::TlsAlloc();
-    if (TLS_OUT_OF_INDEXES == pEngineState->dwElevatedLoggingTlsId)
-    {
-        ExitWithLastError(hr, "Failed to allocate thread local storage for logging.");
-    }
+    ::InitializeCriticalSection(&loggingContext.csBuffer);
+    fDeleteLoggingCs = TRUE;
 
-    if (!::TlsSetValue(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe))
-    {
-        ExitWithLastError(hr, "Failed to set elevated pipe into thread local storage for logging.");
-    }
+    loggingContext.hLogEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
+    ExitOnNullWithLastError(loggingContext.hLogEvent, hr, "Failed to create log event for logging thread.");
 
-    LogRedirect(RedirectLoggingOverPipe, pEngineState);
+    loggingContext.hFinishedEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
+    ExitOnNullWithLastError(loggingContext.hFinishedEvent, hr, "Failed to create finished event for logging thread.");
+
+    loggingContext.hPipe = pEngineState->companionConnection.hLoggingPipe;
+
+    hLoggingThread = ::CreateThread(NULL, 0, ElevatedLoggingThreadProc, &loggingContext, 0, NULL);
+    ExitOnNullWithLastError(hLoggingThread, hr, "Failed to create elevated logging thread.");
+
+    LogRedirect(RedirectLoggingOverPipe, &loggingContext);
 
     // Create a top-level window to prevent shutting down the elevated process.
     hr = UiCreateMessageWindow(hInstance, pEngineState);
@@ -677,15 +702,34 @@ static HRESULT RunElevated(
     SrpInitialize(TRUE);
 
     // Pump messages from parent process.
-    hr = ElevationChildPumpMessages(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->cache, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart, &pEngineState->plan.fApplying);
-    LogRedirect(NULL, NULL); // reset logging so the next failure gets written to "log buffer" for the failure log.
+    hr = ElevationChildPumpMessages(pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->cache, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart, &pEngineState->plan.fApplying);
     ExitOnFailure(hr, "Failed to pump messages from parent process.");
 
+    WaitForElevatedLoggingThread(&loggingContext, hLoggingThread);
+
 LExit:
+    ReleaseHandle(hLoggingThread);
+
     LogRedirect(NULL, NULL); // we're done talking to the child so always reset logging now.
 
     // If the message window is still around, close it.
     UiCloseMessageWindow(pEngineState);
+
+    if (fDeleteLoggingCs)
+    {
+        ::DeleteCriticalSection(&loggingContext.csBuffer);
+    }
+
+    ReleaseHandle(loggingContext.hLogEvent);
+    ReleaseHandle(loggingContext.hFinishedEvent);
+
+    // If there was a log message left, try to log it locally.
+    if (loggingContext.sczBuffer)
+    {
+        LogStringWorkRaw(loggingContext.sczBuffer);
+
+        ReleaseStr(loggingContext.sczBuffer);
+    }
 
     if (hLock)
     {
@@ -883,54 +927,180 @@ static HRESULT DAPI RedirectLoggingOverPipe(
     __in_opt LPVOID pvContext
     )
 {
-    static BOOL s_fCurrentlyLoggingToPipe = FALSE;
-
     HRESULT hr = S_OK;
-    BURN_ENGINE_STATE* pEngineState = static_cast<BURN_ENGINE_STATE*>(pvContext);
-    BOOL fStartedLogging = FALSE;
-    HANDLE hPipe = INVALID_HANDLE_VALUE;
+    REDIRECTED_LOGGING_CONTEXT* pContext = static_cast<REDIRECTED_LOGGING_CONTEXT*>(pvContext);
+
+    ::EnterCriticalSection(&pContext->csBuffer);
+
+    hr = StrAnsiAllocConcat(&pContext->sczBuffer, szString, 0);
+
+    if (SUCCEEDED(hr) && !::SetEvent(pContext->hLogEvent))
+    {
+        HRESULT hrSet = HRESULT_FROM_WIN32(::GetLastError());
+        if (FAILED(hrSet))
+        {
+            TraceError(hrSet, "Failed to set log event.");
+        }
+    }
+
+    ::LeaveCriticalSection(&pContext->csBuffer);
+
+    return hr;
+}
+
+static HRESULT LogStringOverPipe(
+    __in_z LPCSTR szString,
+    __in HANDLE hPipe
+    )
+{
+    HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwResult = 0;
 
-    // Prevent this function from being called recursively.
-    if (s_fCurrentlyLoggingToPipe)
-    {
-        ExitFunction();
-    }
-
-    s_fCurrentlyLoggingToPipe = TRUE;
-    fStartedLogging = TRUE;
-
-    // Make sure the current thread set the pipe in TLS.
-    hPipe = ::TlsGetValue(pEngineState->dwElevatedLoggingTlsId);
-    if (!hPipe || INVALID_HANDLE_VALUE == hPipe)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_PIPE_NOT_CONNECTED);
-        ExitFunction();
-    }
-
-    // Do not log or use ExitOnFailure() macro here because they will be discarded
-    // by the recursive block at the top of this function.
     hr = BuffWriteStringAnsi(&pbData, &cbData, szString);
-    if (SUCCEEDED(hr))
-    {
-        hr = PipeSendMessage(hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_LOG), pbData, cbData, NULL, NULL, &dwResult);
-        if (SUCCEEDED(hr))
-        {
-            hr = (HRESULT)dwResult;
-        }
-    }
+    ExitOnFailure(hr, "Failed to prepare logging pipe message.");
+
+    hr = PipeSendMessage(hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_LOG), pbData, cbData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send logging message over the pipe.");
+
+    hr = (HRESULT)dwResult;
 
 LExit:
     ReleaseBuffer(pbData);
 
-    // We started logging so remember to say we are no longer logging.
-    if (fStartedLogging)
+    return hr;
+}
+
+static DWORD WINAPI ElevatedLoggingThreadProc(
+    __in LPVOID lpThreadParameter
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwLastError = ERROR_SUCCESS;
+    REDIRECTED_LOGGING_CONTEXT* pContext = static_cast<REDIRECTED_LOGGING_CONTEXT*>(lpThreadParameter);
+    DWORD dwSignaledIndex = 0;
+    LPSTR sczBuffer = NULL;
+    BURN_PIPE_RESULT result = { };
+    HANDLE rghEvents[2] =
     {
-        s_fCurrentlyLoggingToPipe = FALSE;
+        pContext->hLogEvent,
+        pContext->hFinishedEvent,
+    };
+
+    for (;;)
+    {
+        hr = AppWaitForMultipleObjects(countof(rghEvents), rghEvents, FALSE, INFINITE, &dwSignaledIndex);
+        if (FAILED(hr))
+        {
+            LogRedirect(NULL, NULL); // reset logging so the next failure gets written locally.
+            ExitOnFailure(hr, "Failed to wait for log thread events, signaled: %u.", dwSignaledIndex);
+        }
+
+        if (1 == dwSignaledIndex)
+        {
+            LogRedirect(NULL, NULL); // No more messages will be logged over the pipe.
+        }
+
+        dwLastError = ERROR_SUCCESS;
+
+        ::EnterCriticalSection(&pContext->csBuffer);
+
+        sczBuffer = pContext->sczBuffer;
+        pContext->sczBuffer = NULL;
+
+        if (0 == dwSignaledIndex && !::ResetEvent(rghEvents[0]))
+        {
+            dwLastError = ::GetLastError();
+        }
+
+        ::LeaveCriticalSection(&pContext->csBuffer);
+
+        if (ERROR_SUCCESS != dwLastError)
+        {
+            LogRedirect(NULL, NULL); // reset logging so the next failure gets written locally.
+            ExitOnWin32Error(dwLastError, hr, "Failed to reset log event.");
+        }
+
+        if (sczBuffer)
+        {
+            hr = LogStringOverPipe(sczBuffer, pContext->hPipe);
+            if (FAILED(hr))
+            {
+                LogRedirect(NULL, NULL); // reset logging so the next failure gets written locally.
+                ExitOnFailure(hr, "Failed to wait log message over pipe.");
+            }
+
+            ReleaseStr(sczBuffer);
+        }
+
+        if (1 == dwSignaledIndex)
+        {
+            break;
+        }
     }
 
+LExit:
+    LogRedirect(NULL, NULL); // No more messages will be logged over the pipe.
+
+    {
+        HRESULT hrTerminate = PipeTerminateLoggingPipe(pContext->hPipe, hr);
+        if (FAILED(hrTerminate))
+        {
+            TraceError(hrTerminate, "Failed to terminate logging pipe.");
+        }
+    }
+
+    // Log the message locally if it failed to go over the pipe.
+    if (sczBuffer)
+    {
+        LogStringWorkRaw(sczBuffer);
+
+        ReleaseStr(sczBuffer);
+    }
+
+    // Log any remaining message locally.
+    if (pContext->sczBuffer)
+    {
+        AssertSz(FAILED(hr), "Exiting logging thread on success even though there was a leftover message");
+        LogStringWorkRaw(pContext->sczBuffer);
+
+        ReleaseStr(pContext->sczBuffer);
+    }
+
+    return (DWORD)hr;
+}
+
+static HRESULT WaitForElevatedLoggingThread(
+    __in REDIRECTED_LOGGING_CONTEXT* pContext,
+    __in HANDLE hLoggingThread
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!::SetEvent(pContext->hFinishedEvent))
+    {
+        ExitWithLastError(hr, "Failed to set log finished event.");
+    }
+
+    hr = AppWaitForSingleObject(hLoggingThread, 5 * 60 * 1000); // TODO: is 5 minutes good?
+    ExitOnFailure(hr, "Failed to wait for elevated logging thread.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT WaitForUnelevatedLoggingThread(
+    __in HANDLE hUnelevatedLoggingThread
+    )
+{
+    HRESULT hr = S_OK;
+
+    // Give the thread 15 seconds to exit.
+    hr = AppWaitForSingleObject(hUnelevatedLoggingThread, 15 * 1000);
+    ExitOnFailure(hr, "Failed to wait for unelevated logging thread.");
+
+LExit:
     return hr;
 }
 

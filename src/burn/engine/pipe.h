@@ -15,6 +15,7 @@ typedef struct _BURN_PIPE_CONNECTION
     HANDLE hProcess;
     HANDLE hPipe;
     HANDLE hCachePipe;
+    HANDLE hLoggingPipe;
 } BURN_PIPE_CONNECTION;
 
 typedef enum _BURN_PIPE_MESSAGE_TYPE : DWORD
@@ -77,11 +78,14 @@ HRESULT PipeCreateNameAndSecret(
     );
 HRESULT PipeCreatePipes(
     __in BURN_PIPE_CONNECTION* pConnection,
-    __in BOOL fCreateCachePipe,
-    __out HANDLE* phEvent
+    __in BOOL fCompanion
     );
 HRESULT PipeWaitForChildConnect(
     __in BURN_PIPE_CONNECTION* pConnection
+    );
+HRESULT PipeTerminateLoggingPipe(
+    __in HANDLE hLoggingPipe,
+    __in DWORD dwParentExitCode
     );
 HRESULT PipeTerminateChildProcess(
     __in BURN_PIPE_CONNECTION* pConnection,
@@ -92,7 +96,7 @@ HRESULT PipeTerminateChildProcess(
 // Child functions.
 HRESULT PipeChildConnect(
     __in BURN_PIPE_CONNECTION* pConnection,
-    __in BOOL fConnectCachePipe
+    __in BOOL fCompanion
     );
 
 #ifdef __cplusplus
