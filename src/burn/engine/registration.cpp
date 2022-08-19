@@ -1613,12 +1613,14 @@ LExit:
 static BOOL IsWuRebootPending()
 {
     HRESULT hr = S_OK;
+    BOOL fUninitializeCom = FALSE;
     BOOL fRebootPending = FALSE;
 
     // Do a best effort to ask WU if a reboot is required. If anything goes
     // wrong then let's pretend a reboot is not required.
     hr = ::CoInitialize(NULL);
-    if (SUCCEEDED(hr) || RPC_E_CHANGED_MODE == hr)
+    fUninitializeCom = SUCCEEDED(hr);
+    if (fUninitializeCom || RPC_E_CHANGED_MODE == hr)
     {
         hr = WuaRestartRequired(&fRebootPending);
         if (FAILED(hr))
@@ -1626,7 +1628,10 @@ static BOOL IsWuRebootPending()
             fRebootPending = FALSE;
         }
 
-        ::CoUninitialize();
+        if (fUninitializeCom)
+        {
+            ::CoUninitialize();
+        }
     }
 
     return fRebootPending;
