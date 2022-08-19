@@ -91,7 +91,6 @@ typedef struct _BURN_ELEVATION_LAUNCH_APPROVED_EXE_MESSAGE_CONTEXT
 
 typedef struct _BURN_ELEVATION_CHILD_MESSAGE_CONTEXT
 {
-    DWORD dwLoggingTlsId;
     HANDLE hPipe;
     HANDLE* phLock;
     BOOL* pfDisabledAutomaticUpdates;
@@ -397,10 +396,10 @@ extern "C" HRESULT ElevationElevate(
     Assert(!pEngineState->companionConnection.dwProcessId);
     Assert(INVALID_HANDLE_VALUE == pEngineState->companionConnection.hPipe);
     Assert(INVALID_HANDLE_VALUE == pEngineState->companionConnection.hCachePipe);
+    Assert(INVALID_HANDLE_VALUE == pEngineState->companionConnection.hLoggingPipe);
 
     HRESULT hr = S_OK;
     int nResult = IDOK;
-    HANDLE hPipesCreatedEvent = INVALID_HANDLE_VALUE;
 
     hr = UserExperienceOnElevateBegin(&pEngineState->userExperience);
     ExitOnRootFailure(hr, "BA aborted elevation requirement.");
@@ -408,7 +407,7 @@ extern "C" HRESULT ElevationElevate(
     hr = PipeCreateNameAndSecret(&pEngineState->companionConnection.sczName, &pEngineState->companionConnection.sczSecret);
     ExitOnFailure(hr, "Failed to create pipe name and client token.");
 
-    hr = PipeCreatePipes(&pEngineState->companionConnection, TRUE, &hPipesCreatedEvent);
+    hr = PipeCreatePipes(&pEngineState->companionConnection, TRUE);
     ExitOnFailure(hr, "Failed to create pipe and cache pipe.");
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_ELEVATED_ENGINE_STARTING);
@@ -442,8 +441,6 @@ extern "C" HRESULT ElevationElevate(
     ExitOnFailure(hr, "Failed to elevate.");
 
 LExit:
-    ReleaseHandle(hPipesCreatedEvent);
-
     if (FAILED(hr))
     {
         PipeConnectionUninitialize(&pEngineState->companionConnection);
@@ -1532,7 +1529,6 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT ElevationChildPumpMessages(
-    __in DWORD dwLoggingTlsId,
     __in HANDLE hPipe,
     __in HANDLE hCachePipe,
     __in BURN_APPROVED_EXES* pApprovedExes,
@@ -1556,7 +1552,6 @@ extern "C" HRESULT ElevationChildPumpMessages(
     BURN_PIPE_RESULT result = { };
     BOOL fDisabledAutomaticUpdates = FALSE;
 
-    cacheContext.dwLoggingTlsId = dwLoggingTlsId;
     cacheContext.hPipe = hCachePipe;
     cacheContext.pCache = pCache;
     cacheContext.pContainers = pContainers;
@@ -1566,7 +1561,6 @@ extern "C" HRESULT ElevationChildPumpMessages(
     cacheContext.pRegistration = pRegistration;
     cacheContext.pUserExperience = pUserExperience;
 
-    context.dwLoggingTlsId = dwLoggingTlsId;
     context.hPipe = hPipe;
     context.phLock = phLock;
     context.pfDisabledAutomaticUpdates = &fDisabledAutomaticUpdates;
@@ -1659,11 +1653,6 @@ static DWORD WINAPI ElevatedChildCacheThreadProc(
     BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext = reinterpret_cast<BURN_ELEVATION_CHILD_MESSAGE_CONTEXT*>(lpThreadParameter);
     BOOL fComInitialized = FALSE;
     BURN_PIPE_RESULT result = { };
-
-    if (!::TlsSetValue(pContext->dwLoggingTlsId, pContext->hPipe))
-    {
-        ExitWithLastError(hr, "Failed to set elevated cache pipe into thread local storage for logging.");
-    }
 
     // initialize COM
     hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);

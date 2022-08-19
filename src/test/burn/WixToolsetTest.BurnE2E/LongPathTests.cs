@@ -284,6 +284,11 @@ namespace WixToolsetTest.BurnE2E
                     {
                         WixAssert.Skip($"MAX_PATH is being enforced ({baseFolder})");
                     }
+                    else if (lastError == 3)
+                    {
+                        // TODO: figure out why Windows Sandbox returns this error instead of 206 like all other environments.
+                        WixAssert.Skip($"The system cannot find the path specified ({baseFolder})");
+                    }
                     throw new Win32Exception(lastError);
                 }
             }

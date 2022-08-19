@@ -8,6 +8,7 @@ static const DWORD PIPE_RETRY_FOR_CONNECTION = 1800; // for up to 3 minutes.
 
 static const LPCWSTR PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls";
 static const LPCWSTR CACHE_PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls.Cache";
+static const LPCWSTR LOGGING_PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls.Log";
 
 static HRESULT AllocatePipeMessage(
     __in DWORD dwMessage,
@@ -48,6 +49,7 @@ void PipeConnectionInitialize(
     memset(pConnection, 0, sizeof(BURN_PIPE_CONNECTION));
     pConnection->hPipe = INVALID_HANDLE_VALUE;
     pConnection->hCachePipe = INVALID_HANDLE_VALUE;
+    pConnection->hLoggingPipe = INVALID_HANDLE_VALUE;
 }
 
 /*******************************************************************
@@ -58,15 +60,14 @@ void PipeConnectionUninitialize(
     __in BURN_PIPE_CONNECTION* pConnection
     )
 {
+    ReleaseFileHandle(pConnection->hLoggingPipe);
     ReleaseFileHandle(pConnection->hCachePipe);
     ReleaseFileHandle(pConnection->hPipe);
     ReleaseHandle(pConnection->hProcess);
     ReleaseStr(pConnection->sczSecret);
     ReleaseStr(pConnection->sczName);
 
-    memset(pConnection, 0, sizeof(BURN_PIPE_CONNECTION));
-    pConnection->hPipe = INVALID_HANDLE_VALUE;
-    pConnection->hCachePipe = INVALID_HANDLE_VALUE;
+    PipeConnectionInitialize(pConnection);
 }
 
 /*******************************************************************
@@ -235,13 +236,13 @@ LExit:
 *******************************************************************/
 extern "C" HRESULT PipeCreatePipes(
     __in BURN_PIPE_CONNECTION* pConnection,
-    __in BOOL fCreateCachePipe,
-    __out HANDLE* phEvent
+    __in BOOL fCompanion
     )
 {
     Assert(pConnection->sczName);
     Assert(INVALID_HANDLE_VALUE == pConnection->hPipe);
     Assert(INVALID_HANDLE_VALUE == pConnection->hCachePipe);
+    Assert(INVALID_HANDLE_VALUE == pConnection->hLoggingPipe);
 
     HRESULT hr = S_OK;
     PSECURITY_DESCRIPTOR psd = NULL;
@@ -249,10 +250,10 @@ extern "C" HRESULT PipeCreatePipes(
     LPWSTR sczFullPipeName = NULL;
     HANDLE hPipe = INVALID_HANDLE_VALUE;
     HANDLE hCachePipe = INVALID_HANDLE_VALUE;
+    HANDLE hLoggingPipe = INVALID_HANDLE_VALUE;
 
-    // Only the grant special rights when the pipe is being used for "embedded"
-    // scenarios (aka: there is no cache pipe).
-    if (!fCreateCachePipe)
+    // Only grant special rights when the pipe is being used for "embedded" scenarios.
+    if (!fCompanion)
     {
         // Create the security descriptor that grants read/write/sync access to Everyone.
         // TODO: consider locking down "WD" to LogonIds (logon session)
@@ -278,7 +279,7 @@ extern "C" HRESULT PipeCreatePipes(
         ExitWithLastError(hr, "Failed to create pipe: %ls", sczFullPipeName);
     }
 
-    if (fCreateCachePipe)
+    if (fCompanion)
     {
         // Create the cache pipe.
         hr = StrAllocFormatted(&sczFullPipeName, CACHE_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
@@ -287,9 +288,22 @@ extern "C" HRESULT PipeCreatePipes(
         hCachePipe = ::CreateNamedPipeW(sczFullPipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, PIPE_64KB, PIPE_64KB, 1, NULL);
         if (INVALID_HANDLE_VALUE == hCachePipe)
         {
-            ExitWithLastError(hr, "Failed to create pipe: %ls", sczFullPipeName);
+            ExitWithLastError(hr, "Failed to create cache pipe: %ls", sczFullPipeName);
+        }
+
+        // Create the logging pipe.
+        hr = StrAllocFormatted(&sczFullPipeName, LOGGING_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
+        ExitOnFailure(hr, "Failed to allocate full name of logging pipe: %ls", pConnection->sczName);
+
+        hLoggingPipe = ::CreateNamedPipeW(sczFullPipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, PIPE_64KB, PIPE_64KB, 1, NULL);
+        if (INVALID_HANDLE_VALUE == hLoggingPipe)
+        {
+            ExitWithLastError(hr, "Failed to create logging pipe: %ls", sczFullPipeName);
         }
     }
+
+    pConnection->hLoggingPipe = hLoggingPipe;
+    hLoggingPipe = INVALID_HANDLE_VALUE;
 
     pConnection->hCachePipe = hCachePipe;
     hCachePipe = INVALID_HANDLE_VALUE;
@@ -297,10 +311,8 @@ extern "C" HRESULT PipeCreatePipes(
     pConnection->hPipe = hPipe;
     hPipe = INVALID_HANDLE_VALUE;
 
-    // TODO: remove the following
-    *phEvent = NULL;
-
 LExit:
+    ReleaseFileHandle(hLoggingPipe);
     ReleaseFileHandle(hCachePipe);
     ReleaseFileHandle(hPipe);
     ReleaseStr(sczFullPipeName);
@@ -322,7 +334,7 @@ extern "C" HRESULT PipeWaitForChildConnect(
     )
 {
     HRESULT hr = S_OK;
-    HANDLE hPipes[2] = { pConnection->hPipe, pConnection->hCachePipe};
+    HANDLE hPipes[3] = { pConnection->hPipe, pConnection->hCachePipe, pConnection->hLoggingPipe};
     LPCWSTR wzSecret = pConnection->sczSecret;
     DWORD cbSecret = lstrlenW(wzSecret) * sizeof(WCHAR);
     DWORD dwCurrentProcessId = ::GetCurrentProcessId();
@@ -410,6 +422,32 @@ LExit:
 }
 
 /*******************************************************************
+ PipeTerminateLoggingPipe - 
+
+*******************************************************************/
+extern "C" HRESULT PipeTerminateLoggingPipe(
+    __in HANDLE hLoggingPipe,
+    __in DWORD dwParentExitCode
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+
+    // Prepare the exit message.
+    hr = BuffWriteNumber(&pbData, &cbData, dwParentExitCode);
+    ExitOnFailure(hr, "Failed to write exit code to message buffer.");
+
+    hr = WritePipeMessage(hLoggingPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_COMPLETE), pbData, cbData);
+    ExitOnFailure(hr, "Failed to post complete message to logging pipe.");
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return hr;
+}
+
+/*******************************************************************
  PipeTerminateChildProcess - 
 
 *******************************************************************/
@@ -468,6 +506,8 @@ extern "C" HRESULT PipeTerminateChildProcess(
 #endif
 
 LExit:
+    ReleaseBuffer(pbData);
+
     return hr;
 }
 
@@ -478,7 +518,7 @@ LExit:
 *******************************************************************/
 extern "C" HRESULT PipeChildConnect(
     __in BURN_PIPE_CONNECTION* pConnection,
-    __in BOOL fConnectCachePipe
+    __in BOOL fCompanion
     )
 {
     Assert(pConnection->sczName);
@@ -486,6 +526,7 @@ extern "C" HRESULT PipeChildConnect(
     Assert(!pConnection->hProcess);
     Assert(INVALID_HANDLE_VALUE == pConnection->hPipe);
     Assert(INVALID_HANDLE_VALUE == pConnection->hCachePipe);
+    Assert(INVALID_HANDLE_VALUE == pConnection->hLoggingPipe);
 
     HRESULT hr = S_OK;
     LPWSTR sczPipeName = NULL;
@@ -519,7 +560,7 @@ extern "C" HRESULT PipeChildConnect(
     hr = ChildPipeConnected(pConnection->hPipe, pConnection->sczSecret, &pConnection->dwProcessId);
     ExitOnFailure(hr, "Failed to verify parent pipe: %ls", sczPipeName);
 
-    if (fConnectCachePipe)
+    if (fCompanion)
     {
         // Connect to the parent for the cache pipe.
         hr = StrAllocFormatted(&sczPipeName, CACHE_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
@@ -528,12 +569,26 @@ extern "C" HRESULT PipeChildConnect(
         pConnection->hCachePipe = ::CreateFileW(sczPipeName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
         if (INVALID_HANDLE_VALUE == pConnection->hCachePipe)
         {
-            ExitWithLastError(hr, "Failed to open parent pipe: %ls", sczPipeName)
+            ExitWithLastError(hr, "Failed to open parent cache pipe: %ls", sczPipeName)
         }
 
         // Verify the parent and notify it that the child connected.
         hr = ChildPipeConnected(pConnection->hCachePipe, pConnection->sczSecret, &pConnection->dwProcessId);
-        ExitOnFailure(hr, "Failed to verify parent pipe: %ls", sczPipeName);
+        ExitOnFailure(hr, "Failed to verify parent cache pipe: %ls", sczPipeName);
+
+        // Connect to the parent for the logging pipe.
+        hr = StrAllocFormatted(&sczPipeName, LOGGING_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
+        ExitOnFailure(hr, "Failed to allocate name of parent logging pipe.");
+
+        pConnection->hLoggingPipe = ::CreateFileW(sczPipeName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+        if (INVALID_HANDLE_VALUE == pConnection->hLoggingPipe)
+        {
+            ExitWithLastError(hr, "Failed to open parent logging pipe: %ls", sczPipeName)
+        }
+
+        // Verify the parent and notify it that the child connected.
+        hr = ChildPipeConnected(pConnection->hLoggingPipe, pConnection->sczSecret, &pConnection->dwProcessId);
+        ExitOnFailure(hr, "Failed to verify parent logging pipe: %ls", sczPipeName);
     }
 
     pConnection->hProcess = ::OpenProcess(SYNCHRONIZE, FALSE, pConnection->dwProcessId);

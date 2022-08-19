@@ -69,6 +69,9 @@ static HRESULT DetectPackagePayloadsCached(
 static DWORD WINAPI CacheThreadProc(
     __in LPVOID lpThreadParameter
     );
+static DWORD WINAPI LoggingThreadProc(
+    __in LPVOID lpThreadParameter
+    );
 static void LogPackages(
     __in_opt const BURN_PACKAGE* pUpgradeBundlePackage,
     __in_opt const BURN_PACKAGE* pForwardCompatibleBundlePackage,
@@ -615,6 +618,9 @@ extern "C" HRESULT CoreElevate(
 
         hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_ELEVATED, TRUE, TRUE);
         ExitOnFailure(hr, "Failed to overwrite the %ls built-in variable.", BURN_BUNDLE_ELEVATED);
+
+        pEngineState->hUnelevatedLoggingThread = ::CreateThread(NULL, 0, LoggingThreadProc, pEngineState, 0, NULL);
+        ExitOnNullWithLastError(pEngineState->hUnelevatedLoggingThread, hr, "Failed to create unelevated logging thread.");
     }
 
 LExit:
@@ -2321,6 +2327,24 @@ LExit:
     {
         ::CoUninitialize();
     }
+
+    return (DWORD)hr;
+}
+
+static DWORD WINAPI LoggingThreadProc(
+    __in LPVOID lpThreadParameter
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_ENGINE_STATE* pEngineState = reinterpret_cast<BURN_ENGINE_STATE*>(lpThreadParameter);
+    BURN_PIPE_RESULT result = { };
+
+    hr = PipePumpMessages(pEngineState->companionConnection.hLoggingPipe, NULL, NULL, &result);
+    ExitOnFailure(hr, "Failed to pump logging messages for elevated process.");
+
+    hr = (HRESULT)result.dwResult;
+
+LExit:
 
     return (DWORD)hr;
 }

@@ -222,8 +222,12 @@ void DAPI LogRedirect(
     __in_opt LPVOID pvContext
     )
 {
+    ::EnterCriticalSection(&LogUtil_csLog);
+
     s_vpfLogStringWorkRaw = vpfLogStringWorkRaw;
     s_vpvLogStringWorkRawContext = pvContext;
+
+    ::LeaveCriticalSection(&LogUtil_csLog);
 }
 
 
