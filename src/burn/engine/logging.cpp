@@ -77,6 +77,9 @@ extern "C" HRESULT LoggingOpen(
     case BURN_MODE_UNTRUSTED:
         wzPostfix = L".cleanroom";
         break;
+    case BURN_MODE_ELEVATED:
+        wzPostfix = L".elevated";
+        break;
     case BURN_MODE_RUNONCE:
         wzPostfix = L".runonce";
         break;

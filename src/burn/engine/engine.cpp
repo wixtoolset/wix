@@ -106,6 +106,7 @@ extern "C" HRESULT EngineRun(
     LPWSTR sczExePath = NULL;
     BOOL fRunUntrusted = FALSE;
     BOOL fRunNormal = FALSE;
+    BOOL fRunElevated = FALSE;
     BOOL fRunRunOnce = FALSE;
     BOOL fRestart = FALSE;
 
@@ -220,6 +221,8 @@ extern "C" HRESULT EngineRun(
         break;
 
     case BURN_MODE_ELEVATED:
+        fRunElevated = TRUE;
+
         hr = RunElevated(hInstance, wzCommandLine, &engineState);
         ExitOnFailure(hr, "Failed to run per-machine mode.");
         break;
@@ -320,6 +323,11 @@ LExit:
     {
         LogId(REPORT_STANDARD, MSG_EXITING_RUN_ONCE, FAILED(hr) ? (int)hr : *pdwExitCode);
     }
+    else if (fRunElevated)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING_ELEVATED, FAILED(hr) ? (int)hr : *pdwExitCode);
+    }
+
 
     if (fLogInitialized)
     {
@@ -638,6 +646,10 @@ static HRESULT RunElevated(
 {
     HRESULT hr = S_OK;
     HANDLE hLock = NULL;
+
+    // Initialize logging.
+    hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
+    ExitOnFailure(hr, "Failed to open elevated log.");
 
     // connect to per-user process
     hr = PipeChildConnect(&pEngineState->companionConnection, TRUE);

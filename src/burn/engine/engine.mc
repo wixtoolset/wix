@@ -170,6 +170,13 @@ Language=English
 Failed to use folder as machine package cache: %2!ls!, encountered error: %1!ls!.
 .
 
+MessageId=21
+Severity=Success
+SymbolicName=MSG_EXITING_ELEVATED
+Language=English
+Exit code: 0x%1!x!
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
