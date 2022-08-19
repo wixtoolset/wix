@@ -178,7 +178,6 @@ HRESULT ElevationChildPumpMessages(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __out HANDLE* phLock,
-    __out BOOL* pfDisabledAutomaticUpdates,
     __out DWORD* pdwChildExitCode,
     __out BOOL* pfRestart,
     __out BOOL* pfApplying

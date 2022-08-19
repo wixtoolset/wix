@@ -638,7 +638,6 @@ static HRESULT RunElevated(
 {
     HRESULT hr = S_OK;
     HANDLE hLock = NULL;
-    BOOL fDisabledAutomaticUpdates = FALSE;
 
     // connect to per-user process
     hr = PipeChildConnect(&pEngineState->companionConnection, TRUE);
@@ -666,7 +665,7 @@ static HRESULT RunElevated(
     SrpInitialize(TRUE);
 
     // Pump messages from parent process.
-    hr = ElevationChildPumpMessages(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->cache, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &fDisabledAutomaticUpdates, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart, &pEngineState->plan.fApplying);
+    hr = ElevationChildPumpMessages(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->cache, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart, &pEngineState->plan.fApplying);
     LogRedirect(NULL, NULL); // reset logging so the next failure gets written to "log buffer" for the failure log.
     ExitOnFailure(hr, "Failed to pump messages from parent process.");
 
@@ -675,11 +674,6 @@ LExit:
 
     // If the message window is still around, close it.
     UiCloseMessageWindow(pEngineState);
-
-    if (fDisabledAutomaticUpdates)
-    {
-        ElevationChildResumeAutomaticUpdates();
-    }
 
     if (hLock)
     {
