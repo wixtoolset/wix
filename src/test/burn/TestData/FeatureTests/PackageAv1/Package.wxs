@@ -1,0 +1,64 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+
+<?ifndef Version?>
+<?define Version = 1.0.0.0?>
+<?endif?>
+
+<?ifndef ProductCode?>
+<?define ProductCode = *?>
+<?endif?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="~$(var.TestGroupName) - $(var.PackageName)" Language="1033" Version="$(var.Version)" Manufacturer="WixToolset" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" ProductCode="$(var.ProductCode)">
+    <MediaTemplate EmbedCab="yes" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <PropertyRef Id="TestVersion" />
+
+    <Feature Id="Complete" Level="1">
+      <ComponentRef Id="RegistryComponent"/>
+
+      <!-- Not installed by default. -->
+      <Feature Id="Test" Level="100">
+        <ComponentRef Id="FileComponent"/>
+        <ComponentRef Id="RegistryComponent2"/>
+      </Feature>
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="WixDir" Name="~Test WiX">
+        <Directory Id="TestDir" Name="$(var.TestGroupName)">
+          <Directory Id="INSTALLFOLDER" Name="$(var.PackageName)" />
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="FileComponent" Guid="{771E78AA-850D-4E08-AA6D-3F31E30ED140}" Directory="INSTALLFOLDER">
+      <File Source="$(sys.SOURCEFILEPATH)" />
+      <File Name="notkeypath.file" Source="$(sys.SOURCEFILEPATH)" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="RegistryComponent" Directory="INSTALLFOLDER">
+      <RegistryValue Root="HKLM" Key="Software\WiX\Tests\$(var.TestGroupName)" Name="$(var.PackageName)" Value="!(bind.Property.TestVersion)" Type="string" />
+      <Provides Key="WiX.$(var.TestGroupName).A,v1.0" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="RegistryComponent2" Directory="INSTALLFOLDER">
+      <RegistryValue Root="HKLM" Key="Software\WiX\Tests\$(var.TestGroupName)" Name="$(var.PackageName)2" Value="!(bind.Property.TestVersion)" Type="string" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Property Id="TestVersion" Value="$(var.Version)" />
+  </Fragment>
+</Wix>

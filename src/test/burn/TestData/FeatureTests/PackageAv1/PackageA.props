@@ -1,0 +1,7 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project>
+  <PropertyGroup>
+    <PackageName>PackageA</PackageName>
+    <UpgradeCode>{6E3370C1-12DE-4E1C-8AE6-C15113FCE22B}</UpgradeCode>
+  </PropertyGroup>
+</Project>
