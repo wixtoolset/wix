@@ -322,6 +322,21 @@ public: // IBootstrapperApplication
             // Best effort
         }
 
+        if (BOOTSTRAPPER_ACTION_INSTALL == m_command.action && BOOTSTRAPPER_RELATION_UPGRADE == relationType)
+        {
+            int nResult = 0;
+            HRESULT hr = VerCompareStringVersions(m_sczBundleVersion, wzVersion, TRUE/*fStrict*/, &nResult);
+            BalExitOnFailure(hr, "Failed to compare bundle version: %ls to related bundle version: %ls.", m_sczBundleVersion, wzVersion);
+
+            if (0 > nResult)
+            {
+                m_fDowngrading = TRUE;
+
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "Related bundle version: %ls is a downgrade for bundle version: %ls.", wzVersion, m_sczBundleVersion);
+            }
+        }
+
+    LExit:
         return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
     }
 
@@ -332,6 +347,15 @@ public: // IBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
+
+        if (m_fSuppressDowngradeFailure && m_fDowngrading)
+        {
+            SetState(WIXSTDBA_STATE_APPLIED, hrStatus);
+
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Bundle downgrade was attempted but downgrade failure has been suppressed.");
+
+            ExitFunction();
+        }
 
         // If we're not interacting with the user or we're doing a layout or we're resuming just after a force restart
         // then automatically start planning.
@@ -365,6 +389,7 @@ public: // IBootstrapperApplication
             }
         }
 
+    LExit:
         return hr;
     }
 
@@ -1184,21 +1209,6 @@ public: // IBootstrapperApplication
         *pfCancel |= CheckCanceled();
 
         ReleaseStr(sczPath);
-
-        return hr;
-    }
-
-    virtual STDMETHODIMP OnApplyDowngrade(
-        __in HRESULT /*hrRecommendation*/,
-        __in HRESULT* phrStatus
-        )
-    {
-        HRESULT hr = S_OK;
-
-        if (m_fSuppressDowngradeFailure)
-        {
-            *phrStatus = S_OK;
-        }
 
         return hr;
     }
@@ -3888,7 +3898,7 @@ private:
                 hr = ThemeShowPage(m_pTheme, dwNewPageId, SW_SHOW);
                 if (FAILED(hr))
                 {
-                    BalLogError(hr, "Failed to show page: %u", dwOldPageId);
+                    BalLogError(hr, "Failed to show page: %u", dwNewPageId);
                 }
 
                 // On the install page set the focus to the install button or the next enabled control if install is disabled.
@@ -4643,6 +4653,7 @@ public:
         m_sczLicenseFile = NULL;
         m_sczLicenseUrl = NULL;
         m_fSuppressDowngradeFailure = FALSE;
+        m_fDowngrading = FALSE;
         m_fSuppressRepair = FALSE;
         m_fSupportCacheOnly = FALSE;
         m_fRequestedCacheOnly = FALSE;
@@ -4949,6 +4960,7 @@ private:
     LPWSTR m_sczLicenseFile;
     LPWSTR m_sczLicenseUrl;
     BOOL m_fSuppressDowngradeFailure;
+    BOOL m_fDowngrading;
     BOOL m_fSuppressRepair;
     BOOL m_fSupportCacheOnly;
     BOOL m_fRequestedCacheOnly;
