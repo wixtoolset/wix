@@ -320,6 +320,8 @@ namespace WixToolset.Test.BA
             {
                 args.State = state;
             }
+
+            this.Log("OnPlanMsiFeature() - id: {0}, defaultState: {1}, requestedState: {2}", args.PackageId, args.RecommendedState, args.State);
         }
 
         protected override void OnPlanComplete(PlanCompleteEventArgs args)

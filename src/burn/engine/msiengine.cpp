@@ -448,12 +448,15 @@ extern "C" HRESULT MsiEngineDetectPackage(
     VERUTIL_VERSION* pVersion = NULL;
     UINT uLcid = 0;
     BOOL fPerMachine = FALSE;
+    BOOL fDetectFeatures = FALSE;
 
     // detect self by product code
     // TODO: what to do about MSIINSTALLCONTEXT_USERMANAGED?
     hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
     if (SUCCEEDED(hr))
     {
+        fDetectFeatures = TRUE;
+
         hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pVersion);
         ExitOnFailure(hr, "Failed to parse installed version: '%ls' for ProductCode: %ls", sczInstalledVersion, pPackage->Msi.sczProductCode);
 
@@ -661,7 +664,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
             BURN_MSIFEATURE* pFeature = &pPackage->Msi.rgFeatures[i];
 
             // Try to detect features state if the product is present on the machine.
-            if (BOOTSTRAPPER_PACKAGE_STATE_PRESENT <= pPackage->currentState)
+            if (fDetectFeatures)
             {
                 hr = WiuQueryFeatureState(pPackage->Msi.sczProductCode, pFeature->sczId, &installState);
                 ExitOnFailure(hr, "Failed to query feature state.");
@@ -864,8 +867,9 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
 
     if (pPackage->Msi.cFeatures)
     {
-        // If the package is present and we're repairing it.
-        BOOL fRepairingPackage = (BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested);
+        // If the package is present and we're repairing it, or we're doing a minor update.
+        BOOL fRepairingPackage = (BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested) ||
+                                 BOOTSTRAPPER_RELATED_OPERATION_MINOR_UPDATE == pPackage->Msi.operation;
 
         // plan features
         for (DWORD i = 0; i < pPackage->Msi.cFeatures; ++i)
@@ -1282,10 +1286,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     hr = ConcatPatchProperty(pCache, pPackage, fRollback, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
 
-    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, !pPackage->Msi.cFeatures, &sczProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, 0 != pPackage->Msi.cFeatures, &sczProperties);
     ExitOnFailure(hr, "Failed to add action property to argument string.");
 
-    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, !pPackage->Msi.cFeatures, &sczObfuscatedProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, 0 != pPackage->Msi.cFeatures, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), sczMsiPath, sczObfuscatedProperties ? sczObfuscatedProperties : L"");
