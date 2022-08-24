@@ -206,7 +206,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaSymbol.Cabinet), TrackedFileType.BuiltOutput, mediaSymbol.SourceLineNumbers);
+                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaSymbol.Cabinet), TrackedFileType.BuiltContentOutput, mediaSymbol.SourceLineNumbers);
                 this.trackedFiles.Add(trackDestination);
 
                 var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, trackDestination.Path, resolvedCabinet.BuildOption == CabinetBuildOption.BuildAndMove, mediaSymbol.SourceLineNumbers);
@@ -314,7 +314,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var trackSource = this.BackendHelper.TrackFile(spannedCabinetSourcePath, TrackedFileType.Intermediate, transfer.SourceLineNumbers);
                     this.trackedFiles.Add(trackSource);
 
-                    var trackTarget = this.BackendHelper.TrackFile(spannedCabinetTargetPath, TrackedFileType.BuiltOutput, transfer.SourceLineNumbers);
+                    var trackTarget = this.BackendHelper.TrackFile(spannedCabinetTargetPath, TrackedFileType.BuiltContentOutput, transfer.SourceLineNumbers);
                     this.trackedFiles.Add(trackTarget);
 
                     var newTransfer = this.BackendHelper.CreateFileTransfer(trackSource.Path, trackTarget.Path, transfer.Move, transfer.SourceLineNumbers);

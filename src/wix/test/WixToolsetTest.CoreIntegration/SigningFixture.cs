@@ -148,7 +148,7 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 result = WixRunner.Execute(new[]
-{
+                {
                     "burn",
                     "detach",
                     exePath,

@@ -25,10 +25,22 @@ namespace WixToolset.Extensibility.Data
         Intermediate,
 
         /// <summary>
-        /// Output created by the build process itself (like a .msi, .cab or .wixpdb).
+        /// Output created by the build process itself (like a .cab).
         /// These files can be recreated in the final output location by building again.
         /// </summary>
-        BuiltOutput,
+        BuiltContentOutput,
+
+        /// <summary>
+        /// Target output created by the build process itself (like a .msi, .msm, .wixlib, .exe).
+        /// These files can be recreated in the final output location by building again.
+        /// </summary>
+        BuiltTargetOutput,
+
+        /// <summary>
+        /// Output pdb created by the build process itself (like a .wixpdb).
+        /// These files can be recreated in the final output location by building again.
+        /// </summary>
+        BuiltPdbOutput,
 
         /// <summary>
         /// Output copied by the build process (like external files in an .msi).

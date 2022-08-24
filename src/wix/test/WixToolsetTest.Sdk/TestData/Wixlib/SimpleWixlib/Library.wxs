@@ -1,0 +1,15 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+      <StandardDirectory Id="ProgramFilesFolder">
+          <Directory Id="WixLibFolder" />
+      </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="WixLibFolder">
+       <Component Id="TextFile" Guid="2D93B748-4926-4185-BC84-9F1D6883AF20">
+         <File Source="Library.txt" />
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

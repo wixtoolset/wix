@@ -71,7 +71,8 @@
     <!-- Default OutputType to a known WiX Toolset type.  -->
     <OutputType Condition=" '$(OutputType)' == '' ">Package</OutputType>
 
-    <WixPdbType Condition=" '$(WixPdbType)' == '' ">full</WixPdbType>
+    <DebugType Condition=" '$(SuppressPdbOutput)' == 'true' ">none</DebugType>
+    <DebugType Condition=" '$(DebugType)' == '' ">full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -111,6 +112,13 @@
   <PropertyGroup>
     <!-- We don't target any frameworks, so clear what the Microsoft.Common.targets set -->
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+    Only Package, Module and Bundle output types create .wixpdbs, so reset the flag indicating symbols will be produced outside of those output types.
+    -->
+    <_DebugSymbolsProduced Condition=" '$(OutputType)' != 'Package' and '$(OutputType)' != 'Module' and '$(OutputType)' != 'Bundle' ">false</_DebugSymbolsProduced>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -625,7 +633,7 @@
         OutputFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)"
         OutputType="$(OutputType)"
         PdbFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"
-        PdbType="$(WixPdbType)"
+        PdbType="$(DebugType)"
 
         AdditionalOptions="$(CompilerAdditionalOptions) $(LinkerAdditionalOptions)"
         DefineConstants="$(DefineConstants);$(SolutionDefineConstants);$(ProjectDefineConstants);$(ProjectReferenceDefineConstants)"
@@ -887,7 +895,7 @@
 
     <!-- Include build output pdb(s).  Different than predefined itemgroup since AssignTargetPaths target may change -->
     <ItemGroup>
-      <DebugSymbolsProjectOutputGroupOutput Include="$(TargetPdbPath)" Condition=" '$(SuppressPdbOutput)' != 'true' "/>
+      <DebugSymbolsProjectOutputGroupOutput Include="$(TargetPdbPath)" Condition=" '$(DebugType)' != 'none' "/>
     </ItemGroup>
   </Target>
 
@@ -922,13 +930,18 @@
       <FullIntermediateOutputPath>$([MSBuild]::NormalizeDirectory($(IntermediateOutputPath)))</FullIntermediateOutputPath>
     </PropertyGroup>
 
-    <!-- Copy the bound output files. -->
+    <!-- Add the target output to the list to be copied. -->
+    <ItemGroup>
+      <_FullPathToCopy Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" />
+    </ItemGroup>
+
+    <!-- Add the bound content output files to the list to be copied. -->
     <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
-      <Output TaskParameter="Outputs" ItemName="_FullPathToCopy" />
+      <Output TaskParameter="BuiltContentOutputs" ItemName="_FullPathToCopy" />
+      <Output TaskParameter="CopiedOutputs" ItemName="_FullPathToCopy" />
     </ReadTracking>
 
     <ItemGroup>
-      <_FullPathToCopy Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" Condition=" '@(_FullPathToCopy)'=='' " />
       <_RelativePath Include="$([MSBuild]::MakeRelative($(FullIntermediateOutputPath), %(_FullPathToCopy.FullPath)))" />
     </ItemGroup>
 
@@ -950,10 +963,10 @@
 
     <Message Importance="High" Text="$(MSBuildProjectName) -&gt; $(TargetPath)" Condition="'$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)'!='true'" />
 
-    <!-- Copy the debug information file (.pdb), if any
+    <!-- Copy the debug information file (.wixpdb), if any -->
     <Copy
-        SourceFiles="@(_DebugSymbolsIntermediatePath)"
-        DestinationFiles="@(_DebugSymbolsOutputPath)"
+        SourceFiles="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"
+        DestinationFiles="$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"
         SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
         OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
         Retries="$(CopyRetryCount)"
@@ -964,7 +977,6 @@
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
 
     </Copy>
-    -->
   </Target>
 
   <Import Project="$(WixSigningTargetsPath)"  />
