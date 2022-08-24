@@ -7,4 +7,10 @@
   </PropertyGroup>
 
   <Import Project="..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <PlatformFolder Condition=" '$(Platform)' == 'AnyCPU' ">x86</PlatformFolder>
+    <PlatformFolder Condition=" '$(PlatformFolder)' == '' ">$(Platform)</PlatformFolder>
+    <PdbOutputDir>$(PdbsFolder)$(PlatformFolder)\</PdbOutputDir>
+  </PropertyGroup>
 </Project>
