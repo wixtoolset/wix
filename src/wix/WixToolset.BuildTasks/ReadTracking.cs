@@ -29,10 +29,28 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] All { get; private set; }
 
         /// <summary>
-        /// The tracked built outputs.
+        /// The union of tracked built outputs.
         /// </summary>
         [Output]
         public ITaskItem[] BuiltOutputs { get; private set; }
+
+        /// <summary>
+        /// The tracked content built outputs.
+        /// </summary>
+        [Output]
+        public ITaskItem[] BuiltContentOutputs { get; private set; }
+
+        /// <summary>
+        /// The tracked target built outputs.
+        /// </summary>
+        [Output]
+        public ITaskItem[] BuiltTargetOutputs { get; private set; }
+
+        /// <summary>
+        /// The tracked pdb built outputs.
+        /// </summary>
+        [Output]
+        public ITaskItem[] BuiltPdbOutputs { get; private set; }
 
         /// <summary>
         /// The tracked copied outputs.
@@ -47,7 +65,7 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] Inputs { get; private set; }
 
         /// <summary>
-        /// All tracked outputs.
+        /// The union of all tracked outputs.
         /// </summary>
         [Output]
         public ITaskItem[] Outputs { get; private set; }
@@ -81,10 +99,14 @@ namespace WixToolset.BuildTasks
             }
 
             this.All = all.ToArray();
-            this.BuiltOutputs = all.Where(t => FilterByTrackedType(t, "BuiltOutput")).ToArray();
+            this.BuiltContentOutputs = all.Where(t => FilterByTrackedType(t, "BuiltContentOutput")).ToArray();
+            this.BuiltTargetOutputs = all.Where(t => FilterByTrackedType(t, "BuiltTargetOutput")).ToArray();
+            this.BuiltPdbOutputs = all.Where(t => FilterByTrackedType(t, "BuiltPdbOutput")).ToArray();
             this.CopiedOutputs = all.Where(t => FilterByTrackedType(t, "CopiedOutput")).ToArray();
             this.Inputs = all.Where(t => FilterByTrackedType(t, "Input")).ToArray();
-            this.Outputs = all.Where(t => FilterByTrackedType(t, "BuiltOutput") || FilterByTrackedType(t, "CopiedOutput")).ToArray();
+
+            this.BuiltOutputs = this.BuiltContentOutputs.Concat(this.BuiltTargetOutputs).Concat(this.BuiltPdbOutputs).ToArray();
+            this.Outputs = this.BuiltOutputs.Concat(this.CopiedOutputs).ToArray();
 
             return true;
         }

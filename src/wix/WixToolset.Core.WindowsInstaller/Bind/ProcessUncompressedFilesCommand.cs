@@ -112,12 +112,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             var transfer = this.BackendHelper.CreateFileTransfer(facade.SourcePath, fileLayoutPath, false, facade.SourceLineNumber);
                             fileTransfers.Add(transfer);
 
-                            // Track the location where the cabinet will be placed. If the transfer is
-                            // redundant then then the file should not be cleaned. This is important
-                            // because if the source and destination of the transfer is the same, we
-                            // don't want to clean the file because we'd be deleting the original
-                            // (and that would be bad).
-                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.BuiltOutput, facade.SourceLineNumber);
+                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.CopiedOutput, facade.SourceLineNumber);
+
                             tracked.Clean = !transfer.Redundant;
 
                             trackedFiles.Add(tracked);

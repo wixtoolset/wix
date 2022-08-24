@@ -12,7 +12,7 @@ namespace WixToolset.Core.ExtensibilityServices
             this.Path = path;
             this.Type = type;
             this.SourceLineNumbers = sourceLineNumbers;
-            this.Clean = (type == TrackedFileType.Intermediate || type == TrackedFileType.BuiltOutput || type == TrackedFileType.CopiedOutput);
+            this.Clean = (type == TrackedFileType.Intermediate || type == TrackedFileType.BuiltContentOutput || type == TrackedFileType.BuiltTargetOutput || type == TrackedFileType.BuiltPdbOutput || type == TrackedFileType.CopiedOutput);
         }
 
         public bool Clean { get; set; }

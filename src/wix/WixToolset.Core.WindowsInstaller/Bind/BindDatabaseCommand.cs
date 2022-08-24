@@ -471,7 +471,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.GeneratingDatabase());
 
-                var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.BuiltOutput);
+                var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.BuiltTargetOutput);
                 trackedFiles.Add(trackMsi);
 
                 var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, data, trackMsi.Path, tableDefinitions, this.IntermediateFolder, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
@@ -601,7 +601,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                var trackPdb = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.BuiltOutput);
+                var trackPdb = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.BuiltPdbOutput);
                 trackedFiles.Add(trackPdb);
 
                 wixout = WixOutput.Create(trackPdb.Path);

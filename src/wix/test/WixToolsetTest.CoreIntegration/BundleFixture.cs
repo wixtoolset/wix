@@ -497,11 +497,13 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(exePath));
                 Assert.True(File.Exists(Path.Combine(Path.GetDirectoryName(exePath), "test.txt")));
 
-                var trackedLines = File.ReadAllLines(trackingFile).Select(s => s.Replace(baseFolder, null, StringComparison.OrdinalIgnoreCase).Replace(folder, null, StringComparison.OrdinalIgnoreCase)).ToArray();
+                var trackedLines = File.ReadAllLines(trackingFile).Select(s => s.Replace(baseFolder, null, StringComparison.OrdinalIgnoreCase).Replace(folder, null, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(s => s)
+                    .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "BuiltOutput\tbin\\test.exe",
-                    "BuiltOutput\tbin\\test.wixpdb",
+                    "BuiltPdbOutput\tbin\\test.wixpdb",
+                    "BuiltTargetOutput\tbin\\test.exe",
                     "CopiedOutput\tbin\\test.txt",
                     "Input\tSimpleBundle\\data\\fakeba.dll",
                     "Input\tSimpleBundle\\data\\MsiPackage\\test.txt"

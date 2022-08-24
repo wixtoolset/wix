@@ -108,7 +108,7 @@ namespace WixToolset.Core.Burn.Bundles
                         var transfer = this.BackendHelper.CreateFileTransfer(container.WorkingPath, outputPath, true, container.SourceLineNumbers);
                         fileTransfers.Add(transfer);
 
-                        trackedFiles.Add(this.BackendHelper.TrackFile(outputPath, TrackedFileType.BuiltOutput, container.SourceLineNumbers));
+                        trackedFiles.Add(this.BackendHelper.TrackFile(outputPath, TrackedFileType.BuiltContentOutput, container.SourceLineNumbers));
                     }
                     else // update the attached container index.
                     {
