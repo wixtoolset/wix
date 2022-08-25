@@ -55,6 +55,60 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWithCustomExitCodes()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ExePackage", "CustomExitCodes.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964' InstallSize='463360' Size='463360' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='condition' DetectCondition='detect' UninstallArguments='-uninstall' Uninstallable='yes'>" +
+                      "<ExitCode Code='0' Type='2' />" +
+                      "<ExitCode Code='3' Type='3' />" +
+                      "<ExitCode Code='4' Type='4' />" +
+                      "<ExitCode Code='3010' Type='2' />" +
+                      "<ExitCode Code='-2147021886' Type='2' />" +
+                      "<ExitCode Code='3011' Type='2' />" +
+                      "<ExitCode Code='-2147021885' Type='2' />" +
+                      "<ExitCode Code='1641' Type='2' />" +
+                      "<ExitCode Code='-2147023255' Type='2' />" +
+                      "<ExitCode Code='-2147483647' Type='2' />" +
+                      "<ExitCode Code='-2147483648' Type='2' />" +
+                      "<ExitCode Code='*' Type='1' />" +
+                      "<PayloadRef Id='burn.exe' />" +
+                    "</ExePackage>",
+                }, exePackages);
+            }
+        }
+
+        [Fact]
         public void WarningWhenInvalidArpEntryVersion()
         {
             var folder = TestData.Get(@"TestData");

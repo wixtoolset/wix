@@ -532,7 +532,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                         if (exitCode.Code.HasValue)
                         {
-                            writer.WriteAttributeString("Code", unchecked((uint)exitCode.Code).ToString(CultureInfo.InvariantCulture));
+                            writer.WriteAttributeString("Code", exitCode.Code.Value.ToString(CultureInfo.InvariantCulture));
                         }
                         else
                         {
