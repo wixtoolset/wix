@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage InstallArguments="-install"
+                        RepairArguments="-repair"
+                        UninstallArguments="-uninstall"
+                        DetectCondition="detect"
+                        SourceFile="burn.exe">
+                <ExitCode Value="0" Behavior="error" />
+                <ExitCode Value="3" Behavior="scheduleReboot" />
+                <ExitCode Value="4" Behavior="forceReboot" />
+                <ExitCode Value="3010" Behavior="error" />
+                <ExitCode Value="-2147021886" Behavior="error" />
+                <ExitCode Value="3011" Behavior="error" />
+                <ExitCode Value="-2147021885" Behavior="error" />
+                <ExitCode Value="1641" Behavior="error" />
+                <ExitCode Value="-2147023255" Behavior="error" />
+                <ExitCode Value="-2147483647" Behavior="error" />
+                <ExitCode Value="-2147483648" Behavior="error" />
+                <ExitCode Behavior="success" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

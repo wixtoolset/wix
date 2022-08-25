@@ -681,6 +681,33 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Get an integer attribute value and displays an error for an illegal integer value.
+        /// </summary>
+        /// <param name="messaging"></param>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <returns>The attribute's integer value or null if an error occurred during conversion.</returns>
+        public static int? GetAttributeRawIntegerValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            var value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.MustHaveNonWhitespaceCharacters);
+            int? integer = null;
+
+            if (0 < value.Length)
+            {
+                if (Int32.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var integerValue))
+                {
+                    integer = integerValue;
+                }
+                else
+                {
+                    messaging.Write(ErrorMessages.IllegalIntegerValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                }
+            }
+
+            return integer;
+        }
+
+        /// <summary>
         /// Gets a yes/no value and displays an error for an illegal yes/no value.
         /// </summary>
         /// <param name="messaging"></param>

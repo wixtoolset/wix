@@ -1609,7 +1609,7 @@ namespace WixToolset.Core
         private void ParseExitCodeElement(XElement node, string packageId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var value = CompilerConstants.IntegerNotSet;
+            int? value = null;
             var behavior = ExitCodeBehaviorType.NotSet;
 
             foreach (var attrib in node.Attributes())
@@ -1619,7 +1619,7 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "Value":
-                            value = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
+                            value = this.Core.GetAttributeRawIntegerValue(sourceLineNumbers, attrib);
                             break;
                         case "Behavior":
                             var behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);

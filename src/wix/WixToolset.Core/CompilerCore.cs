@@ -501,6 +501,17 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Get an integer attribute value and displays an error for an illegal integer value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <returns>The attribute's integer value or null if an error occurred during conversion.</returns>
+        public int? GetAttributeRawIntegerValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            return Common.GetAttributeRawIntegerValue(this.messaging, sourceLineNumbers, attribute);
+        }
+
+        /// <summary>
         /// Get a long integral attribute value and displays an error for an illegal long value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>

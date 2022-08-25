@@ -32,7 +32,7 @@ namespace WixToolset.Data.Symbols
     public enum ExitCodeBehaviorType
     {
         NotSet = -1,
-        Success,
+        Success = 1,
         Error,
         ScheduleReboot,
         ForceReboot,
