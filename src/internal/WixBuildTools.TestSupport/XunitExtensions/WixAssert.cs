@@ -58,7 +58,7 @@ namespace WixBuildTools.TestSupport
         {
             if (hrExpected != hr)
             {
-                throw new SpecificReturnCodeException(hr, String.Format(format, formatArgs));
+                throw new SpecificReturnCodeException(hrExpected, hr, String.Format(format, formatArgs));
             }
         }
 

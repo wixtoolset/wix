@@ -69,6 +69,7 @@ HRESULT ExeEngineParseCommandLineArgumentsFromXml(
 HRESULT ExeEngineHandleExitCode(
     __in BURN_EXE_EXIT_CODE* rgCustomExitCodes,
     __in DWORD cCustomExitCodes,
+    __in_z LPCWSTR wzId,
     __in DWORD dwExitCode,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );

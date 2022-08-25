@@ -495,7 +495,7 @@ extern "C" HRESULT PipeTerminateChildProcess(
         HRESULT hrDebug = S_OK;
 
         hrDebug = CoreWaitForProcCompletion(pConnection->hProcess, 0, &dwChildExitCode);
-        if (E_ACCESSDENIED != hrDebug) // if the other process is elevated and we are not, then we'll get ERROR_ACCESS_DENIED.
+        if (E_ACCESSDENIED != hrDebug && FAILED(hrDebug)) // if the other process is elevated and we are not, then we'll get ERROR_ACCESS_DENIED.
         {
             TraceError(hrDebug, "Failed to wait for child process completion.");
         }
