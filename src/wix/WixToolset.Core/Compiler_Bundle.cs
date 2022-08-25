@@ -1628,6 +1628,12 @@ namespace WixToolset.Core
                                 case "error":
                                     behavior = ExitCodeBehaviorType.Error;
                                     break;
+                                case "errorForceReboot":
+                                    behavior = ExitCodeBehaviorType.ErrorForceReboot;
+                                    break;
+                                case "errorScheduleReboot":
+                                    behavior = ExitCodeBehaviorType.ErrorScheduleReboot;
+                                    break;
                                 case "forceReboot":
                                     behavior = ExitCodeBehaviorType.ForceReboot;
                                     break;
@@ -1638,7 +1644,7 @@ namespace WixToolset.Core
                                     behavior = ExitCodeBehaviorType.Success;
                                     break;
                                 default:
-                                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot, errorScheduleReboot, errorForceReboot"));
                                     behavior = ExitCodeBehaviorType.Success; // set value to avoid ExpectedAttribute below.
                                     break;
                             }

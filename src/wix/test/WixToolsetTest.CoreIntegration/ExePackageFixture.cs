@@ -93,12 +93,20 @@ namespace WixToolsetTest.CoreIntegration
                       "<ExitCode Code='0' Type='2' />" +
                       "<ExitCode Code='3' Type='3' />" +
                       "<ExitCode Code='4' Type='4' />" +
+                      "<ExitCode Code='5' Type='5' />" +
+                      "<ExitCode Code='-2147024891' Type='5' />" +
+                      "<ExitCode Code='6' Type='6' />" +
+                      "<ExitCode Code='-2147024890' Type='6' />" +
                       "<ExitCode Code='3010' Type='2' />" +
                       "<ExitCode Code='-2147021886' Type='2' />" +
                       "<ExitCode Code='3011' Type='2' />" +
                       "<ExitCode Code='-2147021885' Type='2' />" +
                       "<ExitCode Code='1641' Type='2' />" +
                       "<ExitCode Code='-2147023255' Type='2' />" +
+                      "<ExitCode Code='3017' Type='2' />" +
+                      "<ExitCode Code='-2147021879' Type='2' />" +
+                      "<ExitCode Code='3018' Type='2' />" +
+                      "<ExitCode Code='-2147021878' Type='2' />" +
                       "<ExitCode Code='-2147483647' Type='2' />" +
                       "<ExitCode Code='-2147483648' Type='2' />" +
                       "<ExitCode Code='*' Type='1' />" +

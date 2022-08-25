@@ -2684,11 +2684,11 @@ private:
 
         if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == pThis->m_restartResult)
         {
-            dwQuit = ERROR_SUCCESS_REBOOT_INITIATED;
+            dwQuit = SUCCEEDED(hr) ? ERROR_SUCCESS_REBOOT_INITIATED : ERROR_FAIL_REBOOT_INITIATED;
         }
         else if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == pThis->m_restartResult)
         {
-            dwQuit = ERROR_SUCCESS_REBOOT_REQUIRED;
+            dwQuit = SUCCEEDED(hr) ? ERROR_SUCCESS_REBOOT_REQUIRED : ERROR_FAIL_REBOOT_REQUIRED;
         }
         else if (SEVERITY_ERROR == HRESULT_SEVERITY(hr) && FACILITY_WIN32 == HRESULT_FACILITY(hr))
         {

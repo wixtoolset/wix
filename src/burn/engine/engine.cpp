@@ -294,7 +294,7 @@ LExit:
         LogId(REPORT_STANDARD, MSG_RESTART_ABORTED, LoggingRelationTypeToString(engineState.command.relationType));
 
         fRestart = FALSE;
-        hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
+        hr = SUCCEEDED(hr) ? HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED) : HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_REQUIRED);
     }
 
     UninitializeEngineState(&engineState);

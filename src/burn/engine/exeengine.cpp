@@ -992,6 +992,16 @@ extern "C" HRESULT ExeEngineHandleExitCode(
         {
             typeCode = BURN_EXE_EXIT_CODE_TYPE_FORCE_REBOOT;
         }
+        else if (ERROR_FAIL_REBOOT_REQUIRED == dwExitCode ||
+                 HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_REQUIRED) == static_cast<HRESULT>(dwExitCode))
+        {
+            typeCode = BURN_EXE_EXIT_CODE_TYPE_ERROR_SCHEDULE_REBOOT;
+        }
+        else if (ERROR_FAIL_REBOOT_INITIATED == dwExitCode ||
+                 HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_INITIATED) == static_cast<HRESULT>(dwExitCode))
+        {
+            typeCode = BURN_EXE_EXIT_CODE_TYPE_ERROR_FORCE_REBOOT;
+        }
         else
         {
             typeCode = BURN_EXE_EXIT_CODE_TYPE_ERROR;
@@ -1022,6 +1032,24 @@ extern "C" HRESULT ExeEngineHandleExitCode(
     case BURN_EXE_EXIT_CODE_TYPE_FORCE_REBOOT:
         *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
         hr = S_OK;
+        break;
+
+    case BURN_EXE_EXIT_CODE_TYPE_ERROR_SCHEDULE_REBOOT:
+        *pRestart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
+        hr = HRESULT_FROM_WIN32(dwExitCode);
+        if (SUCCEEDED(hr))
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_REQUIRED);
+        }
+        break;
+
+    case BURN_EXE_EXIT_CODE_TYPE_ERROR_FORCE_REBOOT:
+        *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
+        hr = HRESULT_FROM_WIN32(dwExitCode);
+        if (SUCCEEDED(hr))
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_INITIATED);
+        }
         break;
 
     default:

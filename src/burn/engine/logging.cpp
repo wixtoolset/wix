@@ -545,6 +545,10 @@ extern "C" LPCSTR LoggingExitCodeTypeToString(
         return "ScheduleReboot";
     case BURN_EXE_EXIT_CODE_TYPE_FORCE_REBOOT:
         return "ForceReboot";
+    case BURN_EXE_EXIT_CODE_TYPE_ERROR_SCHEDULE_REBOOT:
+        return "ErrorScheduleReboot";
+    case BURN_EXE_EXIT_CODE_TYPE_ERROR_FORCE_REBOOT:
+        return "ErrorForceReboot";
     default:
         return "Invalid";
     }

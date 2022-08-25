@@ -36,6 +36,8 @@ namespace WixToolset.Data.Symbols
         Error,
         ScheduleReboot,
         ForceReboot,
+        ErrorScheduleReboot,
+        ErrorForceReboot,
     }
 
     public class WixBundlePackageExitCodeSymbol : IntermediateSymbol
