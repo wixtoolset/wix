@@ -1034,6 +1034,14 @@ static DWORD CheckForRestartErrorCode(
         *pRestart = WIU_RESTART_INITIATED;
         dwErrorCode = ERROR_SUCCESS;
         break;
+
+    case ERROR_FAIL_REBOOT_REQUIRED:
+        *pRestart = WIU_RESTART_REQUIRED;
+        break;
+
+    case ERROR_FAIL_REBOOT_INITIATED:
+        *pRestart = WIU_RESTART_INITIATED;
+        break;
     }
 
     return dwErrorCode;
