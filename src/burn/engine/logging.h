@@ -112,6 +112,10 @@ LPCSTR LoggingTrueFalseToString(
     __in BOOL f
     );
 
+LPCSTR LoggingExitCodeTypeToString(
+    __in BURN_EXE_EXIT_CODE_TYPE exitCodeType
+    );
+
 LPCSTR LoggingPackageStateToString(
     __in BOOTSTRAPPER_PACKAGE_STATE packageState
     );

@@ -531,6 +531,25 @@ extern "C" LPCSTR LoggingTrueFalseToString(
     return "false";
 }
 
+extern "C" LPCSTR LoggingExitCodeTypeToString(
+    __in BURN_EXE_EXIT_CODE_TYPE exitCodeType
+    )
+{
+    switch (exitCodeType)
+    {
+    case BURN_EXE_EXIT_CODE_TYPE_SUCCESS:
+        return "Success";
+    case BURN_EXE_EXIT_CODE_TYPE_ERROR:
+        return "Error";
+    case BURN_EXE_EXIT_CODE_TYPE_SCHEDULE_REBOOT:
+        return "ScheduleReboot";
+    case BURN_EXE_EXIT_CODE_TYPE_FORCE_REBOOT:
+        return "ForceReboot";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingPackageStateToString(
     __in BOOTSTRAPPER_PACKAGE_STATE packageState
     )

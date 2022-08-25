@@ -982,6 +982,13 @@ Language=English
 Skipping rollback of package: %1!ls! due to abandoning its process. Continuing...
 .
 
+MessageId=366
+Severity=Success
+SymbolicName=MSG_EXECUTE_PACKAGE_PROCESS_EXITED
+Language=English
+The process for package: %1!ls! exited with code: %2!u!. The exit code has been translated to type: %3!hs! and restart: %4!hs!.
+.
+
 MessageId=370
 Severity=Success
 SymbolicName=MSG_SESSION_BEGIN

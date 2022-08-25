@@ -7,11 +7,12 @@ namespace WixBuildTools.TestSupport
 
     public class SpecificReturnCodeException : XunitException
     {
-        public SpecificReturnCodeException(int hr, string userMessage)
+        public SpecificReturnCodeException(int hrExpected, int hr, string userMessage)
             : base(String.Format("WixAssert.SpecificReturnCode() Failure\r\n" +
-                                 "HRESULT:  0x{0:X8}\r\n" +
-                                 "Message:  {1}",
-                                 hr, userMessage))
+                                 "Expected HRESULT:  0x{0:X8}\r\n" +
+                                 "Actual   HRESULT:  0x{1:X8}\r\n" +
+                                 "Message:  {2}",
+                                 hrExpected, hr, userMessage))
         {
             this.HResult = hr;
         }

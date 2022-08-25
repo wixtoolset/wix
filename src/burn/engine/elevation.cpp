@@ -53,6 +53,7 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_NETFX_FILES_IN_USE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID,
     BURN_ELEVATION_MESSAGE_TYPE_PROGRESS_ROUTINE,
+    BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE,
 } BURN_ELEVATION_MESSAGE_TYPE;
 
 
@@ -76,12 +77,14 @@ typedef struct _BURN_ELEVATION_GENERIC_MESSAGE_CONTEXT
 {
     PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler;
     LPVOID pvContext;
+    BOOTSTRAPPER_APPLY_RESTART restart;
 } BURN_ELEVATION_GENERIC_MESSAGE_CONTEXT;
 
 typedef struct _BURN_ELEVATION_MSI_MESSAGE_CONTEXT
 {
     PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler;
     LPVOID pvContext;
+    BOOTSTRAPPER_APPLY_RESTART restart;
 } BURN_ELEVATION_MSI_MESSAGE_CONTEXT;
 
 typedef struct _BURN_ELEVATION_LAUNCH_APPROVED_EXE_MESSAGE_CONTEXT
@@ -166,9 +169,11 @@ static HRESULT ProcessElevatedChildCacheMessage(
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
-static HRESULT ProcessResult(
-    __in DWORD dwResult,
-    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+static HRESULT ProcessExecuteActionCompleteMessage(
+    __in BYTE* pbData,
+    __in DWORD cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart,
+    __out DWORD* pdwResult
     );
 static HRESULT OnApplyInitialize(
     __in HANDLE hPipe,
@@ -246,7 +251,8 @@ static HRESULT OnExecuteRelatedBundle(
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnExecuteBundlePackage(
     __in HANDLE hPipe,
@@ -254,7 +260,8 @@ static HRESULT OnExecuteBundlePackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnExecuteExePackage(
     __in HANDLE hPipe,
@@ -262,7 +269,8 @@ static HRESULT OnExecuteExePackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnExecuteMsiPackage(
     __in HANDLE hPipe,
@@ -270,7 +278,8 @@ static HRESULT OnExecuteMsiPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnExecuteMspPackage(
     __in HANDLE hPipe,
@@ -278,7 +287,8 @@ static HRESULT OnExecuteMspPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnExecuteMsuPackage(
     __in HANDLE hPipe,
@@ -286,7 +296,8 @@ static HRESULT OnExecuteMsuPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnUninstallMsiCompatiblePackage(
     __in HANDLE hPipe,
@@ -294,7 +305,8 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnExecutePackageProviderAction(
     __in BURN_PACKAGES* pPackages,
@@ -379,6 +391,10 @@ static HRESULT ElevatedOnSystemRestorePointBegin(
 static HRESULT ElevatedOnSystemRestorePointComplete(
     __in HANDLE hPipe,
     __in HRESULT hrStatus
+    );
+static HRESULT ElevatedOnExecuteActionComplete(
+    __in HANDLE hPipe,
+    __in BOOTSTRAPPER_APPLY_RESTART restart
     );
 
 
@@ -868,7 +884,8 @@ extern "C" HRESULT ElevationExecuteRelatedBundle(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -931,7 +948,8 @@ extern "C" HRESULT ElevationExecuteBundlePackage(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -985,7 +1003,8 @@ extern "C" HRESULT ElevationExecuteExePackage(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1155,7 +1174,8 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1234,7 +1254,8 @@ extern "C" HRESULT ElevationExecuteMspPackage(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1285,7 +1306,8 @@ extern "C" HRESULT ElevationExecuteMsuPackage(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1337,7 +1359,8 @@ extern "C" HRESULT ElevationUninstallMsiCompatiblePackage(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE message to per-machine process.");
 
-    hr = ProcessResult(dwResult, pRestart);
+    hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1355,7 +1378,6 @@ extern "C" HRESULT ElevationExecutePackageProviderAction(
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwResult = 0;
-    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     // Serialize the message data.
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->packageProvider.pPackage->sczId);
@@ -1377,9 +1399,6 @@ extern "C" HRESULT ElevationExecutePackageProviderAction(
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER message to per-machine process.");
 
-    // Ignore the restart since this action only results in registry writes.
-    hr = ProcessResult(dwResult, &restart);
-
 LExit:
     ReleaseBuffer(pbData);
 
@@ -1396,7 +1415,6 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwResult = 0;
-    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     // Serialize the message data.
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->packageDependency.pPackage->sczId);
@@ -1420,9 +1438,6 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
     // Send the message.
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY message to per-machine process.");
-
-    // Ignore the restart since this action only results in registry writes.
-    hr = ProcessResult(dwResult, &restart);
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1839,6 +1854,14 @@ static HRESULT ProcessGenericExecuteMessages(
     LPWSTR* rgwzFiles = NULL;
     GENERIC_EXECUTE_MESSAGE message = { };
 
+    if (BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE == pMsg->dwMessage)
+    {
+        hr = ProcessExecuteActionCompleteMessage((BYTE*)pMsg->pvData, pMsg->cbData, &pContext->restart, pdwResult);
+        ExitOnFailure(hr, "Failed to process BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message.");
+
+        ExitFunction();
+    }
+
     hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwUIHint);
     ExitOnFailure(hr, "Failed to allowed results.");
     
@@ -1938,6 +1961,14 @@ static HRESULT ProcessMsiPackageMessages(
     BURN_ELEVATION_MSI_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_MSI_MESSAGE_CONTEXT*>(pvContext);
     LPWSTR sczMessage = NULL;
     BOOL fRestartManager = FALSE;
+
+    if (BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE == pMsg->dwMessage)
+    {
+        hr = ProcessExecuteActionCompleteMessage((BYTE*)pMsg->pvData, pMsg->cbData, &pContext->restart, pdwResult);
+        ExitOnFailure(hr, "Failed to process BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message.");
+
+        ExitFunction();
+    }
 
     // Read MSI extended message data.
     hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &cMsiData);
@@ -2102,7 +2133,8 @@ static HRESULT ProcessElevatedChildMessage(
     HRESULT hr = S_OK;
     BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_CHILD_MESSAGE_CONTEXT*>(pvContext);
     HRESULT hrResult = S_OK;
-    DWORD dwPid = 0;
+    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    BOOL fSendRestart = FALSE;
 
     switch (pMsg->dwMessage)
     {
@@ -2143,27 +2175,33 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE:
-        hrResult = OnExecuteRelatedBundle(pContext->hPipe, pContext->pCache, &pContext->pRegistration->relatedBundles, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteRelatedBundle(pContext->hPipe, pContext->pCache, &pContext->pRegistration->relatedBundles, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE:
-        hrResult = OnExecuteBundlePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteBundlePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE:
-        hrResult = OnExecuteExePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteExePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE:
-        hrResult = OnExecuteMsiPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteMsiPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE:
-        hrResult = OnExecuteMspPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteMspPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE:
-        hrResult = OnExecuteMsuPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteMsuPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER:
@@ -2183,7 +2221,8 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE:
-        hrResult = OnUninstallMsiCompatiblePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnUninstallMsiCompatiblePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE:
@@ -2191,11 +2230,16 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     default:
-        hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Unexpected elevated message sent to child process, msg: %u", pMsg->dwMessage);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Unexpected elevated message sent to child process, msg: %u", pMsg->dwMessage);
     }
 
-    *pdwResult = dwPid ? dwPid : (DWORD)hrResult;
+    if (fSendRestart)
+    {
+        hr = ElevatedOnExecuteActionComplete(pContext->hPipe, restart);
+        ExitOnFailure(hr, "ElevatedOnExecuteActionComplete failed.");
+    }
+
+    *pdwResult = (DWORD)hrResult;
 
 LExit:
     return hr;
@@ -2245,23 +2289,22 @@ LExit:
     return hr;
 }
 
-static HRESULT ProcessResult(
-    __in DWORD dwResult,
-    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
+static HRESULT ProcessExecuteActionCompleteMessage(
+    __in BYTE* pbData,
+    __in DWORD cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart,
+    __out DWORD* pdwResult
     )
 {
-    HRESULT hr = static_cast<HRESULT>(dwResult);
-    if (HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED) == hr)
-    {
-        *pRestart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
-        hr = S_OK;
-    }
-    else if (HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED) == hr)
-    {
-        *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
-        hr = S_OK;
-    }
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
 
+    hr = BuffReadNumber(pbData, cbData, &iData, reinterpret_cast<DWORD*>(pRestart));
+    ExitOnFailure(hr, "Failed to read execute action restart result.");
+
+    *pdwResult = (DWORD)hr;
+
+LExit:
     return hr;
 }
 
@@ -2759,7 +2802,8 @@ static HRESULT OnExecuteRelatedBundle(
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -2771,7 +2815,7 @@ static HRESULT OnExecuteRelatedBundle(
     LPWSTR sczIgnoreDependencies = NULL;
     LPWSTR sczAncestors = NULL;
     LPWSTR sczEngineWorkingDirectory = NULL;
-    BOOTSTRAPPER_APPLY_RESTART bundleRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE;
 
@@ -2826,7 +2870,7 @@ static HRESULT OnExecuteRelatedBundle(
     }
 
     // Execute related bundle.
-    hr = BundlePackageEngineExecuteRelatedBundle(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &bundleRestart);
+    hr = BundlePackageEngineExecuteRelatedBundle(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute related bundle.");
 
 LExit:
@@ -2835,18 +2879,6 @@ LExit:
     ReleaseStr(sczIgnoreDependencies);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == bundleRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == bundleRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -2857,7 +2889,8 @@ static HRESULT OnExecuteBundlePackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -2869,7 +2902,7 @@ static HRESULT OnExecuteBundlePackage(
     LPWSTR sczIgnoreDependencies = NULL;
     LPWSTR sczAncestors = NULL;
     LPWSTR sczEngineWorkingDirectory = NULL;
-    BOOTSTRAPPER_APPLY_RESTART bundleRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_BUNDLE_PACKAGE;
 
@@ -2930,7 +2963,7 @@ static HRESULT OnExecuteBundlePackage(
     }
 
     // Execute BUNDLE package.
-    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, fRollback, fCacheAvailable, GenericExecuteMessageHandler, hPipe, &bundleRestart);
+    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, fRollback, fCacheAvailable, GenericExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute BUNDLE package.");
 
 LExit:
@@ -2939,18 +2972,6 @@ LExit:
     ReleaseStr(sczIgnoreDependencies);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == bundleRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == bundleRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -2961,7 +2982,8 @@ static HRESULT OnExecuteExePackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -2971,7 +2993,7 @@ static HRESULT OnExecuteExePackage(
     BURN_EXECUTE_ACTION executeAction = { };
     LPWSTR sczAncestors = NULL;
     LPWSTR sczEngineWorkingDirectory = NULL;
-    BOOTSTRAPPER_APPLY_RESTART exeRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
 
@@ -3016,7 +3038,7 @@ static HRESULT OnExecuteExePackage(
     }
 
     // Execute EXE package.
-    hr = ExeEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &exeRestart);
+    hr = ExeEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute EXE package.");
 
 LExit:
@@ -3024,18 +3046,6 @@ LExit:
     ReleaseStr(sczAncestors);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == exeRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == exeRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -3046,7 +3056,8 @@ static HRESULT OnExecuteMsiPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -3055,7 +3066,7 @@ static HRESULT OnExecuteMsiPackage(
     HWND hwndParent = NULL;
     BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
-    BOOTSTRAPPER_APPLY_RESTART msiRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE;
 
@@ -3124,24 +3135,12 @@ static HRESULT OnExecuteMsiPackage(
     }
 
     // Execute MSI package.
-    hr = MsiEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);
+    hr = MsiEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute MSI package.");
 
 LExit:
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == msiRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == msiRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -3152,7 +3151,8 @@ static HRESULT OnExecuteMspPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -3161,7 +3161,7 @@ static HRESULT OnExecuteMspPackage(
     HWND hwndParent = NULL;
     BOOL fRollback = FALSE;
     BURN_EXECUTE_ACTION executeAction = { };
-    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_MSP_TARGET;
 
@@ -3228,24 +3228,12 @@ static HRESULT OnExecuteMspPackage(
     }
 
     // Execute MSP package.
-    hr = MspEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &restart);
+    hr = MspEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute MSP package.");
 
 LExit:
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == restart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -3256,7 +3244,8 @@ static HRESULT OnExecuteMsuPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -3265,7 +3254,7 @@ static HRESULT OnExecuteMsuPackage(
     DWORD dwRollback = 0;
     DWORD dwStopWusaService = 0;
     BURN_EXECUTE_ACTION executeAction = { };
-    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE;
 
@@ -3294,24 +3283,12 @@ static HRESULT OnExecuteMsuPackage(
     }
 
     // execute MSU package
-    hr = MsuEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), static_cast<BOOL>(dwStopWusaService), GenericExecuteMessageHandler, hPipe, &restart);
+    hr = MsuEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), static_cast<BOOL>(dwStopWusaService), GenericExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute MSU package.");
 
 LExit:
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == restart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -3322,7 +3299,8 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -3334,7 +3312,7 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     BURN_EXECUTE_ACTION executeAction = { };
     BURN_PACKAGE* pPackage = NULL;
     BURN_COMPATIBLE_PACKAGE* pCompatiblePackage = NULL;
-    BOOTSTRAPPER_APPLY_RESTART msiRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE;
 
@@ -3375,25 +3353,13 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     }
 
     // Uninstall MSI compatible package.
-    hr = MsiEngineUninstallCompatiblePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);
-    ExitOnFailure(hr, "Failed to execute MSI package.");
+    hr = MsiEngineUninstallCompatiblePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, pRestart);
+    ExitOnFailure(hr, "Failed to execute compatible MSI package.");
 
 LExit:
     ReleaseStr(sczPackageId);
     ReleaseStr(sczCompatiblePackageId);
     PlanUninitializeExecuteAction(&executeAction);
-
-    if (SUCCEEDED(hr))
-    {
-        if (BOOTSTRAPPER_APPLY_RESTART_REQUIRED == msiRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED);
-        }
-        else if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == msiRestart)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_INITIATED);
-        }
-    }
 
     return hr;
 }
@@ -4090,6 +4056,28 @@ static HRESULT ElevatedOnSystemRestorePointComplete(
 
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE message to per-user process.");
+
+LExit:
+    ReleaseBuffer(pbSendData);
+
+    return hr;
+}
+
+static HRESULT ElevatedOnExecuteActionComplete(
+    __in HANDLE hPipe,
+    __in BOOTSTRAPPER_APPLY_RESTART restart
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbSendData = NULL;
+    SIZE_T cbSendData = 0;
+    DWORD dwResult = 0;
+
+    hr = BuffWriteNumber(&pbSendData, &cbSendData, restart);
+    ExitOnFailure(hr, "Failed to write the restart type to message buffer.");
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message to per-user process.");
 
 LExit:
     ReleaseBuffer(pbSendData);

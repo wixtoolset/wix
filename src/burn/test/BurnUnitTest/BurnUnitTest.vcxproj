@@ -48,6 +48,7 @@
     <ClCompile Include="CacheTest.cpp" />
     <ClCompile Include="ElevationTest.cpp" />
     <ClCompile Include="EmbeddedTest.cpp" />
+    <ClCompile Include="ExitCodeTest.cpp" />
     <ClCompile Include="LoggingTest.cpp" />
     <ClCompile Include="ManifestHelpers.cpp" />
     <ClCompile Include="ManifestTest.cpp" />

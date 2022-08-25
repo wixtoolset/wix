@@ -1014,7 +1014,7 @@ static HRESULT ExecuteBundle(
         ExitOnFailure(hr, "Failed to run BUNDLE process");
     }
 
-    hr = ExeEngineHandleExitCode(pPackage->Bundle.rgExitCodes, pPackage->Bundle.cExitCodes, dwExitCode, pRestart);
+    hr = ExeEngineHandleExitCode(pPackage->Bundle.rgExitCodes, pPackage->Bundle.cExitCodes, pPackage->sczId, dwExitCode, pRestart);
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:

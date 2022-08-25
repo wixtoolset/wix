@@ -648,7 +648,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
         ExitOnFailure(hr, "Failed to run EXE process");
     }
 
-    hr = ExeEngineHandleExitCode(pPackage->Exe.rgExitCodes, pPackage->Exe.cExitCodes, dwExitCode, pRestart);
+    hr = ExeEngineHandleExitCode(pPackage->Exe.rgExitCodes, pPackage->Exe.cExitCodes, pPackage->sczId, dwExitCode, pRestart);
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:
@@ -759,7 +759,7 @@ extern "C" HRESULT ExeEngineRunProcess(
         hr = (IDOK == nResult || IDNOACTION == nResult) ? S_OK : IDCANCEL == nResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
         ExitOnRootFailure(hr, "Bootstrapper application aborted during package process progress.");
 
-        hr = ProcWaitForCompletion(pi.hProcess, 500, pdwExitCode);
+        hr = CoreWaitForProcCompletion(pi.hProcess, 500, pdwExitCode);
         if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) != hr)
         {
             ExitOnFailure(hr, "Failed to wait for executable to complete: %ls", wzExecutablePath);
@@ -948,6 +948,7 @@ LExit:
 extern "C" HRESULT ExeEngineHandleExitCode(
     __in BURN_EXE_EXIT_CODE* rgCustomExitCodes,
     __in DWORD cCustomExitCodes,
+    __in_z LPCWSTR wzId,
     __in DWORD dwExitCode,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
@@ -1029,6 +1030,8 @@ extern "C" HRESULT ExeEngineHandleExitCode(
     }
 
 //LExit:
+    LogId(REPORT_STANDARD, MSG_EXECUTE_PACKAGE_PROCESS_EXITED, wzId, dwExitCode, LoggingExitCodeTypeToString(typeCode), LoggingRestartToString(*pRestart));
+
     return hr;
 }
 
