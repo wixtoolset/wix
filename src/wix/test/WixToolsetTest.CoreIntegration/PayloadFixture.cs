@@ -169,11 +169,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "The Payload 'burn.exe' is being added to Container 'PackagesContainer', overriding its Compressed value of 'no'.",
-                }, result.Messages.Select(m => m.ToString()).ToArray());
-
                 Assert.True(File.Exists(bundlePath));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
@@ -277,7 +272,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The Payload 'RemotePayload' is being added to Container 'WixUXContainer', overriding its Compressed value of 'no'.",
                     "Bootstrapper application and bundle extension payloads must be embedded in the bundle. The payload 'someremotefile.txt' is remote thus cannot be found for embedding. Provide a full path to the payload via the Payload/@SourceFile attribute."
                 }, result.Messages.Select(m => m.ToString()).ToArray());
             }
