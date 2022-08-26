@@ -31,6 +31,16 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.UnscheduledRollbackBoundary, "Found orphaned RollbackBoundary '{0}'. Make sure to reference it from the Chain or move it into its own Fragment so it only gets linked in when actually used.", rollbackBoundaryId);
         }
 
+        public static Message BAContainerCannotContainRemotePayload(SourceLineNumber sourceLineNumbers, string payloadName)
+        {
+            return Message(sourceLineNumbers, Ids.BAContainerCannotContainRemotePayload, "Bootstrapper application and bundle extension payloads must be embedded in the bundle. The payload '{0}' is remote thus cannot be found for embedding. Provide a full path to the payload via the Payload/@SourceFile attribute.", payloadName);
+        }
+
+        public static Message UncompressedPayloadInContainer(SourceLineNumber sourceLineNumbers, string payloadId, string containerId)
+        {
+            return Message(sourceLineNumbers, Ids.UncompressedPayloadInContainer, "The payload '{0}' is uncompressed and cannot be added to container '{1}'. Remove its Compressed attribute and provide a @SourceFile value to allow it to be added to a container.", payloadId, containerId);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -43,6 +53,8 @@ namespace WixToolset.Core
             PayloadSharedWithBA = 7002,
             UnscheduledChainPackage = 7003,
             UnscheduledRollbackBoundary = 7004,
+            UncompressedPayloadInContainer = 7005,
+            BAContainerCannotContainRemotePayload = 7006,
         } // last available is 7099. 7100 is WindowsInstallerBackendWarnings.
     }
 }

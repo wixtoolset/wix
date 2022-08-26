@@ -95,11 +95,6 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.InvalidBundleManifest, "Unable to read bundle executable '{0}'. Its manifest is invalid. {1}", bundleExecutable, reason);
         }
 
-        public static Message BAContainerCannotContainRemotePayload(SourceLineNumber sourceLineNumbers, string payloadName)
-        {
-            return Message(sourceLineNumbers, Ids.BAContainerCannotContainRemotePayload, "Bootstrapper application and bundle extension payloads must be embedded in the bundle. The payload '{0}' is remote thus cannot be found for embedding. Provide a full path to the payload via the Payload/@SourceFile attribute.", payloadName);
-        }
-
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -121,7 +116,6 @@ namespace WixToolset.Core.Burn
             FailedToAddIconOrSplashScreenToBundle = 8011,
             InvalidBundleManifest = 8012,
             BundleMultipleProviders = 8013,
-            BAContainerCannotContainRemotePayload = 8014,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }

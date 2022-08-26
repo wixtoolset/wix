@@ -290,20 +290,6 @@ namespace WixToolset.Core.Burn
             {
                 foreach (var payload in payloadSymbols.Values.Where(p => BurnConstants.BurnUXContainerName == p.ContainerRef))
                 {
-                    // In theory, UX payloads could be embedded in the UX CAB, external to the bundle EXE, or even
-                    // downloaded. The current engine requires the UX to be fully present before any downloading starts,
-                    // so that rules out downloading. Also, the burn engine does not currently copy external UX payloads
-                    // into the temporary UX directory correctly, so we don't allow external either.
-                    if (payload.SourceFile is null)
-                    {
-                        this.Messaging.Write(BurnBackendErrors.BAContainerCannotContainRemotePayload(payload.SourceLineNumbers, payload.Name));
-                    }
-                    else if (PackagingType.Embedded != payload.Packaging)
-                    {
-                        this.Messaging.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(payload.SourceLineNumbers, payload.SourceFile.Path));
-                        payload.Packaging = PackagingType.Embedded;
-                    }
-
                     payload.EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnUXContainerEmbeddedIdFormat, uxPayloadIndex);
                     ++uxPayloadIndex;
                 }

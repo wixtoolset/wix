@@ -171,11 +171,32 @@ namespace WixToolset.Core.Link
                     {
                         if (payloadSymbol.Compressed == false)
                         {
-                            this.Messaging.Write(LinkerWarnings.UncompressedPayloadInContainer(payloadSymbol.SourceLineNumbers, groupSymbol.ChildId, containerId));
+                            if (containerId == BurnConstants.BurnUXContainerName)
+                            {
+                                // In theory, UX payloads could be embedded in the UX CAB, external to the bundle EXE, or even
+                                // downloaded. The current engine requires the UX to be fully present before any downloading starts,
+                                // so that rules out downloading. Also, the burn engine does not currently copy external UX payloads
+                                // into the temporary UX directory correctly, so we don't allow external either.
+                                if (payloadSymbol.SourceFile is null)
+                                {
+                                    this.Messaging.Write(LinkerErrors.BAContainerCannotContainRemotePayload(payloadSymbol.SourceLineNumbers, payloadSymbol.Name));
+                                }
+                                else if (PackagingType.Embedded != payloadSymbol.Packaging)
+                                {
+                                    this.Messaging.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(payloadSymbol.SourceLineNumbers, payloadSymbol.SourceFile.Path));
+                                    payloadSymbol.Packaging = PackagingType.Embedded;
+                                }
+                            }
+                            else
+                            {
+                                this.Messaging.Write(LinkerErrors.UncompressedPayloadInContainer(payloadSymbol.SourceLineNumbers, groupSymbol.ChildId, containerId));
+                            }
                         }
-
-                        payloadSymbol.Compressed = true;
-                        payloadSymbol.ContainerRef = containerId;
+                        else
+                        {
+                            payloadSymbol.Compressed = true;
+                            payloadSymbol.ContainerRef = containerId;
+                        }
                     }
                     else
                     {
