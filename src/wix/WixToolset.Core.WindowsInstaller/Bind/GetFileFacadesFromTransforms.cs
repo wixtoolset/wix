@@ -40,10 +40,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             //var patchActualFileTable = this.Output.EnsureTable(this.TableDefinitions["File"]);
 
             // Index paired transforms by name without their "#" prefix.
-            var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith("#")).ToDictionary(s => s.Name, s => s.Data);
+            var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)).ToDictionary(s => s.Name, s => s.Data);
 
             // Enumerate through main transforms.
-            foreach (var substorage in this.SubStorages.Where(s => !s.Name.StartsWith("#")))
+            foreach (var substorage in this.SubStorages.Where(s => !s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)))
             {
                 var mainTransform = substorage.Data;
                 var mainFileTable = mainTransform.Tables["File"];
@@ -54,7 +54,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // Index File table of pairedTransform
-                var pairedTransform = pairedTransforms["#" + substorage.Name];
+                var pairedTransform = pairedTransforms[PatchConstants.PairedPatchTransformPrefix + substorage.Name];
                 var pairedFileRows = new RowDictionary<FileRow>(pairedTransform.Tables["File"]);
 
                 foreach (FileRow mainFileRow in mainFileTable.Rows.Where(f => f.Operation != RowOperation.Delete))

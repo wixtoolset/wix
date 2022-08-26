@@ -52,16 +52,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var patchMediaRows = new RowDictionary<MediaRow>(this.Output.Tables["Media"]);
 
             // Index paired transforms by name without the "#" prefix.
-            var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith("#")).ToDictionary(s => s.Name, s => s.Data);
+            var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)).ToDictionary(s => s.Name, s => s.Data);
 
             // Copy File bind data into substorages
-            foreach (var substorage in this.SubStorages.Where(s => !s.Name.StartsWith("#")))
+            foreach (var substorage in this.SubStorages.Where(s => !s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)))
             {
                 var mainTransform = substorage.Data;
 
                 var mainMsiFileHashIndex = new RowDictionary<Row>(mainTransform.Tables["MsiFileHash"]);
 
-                var pairedTransform = pairedTransforms["#" + substorage.Name];
+                var pairedTransform = pairedTransforms[PatchConstants.PairedPatchTransformPrefix + substorage.Name];
 
                 // Copy Media.LastSequence.
                 var pairedMediaTable = pairedTransform.Tables["Media"];

@@ -25,7 +25,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimplePatch()
         {
-            var folder = TestData.Get(@"TestData\PatchSingle");
+            var folder = TestData.Get(@"TestData", "PatchSingle");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -57,7 +57,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimplePatchWithNoFileChanges()
         {
-            var folder = TestData.Get(@"TestData\PatchNoFileChanges");
+            var folder = TestData.Get(@"TestData", "PatchNoFileChanges");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -86,6 +86,31 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildSimplePatchWithBaselineIdTooLong()
+        {
+            var folder = TestData.Get(@"TestData", "PatchBaselineIdTooLong");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderBaseline = Path.Combine(baseFolder, "baseline");
+                var tempFolderUpdate = Path.Combine(baseFolder, "update");
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) }, hasNoFiles: true, warningsAsErrors: false);
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#ThisBaseLineIdIsTooLongAndGe.1", "ThisBaseLineIdIsTooLongAndGe.1" }, names);
+            }
+        }
+
         [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6387")]
         public void CanBuildPatchFromProductWithFilesFromWixlib()
         {
@@ -110,7 +135,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildBundleWithNonSpecificPatches()
         {
-            var folder = TestData.Get(@"TestData\PatchNonSpecific");
+            var folder = TestData.Get(@"TestData", "PatchNonSpecific");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -125,23 +150,23 @@ namespace WixToolsetTest.CoreIntegration
                 var bundleBPdb = BuildBundle("BundleB.exe", Path.Combine(folder, "BundleB"), tempFolder);
                 var bundleCPdb = BuildBundle("BundleC.exe", Path.Combine(folder, "BundleC"), tempFolder);
 
-                VerifyPatchTargetCodes(bundleAPdb, new[]
+                VerifyPatchTargetCodesInBurnManifest(bundleAPdb, new[]
                 {
                     "<PatchTargetCode TargetCode='{26309973-0A5E-4979-B142-98A6E064EDC0}' Product='yes' />",
                 });
-                VerifyPatchTargetCodes(bundleBPdb, new[]
+                VerifyPatchTargetCodesInBurnManifest(bundleBPdb, new[]
                 {
                     "<PatchTargetCode TargetCode='{26309973-0A5E-4979-B142-98A6E064EDC0}' Product='yes' />",
                     "<PatchTargetCode TargetCode='{32B0396A-CE36-4570-B16E-F88FA42DC409}' Product='no' />",
                 });
-                VerifyPatchTargetCodes(bundleCPdb, new string[0]);
+                VerifyPatchTargetCodesInBurnManifest(bundleCPdb, new string[0]);
             }
         }
 
         [Fact]
         public void CanBuildBundleWithSlipstreamPatch()
         {
-            var folder = TestData.Get(@"TestData\PatchSingle");
+            var folder = TestData.Get(@"TestData", "PatchSingle");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -164,20 +189,6 @@ namespace WixToolsetTest.CoreIntegration
                         "<SlipstreamMsp Id='PatchA' />",
                     }, slipstreamMspNodes);
                 }
-            }
-        }
-
-        private static void VerifyPatchTargetCodes(string pdbPath, string[] expected)
-        {
-            using (var wixOutput = WixOutput.Read(pdbPath))
-            {
-                var manifestData = wixOutput.GetData(BurnConstants.BurnManifestWixOutputStreamName);
-                var doc = new XmlDocument();
-                doc.LoadXml(manifestData);
-                var nsmgr = BundleExtractor.GetBurnNamespaceManager(doc, "w");
-                var patchTargetCodes = doc.SelectNodes("/w:BurnManifest/w:PatchTargetCode", nsmgr).GetTestXmlLines();
-
-                WixAssert.CompareLineByLine(expected, patchTargetCodes);
             }
         }
 
@@ -204,7 +215,7 @@ namespace WixToolsetTest.CoreIntegration
             return Path.ChangeExtension(outputPath, ".wixpdb");
         }
 
-        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, bool hasNoFiles = false)
+        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, bool hasNoFiles = false, bool warningsAsErrors = true)
         {
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
@@ -225,7 +236,7 @@ namespace WixToolsetTest.CoreIntegration
                 args.Add(additionaBindPath);
             }
 
-            var result = WixRunner.Execute(args.ToArray());
+            var result = WixRunner.Execute(warningsAsErrors, args.ToArray());
 
             result.AssertSuccess();
 
@@ -264,6 +275,20 @@ namespace WixToolsetTest.CoreIntegration
             }
 
             return XDocument.Parse(buffer.ToString());
+        }
+
+        private static void VerifyPatchTargetCodesInBurnManifest(string pdbPath, string[] expected)
+        {
+            using (var wixOutput = WixOutput.Read(pdbPath))
+            {
+                var manifestData = wixOutput.GetData(BurnConstants.BurnManifestWixOutputStreamName);
+                var doc = new XmlDocument();
+                doc.LoadXml(manifestData);
+                var nsmgr = BundleExtractor.GetBurnNamespaceManager(doc, "w");
+                var patchTargetCodes = doc.SelectNodes("/w:BurnManifest/w:PatchTargetCode", nsmgr).GetTestXmlLines();
+
+                WixAssert.CompareLineByLine(expected, patchTargetCodes);
+            }
         }
 
         [DllImport("msi.dll", EntryPoint = "MsiExtractPatchXMLDataW", CharSet = CharSet.Unicode, ExactSpelling = true)]
