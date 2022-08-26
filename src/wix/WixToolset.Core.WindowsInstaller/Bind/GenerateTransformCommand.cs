@@ -75,7 +75,7 @@ namespace WixToolset.Core.WindowsInstaller
 
             this.transformSummaryInfo = new SummaryInformationStreams();
 
-            // compare the codepages
+            // Compare the codepages.
             if (targetOutput.Codepage != updatedOutput.Codepage && 0 == (TransformFlags.ErrorChangeCodePage & validationFlags))
             {
                 this.messaging.Write(ErrorMessages.OutputCodepageMismatch(targetOutput.SourceLineNumbers, targetOutput.Codepage, updatedOutput.Codepage));
@@ -85,19 +85,18 @@ namespace WixToolset.Core.WindowsInstaller
                 }
             }
 
-            // compare the output types
+            // Compare the output types.
             if (targetOutput.Type != updatedOutput.Type)
             {
                 throw new WixException(ErrorMessages.OutputTypeMismatch(targetOutput.SourceLineNumbers, targetOutput.Type.ToString(), updatedOutput.Type.ToString()));
             }
 
-            // compare the contents of the tables
+            // Compare the contents of the tables.
             foreach (var targetTable in targetOutput.Tables)
             {
                 var updatedTable = updatedOutput.Tables[targetTable.Name];
-                var operation = TableOperation.None;
 
-                var rows = this.CompareTables(targetOutput, targetTable, updatedTable, out operation);
+                var rows = this.CompareTables(targetOutput, targetTable, updatedTable, out var operation);
 
                 if (TableOperation.Drop == operation)
                 {
@@ -114,10 +113,10 @@ namespace WixToolset.Core.WindowsInstaller
                 }
             }
 
-            // added tables
+            // Add all of the rows for tables that only exist in the update.
             foreach (var updatedTable in updatedOutput.Tables)
             {
-                if (null == targetOutput.Tables[updatedTable.Name])
+                if (!targetOutput.Tables.TryGetTable(updatedTable.Name, out var _))
                 {
                     var addedTable = transform.EnsureTable(updatedTable.Definition);
                     addedTable.Operation = TableOperation.Add;
@@ -131,7 +130,7 @@ namespace WixToolset.Core.WindowsInstaller
                 }
             }
 
-            // set summary information properties
+            // Set summary information properties.
             if (!this.SuppressKeepingSpecialRows)
             {
                 var summaryInfoTable = transform.Tables["_SummaryInformation"];
@@ -319,20 +318,20 @@ namespace WixToolset.Core.WindowsInstaller
             var rows = new List<Row>();
             operation = TableOperation.None;
 
-            // dropped tables
-            if (null == updatedTable ^ null == targetTable)
+            // No tables.
+            if (null == targetTable && null == updatedTable)
             {
-                if (null == targetTable)
-                {
-                    operation = TableOperation.Add;
-                    rows.AddRange(updatedTable.Rows);
-                }
-                else if (null == updatedTable)
-                {
-                    operation = TableOperation.Drop;
-                }
             }
-            else // possibly modified tables
+            else if (null == targetTable) // added table.
+            {
+                operation = TableOperation.Add;
+                rows.AddRange(updatedTable.Rows);
+            }
+            else if (null == updatedTable) // removed table.
+            {
+                operation = TableOperation.Drop;
+            }
+            else // possibly modified table.
             {
                 var updatedPrimaryKeys = new Dictionary<string, Row>();
                 var targetPrimaryKeys = new Dictionary<string, Row>();
