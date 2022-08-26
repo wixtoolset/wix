@@ -7745,10 +7745,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
-            else if (27 < id.Id.Length)
-            {
-                this.Core.Write(ErrorMessages.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, 27));
-            }
 
             if (!String.IsNullOrEmpty(baselineFile) || !String.IsNullOrEmpty(updateFile))
             {

@@ -174,14 +174,26 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 productCodes.Add(productCode);
                 validTransform.Add(Tuple.Create(productCode, mainTransform.Transform));
 
-                // attach these transforms to the patch object
-                // TODO: is this an acceptable way to auto-generate transform stream names?
-                var transformName = mainTransform.Baseline + "." + validTransform.Count.ToString(CultureInfo.InvariantCulture);
-                subStorages.Add(new SubStorage(transformName, mainTransform.Transform));
-                subStorages.Add(new SubStorage("#" + transformName, pairedTransform));
+                // Attach the main and paired transforms to the patch object.
+                var baseTransformName = mainTransform.Baseline;
+                var countSuffix = "." + validTransform.Count.ToString(CultureInfo.InvariantCulture);
 
+                if (PatchConstants.PairedPatchTransformPrefix.Length + baseTransformName.Length + countSuffix.Length > PatchConstants.MaxPatchTransformName)
+                {
+                    var trimmedTransformName = baseTransformName.Substring(0, PatchConstants.MaxPatchTransformName - PatchConstants.PairedPatchTransformPrefix.Length - countSuffix.Length);
+
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.LongPatchBaselineIdTrimmed(baselineSymbol.SourceLineNumbers, baseTransformName, trimmedTransformName));
+
+                    baseTransformName = trimmedTransformName;
+                }
+
+                var transformName = baseTransformName + countSuffix;
+                subStorages.Add(new SubStorage(transformName, mainTransform.Transform));
                 transformNames.Add(":" + transformName);
-                transformNames.Add(":#" + transformName);
+
+                var pairedTransformName = PatchConstants.PairedPatchTransformPrefix + transformName;
+                subStorages.Add(new SubStorage(pairedTransformName, pairedTransform));
+                transformNames.Add(":" + pairedTransformName);
             }
 
             if (validTransform.Count == 0)

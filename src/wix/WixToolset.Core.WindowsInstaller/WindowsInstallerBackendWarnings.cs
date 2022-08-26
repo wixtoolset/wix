@@ -6,10 +6,10 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal static class WindowsInstallerBackendWarnings
     {
-        //public static Message ReplaceThisWithTheFirstWarning(SourceLineNumber sourceLineNumbers)
-        //{
-        //    return Message(sourceLineNumbers, Ids.ReplaceThisWithTheFirstWarning, "format string", arg1, arg2);
-        //}
+        internal static Message LongPatchBaselineIdTrimmed(SourceLineNumber sourceLineNumbers, string baseTransformName, string trimmedTransformName)
+        {
+            return Message(sourceLineNumbers, Ids.LongPatchBaselineIdTrimmed, "The PatchBaseline/@Id='{0}' is too long. It is recommended to use short identifiers like 'RTM' and 'SP1'. The identifier has been trimmed to '{1}' so the patch can be created.", baseTransformName, trimmedTransformName);
+        }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         public enum Ids
         {
-            // ReplaceThisWithTheFirstWarning = 7100,
+            LongPatchBaselineIdTrimmed = 7100,
         } // last available is 7499. 7500 is WindowsInstallerBackendErrors.
     }
 }
