@@ -67,7 +67,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
             // create a schema msi which hopefully matches the table schemas in the transform
             var schemaOutput = new WindowsInstallerData(null);
-            var msiDatabaseFile = Path.Combine(this.IntermediateFolder, "schema.msi");
             foreach (var tableDefinition in this.TableDefinitions)
             {
                 // skip unreal tables and the Patch table
@@ -81,9 +80,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             Table transformViewTable;
 
             // Bind the schema msi.
+            var msiDatabaseFile = Path.Combine(this.IntermediateFolder, "schema.msi");
             this.GenerateDatabase(schemaOutput, msiDatabaseFile);
 
-            // apply the transform to the database and retrieve the modifications
+            // Apply the transform to the database and retrieve the modifications.
             using (var msiDatabase = new Database(msiDatabaseFile, OpenDatabase.Transact))
             {
                 // apply the transform with the ViewTransform option to collect all the modifications
