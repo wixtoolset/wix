@@ -87,6 +87,7 @@
   <PropertyGroup Condition=" '$(TargetExt)' == '' ">
     <TargetExt Condition=" '$(OutputType)' == 'Package' ">.msi</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Module' ">.msm</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'Patch' ">.msp</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'PatchCreation' ">.pcp</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Library' ">.wixlib</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Bundle' ">.exe</TargetExt>
@@ -118,7 +119,7 @@
     <!--
     Only Package, Module and Bundle output types create .wixpdbs, so reset the flag indicating symbols will be produced outside of those output types.
     -->
-    <_DebugSymbolsProduced Condition=" '$(OutputType)' != 'Package' and '$(OutputType)' != 'Module' and '$(OutputType)' != 'Bundle' ">false</_DebugSymbolsProduced>
+    <_DebugSymbolsProduced Condition=" '$(OutputType)' != 'Package' and '$(OutputType)' != 'Module' and '$(OutputType)' != 'Patch' and '$(OutputType)' != 'Bundle' ">false</_DebugSymbolsProduced>
   </PropertyGroup>
 
   <PropertyGroup>
