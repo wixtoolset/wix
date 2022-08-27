@@ -20,7 +20,7 @@
     <?endif?>
 
     <?ifdef SoftwareTag?>
-    <SoftwareTag Regid="regid.1995-08.com.example" InstallDirectory="CommonAppDataFolder" />
+    <SoftwareTag Regid="regid.1995-08.com.example" InstallDirectory="SwidTagBaseFolder" />
     <?endif?>
 
     <PropertyRef Id="TestVersion" />
@@ -35,6 +35,12 @@
   </Package>
 
   <Fragment>
+    <?ifdef SoftwareTag?>
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="SwidTagBaseFolder" Name="TestingSwidTags" />
+    </StandardDirectory>
+    <?endif?>
+
     <StandardDirectory Id="ProgramFiles6432Folder">
       <Directory Id="WixDir" Name="~Test WiX">
         <Directory Id="TestDir" Name="$(var.TestGroupName)">

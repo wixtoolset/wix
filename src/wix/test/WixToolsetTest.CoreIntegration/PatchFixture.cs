@@ -9,6 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
     using Example.Extension;
@@ -83,6 +84,50 @@ namespace WixToolsetTest.CoreIntegration
 
                 var files = Query.GetCabinetFiles(cab);
                 Assert.Empty(files);
+            }
+        }
+
+        [Fact]
+        public void CanBuildSimplePatchWithSoftwareTag()
+        {
+            var folder = TestData.Get(@"TestData", "PatchWithSoftwareTag");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderBaseline = Path.Combine(baseFolder, "baseline");
+                var tempFolderUpdate = Path.Combine(baseFolder, "update");
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) });
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(baseFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+                Assert.True(File.Exists(cab));
+
+                var files = Query.GetCabinetFiles(cab);
+                var file = files.Single();
+                WixAssert.StringEqual("tag1jwIT_7lT286E4Dyji95s65UuO4", file.Name);
+
+                var contents = file.OpenText().ReadToEnd();
+                contents = Regex.Replace(contents, @"msi\:package/[A-Z0-9\-]+", "msi:package/G-U-I-D");
+                WixAssert.StringEqual(String.Join(Environment.NewLine, new[]
+                {
+                    "<?xml version='1.0' encoding='utf-8'?>",
+                    "<SoftwareIdentity tagId='msi:package/G-U-I-D' name='~Test Package' version='1.0.1' versionScheme='multipartnumeric' xmlns='http://standards.iso.org/iso/19770/-2/2015/schema.xsd'>",
+                    "  <Entity name='Example Corporation' regid='regid.1995-08.com.example' role='softwareCreator tagCreator' />",
+                    "  <Meta persistentId='msi:upgrade/7D326855-E790-4A94-8611-5351F8321FCA' />",
+                    "</SoftwareIdentity>",
+                }), contents.Replace('"', '\''));
             }
         }
 
@@ -192,12 +237,12 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB)
+        private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB, IEnumerable<string> bindpaths = null)
         {
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
-            var result = WixRunner.Execute(new[]
+            var args = new List<string>
             {
                 "build",
                 Path.Combine(sourceFolder, @"Package.wxs"),
@@ -208,7 +253,15 @@ namespace WixToolsetTest.CoreIntegration
                 "-intermediateFolder", Path.Combine(baseFolder, "obj"),
                 "-o", outputPath,
                 "-ext", extensionPath,
-            });
+            };
+
+            foreach (var additionaBindPath in bindpaths ?? Enumerable.Empty<string>())
+            {
+                args.Add("-bindpath");
+                args.Add(additionaBindPath);
+            }
+
+            var result = WixRunner.Execute(args.ToArray());
 
             result.AssertSuccess();
 

@@ -5,6 +5,9 @@
     <IncludeSoftwareTag>true</IncludeSoftwareTag>
     <UpgradeCode>{AA083618-6280-44B8-9899-57BCC57906A5}</UpgradeCode>
   </PropertyGroup>
+  <PropertyGroup>
+    <Version>1.0.1.0</Version>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
   </ItemGroup>
