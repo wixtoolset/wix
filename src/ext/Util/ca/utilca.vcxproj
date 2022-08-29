@@ -77,7 +77,7 @@
     <ClCompile Include="XmlConfig.cpp" />
     <ClCompile Include="XmlFile.cpp" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ClInclude Include="caDecor.h" />
     <ClInclude Include="cost.h" />
@@ -99,6 +99,6 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" />
     <PackageReference Include="GitInfo" />
   </ItemGroup>
-
+  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
