@@ -18,7 +18,7 @@
         <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
             <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
 
-            <util:User Id="TEST_USER1" Name="testName1" Password="test123!@#" PasswordExpired="yes">
+            <util:User Id="TEST_USER1" Name="testName1" Password="test123!@#" PasswordExpired="yes" CreateUser="yes" RemoveOnUninstall="yes">
                 <util:GroupRef Id="ADMIN" />
                 <util:GroupRef Id="POWER_USER" />
             </util:User>
@@ -27,7 +27,7 @@
                 <util:GroupRef Id="POWER_USER" />
             </util:User>
 
-            <util:User Id="TEST_USER3" Name="[TEMPUSERNAME]" Domain="[TEMPDOMAIN]" CreateUser="no">
+            <util:User Id="TEST_USER3" Name="testName3" CreateUser="no">
                 <util:GroupRef Id="POWER_USER" />
             </util:User>
         </Component>
