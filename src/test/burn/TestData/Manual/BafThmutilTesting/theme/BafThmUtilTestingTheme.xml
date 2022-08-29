@@ -132,16 +132,30 @@ There are currently four states for a button: default, focus, hover, and selecte
         </Page>
         <Page Name="Billboard">
             <Label X="6" Y="6" Width="-6" Height="43" FontId="Default">
-                This page has a billboard. It loops between two panels every 1.5 seconds. Only one button should be visible at all times (this is currently broken).
+                This page has a billboard. It loops between two panels every 1.5 seconds.
             </Label>
             <Billboard Name="FirstBillboard" X="11" Y="59" Width="-11" Height="-39" Interval="1500" Loop="yes">
-                <BillboardPanel>
-                    <Button Name="FirstBillboardButton1" X="11" Y="11" Width="75" Height="23" TabStop="yes" FontId="Default">First Panel</Button>
-                </BillboardPanel>
-                <BillboardPanel>
-                    <Button Name="FirstBillboardButton2" X="11" Y="39" Width="75" Height="23" TabStop="yes" FontId="Default">Second Panel</Button>
-                </BillboardPanel>
+                <Panel>
+                    <ImageControl ImageId="square_default" X="0" Y="0" Width="128" Height="128" />
+                    <ImageControl ImageId="square_focus" X="128" Y="0" Width="128" Height="128" />
+                    <ImageControl ImageId="square_hover" X="256" Y="0" Width="128" Height="128" />
+                    <ImageControl ImageId="square_selected" X="384" Y="0" Width="128" Height="128" />
+                </Panel>
+                <Panel>
+                    <ImageControl ImageId="square_selected" X="0" Y="0" Width="128" Height="128" />
+                    <ImageControl ImageId="square_hover" X="128" Y="0" Width="128" Height="128" />
+                    <ImageControl ImageId="square_focus" X="256" Y="0" Width="128" Height="128" />
+                    <ImageControl ImageId="square_default" X="384" Y="0" Width="128" Height="128" />
+                </Panel>
             </Billboard>
+            <Panel X="0" Y="-64" Width="-1" Height="64">
+                <ImageControl X="0" Y="0" Width="64" Height="64" ImageId="star_transparent.bmp" />
+                <ImageControl X="64" Y="0" Width="64" Height="64" ImageId="star_opaque.bmp" />
+                <ImageControl X="128" Y="0" Width="64" Height="64" ImageId="star_transparent.png" />
+                <ImageControl X="-1" Y="0" Width="64" Height="64" ImageId="star_transparent.bmp" />
+                <ImageControl X="-65" Y="0" Width="64" Height="64" ImageId="star_opaque.bmp" />
+                <ImageControl X="-129" Y="0" Width="64" Height="64" ImageId="star_transparent.png" />
+            </Panel>
             <Button Name="BillboardBackButton" X="-269" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
                 <Text>Back</Text>
                 <ChangePageAction Page="Progressbar" />
