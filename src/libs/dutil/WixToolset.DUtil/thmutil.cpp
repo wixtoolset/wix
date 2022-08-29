@@ -45,6 +45,9 @@ const COLORREF THEME_INVISIBLE_COLORREF = 0xFFFFFFFF;
 const DWORD GROW_FONT_INSTANCES = 3;
 const DWORD GROW_IMAGE_INSTANCES = 5;
 
+const LPCWSTR ALL_CONTROL_NAMES = L"Billboard|Button|Checkbox|Combobox|CommandLink|Editbox|Hyperlink|Hypertext|ImageControl|Label|ListView|Panel|Progressbar|Richedit|Static|Tabs|TreeView";
+const LPCWSTR PANEL_CHILD_CONTROL_NAMES = L"Hyperlink|Hypertext|ImageControl|Label|Progressbar|Static";
+
 static Gdiplus::GdiplusStartupInput vgsi;
 static Gdiplus::GdiplusStartupOutput vgso = { };
 static ULONG_PTR vgdiToken = 0;
@@ -205,8 +208,9 @@ static HRESULT ParseControls(
     __in IXMLDOMNode* pElement,
     __in THEME* pTheme,
     __in_opt THEME_CONTROL* pParentControl,
-    __in_opt THEME_PAGE* pPage
-    );
+    __in_opt THEME_PAGE* pPage,
+    __in_opt LPCWSTR wzControlNames
+);
 static HRESULT ParseControl(
     __in_opt HMODULE hModule,
     __in_opt LPCWSTR wzRelativePath,
@@ -2612,7 +2616,7 @@ static HRESULT ParseWindow(
     ThmExitOnFailure(hr, "Failed to parse theme pages.");
 
     // Parse the non-paged controls.
-    hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, NULL, NULL);
+    hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, NULL, NULL, NULL);
     ThmExitOnFailure(hr, "Failed to parse theme controls.");
 
 LExit:
@@ -2987,7 +2991,7 @@ static HRESULT ParsePages(
         hr = XmlGetAttributeEx(pixn, L"Name", &pPage->sczName);
         ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying page Name.");
 
-        hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, NULL, pPage);
+        hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, NULL, pPage, NULL);
         ThmExitOnFailure(hr, "Failed to parse page controls.");
 
         ++iPage;
@@ -3171,7 +3175,8 @@ static HRESULT ParseControls(
     __in IXMLDOMNode* pElement,
     __in THEME* pTheme,
     __in_opt THEME_CONTROL* pParentControl,
-    __in_opt THEME_PAGE* pPage
+    __in_opt THEME_PAGE* pPage,
+    __in_opt LPCWSTR wzControlNames
     )
 {
     HRESULT hr = S_OK;
@@ -3188,7 +3193,7 @@ static HRESULT ParseControls(
     hr = ParseRadioButtons(hModule, wzRelativePath, pElement, pTheme, pParentControl, pPage);
     ThmExitOnFailure(hr, "Failed to parse radio buttons.");
 
-    hr = XmlSelectNodes(pElement, L"Billboard|Button|Checkbox|Combobox|CommandLink|Editbox|Hyperlink|Hypertext|ImageControl|Label|ListView|Panel|Progressbar|Richedit|Static|Tabs|TreeView", &pixnl);
+    hr = XmlSelectNodes(pElement, wzControlNames ? wzControlNames : ALL_CONTROL_NAMES, &pixnl);
     ThmExitOnFailure(hr, "Failed to find control elements.");
 
     hr = pixnl->get_length(reinterpret_cast<long*>(&cNewControls));
@@ -3353,28 +3358,28 @@ static HRESULT ParseControl(
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control Name attribute.");
 
     hr = XmlGetAttributeEx(pixn, L"EnableCondition", &pControl->sczEnableCondition);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control EnableCondition attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' EnableCondition attribute.", pControl->sczName);
 
     hr = XmlGetAttributeEx(pixn, L"VisibleCondition", &pControl->sczVisibleCondition);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control VisibleCondition attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' VisibleCondition attribute.", pControl->sczName);
 
     hr = GetAttributeCoordinateOrDimension(pixn, L"X", &nValue);
-    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control X attribute.");
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control '%ls' X attribute.", pControl->sczName);
 
     pControl->nX = pControl->nDefaultDpiX = nValue;
 
     hr = GetAttributeCoordinateOrDimension(pixn, L"Y", &nValue);
-    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control Y attribute.");
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control '%ls' Y attribute.", pControl->sczName);
 
     pControl->nY = pControl->nDefaultDpiY = nValue;
 
     hr = GetAttributeCoordinateOrDimension(pixn, L"Height", &nValue);
-    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control Height attribute.");
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control '%ls' Height attribute.", pControl->sczName);
 
     pControl->nHeight = pControl->nDefaultDpiHeight = nValue;
 
     hr = GetAttributeCoordinateOrDimension(pixn, L"Width", &nValue);
-    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control Width attribute.");
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control '%ls' Width attribute.", pControl->sczName);
 
     pControl->nWidth = pControl->nDefaultDpiWidth = nValue;
 
@@ -3382,19 +3387,19 @@ static HRESULT ParseControl(
     {
     case THEME_CONTROL_TYPE_COMMANDLINK:
         hr = ParseCommandLinkImage(hModule, wzRelativePath, pixn, pControl);
-        ThmExitOnFailure(hr, "Failed while parsing CommandLink image.");
+        ThmExitOnFailure(hr, "Failed while parsing CommandLink '%ls' image.", pControl->sczName);
         break;
     case THEME_CONTROL_TYPE_BUTTON:
         hr = ParseButtonImages(hModule, wzRelativePath, pTheme, pixn, pControl);
-        ThmExitOnFailure(hr, "Failed while parsing Button images.");
+        ThmExitOnFailure(hr, "Failed while parsing Button '%ls' images.", pControl->sczName);
         break;
     case THEME_CONTROL_TYPE_IMAGE:
         hr = ParseOwnerDrawImage(hModule, wzRelativePath, pTheme, pixn, wzElementName, pControl, &pControl->Image.imageRef);
-        ThmExitOnFailure(hr, "Failed while parsing ImageControl image.");
+        ThmExitOnFailure(hr, "Failed while parsing ImageControl '%ls' image.", pControl->sczName);
         break;
     case THEME_CONTROL_TYPE_PROGRESSBAR:
         hr = ParseProgressBarImages(hModule, wzRelativePath, pTheme, pixn, pControl);
-        ThmExitOnFailure(hr, "Failed while parsing Progressbar images.");
+        ThmExitOnFailure(hr, "Failed while parsing Progressbar '%ls' images.", pControl->sczName);
         break;
     default:
         ThmExitOnUnexpectedAttribute(hr, pixn, wzElementName, L"ImageId");
@@ -3407,15 +3412,15 @@ static HRESULT ParseControl(
 
 
     hr = GetAttributeFontId(pTheme, pixn, L"FontId", &pControl->dwFontId);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control FontId attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' FontId attribute.", pControl->sczName);
 
     // Parse the optional window style.
     hr = XmlGetAttributeNumberBase(pixn, L"HexStyle", 16, &pControl->dwStyle);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HexStyle attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' HexStyle attribute.", pControl->sczName);
 
     // Parse the tabstop bit "shortcut nomenclature", this could have been set with the style above.
     hr = XmlGetYesNoAttribute(pixn, L"TabStop", &fValue);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control TabStop attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' TabStop attribute.", pControl->sczName);
 
     if (fXmlFound && fValue)
     {
@@ -3423,7 +3428,7 @@ static HRESULT ParseControl(
     }
 
     hr = XmlGetYesNoAttribute(pixn, L"Visible", &fValue);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control Visible attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' Visible attribute.", pControl->sczName);
 
     if (fXmlFound && fValue)
     {
@@ -3431,7 +3436,7 @@ static HRESULT ParseControl(
     }
 
     hr = XmlGetYesNoAttribute(pixn, L"HideWhenDisabled", &fValue);
-    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HideWhenDisabled attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' HideWhenDisabled attribute.", pControl->sczName);
 
     if (fXmlFound && fValue)
     {
@@ -3439,24 +3444,24 @@ static HRESULT ParseControl(
     }
 
     hr = ParseActions(pixn, pControl);
-    ThmExitOnFailure(hr, "Failed to parse action nodes of the control.");
+    ThmExitOnFailure(hr, "Failed to parse action nodes of the control '%ls'.", pControl->sczName);
 
     hr = ParseText(pixn, pControl, &fAnyTextChildren);
-    ThmExitOnFailure(hr, "Failed to parse text nodes of the control.");
+    ThmExitOnFailure(hr, "Failed to parse text nodes of the control '%ls'.", pControl->sczName);
 
     hr = ParseTooltips(pixn, pControl, &fAnyTextChildren);
-    ThmExitOnFailure(hr, "Failed to parse control Tooltip.");
+    ThmExitOnFailure(hr, "Failed to parse control '%ls' Tooltip.", pControl->sczName);
 
     if (THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
     {
         hr = ParseNotes(pixn, pControl, &fAnyNoteChildren);
-        ThmExitOnFailure(hr, "Failed to parse note text nodes of the control.");
+        ThmExitOnFailure(hr, "Failed to parse note text nodes of the control '%ls'.", pControl->sczName);
     }
 
     if (!fAnyTextChildren && !fAnyNoteChildren)
     {
         hr = XmlGetAttributeUInt32(pixn, L"StringId", &dwValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control StringId attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' StringId attribute.", pControl->sczName);
 
         if (fXmlFound)
         {
@@ -3468,7 +3473,7 @@ static HRESULT ParseControl(
             if (THEME_CONTROL_TYPE_BILLBOARD != pControl->type && THEME_CONTROL_TYPE_PANEL != pControl->type)
             {
                 hr = XmlGetText(pixn, &bstrText);
-                ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get control inner text.");
+                ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get control '%ls' inner text.", pControl->sczName);
 
                 if (fXmlFound)
                 {
@@ -3484,10 +3489,10 @@ static HRESULT ParseControl(
     if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
     {
         hr = XmlGetYesNoAttribute(pixn, L"Loop", &pControl->fBillboardLoops);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Billboard/@Loop attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' Billboard/@Loop attribute.", pControl->sczName);
 
         hr = XmlGetAttributeUInt16(pixn, L"Interval", &pControl->wBillboardInterval);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Billboard/@Interval attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' Billboard/@Interval attribute.", pControl->sczName);
 
         if (!pControl->wBillboardInterval)
         {
@@ -3495,12 +3500,12 @@ static HRESULT ParseControl(
         }
 
         hr = ParseBillboardPanels(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
-        ThmExitOnFailure(hr, "Failed to parse billboard children.");
+        ThmExitOnFailure(hr, "Failed to parse billboard '%ls' children.", pControl->sczName);
     }
     else if (THEME_CONTROL_TYPE_EDITBOX == pControl->type)
     {
         hr = XmlGetYesNoAttribute(pixn, L"FileSystemAutoComplete", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Editbox/@FileSystemAutoComplete attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' Editbox/@FileSystemAutoComplete attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3510,15 +3515,15 @@ static HRESULT ParseControl(
     else if (THEME_CONTROL_TYPE_HYPERLINK == pControl->type || THEME_CONTROL_TYPE_BUTTON == pControl->type)
     {
         hr = GetAttributeFontId(pTheme, pixn, L"HoverFontId", &pControl->dwFontHoverId);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HoverFontId attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' HoverFontId attribute.", pControl->sczName);
 
         hr = GetAttributeFontId(pTheme, pixn, L"SelectedFontId", &pControl->dwFontSelectedId);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control SelectedFontId attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' SelectedFontId attribute.", pControl->sczName);
     }
     else if (THEME_CONTROL_TYPE_LABEL == pControl->type)
     {
         hr = XmlGetYesNoAttribute(pixn, L"Center", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Label/@Center attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' Label/@Center attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3526,7 +3531,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetYesNoAttribute(pixn, L"DisablePrefix", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Label/@DisablePrefix attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' Label/@DisablePrefix attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3537,10 +3542,10 @@ static HRESULT ParseControl(
     {
         // Parse the optional extended window style.
         hr = XmlGetAttributeNumberBase(pixn, L"HexExtendedStyle", 16, &pControl->dwExtendedStyle);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@HexExtendedStyle attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' ListView/@HexExtendedStyle attribute.", pControl->sczName);
 
         hr = XmlGetAttribute(pixn, L"ImageList", &bstrText);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageList attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' ListView/@ImageList attribute.", pControl->sczName);
 
         if (fXmlFound)
         {
@@ -3549,7 +3554,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetAttribute(pixn, L"ImageListSmall", &bstrText);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageListSmall attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' ListView/@ImageListSmall attribute.", pControl->sczName);
 
         if (fXmlFound)
         {
@@ -3558,7 +3563,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetAttribute(pixn, L"ImageListState", &bstrText);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageListState attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' ListView/@ImageListState attribute.", pControl->sczName);
 
         if (fXmlFound)
         {
@@ -3567,7 +3572,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetAttribute(pixn, L"ImageListGroupHeader", &bstrText);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageListGroupHeader attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' ListView/@ImageListGroupHeader attribute.", pControl->sczName);
 
         if (fXmlFound)
         {
@@ -3580,13 +3585,13 @@ static HRESULT ParseControl(
     }
     else if (THEME_CONTROL_TYPE_PANEL == pControl->type)
     {
-        hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
+        hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, pControl, pPage, PANEL_CHILD_CONTROL_NAMES);
         ThmExitOnFailure(hr, "Failed to parse panel children.");
     }
     else if (THEME_CONTROL_TYPE_RADIOBUTTON == pControl->type)
     {
         hr = XmlGetAttributeEx(pixn, L"Value", &pControl->sczValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying RadioButton/@Value attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' RadioButton/@Value attribute.", pControl->sczName);
     }
     else if (THEME_CONTROL_TYPE_TAB == pControl->type)
     {
@@ -3598,7 +3603,7 @@ static HRESULT ParseControl(
         pControl->dwStyle |= TVS_DISABLEDRAGDROP;
 
         hr = XmlGetYesNoAttribute(pixn, L"EnableDragDrop", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@EnableDragDrop attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' TreeView/@EnableDragDrop attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3606,7 +3611,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetYesNoAttribute(pixn, L"FullRowSelect", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@FullRowSelect attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' TreeView/@FullRowSelect attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3614,7 +3619,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetYesNoAttribute(pixn, L"HasButtons", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@HasButtons attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' TreeView/@HasButtons attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3622,7 +3627,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetYesNoAttribute(pixn, L"AlwaysShowSelect", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@AlwaysShowSelect attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' TreeView/@AlwaysShowSelect attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3630,7 +3635,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetYesNoAttribute(pixn, L"LinesAtRoot", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@LinesAtRoot attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' TreeView/@LinesAtRoot attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3638,7 +3643,7 @@ static HRESULT ParseControl(
         }
 
         hr = XmlGetYesNoAttribute(pixn, L"HasLines", &fValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@HasLines attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying '%ls' TreeView/@HasLines attribute.", pControl->sczName);
 
         if (fXmlFound && fValue)
         {
@@ -3775,15 +3780,15 @@ static HRESULT ParseBillboardPanels(
     DWORD dwValue = 0;
     THEME_CONTROL* pControl = NULL;
 
-    hr = XmlSelectNodes(pElement, L"BillboardPanel", &pixnl);
-    ThmExitOnFailure(hr, "Failed to select child billboard panel nodes.");
+    hr = XmlSelectNodes(pElement, L"Panel", &pixnl);
+    ThmExitOnFailure(hr, "Failed to select billboard child nodes.");
 
     hr = pixnl->get_length(reinterpret_cast<long*>(&dwValue));
     ThmExitOnFailure(hr, "Failed to count the number of billboard panel nodes.");
 
     if (!dwValue)
     {
-        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Billboard must have at least one BillboardPanel.");
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Billboard must have at least one Panel.");
     }
 
     hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pParentControl->rgControls), pParentControl->cControls, dwValue, sizeof(THEME_CONTROL), 0);
@@ -3801,7 +3806,7 @@ static HRESULT ParseBillboardPanels(
             pControl->wPageId = pPage->wId;
         }
 
-        hr = ParseControls(hModule, wzRelativePath, pixnChild, pTheme, pControl, pPage);
+        hr = ParseControls(hModule, wzRelativePath, pixnChild, pTheme, pControl, pPage, PANEL_CHILD_CONTROL_NAMES);
         ThmExitOnFailure(hr, "Failed to parse control.");
 
         ReleaseNullObject(pixnChild);
