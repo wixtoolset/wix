@@ -31,7 +31,7 @@
                 <util:GroupRef Id="POWER_USER" />
             </util:User>
 
-            <util:User Id="TEST_USER3" Name="[TEMPUSERNAME]" Domain="[TEMPDOMAIN]" CreateUser="no">
+            <util:User Id="TEST_USER3" Name="testName3" CreateUser="no">
                 <util:GroupRef Id="POWER_USER" />
             </util:User>
         </Component>

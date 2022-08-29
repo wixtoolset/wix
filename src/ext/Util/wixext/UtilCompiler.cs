@@ -34,6 +34,7 @@ namespace WixToolset.Util
         internal const int UserDontRemoveOnUninstall = 0x00000100;
         internal const int UserDontCreateUser = 0x00000200;
         internal const int UserNonVital = 0x00000400;
+        internal const int UserRemoveComment = 0x00000800;
 
         private static readonly Regex FindPropertyBrackets = new Regex(@"\[(?!\\|\])|(?<!\[\\\]|\[\\|\\\[)\]", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
@@ -3251,6 +3252,7 @@ namespace WixToolset.Util
             int attributes = 0;
             string domain = null;
             string name = null;
+            string comment = null;
             string password = null;
 
             foreach (var attrib in element.Attributes())
@@ -3272,6 +3274,14 @@ namespace WixToolset.Util
                             {
                                 attributes |= UserPasswdCantChange;
                             }
+                            break;
+                        case "Comment":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            comment = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "CreateUser":
                             if (null == componentId)
@@ -3357,6 +3367,12 @@ namespace WixToolset.Util
                                 attributes |= UserDontExpirePasswrd;
                             }
                             break;
+                        case "RemoveComment":
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= UserRemoveComment;
+                            }
+                            break;
                         case "RemoveOnUninstall":
                             if (null == componentId)
                             {
@@ -3411,6 +3427,11 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
+            if (null != comment && (UserRemoveComment & attributes) != 0)
+            {
+                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Comment", "RemoveComment"));
+            }
+
             foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
@@ -3450,6 +3471,7 @@ namespace WixToolset.Util
                     Name = name,
                     Domain = domain,
                     Password = password,
+                    Comment = comment,
                     Attributes = attributes,
                 });
             }

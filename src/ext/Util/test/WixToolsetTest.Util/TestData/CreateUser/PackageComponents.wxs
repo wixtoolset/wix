@@ -1,0 +1,76 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
+            <util:User Id="TEST_USER00" Name="testName00" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER01" Name="testName01" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER02" Name="testName02" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER03" Name="testName03" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER04" Name="testName04" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER05" Name="testName05" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER06" Name="testName06" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER07" Name="testName07" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER10" Name="testName10" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER11" Name="testName11" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER12" Name="testName12" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER13" Name="testName13" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER14" Name="testName14" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER15" Name="testName15" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER16" Name="testName16" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER17" Name="testName17" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER20" Name="testName20" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER21" Name="testName21" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER22" Name="testName22" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER23" Name="testName23" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER24" Name="testName24" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER25" Name="testName25" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER26" Name="testName26" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER27" Name="testName27" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER30" Name="testName30" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER31" Name="testName31" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER32" Name="testName32" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER33" Name="testName33" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER34" Name="testName34" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER35" Name="testName35" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER36" Name="testName36" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER37" Name="testName37" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="no" />
+            <util:User Id="TEST_USER40" Name="testName40" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER41" Name="testName41" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER42" Name="testName42" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER43" Name="testName43" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER44" Name="testName44" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER45" Name="testName45" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER46" Name="testName46" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER47" Name="testName47" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER50" Name="testName50" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER51" Name="testName51" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER52" Name="testName52" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER53" Name="testName53" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER54" Name="testName54" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER55" Name="testName55" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER56" Name="testName56" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER57" Name="testName57" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="no"  RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER60" Name="testName60" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER61" Name="testName61" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER62" Name="testName62" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER63" Name="testName63" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER64" Name="testName64" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER65" Name="testName65" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER66" Name="testName66" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER67" Name="testName67" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="no"  Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER70" Name="testName70" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER71" Name="testName71" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER72" Name="testName72" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER73" Name="testName73" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="no"  FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER74" Name="testName74" Password="test123!@#" PasswordExpired="no"  Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER75" Name="testName75" Password="test123!@#" PasswordExpired="yes" Comment="Test Comment 1" CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER76" Name="testName76" Password="test123!@#" PasswordExpired="no"  RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+            <util:User Id="TEST_USER77" Name="testName77" Password="test123!@#" PasswordExpired="yes" RemoveComment="yes"      CreateUser="yes" FailIfExists="yes" Vital="yes" RemoveOnUninstall="yes"/>
+        </Component>
+    </Fragment>
+</Wix>
