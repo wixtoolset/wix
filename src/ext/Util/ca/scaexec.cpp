@@ -2,7 +2,6 @@
 
 #include "precomp.h"
 
-
 /********************************************************************
  * CreateSmb - CUSTOM ACTION ENTRY POINT for creating fileshares
  *
@@ -520,55 +519,88 @@ static HRESULT ModifyUserLocalBatchRight(
     return hr;
 }
 
-static void SetUserPasswordAndAttributes(
-    __in USER_INFO_1* puserInfo,
-    __in LPWSTR wzPassword,
-    __in int iAttributes
-    )
+static HRESULT ApplyAttributes(int iAttributes, DWORD* pFlags)
 {
-    Assert(puserInfo);
+    HRESULT hr = S_OK;
 
-    // Set the User's password
-    puserInfo->usri1_password = wzPassword;
-
-    // Apply the Attributes
     if (SCAU_DONT_EXPIRE_PASSWRD & iAttributes)
     {
-        puserInfo->usri1_flags |= UF_DONT_EXPIRE_PASSWD;
+        *pFlags |= UF_DONT_EXPIRE_PASSWD;
     }
     else
     {
-        puserInfo->usri1_flags &= ~UF_DONT_EXPIRE_PASSWD;
+        *pFlags &= ~UF_DONT_EXPIRE_PASSWD;
     }
 
     if (SCAU_PASSWD_CANT_CHANGE & iAttributes)
     {
-        puserInfo->usri1_flags |= UF_PASSWD_CANT_CHANGE;
+        *pFlags |= UF_PASSWD_CANT_CHANGE;
     }
     else
     {
-        puserInfo->usri1_flags &= ~UF_PASSWD_CANT_CHANGE;
+        *pFlags &= ~UF_PASSWD_CANT_CHANGE;
     }
 
     if (SCAU_DISABLE_ACCOUNT & iAttributes)
     {
-        puserInfo->usri1_flags |= UF_ACCOUNTDISABLE;
+        *pFlags |= UF_ACCOUNTDISABLE;
     }
     else
     {
-        puserInfo->usri1_flags &= ~UF_ACCOUNTDISABLE;
+        *pFlags &= ~UF_ACCOUNTDISABLE;
     }
 
     if (SCAU_PASSWD_CHANGE_REQD_ON_LOGIN & iAttributes) // TODO: for some reason this doesn't work
     {
-        puserInfo->usri1_flags |= UF_PASSWORD_EXPIRED;
+        *pFlags |= UF_PASSWORD_EXPIRED;
     }
     else
     {
-        puserInfo->usri1_flags &= ~UF_PASSWORD_EXPIRED;
+        *pFlags &= ~UF_PASSWORD_EXPIRED;
     }
+
+    return hr;
 }
 
+static HRESULT ApplyComment(int iAttributes, LPWSTR pwzComment, LPWSTR* ppComment)
+{
+    HRESULT hr = S_OK;
+
+    if (SCAU_REMOVE_COMMENT & iAttributes)
+    {
+        *ppComment = L"";
+    }
+    else if (pwzComment && *pwzComment)
+    {
+        *ppComment = pwzComment;
+    }
+
+    return hr;
+}
+
+static NET_API_STATUS SetUserPassword(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in LPWSTR pwzPassword)
+{
+    _USER_INFO_1003 userInfo1003;
+
+    userInfo1003.usri1003_password = pwzPassword;
+    return ::NetUserSetInfo(pwzServerName, pwzName, 1003, reinterpret_cast<LPBYTE>(&userInfo1003), NULL);
+}
+
+static NET_API_STATUS SetUserComment(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in LPWSTR pwzComment)
+{
+    _USER_INFO_1007 userInfo1007;
+
+    userInfo1007.usri1007_comment = pwzComment;
+    return ::NetUserSetInfo(pwzServerName, pwzName, 1007, reinterpret_cast<LPBYTE>(&userInfo1007), NULL);
+}
+
+static NET_API_STATUS SetUserFlags(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in DWORD flags)
+{
+    _USER_INFO_1008 userInfo1008;
+
+    userInfo1008.usri1008_flags = flags;
+    return ::NetUserSetInfo(pwzServerName, pwzName, 1008, reinterpret_cast<LPBYTE>(&userInfo1008), NULL);
+}
 
 static HRESULT RemoveUserInternal(
     LPWSTR wzGroupCaData,
@@ -624,7 +656,12 @@ static HRESULT RemoveUserInternal(
             }
             if (ERROR_SUCCESS == er)
             {
-                wz = pDomainControllerInfo->DomainControllerName + 2;  //Add 2 so that we don't get the \\ prefix
+                if (2 <= wcslen(pDomainControllerInfo->DomainControllerName))
+                {
+                    wz = pDomainControllerInfo->DomainControllerName + 2; // Add 2 so that we don't get the \\ prefix.
+                                                                          // Pass the entire string if it is too short
+                                                                          // to have a \\ prefix.
+                }
             }
             else
             {
@@ -680,6 +717,41 @@ LExit:
     return hr;
 }
 
+static HRESULT GetServerName(LPWSTR pwzDomain, LPWSTR* ppwzServerName)
+{
+    HRESULT hr = S_OK;
+
+    PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
+    UINT er;
+
+    if (pwzDomain && *pwzDomain)
+    {
+        er = ::DsGetDcNameW(NULL, (LPCWSTR)pwzDomain, NULL, NULL, NULL, &pDomainControllerInfo);
+        if (RPC_S_SERVER_UNAVAILABLE == er)
+        {
+            // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
+            er = ::DsGetDcNameW(NULL, (LPCWSTR)pwzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo);
+        }
+        if (ERROR_SUCCESS == er
+         && 2 <= wcslen(pDomainControllerInfo->DomainControllerName)
+         && '\\' == *pDomainControllerInfo->DomainControllerName
+         && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
+        {
+            *ppwzServerName = pDomainControllerInfo->DomainControllerName + 2;  // Skip the \\ prefix
+        }
+        else
+        {
+            *ppwzServerName = pwzDomain;
+        }
+    }
+
+    if (pDomainControllerInfo)
+    {
+        ::NetApiBufferFree((LPVOID)pDomainControllerInfo);
+    }
+
+    return hr;
+}
 
 /********************************************************************
  CreateUser - CUSTOM ACTION ENTRY POINT for creating users
@@ -688,7 +760,7 @@ LExit:
  * *****************************************************************/
 extern "C" UINT __stdcall CreateUser(
     __in MSIHANDLE hInstall
-    )
+)
 {
     //AssertSz(0, "Debug CreateUser");
 
@@ -699,11 +771,11 @@ extern "C" UINT __stdcall CreateUser(
     LPWSTR pwz = NULL;
     LPWSTR pwzName = NULL;
     LPWSTR pwzDomain = NULL;
+    LPWSTR pwzComment = NULL;
     LPWSTR pwzScriptKey = NULL;
     LPWSTR pwzPassword = NULL;
     LPWSTR pwzGroup = NULL;
     LPWSTR pwzGroupDomain = NULL;
-    PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
     int iAttributes = 0;
     BOOL fInitializedCom = FALSE;
 
@@ -711,10 +783,10 @@ extern "C" UINT __stdcall CreateUser(
     int iOriginalAttributes = 0;
     int iRollbackAttributes = 0;
 
-    USER_INFO_1 userInfo;
-    USER_INFO_1* puserInfo = NULL;
+    USER_INFO_1 userInfo1;
+    USER_INFO_1* pUserInfo1 = NULL;
     DWORD dw;
-    LPCWSTR wz = NULL;
+    LPWSTR pwzServerName = NULL;
 
     hr = WcaInitialize(hInstall, "CreateUser");
     ExitOnFailure(hr, "failed to initialize");
@@ -723,7 +795,7 @@ extern "C" UINT __stdcall CreateUser(
     ExitOnFailure(hr, "failed to initialize COM");
     fInitializedCom = TRUE;
 
-    hr = WcaGetProperty( L"CustomActionData", &pwzData);
+    hr = WcaGetProperty(L"CustomActionData", &pwzData);
     ExitOnFailure(hr, "failed to get CustomActionData");
 
     WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
@@ -738,6 +810,9 @@ extern "C" UINT __stdcall CreateUser(
     hr = WcaReadStringFromCaData(&pwz, &pwzDomain);
     ExitOnFailure(hr, "failed to read domain from custom action data");
 
+    hr = WcaReadStringFromCaData(&pwz, &pwzComment);
+    ExitOnFailure(hr, "failed to read user comment from custom action data");
+
     hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
     ExitOnFailure(hr, "failed to read attributes from custom action data");
 
@@ -747,96 +822,155 @@ extern "C" UINT __stdcall CreateUser(
     hr = WcaReadStringFromCaData(&pwz, &pwzPassword);
     ExitOnFailure(hr, "failed to read password from custom action data");
 
-    // There is no rollback scheduled if the key is empty.
-    // Best effort to get original configuration and save it in the script so rollback can restore it.
-    if (*pwzScriptKey)
-    {
-        hr = WcaCaScriptCreate(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, FALSE, &hRollbackScript);
-        ExitOnFailure(hr, "Failed to open rollback CustomAction script.");
-
-        iRollbackAttributes = 0;
-        hr = GetExistingUserRightsAssignments(pwzDomain, pwzName, &iOriginalAttributes);
-        if (FAILED(hr))
-        {
-            WcaLogError(hr, "failed to get existing user rights: %ls, continuing anyway.", pwzName);
-        }
-        else
-        {
-            if (!(SCAU_ALLOW_LOGON_AS_SERVICE & iOriginalAttributes) && (SCAU_ALLOW_LOGON_AS_SERVICE & iAttributes))
-            {
-                iRollbackAttributes |= SCAU_ALLOW_LOGON_AS_SERVICE;
-            }
-            if (!(SCAU_ALLOW_LOGON_AS_BATCH & iOriginalAttributes) && (SCAU_ALLOW_LOGON_AS_BATCH & iAttributes))
-            {
-                iRollbackAttributes |= SCAU_ALLOW_LOGON_AS_BATCH;
-            }
-        }
-
-        hr = WcaCaScriptWriteNumber(hRollbackScript, iRollbackAttributes);
-        ExitOnFailure(hr, "Failed to add data to rollback script.");
-
-        // Nudge the system to get all our rollback data written to disk.
-        WcaCaScriptFlush(hRollbackScript);
-    }
-
     if (!(SCAU_DONT_CREATE_USER & iAttributes))
     {
-        ::ZeroMemory(&userInfo, sizeof(USER_INFO_1));
-        userInfo.usri1_name = pwzName;
-        userInfo.usri1_priv = USER_PRIV_USER;
-        userInfo.usri1_flags = UF_SCRIPT;
-        userInfo.usri1_home_dir = NULL;
-        userInfo.usri1_comment = NULL;
-        userInfo.usri1_script_path = NULL;
+        pUserInfo1 = &userInfo1;
+        ::ZeroMemory(pUserInfo1, sizeof(USER_INFO_1));
+        pUserInfo1->usri1_name = pwzName;
+        pUserInfo1->usri1_priv = USER_PRIV_USER;
+        pUserInfo1->usri1_flags = UF_SCRIPT;
+        pUserInfo1->usri1_home_dir = NULL;
+        pUserInfo1->usri1_comment = NULL;
+        pUserInfo1->usri1_script_path = NULL;
 
-        SetUserPasswordAndAttributes(&userInfo, pwzPassword, iAttributes);
+        // Set the user's password
+        pUserInfo1->usri1_password = pwzPassword;
+
+        // Set the user's comment
+        hr = ApplyComment(iAttributes, pwzComment, &pUserInfo1->usri1_comment);
+        ExitOnFailure(hr, "failed to apply comment");
+
+        // Set the user's flags
+        hr = ApplyAttributes(iAttributes, &pUserInfo1->usri1_flags);
+        ExitOnFailure(hr, "failed to apply attributes");
 
         //
         // Create the User
         //
-        if (pwzDomain && *pwzDomain)
-        {
-            er = ::DsGetDcNameW( NULL, (LPCWSTR)pwzDomain, NULL, NULL, NULL, &pDomainControllerInfo );
-            if (RPC_S_SERVER_UNAVAILABLE == er)
-            {
-                // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
-                er = ::DsGetDcNameW( NULL, (LPCWSTR)pwzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo );
-            }
-            if (ERROR_SUCCESS == er)
-            {
-                wz = pDomainControllerInfo->DomainControllerName + 2;  //Add 2 so that we don't get the \\ prefix
-            }
-            else
-            {
-                wz = pwzDomain;
-            }
-        }
+        hr = GetServerName(pwzDomain, &pwzServerName);
+        ExitOnFailure(hr, "failed to get server name");
 
-        er = ::NetUserAdd(wz, 1, reinterpret_cast<LPBYTE>(&userInfo), &dw);
+        er = ::NetUserAdd(pwzServerName, 1, reinterpret_cast<LPBYTE>(pUserInfo1), &dw);
         if (NERR_UserExists == er)
         {
+            er = ERROR_SUCCESS; // Make sure that we don't report this situation as an error
+                                // if we fall through the tests that follow.
+            if (SCAU_FAIL_IF_EXISTS & iAttributes)
+            {
+                hr = HRESULT_FROM_WIN32(er);
+                ExitOnFailure(hr, "User was not supposed to exist, but does.");
+            }
+
             if (SCAU_UPDATE_IF_EXISTS & iAttributes)
             {
-                er = ::NetUserGetInfo(wz, pwzName, 1, reinterpret_cast<LPBYTE*>(&puserInfo));
-                if (NERR_Success == er)
+                pUserInfo1 = NULL;
+                er = ::NetUserGetInfo(pwzServerName, pwzName, 1, reinterpret_cast<LPBYTE*>(&pUserInfo1));
+                if (ERROR_SUCCESS == er)
                 {
-                    // Change the existing user's password and attributes again then try
-                    // to update user with this new data
-                    SetUserPasswordAndAttributes(puserInfo, pwzPassword, iAttributes);
+                    // There is no rollback scheduled if the key is empty.
+                    // Best effort to get original configuration and save it in the script so rollback can restore it.
 
-                    er = ::NetUserSetInfo(wz, pwzName, 1, reinterpret_cast<LPBYTE>(puserInfo), &dw);
+                    if (*pwzScriptKey)
+                    {
+                        // Try to open the rollback script
+                        hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
+
+                        if (INVALID_HANDLE_VALUE != hRollbackScript)
+                        {
+                            WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
+                        }
+                        else
+                        {
+                            hRollbackScript = NULL;
+                            hr = WcaCaScriptCreate(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, FALSE, &hRollbackScript);
+                            ExitOnFailure(hr, "Failed to open rollback CustomAction script.");
+
+                            iRollbackAttributes = 0;
+                            hr = GetExistingUserRightsAssignments(pwzDomain, pwzName, &iOriginalAttributes);
+                            if (FAILED(hr))
+                            {
+                                WcaLogError(hr, "failed to get existing user rights: %ls, continuing anyway.", pwzName);
+                            }
+                            else
+                            {
+                                if (!(SCAU_ALLOW_LOGON_AS_SERVICE & iOriginalAttributes) && (SCAU_ALLOW_LOGON_AS_SERVICE & iAttributes))
+                                {
+                                    iRollbackAttributes |= SCAU_ALLOW_LOGON_AS_SERVICE;
+                                }
+
+                                if (!(SCAU_ALLOW_LOGON_AS_BATCH & iOriginalAttributes) && (SCAU_ALLOW_LOGON_AS_BATCH & iAttributes))
+                                {
+                                    iRollbackAttributes |= SCAU_ALLOW_LOGON_AS_BATCH;
+                                }
+                            }
+
+                            hr = WcaCaScriptWriteString(hRollbackScript, pUserInfo1->usri1_comment);
+                            ExitOnFailure(hr, "Failed to add rollback comment to rollback script.");
+
+                            if (!pUserInfo1->usri1_comment || !*pUserInfo1->usri1_comment)
+                            {
+                                iRollbackAttributes |= SCAU_REMOVE_COMMENT;
+                            }
+
+                            hr = WcaCaScriptWriteNumber(hRollbackScript, iRollbackAttributes);
+                            ExitOnFailure(hr, "Failed to add rollback attributes to rollback script.");
+
+                            // Nudge the system to get all our rollback data written to disk.
+                            WcaCaScriptFlush(hRollbackScript);
+                        }
+                    }
                 }
-            }
-            else if (!(SCAU_FAIL_IF_EXISTS & iAttributes))
-            {
-                er = NERR_Success;
+
+                if (ERROR_SUCCESS == er)
+                {
+                    hr = HRESULT_FROM_WIN32(::SetUserPassword(pwzServerName, pwzName, pwzPassword));
+                    if (FAILED(hr))
+                    {
+                        WcaLogError(hr, "failed to set user password for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                    }
+
+                    if (SCAU_REMOVE_COMMENT & iAttributes)
+                    {
+                        hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, L""));
+                        if (FAILED(hr))
+                        {
+                            WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                        }
+                    }
+                    else if (pwzComment && *pwzComment)
+                    {
+                        hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, pwzComment));
+                        if (FAILED(hr))
+                        {
+                            WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
+                        }
+                    }
+
+                    DWORD flags = pUserInfo1->usri1_flags;
+
+                    hr = ApplyAttributes(iAttributes, &flags);
+                    if (FAILED(hr))
+                    {
+                        WcaLogError(hr, "failed to apply attributes for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                    }
+
+                    hr = HRESULT_FROM_WIN32(SetUserFlags(pwzServerName, pwzName, flags));
+                    if (FAILED(hr))
+                    {
+                        WcaLogError(hr, "failed to set user flags for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                    }
+                }
             }
         }
         else if (NERR_PasswordTooShort == er || NERR_PasswordTooLong == er)
         {
             MessageExitOnFailure(hr = HRESULT_FROM_WIN32(er), msierrUSRFailedUserCreatePswd, "failed to create user: %ls due to invalid password.", pwzName);
         }
-        MessageExitOnFailure(hr = HRESULT_FROM_WIN32(er), msierrUSRFailedUserCreate, "failed to create user: %ls", pwzName);
+
+        if (ERROR_SUCCESS != er)
+        {
+            MessageExitOnFailure(hr = HRESULT_FROM_WIN32(er), msierrUSRFailedUserCreate, "failed to create user: %ls", pwzName);
+        }
     }
 
     if (SCAU_ALLOW_LOGON_AS_SERVICE & iAttributes)
@@ -851,14 +985,15 @@ extern "C" UINT __stdcall CreateUser(
         MessageExitOnFailure(hr, msierrUSRFailedGrantLogonAsService, "Failed to grant logon as batch job rights to user: %ls", pwzName);
     }
 
-    //
-    // Add the users to groups
-    //
-    while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
-    {
-        hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
-        ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
+//
+// Add the users to groups
+//
+while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
+{
+    hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
+    ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
 
+        WcaLog(LOGMSG_STANDARD, "Adding user %ls\\%ls to group %ls\\%ls", pwzDomain, pwzName, pwzGroupDomain, pwzGroup);
         hr = AddUserToGroup(pwzName, pwzDomain, pwzGroup, pwzGroupDomain);
         MessageExitOnFailure(hr, msierrUSRFailedUserGroupAdd, "failed to add user: %ls to group %ls", pwzName, pwzGroup);
     }
@@ -866,24 +1001,23 @@ extern "C" UINT __stdcall CreateUser(
     {
         hr = S_OK;
     }
+
     ExitOnFailure(hr, "failed to get next group in which to include user:%ls", pwzName);
+
+ExitOnFailure(hr, "failed to get next group in which to include user:%ls", pwzName);
 
 LExit:
     WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
 
-    if (puserInfo)
+    if (pUserInfo1 && pUserInfo1 != &userInfo1)
     {
-        ::NetApiBufferFree((LPVOID)puserInfo);
-    }
-
-    if (pDomainControllerInfo)
-    {
-        ::NetApiBufferFree((LPVOID)pDomainControllerInfo);
+        ::NetApiBufferFree((LPVOID)pUserInfo1);
     }
 
     ReleaseStr(pwzData);
     ReleaseStr(pwzName);
     ReleaseStr(pwzDomain);
+    ReleaseStr(pwzComment);
     ReleaseStr(pwzScriptKey);
     ReleaseStr(pwzPassword);
     ReleaseStr(pwzGroup);
@@ -922,15 +1056,17 @@ extern "C" UINT __stdcall CreateUserRollback(
 
     LPWSTR pwzData = NULL;
     LPWSTR pwz = NULL;
+    LPWSTR pwzScriptKey = NULL;
     LPWSTR pwzName = NULL;
     LPWSTR pwzDomain = NULL;
-    LPWSTR pwzScriptKey = NULL;
+    LPWSTR pwzComment = NULL;
     int iAttributes = 0;
     BOOL fInitializedCom = FALSE;
 
     WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
     LPWSTR pwzRollbackData = NULL;
     int iOriginalAttributes = 0;
+    LPWSTR pwzOriginalComment = NULL;
 
     hr = WcaInitialize(hInstall, "CreateUserRollback");
     ExitOnFailure(hr, "failed to initialize");
@@ -957,6 +1093,9 @@ extern "C" UINT __stdcall CreateUserRollback(
     hr = WcaReadStringFromCaData(&pwz, &pwzDomain);
     ExitOnFailure(hr, "failed to read domain from custom action data");
 
+    hr = WcaReadStringFromCaData(&pwz, &pwzComment);
+    ExitOnFailure(hr, "failed to read comment from custom action data");
+
     hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
     ExitOnFailure(hr, "failed to read attributes from custom action data");
 
@@ -978,6 +1117,15 @@ extern "C" UINT __stdcall CreateUserRollback(
             WcaLog(LOGMSG_TRACEONLY, "Rollback Data: %ls", pwzRollbackData);
 
             pwz = pwzRollbackData;
+            hr = WcaReadStringFromCaData(&pwz, &pwzOriginalComment);
+            if (FAILED(hr))
+            {
+                WcaLogError(hr, "failed to read comment from rollback data, continuing anyway");
+            }
+            else
+            {
+                pwzComment = pwzOriginalComment;
+            }
             hr = WcaReadIntegerFromCaData(&pwz, &iOriginalAttributes);
             if (FAILED(hr))
             {
@@ -998,8 +1146,10 @@ LExit:
     ReleaseStr(pwzData);
     ReleaseStr(pwzName);
     ReleaseStr(pwzDomain);
+    ReleaseStr(pwzComment);
     ReleaseStr(pwzScriptKey);
     ReleaseStr(pwzRollbackData);
+    ReleaseStr(pwzOriginalComment);
 
     if (fInitializedCom)
     {
@@ -1033,6 +1183,7 @@ extern "C" UINT __stdcall RemoveUser(
     LPWSTR pwz = NULL;
     LPWSTR pwzName = NULL;
     LPWSTR pwzDomain = NULL;
+    LPWSTR pwzComment = NULL;
     int iAttributes = 0;
     BOOL fInitializedCom = FALSE;
 
@@ -1058,6 +1209,9 @@ extern "C" UINT __stdcall RemoveUser(
     hr = WcaReadStringFromCaData(&pwz, &pwzDomain);
     ExitOnFailure(hr, "failed to read domain from custom action data");
 
+    hr = WcaReadStringFromCaData(&pwz, &pwzComment);
+    ExitOnFailure(hr, "failed to read comment from custom action data");
+
     hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
     ExitOnFailure(hr, "failed to read attributes from custom action data");
 
@@ -1067,6 +1221,7 @@ LExit:
     ReleaseStr(pwzData);
     ReleaseStr(pwzName);
     ReleaseStr(pwzDomain);
+    ReleaseStr(pwzComment);
 
     if (fInitializedCom)
     {

@@ -11,21 +11,14 @@ namespace WixToolsetTest.MsiE2E
     {
         public UtilExtensionUserTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        const string TempDomain = "USERDOMAIN";
-        const string TempUsername = "USERNAME";
-
         // Verify that the users specified in the authoring are created as expected.
         [RuntimeFact]
         public void CanInstallAndUninstallUsers()
         {
-            var arguments = new string[]
-            {
-                $"TEMPDOMAIN={Environment.GetEnvironmentVariable(TempDomain)}",
-                $"TEMPUSERNAME={Environment.GetEnvironmentVariable(TempUsername)}",
-            };
+            UserVerifier.CreateLocalUser("testName3", "test123!@#");
             var productA = this.CreatePackageInstaller("ProductA");
 
-            productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+            productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
             // Validate New User Information.
             UserVerifier.VerifyUserInformation(String.Empty, "testName1", true, false, false);
@@ -34,62 +27,90 @@ namespace WixToolsetTest.MsiE2E
             UserVerifier.VerifyUserInformation(String.Empty, "testName2", true, true, true);
             UserVerifier.VerifyUserIsMemberOf(String.Empty, "testName2", "Power Users");
 
-            UserVerifier.VerifyUserIsMemberOf(Environment.GetEnvironmentVariable(TempDomain), Environment.GetEnvironmentVariable(TempUsername), "Power Users");
+            UserVerifier.VerifyUserIsMemberOf("", "testName3", "Power Users");
 
-            productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+            productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
             // Verify Users marked as RemoveOnUninstall were removed.
             Assert.False(UserVerifier.UserExists(String.Empty, "testName1"), String.Format("User '{0}' was not removed on Uninstall", "testName1"));
             Assert.True(UserVerifier.UserExists(String.Empty, "testName2"), String.Format("User '{0}' was removed on Uninstall", "testName2"));
 
-            // clean up
-            UserVerifier.DeleteLocalUser("testName2");
+            // Verify that user added to power users group is removed on uninstall.
+            UserVerifier.VerifyUserIsNotMemberOf("", "testName3", "Power Users");
 
-            UserVerifier.VerifyUserIsNotMemberOf(Environment.GetEnvironmentVariable(TempDomain), Environment.GetEnvironmentVariable(TempUsername), "Power Users");
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+            UserVerifier.DeleteLocalUser("testName2");
+            UserVerifier.DeleteLocalUser("testName3");
         }
 
         // Verify the rollback action reverts all Users changes.
         [RuntimeFact]
         public void CanRollbackUsers()
         {
-            var arguments = new string[]
-            {
-                $"TEMPDOMAIN={Environment.GetEnvironmentVariable(TempDomain)}",
-                $"TEMPUSERNAME={Environment.GetEnvironmentVariable(TempUsername)}",
-            };
+            UserVerifier.CreateLocalUser("testName3", "test123!@#");
             var productFail = this.CreatePackageInstaller("ProductFail");
 
             // make sure the user accounts are deleted before we start
             UserVerifier.DeleteLocalUser("testName1");
             UserVerifier.DeleteLocalUser("testName2");
-            UserVerifier.VerifyUserIsNotMemberOf(Environment.GetEnvironmentVariable(TempDomain), Environment.GetEnvironmentVariable(TempUsername), "Power Users");
 
-            productFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, arguments);
+            productFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
 
-            // Verify Users marked as RemoveOnUninstall were removed.
+            // Verify added Users were removed on rollback.
             Assert.False(UserVerifier.UserExists(String.Empty, "testName1"), String.Format("User '{0}' was not removed on Rollback", "testName1"));
             Assert.False(UserVerifier.UserExists(String.Empty, "testName2"), String.Format("User '{0}' was not removed on Rollback", "testName2"));
 
-            UserVerifier.VerifyUserIsNotMemberOf(Environment.GetEnvironmentVariable(TempDomain), Environment.GetEnvironmentVariable(TempUsername), "Power Users");
+            // Verify that user added to power users group is removed from power users group on rollback.
+            UserVerifier.VerifyUserIsNotMemberOf("", "testName3", "Power Users");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+            UserVerifier.DeleteLocalUser("testName2");
+            UserVerifier.DeleteLocalUser("testName3");
         }
 
-        // Verify that the users specified in the authoring are created as expected on repair.
-        [RuntimeFact(Skip = "Test demonstrates failure")]
-        public void CanRepairUsers()
+
+        // Verify that command-line parameters aer not blocked by repair switches.
+        // Original code signalled repair mode by using "-f ", which silently
+        // terminated the command-line parsing, ignoring any parameters that followed.
+        [RuntimeFact()]
+        public void CanRepairUsersWithCommandLineParameters()
         {
             var arguments = new string[]
             {
-                $"TEMPDOMAIN={Environment.GetEnvironmentVariable(TempDomain)}",
-                $"TEMPUSERNAME={Environment.GetEnvironmentVariable(TempUsername)}",
+                "TESTPARAMETER1=testName1",
             };
+            var productWithCommandLineParameters = this.CreatePackageInstaller("ProductWithCommandLineParameters");
+
+            // Make sure that the user doesn't exist when we start the test.
+            UserVerifier.DeleteLocalUser("testName1");
+
+            // Install
+            productWithCommandLineParameters.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+
+            // Repair
+            productWithCommandLineParameters.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+
+            // Clean up
+            UserVerifier.DeleteLocalUser("testName1");
+        }
+
+
+        // Verify that the users specified in the authoring are created as expected on repair.
+        [RuntimeFact()]
+        public void CanRepairUsers()
+        {
+            UserVerifier.CreateLocalUser("testName3", "test123!@#");
             var productA = this.CreatePackageInstaller("ProductA");
 
-            productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+            productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
+            // Validate New User Information.
             UserVerifier.DeleteLocalUser("testName1");
             UserVerifier.SetUserInformation(String.Empty, "testName2", true, false, false);
 
-            productA.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+            productA.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
             // Validate New User Information.
             UserVerifier.VerifyUserInformation(String.Empty, "testName1", true, false, false);
@@ -98,21 +119,24 @@ namespace WixToolsetTest.MsiE2E
             UserVerifier.VerifyUserInformation(String.Empty, "testName2", true, true, true);
             UserVerifier.VerifyUserIsMemberOf(String.Empty, "testName2", "Power Users");
 
-            UserVerifier.VerifyUserIsMemberOf(Environment.GetEnvironmentVariable(TempDomain), Environment.GetEnvironmentVariable(TempUsername), "Power Users");
+            UserVerifier.VerifyUserIsMemberOf("", "testName3", "Power Users");
 
-            productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+            productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
             // Verify Users marked as RemoveOnUninstall were removed.
             Assert.False(UserVerifier.UserExists(String.Empty, "testName1"), String.Format("User '{0}' was not removed on Uninstall", "testName1"));
             Assert.True(UserVerifier.UserExists(String.Empty, "testName2"), String.Format("User '{0}' was removed on Uninstall", "testName2"));
 
-            // clean up
-            UserVerifier.DeleteLocalUser("testName2");
+            // Verify that user added to power users group is removed on uninstall.
+            UserVerifier.VerifyUserIsNotMemberOf("", "testName3", "Power Users");
 
-            UserVerifier.VerifyUserIsNotMemberOf(Environment.GetEnvironmentVariable(TempDomain), Environment.GetEnvironmentVariable(TempUsername), "Power Users");
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+            UserVerifier.DeleteLocalUser("testName2");
+            UserVerifier.DeleteLocalUser("testName3");
         }
 
-        // Verify that Installation fails if FailIfExisits is set.
+        // Verify that Installation fails if FailIfExists is set.
         [RuntimeFact]
         public void FailsIfUserExists()
         {
@@ -135,7 +159,6 @@ namespace WixToolsetTest.MsiE2E
                 // clean up
                 UserVerifier.DeleteLocalUser("existinguser");
             }
-
         }
 
         // Verify that a user cannot be created on a domain on which you dont have create user permission.
@@ -157,6 +180,99 @@ namespace WixToolsetTest.MsiE2E
             var productNonVitalGroup = this.CreatePackageInstaller("ProductNonVitalUserGroup");
 
             productNonVitalGroup.InstallProduct();
+        }
+
+        // Verify that a user can be created with a user comment
+        [RuntimeFact]
+        public void CanCreateNewUserWithComment()
+        {
+            var productNewUserWithComment = this.CreatePackageInstaller("ProductNewUserWithComment");
+
+            productNewUserWithComment.InstallProduct();
+            UserVerifier.VerifyUserComment(String.Empty, "testName1", "testComment1");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+        }
+
+        // Verify that a comment can be added to an existing user
+        [RuntimeFact]
+        public void CanAddCommentToExistingUser()
+        {
+            UserVerifier.CreateLocalUser("testName1", "test123!@#");
+            var productAddCommentToExistingUser = this.CreatePackageInstaller("ProductAddCommentToExistingUser");
+
+            productAddCommentToExistingUser.InstallProduct();
+
+            UserVerifier.VerifyUserComment(String.Empty, "testName1", "testComment1");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+        }
+
+        // Verify that a comment can be repaired for a new user
+        [RuntimeFact]
+        public void CanRepairCommentOfNewUser()
+        {
+            var productNewUserWithComment = this.CreatePackageInstaller("ProductNewUserWithComment");
+
+            productNewUserWithComment.InstallProduct();
+            UserVerifier.SetUserComment(String.Empty, "testName1", "");
+
+            productNewUserWithComment.RepairProduct();
+            UserVerifier.VerifyUserComment(String.Empty, "testName1", "testComment1");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+        }
+
+        // Verify that a comment can be changed for an existing user
+        [RuntimeFact]
+        public void CanChangeCommentOfExistingUser()
+        {
+            UserVerifier.CreateLocalUser("testName1", "test123!@#");
+            UserVerifier.SetUserComment(String.Empty, "testName1", "initialTestComment1");
+            var productNewUserWithComment = this.CreatePackageInstaller("ProductNewUserWithComment");
+
+            productNewUserWithComment.InstallProduct();
+            UserVerifier.VerifyUserComment(String.Empty, "testName1", "testComment1");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+        }
+
+        // Verify that a comment can be rolled back for an existing user
+        [RuntimeFact]
+        public void CanRollbackCommentOfExistingUser()
+        {
+            UserVerifier.CreateLocalUser("testName1", "test123!@#");
+            UserVerifier.SetUserComment(String.Empty, "testName1", "initialTestComment1");
+            var productCommentFail = this.CreatePackageInstaller("ProductCommentFail");
+
+            productCommentFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
+
+            // Verify that comment change was rolled back.
+            UserVerifier.VerifyUserComment(String.Empty, "testName1", "initialTestComment1");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
+        }
+
+        // Verify that a comment can be deleted for an existing user
+        [RuntimeFact]
+        public void CanDeleteCommentOfExistingUser()
+        {
+            UserVerifier.CreateLocalUser("testName1", "test123!@#");
+            UserVerifier.SetUserComment(String.Empty, "testName1", "testComment1");
+            var productCommentDelete = this.CreatePackageInstaller("ProductCommentDelete");
+
+            productCommentDelete.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            // Verify that comment was removed.
+            UserVerifier.VerifyUserComment(String.Empty, "testName1", "");
+
+            // clean up
+            UserVerifier.DeleteLocalUser("testName1");
         }
     }
 }

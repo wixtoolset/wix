@@ -297,6 +297,82 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanCreateUserAccountWithComment()
+        {
+            var folder = TestData.Get(@"TestData\CreateUser");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(Build, "Wix4User");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Wix4User:TEST_USER00\tComponent1\ttestName00\t\ttest123!@#\tTest Comment 1\t1792",
+                "Wix4User:TEST_USER01\tComponent1\ttestName01\t\ttest123!@#\tTest Comment 1\t1796",
+                "Wix4User:TEST_USER02\tComponent1\ttestName02\t\ttest123!@#\t\t3840",
+                "Wix4User:TEST_USER03\tComponent1\ttestName03\t\ttest123!@#\t\t3844",
+                "Wix4User:TEST_USER04\tComponent1\ttestName04\t\ttest123!@#\tTest Comment 1\t1280",
+                "Wix4User:TEST_USER05\tComponent1\ttestName05\t\ttest123!@#\tTest Comment 1\t1284",
+                "Wix4User:TEST_USER06\tComponent1\ttestName06\t\ttest123!@#\t\t3328",
+                "Wix4User:TEST_USER07\tComponent1\ttestName07\t\ttest123!@#\t\t3332",
+                "Wix4User:TEST_USER10\tComponent1\ttestName10\t\ttest123!@#\tTest Comment 1\t1808",
+                "Wix4User:TEST_USER11\tComponent1\ttestName11\t\ttest123!@#\tTest Comment 1\t1812",
+                "Wix4User:TEST_USER12\tComponent1\ttestName12\t\ttest123!@#\t\t3856",
+                "Wix4User:TEST_USER13\tComponent1\ttestName13\t\ttest123!@#\t\t3860",
+                "Wix4User:TEST_USER14\tComponent1\ttestName14\t\ttest123!@#\tTest Comment 1\t1296",
+                "Wix4User:TEST_USER15\tComponent1\ttestName15\t\ttest123!@#\tTest Comment 1\t1300",
+                "Wix4User:TEST_USER16\tComponent1\ttestName16\t\ttest123!@#\t\t3344",
+                "Wix4User:TEST_USER17\tComponent1\ttestName17\t\ttest123!@#\t\t3348",
+                "Wix4User:TEST_USER20\tComponent1\ttestName20\t\ttest123!@#\tTest Comment 1\t768",
+                "Wix4User:TEST_USER21\tComponent1\ttestName21\t\ttest123!@#\tTest Comment 1\t772",
+                "Wix4User:TEST_USER22\tComponent1\ttestName22\t\ttest123!@#\t\t2816",
+                "Wix4User:TEST_USER23\tComponent1\ttestName23\t\ttest123!@#\t\t2820",
+                "Wix4User:TEST_USER24\tComponent1\ttestName24\t\ttest123!@#\tTest Comment 1\t256",
+                "Wix4User:TEST_USER25\tComponent1\ttestName25\t\ttest123!@#\tTest Comment 1\t260",
+                "Wix4User:TEST_USER26\tComponent1\ttestName26\t\ttest123!@#\t\t2304",
+                "Wix4User:TEST_USER27\tComponent1\ttestName27\t\ttest123!@#\t\t2308",
+                "Wix4User:TEST_USER30\tComponent1\ttestName30\t\ttest123!@#\tTest Comment 1\t784",
+                "Wix4User:TEST_USER31\tComponent1\ttestName31\t\ttest123!@#\tTest Comment 1\t788",
+                "Wix4User:TEST_USER32\tComponent1\ttestName32\t\ttest123!@#\t\t2832",
+                "Wix4User:TEST_USER33\tComponent1\ttestName33\t\ttest123!@#\t\t2836",
+                "Wix4User:TEST_USER34\tComponent1\ttestName34\t\ttest123!@#\tTest Comment 1\t272",
+                "Wix4User:TEST_USER35\tComponent1\ttestName35\t\ttest123!@#\tTest Comment 1\t276",
+                "Wix4User:TEST_USER36\tComponent1\ttestName36\t\ttest123!@#\t\t2320",
+                "Wix4User:TEST_USER37\tComponent1\ttestName37\t\ttest123!@#\t\t2324",
+                "Wix4User:TEST_USER40\tComponent1\ttestName40\t\ttest123!@#\tTest Comment 1\t1536",
+                "Wix4User:TEST_USER41\tComponent1\ttestName41\t\ttest123!@#\tTest Comment 1\t1540",
+                "Wix4User:TEST_USER42\tComponent1\ttestName42\t\ttest123!@#\t\t3584",
+                "Wix4User:TEST_USER43\tComponent1\ttestName43\t\ttest123!@#\t\t3588",
+                "Wix4User:TEST_USER44\tComponent1\ttestName44\t\ttest123!@#\tTest Comment 1\t1024",
+                "Wix4User:TEST_USER45\tComponent1\ttestName45\t\ttest123!@#\tTest Comment 1\t1028",
+                "Wix4User:TEST_USER46\tComponent1\ttestName46\t\ttest123!@#\t\t3072",
+                "Wix4User:TEST_USER47\tComponent1\ttestName47\t\ttest123!@#\t\t3076",
+                "Wix4User:TEST_USER50\tComponent1\ttestName50\t\ttest123!@#\tTest Comment 1\t1552",
+                "Wix4User:TEST_USER51\tComponent1\ttestName51\t\ttest123!@#\tTest Comment 1\t1556",
+                "Wix4User:TEST_USER52\tComponent1\ttestName52\t\ttest123!@#\t\t3600",
+                "Wix4User:TEST_USER53\tComponent1\ttestName53\t\ttest123!@#\t\t3604",
+                "Wix4User:TEST_USER54\tComponent1\ttestName54\t\ttest123!@#\tTest Comment 1\t1040",
+                "Wix4User:TEST_USER55\tComponent1\ttestName55\t\ttest123!@#\tTest Comment 1\t1044",
+                "Wix4User:TEST_USER56\tComponent1\ttestName56\t\ttest123!@#\t\t3088",
+                "Wix4User:TEST_USER57\tComponent1\ttestName57\t\ttest123!@#\t\t3092",
+                "Wix4User:TEST_USER60\tComponent1\ttestName60\t\ttest123!@#\tTest Comment 1\t512",
+                "Wix4User:TEST_USER61\tComponent1\ttestName61\t\ttest123!@#\tTest Comment 1\t516",
+                "Wix4User:TEST_USER62\tComponent1\ttestName62\t\ttest123!@#\t\t2560",
+                "Wix4User:TEST_USER63\tComponent1\ttestName63\t\ttest123!@#\t\t2564",
+                "Wix4User:TEST_USER64\tComponent1\ttestName64\t\ttest123!@#\tTest Comment 1\t0",
+                "Wix4User:TEST_USER65\tComponent1\ttestName65\t\ttest123!@#\tTest Comment 1\t4",
+                "Wix4User:TEST_USER66\tComponent1\ttestName66\t\ttest123!@#\t\t2048",
+                "Wix4User:TEST_USER67\tComponent1\ttestName67\t\ttest123!@#\t\t2052",
+                "Wix4User:TEST_USER70\tComponent1\ttestName70\t\ttest123!@#\tTest Comment 1\t528",
+                "Wix4User:TEST_USER71\tComponent1\ttestName71\t\ttest123!@#\tTest Comment 1\t532",
+                "Wix4User:TEST_USER72\tComponent1\ttestName72\t\ttest123!@#\t\t2576",
+                "Wix4User:TEST_USER73\tComponent1\ttestName73\t\ttest123!@#\t\t2580",
+                "Wix4User:TEST_USER74\tComponent1\ttestName74\t\ttest123!@#\tTest Comment 1\t16",
+                "Wix4User:TEST_USER75\tComponent1\ttestName75\t\ttest123!@#\tTest Comment 1\t20",
+                "Wix4User:TEST_USER76\tComponent1\ttestName76\t\ttest123!@#\t\t2064",
+                "Wix4User:TEST_USER77\tComponent1\ttestName77\t\ttest123!@#\t\t2068",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildBundleWithWarningsWithSearchesUsingDiscouragedVariableNames()
         {
             var folder = TestData.Get("TestData", "BundleWithSearches");

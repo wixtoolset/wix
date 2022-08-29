@@ -906,7 +906,7 @@ static void RevealNulls(
 
 
 /********************************************************************
-WcaGetRecordFormattedString() - gets formatted string filed from record
+WcaGetRecordFormattedString() - gets formatted string field from record
 
 ********************************************************************/
 extern "C" HRESULT WIXAPI WcaGetRecordFormattedString(
@@ -1391,9 +1391,14 @@ extern "C" HRESULT WIXAPI WcaWriteIntegerToCaData(
     )
 {
     WCHAR wzBuffer[13];
-    StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%d", i);
+    HRESULT hr = StringCchPrintfW(wzBuffer, countof(wzBuffer), L"%d", i);
+    ExitOnFailure(hr, "failed to write integer to ca data");
 
-    return WcaWriteStringToCaData(wzBuffer, ppwzCustomActionData);
+    hr = WcaWriteStringToCaData(wzBuffer, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write integer to ca data");
+
+LExit:
+    return hr;
 }
 
 
