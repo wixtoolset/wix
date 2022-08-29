@@ -31,6 +31,7 @@ struct SCA_USER
     WCHAR wzDomain[MAX_DARWIN_COLUMN + 1];
     WCHAR wzName[MAX_DARWIN_COLUMN + 1];
     WCHAR wzPassword[MAX_DARWIN_COLUMN + 1];
+    WCHAR wzComment[MAX_DARWIN_COLUMN + 1];
     INT iAttributes;
 
     SCA_GROUP *psgGroups;
@@ -41,16 +42,16 @@ struct SCA_USER
 
 // prototypes
 HRESULT __stdcall ScaGetUser(
-    __in LPCWSTR wzUser, 
+    __in LPCWSTR wzUser,
     __out SCA_USER* pscau
     );
 HRESULT __stdcall ScaGetUserDeferred(
-    __in LPCWSTR wzUser, 
+    __in LPCWSTR wzUser,
     __in WCA_WRAPQUERY_HANDLE hUserQuery,
     __out SCA_USER* pscau
     );
 HRESULT __stdcall ScaGetGroup(
-    __in LPCWSTR wzGroup, 
+    __in LPCWSTR wzGroup,
     __out SCA_GROUP* pscag
     );
 void ScaUserFreeList(

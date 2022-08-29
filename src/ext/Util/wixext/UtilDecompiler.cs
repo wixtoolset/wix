@@ -559,13 +559,14 @@ namespace WixToolset.Util
         {
             foreach (var row in table.Rows)
             {
-                var attributes = row.FieldAsNullableInteger(5) ?? 0;
+                var attributes = row.FieldAsNullableInteger(6) ?? 0;
 
                 var user = new XElement(UtilConstants.UserName,
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("Name", row.FieldAsString(2)),
                     AttributeIfNotNull("Domain", row, 3),
                     AttributeIfNotNull("Password", row, 4),
+                    AttributeIfNotNull("Comment", row, 5),
                     AttributeIfTrue("PasswordNeverExpires", UtilCompiler.UserDontExpirePasswrd == (attributes & UtilCompiler.UserDontExpirePasswrd)),
                     AttributeIfTrue("CanNotChangePassword", UtilCompiler.UserPasswdCantChange == (attributes & UtilCompiler.UserPasswdCantChange)),
                     AttributeIfTrue("PasswordExpired", UtilCompiler.UserPasswdChangeReqdOnLogin == (attributes & UtilCompiler.UserPasswdChangeReqdOnLogin)),
@@ -573,7 +574,8 @@ namespace WixToolset.Util
                     AttributeIfTrue("FailIfExists", UtilCompiler.UserFailIfExists == (attributes & UtilCompiler.UserFailIfExists)),
                     AttributeIfTrue("UpdateIfExists", UtilCompiler.UserUpdateIfExists == (attributes & UtilCompiler.UserUpdateIfExists)),
                     AttributeIfTrue("LogonAsService", UtilCompiler.UserLogonAsService == (attributes & UtilCompiler.UserLogonAsService)),
-                    AttributeIfTrue("LogonAsService", UtilCompiler.UserLogonAsService == (attributes & UtilCompiler.UserLogonAsService))
+                    AttributeIfTrue("LogonAsBatchJob", UtilCompiler.UserLogonAsBatchJob == (attributes & UtilCompiler.UserLogonAsBatchJob)),
+                    AttributeIfTrue("RemoveComment", UtilCompiler.UserRemoveComment == (attributes & UtilCompiler.UserRemoveComment))
                     );
 
                 if (UtilCompiler.UserDontRemoveOnUninstall == (attributes & UtilCompiler.UserDontRemoveOnUninstall))
