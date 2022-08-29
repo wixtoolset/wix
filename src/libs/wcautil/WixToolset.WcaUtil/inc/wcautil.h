@@ -342,12 +342,12 @@ HRESULT WIXAPI WcaCaScriptReadAsCustomActionData(
 HRESULT WIXAPI WcaCaScriptWriteString(
     __in WCA_CASCRIPT_HANDLE hScript,
     __in_z LPCWSTR wzValue
-    );
+);
 
 HRESULT WIXAPI WcaCaScriptWriteNumber(
     __in WCA_CASCRIPT_HANDLE hScript,
     __in DWORD dwValue
-    );
+);
 
 void WIXAPI WcaCaScriptFlush(
     __in WCA_CASCRIPT_HANDLE hScript

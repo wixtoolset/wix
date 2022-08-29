@@ -259,7 +259,7 @@ namespace WixTestTools
                     arguments.Append(" /a ");
                     break;
                 case MSIExecMode.Repair:
-                    arguments.Append(" /f ");
+                    arguments.Append(" /fvomusa ");
                     break;
                 case MSIExecMode.Cleanup:
                 case MSIExecMode.Uninstall:

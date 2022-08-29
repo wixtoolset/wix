@@ -49,7 +49,7 @@ namespace WixTestTools
             UserPrincipal newUser = new UserPrincipal(new PrincipalContext(ContextType.Machine));
             newUser.SetPassword(password);
             newUser.Name = userName;
-            newUser.Description = "New test User";
+            newUser.Description = String.Empty;
             newUser.UserCannotChangePassword = true;
             newUser.PasswordNeverExpires = false;
             newUser.Save();
@@ -109,6 +109,24 @@ namespace WixTestTools
         }
 
         /// <summary>
+        /// Sets the user comment for a given user
+        /// </summary>
+        /// <param name="domainName">domain name for the user, empty for local users</param>
+        /// <param name="userName">the user name</param>
+        /// <param name="comment">comment to be set for the user</param>
+        public static void SetUserComment(string domainName, string userName, string comment)
+        {
+            UserPrincipal user = GetUser(domainName, userName);
+
+            Assert.False(null == user, String.Format("User '{0}' was not found under domain '{1}'.", userName, domainName));
+
+            var directoryEntry = user.GetUnderlyingObject() as DirectoryEntry;
+            Assert.False(null == directoryEntry);
+            directoryEntry.Properties["Description"].Value = comment;
+            user.Save();
+        }
+
+        /// <summary>
         /// Adds the specified user to the specified local group
         /// </summary>
         /// <param name="userName">User to add</param>
@@ -162,7 +180,24 @@ namespace WixTestTools
         }
 
         /// <summary>
-        /// Verify that a givin user is member of a local group
+        /// Verifies the user comment for a given user
+        /// </summary>
+        /// <param name="domainName">domain name for the user, empty for local users</param>
+        /// <param name="userName">the user name</param>
+        /// <param name="comment">the comment to be verified</param>
+        public static void VerifyUserComment(string domainName, string userName, string comment)
+        {
+            UserPrincipal user = GetUser(domainName, userName);
+
+            Assert.False(null == user, String.Format("User '{0}' was not found under domain '{1}'.", userName, domainName));
+
+            var directoryEntry = user.GetUnderlyingObject() as DirectoryEntry;
+            Assert.False(null == directoryEntry);
+            Assert.True(comment == (string)(directoryEntry.Properties["Description"].Value));
+        }
+
+        /// <summary>
+        /// Verify that a given user is member of a local group
         /// </summary>
         /// <param name="domainName">domain name for the user, empty for local users</param>
         /// <param name="userName">the user name</param>
@@ -322,7 +357,6 @@ namespace WixTestTools
                     missedAGroup = true;
                     message += String.Format("Local group '{0}' was not found. \r\n", groupName);
                 }
-
             }
             Assert.False(missedAGroup, message);
         }
@@ -346,3 +380,4 @@ namespace WixTestTools
         }
     }
 }
+

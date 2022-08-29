@@ -235,7 +235,6 @@ LExit:
     return hr;
 }
 
-
 /********************************************************************
  WcaCaScriptWriteString() - writes a string to the ca script.
 
