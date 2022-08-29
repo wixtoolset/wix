@@ -17,8 +17,8 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="error">The error code from the MsiXxx() function call.</param>
         public MsiException(int error) : base(error)
         {
-            uint handle = MsiInterop.MsiGetLastErrorRecord();
-            if (0 != handle)
+            IntPtr handle = MsiInterop.MsiGetLastErrorRecord();
+            if (IntPtr.Zero != handle)
             {
                 using (Record record = new Record(handle))
                 {

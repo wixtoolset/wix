@@ -58,7 +58,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">Record containing parameters to be substituded into the view.</param>
         public void Execute(Record record)
         {
-            var error = MsiInterop.MsiViewExecute(this.Handle, null == record ? 0 : record.Handle);
+            var error = MsiInterop.MsiViewExecute(this.Handle, null == record ? IntPtr.Zero : record.Handle);
             if (0 != error)
             {
                 throw new MsiException(error);

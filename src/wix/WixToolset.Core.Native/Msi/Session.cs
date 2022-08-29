@@ -2,8 +2,6 @@
 
 namespace WixToolset.Core.Native.Msi
 {
-    using System.Globalization;
-
     /// <summary>
     /// Controls the installation process.
     /// </summary>
@@ -15,7 +13,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="database">The database to open.</param>
         public Session(Database database)
         {
-            var packagePath = "#" + database.Handle.ToString(CultureInfo.InvariantCulture);
+            var packagePath = "#" + database.Handle;
 
             var error = MsiInterop.MsiOpenPackage(packagePath, out var handle);
             if (0 != error)
