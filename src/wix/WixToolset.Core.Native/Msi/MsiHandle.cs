@@ -15,7 +15,7 @@ namespace WixToolset.Core.Native.Msi
     public abstract class MsiHandle : IDisposable
     {
         private bool disposed;
-        private uint handle;
+        private IntPtr handle;
         private int owningThread;
 #if DEBUG
         private string creationStack;
@@ -33,7 +33,7 @@ namespace WixToolset.Core.Native.Msi
         /// Gets or sets the MSI handle.
         /// </summary>
         /// <value>The MSI handle.</value>
-        internal uint Handle
+        internal IntPtr Handle
         {
             get
             {
@@ -85,7 +85,7 @@ namespace WixToolset.Core.Native.Msi
         {
             if (!this.disposed)
             {
-                if (0 != this.handle)
+                if (IntPtr.Zero != this.handle)
                 {
                     if (Thread.CurrentThread.ManagedThreadId == this.owningThread)
                     {
@@ -94,7 +94,7 @@ namespace WixToolset.Core.Native.Msi
                         {
                             throw new Win32Exception(error);
                         }
-                        this.handle = 0;
+                        this.handle = IntPtr.Zero;
                     }
                     else
                     {

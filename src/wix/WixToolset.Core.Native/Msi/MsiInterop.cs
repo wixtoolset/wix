@@ -56,7 +56,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="database">Handle to a database.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiCloseHandle", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiCloseHandle(uint database);
+        internal static extern int MsiCloseHandle(IntPtr database);
 
         /// <summary>
         /// PInvoke of MsiCreateRecord
@@ -64,7 +64,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="parameters">Count of columns in the record.</param>
         /// <returns>Handle referencing the record.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiCreateRecord", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern uint MsiCreateRecord(int parameters);
+        internal static extern IntPtr MsiCreateRecord(int parameters);
 
         /// <summary>
         /// Creates summary information of an existing transform to include validation and error conditions.
@@ -76,7 +76,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="validations">Specifies the properties to be validated to verify that the transform can be applied to the database.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiCreateTransformSummaryInfoW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiCreateTransformSummaryInfo(uint database, uint referenceDatabase, string transformFile, TransformErrorConditions errorConditions, TransformValidations validations);
+        internal static extern int MsiCreateTransformSummaryInfo(IntPtr database, IntPtr referenceDatabase, string transformFile, TransformErrorConditions errorConditions, TransformValidations validations);
 
         /// <summary>
         /// Applies a transform to a database.
@@ -86,7 +86,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="errorConditions">Error conditions that should be suppressed.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseApplyTransformW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseApplyTransform(uint database, string transformFile, TransformErrorConditions errorConditions);
+        internal static extern int MsiDatabaseApplyTransform(IntPtr database, string transformFile, TransformErrorConditions errorConditions);
 
         /// <summary>
         /// PInvoke of MsiDatabaseCommit.
@@ -94,7 +94,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="database">Handle to a databse.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseCommit", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseCommit(uint database);
+        internal static extern int MsiDatabaseCommit(IntPtr database);
 
         /// <summary>
         /// PInvoke of MsiDatabaseExportW.
@@ -105,7 +105,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="fileName">File name.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseExportW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseExport(uint database, string tableName, string folderPath, string fileName);
+        internal static extern int MsiDatabaseExport(IntPtr database, string tableName, string folderPath, string fileName);
 
         /// <summary>
         /// Generates a transform file of differences between two databases.
@@ -120,7 +120,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="reserved2">This is a reserved argument and must be set to 0.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseGenerateTransformW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseGenerateTransform(uint database, uint databaseReference, string transformFile, int reserved1, int reserved2);
+        internal static extern int MsiDatabaseGenerateTransform(IntPtr database, IntPtr databaseReference, string transformFile, int reserved1, int reserved2);
 
         /// <summary>
         /// PInvoke of MsiDatabaseImportW.
@@ -130,7 +130,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="fileName">File name.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseImportW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseImport(uint database, string folderPath, string fileName);
+        internal static extern int MsiDatabaseImport(IntPtr database, string folderPath, string fileName);
 
         /// <summary>
         /// PInvoke of MsiDatabaseMergeW.
@@ -140,7 +140,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="tableName">The name of the table to receive merge conflict information.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseMergeW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseMerge(uint database, uint databaseMerge, string tableName);
+        internal static extern int MsiDatabaseMerge(IntPtr database, IntPtr databaseMerge, string tableName);
 
         /// <summary>
         /// PInvoke of MsiDatabaseOpenViewW.
@@ -150,7 +150,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="view">View handle.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseOpenViewW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseOpenView(uint database, string query, out uint view);
+        internal static extern int MsiDatabaseOpenView(IntPtr database, string query, out IntPtr view);
 
         /// <summary>
         /// PInvoke of MsiExtractPatchXMLDataW.
@@ -190,7 +190,7 @@ namespace WixToolset.Core.Native.Msi
         /// </summary>
         /// <returns>Handle to error record if one exists.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiGetLastErrorRecord", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern uint MsiGetLastErrorRecord();
+        internal static extern IntPtr MsiGetLastErrorRecord();
 
         /// <summary>
         /// PInvoke of MsiDatabaseGetPrimaryKeysW.
@@ -200,7 +200,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">Handle to receive resulting record.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseGetPrimaryKeysW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseGetPrimaryKeys(uint database, string tableName, out uint record);
+        internal static extern int MsiDatabaseGetPrimaryKeys(IntPtr database, string tableName, out IntPtr record);
 
         /// <summary>
         /// PInvoke of MsiDoActionW.
@@ -210,7 +210,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="action">Specifies the action to execute.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDoActionW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDoAction(uint product, string action);
+        internal static extern int MsiDoAction(IntPtr product, string action);
 
         /// <summary>
         /// PInvoke of MsiGetSummaryInformationW.  Can use either database handle or database path as input.
@@ -221,7 +221,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="summaryInfo">Handle to summary information.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiGetSummaryInformationW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiGetSummaryInformation(uint database, string databasePath, uint updateCount, ref uint summaryInfo);
+        internal static extern int MsiGetSummaryInformation(IntPtr database, string databasePath, uint updateCount, ref IntPtr summaryInfo);
 
         /// <summary>
         /// PInvoke of MsiDatabaseIsTablePersitentW.
@@ -230,7 +230,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="tableName">Table name.</param>
         /// <returns>MSICONDITION</returns>
         [DllImport("msi.dll", EntryPoint = "MsiDatabaseIsTablePersistentW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiDatabaseIsTablePersistent(uint database, string tableName);
+        internal static extern int MsiDatabaseIsTablePersistent(IntPtr database, string tableName);
 
         /// <summary>
         /// PInvoke of MsiOpenDatabaseW.
@@ -240,7 +240,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="database">Handle to database.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiOpenDatabaseW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiOpenDatabase(string databasePath, IntPtr persist, out uint database);
+        internal static extern int MsiOpenDatabase(string databasePath, IntPtr persist, out IntPtr database);
 
         /// <summary>
         /// PInvoke of MsiOpenPackageW.
@@ -249,7 +249,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="product">A pointer to a variable that receives the product handle.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiOpenPackageW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiOpenPackage(string packagePath, out uint product);
+        internal static extern int MsiOpenPackage(string packagePath, out IntPtr product);
 
         /// <summary>
         /// PInvoke of MsiRecordIsNull.
@@ -258,7 +258,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="field">Index of field to check for null value.</param>
         /// <returns>true if the field is null, false if not, and an error code for any error.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordIsNull", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordIsNull(uint record, int field);
+        internal static extern int MsiRecordIsNull(IntPtr record, int field);
 
         /// <summary>
         /// PInvoke of MsiRecordGetInteger.
@@ -267,7 +267,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="field">Index of field to retrieve integer from.</param>
         /// <returns>Integer value.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordGetInteger", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordGetInteger(uint record, int field);
+        internal static extern int MsiRecordGetInteger(IntPtr record, int field);
 
         /// <summary>
         /// PInvoke of MsiRectordSetInteger.
@@ -277,7 +277,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="value">Value to set field to.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordSetInteger", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordSetInteger(uint record, int field, int value);
+        internal static extern int MsiRecordSetInteger(IntPtr record, int field, int value);
 
         /// <summary>
         /// PInvoke of MsiRecordGetStringW.
@@ -288,7 +288,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="valueBufSize">Size of buffer.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordGetStringW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordGetString(uint record, int field, StringBuilder valueBuf, ref int valueBufSize);
+        internal static extern int MsiRecordGetString(IntPtr record, int field, StringBuilder valueBuf, ref int valueBufSize);
 
         /// <summary>
         /// PInvoke of MsiRecordSetStringW.
@@ -298,7 +298,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="value">String value.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordSetStringW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordSetString(uint record, int field, string value);
+        internal static extern int MsiRecordSetString(IntPtr record, int field, string value);
 
         /// <summary>
         /// PInvoke of MsiRecordSetStreamW.
@@ -308,7 +308,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="filePath">Path to file to set stream value to.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordSetStreamW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordSetStream(uint record, int field, string filePath);
+        internal static extern int MsiRecordSetStream(IntPtr record, int field, string filePath);
 
         /// <summary>
         /// PInvoke of MsiRecordReadStreamW.
@@ -319,7 +319,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="dataBufSize">Size of data buffer.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordReadStream", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordReadStream(uint record, int field, byte[] dataBuf, ref int dataBufSize);
+        internal static extern int MsiRecordReadStream(IntPtr record, int field, byte[] dataBuf, ref int dataBufSize);
 
         /// <summary>
         /// PInvoke of MsiRecordGetFieldCount.
@@ -327,7 +327,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">MSI Record handle.</param>
         /// <returns>Count of fields in the record.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiRecordGetFieldCount", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiRecordGetFieldCount(uint record);
+        internal static extern int MsiRecordGetFieldCount(IntPtr record);
 
         /// <summary>
         /// PInvoke of MsiSetExternalUIW.
@@ -365,7 +365,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="stringValueBufSize">Size of string buffer.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiSummaryInfoGetPropertyW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiSummaryInfoGetProperty(uint summaryInfo, int property, out uint dataType, out int integerValue, ref System.Runtime.InteropServices.ComTypes.FILETIME fileTimeValue, StringBuilder stringValueBuf, ref int stringValueBufSize);
+        internal static extern int MsiSummaryInfoGetProperty(IntPtr summaryInfo, int property, out uint dataType, out int integerValue, ref System.Runtime.InteropServices.ComTypes.FILETIME fileTimeValue, StringBuilder stringValueBuf, ref int stringValueBufSize);
 
         /// <summary>
         /// PInvoke of MsiViewGetColumnInfo.
@@ -375,7 +375,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">Handle for returned record.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiViewGetColumnInfo", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiViewGetColumnInfo(uint view, int columnInfo, out uint record);
+        internal static extern int MsiViewGetColumnInfo(IntPtr view, int columnInfo, out IntPtr record);
 
         /// <summary>
         /// PInvoke of MsiViewExecute.
@@ -384,7 +384,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">Handle to a record that supplies the parameters for the view.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiViewExecute", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiViewExecute(uint view, uint record);
+        internal static extern int MsiViewExecute(IntPtr view, IntPtr record);
 
         /// <summary>
         /// PInvoke of MsiViewFetch.
@@ -393,7 +393,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">Handle to receive record info.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiViewFetch", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiViewFetch(uint view, out uint record);
+        internal static extern int MsiViewFetch(IntPtr view, out IntPtr record);
 
         /// <summary>
         /// PInvoke of MsiViewModify.
@@ -403,6 +403,6 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="record">Handle of record.</param>
         /// <returns>Error code.</returns>
         [DllImport("msi.dll", EntryPoint = "MsiViewModify", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        internal static extern int MsiViewModify(uint view, int modifyMode, uint record);
+        internal static extern int MsiViewModify(IntPtr view, int modifyMode, IntPtr record);
     }
 }

@@ -200,7 +200,7 @@ namespace WixToolset.Core.Native.Msi
                 throw new ArgumentNullException(nameof(db));
             }
 
-            uint handle = 0;
+            var handle = IntPtr.Zero;
             var error = MsiInterop.MsiGetSummaryInformation(db.Handle, null, 0, ref handle);
             if (0 != error)
             {
@@ -220,8 +220,8 @@ namespace WixToolset.Core.Native.Msi
                 throw new ArgumentNullException(nameof(databaseFile));
             }
 
-            uint handle = 0;
-            var error = MsiInterop.MsiGetSummaryInformation(0, databaseFile, 0, ref handle);
+            var handle = IntPtr.Zero;
+            var error = MsiInterop.MsiGetSummaryInformation(IntPtr.Zero, databaseFile, 0, ref handle);
             if (0 != error)
             {
                 throw new MsiException(error);

@@ -20,7 +20,7 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="type">Persist mode to use when opening the database.</param>
         public Database(string path, OpenDatabase type)
         {
-            var error = MsiInterop.MsiOpenDatabase(path, new IntPtr((int)type), out var handle);
+            var error = MsiInterop.MsiOpenDatabase(path, (IntPtr)type, out var handle);
             if (0 != error)
             {
                 throw new MsiException(error);

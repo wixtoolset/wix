@@ -18,7 +18,7 @@ namespace WixToolset.Core.Native.Msi
         public Record(int fieldCount)
         {
             this.Handle = MsiInterop.MsiCreateRecord(fieldCount);
-            if (0 == this.Handle)
+            if (IntPtr.Zero == this.Handle)
             {
                 throw new OutOfMemoryException();
             }
@@ -28,7 +28,7 @@ namespace WixToolset.Core.Native.Msi
         /// Creates a record from a handle.
         /// </summary>
         /// <param name="handle">Handle to create record from.</param>
-        internal Record(uint handle)
+        internal Record(IntPtr handle)
         {
             this.Handle = handle;
         }
