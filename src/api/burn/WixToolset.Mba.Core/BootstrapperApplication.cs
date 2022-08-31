@@ -1451,9 +1451,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectUpdate(string wzUpdateLocation, long dw64Size, string wzVersion, string wzTitle, string wzSummary, string wzContentType, string wzContent, ref bool fCancel, ref bool fStopProcessingUpdates)
+        int IBootstrapperApplication.OnDetectUpdate(string wzUpdateLocation, long dw64Size, string wzHash, UpdateHashType hashAlgorithm, string wzVersion, string wzTitle, string wzSummary, string wzContentType, string wzContent, ref bool fCancel, ref bool fStopProcessingUpdates)
         {
-            DetectUpdateEventArgs args = new DetectUpdateEventArgs(wzUpdateLocation, dw64Size, wzVersion, wzTitle, wzSummary, wzContentType, wzContent, fCancel, fStopProcessingUpdates);
+            DetectUpdateEventArgs args = new DetectUpdateEventArgs(wzUpdateLocation, dw64Size, wzHash, hashAlgorithm, wzVersion, wzTitle, wzSummary, wzContentType, wzContent, fCancel, fStopProcessingUpdates);
             this.OnDetectUpdate(args);
 
             fCancel = args.Cancel;

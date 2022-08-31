@@ -332,6 +332,8 @@ BAAPI UserExperienceOnDetectUpdate(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzUpdateLocation,
     __in DWORD64 dw64Size,
+    __in_z_opt LPCWSTR wzHash,
+    __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashAlgorithm,
     __in VERUTIL_VERSION* pVersion,
     __in_z_opt LPCWSTR wzTitle,
     __in_z_opt LPCWSTR wzSummary,

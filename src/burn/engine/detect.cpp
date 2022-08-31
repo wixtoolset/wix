@@ -379,6 +379,7 @@ static HRESULT DetectAtomFeedUpdate(
     ATOM_FEED* pAtomFeed = NULL;
     APPLICATION_UPDATE_CHAIN* pApupChain = NULL;
     BOOL fStopProcessingUpdates = FALSE;
+    LPWSTR sczHash = NULL;
 
     hr = AtomInitialize();
     ExitOnFailure(hr, "Failed to initialize Atom.");
@@ -397,11 +398,25 @@ static HRESULT DetectAtomFeedUpdate(
         for (DWORD i = 0; i < pApupChain->cEntries; ++i)
         {
             APPLICATION_UPDATE_ENTRY* pAppUpdateEntry = &pApupChain->rgEntries[i];
+            APPLICATION_UPDATE_ENCLOSURE* pEnclosure = pAppUpdateEntry->rgEnclosures;
 
-            hr = UserExperienceOnDetectUpdate(pUX, pAppUpdateEntry->rgEnclosures ? pAppUpdateEntry->rgEnclosures->wzUrl : NULL, 
-                pAppUpdateEntry->rgEnclosures ? pAppUpdateEntry->rgEnclosures->dw64Size : 0, 
-                pAppUpdateEntry->pVersion, pAppUpdateEntry->wzTitle,
-                pAppUpdateEntry->wzSummary, pAppUpdateEntry->wzContentType, pAppUpdateEntry->wzContent, &fStopProcessingUpdates);
+            if (pEnclosure)
+            {
+                hr = StrAllocHexEncode(pEnclosure->rgbDigest, pEnclosure->cbDigest, &sczHash);
+                ExitOnFailure(hr, "Failed to encode hash as string.");
+            }
+
+            hr = UserExperienceOnDetectUpdate(pUX,
+                pEnclosure ? pEnclosure->wzUrl : NULL,
+                pEnclosure ? pEnclosure->dw64Size : 0,
+                sczHash ? sczHash : L"",
+                pEnclosure ? pEnclosure->digestAlgorithm == APUP_HASH_ALGORITHM_SHA512 ? BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512 : BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE : BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE,
+                pAppUpdateEntry->pVersion,
+                pAppUpdateEntry->wzTitle,
+                pAppUpdateEntry->wzSummary,
+                pAppUpdateEntry->wzContentType,
+                pAppUpdateEntry->wzContent,
+                &fStopProcessingUpdates);
             ExitOnRootFailure(hr, "BA aborted detect update.");
 
             if (fStopProcessingUpdates)
@@ -420,6 +435,7 @@ LExit:
     ApupFreeChain(pApupChain);
     AtomFreeFeed(pAtomFeed);
     ReleaseStr(sczUpdateFeedTempFile);
+    ReleaseStr(sczHash);
     AtomUninitialize();
 
     return hr;

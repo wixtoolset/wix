@@ -106,6 +106,8 @@ namespace WixToolset.Mba.Core
         /// <param name="wzUpdateLocation"></param>
         /// <param name="dw64Size"></param>
         /// <param name="wzVersion"></param>
+        /// <param name="wzHash"></param>
+        /// <param name="hashAlgorithm"></param>
         /// <param name="wzTitle"></param>
         /// <param name="wzSummary"></param>
         /// <param name="wzContentType"></param>
@@ -118,6 +120,8 @@ namespace WixToolset.Mba.Core
         int OnDetectUpdate(
             [MarshalAs(UnmanagedType.LPWStr)] string wzUpdateLocation,
             [MarshalAs(UnmanagedType.U8)] long dw64Size,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzHash,
+            [MarshalAs(UnmanagedType.U4)] UpdateHashType hashAlgorithm,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.LPWStr)] string wzTitle,
             [MarshalAs(UnmanagedType.LPWStr)] string wzSummary,

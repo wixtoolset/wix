@@ -1395,6 +1395,8 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzUpdateLocation,
     __in DWORD64 dw64Size,
+    __in_z_opt LPCWSTR wzHash,
+    __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashAlgorithm,
     __in VERUTIL_VERSION* pVersion,
     __in_z_opt LPCWSTR wzTitle,
     __in_z_opt LPCWSTR wzSummary,
@@ -1410,6 +1412,8 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     args.cbSize = sizeof(args);
     args.wzUpdateLocation = wzUpdateLocation;
     args.dw64Size = dw64Size;
+    args.wzHash = wzHash;
+    args.hashAlgorithm = hashAlgorithm;
     args.wzVersion = pVersion->sczVersion;
     args.wzTitle = wzTitle;
     args.wzSummary = wzSummary;
@@ -1426,6 +1430,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
+
     *pfStopProcessingUpdates = results.fStopProcessingUpdates;
 
 LExit:
