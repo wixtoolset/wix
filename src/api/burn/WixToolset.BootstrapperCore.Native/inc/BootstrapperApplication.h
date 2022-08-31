@@ -870,6 +870,8 @@ struct BA_ONDETECTUPDATE_ARGS
     DWORD cbSize;
     LPCWSTR wzUpdateLocation;
     DWORD64 dw64Size;
+    LPCWSTR wzHash;
+    BOOTSTRAPPER_UPDATE_HASH_TYPE hashAlgorithm;
     LPCWSTR wzVersion;
     LPCWSTR wzTitle;
     LPCWSTR wzSummary;

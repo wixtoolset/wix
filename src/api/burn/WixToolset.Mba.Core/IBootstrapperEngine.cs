@@ -421,9 +421,9 @@ namespace WixToolset.Mba.Core
         None,
 
         /// <summary>
-        /// SHA-1 based hash provided.
+        /// SHA-512 based hash provided.
         /// </summary>
-        Sha1,
+        Sha512,
     }
 
     /// <summary>

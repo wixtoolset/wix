@@ -63,6 +63,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     STDMETHOD(OnDetectUpdate)(
         __in_z_opt LPCWSTR wzUpdateLocation,
         __in DWORD64 dw64Size,
+        __in_z_opt LPCWSTR wzHash,
+        __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashAlgorithm,
         __in_z LPCWSTR wzVersion,
         __in_z_opt LPCWSTR wzTitle,
         __in_z_opt LPCWSTR wzSummary,

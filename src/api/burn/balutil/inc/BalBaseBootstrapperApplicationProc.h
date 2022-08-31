@@ -87,7 +87,7 @@ static HRESULT BalBaseBAProcOnDetectUpdate(
     __inout BA_ONDETECTUPDATE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectUpdate(pArgs->wzUpdateLocation, pArgs->dw64Size, pArgs->wzVersion, pArgs->wzTitle, pArgs->wzSummary, pArgs->wzContentType, pArgs->wzContent, &pResults->fCancel, &pResults->fStopProcessingUpdates);
+    return pBA->OnDetectUpdate(pArgs->wzUpdateLocation, pArgs->dw64Size, pArgs->wzHash, pArgs->hashAlgorithm, pArgs->wzVersion, pArgs->wzTitle, pArgs->wzSummary, pArgs->wzContentType, pArgs->wzContent, &pResults->fCancel, &pResults->fStopProcessingUpdates);
 }
 
 static HRESULT BalBaseBAProcOnDetectUpdateComplete(

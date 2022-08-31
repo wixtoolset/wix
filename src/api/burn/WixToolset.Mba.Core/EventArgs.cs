@@ -5,6 +5,7 @@ namespace WixToolset.Mba.Core
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Base class for BA <see cref="EventArgs"/> classes.
@@ -328,11 +329,13 @@ namespace WixToolset.Mba.Core
     public class DetectUpdateEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public DetectUpdateEventArgs(string updateLocation, long size, string version, string title, string summary, string contentType, string content, bool cancelRecommendation, bool stopRecommendation)
+        public DetectUpdateEventArgs(string updateLocation, long size, string hash, UpdateHashType hashAlgorithm, string version, string title, string summary, string contentType, string content, bool cancelRecommendation, bool stopRecommendation)
             : base(cancelRecommendation)
         {
             this.UpdateLocation = updateLocation;
             this.Size = size;
+            this.Hash = hash;
+            this.HashAlgorithm = hashAlgorithm;
             this.Version = version;
             this.Title = title;
             this.Summary = summary;
@@ -350,6 +353,16 @@ namespace WixToolset.Mba.Core
         /// Gets the size of the updated bundle.
         /// </summary>
         public long Size { get; private set; }
+
+        /// <summary>
+        /// File hash of the updated bundle.
+        /// </summary>
+        public string Hash { get; }
+
+        /// <summary>
+        /// The algorithm of the updated bundle's hash.
+        /// </summary>
+        public UpdateHashType HashAlgorithm { get; }
 
         /// <summary>
         /// Gets the version of the updated bundle.

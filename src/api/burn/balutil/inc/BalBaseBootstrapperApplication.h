@@ -132,6 +132,8 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnDetectUpdate(
         __in_z LPCWSTR /*wzUpdateLocation*/,
         __in DWORD64 /*dw64Size*/,
+        __in_z_opt LPCWSTR /*wzHash*/,
+        __in BOOTSTRAPPER_UPDATE_HASH_TYPE /*hashAlgorithm*/,
         __in LPCWSTR /*wzVersion*/,
         __in_z LPCWSTR /*wzTitle*/,
         __in_z LPCWSTR /*wzSummary*/,
