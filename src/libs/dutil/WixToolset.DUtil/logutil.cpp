@@ -40,6 +40,9 @@ static LPCSTR LOGUTIL_DEBUG = "debug";
 static LPCSTR LOGUTIL_NONE = "none";
 
 // prototypes
+static HRESULT LogStringWorkRawUnsynchronized(
+    __in_z LPCSTR szLogData
+    );
 static HRESULT LogIdWork(
     __in REPORT_LEVEL rl,
     __in_opt HMODULE hModule,
@@ -240,6 +243,29 @@ LExit:
     {
         ::LeaveCriticalSection(&LogUtil_csLog);
     }
+
+    return hr;
+}
+
+
+extern "C" HRESULT DAPI LogFlush()
+{
+    HRESULT hr = S_OK;
+
+    ::EnterCriticalSection(&LogUtil_csLog);
+
+    if (INVALID_HANDLE_VALUE == LogUtil_hLog)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
+
+    if (!::FlushFileBuffers(LogUtil_hLog))
+    {
+        LoguExitWithLastError(hr, "Failed to flush log file buffers.");
+    }
+
+LExit:
+    ::LeaveCriticalSection(&LogUtil_csLog);
 
     return hr;
 }
@@ -630,7 +656,26 @@ extern "C" HRESULT DAPI LogFooter()
     return hr;
 }
 
-extern "C" HRESULT LogStringWorkRaw(
+extern "C" HRESULT DAPI LogStringWorkRaw(
+    __in_z LPCSTR szLogData
+    )
+{
+    HRESULT hr = S_OK;
+
+    ::EnterCriticalSection(&LogUtil_csLog);
+
+    hr = LogStringWorkRawUnsynchronized(szLogData);
+
+    ::LeaveCriticalSection(&LogUtil_csLog);
+
+    return hr;
+}
+
+//
+// private worker functions
+//
+
+static HRESULT LogStringWorkRawUnsynchronized(
     __in_z LPCSTR szLogData
     )
 {
@@ -671,9 +716,6 @@ LExit:
     return hr;
 }
 
-//
-// private worker functions
-//
 static HRESULT LogIdWork(
     __in REPORT_LEVEL rl,
     __in_opt HMODULE hModule,

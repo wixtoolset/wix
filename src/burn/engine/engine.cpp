@@ -297,6 +297,41 @@ LExit:
         hr = SUCCEEDED(hr) ? HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED) : HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_REQUIRED);
     }
 
+    if (fRunNormal)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING, FAILED(hr) ? (int)hr : *pdwExitCode, LoggingBoolToString(fRestart));
+    }
+    else if (fRunUntrusted)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING_CLEAN_ROOM, FAILED(hr) ? (int)hr : *pdwExitCode);
+    }
+    else if (fRunRunOnce)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING_RUN_ONCE, FAILED(hr) ? (int)hr : *pdwExitCode);
+    }
+    else if (fRunElevated)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING_ELEVATED, FAILED(hr) ? (int)hr : *pdwExitCode);
+    }
+
+    if (fLogInitialized)
+    {
+        // Leave the log open before calling restart so messages can be logged from there.
+        // Best effort to make sure all previous messages are written to disk in case the restart causes messages to be lost in buffers.
+        LogFlush();
+    }
+
+    if (fRestart)
+    {
+        LogId(REPORT_STANDARD, MSG_RESTARTING);
+
+        HRESULT hrRestart = Restart();
+        if (FAILED(hrRestart))
+        {
+            LogErrorId(hrRestart, MSG_RESTART_FAILED);
+        }
+    }
+
     UninitializeEngineState(&engineState);
 
     if (fXmlInitialized)
@@ -329,42 +364,9 @@ LExit:
         ::CoUninitialize();
     }
 
-    if (fRunNormal)
-    {
-        LogId(REPORT_STANDARD, MSG_EXITING, FAILED(hr) ? (int)hr : *pdwExitCode, LoggingBoolToString(fRestart));
-
-        if (fRestart)
-        {
-            LogId(REPORT_STANDARD, MSG_RESTARTING);
-        }
-    }
-    else if (fRunUntrusted)
-    {
-        LogId(REPORT_STANDARD, MSG_EXITING_CLEAN_ROOM, FAILED(hr) ? (int)hr : *pdwExitCode);
-    }
-    else if (fRunRunOnce)
-    {
-        LogId(REPORT_STANDARD, MSG_EXITING_RUN_ONCE, FAILED(hr) ? (int)hr : *pdwExitCode);
-    }
-    else if (fRunElevated)
-    {
-        LogId(REPORT_STANDARD, MSG_EXITING_ELEVATED, FAILED(hr) ? (int)hr : *pdwExitCode);
-    }
-
-
     if (fLogInitialized)
     {
         DutilUninitialize();
-        LogClose(FALSE);
-    }
-
-    if (fRestart)
-    {
-        Restart();
-    }
-
-    if (fLogInitialized)
-    {
         LogUninitialize(FALSE);
     }
 

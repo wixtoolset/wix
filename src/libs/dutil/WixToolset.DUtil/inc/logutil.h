@@ -81,6 +81,12 @@ HRESULT DAPI LogRename(
     __in_z LPCWSTR wzNewPath
     );
 
+/********************************************************************
+ LogFlush - calls ::FlushFileBuffers with the log file handle.
+
+********************************************************************/
+HRESULT DAPI LogFlush();
+
 void DAPI LogClose(
     __in BOOL fFooter
     );
@@ -344,7 +350,7 @@ HRESULT DAPI LogFooter();
  LogStringWorkRaw - Write a raw, unformatted string to the log
 
 ********************************************************************/
-HRESULT LogStringWorkRaw(
+HRESULT DAPI LogStringWorkRaw(
     __in_z LPCSTR szLogData
     );
 

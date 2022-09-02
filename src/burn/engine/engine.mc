@@ -184,6 +184,13 @@ Language=English
 Elevated engine process is not running with elevated privileges. Either run the bundle as a privileged user or reconfigure Windows to allow standard users to request elevation.
 .
 
+MessageId=23
+Severity=Error
+SymbolicName=MSG_RESTART_FAILED
+Language=English
+The restart request failed, error: %1!ls!. The machine will need to be manually restarted.
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
