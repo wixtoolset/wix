@@ -696,6 +696,11 @@ static HRESULT RunElevated(
 
     LogRedirect(RedirectLoggingOverPipe, &loggingContext);
 
+    if (!pEngineState->internalCommand.fInitiallyElevated)
+    {
+        LogId(REPORT_ERROR, MSG_ELEVATED_ENGINE_NOT_ELEVATED);
+    }
+
     // Create a top-level window to prevent shutting down the elevated process.
     hr = UiCreateMessageWindow(hInstance, pEngineState);
     ExitOnFailure(hr, "Failed to create the message window.");
