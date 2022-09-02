@@ -564,6 +564,7 @@ namespace Bootstrapper
                 VariableGetNumericHelper(&variables, L"TerminalServer");
                 VariableGetNumericHelper(&variables, L"UserUILanguageID");
                 VariableGetNumericHelper(&variables, L"UserLanguageID");
+                VariableGetNumericHelper(&variables, L"WixCanRestart");
 
                 // known folders
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData) + "\\", VariableGetStringHelper(&variables, L"AppDataFolder"));

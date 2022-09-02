@@ -118,7 +118,7 @@ static void LoadEngineState(
                 //
                 LoadEngineState(&engineState);
 
-                hr = ElevationElevate(&engineState, NULL);
+                hr = ElevationElevate(&engineState, WM_BURN_ELEVATE, NULL);
                 TestThrowOnFailure(hr, L"Failed to elevate.");
 
                 for (DWORD i = 0; i < countof(rgExitCodeItems); ++i)

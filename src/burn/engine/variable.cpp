@@ -153,6 +153,10 @@ static HRESULT InitializeVariablePrivileged(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     );
+static HRESULT InitializeVariableProcessTokenPrivilege(
+    __in DWORD_PTR dwpData,
+    __inout BURN_VARIANT* pValue
+    );
 static HRESULT InitializeSystemLanguageID(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
@@ -284,6 +288,7 @@ extern "C" HRESULT VariableInitialize(
         {L"WindowsFolder", InitializeVariableCsidlFolder, CSIDL_WINDOWS},
         {L"WindowsVolume", InitializeVariableWindowsVolumeFolder, 0},
         {BURN_BUNDLE_ACTION, InitializeVariableNumeric, 0, FALSE, TRUE},
+        {L"WixCanRestart", InitializeVariableProcessTokenPrivilege, (DWORD_PTR)SE_SHUTDOWN_NAME},
         {BURN_BUNDLE_COMMAND_LINE_ACTION, InitializeVariableNumeric, 0, FALSE, TRUE},
         {BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, InitializeVariableString, NULL, FALSE, TRUE},
@@ -2159,6 +2164,26 @@ static HRESULT InitializeVariablePrivileged(
 
     // set value
     hr = BVariantSetNumeric(pValue, fPrivileged);
+    ExitOnFailure(hr, "Failed to set variant value.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT InitializeVariableProcessTokenPrivilege(
+    __in DWORD_PTR dwpData,
+    __inout BURN_VARIANT* pValue
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fHasPrivilege = FALSE;
+    LPCWSTR wzPrivilegeName = (LPCWSTR)dwpData;
+
+    hr = ProcHasPrivilege(::GetCurrentProcess(), wzPrivilegeName, &fHasPrivilege);
+    ExitOnFailure(hr, "Failed to check if process token has privilege: %ls.", wzPrivilegeName);
+
+    // set value
+    hr = BVariantSetNumeric(pValue, fHasPrivilege);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:

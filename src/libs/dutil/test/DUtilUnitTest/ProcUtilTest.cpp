@@ -6,6 +6,7 @@ using namespace System;
 using namespace System::Security::Principal;
 using namespace Xunit;
 using namespace WixBuildTools::TestSupport;
+using namespace WixBuildTools::TestSupport::XunitExtensions;
 
 namespace DutilTests
 {
@@ -13,7 +14,7 @@ namespace DutilTests
     {
     public:
         [Fact]
-        void ProcTokenUserTest()
+        void ProcGetTokenInformationTest()
         {
             HRESULT hr = S_OK;
             TOKEN_USER* pTokenUser = NULL;
@@ -21,7 +22,7 @@ namespace DutilTests
 
             try
             {
-                hr = ProcTokenUser(::GetCurrentProcess(), &pTokenUser);
+                hr = ProcGetTokenInformation(::GetCurrentProcess(), TokenUser, reinterpret_cast<LPVOID*>(&pTokenUser));
                 NativeAssert::Succeeded(hr, "Failed to get TokenUser for current process.");
 
                 if (!::ConvertSidToStringSidW(pTokenUser->User.Sid, &sczSid))
@@ -36,6 +37,29 @@ namespace DutilTests
             {
                 ReleaseMem(pTokenUser);
                 ReleaseStr(sczSid);
+            }
+        }
+
+        [SkippableFact]
+        void ProcHasPrivilegeTest()
+        {
+            HRESULT hr = S_OK;
+            BOOL fHasPrivilege = FALSE;
+
+            hr = ProcHasPrivilege(::GetCurrentProcess(), SE_CREATE_TOKEN_NAME, &fHasPrivilege);
+            NativeAssert::Succeeded(hr, "Failed to check privilege for current process.");
+
+            if (fHasPrivilege)
+            {
+                WixAssert::Skip("Didn't expect process to have SE_CREATE_TOKEN_NAME privilege");
+            }
+
+            hr = ProcHasPrivilege(::GetCurrentProcess(), SE_INC_WORKING_SET_NAME, &fHasPrivilege);
+            NativeAssert::Succeeded(hr, "Failed to check privilege for current process.");
+
+            if (!fHasPrivilege)
+            {
+                WixAssert::Skip("Expected process to have SE_INC_WORKING_SET_NAME privilege");
             }
         }
     };

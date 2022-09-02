@@ -893,7 +893,7 @@ static HRESULT ProcessMessage(
         break;
 
     case WM_BURN_ELEVATE:
-        hr = CoreElevate(pEngineState, reinterpret_cast<HWND>(pmsg->lParam));
+        hr = CoreElevate(pEngineState, WM_BURN_ELEVATE, reinterpret_cast<HWND>(pmsg->lParam));
         break;
 
     case WM_BURN_APPLY:
@@ -1069,26 +1069,10 @@ static HRESULT Restart(
     )
 {
     HRESULT hr = S_OK;
-    HANDLE hProcessToken = NULL;
-    TOKEN_PRIVILEGES priv = { };
     DWORD dwRetries = 0;
 
-    if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hProcessToken))
-    {
-        ExitWithLastError(hr, "Failed to get process token.");
-    }
-
-    priv.PrivilegeCount = 1;
-    priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-    if (!::LookupPrivilegeValueW(NULL, L"SeShutdownPrivilege", &priv.Privileges[0].Luid))
-    {
-        ExitWithLastError(hr, "Failed to get shutdown privilege LUID.");
-    }
-
-    if (!::AdjustTokenPrivileges(hProcessToken, FALSE, &priv, sizeof(TOKEN_PRIVILEGES), NULL, 0))
-    {
-        ExitWithLastError(hr, "Failed to adjust token to add shutdown privileges.");
-    }
+    hr = ProcEnablePrivilege(::GetCurrentProcess(), SE_SHUTDOWN_NAME);
+    ExitOnFailure(hr, "Failed to enable shutdown privilege in process token.");
 
     pEngineState->fRestarting = TRUE;
     CoreUpdateRestartState(pEngineState, BURN_RESTART_STATE_REQUESTING);
@@ -1147,7 +1131,6 @@ static HRESULT Restart(
     }
 
 LExit:
-    ReleaseHandle(hProcessToken);
     return hr;
 }
 

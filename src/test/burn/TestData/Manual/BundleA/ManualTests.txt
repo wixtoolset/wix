@@ -94,17 +94,61 @@ CanRestartFromUnelevatedPerMachineBundleWithoutShutdownPrivilege
 2. Click Install.
 3. Verify that the UAC prompt came up and accept elevation.
 4. Click OK on the OnExecuteBegin message box.
-5. Click Restart.
-6. The machine should restart.
-7. Login to the machine.
-8. Verify that the bundle did not automatically start running.
-9. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like (the process id for w005 must match the elevated i400 and i401):
+5. Verify the Restart button doesn't have the UAC shield and then click it.
+6. Verify that there was no UAC prompt.
+7. The machine should restart.
+8. Login to the machine.
+9. Verify that the bundle did not automatically start running.
+10. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like (the process id for w005 must match the elevated i400 and i401):
 
 [0DDC:0448]w005: Restarting computer...
 [1228:18CC]i400: Received system request to shut down the process: allowed: Yes, elevated: No, critical: No, logoff: No, close app: No
 [1228:18CC]i401: Received result of system request to shut down the process: closing: Yes, elevated: No, critical: No, logoff: No, close app: No
 [0DDC:0954]i400: Received system request to shut down the process: allowed: Yes, elevated: Yes, critical: No, logoff: No, close app: No
 [0DDC:0954]i401: Received result of system request to shut down the process: closing: Yes, elevated: Yes, critical: No, logoff: No, close app: No
+=======================================
+
+(11. Uninstall the bundle)
+
+CanRestartFromUnelevatedPerUserBundleWithoutShutdownPrivilege
+
+    Note: Requires different User Rights Assignment settings from CanLogRestartFailure - Only Administrators should have the shutdown privilege. Users should not have it.
+
+1. Run BundleC.exe unelevated with the command line EXEEXITCODE=3010.
+2. Click Install.
+3. Verify the Restart button has the UAC shield and then click it.
+4. Verify that the UAC prompt came up and accept elevation.
+5. The machine should restart.
+6. Login to the machine.
+7. Verify that the bundle did not automatically start running.
+8. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like (the process id for w005 must match the elevated i400 and i401):
+
+[0DDC:0448]w005: Restarting computer...
+[1228:18CC]i400: Received system request to shut down the process: allowed: Yes, elevated: No, critical: No, logoff: No, close app: No
+[1228:18CC]i401: Received result of system request to shut down the process: closing: Yes, elevated: No, critical: No, logoff: No, close app: No
+[0DDC:0954]i400: Received system request to shut down the process: allowed: Yes, elevated: Yes, critical: No, logoff: No, close app: No
+[0DDC:0954]i401: Received result of system request to shut down the process: closing: Yes, elevated: Yes, critical: No, logoff: No, close app: No
+=======================================
+
+(9. Uninstall the bundle)
+
+CanRestartFromUnelevatedPerUserBundleWithShutdownPrivilege
+
+    Note: Requires different User Rights Assignment settings from CanLogRestartFailure - Administrators and Users should have the shutdown privilege.
+
+1. Run BundleC.exe unelevated with the command line EXEEXITCODE=3010.
+2. Click Install.
+3. Verify that there was no UAC prompt.
+4. Verify the Restart button doesn't have the UAC shield and then click it.
+5. Verify that there was no UAC prompt.
+6. The machine should restart.
+7. Login to the machine.
+8. Verify that the bundle did not automatically start running.
+9. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like (there should be no elevated i400 and i401 and the process id for w005 must match):
+
+[1228:0448]w005: Restarting computer...
+[1228:18CC]i400: Received system request to shut down the process: allowed: Yes, elevated: No, critical: No, logoff: No, close app: No
+[1228:18CC]i401: Received result of system request to shut down the process: closing: Yes, elevated: No, critical: No, logoff: No, close app: No
 =======================================
 
 (10. Uninstall the bundle)
