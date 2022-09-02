@@ -222,6 +222,16 @@ static LRESULT CALLBACK WndProc(
                 ::Sleep(250);
             }
 
+            // If this is the per-machine process then close the logging pipe with the parent process.
+            if (pInfo->fElevatedEngine)
+            {
+                CoreCloseElevatedLoggingThread(pInfo->pEngineState);
+            }
+            else
+            {
+                CoreWaitForUnelevatedLoggingThread(pInfo->pEngineState->hUnelevatedLoggingThread);
+            }
+
             LogStringWorkRaw("=======================================\r\n");
 
             // Close the log to try to make sure everything is flushed to disk.

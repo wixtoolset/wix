@@ -3,15 +3,6 @@
 #include "precomp.h"
 
 
-typedef struct _REDIRECTED_LOGGING_CONTEXT
-{
-    CRITICAL_SECTION csBuffer;
-    LPSTR sczBuffer;
-    HANDLE hPipe;
-    HANDLE hLogEvent;
-    HANDLE hFinishedEvent;
-} REDIRECTED_LOGGING_CONTEXT;
-
 // constants
 
 const DWORD RESTART_RETRIES = 10;
@@ -64,13 +55,6 @@ static HRESULT LogStringOverPipe(
     );
 static DWORD WINAPI ElevatedLoggingThreadProc(
     __in LPVOID lpThreadParameter
-    );
-static HRESULT WaitForElevatedLoggingThread(
-    __in REDIRECTED_LOGGING_CONTEXT* pContext,
-    __in HANDLE hLoggingThread
-    );
-static HRESULT WaitForUnelevatedLoggingThread(
-    __in HANDLE hUnelevatedLoggingThread
     );
 static HRESULT Restart(
     __in BURN_ENGINE_STATE* pEngineState
@@ -308,10 +292,6 @@ LExit:
     {
         LogId(REPORT_STANDARD, MSG_EXITING_RUN_ONCE, FAILED(hr) ? (int)hr : *pdwExitCode);
     }
-    else if (fRunElevated)
-    {
-        LogId(REPORT_STANDARD, MSG_EXITING_ELEVATED, FAILED(hr) ? (int)hr : *pdwExitCode);
-    }
 
     if (fLogInitialized)
     {
@@ -320,7 +300,12 @@ LExit:
         LogFlush();
     }
 
-    if (engineState.fRestart)
+    // end per-machine process if running
+    if (!fRunElevated && INVALID_HANDLE_VALUE != engineState.companionConnection.hPipe)
+    {
+        PipeTerminateChildProcess(&engineState.companionConnection, *pdwExitCode, engineState.fRestart);
+    }
+    else if (engineState.fRestart)
     {
         LogId(REPORT_STANDARD, MSG_RESTARTING);
 
@@ -333,6 +318,30 @@ LExit:
 
     // If the message window is still around, close it.
     UiCloseMessageWindow(&engineState);
+
+    // If the logging thread is still around, close it.
+    if (!fRunElevated)
+    {
+        CoreWaitForUnelevatedLoggingThread(engineState.hUnelevatedLoggingThread);
+    }
+    else if (fRunElevated)
+    {
+        CoreCloseElevatedLoggingThread(&engineState);
+
+        // We're done talking to the child so always reset logging now.
+        LogRedirect(NULL, NULL);
+
+        // If there was a log message left, try to log it locally.
+        if (engineState.elevatedLoggingContext.sczBuffer)
+        {
+            LogStringWorkRaw(engineState.elevatedLoggingContext.sczBuffer);
+
+            ReleaseStr(engineState.elevatedLoggingContext.sczBuffer);
+        }
+
+        // Log the exit code here to make sure it gets in the elevated log.
+        LogId(REPORT_STANDARD, MSG_EXITING_ELEVATED, FAILED(hr) ? (int)hr : *pdwExitCode);
+    }
 
     UninitializeEngineState(&engineState);
 
@@ -387,7 +396,12 @@ static HRESULT InitializeEngineState(
     HANDLE hSectionFile = hEngineFile;
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
 
+    pEngineState->hUnelevatedLoggingThread = INVALID_HANDLE_VALUE;
+    pEngineState->elevatedLoggingContext.hPipe = INVALID_HANDLE_VALUE;
+    pEngineState->elevatedLoggingContext.hThread = INVALID_HANDLE_VALUE;
+
     ::InitializeCriticalSection(&pEngineState->csRestartState);
+    ::InitializeCriticalSection(&pEngineState->elevatedLoggingContext.csBuffer);
 
     pEngineState->internalCommand.automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
@@ -422,6 +436,12 @@ static void UninitializeEngineState(
 
     ReleaseMem(pEngineState->internalCommand.rgSecretArgs);
     ReleaseMem(pEngineState->internalCommand.rgUnknownArgs);
+
+    ReleaseFileHandle(pEngineState->hUnelevatedLoggingThread);
+    ReleaseFileHandle(pEngineState->elevatedLoggingContext.hThread);
+    ::DeleteCriticalSection(&pEngineState->elevatedLoggingContext.csBuffer);
+    ReleaseHandle(pEngineState->elevatedLoggingContext.hLogEvent);
+    ReleaseHandle(pEngineState->elevatedLoggingContext.hFinishedEvent);
 
     PipeConnectionUninitialize(&pEngineState->embeddedConnection);
     PipeConnectionUninitialize(&pEngineState->companionConnection);
@@ -643,14 +663,6 @@ LExit:
 
     VariablesDump(&pEngineState->variables);
 
-    // end per-machine process if running
-    if (INVALID_HANDLE_VALUE != pEngineState->companionConnection.hPipe)
-    {
-        PipeTerminateChildProcess(&pEngineState->companionConnection, pEngineState->userExperience.dwExitCode, FALSE);
-
-        WaitForUnelevatedLoggingThread(pEngineState->hUnelevatedLoggingThread);
-    }
-
     // If the splash screen is still around, close it.
     if (::IsWindow(pEngineState->command.hwndSplashScreen))
     {
@@ -671,9 +683,7 @@ static HRESULT RunElevated(
 {
     HRESULT hr = S_OK;
     HANDLE hLock = NULL;
-    HANDLE hLoggingThread = NULL;
-    REDIRECTED_LOGGING_CONTEXT loggingContext = { };
-    BOOL fDeleteLoggingCs = FALSE;
+    BURN_REDIRECTED_LOGGING_CONTEXT* pLoggingContext = &pEngineState->elevatedLoggingContext;
 
     // Initialize logging.
     hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
@@ -685,21 +695,18 @@ static HRESULT RunElevated(
 
     // Set up the context for the logging thread then
     // override logging to write over the pipe.
-    ::InitializeCriticalSection(&loggingContext.csBuffer);
-    fDeleteLoggingCs = TRUE;
+    pLoggingContext->hLogEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
+    ExitOnNullWithLastError(pLoggingContext->hLogEvent, hr, "Failed to create log event for logging thread.");
 
-    loggingContext.hLogEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
-    ExitOnNullWithLastError(loggingContext.hLogEvent, hr, "Failed to create log event for logging thread.");
+    pLoggingContext->hFinishedEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
+    ExitOnNullWithLastError(pLoggingContext->hFinishedEvent, hr, "Failed to create finished event for logging thread.");
 
-    loggingContext.hFinishedEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
-    ExitOnNullWithLastError(loggingContext.hFinishedEvent, hr, "Failed to create finished event for logging thread.");
+    pLoggingContext->hPipe = pEngineState->companionConnection.hLoggingPipe;
 
-    loggingContext.hPipe = pEngineState->companionConnection.hLoggingPipe;
+    pLoggingContext->hThread = ::CreateThread(NULL, 0, ElevatedLoggingThreadProc, pLoggingContext, 0, NULL);
+    ExitOnNullWithLastError(pLoggingContext->hThread, hr, "Failed to create elevated logging thread.");
 
-    hLoggingThread = ::CreateThread(NULL, 0, ElevatedLoggingThreadProc, &loggingContext, 0, NULL);
-    ExitOnNullWithLastError(hLoggingThread, hr, "Failed to create elevated logging thread.");
-
-    LogRedirect(RedirectLoggingOverPipe, &loggingContext);
+    LogRedirect(RedirectLoggingOverPipe, pLoggingContext);
 
     if (!pEngineState->internalCommand.fInitiallyElevated)
     {
@@ -716,29 +723,7 @@ static HRESULT RunElevated(
     hr = ElevationChildPumpMessages(pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->cache, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart, &pEngineState->plan.fApplying);
     ExitOnFailure(hr, "Failed to pump messages from parent process.");
 
-    WaitForElevatedLoggingThread(&loggingContext, hLoggingThread);
-
 LExit:
-    ReleaseHandle(hLoggingThread);
-
-    LogRedirect(NULL, NULL); // we're done talking to the child so always reset logging now.
-
-    if (fDeleteLoggingCs)
-    {
-        ::DeleteCriticalSection(&loggingContext.csBuffer);
-    }
-
-    ReleaseHandle(loggingContext.hLogEvent);
-    ReleaseHandle(loggingContext.hFinishedEvent);
-
-    // If there was a log message left, try to log it locally.
-    if (loggingContext.sczBuffer)
-    {
-        LogStringWorkRaw(loggingContext.sczBuffer);
-
-        ReleaseStr(loggingContext.sczBuffer);
-    }
-
     if (hLock)
     {
         ::ReleaseMutex(hLock);
@@ -936,7 +921,7 @@ static HRESULT DAPI RedirectLoggingOverPipe(
     )
 {
     HRESULT hr = S_OK;
-    REDIRECTED_LOGGING_CONTEXT* pContext = static_cast<REDIRECTED_LOGGING_CONTEXT*>(pvContext);
+    BURN_REDIRECTED_LOGGING_CONTEXT* pContext = static_cast<BURN_REDIRECTED_LOGGING_CONTEXT*>(pvContext);
 
     ::EnterCriticalSection(&pContext->csBuffer);
 
@@ -986,7 +971,7 @@ static DWORD WINAPI ElevatedLoggingThreadProc(
 {
     HRESULT hr = S_OK;
     DWORD dwLastError = ERROR_SUCCESS;
-    REDIRECTED_LOGGING_CONTEXT* pContext = static_cast<REDIRECTED_LOGGING_CONTEXT*>(lpThreadParameter);
+    BURN_REDIRECTED_LOGGING_CONTEXT* pContext = static_cast<BURN_REDIRECTED_LOGGING_CONTEXT*>(lpThreadParameter);
     DWORD dwSignaledIndex = 0;
     LPSTR sczBuffer = NULL;
     BURN_PIPE_RESULT result = { };
@@ -1077,39 +1062,6 @@ LExit:
     }
 
     return (DWORD)hr;
-}
-
-static HRESULT WaitForElevatedLoggingThread(
-    __in REDIRECTED_LOGGING_CONTEXT* pContext,
-    __in HANDLE hLoggingThread
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (!::SetEvent(pContext->hFinishedEvent))
-    {
-        ExitWithLastError(hr, "Failed to set log finished event.");
-    }
-
-    hr = AppWaitForSingleObject(hLoggingThread, 5 * 60 * 1000); // TODO: is 5 minutes good?
-    ExitOnFailure(hr, "Failed to wait for elevated logging thread.");
-
-LExit:
-    return hr;
-}
-
-static HRESULT WaitForUnelevatedLoggingThread(
-    __in HANDLE hUnelevatedLoggingThread
-    )
-{
-    HRESULT hr = S_OK;
-
-    // Give the thread 15 seconds to exit.
-    hr = AppWaitForSingleObject(hUnelevatedLoggingThread, 15 * 1000);
-    ExitOnFailure(hr, "Failed to wait for unelevated logging thread.");
-
-LExit:
-    return hr;
 }
 
 static HRESULT Restart(

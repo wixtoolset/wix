@@ -1,0 +1,110 @@
+VariousWixstdbaAndBAFunctionsAndThmutilFunctionality
+1. Run BundleA.exe unelevated.
+2. Click Test.
+3. Verify that the BafThmUtilTestingTheme window comes up and click Start.
+4. There are several pages. Follow the instructions on each page before clicking Next.
+5. Click ThemeClose to close the BafThmUtilTestingTheme window.
+6. Click the Options button.
+7. Click the Browse button.
+8. Type in "C:\Program Files (x86)\mytest".
+9. Click the Select Folder button.
+10. Verify the Install location textbox was populated with "C:\Program Files (x86)\mytest".
+11. Click OK.
+12. Verify the caption of the window is "~Manual - BundleA Setup" and the text is "~Manual - BundleA".
+13. Verify the Install button has the UAC shield and then click it (accept elevation).
+14. Click OK on the OnExecuteBegin message box.
+15. After it finishes, verify the window text is "Installation Successfully Completed".
+16. Click Close.
+17. Verify in the bundle log that the variable InstallFolder was set to "C:\Program Files (x86)\mytest".
+18. Run BundleA.exe again.
+19. Click Uninstall (accept elevation).
+20. Click OK on the OnExecuteBegin message box.
+21. After it finishes, verify the window text is "Uninstallation Successfully Completed".
+22. Click Close.
+
+CanBlockShutdownDuringApply
+1. Run BundleA.exe unelevated.
+2. Click Install (accept elevation).
+3. Verify the OnExecuteBegin message box comes up with the message "Shutdown requests should be denied right now." and leave it up.
+4. Use the Windows UI to try to restart the machine.
+5. On current versions of Windows, full screen UI will display that the bundle is blocking restart. Click Cancel to stop the restart.
+6. Click OK on the message box from step 3 to allow installation to continue.
+7. Verify that the installation was successful and then close the bundle.
+8. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like:
+
+i400: Received system request to shut down the process: allowed: No, elevated: No, critical: No, logoff: No, close app: No
+i400: Received system request to shut down the process: allowed: No, elevated: Yes, critical: No, logoff: No, close app: No
+i401: Received result of system request to shut down the process: closing: No, elevated: No, critical: No, logoff: No, close app: No
+i401: Received result of system request to shut down the process: closing: No, elevated: Yes, critical: No, logoff: No, close app: No
+
+(9. Uninstall the bundle)
+
+CanLogRestartFailure
+
+    Note: this test requires special setup. Change the User Rights Assignment such that no one has the shutdown privilege. Logout and log back in after making changes to make them take effect.
+    (mmc.exe -> Group Policy Object Editor -> Local Computer Policy -> Computer Configuration -> Windows Settings -> Security Settings -> Local Policies -> User Rights Assignment -> Shut down the system)
+
+1. Run BundleA.exe elevated with the command line EXEEXITCODE=3010.
+2. Click Install.
+3. Click OK on the OnExecuteBegin message box.
+4. Click Restart.
+5. Look in the bundle log and verify that the restart request failure was logged with messages that look like:
+
+w005: Restarting computer...
+e000: Error 0x80070005: Failed to schedule restart.
+e023: The restart request failed, error: 0x80070005. The machine will need to be manually restarted.
+
+(5. Uninstall the bundle)
+
+CanGracefullyCutApplyShortInResponseToCriticalShutdown
+
+    Note: Requires different User Rights Assignment settings from CanLogRestartFailure - Administrators need to have the shutdown privilege.
+
+1. Run BundleA.exe FORCERESTARTCA=1.
+2. Click Install (accept elevation).
+3. Click OK on the OnExecuteBegin message box.
+4. Verify the machine automatically restarts with no chance to cancel it (because the MSI forces a restart).
+5. Login to the machine.
+6. Verify that the bundle automatically started running again.
+7. Click OK on the OnExecuteBegin message box.
+8. Verify that the installation was successful and then close the bundle.
+9. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like:
+
+i301: Applying execute package: PackageA, action: Install, path: C:\ProgramData\Package Cache\{1C6F49C0-B4BA-438D-871D-2B5E91C0EED5}v1.0.0.0\PackageA.msi, arguments: ' FORCERESTARTCA="1" ARPSYSTEMCOMPONENT="1" MSIFASTINSTALL="7" BURNMSIINSTALL=1 REINSTALLMODE="muso" REBOOT=ReallySuppress'
+...
+i400: Received system request to shut down the process: allowed: No, elevated: No, critical: Yes, logoff: No, close app: No
+i400: Received system request to shut down the process: allowed: No, elevated: Yes, critical: Yes, logoff: No, close app: No
+i401: Received result of system request to shut down the process: closing: Yes, elevated: No, critical: Yes, logoff: No, close app: No
+i401: Received result of system request to shut down the process: closing: Yes, elevated: Yes, critical: Yes, logoff: No, close app: No
+...
+i319: Applied execute package: PackageA, result: 0x0, restart: Initiated
+...
+i420: Resuming automatic updates.
+i421: Resumed automatic updates.
+=======================================
+i001: Burn x86 v4.0.0.525, Windows v10.0 x64 (Build 19041: Service Pack 0), path: C:\ProgramData\Package Cache\{30D63455-CD23-4AC3-81CC-4695434F848A}\BundleA.exe
+
+(10. Uninstall the bundle)
+
+CanRestartFromUnelevatedPerMachineBundleWithoutShutdownPrivilege
+
+    Note: Requires different User Rights Assignment settings from CanLogRestartFailure - Only Administrators should have the shutdown privilege. Users should not have it.
+
+1. Run BundleA.exe unelevated with the command line EXEEXITCODE=3010.
+2. Click Install.
+3. Verify that the UAC prompt came up and accept elevation.
+4. Click OK on the OnExecuteBegin message box.
+5. Click Restart.
+6. The machine should restart.
+7. Login to the machine.
+8. Verify that the bundle did not automatically start running.
+9. Look in the bundle log and verify that the restart request didn't cause any errors, and that it logged messages that look like (the process id for w005 must match the elevated i400 and i401):
+
+[0DDC:0448]w005: Restarting computer...
+[1228:18CC]i400: Received system request to shut down the process: allowed: Yes, elevated: No, critical: No, logoff: No, close app: No
+[1228:18CC]i401: Received result of system request to shut down the process: closing: Yes, elevated: No, critical: No, logoff: No, close app: No
+[0DDC:0954]i400: Received system request to shut down the process: allowed: Yes, elevated: Yes, critical: No, logoff: No, close app: No
+[0DDC:0954]i401: Received result of system request to shut down the process: closing: Yes, elevated: Yes, critical: No, logoff: No, close app: No
+=======================================
+
+(10. Uninstall the bundle)
