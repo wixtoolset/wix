@@ -123,6 +123,16 @@ typedef struct _BURN_ENGINE_COMMAND
     LPWSTR sczLogFile;
 } BURN_ENGINE_COMMAND;
 
+typedef struct _BURN_REDIRECTED_LOGGING_CONTEXT
+{
+    CRITICAL_SECTION csBuffer;
+    LPSTR sczBuffer;
+    HANDLE hPipe;
+    HANDLE hLogEvent;
+    HANDLE hFinishedEvent;
+    HANDLE hThread;
+} BURN_REDIRECTED_LOGGING_CONTEXT;
+
 typedef struct _BURN_ENGINE_STATE
 {
     // UX flow control
@@ -164,6 +174,7 @@ typedef struct _BURN_ENGINE_STATE
 
     BURN_PLAN plan;
 
+    BURN_REDIRECTED_LOGGING_CONTEXT elevatedLoggingContext;
     HANDLE hUnelevatedLoggingThread;
 
     LPWSTR sczBundleEngineWorkingPath;
@@ -335,6 +346,12 @@ HRESULT DAPI CoreWaitForProcCompletion(
     __in HANDLE hProcess,
     __in DWORD dwTimeout,
     __out_opt DWORD* pdwReturnCode
+    );
+HRESULT DAPI CoreCloseElevatedLoggingThread(
+    __in BURN_ENGINE_STATE* pEngineState
+    );
+HRESULT DAPI CoreWaitForUnelevatedLoggingThread(
+    __in HANDLE hUnelevatedLoggingThread
     );
 
 #if defined(__cplusplus)

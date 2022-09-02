@@ -11,7 +11,12 @@
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)">
         <MsiProperty Name="FORCERESTARTCA" Value="[FORCERESTARTCA]" />
       </MsiPackage>
+      <ExePackage Id="ExeA" Cache="remove" PerMachine="yes"
+                  DetectCondition="" Permanent="yes" InstallArguments="/ec [EXEEXITCODE]">
+        <PayloadGroupRef Id="TestExePayloads" />
+      </ExePackage>
     </PackageGroup>
+    <Variable Name="EXEEXITCODE" bal:Overridable="yes" Value="0" />
     <Variable Name="FORCERESTARTCA" bal:Overridable="yes" />
   </Fragment>
 </Wix>

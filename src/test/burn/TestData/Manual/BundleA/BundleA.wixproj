@@ -11,8 +11,12 @@
   <ItemGroup>
     <ProjectReference Include="..\BafThmUtilTesting\BafThmUtilTesting.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
+    <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" />
   </ItemGroup>
+  <Target Name="CopyManualInstructions" AfterTargets="AfterBuild">
+    <Copy SourceFiles="ManualTests.txt" DestinationFiles="$(OutputPath)ManualTests.txt" />
+  </Target>
 </Project>

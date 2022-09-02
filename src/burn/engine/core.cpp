@@ -2028,6 +2028,48 @@ extern "C" HRESULT DAPI CoreWaitForProcCompletion(
     return vpfnProcWaitForCompletion(hProcess, dwTimeout, pdwReturnCode);
 }
 
+extern "C" HRESULT DAPI CoreCloseElevatedLoggingThread(
+    __in BURN_ENGINE_STATE* pEngineState
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (INVALID_HANDLE_VALUE == pEngineState->elevatedLoggingContext.hThread)
+    {
+        ExitFunction();
+    }
+
+    if (!::SetEvent(pEngineState->elevatedLoggingContext.hFinishedEvent))
+    {
+        ExitWithLastError(hr, "Failed to set log finished event.");
+    }
+
+    hr = AppWaitForSingleObject(pEngineState->elevatedLoggingContext.hThread, 5 * 60 * 1000); // TODO: is 5 minutes good?
+    ExitOnFailure(hr, "Failed to wait for elevated logging thread.");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT DAPI CoreWaitForUnelevatedLoggingThread(
+    __in HANDLE hUnelevatedLoggingThread
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (INVALID_HANDLE_VALUE == hUnelevatedLoggingThread)
+    {
+        ExitFunction();
+    }
+
+    // Give the thread 15 seconds to exit.
+    hr = AppWaitForSingleObject(hUnelevatedLoggingThread, 15 * 1000);
+    ExitOnFailure(hr, "Failed to wait for unelevated logging thread.");
+
+LExit:
+    return hr;
+}
+
 // internal helper functions
 
 static HRESULT AppendEscapedArgumentToCommandLine(
