@@ -56,6 +56,41 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildSimplePatchWithFileChanges()
+        {
+            var folder = TestData.Get(@"TestData", "PatchWithFileChanges");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderBaseline = Path.Combine(baseFolder, "baseline");
+                var tempFolderUpdate = Path.Combine(baseFolder, "update");
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0", new[] { Path.Combine(folder, ".baseline-data") });
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(folder, ".update-data") });
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) });
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(baseFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+                Assert.True(File.Exists(cab));
+
+                var files = Query.GetCabinetFiles(cab);
+                var file = files.Single();
+                WixAssert.StringEqual("a.txt", file.Name);
+                var contents = file.OpenText().ReadToEnd();
+                WixAssert.StringEqual("This is A v1.0.1\r\n", contents);
+            }
+        }
+
+        [Fact]
         public void CanBuildSimplePatchWithNoFileChanges()
         {
             var folder = TestData.Get(@"TestData", "PatchNoFileChanges");
