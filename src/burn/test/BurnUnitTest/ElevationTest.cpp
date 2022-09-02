@@ -68,7 +68,7 @@ namespace Bootstrapper
                 //
                 // per-user side setup
                 //
-                hr = ElevationElevate(&engineState, NULL);
+                hr = ElevationElevate(&engineState, WM_BURN_ELEVATE, NULL);
                 TestThrowOnFailure(hr, L"Failed to elevate.");
 
                 // post execute message

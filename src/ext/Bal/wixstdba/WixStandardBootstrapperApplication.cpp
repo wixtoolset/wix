@@ -4,6 +4,7 @@
 #include "BalBaseBootstrapperApplicationProc.h"
 #include "BalBaseBootstrapperApplication.h"
 
+static const LPCWSTR WIXBUNDLE_VARIABLE_CANRESTART = L"WixCanRestart";
 static const LPCWSTR WIXBUNDLE_VARIABLE_ELEVATED = L"WixBundleElevated";
 
 static const LPCWSTR WIXSTDBA_WINDOW_CLASS = L"WixStdBA";
@@ -1288,6 +1289,28 @@ public: // IBootstrapperApplication
 
         return S_OK;
     }
+
+
+    virtual STDMETHODIMP OnElevateComplete(
+        __in HRESULT hrStatus
+        )
+    {
+        if (m_fElevatingForRestart)
+        {
+            m_fElevatingForRestart = FALSE;
+
+            if (SUCCEEDED(hrStatus))
+            {
+                m_fAllowRestart = TRUE;
+
+                ::SendMessageW(m_hWnd, WM_CLOSE, 0, 0);
+            }
+            // else if failed then OnError showed the user an error message box
+        }
+
+        return __super::OnElevateComplete(hrStatus);
+    }
+
 
     virtual STDMETHODIMP_(void) BAProcFallback(
         __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
@@ -3734,14 +3757,16 @@ private:
 
             if (dwOldPageId != dwNewPageId)
             {
+                LONGLONG llCanRestart = 0;
+                LONGLONG llElevated = 0;
+
+                BalGetNumericVariable(WIXBUNDLE_VARIABLE_CANRESTART, &llCanRestart);
+                BalGetNumericVariable(WIXBUNDLE_VARIABLE_ELEVATED, &llElevated);
+                m_fRestartRequiresElevation = !llCanRestart && !llElevated;
+
                 // Enable disable controls per-page.
                 if (m_rgdwPageIds[WIXSTDBA_PAGE_INSTALL] == dwNewPageId) // on the "Install" page, ensure the install button is enabled/disabled correctly.
                 {
-                    LONGLONG llElevated = 0;
-                    if (m_Bundle.fPerMachine)
-                    {
-                        BalGetNumericVariable(WIXBUNDLE_VARIABLE_ELEVATED, &llElevated);
-                    }
                     ThemeControlElevates(m_pControlInstallButton, (m_Bundle.fPerMachine && !llElevated));
 
                     // If the EULA control exists, show it only if a license URL is provided as well.
@@ -3757,12 +3782,18 @@ private:
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_MODIFY] == dwNewPageId)
                 {
+                    ThemeControlElevates(m_pControlRepairButton, (m_Bundle.fPerMachine && !llElevated));
+                    ThemeControlElevates(m_pControlUninstallButton, (m_Bundle.fPerMachine && !llElevated));
+
                     ThemeControlEnable(m_pControlRepairButton, !m_fSuppressRepair);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_SUCCESS] == dwNewPageId) // on the "Success" page, check if the restart or launch button should be enabled.
                 {
                     BOOL fEnableRestartButton = FALSE;
                     BOOL fLaunchTargetExists = FALSE;
+
+                    ThemeControlElevates(m_pControlSuccessRestartButton, m_fRestartRequiresElevation);
+
                     if (m_fShouldRestart)
                     {
                         if (BAL_INFO_RESTART_PROMPT == m_BalInfoCommand.restart)
@@ -3783,6 +3814,8 @@ private:
                     BOOL fShowLogLink = (m_Bundle.sczLogVariable && *m_Bundle.sczLogVariable); // if there is a log file variable then we'll assume the log file exists.
                     BOOL fShowErrorMessage = FALSE;
                     BOOL fEnableRestartButton = FALSE;
+
+                    ThemeControlElevates(m_pControlFailureRestartButton, m_fRestartRequiresElevation);
 
                     if (FAILED(m_hrFinal))
                     {
@@ -4156,8 +4189,20 @@ private:
     {
         AssertSz(m_fRestartRequired, "Restart must be requested to be able to click on the restart button.");
 
-        m_fAllowRestart = TRUE;
-        ::SendMessageW(m_hWnd, WM_CLOSE, 0, 0);
+        if (m_fRestartRequiresElevation)
+        {
+            m_fElevatingForRestart = TRUE;
+            ThemeControlEnable(m_pControlFailureRestartButton, FALSE);
+            ThemeControlEnable(m_pControlSuccessRestartButton, FALSE);
+
+            m_pEngine->Elevate(m_hWnd);
+        }
+        else
+        {
+            m_fAllowRestart = TRUE;
+
+            ::SendMessageW(m_hWnd, WM_CLOSE, 0, 0);
+        }
     }
 
 
@@ -4649,6 +4694,8 @@ public:
         m_fRestartRequired = FALSE;
         m_fShouldRestart = FALSE;
         m_fAllowRestart = FALSE;
+        m_fRestartRequiresElevation = FALSE;
+        m_fElevatingForRestart = FALSE;
 
         m_sczLicenseFile = NULL;
         m_sczLicenseUrl = NULL;
@@ -4956,6 +5003,8 @@ private:
     BOOL m_fRestartRequired;
     BOOL m_fShouldRestart;
     BOOL m_fAllowRestart;
+    BOOL m_fRestartRequiresElevation;
+    BOOL m_fElevatingForRestart;
 
     LPWSTR m_sczLicenseFile;
     LPWSTR m_sczLicenseUrl;

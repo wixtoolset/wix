@@ -23,9 +23,21 @@ HRESULT DAPI ProcSystem(
     __out BOOL* pfSystem
     );
 
-HRESULT DAPI ProcTokenUser(
+HRESULT DAPI ProcGetTokenInformation(
     __in HANDLE hProcess,
-    __out TOKEN_USER** ppTokenUser
+    __in TOKEN_INFORMATION_CLASS tokenInformationClass,
+    __out LPVOID* ppvTokenInformation
+    );
+
+HRESULT DAPI ProcHasPrivilege(
+    __in HANDLE hProcess,
+    __in LPCWSTR wzPrivilegeName,
+    __out BOOL* pfHasPrivilege
+    );
+
+HRESULT DAPI ProcEnablePrivilege(
+    __in HANDLE hProcess,
+    __in LPCWSTR wzPrivilegeName
     );
 
 HRESULT DAPI ProcWow64(

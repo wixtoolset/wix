@@ -6,22 +6,6 @@
 extern "C" {
 #endif
 
-// constants
-
-enum WM_BURN
-{
-    WM_BURN_FIRST = WM_APP + 0xFFF, // this enum value must always be first.
-
-    WM_BURN_DETECT,
-    WM_BURN_PLAN,
-    WM_BURN_ELEVATE,
-    WM_BURN_APPLY,
-    WM_BURN_LAUNCH_APPROVED_EXE,
-    WM_BURN_QUIT,
-
-    WM_BURN_LAST, // this enum value must always be last.
-};
-
 // structs
 
 typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT

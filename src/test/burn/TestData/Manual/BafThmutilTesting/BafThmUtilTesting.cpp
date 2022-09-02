@@ -477,7 +477,7 @@ static HRESULT LogUserSid()
     TOKEN_USER* pTokenUser = NULL;
     LPWSTR sczSid = NULL;
 
-    hr = ProcTokenUser(::GetCurrentProcess(), &pTokenUser);
+    hr = ProcGetTokenInformation(::GetCurrentProcess(), TokenUser, reinterpret_cast<LPVOID*>(&pTokenUser));
     BalExitOnFailure(hr, "Failed to get user from process token.");
 
     if (!::ConvertSidToStringSidW(pTokenUser->User.Sid, &sczSid))

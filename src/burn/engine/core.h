@@ -251,6 +251,7 @@ HRESULT CorePlan(
     );
 HRESULT CoreElevate(
     __in BURN_ENGINE_STATE* pEngineState,
+    __in WM_BURN reason,
     __in_opt HWND hwndParent
     );
 HRESULT CoreApply(

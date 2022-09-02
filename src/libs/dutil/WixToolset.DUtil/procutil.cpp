@@ -85,7 +85,7 @@ extern "C" HRESULT DAPI ProcSystem(
     HRESULT hr = S_OK;
     TOKEN_USER* pTokenUser = NULL;
 
-    hr = ProcTokenUser(hProcess, &pTokenUser);
+    hr = ProcGetTokenInformation(hProcess, TokenUser, reinterpret_cast<LPVOID*>(&pTokenUser));
     ProcExitOnFailure(hr, "Failed to get TokenUser from process token.");
 
     *pfSystem = ::IsWellKnownSid(pTokenUser->User.Sid, WinLocalSystemSid);
@@ -96,15 +96,16 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT DAPI ProcTokenUser(
+extern "C" HRESULT DAPI ProcGetTokenInformation(
     __in HANDLE hProcess,
-    __out TOKEN_USER** ppTokenUser
+    __in TOKEN_INFORMATION_CLASS tokenInformationClass,
+    __out LPVOID* ppvTokenInformation
     )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
     HANDLE hToken = NULL;
-    TOKEN_USER* pTokenUser = NULL;
+    LPVOID pvTokenInformation = NULL;
     DWORD cbToken = 0;
 
     if (!::OpenProcessToken(hProcess, TOKEN_QUERY, &hToken))
@@ -112,33 +113,104 @@ extern "C" HRESULT DAPI ProcTokenUser(
         ProcExitWithLastError(hr, "Failed to open process token.");
     }
 
-    if (::GetTokenInformation(hToken, TokenUser, pTokenUser, 0, &cbToken))
-    {
-        er = ERROR_SUCCESS;
-    }
-    else
+    if (!::GetTokenInformation(hToken, tokenInformationClass, pvTokenInformation, 0, &cbToken))
     {
         er = ::GetLastError();
     }
 
     if (er != ERROR_INSUFFICIENT_BUFFER)
     {
-        ProcExitOnWin32Error(er, hr, "Failed to get user from process token size.");
+        ProcExitOnWin32Error(er, hr, "Failed to get information from process token size.");
     }
 
-    pTokenUser = reinterpret_cast<TOKEN_USER*>(MemAlloc(cbToken, TRUE));
-    ProcExitOnNull(pTokenUser, hr, E_OUTOFMEMORY, "Failed to allocate token information.");
+    pvTokenInformation = MemAlloc(cbToken, TRUE);
+    ProcExitOnNull(pvTokenInformation, hr, E_OUTOFMEMORY, "Failed to allocate token information.");
 
-    if (!::GetTokenInformation(hToken, TokenUser, pTokenUser, cbToken, &cbToken))
+    if (!::GetTokenInformation(hToken, tokenInformationClass, pvTokenInformation, cbToken, &cbToken))
     {
-        ProcExitWithLastError(hr, "Failed to get user from process token.");
+        ProcExitWithLastError(hr, "Failed to get information from process token.");
     }
 
-    *ppTokenUser = pTokenUser;
-    pTokenUser = NULL;
+    *ppvTokenInformation = pvTokenInformation;
+    pvTokenInformation = NULL;
 
 LExit:
-    ReleaseMem(pTokenUser);
+    ReleaseMem(pvTokenInformation);
+    ReleaseHandle(hToken);
+
+    return hr;
+}
+
+extern "C" HRESULT DAPI ProcHasPrivilege(
+    __in HANDLE hProcess,
+    __in LPCWSTR wzPrivilegeName,
+    __out BOOL* pfHasPrivilege
+    )
+{
+    HRESULT hr = S_OK;
+    TOKEN_PRIVILEGES* pTokenPrivileges = NULL;
+    LUID luidPrivilege = { };
+
+    *pfHasPrivilege = FALSE;
+
+    if (!::LookupPrivilegeValueW(NULL, wzPrivilegeName, &luidPrivilege))
+    {
+        ProcExitWithLastError(hr, "Failed to get privilege LUID: %ls", wzPrivilegeName);
+    }
+
+    hr = ProcGetTokenInformation(hProcess, TokenPrivileges, reinterpret_cast<LPVOID*>(&pTokenPrivileges));
+    ProcExitOnFailure(hr, "Failed to get token privilege information.");
+
+    for (DWORD i = 0; i < pTokenPrivileges->PrivilegeCount; ++i)
+    {
+        LUID* pTokenLuid = &pTokenPrivileges->Privileges[i].Luid;
+
+        if (luidPrivilege.LowPart == pTokenLuid->LowPart && luidPrivilege.HighPart == pTokenLuid->HighPart)
+        {
+            *pfHasPrivilege = TRUE;
+            break;
+        }
+    }
+
+LExit:
+    ReleaseMem(pTokenPrivileges);
+
+    return hr;
+}
+
+extern "C" HRESULT DAPI ProcEnablePrivilege(
+    __in HANDLE hProcess,
+    __in LPCWSTR wzPrivilegeName
+    )
+{
+    HRESULT hr = S_OK;
+    HANDLE hToken = NULL;
+    TOKEN_PRIVILEGES priv = { };
+
+    priv.PrivilegeCount = 1;
+    priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if (!::LookupPrivilegeValueW(NULL, wzPrivilegeName, &priv.Privileges[0].Luid))
+    {
+        ProcExitWithLastError(hr, "Failed to get privilege LUID: %ls", wzPrivilegeName);
+    }
+
+    if (!::OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES, &hToken))
+    {
+        ProcExitWithLastError(hr, "Failed to get process token to adjust privileges.");
+    }
+
+    if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, sizeof(TOKEN_PRIVILEGES), NULL, 0))
+    {
+        ProcExitWithLastError(hr, "Failed to adjust token to add privilege: %ls", wzPrivilegeName);
+    }
+
+    if (ERROR_NOT_ALL_ASSIGNED == ::GetLastError())
+    {
+        hr = S_FALSE;
+    }
+
+LExit:
     ReleaseHandle(hToken);
 
     return hr;

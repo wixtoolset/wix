@@ -402,6 +402,7 @@ static HRESULT ElevatedOnExecuteActionComplete(
 
 extern "C" HRESULT ElevationElevate(
     __in BURN_ENGINE_STATE* pEngineState,
+    __in WM_BURN reason,
     __in_opt HWND hwndParent
     )
 {
@@ -450,7 +451,11 @@ extern "C" HRESULT ElevationElevate(
         else if (HRESULT_FROM_WIN32(ERROR_CANCELLED) == hr)
         {
             // The user clicked "Cancel" on the elevation prompt or the elevation prompt timed out, provide the notification with the option to retry.
-            hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+            if (WM_BURN_APPLY == reason)
+            {
+                hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+            }
+
             nResult = UserExperienceSendError(&pEngineState->userExperience, BOOTSTRAPPER_ERROR_TYPE_ELEVATE, NULL, hr, NULL, MB_ICONERROR | MB_RETRYCANCEL, IDNOACTION);
         }
     } while (IDRETRY == nResult);

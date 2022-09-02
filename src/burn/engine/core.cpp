@@ -593,6 +593,7 @@ LExit:
 
 extern "C" HRESULT CoreElevate(
     __in BURN_ENGINE_STATE* pEngineState,
+    __in WM_BURN reason,
     __in_opt HWND hwndParent
     )
 {
@@ -608,7 +609,7 @@ extern "C" HRESULT CoreElevate(
             ExitOnFailure(hr, "Failed to cache engine to working directory.");
         }
 
-        hr = ElevationElevate(pEngineState, hwndParent);
+        hr = ElevationElevate(pEngineState, reason, hwndParent);
         if (E_SUSPECTED_AV_INTERFERENCE == hr && 1 > cAVRetryAttempts)
         {
             ++cAVRetryAttempts;
@@ -720,7 +721,7 @@ extern "C" HRESULT CoreApply(
     // Elevate.
     if (pEngineState->plan.fPerMachine)
     {
-        hr = CoreElevate(pEngineState, pEngineState->userExperience.hwndApply);
+        hr = CoreElevate(pEngineState, WM_BURN_APPLY, pEngineState->userExperience.hwndApply);
         ExitOnFailure(hr, "Failed to elevate.");
 
         hr = ElevationApplyInitialize(pEngineState->companionConnection.hPipe, &pEngineState->userExperience, &pEngineState->variables, &pEngineState->plan);
@@ -872,7 +873,7 @@ extern "C" HRESULT CoreLaunchApprovedExe(
     ExitOnRootFailure(hr, "BA aborted LaunchApprovedExe begin.");
 
     // Elevate.
-    hr = CoreElevate(pEngineState, pLaunchApprovedExe->hwndParent);
+    hr = CoreElevate(pEngineState, WM_BURN_LAUNCH_APPROVED_EXE, pLaunchApprovedExe->hwndParent);
     ExitOnFailure(hr, "Failed to elevate.");
 
     // Launch.
