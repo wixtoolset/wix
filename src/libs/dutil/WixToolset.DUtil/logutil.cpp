@@ -65,27 +65,17 @@ static PFN_LOGSTRINGWORKRAW s_vpfLogStringWorkRaw = NULL;
 static LPVOID s_vpvLogStringWorkRawContext = NULL;
 
 
-/********************************************************************
- IsLogInitialized - Checks if log is currently initialized.
-********************************************************************/
 extern "C" BOOL DAPI IsLogInitialized()
 {
     return LogUtil_fInitializedCriticalSection;
 }
 
-/********************************************************************
- IsLogOpen - Checks if log is currently initialized and open.
-********************************************************************/
 extern "C" BOOL DAPI IsLogOpen()
 {
     return (INVALID_HANDLE_VALUE != LogUtil_hLog && NULL != LogUtil_sczLogPath);
 }
 
 
-/********************************************************************
- LogInitialize - initializes the logutil API
-
-********************************************************************/
 extern "C" void DAPI LogInitialize(
     __in_opt HMODULE hModule
     )
@@ -100,11 +90,6 @@ extern "C" void DAPI LogInitialize(
 }
 
 
-/********************************************************************
- LogOpen - creates an application log file
-
- NOTE: if wzExt is null then wzLog is path to desired log else wzLog and wzExt are used to generate log name
-********************************************************************/
 extern "C" HRESULT DAPI LogOpen(
     __in_z_opt LPCWSTR wzDirectory,
     __in_z LPCWSTR wzLog,
@@ -195,10 +180,6 @@ LExit:
 }
 
 
-/********************************************************************
- LogDisable - closes any open files and disables in memory logging.
-
-********************************************************************/
 void DAPI LogDisable()
 {
     ::EnterCriticalSection(&LogUtil_csLog);
@@ -213,10 +194,6 @@ void DAPI LogDisable()
 }
 
 
-/********************************************************************
- LogRedirect - Redirects all logging strings to the specified
-               function - or set NULL to disable the hook
-********************************************************************/
 void DAPI LogRedirect(
     __in_opt PFN_LOGSTRINGWORKRAW vpfLogStringWorkRaw,
     __in_opt LPVOID pvContext
@@ -231,11 +208,6 @@ void DAPI LogRedirect(
 }
 
 
-/********************************************************************
- LogRename - Renames a logfile, moving its contents to a new path,
-             and re-opening the file for appending at the new
-             location
-********************************************************************/
 HRESULT DAPI LogRename(
     __in_z LPCWSTR wzNewPath
     )
@@ -309,20 +281,12 @@ extern "C" void DAPI LogUninitialize(
 }
 
 
-/********************************************************************
- LogIsOpen - returns whether log file is open or note
-
-********************************************************************/
 extern "C" BOOL DAPI LogIsOpen()
 {
     return INVALID_HANDLE_VALUE != LogUtil_hLog;
 }
 
 
-/********************************************************************
- LogSetSpecialParams - sets a special beginline string, endline
-                       string, post-timestamp string, etc.
-********************************************************************/
 HRESULT DAPI LogSetSpecialParams(
     __in_z_opt LPCWSTR wzSpecialBeginLine,
     __in_z_opt LPCWSTR wzSpecialAfterTimeStamp,
@@ -368,11 +332,6 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- LogSetLevel - sets the logging level
-
- NOTE: returns previous logging level
-********************************************************************/
 extern "C" REPORT_LEVEL DAPI LogSetLevel(
     __in REPORT_LEVEL rl,
     __in BOOL fLogChange
@@ -416,20 +375,12 @@ extern "C" REPORT_LEVEL DAPI LogSetLevel(
 }
 
 
-/********************************************************************
- LogGetLevel - gets the current logging level
-
-********************************************************************/
 extern "C" REPORT_LEVEL DAPI LogGetLevel()
 {
     return LogUtil_rlCurrent;
 }
 
 
-/********************************************************************
- LogGetPath - gets the current log path
-
-********************************************************************/
 extern "C" HRESULT DAPI LogGetPath(
     __out_ecount_z(cchLogPath) LPWSTR pwzLogPath,
     __in DWORD cchLogPath
@@ -451,36 +402,11 @@ LExit:
 }
 
 
-/********************************************************************
- LogGetHandle - gets the current log file handle
-
-********************************************************************/
 extern "C" HANDLE DAPI LogGetHandle()
 {
     return LogUtil_hLog;
 }
 
-
-/********************************************************************
- LogString - write a string to the log
-
- NOTE: use printf formatting ("%ls", "%d", etc.)
-********************************************************************/
-extern "C" HRESULT DAPIV LogString(
-    __in REPORT_LEVEL rl,
-    __in_z __format_string LPCSTR szFormat,
-    ...
-    )
-{
-    HRESULT hr = S_OK;
-    va_list args;
-
-    va_start(args, szFormat);
-    hr = LogStringArgs(rl, szFormat, args);
-    va_end(args);
-
-    return hr;
-}
 
 extern "C" HRESULT DAPI LogStringArgs(
     __in REPORT_LEVEL rl,
@@ -499,27 +425,6 @@ extern "C" HRESULT DAPI LogStringArgs(
     hr = LogStringWorkArgs(rl, szFormat, args, FALSE);
 
 LExit:
-    return hr;
-}
-
-/********************************************************************
- LogStringLine - write a string plus LOGUTIL_NEWLINE to the log
-
- NOTE: use printf formatting ("%ls", "%d", etc.)
-********************************************************************/
-extern "C" HRESULT DAPIV LogStringLine(
-    __in REPORT_LEVEL rl,
-    __in_z __format_string LPCSTR szFormat,
-    ...
-    )
-{
-    HRESULT hr = S_OK;
-    va_list args;
-
-    va_start(args, szFormat);
-    hr = LogStringLineArgs(rl, szFormat, args);
-    va_end(args);
-
     return hr;
 }
 
@@ -543,11 +448,6 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- LogIdModuleArgs - write a string embedded in a MESSAGETABLE to the log
-
- NOTE: uses format string from MESSAGETABLE resource
-********************************************************************/
 
 extern "C" HRESULT DAPI LogIdModuleArgs(
     __in REPORT_LEVEL rl,
@@ -570,53 +470,6 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT DAPI LogIdModule(
-    __in REPORT_LEVEL rl,
-    __in DWORD dwLogId,
-    __in_opt HMODULE hModule,
-    ...
-    )
-{
-    AssertSz(REPORT_NONE != rl, "REPORT_NONE is not a valid logging level");
-    HRESULT hr = S_OK;
-    va_list args;
-
-    if (REPORT_ERROR != rl && LogUtil_rlCurrent < rl)
-    {
-        ExitFunction1(hr = S_FALSE);
-    }
-
-    va_start(args, hModule);
-    hr = LogIdWork(rl, (hModule) ? hModule : LogUtil_hModule, dwLogId, args, TRUE);
-    va_end(args);
-
-LExit:
-    return hr;
-}
-
-
-
-
-/********************************************************************
- LogError - write an error to the log
-
- NOTE: use printf formatting ("%ls", "%d", etc.)
-********************************************************************/
-extern "C" HRESULT DAPIV LogErrorString(
-    __in HRESULT hrError,
-    __in_z __format_string LPCSTR szFormat,
-    ...
-    )
-{
-    HRESULT hr  = S_OK;
-
-    va_list args;
-    va_start(args, szFormat);
-    hr = LogErrorStringArgs(hrError, szFormat, args);
-    va_end(args);
-
-    return hr;
-}
 
 extern "C" HRESULT DAPI LogErrorStringArgs(
     __in HRESULT hrError,
@@ -648,12 +501,6 @@ LExit:
 }
 
 
-/********************************************************************
- LogErrorIdModule - write an error string embedded in a MESSAGETABLE to the log
-
- NOTE:  uses format string from MESSAGETABLE resource
-        can log no more than three strings in the error message
-********************************************************************/
 extern "C" HRESULT DAPI LogErrorIdModule(
     __in HRESULT hrError,
     __in DWORD dwLogId,
@@ -681,10 +528,6 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- LogHeader - write a standard header to the log
-
-********************************************************************/
 extern "C" HRESULT DAPI LogHeader()
 {
     HRESULT hr = S_OK;
@@ -761,10 +604,6 @@ extern "C" HRESULT DAPI LogHeader()
 }
 
 
-/********************************************************************
- LogFooterWork - write a standard footer to the log
-
-********************************************************************/
 
 static HRESULT LogFooterWork(
     __in_z __format_string LPCSTR szFormat,
@@ -791,10 +630,6 @@ extern "C" HRESULT DAPI LogFooter()
     return hr;
 }
 
-/********************************************************************
- LogStringWorkRaw - Write a raw, unformatted string to the log
-
-********************************************************************/
 extern "C" HRESULT LogStringWorkRaw(
     __in_z LPCSTR szLogData
     )
