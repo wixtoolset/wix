@@ -62,7 +62,6 @@ Severity=Warning
 SymbolicName=MSG_RESTARTING
 Language=English
 Restarting computer...
-=======================================
 .
 
 MessageId=6
@@ -189,6 +188,13 @@ Severity=Error
 SymbolicName=MSG_RESTART_FAILED
 Language=English
 The restart request failed, error: %1!ls!. The machine will need to be manually restarted.
+.
+
+MessageId=24
+Severity=Error
+SymbolicName=MSG_RESTART_BLOCKED
+Language=English
+The restart request was successful, but no system restart messages have been received. This may be caused by another application blocking the restart or taking too long to respond. The machine might need to be manually restarted.
 .
 
 MessageId=51
@@ -1138,9 +1144,16 @@ Apply complete, result: 0x%1!x!, restart: %2!hs!, ba requested restart:  %3!hs!
 
 MessageId=400
 Severity=Success
-SymbolicName=MSG_SYSTEM_SHUTDOWN
+SymbolicName=MSG_SYSTEM_SHUTDOWN_REQUEST
 Language=English
-Received system request to shut down the process: critical: %1!hs!, elevated: %2!hs!, allowed: %3!hs!
+Received system request to shut down the process: allowed: %1!hs!, elevated: %2!hs!, critical: %3!hs!, logoff: %4!hs!, close app: %5!hs!
+.
+
+MessageId=401
+Severity=Success
+SymbolicName=MSG_SYSTEM_SHUTDOWN_RESULT
+Language=English
+Received result of system request to shut down the process: closing: %1!hs!, elevated: %2!hs!, critical: %3!hs!, logoff: %4!hs!, close app: %5!hs!
 .
 
 MessageId=410

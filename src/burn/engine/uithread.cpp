@@ -46,6 +46,11 @@ HRESULT UiCreateMessageWindow(
     HANDLE rgWaitHandles[2] = { };
     UITHREAD_CONTEXT context = { };
 
+    // Try to make this process the first one to receive WM_QUERYENDSESSION.
+    // When blocking shutdown during Apply, this prevents other applications from being closed even though the restart will be blocked.
+    // When initiating a restart, this makes it reasonable to assume WM_QUERYENDSESSION will be received quickly because otherwise other applications could delay indefinitely.
+    ::SetProcessShutdownParameters(0x3FF, 0);
+
     // Create event to signal after the UI thread / window is initialized.
     rgWaitHandles[0] = ::CreateEventW(NULL, TRUE, FALSE, NULL);
     ExitOnNullWithLastError(rgWaitHandles[0], hr, "Failed to create initialization event.");
@@ -79,10 +84,6 @@ void UiCloseMessageWindow(
     if (::IsWindow(pEngineState->hMessageWindow))
     {
         ::PostMessageW(pEngineState->hMessageWindow, WM_CLOSE, 0, 0);
-
-        // Give the window 15 seconds to close because if it stays open it can prevent
-        // the engine from starting a reboot (should a reboot actually be necessary).
-        ::WaitForSingleObject(pEngineState->hMessageWindowThread, 15 * 1000);
     }
 }
 
@@ -180,23 +181,56 @@ static LRESULT CALLBACK WndProc(
 
     case WM_QUERYENDSESSION:
         {
-        DWORD dwEndSession = static_cast<DWORD>(lParam);
-        BOOL fCritical = ENDSESSION_CRITICAL & dwEndSession;
-        BOOL fCancel = FALSE;
-        BOOL fRet = FALSE;
+        BOOL fCritical = ENDSESSION_CRITICAL & lParam;
+        BOOL fAllowed = FALSE;
 
-        // Always block shutdown during apply.
         UITHREAD_INFO* pInfo = reinterpret_cast<UITHREAD_INFO*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
-        if (pInfo->pEngineState->plan.fApplying)
+        if (!pInfo->pEngineState->plan.fApplying && // always block shutdown during apply.
+            !fCritical)                             // always block critical shutdowns to receive the WM_ENDSESSION message.
         {
-            fCancel = TRUE;
+            fAllowed = TRUE;
         }
 
+        CoreUpdateRestartState(pInfo->pEngineState, BURN_RESTART_STATE_INITIATING);
         pInfo->pEngineState->fCriticalShutdownInitiated |= fCritical;
 
-        fRet = !fCancel;
-        LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN, LoggingBoolToString(fCritical), LoggingBoolToString(pInfo->fElevatedEngine), LoggingBoolToString(fRet));
-        return fRet;
+        LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN_REQUEST, LoggingBoolToString(fAllowed), LoggingBoolToString(pInfo->fElevatedEngine), LoggingBoolToString(fCritical), LoggingBoolToString(lParam & ENDSESSION_LOGOFF), LoggingBoolToString(lParam & ENDSESSION_CLOSEAPP));
+        LogFlush();
+        return fAllowed;
+        }
+
+    case WM_ENDSESSION:
+        {
+        UITHREAD_INFO* pInfo = reinterpret_cast<UITHREAD_INFO*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+        BOOL fAllowed = 0 != wParam;
+
+        LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN_RESULT, LoggingBoolToString(fAllowed), LoggingBoolToString(pInfo->fElevatedEngine), LoggingBoolToString(lParam & ENDSESSION_CRITICAL), LoggingBoolToString(lParam & ENDSESSION_LOGOFF), LoggingBoolToString(lParam & ENDSESSION_CLOSEAPP));
+
+        if (fAllowed)
+        {
+            // Windows will shutdown the process as soon as we return from this message.
+            // https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ms700677(v=vs.85)
+
+            // Give Apply approximately 20 seconds to complete.
+            for (DWORD i = 0; i < 80; ++i)
+            {
+                if (!pInfo->pEngineState->plan.fApplying)
+                {
+                    break;
+                }
+
+                ::Sleep(250);
+            }
+
+            LogStringWorkRaw("=======================================\r\n");
+
+            // Close the log to try to make sure everything is flushed to disk.
+            LogClose(FALSE);
+        }
+
+        CoreUpdateRestartState(pInfo->pEngineState, fAllowed ? BURN_RESTART_STATE_INITIATED : BURN_RESTART_STATE_BLOCKED);
+
+        return 0;
         }
 
     case WM_DESTROY:

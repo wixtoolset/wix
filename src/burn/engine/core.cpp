@@ -1963,6 +1963,21 @@ LExit:
     return hr;
 }
 
+extern "C" void CoreUpdateRestartState(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_RESTART_STATE restartState
+    )
+{
+    ::EnterCriticalSection(&pEngineState->csRestartState);
+
+    if (pEngineState->fRestarting && restartState > pEngineState->restartState)
+    {
+        pEngineState->restartState = restartState;
+    }
+
+    ::LeaveCriticalSection(&pEngineState->csRestartState);
+}
+
 extern "C" void CoreFunctionOverride(
     __in_opt PFN_CREATEPROCESSW pfnCreateProcessW,
     __in_opt PFN_PROCWAITFORCOMPLETION pfnProcWaitForCompletion

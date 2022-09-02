@@ -72,7 +72,9 @@ static HRESULT WaitForElevatedLoggingThread(
 static HRESULT WaitForUnelevatedLoggingThread(
     __in HANDLE hUnelevatedLoggingThread
     );
-static HRESULT Restart();
+static HRESULT Restart(
+    __in BURN_ENGINE_STATE* pEngineState
+    );
 static void CALLBACK BurnTraceError(
     __in_z LPCSTR szFile,
     __in int iLine,
@@ -131,7 +133,6 @@ extern "C" HRESULT EngineRun(
     BOOL fRunNormal = FALSE;
     BOOL fRunElevated = FALSE;
     BOOL fRunRunOnce = FALSE;
-    BOOL fRestart = FALSE;
 
     BURN_ENGINE_STATE engineState = { };
     engineState.command.cbSize = sizeof(BOOTSTRAPPER_COMMAND);
@@ -269,9 +270,7 @@ extern "C" HRESULT EngineRun(
         ExitOnFailure(hr, "Invalid run mode.");
     }
 
-    // set exit code and remember if we are supposed to restart.
     *pdwExitCode = engineState.userExperience.dwExitCode;
-    fRestart = engineState.fRestart;
 
 LExit:
     ReleaseStr(sczExePath);
@@ -289,17 +288,17 @@ LExit:
     CacheUninitialize(&engineState.cache);
 
     // If this is a related bundle (but not an update) suppress restart and return the standard restart error code.
-    if (fRestart && BOOTSTRAPPER_RELATION_NONE != engineState.command.relationType && BOOTSTRAPPER_RELATION_UPDATE != engineState.command.relationType)
+    if (engineState.fRestart && BOOTSTRAPPER_RELATION_NONE != engineState.command.relationType && BOOTSTRAPPER_RELATION_UPDATE != engineState.command.relationType)
     {
         LogId(REPORT_STANDARD, MSG_RESTART_ABORTED, LoggingRelationTypeToString(engineState.command.relationType));
 
-        fRestart = FALSE;
+        engineState.fRestart = FALSE;
         hr = SUCCEEDED(hr) ? HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED) : HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_REQUIRED);
     }
 
     if (fRunNormal)
     {
-        LogId(REPORT_STANDARD, MSG_EXITING, FAILED(hr) ? (int)hr : *pdwExitCode, LoggingBoolToString(fRestart));
+        LogId(REPORT_STANDARD, MSG_EXITING, FAILED(hr) ? (int)hr : *pdwExitCode, LoggingBoolToString(engineState.fRestart));
     }
     else if (fRunUntrusted)
     {
@@ -321,16 +320,19 @@ LExit:
         LogFlush();
     }
 
-    if (fRestart)
+    if (engineState.fRestart)
     {
         LogId(REPORT_STANDARD, MSG_RESTARTING);
 
-        HRESULT hrRestart = Restart();
+        HRESULT hrRestart = Restart(&engineState);
         if (FAILED(hrRestart))
         {
             LogErrorId(hrRestart, MSG_RESTART_FAILED);
         }
     }
+
+    // If the message window is still around, close it.
+    UiCloseMessageWindow(&engineState);
 
     UninitializeEngineState(&engineState);
 
@@ -384,6 +386,8 @@ static HRESULT InitializeEngineState(
     HRESULT hr = S_OK;
     HANDLE hSectionFile = hEngineFile;
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
+
+    ::InitializeCriticalSection(&pEngineState->csRestartState);
 
     pEngineState->internalCommand.automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
@@ -458,6 +462,8 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->log.sczPrefix);
     ReleaseStr(pEngineState->log.sczPath);
     ReleaseStr(pEngineState->log.sczPathVariable);
+
+    ::DeleteCriticalSection(&pEngineState->csRestartState);
 
     // clear struct
     memset(pEngineState, 0, sizeof(BURN_ENGINE_STATE));
@@ -635,9 +641,6 @@ LExit:
 
     BurnExtensionUnload(&pEngineState->extensions);
 
-    // If the message window is still around, close it.
-    UiCloseMessageWindow(pEngineState);
-
     VariablesDump(&pEngineState->variables);
 
     // end per-machine process if running
@@ -719,9 +722,6 @@ LExit:
     ReleaseHandle(hLoggingThread);
 
     LogRedirect(NULL, NULL); // we're done talking to the child so always reset logging now.
-
-    // If the message window is still around, close it.
-    UiCloseMessageWindow(pEngineState);
 
     if (fDeleteLoggingCs)
     {
@@ -1112,7 +1112,9 @@ LExit:
     return hr;
 }
 
-static HRESULT Restart()
+static HRESULT Restart(
+    __in BURN_ENGINE_STATE* pEngineState
+    )
 {
     HRESULT hr = S_OK;
     HANDLE hProcessToken = NULL;
@@ -1136,17 +1138,19 @@ static HRESULT Restart()
         ExitWithLastError(hr, "Failed to adjust token to add shutdown privileges.");
     }
 
+    pEngineState->fRestarting = TRUE;
+    CoreUpdateRestartState(pEngineState, BURN_RESTART_STATE_REQUESTING);
+
     do
     {
         hr = S_OK;
 
-        // Wait a second to let the companion process (assuming we did an elevated install) to get to the
-        // point where it too is thinking about restarting the computer. Only one will schedule the restart
-        // but both will have their log files closed and otherwise be ready to exit.
-        //
-        // On retry, we'll also wait a second to let the OS try to get to a place where the restart can
-        // be initiated.
-        ::Sleep(1000);
+        if (dwRetries)
+        {
+            // On retry, wait a second to let the OS try to get to a place where the restart can
+            // be initiated.
+            ::Sleep(1000);
+        }
 
         if (!vpfnInitiateSystemShutdownExW(NULL, NULL, 0, FALSE, TRUE, SHTDN_REASON_MAJOR_APPLICATION | SHTDN_REASON_MINOR_INSTALLATION | SHTDN_REASON_FLAG_PLANNED))
         {
@@ -1154,6 +1158,41 @@ static HRESULT Restart()
         }
     } while (dwRetries++ < RESTART_RETRIES && (HRESULT_FROM_WIN32(ERROR_MACHINE_LOCKED) == hr || HRESULT_FROM_WIN32(ERROR_NOT_READY) == hr));
     ExitOnRootFailure(hr, "Failed to schedule restart.");
+
+    CoreUpdateRestartState(pEngineState, BURN_RESTART_STATE_REQUESTED);
+
+    // Give the UI thread approximately 15 seconds to get the WM_QUERYENDSESSION message.
+    for (DWORD i = 0; i < 60; ++i)
+    {
+        if (!::IsWindow(pEngineState->hMessageWindow))
+        {
+            ExitFunction();
+        }
+
+        if (BURN_RESTART_STATE_REQUESTED < pEngineState->restartState)
+        {
+            break;
+        }
+
+        ::Sleep(250);
+    }
+
+    if (BURN_RESTART_STATE_INITIATING > pEngineState->restartState)
+    {
+        LogId(REPORT_WARNING, MSG_RESTART_BLOCKED);
+        ExitFunction();
+    }
+
+    // Give the UI thread the chance to process the WM_ENDSESSION message.
+    for (;;)
+    {
+        if (!::IsWindow(pEngineState->hMessageWindow) || BURN_RESTART_STATE_INITIATING < pEngineState->restartState)
+        {
+            break;
+        }
+
+        ::Sleep(250);
+    }
 
 LExit:
     ReleaseHandle(hProcessToken);
