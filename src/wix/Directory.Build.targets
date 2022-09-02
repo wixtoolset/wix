@@ -8,6 +8,9 @@
     <None Include="$(MSBuildThisFileDirectory)wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'=='' " />
     <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'=='' " />
 
+    <None Include="$(MSBuildThisFileDirectory)wixnative\arm64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-arm64' " />
+    <None Include="$(BaseOutputPath)$(Configuration)\arm64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-arm64' " />
+
     <None Include="$(MSBuildThisFileDirectory)wixnative\Win32\mergemod.dll" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x86' " />
     <None Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.exe" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x86' " />
   </ItemGroup>
