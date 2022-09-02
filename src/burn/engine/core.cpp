@@ -1612,6 +1612,16 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 ++i;
 
+                hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pInternalCommand->rgSecretArgs), pInternalCommand->cSecretArgs, 3, sizeof(int), 3);
+                ExitOnFailure(hr, "Failed to ensure size for secret args.");
+
+                pInternalCommand->rgSecretArgs[pInternalCommand->cSecretArgs] = i;
+                pInternalCommand->cSecretArgs += 1;
+                pInternalCommand->rgSecretArgs[pInternalCommand->cSecretArgs] = i + 1;
+                pInternalCommand->cSecretArgs += 1;
+                pInternalCommand->rgSecretArgs[pInternalCommand->cSecretArgs] = i + 2;
+                pInternalCommand->cSecretArgs += 1;
+
                 hr = ParsePipeConnection(argv + i, pCompanionConnection);
                 if (FAILED(hr))
                 {
@@ -1684,7 +1694,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 if (i + 3 >= argc)
                 {
                     fInvalidCommandLine = TRUE;
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Must specify the embedded name, token and parent process id.");
+                    ExitWithRootFailure(hr, E_INVALIDARG, "Must specify the embedded name, token and parent process id.");
                 }
 
                 switch (pInternalCommand->mode)
@@ -1701,7 +1711,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     break;
                 default:
                     fInvalidCommandLine = TRUE;
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Multiple mode command-line switches were provided.");
+                    ExitWithRootFailure(hr, E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
 
                 ++i;
@@ -2111,6 +2121,7 @@ static HRESULT GetSanitizedCommandLine(
 {
     HRESULT hr = S_OK;
     DWORD dwUnknownArgIndex = 0;
+    DWORD dwSecretArgIndex = 0;
     BOOL fHidden = FALSE;
     LPWSTR sczSanitizedArgument = NULL;
     LPWSTR sczVariableName = NULL;
@@ -2118,6 +2129,8 @@ static HRESULT GetSanitizedCommandLine(
     LPWSTR* argv = pInternalCommand->argv;
     DWORD cUnknownArgs = pInternalCommand->cUnknownArgs;
     int* rgUnknownArgs = pInternalCommand->rgUnknownArgs;
+    DWORD cSecretArgs = pInternalCommand->cSecretArgs;
+    int* rgSecretArgs = pInternalCommand->rgSecretArgs;
 
     for (int i = 0; i < argc; ++i)
     {
@@ -2148,13 +2161,21 @@ static HRESULT GetSanitizedCommandLine(
                     if (fHidden)
                     {
                         hr = StrAllocFormatted(&sczSanitizedArgument, L"%ls=*****", sczVariableName);
-                        ExitOnFailure(hr, "Failed to copy sanitized argument.");
+                        ExitOnFailure(hr, "Failed to copy sanitized unknown argument.");
                     }
                 }
             }
 
             // Remember command-line switch to pass off to BA.
             AppAppendCommandLineArgument(&pCommand->wzCommandLine, argv[i]);
+        }
+        else if (dwSecretArgIndex < cSecretArgs && rgSecretArgs[dwSecretArgIndex] == i)
+        {
+            ++dwSecretArgIndex;
+            fHidden = TRUE;
+
+            hr = StrAllocString(&sczSanitizedArgument, L"*****", 0);
+            ExitOnFailure(hr, "Failed to copy sanitized secret argument.");
         }
 
         if (fHidden)
