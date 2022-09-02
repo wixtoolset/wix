@@ -82,6 +82,16 @@ enum BURN_AU_PAUSE_ACTION
     BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME,
 };
 
+enum BURN_RESTART_STATE
+{
+    BURN_RESTART_STATE_NONE,
+    BURN_RESTART_STATE_REQUESTING,
+    BURN_RESTART_STATE_REQUESTED,
+    BURN_RESTART_STATE_INITIATING,
+    BURN_RESTART_STATE_INITIATED,
+    BURN_RESTART_STATE_BLOCKED,
+};
+
 
 // structs
 
@@ -159,6 +169,10 @@ typedef struct _BURN_ENGINE_STATE
     LPWSTR sczBundleEngineWorkingPath;
     BURN_PIPE_CONNECTION companionConnection;
     BURN_PIPE_CONNECTION embeddedConnection;
+
+    CRITICAL_SECTION csRestartState;
+    BOOL fRestarting;
+    BURN_RESTART_STATE restartState;
 
     BOOL fCriticalShutdownInitiated;
     BURN_RESUME_MODE resumeMode;
@@ -299,6 +313,10 @@ HRESULT CoreParseCommandLine(
     __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
     __inout HANDLE* phSectionFile,
     __inout HANDLE* phSourceEngineFile
+    );
+void CoreUpdateRestartState(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_RESTART_STATE restartState
     );
 void CoreFunctionOverride(
     __in_opt PFN_CREATEPROCESSW pfnCreateProcessW,
