@@ -89,6 +89,8 @@ typedef struct _BURN_ENGINE_COMMAND
 {
     int argc;
     LPWSTR* argv;
+    DWORD cSecretArgs;
+    int* rgSecretArgs;
     DWORD cUnknownArgs;
     int* rgUnknownArgs;
     BOOL fInvalidCommandLine;

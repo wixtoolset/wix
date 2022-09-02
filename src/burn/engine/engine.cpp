@@ -414,6 +414,7 @@ static void UninitializeEngineState(
         AppFreeCommandLineArgs(pEngineState->internalCommand.argv);
     }
 
+    ReleaseMem(pEngineState->internalCommand.rgSecretArgs);
     ReleaseMem(pEngineState->internalCommand.rgUnknownArgs);
 
     PipeConnectionUninitialize(&pEngineState->embeddedConnection);
