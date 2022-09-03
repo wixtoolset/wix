@@ -17,9 +17,4 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Mba.Core" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

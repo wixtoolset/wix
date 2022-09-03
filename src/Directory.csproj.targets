@@ -12,7 +12,18 @@
 
   <Target Name="__SetAssemblyInfoFromGit" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="GetAssemblyVersion" />
 
-  <ItemGroup>
+  <PropertyGroup Condition=" '$(IsWixTestProject)'=='true' ">
+    <IsPackable>false</IsPackable>
+    <SignOutput>false</SignOutput>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsWixTestProject)'=='true' ">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(IsWixTestProject)'!='true' ">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>

@@ -73,7 +73,7 @@
 
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-    <PackageVersion Include="GitInfo" Version="2.1.2" />
+    <PackageVersion Include="GitInfo" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -50,7 +50,7 @@
   </PropertyGroup>
 
   <Target Name="PublicizeNativePdb"
-          Condition=" '@(Link)' != '' and '$(IsWixTestProject)' != 'true' and '$(IsWixSampleProject)' != 'true' ">
+          Condition=" '@(Link)' != '' and '$(IsWixTestSupportProject)' != 'true' and '$(IsWixTestProject)' != 'true' and '$(IsWixSampleProject)' != 'true' ">
     <Copy SourceFiles="%(Link.ProgramDatabaseFile)" DestinationFolder="$(PdbsFolder)$(PlatformFolder)" />
   </Target>
 </Project>
