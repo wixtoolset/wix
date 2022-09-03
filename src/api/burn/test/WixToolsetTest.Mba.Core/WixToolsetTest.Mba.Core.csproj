@@ -4,9 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <IsPackable>false</IsPackable>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
-    <SignOutput>false</SignOutput>
     <RollForward>Major</RollForward>
     <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
@@ -17,11 +15,5 @@
 
   <ItemGroup>
     <PackageReference Include="WixBuildTools.TestSupport" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 </Project>

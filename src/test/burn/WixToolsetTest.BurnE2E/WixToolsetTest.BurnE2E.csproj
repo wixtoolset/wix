@@ -6,6 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <RollForward>Major</RollForward>
+    <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,11 +24,5 @@
     <PackageReference Include="WixBuildTools.TestSupport" />
     <PackageReference Include="WixToolset.Data" />
     <PackageReference Include="WixToolset.Mba.Core" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 </Project>

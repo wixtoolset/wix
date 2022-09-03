@@ -4,11 +4,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <DebugType>embedded</DebugType>
     <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
-    <SignOutput>false</SignOutput>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
+    <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,11 +19,5 @@
 
   <ItemGroup>
     <PackageReference Include="WixBuildTools.TestSupport" /> 
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 </Project>

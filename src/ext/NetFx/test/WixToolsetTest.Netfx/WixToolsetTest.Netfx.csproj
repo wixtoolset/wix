@@ -4,9 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <DebugType>embedded</DebugType>
-    <IsPackable>false</IsPackable>
-    <SignOutput>false</SignOutput>
+    <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,12 +18,6 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.Core.TestPackage" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 
   <Target Name="CopyExtensions" AfterTargets="Build">
