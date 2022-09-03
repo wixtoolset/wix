@@ -191,20 +191,21 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6387")]
+        [Fact]
         public void CanBuildPatchFromProductWithFilesFromWixlib()
         {
-            var folder = TestData.Get(@"TestData\PatchFromWixlib");
+            var sourceFolder = TestData.Get(@"TestData", "PatchFromWixlib");
 
             using (var fs = new DisposableFileSystem())
             {
-                var tempFolderBaseline = fs.GetFolder();
-                var tempFolderUpdate = fs.GetFolder();
-                var tempFolderPatch = fs.GetFolder();
+                var baseFolder = fs.GetFolder();
+                var tempFolderBaseline = Path.Combine(baseFolder, "baseline");
+                var tempFolderUpdate = Path.Combine(baseFolder, "update");
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
-                var update1Pdb = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) }, hasNoFiles: true);
+                var baselinePdb = BuildMsi("Baseline.msi", sourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", sourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) }, hasNoFiles: true);
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
                 Assert.True(File.Exists(baselinePdb));

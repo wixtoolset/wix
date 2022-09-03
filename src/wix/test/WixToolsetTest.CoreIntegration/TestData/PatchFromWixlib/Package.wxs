@@ -5,11 +5,9 @@
 
     <CustomAction Id="CAFromExtension" DllEntry="DoesntExist" BinaryRef="BinFromWir" />
 
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="~Test App" />
-      </Directory>
-    </Directory>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="~Test App" />
+    </StandardDirectory>
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />
