@@ -1,12 +1,9 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="~Test Package" Version="$(V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="7d326855-e790-4a94-8611-5351f8321fca" Compressed="yes" Scope="perMachine" ProductCode="7d326855-e790-4a94-8611-5351f8321fca">
+  <Package Name="~Patch Template Package" Version="$(V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="AAAAAAAA-BBBB-CCCC-DDDD-1234567890AB"
+           Compressed="yes" Scope="perMachine" ProductCode="11111111-2222-3333-4444-555555555555">
 
     <MajorUpgrade DowngradeErrorMessage="Newer version already installed." />
     <MediaTemplate EmbedCab="yes" />
-
-    <StandardDirectory Id="ProgramFilesFolder">
-      <Directory Id="INSTALLFOLDER" Name="~Test App" />
-    </StandardDirectory>
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />
@@ -23,5 +20,11 @@
         <RegistryValue Root="HKLM" Key="SOFTWARE\!(bind.property.ProductName)\Patch" Name="Version" Value="$(V)" />
       </Component>
     </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="~Test App" />
+    </StandardDirectory>
   </Fragment>
 </Wix>
