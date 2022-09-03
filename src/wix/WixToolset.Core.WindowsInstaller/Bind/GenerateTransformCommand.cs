@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller
     /// </summary>
     internal class GenerateTransformCommand
     {
-        private const char sectionDelimiter = '/';
+        private const char SectionDelimiter = '/';
         private readonly IMessaging messaging;
         private SummaryInformationStreams transformSummaryInfo;
 
@@ -38,22 +38,10 @@ namespace WixToolset.Core.WindowsInstaller
 
         private TransformFlags ValidationFlags { get; }
 
-        /// <summary>
-        /// Gets or sets the option to show pedantic messages.
-        /// </summary>
-        /// <value>The option to show pedantic messages.</value>
         private bool ShowPedanticMessages { get; }
 
-        /// <summary>
-        /// Gets or sets the option to suppress keeping special rows.
-        /// </summary>
-        /// <value>The option to suppress keeping special rows.</value>
         private bool SuppressKeepingSpecialRows { get; }
 
-        /// <summary>
-        /// Gets or sets the flag to determine if all rows, even unchanged ones will be persisted in the output.
-        /// </summary>
-        /// <value>The option to keep all rows including unchanged rows.</value>
         private bool PreserveUnchangedRows { get; }
 
         public WindowsInstallerData Transform { get; private set; }
@@ -124,7 +112,7 @@ namespace WixToolset.Core.WindowsInstaller
                     foreach (var updatedRow in updatedTable.Rows)
                     {
                         updatedRow.Operation = RowOperation.Add;
-                        updatedRow.SectionId = sectionDelimiter + updatedRow.SectionId;
+                        updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                         addedTable.Rows.Add(updatedRow);
                     }
                 }
@@ -152,27 +140,8 @@ namespace WixToolset.Core.WindowsInstaller
 
             if (null != primaryKey)
             {
-                if (index.TryGetValue(primaryKey, out var collisionRow))
+                if (index.ContainsKey(primaryKey))
                 {
-#if TODO_PATCH // This case doesn't seem like it can happen any longer.
-                    // Overriding WixActionRows have a primary key defined and take precedence in the index.
-                    if (row is WixActionRow actionRow)
-                    {
-                        // If the current row is not overridable, see if the indexed row is.
-                        if (!actionRow.Overridable)
-                        {
-                            if (collisionRow is WixActionRow indexedRow && indexedRow.Overridable)
-                            {
-                                // The indexed key is overridable and should be replaced.
-                                index[primaryKey] = actionRow;
-                            }
-                        }
-
-                        // If we got this far, the row does not need to be indexed.
-                        return;
-                    }
-#endif
-
                     if (this.ShowPedanticMessages)
                     {
                         this.messaging.Write(ErrorMessages.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, row.Table.Name));
@@ -208,7 +177,7 @@ namespace WixToolset.Core.WindowsInstaller
                 else if (null == updatedRow)
                 {
                     targetRow.Operation = RowOperation.Delete;
-                    targetRow.SectionId += sectionDelimiter;
+                    targetRow.SectionId += SectionDelimiter;
 
                     comparedRow = targetRow;
                     keepRow = true;
@@ -219,10 +188,10 @@ namespace WixToolset.Core.WindowsInstaller
                 updatedRow.Operation = RowOperation.None;
                 if (!this.SuppressKeepingSpecialRows && "_SummaryInformation" == targetTable.Name)
                 {
-                    // ignore rows that shouldn't be in a transform
+                    // Include only summary information rows that are allowed in a transform.
                     if (Enum.IsDefined(typeof(SummaryInformation.Transform), (int)updatedRow[0]))
                     {
-                        updatedRow.SectionId = targetRow.SectionId + sectionDelimiter + updatedRow.SectionId;
+                        updatedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                         comparedRow = updatedRow;
                         keepRow = true;
                     }
@@ -273,14 +242,14 @@ namespace WixToolset.Core.WindowsInstaller
                                 updatedObjectField.PreviousEmbeddedFileIndex = targetObjectField.EmbeddedFileIndex;
                                 updatedObjectField.PreviousBaseUri = targetObjectField.BaseUri;
 
-                                // always keep a copy of the previous data even if they are identical
-                                // This makes diff.wixmst clean and easier to control patch logic
+                                // Always keep a copy of the previous data even if they are identical.
+                                // This makes diff data clean and easier to control in patch logic.
                                 updatedObjectField.PreviousData = (string)targetObjectField.Data;
 
-                                // always remember the unresolved data for target build
+                                // Always remember the unresolved data for target build.
                                 updatedObjectField.UnresolvedPreviousData = targetObjectField.UnresolvedData;
 
-                                // keep rows containing object fields so the files can be compared in the binder
+                                // Keep rows containing object fields so the files can be compared later.
                                 keepRow = !this.SuppressKeepingSpecialRows;
                             }
                             else
@@ -305,7 +274,7 @@ namespace WixToolset.Core.WindowsInstaller
                     if (keepRow)
                     {
                         comparedRow = updatedRow;
-                        comparedRow.SectionId = targetRow.SectionId + sectionDelimiter + updatedRow.SectionId;
+                        comparedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                     }
                 }
             }
@@ -333,9 +302,6 @@ namespace WixToolset.Core.WindowsInstaller
             }
             else // possibly modified table.
             {
-                var updatedPrimaryKeys = new Dictionary<string, Row>();
-                var targetPrimaryKeys = new Dictionary<string, Row>();
-
                 // compare the table definitions
                 if (0 != targetTable.Definition.CompareTo(updatedTable.Definition))
                 {
@@ -344,6 +310,9 @@ namespace WixToolset.Core.WindowsInstaller
                 }
                 else
                 {
+                    var updatedPrimaryKeys = new Dictionary<string, Row>();
+                    var targetPrimaryKeys = new Dictionary<string, Row>();
+
                     this.IndexPrimaryKeys(targetTable, targetPrimaryKeys, updatedTable, updatedPrimaryKeys);
 
                     // diff the target and updated rows
@@ -371,7 +340,7 @@ namespace WixToolset.Core.WindowsInstaller
                             var updatedRow = updatedPrimaryKeyEntry.Value;
 
                             updatedRow.Operation = RowOperation.Add;
-                            updatedRow.SectionId = sectionDelimiter + updatedRow.SectionId;
+                            updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                             rows.Add(updatedRow);
                         }
                     }

@@ -47,28 +47,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     if ("ProductCode" == propertySymbol.Id.Id && "*".Equals(propertySymbol.Value, StringComparison.Ordinal))
                     {
                         propertySymbol.Value = this.BackendHelper.CreateGuid();
-
-#if TODO_PATCHING // Is this still necessary?
-                        // Update the target ProductCode in any instance transforms.
-                        foreach (SubStorage subStorage in this.Output.SubStorages)
-                        {
-                            Output subStorageOutput = subStorage.Data;
-                            if (OutputType.Transform != subStorageOutput.Type)
-                            {
-                                continue;
-                            }
-
-                            Table instanceSummaryInformationTable = subStorageOutput.Tables["_SummaryInformation"];
-                            foreach (Row row in instanceSummaryInformationTable.Rows)
-                            {
-                                if ((int)SummaryInformation.Transform.ProductCodes == row.FieldAsInteger(0))
-                                {
-                                    row[1] = row.FieldAsString(1).Replace("*", propertyRow.Value);
-                                    break;
-                                }
-                            }
-                        }
-#endif
                     }
                     else if ("ProductLanguage" == propertySymbol.Id.Id)
                     {

@@ -14,7 +14,6 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.ValidationFlags), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.BaselineFile), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.UpdateFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.TransformFile), IntermediateFieldType.Path),
             },
             typeof(WixPatchBaselineSymbol));
     }
@@ -28,7 +27,6 @@ namespace WixToolset.Data.Symbols
         ValidationFlags,
         BaselineFile,
         UpdateFile,
-        TransformFile,
     }
 
     public class WixPatchBaselineSymbol : IntermediateSymbol
@@ -65,12 +63,6 @@ namespace WixToolset.Data.Symbols
         {
             get => this.Fields[(int)WixPatchBaselineSymbolFields.UpdateFile].AsPath();
             set => this.Set((int)WixPatchBaselineSymbolFields.UpdateFile, value);
-        }
-
-        public IntermediateFieldPathValue TransformFile
-        {
-            get => this.Fields[(int)WixPatchBaselineSymbolFields.TransformFile].AsPath();
-            set => this.Set((int)WixPatchBaselineSymbolFields.TransformFile, value);
         }
     }
 }

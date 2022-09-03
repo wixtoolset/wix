@@ -63,11 +63,6 @@ namespace WixToolset.Extensibility.Data
         string IntermediateFolder { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the decompiler admin image.
-        /// </summary>
-        bool IsAdminImage { get; set; }
-
-        /// <summary>
         /// Gets or sets where to output the result.
         /// </summary>
         string OutputPath { get; set; }

@@ -35,21 +35,6 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         #region IBackendHelper interfaces
 
-        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly)
-        {
-            return this.backendHelper.CreateFileFacade(file, assembly);
-        }
-
-        public IFileFacade CreateFileFacade(FileRow fileRow)
-        {
-            return this.backendHelper.CreateFileFacade(fileRow);
-        }
-
-        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol)
-        {
-            return this.backendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
-        }
-
         public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)
         {
             return this.backendHelper.CreateFileTransfer(source, destination, move, sourceLineNumbers);

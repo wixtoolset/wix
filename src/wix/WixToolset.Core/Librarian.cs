@@ -5,7 +5,6 @@ namespace WixToolset.Core
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.Link;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
@@ -21,12 +20,15 @@ namespace WixToolset.Core
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            this.FileResolver = this.ServiceProvider.GetService<IFileResolver>();
             this.LayoutServices = this.ServiceProvider.GetService<ILayoutServices>();
         }
 
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
+
+        private IFileResolver FileResolver { get; }
 
         private ILayoutServices LayoutServices { get; }
 
@@ -97,7 +99,7 @@ namespace WixToolset.Core
             {
                 var variableResolver = this.ServiceProvider.GetService<IVariableResolver>();
 
-                var fileResolver = new FileResolver(context.BindPaths, context.Extensions);
+                var bindPaths = context.BindPaths.Where(b => b.Stage == BindStage.Normal).ToList();
 
                 foreach (var symbol in sections.SelectMany(s => s.Symbols))
                 {
@@ -109,7 +111,7 @@ namespace WixToolset.Core
                         {
                             var resolution = variableResolver.ResolveVariables(symbol.SourceLineNumbers, pathField.Path);
 
-                            var file = fileResolver.Resolve(symbol.SourceLineNumbers, symbol.Definition, resolution.Value);
+                            var file = this.FileResolver.ResolveFile(resolution.Value, context.Extensions, bindPaths, symbol.SourceLineNumbers, symbol.Definition);
 
                             if (!String.IsNullOrEmpty(file))
                             {

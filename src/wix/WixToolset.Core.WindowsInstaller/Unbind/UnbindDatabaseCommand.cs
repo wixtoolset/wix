@@ -5,29 +5,35 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class UnbindDatabaseCommand
     {
-        private List<string> exportedFiles;
+        private static readonly Regex Modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
 
-        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, Database database, string databasePath, OutputType outputType, string exportBasePath, string intermediateFolder, bool isAdminImage, bool suppressDemodularization, bool skipSummaryInfo)
+        private int sectionCount;
+
+        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, string databasePath, OutputType outputType, string exportBasePath, string extractFilesFolder, string intermediateFolder, bool enableDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
-            this.Database = database;
+            this.PathResolver = pathResolver;
             this.DatabasePath = databasePath;
             this.OutputType = outputType;
             this.ExportBasePath = exportBasePath;
+            this.ExtractFilesFolder = extractFilesFolder;
             this.IntermediateFolder = intermediateFolder;
-            this.IsAdminImage = isAdminImage;
-            this.SuppressDemodularization = suppressDemodularization;
+            this.EnableDemodularization = enableDemodularization;
             this.SkipSummaryInfo = skipSummaryInfo;
 
             this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
@@ -37,7 +43,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public IBackendHelper BackendHelper { get; }
 
-        public Database Database { get; }
+        private IPathResolver PathResolver { get; }
+
+        private Database Database { get; set; }
 
         public string DatabasePath { get; }
 
@@ -45,72 +53,90 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public string ExportBasePath { get; }
 
+        public string ExtractFilesFolder { get; }
+
         public string IntermediateFolder { get; }
 
-        public bool IsAdminImage { get; }
-
-        public bool SuppressDemodularization { get; }
+        public bool EnableDemodularization { get; }
 
         public bool SkipSummaryInfo { get; }
 
         public TableDefinitionCollection TableDefinitions { get; }
 
-        public IEnumerable<string> ExportedFiles => this.exportedFiles;
+        public bool AdminImage { get; private set; }
 
-        private int SectionCount { get; set; }
+        public IEnumerable<string> ExportedFiles { get; private set; }
 
         public WindowsInstallerData Execute()
         {
-            this.exportedFiles = new List<string>();
+            var adminImage = false;
+            var exportedFiles = new List<string>();
 
-            string modularizationGuid = null;
-            var output = new WindowsInstallerData(new SourceLineNumber(this.DatabasePath));
-            View validationView = null;
+            var output = new WindowsInstallerData(new SourceLineNumber(this.DatabasePath))
+            {
+                Type = this.OutputType
+            };
 
-            // set the output type
-            output.Type = this.OutputType;
+            try
+            {
+                using (var database = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
+                {
+                    this.Database = database;
 
-            Directory.CreateDirectory(this.IntermediateFolder);
+                    Directory.CreateDirectory(this.IntermediateFolder);
 
-            // get the codepage
+                    output.Codepage = this.GetCodePage();
+
+                    var modularizationGuid = this.ProcessTables(output, exportedFiles);
+
+                    var summaryInfo = this.ProcessSummaryInfo(output, modularizationGuid);
+
+                    this.UpdateUnrealFileColumns(this.DatabasePath, output, summaryInfo, exportedFiles);
+
+                    this.GenerateSectionIds(output);
+                }
+            }
+            catch (Win32Exception e)
+            {
+                if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
+                {
+                    throw new WixException(ErrorMessages.OpenDatabaseFailed(this.DatabasePath));
+                }
+
+                throw;
+            }
+
+            this.AdminImage = adminImage;
+            this.ExportedFiles = exportedFiles;
+
+            return output;
+        }
+
+        private int GetCodePage()
+        {
+            var codepage = 0;
+
             this.Database.Export("_ForceCodepage", this.IntermediateFolder, "_ForceCodepage.idt");
-            using (var sr = File.OpenText(Path.Combine(this.IntermediateFolder, "_ForceCodepage.idt")))
+
+            var lines = File.ReadAllLines(Path.Combine(this.IntermediateFolder, "_ForceCodepage.idt"));
+
+            if (lines.Length == 3)
             {
-                string line;
+                var data = lines[2].Split('\t');
 
-                while (null != (line = sr.ReadLine()))
+                if (2 == data.Length)
                 {
-                    var data = line.Split('\t');
-
-                    if (2 == data.Length)
-                    {
-                        output.Codepage = Convert.ToInt32(data[0], CultureInfo.InvariantCulture);
-                    }
+                    codepage = Convert.ToInt32(data[0], CultureInfo.InvariantCulture);
                 }
             }
 
-            // get the summary information table if it exists; it won't if unbinding a transform
-            if (!this.SkipSummaryInfo)
-            {
-                using (var summaryInformation = new SummaryInformation(this.Database))
-                {
-                    var table = new Table(this.TableDefinitions["_SummaryInformation"]);
+            return codepage;
+        }
 
-                    for (var i = 1; 19 >= i; i++)
-                    {
-                        var value = summaryInformation.GetProperty(i);
-
-                        if (0 < value.Length)
-                        {
-                            var row = table.CreateRow(output.SourceLineNumbers);
-                            row[0] = i;
-                            row[1] = value;
-                        }
-                    }
-
-                    output.Tables.Add(table);
-                }
-            }
+        private string ProcessTables(WindowsInstallerData output, List<string> exportedFiles)
+        {
+            View validationView = null;
+            string modularizationGuid = null;
 
             try
             {
@@ -127,7 +153,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     {
                         var tableName = tableRecord.GetString(1);
 
-                        using (var tableView = this.Database.OpenExecuteView(String.Format(CultureInfo.InvariantCulture, "SELECT * FROM `{0}`", tableName)))
+                        using (var tableView = this.Database.OpenExecuteView($"SELECT * FROM `{tableName}`"))
                         {
                             var tableDefinition = this.GetTableDefinition(tableName, tableView, validationView);
                             var table = new Table(tableDefinition);
@@ -154,16 +180,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                         switch (row.Fields[i].Column.Type)
                                         {
                                             case ColumnType.Number:
-                                                var success = false;
                                                 var intValue = rowRecord.GetInteger(i + 1);
-                                                if (row.Fields[i].Column.IsLocalizable)
-                                                {
-                                                    success = row.BestEffortSetField(i, Convert.ToString(intValue, CultureInfo.InvariantCulture));
-                                                }
-                                                else
-                                                {
-                                                    success = row.BestEffortSetField(i, intValue);
-                                                }
+                                                var success = row.Fields[i].Column.IsLocalizable ? row.BestEffortSetField(i, Convert.ToString(intValue, CultureInfo.InvariantCulture)) : row.BestEffortSetField(i, intValue);
 
                                                 if (!success)
                                                 {
@@ -171,20 +189,18 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 }
                                                 break;
                                             case ColumnType.Object:
-                                                var sourceFile = "FILE NOT EXPORTED";
+                                                var source = "FILE NOT EXPORTED";
 
                                                 if (null != this.ExportBasePath)
                                                 {
-                                                    var relativeSourceFile = Path.Combine(tableName, row.GetPrimaryKey('.'));
-                                                    sourceFile = Path.Combine(this.ExportBasePath, relativeSourceFile);
+                                                    source = Path.Combine(this.ExportBasePath, tableName, row.GetPrimaryKey('.'));
 
-                                                    // ensure the parent directory exists
-                                                    System.IO.Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
+                                                    Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
 
-                                                    using (var fs = System.IO.File.Create(sourceFile))
+                                                    using (var fs = File.Create(source))
                                                     {
                                                         int bytesRead;
-                                                        var buffer = new byte[512];
+                                                        var buffer = new byte[4096];
 
                                                         while (0 != (bytesRead = rowRecord.GetStream(i + 1, buffer, buffer.Length)))
                                                         {
@@ -192,10 +208,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                         }
                                                     }
 
-                                                    this.exportedFiles.Add(sourceFile);
+                                                    exportedFiles.Add(source);
                                                 }
 
-                                                row[i] = sourceFile;
+                                                row[i] = source;
                                                 break;
                                             default:
                                                 var value = rowRecord.GetString(i + 1);
@@ -203,27 +219,26 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 switch (row.Fields[i].Column.Category)
                                                 {
                                                     case ColumnCategory.Guid:
-                                                        value = value.ToUpper(CultureInfo.InvariantCulture);
+                                                        value = value.ToUpperInvariant();
                                                         break;
                                                 }
 
-                                                // de-modularize
-                                                if (!this.SuppressDemodularization && OutputType.Module == output.Type && ColumnModularizeType.None != row.Fields[i].Column.ModularizeType)
+                                                // De-modularize
+                                                if (this.EnableDemodularization && OutputType.Module == output.Type && ColumnModularizeType.None != row.Fields[i].Column.ModularizeType)
                                                 {
-                                                    var modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
-
                                                     if (null == modularizationGuid)
                                                     {
-                                                        var match = modularization.Match(value);
+                                                        var match = Modularization.Match(value);
                                                         if (match.Success)
                                                         {
                                                             modularizationGuid = String.Concat('{', match.Value.Substring(1).Replace('_', '-'), '}');
                                                         }
                                                     }
 
-                                                    value = modularization.Replace(value, String.Empty);
+                                                    value = Modularization.Replace(value, String.Empty);
                                                 }
 
+#if TODO_MOVE_TO_DECOMPILER
                                                 // escape "$(" for the preprocessor
                                                 value = value.Replace("$(", "$$(");
 
@@ -234,6 +249,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 //{
                                                 //    value = value.Insert(matches[j].Index, "!");
                                                 //}
+#endif
 
                                                 row[i] = value;
                                                 break;
@@ -249,33 +265,54 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
             finally
             {
-                if (null != validationView)
-                {
-                    validationView.Close();
-                }
+                validationView?.Close();
             }
 
-            // set the modularization guid as the PackageCode
-            if (null != modularizationGuid)
-            {
-                var table = output.Tables["_SummaryInformation"];
+            return modularizationGuid;
+        }
 
-                foreach (var row in table.Rows)
+        private SummaryInformationBits ProcessSummaryInfo(WindowsInstallerData output, string modularizationGuid)
+        {
+            var result = new SummaryInformationBits();
+
+            if (!this.SkipSummaryInfo)
+            {
+                using (var summaryInformation = new SummaryInformation(this.Database))
                 {
-                    if (9 == (int)row[0]) // PID_REVNUMBER
+                    var table = new Table(this.TableDefinitions["_SummaryInformation"]);
+
+                    for (var i = 1; 19 >= i; i++)
                     {
-                        row[1] = modularizationGuid;
+                        var value = summaryInformation.GetProperty(i);
+
+                        // Set the modularization guid as the PackageCode, for merge modules.
+                        if (i == (int)SummaryInformation.Package.PackageCode && !String.IsNullOrEmpty(modularizationGuid))
+                        {
+                            var row = table.CreateRow(output.SourceLineNumbers);
+                            row[0] = i;
+                            row[1] = modularizationGuid;
+                        }
+                        else if (0 < value.Length)
+                        {
+                            var row = table.CreateRow(output.SourceLineNumbers);
+                            row[0] = i;
+                            row[1] = value;
+
+                            if (i == (int)SummaryInformation.Package.FileAndElevatedFlags)
+                            {
+                                var wordcount = Convert.ToInt32(value, CultureInfo.InvariantCulture);
+                                result.LongFilenames = (wordcount & 0x1) != 0x1;
+                                result.Compressed = (wordcount & 0x2) == 0x2;
+                                result.AdminImage = (wordcount & 0x4) == 0x4;
+                            }
+                        }
                     }
+
+                    output.Tables.Add(table);
                 }
             }
 
-            if (this.IsAdminImage)
-            {
-                this.GenerateWixFileTable(this.DatabasePath, output);
-                this.GenerateSectionIds(output);
-            }
-
-            return output;
+            return result;
         }
 
         private TableDefinition GetTableDefinition(string tableName, View tableView, View validationView)
@@ -310,10 +347,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     var columnName = columnNameRecord.GetString(i);
                     var idtType = columnTypeRecord.GetString(i);
 
-                    ColumnType columnType;
-                    int length;
-                    bool nullable;
-
                     var columnCategory = ColumnCategory.Unknown;
                     var columnModularizeType = ColumnModularizeType.None;
                     var primary = tablePrimaryKeys.Contains(columnName);
@@ -326,7 +359,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     string description = null;
 
                     // get the column type, length, and whether its nullable
-                    switch (Char.ToLower(idtType[0], CultureInfo.InvariantCulture))
+                    ColumnType columnType;
+                    switch (Char.ToLowerInvariant(idtType[0]))
                     {
                         case 'i':
                             columnType = ColumnType.Number;
@@ -345,8 +379,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                             columnType = ColumnType.Unknown;
                             break;
                     }
-                    length = Convert.ToInt32(idtType.Substring(1), CultureInfo.InvariantCulture);
-                    nullable = Char.IsUpper(idtType[0]);
+                    var length = Convert.ToInt32(idtType.Substring(1), CultureInfo.InvariantCulture);
+                    var nullable = Char.IsUpper(idtType[0]);
 
                     // try to get validation information
                     if (null != validationView)
@@ -385,11 +419,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                 // convert category to ColumnCategory
                                 if (null != category)
                                 {
-                                    try
-                                    {
-                                        columnCategory = (ColumnCategory)Enum.Parse(typeof(ColumnCategory), category, true);
-                                    }
-                                    catch (ArgumentException)
+                                    if (!Enum.TryParse(category, true, out columnCategory))
                                     {
                                         columnCategory = ColumnCategory.Unknown;
                                     }
@@ -427,67 +457,103 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             return new TableDefinition(tableName, null, columns, false);
         }
 
-        /// <summary>
-        /// Generates the WixFile table based on a path to an admin image msi and an Output.
-        /// </summary>
-        /// <param name="databaseFile">The path to the msi database file in an admin image.</param>
-        /// <param name="output">The Output that represents the msi database.</param>
-        private void GenerateWixFileTable(string databaseFile, WindowsInstallerData output)
+        private void UpdateUnrealFileColumns(string databaseFile, WindowsInstallerData output, SummaryInformationBits summaryInformation, List<string> exportedFiles)
         {
-            throw new NotImplementedException();
-#if TODO_FIX_UNBINDING_FILES
-            var adminRootPath = Path.GetDirectoryName(databaseFile);
+            var fileRows = output.Tables["File"]?.Rows;
 
-            var componentDirectoryIndex = new Hashtable();
-            var componentTable = output.Tables["Component"];
-            foreach (var row in componentTable.Rows)
+            if (fileRows == null || fileRows.Count == 0)
             {
-                componentDirectoryIndex.Add(row[0], row[2]);
+                return;
             }
 
+            this.UpdateFileRowsDiskId(output, fileRows);
+
+            this.UpdateFileRowsSource(databaseFile, output, fileRows, summaryInformation, exportedFiles);
+        }
+
+        private void UpdateFileRowsDiskId(WindowsInstallerData output, IList<Row> fileRows)
+        {
+            var mediaRows = output.Tables["Media"]?.Rows?.Cast<MediaRow>()?.OrderBy(r => r.LastSequence)?.ToList();
+
+            var lastMediaRowIndex = 0;
+            var lastMediaRow = (mediaRows == null || mediaRows.Count == 0) ? null : mediaRows[lastMediaRowIndex];
+
+            foreach (var fileRow in fileRows.Cast<FileRow>()?.OrderBy(r => r.Sequence))
+            {
+                while (lastMediaRow != null && fileRow.Sequence > lastMediaRow.LastSequence)
+                {
+                    ++lastMediaRowIndex;
+
+                    lastMediaRow = lastMediaRowIndex < mediaRows.Count ? mediaRows[lastMediaRowIndex] : null;
+                }
+
+                fileRow.DiskId = lastMediaRow?.DiskId ?? 1;
+            }
+        }
+
+        private void UpdateFileRowsSource(string databasePath, WindowsInstallerData output, IList<Row> fileRows, SummaryInformationBits summaryInformation, List<string> exportedFiles)
+        {
+            var databaseFolder = Path.GetDirectoryName(databasePath);
+
+            var componentDirectoryIndex = output.Tables["Component"].Rows.Cast<ComponentRow>().ToDictionary(r => r.Component, r => r.Directory);
+
             // Index full source paths for all directories
-            var directoryDirectoryParentIndex = new Hashtable();
-            var directoryFullPathIndex = new Hashtable();
-            var directorySourceNameIndex = new Hashtable();
+            var directories = new Dictionary<string, IResolvedDirectory>();
+
             var directoryTable = output.Tables["Directory"];
             foreach (var row in directoryTable.Rows)
             {
-                directoryDirectoryParentIndex.Add(row[0], row[1]);
-                if (null == row[1])
-                {
-                    directoryFullPathIndex.Add(row[0], adminRootPath);
-                }
-                else
-                {
-                    directorySourceNameIndex.Add(row[0], GetAdminSourceName((string)row[2]));
-                }
+                var sourceName = this.BackendHelper.GetMsiFileName(row.FieldAsString(2), source: true, longName: summaryInformation.LongFilenames);
+                var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(row.FieldAsString(1), sourceName);
+
+                directories.Add(row.FieldAsString(0), resolvedDirectory);
             }
 
-            foreach (DictionaryEntry directoryEntry in directoryDirectoryParentIndex)
+            if (summaryInformation.AdminImage)
             {
-                if (!directoryFullPathIndex.ContainsKey(directoryEntry.Key))
+                foreach (var fileRow in fileRows.Cast<FileRow>())
                 {
-                    this.GetAdminFullPath((string)directoryEntry.Key, directoryDirectoryParentIndex, directorySourceNameIndex, directoryFullPathIndex);
+                    var directoryId = componentDirectoryIndex[fileRow.Component];
+                    var relativeFileLayoutPath = this.PathResolver.GetFileSourcePath(directories, directoryId, fileRow.FileName, compressed: false, useLongName: summaryInformation.LongFilenames);
+
+                    fileRow.Source = Path.Combine(databaseFolder, relativeFileLayoutPath);
                 }
             }
-
-            var fileTable = output.Tables["File"];
-            var wixFileTable = output.EnsureTable(this.TableDefinitions["WixFile"]);
-            foreach (var row in fileTable.Rows)
+            else
             {
-                var wixFileRow = new WixFileRow(null, this.TableDefinitions["WixFile"]);
-                wixFileRow.File = (string)row[0];
-                wixFileRow.Directory = (string)componentDirectoryIndex[(string)row[1]];
-                wixFileRow.Source = Path.Combine((string)directoryFullPathIndex[wixFileRow.Directory], GetAdminSourceName((string)row[2]));
+                var extractedFileIds = new HashSet<string>();
 
-                if (!File.Exists(wixFileRow.Source))
+                if (!String.IsNullOrEmpty(this.ExtractFilesFolder))
                 {
-                    throw new WixException(ErrorMessages.WixFileNotFound(wixFileRow.Source));
+                    var extractCommand = new ExtractCabinetsCommand(output, this.Database, this.DatabasePath, this.ExtractFilesFolder, this.IntermediateFolder);
+                    extractCommand.Execute();
+
+                    extractedFileIds = new HashSet<string>(extractCommand.ExtractedFileIdsWithMediaRow.Keys, StringComparer.OrdinalIgnoreCase);
+                    exportedFiles.AddRange(extractedFileIds);
                 }
 
-                wixFileTable.Rows.Add(wixFileRow);
+                foreach (var fileRow in fileRows.Cast<FileRow>())
+                {
+                    var source = "FILE NOT EXPORTED";
+
+                    if (fileRow.Compressed == YesNoType.Yes || (fileRow.Compressed == YesNoType.NotSet && summaryInformation.Compressed))
+                    {
+                        if (extractedFileIds.Contains(fileRow.File))
+                        {
+                            source = Path.Combine(this.ExtractFilesFolder, fileRow.File);
+                        }
+                    }
+                    else
+                    {
+                        var directoryId = componentDirectoryIndex[fileRow.Component];
+                        var relativeFileLayoutPath = this.PathResolver.GetFileSourcePath(directories, directoryId, fileRow.FileName, compressed: false, useLongName: summaryInformation.LongFilenames);
+
+                        source = Path.Combine(databaseFolder, relativeFileLayoutPath);
+                    }
+
+                    fileRow.Source = source;
+                }
             }
-#endif
         }
 
         /// <summary>
@@ -620,7 +686,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 switch (table.Name)
                 {
-                    case "WixFile":
                     case "MsiFileHash":
                         ConnectTableToSection(table, fileSectionIdIndex, 0);
                         break;
@@ -699,7 +764,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
             }
 
-            // Now pass the output to each unbinder extension to allow them to analyze the output and determine thier proper section ids.
+            // Now pass the output to each unbinder extension to allow them to analyze the output and determine their proper section ids.
             //foreach (IUnbinderExtension extension in this.unbinderExtensions)
             //{
             //    extension.GenerateSectionIds(output);
@@ -711,19 +776,22 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// </summary>
         /// <param name="table">The table to add sections to.</param>
         /// <param name="rowPrimaryKeyIndex">The index of the column which is used by other tables to reference this table.</param>
-        /// <returns>A Hashtable containing the tables key for each row paired with its assigned section id.</returns>
-        private Hashtable AssignSectionIdsToTable(Table table, int rowPrimaryKeyIndex)
+        /// <returns>A dictionary containing the tables key for each row paired with its assigned section id.</returns>
+        private Dictionary<string, string> AssignSectionIdsToTable(Table table, int rowPrimaryKeyIndex)
         {
-            var hashtable = new Hashtable();
+            var primaryKeyToSectionId = new Dictionary<string, string>();
+
             if (null != table)
             {
                 foreach (var row in table.Rows)
                 {
                     row.SectionId = this.GetNewSectionId();
-                    hashtable.Add(row[rowPrimaryKeyIndex], row.SectionId);
+
+                    primaryKeyToSectionId.Add(row.FieldAsString(rowPrimaryKeyIndex), row.SectionId);
                 }
             }
-            return hashtable;
+
+            return primaryKeyToSectionId;
         }
 
         /// <summary>
@@ -732,15 +800,15 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// <param name="table">The table containing rows that need to be connected to sections.</param>
         /// <param name="sectionIdIndex">A hashtable containing keys to map table to its section.</param>
         /// <param name="rowIndex">The index of the column which is used as the foreign key in to the sectionIdIndex.</param>
-        private static void ConnectTableToSection(Table table, Hashtable sectionIdIndex, int rowIndex)
+        private static void ConnectTableToSection(Table table, Dictionary<string, string> sectionIdIndex, int rowIndex)
         {
             if (null != table)
             {
                 foreach (var row in table.Rows)
                 {
-                    if (sectionIdIndex.ContainsKey(row[rowIndex]))
+                    if (sectionIdIndex.TryGetValue(row.FieldAsString(rowIndex), out var sectionId))
                     {
-                        row.SectionId = (string)sectionIdIndex[row[rowIndex]];
+                        row.SectionId = sectionId;
                     }
                 }
             }
@@ -750,40 +818,53 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// Connects a table's rows to an already sectioned table and produces an index for other tables to connect to it.
         /// </summary>
         /// <param name="table">The table containing rows that need to be connected to sections.</param>
-        /// <param name="sectionIdIndex">A hashtable containing keys to map table to its section.</param>
+        /// <param name="sectionIdIndex">A dictionary containing keys to map table to its section.</param>
         /// <param name="rowIndex">The index of the column which is used as the foreign key in to the sectionIdIndex.</param>
         /// <param name="rowPrimaryKeyIndex">The index of the column which is used by other tables to reference this table.</param>
-        /// <returns>A Hashtable containing the tables key for each row paired with its assigned section id.</returns>
-        private static Hashtable ConnectTableToSectionAndIndex(Table table, Hashtable sectionIdIndex, int rowIndex, int rowPrimaryKeyIndex)
+        /// <returns>A dictionary containing the tables key for each row paired with its assigned section id.</returns>
+        private static Dictionary<string, string> ConnectTableToSectionAndIndex(Table table, Dictionary<string, string> sectionIdIndex, int rowIndex, int rowPrimaryKeyIndex)
         {
-            var newHashTable = new Hashtable();
+            var newPrimaryKeyToSectionId = new Dictionary<string, string>();
+
             if (null != table)
             {
                 foreach (var row in table.Rows)
                 {
-                    if (!sectionIdIndex.ContainsKey(row[rowIndex]))
+                    var foreignKey = row.FieldAsString(rowIndex);
+
+                    if (!sectionIdIndex.TryGetValue(foreignKey, out var sectionId))
                     {
                         continue;
                     }
 
-                    row.SectionId = (string)sectionIdIndex[row[rowIndex]];
-                    if (null != row[rowPrimaryKeyIndex])
+                    row.SectionId = sectionId;
+
+                    var primaryKey = row.FieldAsString(rowPrimaryKeyIndex);
+
+                    if (!String.IsNullOrEmpty(primaryKey) && sectionIdIndex.ContainsKey(primaryKey))
                     {
-                        newHashTable.Add(row[rowPrimaryKeyIndex], row.SectionId);
+                        newPrimaryKeyToSectionId.Add(primaryKey, row.SectionId);
                     }
                 }
             }
-            return newHashTable;
+
+            return newPrimaryKeyToSectionId;
         }
 
-        /// <summary>
-        /// Creates a new section identifier to be used when adding a section to an output.
-        /// </summary>
-        /// <returns>A string representing a new section id.</returns>
         private string GetNewSectionId()
         {
-            this.SectionCount++;
-            return "wix.section." + this.SectionCount.ToString(CultureInfo.InvariantCulture);
+            this.sectionCount++;
+
+            return "wix.section." + this.sectionCount.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private class SummaryInformationBits
+        {
+            public bool AdminImage { get; set; }
+
+            public bool Compressed { get; set; }
+
+            public bool LongFilenames { get; set; }
         }
     }
 }

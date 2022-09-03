@@ -4,6 +4,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
 
     /// <summary>
@@ -17,11 +18,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="sourceLineNumber">Source line number that requires the cabinet creation.</param>
         /// <param name="diskId"></param>
         /// <param name="fileFacades">The collection of files in this cabinet.</param>
+        /// <param name="hashesByFileId">The hashes for unversioned files.</param>
         /// <param name="cabinetFile">The cabinet file.</param>
         /// <param name="maxThreshold">Maximum threshold for each cabinet.</param>
         /// <param name="compressionLevel">The compression level of the cabinet.</param>
         /// <param name="modularizationSuffix">Modularization suffix used when building a Merge Module.</param>
-        public CabinetWorkItem(SourceLineNumber sourceLineNumber, int diskId, string cabinetFile, IEnumerable<IFileFacade> fileFacades, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix)
+        public CabinetWorkItem(SourceLineNumber sourceLineNumber, int diskId, string cabinetFile, IEnumerable<IFileFacade> fileFacades, Dictionary<string, MsiFileHashSymbol> hashesByFileId, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix)
         {
             this.SourceLineNumber = sourceLineNumber;
             this.DiskId = diskId;
@@ -29,6 +31,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.CompressionLevel = compressionLevel;
             this.ModularizationSuffix = modularizationSuffix;
             this.FileFacades = fileFacades;
+            this.HashesByFileId = hashesByFileId;
             this.MaxThreshold = maxThreshold;
         }
 
@@ -64,6 +67,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         /// <value>The collection of files in this cabinet.</value>
         public IEnumerable<IFileFacade> FileFacades { get; }
+
+        /// <summary>
+        /// The hashes for unversioned files.
+        /// </summary>
+        public Dictionary<string, MsiFileHashSymbol> HashesByFileId { get; }
 
         /// <summary>
         /// Gets the max threshold.

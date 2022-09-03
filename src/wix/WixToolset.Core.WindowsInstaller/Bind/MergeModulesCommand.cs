@@ -10,7 +10,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
-    using WixToolset.Core.Native;
     using WixToolset.Core.Native.Msi;
     using WixToolset.Core.Native.Msm;
     using WixToolset.Data;
@@ -24,11 +23,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class MergeModulesCommand
     {
-        public MergeModulesCommand(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IFileFacade> fileFacades, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
+        public MergeModulesCommand(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IFileFacade> fileFacadesFromModule, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
-            this.FileFacades = fileFacades;
+            this.FileFacadesFromModule = fileFacadesFromModule;
             this.Section = section;
             this.SuppressedTableNames = suppressedTableNames ?? Array.Empty<string>();
             this.OutputPath = outputPath;
@@ -39,7 +38,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IBackendHelper BackendHelper { get; }
 
-        private IEnumerable<IFileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacadesFromModule { get; }
 
         private IntermediateSection Section { get; }
 
@@ -280,13 +279,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.Messaging.Write(VerboseMessages.ResequencingMergeModuleFiles());
                 using (var view = db.OpenView("SELECT `Sequence`, `Attributes` FROM `File` WHERE `File`=?"))
                 {
-                    foreach (var file in this.FileFacades)
+                    foreach (var file in this.FileFacadesFromModule)
                     {
-                        if (!file.FromModule)
-                        {
-                            continue;
-                        }
-
                         using (var record = new Record(1))
                         {
                             record.SetString(1, file.Id);

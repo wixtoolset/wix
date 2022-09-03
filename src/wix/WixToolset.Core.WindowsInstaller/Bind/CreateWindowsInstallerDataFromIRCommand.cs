@@ -662,9 +662,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.FileSize = symbol.FileSize;
             row.Version = symbol.Version;
             row.Language = symbol.Language;
-            row.DiskId = symbol.DiskId ?? 1; // TODO: is 1 the correct thing to default here
             row.Sequence = symbol.Sequence;
+            row.DiskId = symbol.DiskId ?? throw new InvalidDataException("FileSymbol.DiskId should have been initialized before creating WindowsInstallerData from IntermediateRepresentation.");
             row.Source = symbol.Source.Path;
+
+            var previousSourceField = symbol.Fields[(int)FileSymbolFields.Source]?.PreviousValue;
+            row.PreviousSource = previousSourceField?.AsPath().Path;
 
             var attributes = (symbol.Attributes & FileSymbolAttributes.Checksum) == FileSymbolAttributes.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
             attributes |= (symbol.Attributes & FileSymbolAttributes.Compressed) == FileSymbolAttributes.Compressed ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;

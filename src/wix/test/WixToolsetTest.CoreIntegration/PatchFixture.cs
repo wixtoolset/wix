@@ -5,6 +5,7 @@ namespace WixToolsetTest.CoreIntegration
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -22,8 +23,11 @@ namespace WixToolsetTest.CoreIntegration
     public class PatchFixture : IDisposable
     {
         private static readonly XNamespace PatchNamespace = "http://www.microsoft.com/msi/patch_applicability.xsd";
+        private static readonly XName TargetProductCodeName = PatchNamespace + "TargetProductCode";
+
         private readonly DisposableFileSystem tempFileSystem;
         private readonly string tempBaseFolder;
+        private readonly string templateSourceFolder;
         private readonly string templateBaselinePdb;
         private readonly string templateUpdatePdb;
         private readonly string templateUpdateNoFilesChangedPdb;
@@ -33,14 +37,14 @@ namespace WixToolsetTest.CoreIntegration
             this.tempFileSystem = new DisposableFileSystem();
             this.tempBaseFolder = this.tempFileSystem.GetFolder();
 
-            var templateSourceFolder = TestData.Get(@"TestData", "PatchTemplatePackage");
+            this.templateSourceFolder = TestData.Get(@"TestData", "PatchTemplatePackage");
             var tempFolderBaseline = Path.Combine(this.tempBaseFolder, "PatchTemplatePackage", "baseline");
             var tempFolderUpdate = Path.Combine(this.tempBaseFolder, "PatchTemplatePackage", "update");
             var tempFolderUpdateNoFileChanges = Path.Combine(this.tempBaseFolder, "PatchTemplatePackage", "updatewithoutfilechanges");
 
-            this.templateBaselinePdb = BuildMsi("Baseline.msi", templateSourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0", new[] { Path.Combine(templateSourceFolder, ".baseline-data") });
-            this.templateUpdatePdb = BuildMsi("Update.msi", templateSourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(templateSourceFolder, ".update-data") });
-            this.templateUpdateNoFilesChangedPdb = BuildMsi("Update.msi", templateSourceFolder, tempFolderUpdateNoFileChanges, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(templateSourceFolder, ".baseline-data") });
+            this.templateBaselinePdb = BuildMsi("Baseline.msi", this.templateSourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0", new[] { Path.Combine(this.templateSourceFolder, ".baseline-data") });
+            this.templateUpdatePdb = BuildMsi("Update.msi", this.templateSourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(this.templateSourceFolder, ".update-data") });
+            this.templateUpdateNoFilesChangedPdb = BuildMsi("Update.msi", this.templateSourceFolder, tempFolderUpdateNoFileChanges, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(this.templateSourceFolder, ".baseline-data") });
         }
 
         public void Dispose()
@@ -49,7 +53,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildSimplePatch()
+        public void CanBuildSimplePatchUsingWixpdbs()
         {
             var folder = TestData.Get(@"TestData", "PatchSingle");
 
@@ -66,14 +70,13 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(update1Pdb));
 
                 var doc = GetExtractPatchXml(patchPath);
-                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(TargetProductCodeName).Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
 
                 var cab = Path.Combine(tempFolder, "foo.cab");
                 Query.ExtractStream(patchPath, "foo.cab", cab);
-                Assert.True(File.Exists(cab));
 
                 var files = Query.GetCabinetFiles(cab);
                 WixAssert.CompareLineByLine(new[] { "a.txt", "b.txt" }, files.Select(f => f.Name).ToArray());
@@ -81,7 +84,37 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildSimplePatchWithFileChanges()
+        public void CanBuildSimplePatchWithFileChangesUsingMsi()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchWithFileChangesUsingMsi");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(baseFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+
+                var files = Query.GetCabinetFiles(cab);
+                var file = files.Single();
+                WixAssert.StringEqual("a.txt", file.Name);
+                var contents = file.OpenText().ReadToEnd();
+                WixAssert.StringEqual("This is A v1.0.1 from the '.update-data' folder in 'PatchTemplatePackage'.\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.\r\n", contents);
+            }
+        }
+
+        [Fact]
+        public void CanBuildSimplePatchWithFileChangesUsingWixpdb()
         {
             var sourceFolder = TestData.Get(@"TestData", "PatchWithFileChanges");
 
@@ -94,7 +127,7 @@ namespace WixToolsetTest.CoreIntegration
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
                 var doc = GetExtractPatchXml(patchPath);
-                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
@@ -106,8 +139,70 @@ namespace WixToolsetTest.CoreIntegration
                 var file = files.Single();
                 WixAssert.StringEqual("a.txt", file.Name);
                 var contents = file.OpenText().ReadToEnd();
-                WixAssert.StringEqual("This is A v1.0.1\r\n", contents);
+                WixAssert.StringEqual("This is A v1.0.1 from the '.update-data' folder in 'PatchTemplatePackage'.\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.\r\n", contents);
             }
+        }
+
+        [Fact]
+        public void CanBuildSimplePatchWithFileChangesUsingWixpdbAndAlternativeUpdatedSourceFolder()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchWithFileChanges");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) }, updateBindpaths: new[] { Path.Combine(this.templateSourceFolder, ".update-data-alternative") });
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(baseFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+
+                var files = Query.GetCabinetFiles(cab);
+                var file = files.Single();
+                WixAssert.StringEqual("a.txt", file.Name);
+                var contents = file.OpenText().ReadToEnd();
+                WixAssert.StringEqual("This is A v1.0.1 from the '.update-data-alternative' folder in 'PatchTemplatePackage'.\r\n\r\nDiam quis enim lobortis scelerisque fermentum dui faucibus in ornare.\r\n", contents);
+            }
+        }
+
+        [Fact]
+        public void CanBuildPatchFromAdminImage()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchUsingAdminImages");
+
+            var baseFolder = this.tempFileSystem.GetFolder();
+            var tempFolderPatch = Path.Combine(baseFolder, "patch");
+            var adminBaselineFolder = Path.Combine(baseFolder, "admin-baseline");
+            var adminUpdateFolder = Path.Combine(baseFolder, "admin-update");
+
+            CreateAdminImage(this.templateBaselinePdb, adminBaselineFolder);
+            CreateAdminImage(this.templateUpdatePdb, adminUpdateFolder);
+
+            var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { adminBaselineFolder, adminUpdateFolder });
+            var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+            var doc = GetExtractPatchXml(patchPath);
+            WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
+
+            var names = Query.GetSubStorageNames(patchPath);
+            WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+            var cab = Path.Combine(baseFolder, "foo.cab");
+            Query.ExtractStream(patchPath, "foo.cab", cab);
+
+            var files = Query.GetCabinetFiles(cab);
+            var file = files.Single();
+            WixAssert.StringEqual("a.txt", file.Name);
+            var contents = file.OpenText().ReadToEnd();
+            WixAssert.StringEqual("This is A v1.0.1 from the '.update-data' folder in 'PatchTemplatePackage'.\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.\r\n", contents);
         }
 
         [Fact]
@@ -123,14 +218,13 @@ namespace WixToolsetTest.CoreIntegration
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
                 var doc = GetExtractPatchXml(patchPath);
-                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
 
                 var cab = Path.Combine(tempFolder, "foo.cab");
                 Query.ExtractStream(patchPath, "foo.cab", cab);
-                Assert.True(File.Exists(cab));
 
                 var files = Query.GetCabinetFiles(cab);
                 Assert.Empty(files);
@@ -155,14 +249,13 @@ namespace WixToolsetTest.CoreIntegration
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
                 var doc = GetExtractPatchXml(patchPath);
-                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(TargetProductCodeName).Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
 
                 var cab = Path.Combine(baseFolder, "foo.cab");
                 Query.ExtractStream(patchPath, "foo.cab", cab);
-                Assert.True(File.Exists(cab));
 
                 var files = Query.GetCabinetFiles(cab);
                 var file = files.Single();
@@ -197,7 +290,7 @@ namespace WixToolsetTest.CoreIntegration
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
                 var doc = GetExtractPatchXml(patchPath);
-                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
 
                 var names = Query.GetSubStorageNames(patchPath);
                 WixAssert.CompareLineByLine(new[] { "#ThisBaseLineIdIsTooLongAndGe.1", "ThisBaseLineIdIsTooLongAndGe.1" }, names);
@@ -217,12 +310,12 @@ namespace WixToolsetTest.CoreIntegration
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
                 var baselinePdb = BuildMsi("Baseline.msi", sourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
-                var update1Pdb = BuildMsi("Update.msi", sourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) }, hasNoFiles: true);
+                var updatePdb = BuildMsi("Update.msi", sourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(updatePdb) }, hasNoFiles: true);
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
-                Assert.True(File.Exists(baselinePdb));
-                Assert.True(File.Exists(update1Pdb));
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{7C871EC1-1F89-4850-A6A9-D7A4C21769F6}", doc.Root.Element(TargetProductCodeName).Value);
             }
         }
 
@@ -317,7 +410,28 @@ namespace WixToolsetTest.CoreIntegration
             return Path.ChangeExtension(outputPath, ".wixpdb");
         }
 
-        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, bool hasNoFiles = false, bool warningsAsErrors = true)
+        private static string BuildMst(string transformName, string baseFolder, string templateBaselinePdb, string templateUpdatePdb)
+        {
+            var outputPath = Path.Combine(baseFolder, transformName);
+
+            var args = new List<string>
+            {
+                "msi", "transform",
+                templateBaselinePdb,
+                templateUpdatePdb,
+                "-intermediateFolder", Path.Combine(baseFolder),
+                "-t", "patch",
+                "-o", outputPath,
+            };
+
+            var result = WixRunner.Execute(args.ToArray());
+
+            result.AssertSuccess();
+
+            return outputPath;
+        }
+
+        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, IEnumerable<string> targetBindpaths = null, IEnumerable<string> updateBindpaths = null, bool hasNoFiles = false, bool warningsAsErrors = true)
         {
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
@@ -332,10 +446,22 @@ namespace WixToolsetTest.CoreIntegration
                 "-o", outputPath
             };
 
-            foreach (var additionaBindPath in bindpaths ?? Enumerable.Empty<string>())
+            foreach (var additionalBindPath in bindpaths ?? Enumerable.Empty<string>())
             {
                 args.Add("-bindpath");
-                args.Add(additionaBindPath);
+                args.Add(additionalBindPath);
+            }
+
+            foreach (var targetBindPath in targetBindpaths ?? Enumerable.Empty<string>())
+            {
+                args.Add("-bindpath:target");
+                args.Add(targetBindPath);
+            }
+
+            foreach (var updateBindpath in updateBindpaths ?? Enumerable.Empty<string>())
+            {
+                args.Add("-bindpath:update");
+                args.Add(updateBindpath);
             }
 
             var result = WixRunner.Execute(warningsAsErrors, args.ToArray());
@@ -363,6 +489,16 @@ namespace WixToolsetTest.CoreIntegration
             result.AssertSuccess();
 
             return Path.ChangeExtension(outputPath, ".wixpdb");
+        }
+
+        private static void CreateAdminImage(string msiPath, string targetDir)
+        {
+            var args = $"/a {Path.ChangeExtension(msiPath, "msi")} TARGETDIR={targetDir} /qn";
+
+            var proc = Process.Start("msiexec.exe", args);
+            proc.WaitForExit(5000);
+
+            Assert.Equal(0, proc.ExitCode);
         }
 
         private static XDocument GetExtractPatchXml(string path)

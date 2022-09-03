@@ -651,7 +651,8 @@ namespace WixToolset.Data
         public static Message FileNotFound(SourceLineNumber sourceLineNumbers, string file, string fileType, IEnumerable<string> checkedPaths)
         {
             var combinedCheckedPaths = String.Join(", ", checkedPaths);
-            return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}' with type '{1}'. The following paths were checked: {2}", file, fileType, combinedCheckedPaths);
+            var withType = String.IsNullOrEmpty(fileType) ? String.Empty : $" with type '{fileType}'";
+            return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}'{1}. The following paths were checked: {2}", file, withType, combinedCheckedPaths);
         }
 
         public static Message FileOrDirectoryPathRequired(string parameter)

@@ -21,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, IEnumerable<SubStorage> subStorages = null)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, IEnumerable<SubStorage> patchSubStorages = null)
         {
             this.ServiceProvider = context.ServiceProvider;
 
@@ -47,7 +47,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ResolvedLcid = context.ResolvedLcid;
             this.SuppressLayout = context.SuppressLayout;
 
-            this.SubStorages = subStorages;
+            this.PatchSubStorages = patchSubStorages;
 
             this.BackendExtensions = backendExtension;
         }
@@ -76,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
 
-        private IEnumerable<SubStorage> SubStorages { get; }
+        private IEnumerable<SubStorage> PatchSubStorages { get; }
 
         private Intermediate Intermediate { get; }
 
@@ -180,81 +180,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-#if TODO_PATCHING
-            ////if (OutputType.Patch == this.Output.Type)
-            ////{
-            ////    foreach (SubStorage substorage in this.Output.SubStorages)
-            ////    {
-            ////        Output transform = substorage.Data;
-
-            ////        ResolveFieldsCommand command = new ResolveFieldsCommand();
-            ////        command.Tables = transform.Tables;
-            ////        command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
-            ////        command.FileManagerCore = this.FileManagerCore;
-            ////        command.FileManagers = this.FileManagers;
-            ////        command.SupportDelayedResolution = false;
-            ////        command.TempFilesLocation = this.TempFilesLocation;
-            ////        command.WixVariableResolver = this.WixVariableResolver;
-            ////        command.Execute();
-
-            ////        this.MergeUnrealTables(transform.Tables);
-            ////    }
-            ////}
-#endif
+            // Add missing CreateFolder symbols to null-keypath components.
+            {
+                var command = new AddCreateFoldersCommand(section);
+                command.Execute();
+            }
 
             if (this.Messaging.EncounteredError)
             {
                 return null;
             }
 
-            this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
-            this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
-
-            // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
+            // Process dependency references.
+            if (SectionType.Product == section.Type || SectionType.Module == section.Type)
             {
-                var extractedFiles = this.WindowsInstallerBackendHelper.ExtractEmbeddedFiles(this.ExpectedEmbeddedFiles);
+                var dependencyRefs = section.Symbols.OfType<WixDependencyRefSymbol>().ToList();
 
-                trackedFiles.AddRange(extractedFiles);
-            }
-
-            // This must occur after all variables and source paths have been resolved.
-            List<IFileFacade> fileFacades;
-            if (SectionType.Patch == section.Type)
-            {
-                var command = new GetFileFacadesFromTransforms(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, this.SubStorages);
-                command.Execute();
-
-                fileFacades = command.FileFacades;
-            }
-            else
-            {
-                var command = new GetFileFacadesCommand(section, this.WindowsInstallerBackendHelper);
-                command.Execute();
-
-                fileFacades = command.FileFacades;
-            }
-
-            // Retrieve file information from merge modules.
-            if (SectionType.Product == section.Type)
-            {
-                var wixMergeSymbols = section.Symbols.OfType<WixMergeSymbol>().ToList();
-
-                if (wixMergeSymbols.Any())
+                if (dependencyRefs.Any())
                 {
-                    containsMergeModules = true;
-
-                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, this.WindowsInstallerBackendHelper, wixMergeSymbols, fileFacades, installerVersion, this.IntermediateFolder, this.SuppressLayout);
+                    var command = new ProcessDependencyReferencesCommand(this.WindowsInstallerBackendHelper, section, dependencyRefs);
                     command.Execute();
-
-                    fileFacades.AddRange(command.MergeModulesFileFacades);
-                    trackedFiles.AddRange(command.TrackedFiles);
                 }
-            }
-
-            // stop processing if an error previously occurred
-            if (this.Messaging.EncounteredError)
-            {
-                return null;
             }
 
             // Process SoftwareTags in MSI packages.
@@ -271,9 +217,69 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
+            // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
+            {
+                var extractedFiles = this.WindowsInstallerBackendHelper.ExtractEmbeddedFiles(this.ExpectedEmbeddedFiles);
+
+                trackedFiles.AddRange(extractedFiles);
+            }
+
+            // Update symbols that reference text files on disk. Some of those files may have come from .wixlibs and WixExtensions
+            // extracted above.
+            {
+                var command = new UpdateFromTextFilesCommand(this.Messaging, section);
+                command.Execute();
+            }
+
+            this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
+            this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
+
+            // This must occur after all variables and source paths have been resolved.
+            List<IFileFacade> allFileFacades;
+            List<IFileFacade> fileFacadesFromIntermediate;
+            List<IFileFacade> fileFacadesFromModule = null;
+            if (section.Type == SectionType.Patch)
+            {
+                var command = new GetFileFacadesFromTransforms(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, this.PatchSubStorages);
+                command.Execute();
+
+                allFileFacades = fileFacadesFromIntermediate = command.FileFacades;
+            }
+            else
+            {
+                var command = new GetFileFacadesCommand(section, this.WindowsInstallerBackendHelper);
+                command.Execute();
+
+                allFileFacades = fileFacadesFromIntermediate = command.FileFacades;
+            }
+
+            // Retrieve file information from merge modules.
+            if (SectionType.Product == section.Type)
+            {
+                var wixMergeSymbols = section.Symbols.OfType<WixMergeSymbol>().ToList();
+
+                if (wixMergeSymbols.Any())
+                {
+                    containsMergeModules = true;
+
+                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, this.WindowsInstallerBackendHelper, wixMergeSymbols, fileFacadesFromIntermediate, installerVersion, this.IntermediateFolder, this.SuppressLayout);
+                    command.Execute();
+
+                    fileFacadesFromModule = new List<IFileFacade>(command.MergeModulesFileFacades);
+                    allFileFacades.AddRange(fileFacadesFromModule);
+                    trackedFiles.AddRange(command.TrackedFiles);
+                }
+            }
+
+            // stop processing if an error previously occurred
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
             // Gather information about files that do not come from merge modules.
             {
-                var command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, fileFacades.Where(f => !f.FromModule), variableCache, overwriteHash: true);
+                var command = new UpdateFileFacadesCommand(this.Messaging, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true);
                 command.Execute();
             }
 
@@ -289,35 +295,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.WindowsInstallerBackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
             }
 
-            // Update symbols that reference text files on disk.
-            {
-                var command = new UpdateFromTextFilesCommand(this.Messaging, section);
-                command.Execute();
-            }
-
-            // Add missing CreateFolder symbols to null-keypath components.
-            {
-                var command = new AddCreateFoldersCommand(section);
-                command.Execute();
-            }
-
             // Now that delayed fields are processed, fixup the package version (if needed) and validate it
             // which will short circuit duplicate errors later if the ProductVersion is invalid.
             if (SectionType.Product == section.Type)
             {
                 this.ProcessProductVersion(packageSymbol, section, validate: true);
-            }
-
-            // Process dependency references.
-            if (SectionType.Product == section.Type || SectionType.Module == section.Type)
-            {
-                var dependencyRefs = section.Symbols.OfType<WixDependencyRefSymbol>().ToList();
-
-                if (dependencyRefs.Any())
-                {
-                    var command = new ProcessDependencyReferencesCommand(this.WindowsInstallerBackendHelper, section, dependencyRefs);
-                    command.Execute();
-                }
             }
 
             // If there are any backend extensions, give them the opportunity to process
@@ -339,9 +321,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (reresolvedFiles.Any())
                     {
-                        var updatedFacades = reresolvedFiles.Select(f => fileFacades.First(ff => ff.Id == f.Id?.Id));
+                        var updatedFacades = reresolvedFiles.Select(f => allFileFacades.First(ff => ff.Id == f.Id?.Id));
 
-                        var command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, updatedFacades, variableCache, overwriteHash: false);
+                        var command = new UpdateFileFacadesCommand(this.Messaging, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false);
                         command.Execute();
                     }
                 }
@@ -363,28 +345,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            // Set generated component guids and validate all guids.
-            {
-                var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);
-                command.Execute();
-            }
-
             // Assign files to media and update file sequences.
             Dictionary<MediaSymbol, IEnumerable<IFileFacade>> filesByCabinetMedia;
             IEnumerable<IFileFacade> uncompressedFiles;
             {
-                var order = new OptimizeFileFacadesOrderCommand(this.WindowsInstallerBackendHelper, this.PathResolver, section, platform, fileFacades);
+                var order = new OptimizeFileFacadesOrderCommand(this.WindowsInstallerBackendHelper, this.PathResolver, section, platform, allFileFacades);
                 order.Execute();
 
-                fileFacades = order.FileFacades;
+                allFileFacades = order.FileFacades;
 
-                var assign = new AssignMediaCommand(section, this.Messaging, fileFacades, compressed);
+                var assign = new AssignMediaCommand(section, this.Messaging, allFileFacades, compressed);
                 assign.Execute();
 
                 filesByCabinetMedia = assign.FileFacadesByCabinetMedia;
                 uncompressedFiles = assign.UncompressedFileFacades;
 
-                var update = new UpdateMediaSequencesCommand(section, fileFacades);
+                var update = new UpdateMediaSequencesCommand(section, allFileFacades);
                 update.Execute();
             }
 
@@ -392,6 +368,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (this.Messaging.EncounteredError)
             {
                 return null;
+            }
+
+            // Copy updated file facade data back into the transforms or symbols as appropriate.
+            if (section.Type == SectionType.Patch)
+            {
+                var command = new UpdateTransformsWithFileFacades(this.Messaging, section, this.PatchSubStorages, tableDefinitions, allFileFacades);
+                command.Execute();
+            }
+            else
+            {
+                var command = new UpdateSymbolsWithFileFacadesCommand(section, allFileFacades);
+                command.Execute();
+            }
+
+            // Set generated component guids and validate all guids.
+            {
+                var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);
+                command.Execute();
             }
 
             // Time to create the WindowsInstallerData object. Try to put as much above here as possible, updating the IR is better.
@@ -412,9 +406,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var unsuppress = new AddBackSuppressedSequenceTablesCommand(data, tableDefinitions);
                 suppressedTableNames = unsuppress.Execute();
             }
+            else if (data.Type == OutputType.Product) // we can create instance transforms since Component Guids and Outputs are created.
+            {
+                var command = new CreateInstanceTransformsCommand(section, data, tableDefinitions, this.WindowsInstallerBackendHelper);
+                command.Execute();
+
+                foreach (var storage in command.SubStorages)
+                {
+                    data.SubStorages.Add(storage);
+                }
+            }
             else if (data.Type == OutputType.Patch)
             {
-                foreach (var storage in this.SubStorages)
+                foreach (var storage in this.PatchSubStorages)
                 {
                     data.SubStorages.Add(storage);
                 }
@@ -426,13 +430,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return null;
             }
 
-            // Ensure the intermediate folder is created since delta patches will be
-            // created there.
-            Directory.CreateDirectory(this.IntermediateFolder);
-
-            if (SectionType.Patch == section.Type && this.DeltaBinaryPatch)
+            if (section.Type == SectionType.Patch && this.DeltaBinaryPatch)
             {
-                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Symbols.OfType<WixPatchSymbol>().FirstOrDefault());
+                var command = new CreateDeltaPatchesCommand(allFileFacades, this.IntermediateFolder, section.Symbols.OfType<WixPatchSymbol>().FirstOrDefault());
                 command.Execute();
             }
 
@@ -452,19 +452,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (this.Messaging.EncounteredError)
             {
                 return null;
-            }
-
-            // We can create instance transforms since Component Guids and Outputs are created.
-            if (data.Type == OutputType.Product)
-            {
-                var command = new CreateInstanceTransformsCommand(section, data, tableDefinitions, this.WindowsInstallerBackendHelper);
-                command.Execute();
-            }
-            else if (data.Type == OutputType.Patch)
-            {
-                // Copy output data back into the transforms.
-                var command = new UpdateTransformsWithFileFacades(this.Messaging, data, this.SubStorages, tableDefinitions, fileFacades);
-                command.Execute();
             }
 
             // Generate database file.
@@ -491,7 +478,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.MergingModules());
 
-                var command = new MergeModulesCommand(this.Messaging, this.WindowsInstallerBackendHelper, fileFacades, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
+                var command = new MergeModulesCommand(this.Messaging, this.WindowsInstallerBackendHelper, fileFacadesFromModule, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
                 command.Execute();
 
                 trackedFiles.AddRange(command.TrackedFiles);
@@ -518,7 +505,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var fi = new FileInfo(this.OutputPath);
                 if (fi.Length > Int32.MaxValue)
                 {
-                    this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(null, this.OutputPath, "MSI"));
+                    this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(null, this.OutputPath, data.Type.ToString()));
                 }
             }
             catch

@@ -1,0 +1,3 @@
+This is A v1.0.1 from the '.update-data-alternative' folder in 'PatchTemplatePackage'.
+
+Diam quis enim lobortis scelerisque fermentum dui faucibus in ornare.
