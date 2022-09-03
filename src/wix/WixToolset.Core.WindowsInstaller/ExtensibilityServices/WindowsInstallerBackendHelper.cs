@@ -23,19 +23,14 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
 
         #region IBackendHelper interfaces
 
-        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly)
+        public IFileFacade CreateFileFacade(FileSymbol file)
         {
-            return this.backendHelper.CreateFileFacade(file, assembly);
+            return new FileFacade(file);
         }
 
         public IFileFacade CreateFileFacade(FileRow fileRow)
         {
-            return this.backendHelper.CreateFileFacade(fileRow);
-        }
-
-        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol)
-        {
-            return this.backendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
+            return new FileFacade(fileRow);
         }
 
         public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)

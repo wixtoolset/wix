@@ -3,7 +3,6 @@
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
@@ -26,7 +25,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.TreatOutputAsModule = treatOutputAsModule;
         }
 
-        public string[] ExtractedFiles { get; private set; }
+        public Dictionary<string, MediaRow> ExtractedFileIdsWithMediaRow { get; private set; }
 
         private WindowsInstallerData Output { get; }
 
@@ -42,47 +41,51 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public void Execute()
         {
+            var extractedFileIdsWithMediaRow = new Dictionary<string, MediaRow>();
             var databaseBasePath = Path.GetDirectoryName(this.InputFilePath);
-            var cabinetFiles = new List<string>();
-            var embeddedCabinets = new SortedList();
+
+            var cabinetPathsWithMediaRow = new Dictionary<string, MediaRow>();
+            var embeddedCabinetNamesByDiskId = new SortedDictionary<int, string>();
+            var embeddedCabinetRowsByDiskId = new SortedDictionary<int, MediaRow>();
 
             // index all of the cabinet files
             if (OutputType.Module == this.Output.Type || this.TreatOutputAsModule)
             {
-                embeddedCabinets.Add(0, "MergeModule.CABinet");
+                embeddedCabinetNamesByDiskId.Add(0, "MergeModule.CABinet");
             }
-            else if (null != this.Output.Tables["Media"])
+            else if (this.Output.Tables.TryGetTable("Media", out var mediaTable))
             {
-                foreach (MediaRow mediaRow in this.Output.Tables["Media"].Rows)
+                foreach (var mediaRow in mediaTable.Rows.Cast<MediaRow>().Where(r => !String.IsNullOrEmpty(r.Cabinet)))
                 {
-                    if (null != mediaRow.Cabinet)
+                    if (OutputType.Product == this.Output.Type ||
+                        (OutputType.Transform == this.Output.Type && RowOperation.Add == mediaRow.Operation))
                     {
-                        if (OutputType.Product == this.Output.Type ||
-                            (OutputType.Transform == this.Output.Type && RowOperation.Add == mediaRow.Operation))
+                        if (mediaRow.Cabinet.StartsWith("#", StringComparison.Ordinal))
                         {
-                            if (mediaRow.Cabinet.StartsWith("#", StringComparison.Ordinal))
-                            {
-                                embeddedCabinets.Add(mediaRow.DiskId, mediaRow.Cabinet.Substring(1));
-                            }
-                            else
-                            {
-                                cabinetFiles.Add(Path.Combine(databaseBasePath, mediaRow.Cabinet));
-                            }
+                            embeddedCabinetNamesByDiskId.Add(mediaRow.DiskId, mediaRow.Cabinet.Substring(1));
+                            embeddedCabinetRowsByDiskId.Add(mediaRow.DiskId, mediaRow);
+                        }
+                        else
+                        {
+                            cabinetPathsWithMediaRow.Add(Path.Combine(databaseBasePath, mediaRow.Cabinet), mediaRow);
                         }
                     }
                 }
             }
 
-            // extract the embedded cabinet files from the database
-            if (0 < embeddedCabinets.Count)
+            // Extract any embedded cabinet files from the database.
+            if (0 < embeddedCabinetRowsByDiskId.Count)
             {
                 using (var streamsView = this.Database.OpenView("SELECT `Data` FROM `_Streams` WHERE `Name` = ?"))
                 {
-                    foreach (int diskId in embeddedCabinets.Keys)
+                    foreach (var diskIdWithCabinetName in embeddedCabinetNamesByDiskId)
                     {
+                        var diskId = diskIdWithCabinetName.Key;
+                        var cabinetName = diskIdWithCabinetName.Value;
+
                         using (var record = new Record(1))
                         {
-                            record.SetString(1, (string)embeddedCabinets[diskId]);
+                            record.SetString(1, cabinetName);
                             streamsView.Execute(record);
                         }
 
@@ -92,15 +95,15 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                             {
                                 // since the cabinets are stored in case-sensitive streams inside the msi, but the file system is not (typically) case-sensitive,
                                 // embedded cabinets must be extracted to a canonical file name (like their diskid) to ensure extraction will always work
-                                var cabinetFile = Path.Combine(this.IntermediateFolder, String.Concat("Media", Path.DirectorySeparatorChar, diskId.ToString(CultureInfo.InvariantCulture), ".cab"));
+                                var cabinetPath = Path.Combine(this.IntermediateFolder, "Media", diskId.ToString(CultureInfo.InvariantCulture), ".cab");
 
                                 // ensure the parent directory exists
-                                Directory.CreateDirectory(Path.GetDirectoryName(cabinetFile));
+                                Directory.CreateDirectory(Path.GetDirectoryName(cabinetPath));
 
-                                using (var fs = File.Create(cabinetFile))
+                                using (var fs = File.Create(cabinetPath))
                                 {
                                     int bytesRead;
-                                    var buffer = new byte[512];
+                                    var buffer = new byte[4096];
 
                                     while (0 != (bytesRead = record.GetStream(1, buffer, buffer.Length)))
                                     {
@@ -108,7 +111,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     }
                                 }
 
-                                cabinetFiles.Add(cabinetFile);
+                                embeddedCabinetRowsByDiskId.TryGetValue(diskId, out var cabinetMediaRow);
+                                cabinetPathsWithMediaRow.Add(cabinetPath, cabinetMediaRow);
                             }
                             else
                             {
@@ -119,29 +123,34 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
             }
 
-            // extract the cabinet files
-            if (0 < cabinetFiles.Count)
+            // Extract files from any available cabinets.
+            if (0 < cabinetPathsWithMediaRow.Count)
             {
-                // ensure the directory exists or extraction will fail
                 Directory.CreateDirectory(this.ExportBasePath);
 
-                foreach (var cabinetFile in cabinetFiles)
+                foreach (var cabinetPathWithMediaRow in cabinetPathsWithMediaRow)
                 {
+                    var cabinetPath = cabinetPathWithMediaRow.Key;
+                    var cabinetMediaRow = cabinetPathWithMediaRow.Value;
+
                     try
                     {
-                        var cabinet = new Cabinet(cabinetFile);
-                        this.ExtractedFiles = cabinet.Extract(this.ExportBasePath).ToArray();
+                        var cabinet = new Cabinet(cabinetPath);
+                        var cabinetFilesExtracted = cabinet.Extract(this.ExportBasePath);
+
+                        foreach (var extractedFile in cabinetFilesExtracted)
+                        {
+                            extractedFileIdsWithMediaRow.Add(extractedFile, cabinetMediaRow);
+                        }
                     }
                     catch (FileNotFoundException)
                     {
-                        throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
+                        throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetPath));
                     }
                 }
             }
-            else
-            {
-                this.ExtractedFiles = new string[0];
-            }
+
+            this.ExtractedFileIdsWithMediaRow = extractedFileIdsWithMediaRow;
         }
     }
 }

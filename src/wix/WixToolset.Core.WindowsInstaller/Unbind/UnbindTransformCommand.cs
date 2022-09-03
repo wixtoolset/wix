@@ -1,5 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#if TODO_KEEP_FOR_PATCH_UNBINDING_CONSIDERATION_IN_FUTURE
+
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
     using System;
@@ -17,10 +19,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class UnbindTransformCommand
     {
-        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, string transformFile, string exportBasePath, string intermediateFolder)
+        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, string transformFile, string exportBasePath, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.FileSystemManager = fileSystemManager;
             this.TransformFile = transformFile;
             this.ExportBasePath = exportBasePath;
             this.IntermediateFolder = intermediateFolder;
@@ -31,6 +34,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private FileSystemManager FileSystemManager { get; }
 
         private string TransformFile { get; }
 
@@ -90,7 +95,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 msiDatabase.ApplyTransform(this.TransformFile, TransformErrorConditions.All | TransformErrorConditions.ViewTransform);
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 var transformViewOutput = unbindCommand.Execute();
 
                 // index the added and possibly modified rows (added rows may also appears as modified rows)
@@ -160,7 +165,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 var output = unbindCommand.Execute();
 
                 // index all the rows to easily find modified rows
@@ -302,8 +307,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private void GenerateDatabase(WindowsInstallerData output, string databaseFile)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, null, null, output, databaseFile, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
+            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, databaseFile, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
             command.Execute();
         }
     }
 }
+#endif

@@ -5,8 +5,6 @@ namespace WixToolset.Extensibility.Services
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Data;
 
     /// <summary>
@@ -14,28 +12,6 @@ namespace WixToolset.Extensibility.Services
     /// </summary>
     public interface IBackendHelper : ILayoutServices
     {
-        /// <summary>
-        /// Creates a file facade from a <c>FileSymbol</c> and possible <c>AssemblySymbol</c>.
-        /// </summary>
-        /// <param name="file"><c>FileSymbol</c> backing the facade.</param>
-        /// <param name="assembly"><c>AssemblySymbol</c> backing the facade.</param>
-        /// <returns></returns>
-        IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly);
-
-        /// <summary>
-        /// Creates a file facade from a File row.
-        /// </summary>
-        /// <param name="fileRow"><c>FileRow</c> </param>
-        /// <returns>New <c>IFileFacade</c>.</returns>
-        IFileFacade CreateFileFacade(FileRow fileRow);
-
-        /// <summary>
-        /// Creates a file facade from a Merge Module's File symbol.
-        /// </summary>
-        /// <param name="fileSymbol"><c>FileSymbol</c> created from a Merge Module.</param>
-        /// <returns>New <c>IFileFacade</c>.</returns>
-        IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol);
-
         /// <summary>
         /// Creates a MSI compatible GUID.
         /// </summary>

@@ -6,30 +6,43 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Native.Msi;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CreatePatchTransformsCommand
     {
-        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, Intermediate intermediate, string intermediateFolder)
+        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, IFileResolver fileResolver, IReadOnlyCollection<IResolverExtension> resolverExtensions, Intermediate intermediate, string intermediateFolder, IReadOnlyCollection<IBindPath> bindPaths)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.PathResolver = pathResolver;
+            this.FileResolver = fileResolver;
+            this.ResolverExtensions = resolverExtensions;
             this.Intermediate = intermediate;
             this.IntermediateFolder = intermediateFolder;
+            this.BindPaths = bindPaths;
         }
 
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
 
+        private IPathResolver PathResolver { get; }
+
+        private IFileResolver FileResolver { get; }
+
+        private IReadOnlyCollection<IResolverExtension> ResolverExtensions { get; }
+
         private Intermediate Intermediate { get; }
 
         private string IntermediateFolder { get; }
+
+        private IReadOnlyCollection<IBindPath> BindPaths { get; }
 
         public IEnumerable<PatchTransform> PatchTransforms { get; private set; }
 
@@ -41,23 +54,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var symbol in symbols)
             {
-                WindowsInstallerData transform;
+                var targetData = this.GetWindowsInstallerData(symbol.BaselineFile.Path, BindStage.Target);
+                var updatedData = this.GetWindowsInstallerData(symbol.UpdateFile.Path, BindStage.Updated);
 
-                if (symbol.TransformFile is null)
-                {
-                    var baselineData = this.GetData(symbol.BaselineFile.Path);
-                    var updateData = this.GetData(symbol.UpdateFile.Path);
-
-                    var command = new GenerateTransformCommand(this.Messaging, baselineData, updateData, preserveUnchangedRows: true, showPedanticMessages: false);
-                    transform = command.Execute();
-                }
-                else
-                {
-                    var exportBasePath = Path.Combine(this.IntermediateFolder, "_trans"); // TODO: come up with a better path.
-
-                    var command = new UnbindTransformCommand(this.Messaging, this.BackendHelper, symbol.TransformFile.Path, exportBasePath, this.IntermediateFolder);
-                    transform = command.Execute();
-                }
+                var command = new GenerateTransformCommand(this.Messaging, targetData, updatedData, preserveUnchangedRows: true, showPedanticMessages: false);
+                var transform = command.Execute();
 
                 patchTransforms.Add(new PatchTransform(symbol.Id.Id, transform));
             }
@@ -67,26 +68,61 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return this.PatchTransforms;
         }
 
-        private WindowsInstallerData GetData(string path)
+        private WindowsInstallerData GetWindowsInstallerData(string path, BindStage stage)
         {
-            var ext = Path.GetExtension(path);
-
-            if (".msi".Equals(ext, StringComparison.OrdinalIgnoreCase))
+            if (DataLoader.TryLoadWindowsInstallerData(path, true, out var data))
             {
-                using (var database = new Database(path, OpenDatabase.ReadOnly))
-                {
-                    var exportBasePath = Path.Combine(this.IntermediateFolder, "_msi"); // TODO: come up with a better path.
-
-                    var isAdminImage = false; // TODO: need a better way to set this
-
-                    var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, database, path, OutputType.Product, exportBasePath, this.IntermediateFolder, isAdminImage, suppressDemodularization: true, skipSummaryInfo: true);
-                    return command.Execute();
-                }
+                // Re-resolve file paths only when loading from .wixpdb.
+                this.ReResolveWindowsInstallerData(data, stage);
             }
-            else // assume .wixpdb (or .wixout)
+            else
             {
-                var data = WindowsInstallerData.Load(path, true);
-                return data;
+                var stageFolder = $"_{stage.ToString().ToLowerInvariant()}_msi";
+                var exportBasePath = Path.Combine(this.IntermediateFolder, stageFolder);
+                var extractFilesFolder = Path.Combine(exportBasePath, "File");
+
+                var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, path, OutputType.Product, exportBasePath, extractFilesFolder, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                data = command.Execute();
+            }
+
+            return data;
+        }
+
+        private void ReResolveWindowsInstallerData(WindowsInstallerData data, BindStage stage)
+        {
+            var bindPaths = this.BindPaths.Where(b => b.Stage == stage).ToList();
+
+            if (bindPaths.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var table in data.Tables)
+            {
+                foreach (var row in table.Rows)
+                {
+                    foreach (var field in row.Fields.Where(f => f.Column.Type == ColumnType.Object))
+                    {
+                        if (field.PreviousData != null)
+                        {
+                            try
+                            {
+                                var originalPath = field.AsString();
+
+                                var resolvedPath = this.FileResolver.ResolveFile(field.PreviousData, this.ResolverExtensions, bindPaths, stage, row.SourceLineNumbers, null);
+
+                                if (!String.Equals(originalPath, resolvedPath, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    field.Data = resolvedPath;
+                                }
+                            }
+                            catch (WixException e)
+                            {
+                                this.Messaging.Write(e.Error);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

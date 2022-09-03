@@ -10,7 +10,6 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -18,7 +17,7 @@ namespace WixToolset.Core.WindowsInstaller
     /// </summary>
     public sealed class Differ
     {
-        private const char sectionDelimiter = '/';
+        private const char SectionDelimiter = '/';
         private readonly IMessaging messaging;
         private SummaryInformationStreams transformSummaryInfo;
 
@@ -53,24 +52,16 @@ namespace WixToolset.Core.WindowsInstaller
         /// </summary>
         /// <param name="targetOutput">The target output.</param>
         /// <param name="updatedOutput">The updated output.</param>
-        /// <returns>The transform.</returns>
-        public WindowsInstallerData Diff(WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput)
-        {
-            return this.Diff(targetOutput, updatedOutput, 0);
-        }
-
-        /// <summary>
-        /// Creates a transform by diffing two outputs.
-        /// </summary>
-        /// <param name="targetOutput">The target output.</param>
-        /// <param name="updatedOutput">The updated output.</param>
         /// <param name="validationFlags"></param>
         /// <returns>The transform.</returns>
         public WindowsInstallerData Diff(WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput, TransformFlags validationFlags)
         {
-            var transform = new WindowsInstallerData(null);
-            transform.Type = OutputType.Transform;
-            transform.Codepage = updatedOutput.Codepage;
+            var transform = new WindowsInstallerData(null)
+            {
+                Type = OutputType.Transform,
+                Codepage = updatedOutput.Codepage
+            };
+
             this.transformSummaryInfo = new SummaryInformationStreams();
 
             // compare the codepages
@@ -120,7 +111,7 @@ namespace WixToolset.Core.WindowsInstaller
                     foreach (var updatedRow in updatedTable.Rows)
                     {
                         updatedRow.Operation = RowOperation.Add;
-                        updatedRow.SectionId = sectionDelimiter + updatedRow.SectionId;
+                        updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                         addedTable.Rows.Add(updatedRow);
                     }
                 }
@@ -209,7 +200,7 @@ namespace WixToolset.Core.WindowsInstaller
                 else if (null == updatedRow)
                 {
                     operation = targetRow.Operation = RowOperation.Delete;
-                    targetRow.SectionId += sectionDelimiter;
+                    targetRow.SectionId += SectionDelimiter;
                     comparedRow = targetRow;
                     keepRow = true;
                 }
@@ -222,7 +213,7 @@ namespace WixToolset.Core.WindowsInstaller
                     // ignore rows that shouldn't be in a transform
                     if (Enum.IsDefined(typeof(SummaryInformation.Transform), (int)updatedRow[0]))
                     {
-                        updatedRow.SectionId = targetRow.SectionId + sectionDelimiter + updatedRow.SectionId;
+                        updatedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                         comparedRow = updatedRow;
                         keepRow = true;
                         operation = RowOperation.Modify;
@@ -306,7 +297,7 @@ namespace WixToolset.Core.WindowsInstaller
                     if (keepRow)
                     {
                         comparedRow = updatedRow;
-                        comparedRow.SectionId = targetRow.SectionId + sectionDelimiter + updatedRow.SectionId;
+                        comparedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                     }
                 }
             }
@@ -350,8 +341,9 @@ namespace WixToolset.Core.WindowsInstaller
                     // diff the target and updated rows
                     foreach (var targetPrimaryKeyEntry in targetPrimaryKeys)
                     {
-                        var targetPrimaryKey = targetPrimaryKeyEntry.Key;
-                        var compared = this.CompareRows(targetTable, targetPrimaryKeyEntry.Value, updatedPrimaryKeys[targetPrimaryKey], out var _, out var keepRow);
+                        updatedPrimaryKeys.TryGetValue(targetPrimaryKeyEntry.Key, out var updatedRow);
+
+                        var compared = this.CompareRows(targetTable, targetPrimaryKeyEntry.Value, updatedRow, out var _, out var keepRow);
 
                         if (keepRow)
                         {
@@ -369,7 +361,7 @@ namespace WixToolset.Core.WindowsInstaller
                             var updatedRow = (Row)updatedPrimaryKeyEntry.Value;
 
                             updatedRow.Operation = RowOperation.Add;
-                            updatedRow.SectionId = sectionDelimiter + updatedRow.SectionId;
+                            updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                             rows.Add(updatedRow);
                         }
                     }

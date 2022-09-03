@@ -23,11 +23,15 @@ namespace WixToolset.Core
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
+
+            this.FileResolver = serviceProvider.GetService<IFileResolver>();
         }
 
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
+
+        private IFileResolver FileResolver { get; }
 
         public IResolveResult Resolve(IResolveContext context)
         {
@@ -45,7 +49,7 @@ namespace WixToolset.Core
 
                 this.LocalizeUI(variableResolver, context.IntermediateRepresentation);
 
-                resolveResult = this.DoResolve(context, variableResolver);
+                resolveResult = this.ResolveFields(context, variableResolver);
 
                 var primaryLocalization = filteredLocalizations.FirstOrDefault();
 
@@ -71,48 +75,17 @@ namespace WixToolset.Core
             return resolveResult;
         }
 
-        private ResolveResult DoResolve(IResolveContext context, IVariableResolver variableResolver)
+        private ResolveResult ResolveFields(IResolveContext context, IVariableResolver variableResolver)
         {
-            var buildingPatch = context.IntermediateRepresentation.Sections.Any(s => s.Type == SectionType.Patch);
-
             var filesWithEmbeddedFiles = new ExtractEmbeddedFiles();
 
             IReadOnlyCollection<DelayedField> delayedFields;
             {
-                var command = new ResolveFieldsCommand();
-                command.Messaging = this.Messaging;
-                command.BuildingPatch = buildingPatch;
-                command.VariableResolver = variableResolver;
-                command.BindPaths = context.BindPaths;
-                command.Extensions = context.Extensions;
-                command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
-                command.IntermediateFolder = context.IntermediateFolder;
-                command.Intermediate = context.IntermediateRepresentation;
-                command.SupportDelayedResolution = true;
-                command.AllowUnresolvedVariables = context.AllowUnresolvedVariables;
+                var command = new ResolveFieldsCommand(this.Messaging, this.FileResolver, variableResolver, context.BindPaths, context.Extensions, filesWithEmbeddedFiles, context.IntermediateFolder, context.IntermediateRepresentation, context.AllowUnresolvedVariables);
                 command.Execute();
 
                 delayedFields = command.DelayedFields;
             }
-
-#if TODO_PATCHING
-            if (context.IntermediateRepresentation.SubStorages != null)
-            {
-                foreach (SubStorage transform in context.IntermediateRepresentation.SubStorages)
-                {
-                    var command = new ResolveFieldsCommand();
-                    command.BuildingPatch = buildingPatch;
-                    command.BindVariableResolver = context.WixVariableResolver;
-                    command.BindPaths = context.BindPaths;
-                    command.Extensions = context.Extensions;
-                    command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
-                    command.IntermediateFolder = context.IntermediateFolder;
-                    command.Intermediate = context.IntermediateRepresentation;
-                    command.SupportDelayedResolution = false;
-                    command.Execute();
-                }
-            }
-#endif
 
             var expectedEmbeddedFiles = filesWithEmbeddedFiles.GetExpectedEmbeddedFiles();
 

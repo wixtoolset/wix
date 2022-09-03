@@ -48,7 +48,9 @@ namespace WixToolset.Core.CommandLine
             {
                 new CommandLineHelpSwitch("-arch", "Set the architecture of the output."),
                 new CommandLineHelpSwitch("-bindfiles", "-bf", "Bind files into an output .wixlib. Ignored if not building a .wixlib."),
-                new CommandLineHelpSwitch("-bindpath", "Bind path to search for content files."),
+                new CommandLineHelpSwitch("-bindpath", "-b", "Bind path to search for content files."),
+                new CommandLineHelpSwitch("-bindpath:target", "-bt", "Bind path to search for target package's content files. Only used when building a patch."),
+                new CommandLineHelpSwitch("-bindpath:update", "-bu", "Bind path to search for update package's content files. Only used when building a patch."),
                 new CommandLineHelpSwitch("-cabcache", "-cc", "Set a folder to cache cabinets across builds."),
                 new CommandLineHelpSwitch("-culture", "Adds a culture to filter localization files."),
                 new CommandLineHelpSwitch("-define", "-d", "Sets a preprocessor variable."),
@@ -292,6 +294,7 @@ namespace WixToolset.Core.CommandLine
             {
                 {
                     var context = this.ServiceProvider.GetService<IBindContext>();
+                    context.BindPaths = bindPaths;
                     //context.CabbingThreadCount = this.CabbingThreadCount;
                     context.CabCachePath = cabCachePath;
                     context.ResolvedCodepage = resolveResult.Codepage;
@@ -534,11 +537,25 @@ namespace WixToolset.Core.CommandLine
                             this.BindFiles = true;
                             return true;
 
+                        case "b":
                         case "bindpath":
+                        case "bt":
+                        case "bindpath:target":
+                        case "bu":
+                        case "bindpath:update":
                         {
                             var value = parser.GetNextArgumentOrError(arg);
-                            if (value != null && this.TryParseBindPath(value, out var bindPath))
+                            if (value != null && this.TryParseBindPath(arg, value, out var bindPath))
                             {
+                                if (parameter == "bt" || parameter.EndsWith("target"))
+                                {
+                                    bindPath.Stage = BindStage.Target;
+                                }
+                                else if (parameter == "bu" || parameter.EndsWith("update"))
+                                {
+                                    bindPath.Stage = BindStage.Updated;
+                                }
+
                                 this.BindPaths.Add(bindPath);
                             }
                             return true;
@@ -830,7 +847,7 @@ namespace WixToolset.Core.CommandLine
                 return new InputsAndOutputs(codePaths, localizationPaths, libraryPaths, wixipls, outputPath, outputType, pdbPath, this.PdbType);
             }
 
-            private bool TryParseBindPath(string bindPath, out IBindPath bp)
+            private bool TryParseBindPath(string argument, string bindPath, out IBindPath bp)
             {
                 var namedPath = bindPath.Split(BindPathSplit, 2);
 
@@ -848,7 +865,7 @@ namespace WixToolset.Core.CommandLine
 
                 if (File.Exists(bp.Path))
                 {
-                    this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile("-bindpath", bp.Path));
+                    this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile(argument, bp.Path));
                     return false;
                 }
 

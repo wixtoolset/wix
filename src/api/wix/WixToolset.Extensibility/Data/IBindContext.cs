@@ -18,6 +18,11 @@ namespace WixToolset.Extensibility.Data
         IServiceProvider ServiceProvider { get; }
 
         /// <summary>
+        /// Bind paths used during resolution.
+        /// </summary>
+        IReadOnlyCollection<IBindPath> BindPaths { get; set; }
+
+        /// <summary>
         /// Counnt of threads to use in cabbing.
         /// </summary>
         int CabbingThreadCount { get; set; }

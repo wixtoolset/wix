@@ -22,12 +22,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class ExtractMergeModuleFilesCommand
     {
-        public ExtractMergeModuleFilesCommand(IMessaging messaging, IWindowsInstallerBackendHelper backendHelper, IEnumerable<WixMergeSymbol> wixMergeSymbols, IEnumerable<IFileFacade> fileFacades, int installerVersion, string intermediateFolder, bool suppressLayout)
+        public ExtractMergeModuleFilesCommand(IMessaging messaging, IWindowsInstallerBackendHelper backendHelper, IEnumerable<WixMergeSymbol> wixMergeSymbols, IEnumerable<IFileFacade> fileFacadesFromIntermediate, int installerVersion, string intermediateFolder, bool suppressLayout)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
             this.WixMergeSymbols = wixMergeSymbols;
-            this.FileFacades = fileFacades;
+            this.FileFacadesFromIntermediate = fileFacadesFromIntermediate;
             this.OutputInstallerVersion = installerVersion;
             this.IntermediateFolder = intermediateFolder;
             this.SuppressLayout = suppressLayout;
@@ -39,7 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<WixMergeSymbol> WixMergeSymbols { get; }
 
-        private IEnumerable<IFileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacadesFromIntermediate { get; }
 
         private int OutputInstallerVersion { get; }
 
@@ -65,7 +65,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Now since Merge Modules are already slow and generally less desirable than .wixlibs we'll let
             // this case be slightly more expensive because the cost of maintaining an indexed file row collection
             // is a lot more costly for the common cases.
-            var indexedFileFacades = this.FileFacades.ToDictionary(f => f.Id, StringComparer.Ordinal);
+            var indexedFileFacades = this.FileFacadesFromIntermediate.ToDictionary(f => f.Id, StringComparer.Ordinal);
 
             foreach (var wixMergeRow in this.WixMergeSymbols)
             {
@@ -115,7 +115,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 fileSymbol.DiskId = wixMergeRow.DiskId;
                                 fileSymbol.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
 
-                                var mergeModuleFileFacade = this.BackendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
+                                var mergeModuleFileFacade = this.BackendHelper.CreateFileFacade(fileSymbol);
 
                                 // If case-sensitive collision with another merge module or a user-authored file identifier.
                                 if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.Id, out var collidingFacade))

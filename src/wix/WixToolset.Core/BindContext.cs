@@ -18,7 +18,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IReadOnlyCollection<BindPath> BindPaths { get; set; }
+        public IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
         public string BurnStubPath { get; set; }
 

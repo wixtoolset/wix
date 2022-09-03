@@ -145,8 +145,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var mediaSymbol = patchMediaByDiskId[baselineSymbol.DiskId];
 
                 // Ensure that files are sequenced after the last file in any transform.
-                var transformMediaTable = mainTransform.Transform.Tables["Media"];
-                if (null != transformMediaTable && 0 < transformMediaTable.Rows.Count)
+                if (mainTransform.Transform.Tables.TryGetTable("Media", out var transformMediaTable))
                 {
                     foreach (MediaRow transformMediaRow in transformMediaTable.Rows)
                     {
@@ -370,16 +369,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (transform.TryGetTable(tableName, out var table))
                 {
-                    foreach (var row in table.Rows)
+                    foreach (var row in table.Rows.Where(r => r.Operation == RowOperation.Add))
                     {
-                        if (row.Operation == RowOperation.Add)
-                        {
-                            success = false;
+                        success = false;
 
-                            var primaryKey = row.GetPrimaryKey('/') ?? String.Empty;
+                        var primaryKey = row.GetPrimaryKey('/') ?? String.Empty;
 
-                            this.Messaging.Write(ErrorMessages.NewRowAddedInTable(row.SourceLineNumbers, productCode, table.Name, primaryKey));
-                        }
+                        this.Messaging.Write(ErrorMessages.NewRowAddedInTable(row.SourceLineNumbers, productCode, table.Name, primaryKey));
                     }
                 }
             }
@@ -925,7 +921,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 for (var i = 0; i < propertyTable.Rows.Count; ++i)
                 {
                     var propertyRow = propertyTable.Rows[i];
-                    var property = (string)propertyRow[0];
+                    var property = propertyRow.FieldAsString(0);
 
                     if ("ProductCode" == property)
                     {
@@ -1173,10 +1169,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 var pairedFileTable = pairedTransform.EnsureTable(mainFileTable.Definition);
 
-                foreach (FileRow mainFileRow in mainFileTable.Rows)
+                foreach (var mainFileRow in mainFileTable.Rows.Cast<FileRow>())
                 {
-                    // Set File.Sequence to non null to satisfy transform bind.
+                    // Set File.Sequence to non null to satisfy transform bind and suppress any
+                    // change to File.Sequence to avoid bloat.
                     mainFileRow.Sequence = 1;
+                    mainFileRow.Fields[7].Modified = false;
+
+                    // Override authored media to the media provided in the patch.
+                    mainFileRow.DiskId = mediaSymbol.DiskId;
 
                     // Delete's don't need rows in the paired transform.
                     if (mainFileRow.Operation == RowOperation.Delete)
@@ -1188,13 +1189,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     pairedFileRow.Operation = RowOperation.Modify;
                     mainFileRow.CopyTo(pairedFileRow);
 
-                    // Override authored media for patch bind.
-                    mainFileRow.DiskId = mediaSymbol.DiskId;
-
-                    // Suppress any change to File.Sequence to avoid bloat.
-                    mainFileRow.Fields[7].Modified = false;
-
-                    // Force File row to appear in the transform.
+                    // Force modified File rows to appear in the transform.
                     switch (mainFileRow.Operation)
                     {
                         case RowOperation.Modify:

@@ -6,8 +6,6 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Collections.Generic;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -15,21 +13,6 @@ namespace WixToolset.Core.ExtensibilityServices
     {
         public BackendHelper(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-        }
-
-        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly)
-        {
-            return new FileFacade(file, assembly);
-        }
-
-        public IFileFacade CreateFileFacade(FileRow fileRow)
-        {
-            return new FileFacade(fileRow);
-        }
-
-        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol)
-        {
-            return new FileFacade(true, fileSymbol);
         }
 
         public string CreateGuid()

@@ -21,12 +21,15 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
+            this.PathResolver = serviceProvider.GetService<IPathResolver>();
             this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
         }
 
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IPathResolver PathResolver { get; }
 
         private IExtensionManager ExtensionManager { get; }
 
@@ -39,8 +42,6 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         private string ExportBasePath { get; set; }
 
         private string IntermediateFolder { get; set; }
-
-        private bool IsAdminImage { get; set; }
 
         private bool PreserveUnchangedRows { get; set; }
 
@@ -133,10 +134,6 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 var parameter = argument.Substring(1);
                 switch (parameter.ToLowerInvariant())
                 {
-                    case "a":
-                        this.IsAdminImage = true;
-                        return true;
-
                     case "intermediatefolder":
                         this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
@@ -194,15 +191,15 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                         }
                     }
 
-                    case "val":
+                    case "t":
                     {
-                        var val = parser.GetNextArgumentOrError(argument);
-                        if (String.IsNullOrEmpty(val))
+                        var type = parser.GetNextArgumentOrError(argument);
+                        if (String.IsNullOrEmpty(type))
                         {
                             return true;
                         }
 
-                        switch (val.ToLowerInvariant())
+                        switch (type.ToLowerInvariant())
                         {
                             case "language":
                                 this.ValidationFlags |= TransformFlags.LanguageTransformDefault;
@@ -216,6 +213,22 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                                 this.ValidationFlags |= TransformFlags.PatchTransformDefault;
                                 return true;
 
+                            default:
+                                parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, type, new[] { "language", "instance", "patch" }));
+                                return true;
+                        }
+                    }
+
+                    case "val":
+                    {
+                        var val = parser.GetNextArgumentOrError(argument);
+                        if (String.IsNullOrEmpty(val))
+                        {
+                            return true;
+                        }
+
+                        switch (val.ToLowerInvariant())
+                        {
                             case "g":
                                 this.ValidationFlags |= TransformFlags.ValidateUpgradeCode;
                                 return true;
@@ -261,7 +274,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                                 return true;
 
                             default:
-                                parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, val, new[] { "language", "instance", "patch", "g", "l", "r", "s", "t", "u", "v", "w", "x", "y", "z" }));
+                                parser.ReportErrorArgument(argument, ErrorMessages.IllegalCommandLineArgumentValue(argument, val, new[] { "g", "l", "r", "s", "t", "u", "v", "w", "x", "y", "z" }));
                                 return true;
                         }
                     }
@@ -297,7 +310,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             {
                 Exception exception;
 
-                (transform, exception) = LoadWindowsInstallerDataSafely(this.TargetPath);
+                (transform, exception) = DataLoader.LoadWindowsInstallerDataSafely(this.TargetPath);
 
                 if (transform?.Type != OutputType.Transform)
                 {
@@ -340,17 +353,9 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
         private WindowsInstallerData CreateTransform()
         {
-            if (!TryLoadWindowsInstallerData(this.TargetPath, out var targetOutput))
-            {
-                var unbindCommand = new UnbindMsiOrMsmCommand(this.Messaging, this.BackendHelper, this.TargetPath, this.ExportBasePath, this.IntermediateFolder, this.IsAdminImage, suppressDemodularization: true, suppressExtractCabinets: true);
-                targetOutput = unbindCommand.Execute();
-            }
+            var targetData = this.GetWindowsInstallerData(this.TargetPath);
 
-            if (!TryLoadWindowsInstallerData(this.TargetPath, out var updatedOutput))
-            {
-                var unbindCommand = new UnbindMsiOrMsmCommand(this.Messaging, this.BackendHelper, this.UpdatedPath, this.ExportBasePath, this.IntermediateFolder, this.IsAdminImage, suppressDemodularization: true, suppressExtractCabinets: true);
-                updatedOutput = unbindCommand.Execute();
-            }
+            var updatedData = this.GetWindowsInstallerData(this.UpdatedPath);
 
             var differ = new Differ(this.Messaging)
             {
@@ -359,7 +364,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 SuppressKeepingSpecialRows = this.SuppressKeepingSpecialRows
             };
 
-            return differ.Diff(targetOutput, updatedOutput, this.ValidationFlags);
+            return differ.Diff(targetData, updatedData, this.ValidationFlags);
         }
 
         private TableDefinitionCollection GetTableDefinitions()
@@ -370,37 +375,15 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             return loadTableDefinitions.Execute();
         }
 
-        private static bool TryLoadWindowsInstallerData(string path, out WindowsInstallerData data)
+        private WindowsInstallerData GetWindowsInstallerData(string path)
         {
-            data = null;
-
-            var extension = Path.GetExtension(path);
-
-            // If the path is _not_ obviously a Windows Installer database, let's try opening it as
-            // our own data file format.
-            if (!extension.Equals(".msi", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".msm", StringComparison.OrdinalIgnoreCase))
+            if (!DataLoader.TryLoadWindowsInstallerData(path, out var data))
             {
-                (data, _) = LoadWindowsInstallerDataSafely(path);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, path, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                data = unbindCommand.Execute();
             }
 
-            return data != null;
-        }
-
-        private static (WindowsInstallerData, Exception) LoadWindowsInstallerDataSafely(string path)
-        {
-            WindowsInstallerData data = null;
-            Exception exception = null;
-
-            try
-            {
-                data = WindowsInstallerData.Load(path);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-
-            return (data, exception);
+            return data;
         }
     }
 }

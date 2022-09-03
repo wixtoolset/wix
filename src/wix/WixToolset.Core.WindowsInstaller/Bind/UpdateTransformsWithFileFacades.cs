@@ -4,6 +4,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -14,10 +15,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class UpdateTransformsWithFileFacades
     {
-        public UpdateTransformsWithFileFacades(IMessaging messaging, WindowsInstallerData output, IEnumerable<SubStorage> subStorages, TableDefinitionCollection tableDefinitions, IEnumerable<IFileFacade> fileFacades)
+        public UpdateTransformsWithFileFacades(IMessaging messaging, IntermediateSection section, IEnumerable<SubStorage> subStorages, TableDefinitionCollection tableDefinitions, IEnumerable<IFileFacade> fileFacades)
         {
             this.Messaging = messaging;
-            this.Output = output;
+            this.Section = section;
             this.SubStorages = subStorages;
             this.TableDefinitions = tableDefinitions;
             this.FileFacades = fileFacades;
@@ -25,7 +26,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IMessaging Messaging { get; }
 
-        private WindowsInstallerData Output { get; }
+        private IntermediateSection Section { get; }
 
         private IEnumerable<SubStorage> SubStorages { get; }
 
@@ -34,6 +35,214 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IEnumerable<IFileFacade> FileFacades { get; }
 
         public void Execute()
+        {
+            var fileFacadesByDiskId = this.IndexFileFacadesByDiskId();
+
+            var mediaSymbolsByDiskId = this.Section.Symbols.OfType<MediaSymbol>().ToDictionary(m => m.DiskId);
+
+            // Index paired transforms by name without the "#" prefix.
+            var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)).ToDictionary(s => s.Name, s => s.Data);
+
+            foreach (var substorage in this.SubStorages.Where(s => !s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)))
+            {
+                var mainTransform = substorage.Data;
+
+                var pairedTransform = pairedTransforms[PatchConstants.PairedPatchTransformPrefix + substorage.Name];
+
+                // Update the Media.LastSequence in the paired transforms.
+                foreach (var pairedMediaRow in pairedTransform.Tables["Media"].Rows.Cast<MediaRow>())
+                {
+                    if (mediaSymbolsByDiskId.TryGetValue(pairedMediaRow.DiskId, out var mediaSymbol) && mediaSymbol.LastSequence.HasValue)
+                    {
+                        pairedMediaRow.LastSequence = mediaSymbol.LastSequence.Value;
+                    }
+                    else // TODO: This shouldn't be possible.
+                    {
+                        throw new InvalidDataException();
+                    }
+                }
+
+                // Validate file row changes for keypath-related issues
+                this.ValidateFileRowChanges(mainTransform);
+
+                // Copy File bind data into transforms
+                if (mainTransform.Tables.TryGetTable("File", out var mainFileTable))
+                {
+                    // Index File table of pairedTransform
+                    var pairedFileRows = new RowDictionary<FileRow>(pairedTransform.Tables["File"]);
+
+                    var mainMsiFileHashIndex = new RowDictionary<Row>(mainTransform.Tables["MsiFileHash"]);
+
+                    // Remove the MsiFileHash table because it will be updated later with the final file hash for each file
+                    mainTransform.Tables.Remove("MsiFileHash");
+
+                    foreach (var mainFileRow in mainFileTable.Rows.Where(r => r.Operation == RowOperation.Add || r.Operation == RowOperation.Modify).Cast<FileRow>())
+                    {
+                        // TODO: Wasn't this indexing done at the top of this method?
+                        // Index main transform files by diskId+fileId
+                        if (!fileFacadesByDiskId.TryGetValue(mainFileRow.DiskId, out var mediaFacades))
+                        {
+                            mediaFacades = new Dictionary<string, IFileFacade>();
+                            fileFacadesByDiskId.Add(mainFileRow.DiskId, mediaFacades);
+                        }
+
+                        // Copy data from the facade back to the appropriate transform.
+                        if (mediaFacades.TryGetValue(mainFileRow.File, out var facade))
+                        {
+                            var pairedFileRow = pairedFileRows.Get(mainFileRow.File);
+
+                            TryModifyField(mainFileRow, 3, facade.FileSize);
+
+                            TryModifyField(mainFileRow, 4, facade.Version);
+
+                            TryModifyField(mainFileRow, 5, facade.Language);
+
+#if TODO_PATCHING_DELTA
+                            // File.Attribute should not change for binary deltas, otherwise copy File Attributes from main transform row.
+                            if (null != facade.Patch)
+#endif
+                            {
+                                TryModifyField(pairedFileRow, 6, mainFileRow.Attributes);
+                                mainFileRow.Fields[6].Modified = false;
+                            }
+
+#if TODO_PATCHING_DELTA
+                            // File.Sequence is updated in Patch table instead of File table for delta patches
+                            if (null != facade.Patch)
+                            {
+                                pairedFileRow.Fields[7].Modified = false;
+                            }
+                            else
+#endif
+                            {
+                                // File.Sequence is updated in pairedTransform, not mainTransform.
+                                TryModifyField(pairedFileRow, 7, facade.Sequence);
+                            }
+                            mainFileRow.Fields[7].Modified = false;
+
+                            this.ProcessMsiFileHash(mainTransform, mainFileRow, facade.MsiFileHashSymbol, mainMsiFileHashIndex);
+
+                            this.ProcessMsiAssemblyName(mainTransform, mainFileRow, facade);
+
+#if TODO_PATCHING_DELTA
+                            // Add patch header for this file
+                            if (null != facade.Patch)
+                            {
+                                // Add the PatchFiles action automatically to the AdminExecuteSequence and InstallExecuteSequence tables.
+                                this.AddPatchFilesActionToSequenceTable(SequenceTable.AdminExecuteSequence, mainTransform, pairedTransform, mainFileRow);
+                                this.AddPatchFilesActionToSequenceTable(SequenceTable.InstallExecuteSequence, mainTransform, pairedTransform, mainFileRow);
+
+                                // Add to Patch table
+                                var patchTable = pairedTransform.EnsureTable(this.TableDefinitions["Patch"]);
+                                if (0 == patchTable.Rows.Count)
+                                {
+                                    patchTable.Operation = TableOperation.Add;
+                                }
+
+                                var patchRow = patchTable.CreateRow(mainFileRow.SourceLineNumbers);
+                                patchRow[0] = facade.File;
+                                patchRow[1] = facade.Sequence;
+
+                                var patchFile = new FileInfo(facade.Source);
+                                patchRow[2] = (int)patchFile.Length;
+                                patchRow[3] = 0 == (PatchAttributeType.AllowIgnoreOnError & facade.PatchAttributes) ? 0 : 1;
+
+                                var streamName = patchTable.Name + "." + patchRow[0] + "." + patchRow[1];
+                                if (Msi.MsiInterop.MsiMaxStreamNameLength < streamName.Length)
+                                {
+                                    streamName = "_" + Guid.NewGuid().ToString("D").ToUpperInvariant().Replace('-', '_');
+
+                                    var patchHeadersTable = pairedTransform.EnsureTable(this.TableDefinitions["MsiPatchHeaders"]);
+                                    if (0 == patchHeadersTable.Rows.Count)
+                                    {
+                                        patchHeadersTable.Operation = TableOperation.Add;
+                                    }
+
+                                    var patchHeadersRow = patchHeadersTable.CreateRow(mainFileRow.SourceLineNumbers);
+                                    patchHeadersRow[0] = streamName;
+                                    patchHeadersRow[1] = facade.Patch;
+                                    patchRow[5] = streamName;
+                                    patchHeadersRow.Operation = RowOperation.Add;
+                                }
+                                else
+                                {
+                                    patchRow[4] = facade.Patch;
+                                }
+                                patchRow.Operation = RowOperation.Add;
+                            }
+#endif
+                        }
+                        else
+                        {
+                            // TODO: throw because all transform rows should have made it into the patch
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ProcessMsiFileHash(WindowsInstallerData transform, FileRow fileRow, MsiFileHashSymbol msiFileHashSymbol, RowDictionary<Row> msiFileHashIndex)
+        {
+            Row msiFileHashRow = null;
+
+            if (msiFileHashSymbol != null || msiFileHashIndex.TryGetValue(fileRow.File, out msiFileHashRow))
+            {
+                var sourceLineNumbers = msiFileHashSymbol?.SourceLineNumbers ?? msiFileHashRow?.SourceLineNumbers;
+
+                var transformHashTable = transform.EnsureTable(this.TableDefinitions["MsiFileHash"]);
+
+                var transformHashRow = transformHashTable.CreateRow(sourceLineNumbers);
+                transformHashRow.Operation = fileRow.Operation; // Assume the MsiFileHash operation follows the File one.
+
+                transformHashRow[0] = fileRow.File;
+                transformHashRow[1] = msiFileHashSymbol?.Options ?? msiFileHashRow?.Fields[1].Data;
+
+                // Assume all hash fields have been modified.
+                TryModifyField(transformHashRow, 2, msiFileHashSymbol?.HashPart1 ?? msiFileHashRow?.Fields[2].Data);
+                TryModifyField(transformHashRow, 3, msiFileHashSymbol?.HashPart2 ?? msiFileHashRow?.Fields[3].Data);
+                TryModifyField(transformHashRow, 4, msiFileHashSymbol?.HashPart3 ?? msiFileHashRow?.Fields[4].Data);
+                TryModifyField(transformHashRow, 5, msiFileHashSymbol?.HashPart4 ?? msiFileHashRow?.Fields[5].Data);
+            }
+        }
+
+        private void ProcessMsiAssemblyName(WindowsInstallerData transform, FileRow fileRow, IFileFacade facade)
+        {
+            if (facade.AssemblyNameSymbols.Count > 0)
+            {
+                var assemblyNameTable = transform.EnsureTable(this.TableDefinitions["MsiAssemblyName"]);
+
+                foreach (var assemblyNameSymbol in facade.AssemblyNameSymbols)
+                {
+                    // Copy if there isn't an identical modified/added row already in the transform.
+                    var foundMatchingModifiedRow = false;
+                    foreach (var mainAssemblyNameRow in assemblyNameTable.Rows.Where(r => r.Operation != RowOperation.None))
+                    {
+                        var component = mainAssemblyNameRow.FieldAsString(0);
+                        var name = mainAssemblyNameRow.FieldAsString(1);
+
+                        if (assemblyNameSymbol.ComponentRef == component && assemblyNameSymbol.Name == name)
+                        {
+                            foundMatchingModifiedRow = true;
+                            break;
+                        }
+                    }
+
+                    if (!foundMatchingModifiedRow)
+                    {
+                        var assemblyNameRow = assemblyNameTable.CreateRow(fileRow.SourceLineNumbers);
+                        assemblyNameRow[0] = assemblyNameSymbol.ComponentRef;
+                        assemblyNameRow[1] = assemblyNameSymbol.Name;
+                        assemblyNameRow[2] = assemblyNameSymbol.Value;
+
+                        // assume value field has been modified
+                        assemblyNameRow.Fields[2].Modified = true;
+                        assemblyNameRow.Operation = fileRow.Operation;
+                    }
+                }
+            }
+        }
+
+        private Dictionary<int, Dictionary<string, IFileFacade>> IndexFileFacadesByDiskId()
         {
             var fileFacadesByDiskId = new Dictionary<int, Dictionary<string, IFileFacade>>();
 
@@ -49,233 +258,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 mediaFacades.Add(facade.Id, facade);
             }
 
-            var patchMediaRows = new RowDictionary<MediaRow>(this.Output.Tables["Media"]);
-
-            // Index paired transforms by name without the "#" prefix.
-            var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)).ToDictionary(s => s.Name, s => s.Data);
-
-            // Copy File bind data into substorages
-            foreach (var substorage in this.SubStorages.Where(s => !s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)))
-            {
-                var mainTransform = substorage.Data;
-
-                var mainMsiFileHashIndex = new RowDictionary<Row>(mainTransform.Tables["MsiFileHash"]);
-
-                var pairedTransform = pairedTransforms[PatchConstants.PairedPatchTransformPrefix + substorage.Name];
-
-                // Copy Media.LastSequence.
-                var pairedMediaTable = pairedTransform.Tables["Media"];
-                foreach (MediaRow pairedMediaRow in pairedMediaTable.Rows)
-                {
-                    var patchMediaRow = patchMediaRows.Get(pairedMediaRow.DiskId);
-                    pairedMediaRow.LastSequence = patchMediaRow.LastSequence;
-                }
-
-                // Validate file row changes for keypath-related issues
-                this.ValidateFileRowChanges(mainTransform);
-
-                // Index File table of pairedTransform
-                var pairedFileRows = new RowDictionary<FileRow>(pairedTransform.Tables["File"]);
-
-                var mainFileTable = mainTransform.Tables["File"];
-                if (null != mainFileTable)
-                {
-                    // Remove the MsiFileHash table because it will be updated later with the final file hash for each file
-                    mainTransform.Tables.Remove("MsiFileHash");
-
-                    foreach (FileRow mainFileRow in mainFileTable.Rows)
-                    {
-                        if (RowOperation.Delete == mainFileRow.Operation)
-                        {
-                            continue;
-                        }
-                        else if (RowOperation.None == mainFileRow.Operation)
-                        {
-                            continue;
-                        }
-
-                        // Index patch files by diskId+fileId
-                        if (!fileFacadesByDiskId.TryGetValue(mainFileRow.DiskId, out var mediaFacades))
-                        {
-                            mediaFacades = new Dictionary<string, IFileFacade>();
-                            fileFacadesByDiskId.Add(mainFileRow.DiskId, mediaFacades);
-                        }
-
-                        // copy data from the patch back to the transform
-                        if (mediaFacades.TryGetValue(mainFileRow.File, out var facade))
-                        {
-                            var patchFileRow = facade.GetFileRow();
-                            var pairedFileRow = pairedFileRows.Get(mainFileRow.File);
-
-                            for (var i = 0; i < patchFileRow.Fields.Length; i++)
-                            {
-                                var patchValue = patchFileRow.FieldAsString(i) ?? String.Empty;
-                                var mainValue = mainFileRow.FieldAsString(i) ?? String.Empty;
-
-                                if (1 == i)
-                                {
-                                    // File.Component_ changes should not come from the shared file rows
-                                    // that contain the file information as each individual transform might
-                                    // have different changes (or no changes at all).
-                                }
-                                else if (6 == i) // File.Attributes should not changed for binary deltas
-                                {
-#if TODO_PATCHING_DELTA
-                                    if (null != patchFileRow.Patch)
-                                    {
-                                        // File.Attribute should not change for binary deltas
-                                        pairedFileRow.Attributes = mainFileRow.Attributes;
-                                        mainFileRow.Fields[i].Modified = false;
-                                    }
-#endif
-                                }
-                                else if (7 == i) // File.Sequence is updated in pairedTransform, not mainTransform
-                                {
-                                    // file sequence is updated in Patch table instead of File table for delta patches
-#if TODO_PATCHING_DELTA
-                                    if (null != patchFileRow.Patch)
-                                    {
-                                        pairedFileRow.Fields[i].Modified = false;
-                                    }
-                                    else
-#endif
-                                    {
-                                        pairedFileRow[i] = patchFileRow[i];
-                                        pairedFileRow.Fields[i].Modified = true;
-                                    }
-                                    mainFileRow.Fields[i].Modified = false;
-                                }
-                                else if (patchValue != mainValue)
-                                {
-                                    mainFileRow[i] = patchFileRow[i];
-                                    mainFileRow.Fields[i].Modified = true;
-                                    if (mainFileRow.Operation == RowOperation.None)
-                                    {
-                                        mainFileRow.Operation = RowOperation.Modify;
-                                    }
-                                }
-                            }
-
-                            // Copy MsiFileHash row for this File.
-                            if (!mainMsiFileHashIndex.TryGetValue(patchFileRow.File, out var patchHashRow))
-                            {
-                                //patchHashRow = patchFileRow.Hash;
-                                throw new NotImplementedException();
-                            }
-
-                            if (null != patchHashRow)
-                            {
-                                var mainHashTable = mainTransform.EnsureTable(this.TableDefinitions["MsiFileHash"]);
-                                var mainHashRow = mainHashTable.CreateRow(mainFileRow.SourceLineNumbers);
-                                for (var i = 0; i < patchHashRow.Fields.Length; i++)
-                                {
-                                    mainHashRow[i] = patchHashRow[i];
-                                    if (i > 1)
-                                    {
-                                        // assume all hash fields have been modified
-                                        mainHashRow.Fields[i].Modified = true;
-                                    }
-                                }
-
-                                // assume the MsiFileHash operation follows the File one
-                                mainHashRow.Operation = mainFileRow.Operation;
-                            }
-
-                            // copy MsiAssemblyName rows for this File
-#if TODO_PATCHING
-                            List<Row> patchAssemblyNameRows = patchFileRow.AssemblyNames;
-                            if (null != patchAssemblyNameRows)
-                            {
-                                var mainAssemblyNameTable = mainTransform.EnsureTable(this.TableDefinitions["MsiAssemblyName"]);
-                                foreach (var patchAssemblyNameRow in patchAssemblyNameRows)
-                                {
-                                    // Copy if there isn't an identical modified/added row already in the transform.
-                                    var foundMatchingModifiedRow = false;
-                                    foreach (var mainAssemblyNameRow in mainAssemblyNameTable.Rows)
-                                    {
-                                        if (RowOperation.None != mainAssemblyNameRow.Operation && mainAssemblyNameRow.GetPrimaryKey('/').Equals(patchAssemblyNameRow.GetPrimaryKey('/')))
-                                        {
-                                            foundMatchingModifiedRow = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!foundMatchingModifiedRow)
-                                    {
-                                        var mainAssemblyNameRow = mainAssemblyNameTable.CreateRow(mainFileRow.SourceLineNumbers);
-                                        for (var i = 0; i < patchAssemblyNameRow.Fields.Length; i++)
-                                        {
-                                            mainAssemblyNameRow[i] = patchAssemblyNameRow[i];
-                                        }
-
-                                        // assume value field has been modified
-                                        mainAssemblyNameRow.Fields[2].Modified = true;
-                                        mainAssemblyNameRow.Operation = mainFileRow.Operation;
-                                    }
-                                }
-                            }
-#endif
-
-                            // Add patch header for this file
-#if TODO_PATCHING_DELTA
-                            if (null != patchFileRow.Patch)
-                            {
-                                // Add the PatchFiles action automatically to the AdminExecuteSequence and InstallExecuteSequence tables.
-                                this.AddPatchFilesActionToSequenceTable(SequenceTable.AdminExecuteSequence, mainTransform, pairedTransform, mainFileRow);
-                                this.AddPatchFilesActionToSequenceTable(SequenceTable.InstallExecuteSequence, mainTransform, pairedTransform, mainFileRow);
-
-                                // Add to Patch table
-                                var patchTable = pairedTransform.EnsureTable(this.TableDefinitions["Patch"]);
-                                if (0 == patchTable.Rows.Count)
-                                {
-                                    patchTable.Operation = TableOperation.Add;
-                                }
-
-                                var patchRow = patchTable.CreateRow(mainFileRow.SourceLineNumbers);
-                                patchRow[0] = patchFileRow.File;
-                                patchRow[1] = patchFileRow.Sequence;
-
-                                var patchFile = new FileInfo(patchFileRow.Source);
-                                patchRow[2] = (int)patchFile.Length;
-                                patchRow[3] = 0 == (PatchAttributeType.AllowIgnoreOnError & patchFileRow.PatchAttributes) ? 0 : 1;
-
-                                var streamName = patchTable.Name + "." + patchRow[0] + "." + patchRow[1];
-                                if (Msi.MsiInterop.MsiMaxStreamNameLength < streamName.Length)
-                                {
-                                    streamName = "_" + Guid.NewGuid().ToString("D").ToUpperInvariant().Replace('-', '_');
-
-                                    var patchHeadersTable = pairedTransform.EnsureTable(this.TableDefinitions["MsiPatchHeaders"]);
-                                    if (0 == patchHeadersTable.Rows.Count)
-                                    {
-                                        patchHeadersTable.Operation = TableOperation.Add;
-                                    }
-
-                                    var patchHeadersRow = patchHeadersTable.CreateRow(mainFileRow.SourceLineNumbers);
-                                    patchHeadersRow[0] = streamName;
-                                    patchHeadersRow[1] = patchFileRow.Patch;
-                                    patchRow[5] = streamName;
-                                    patchHeadersRow.Operation = RowOperation.Add;
-                                }
-                                else
-                                {
-                                    patchRow[4] = patchFileRow.Patch;
-                                }
-                                patchRow.Operation = RowOperation.Add;
-                            }
-#endif
-                        }
-                        else
-                        {
-                            // TODO: throw because all transform rows should have made it into the patch
-                        }
-                    }
-                }
-
-                this.Output.Tables.Remove("Media");
-                this.Output.Tables.Remove("File");
-                this.Output.Tables.Remove("MsiFileHash");
-                this.Output.Tables.Remove("MsiAssemblyName");
-            }
+            return fileFacadesByDiskId;
         }
 
         /// <summary>
@@ -349,6 +332,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
+        private static bool TryModifyField(Row row, int index, object value)
+        {
+            var field = row.Fields[index];
+
+            if (field.Data != value)
+            {
+                field.Data = value;
+                field.Modified = true;
+
+                if (row.Operation == RowOperation.None)
+                {
+                    row.Operation = RowOperation.Modify;
+                }
+            }
+
+            return field.Modified;
+        }
+
         /// <summary>
         /// Tests sequence table for PatchFiles and associated actions
         /// </summary>
@@ -396,33 +397,29 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            var componentKeyPath = new Dictionary<string, string>(componentTable.Rows.Count);
-
             // Index the Component table for non-directory & non-registry key paths.
-            foreach (var row in componentTable.Rows)
+            var componentKeyPath = new Dictionary<string, string>();
+            foreach (var row in componentTable.Rows.Cast<ComponentRow>().Where(r => !r.IsRegistryKeyPath))
             {
-                var keyPath = row.FieldAsString(5);
-                if (keyPath != null && 0 != (row.FieldAsInteger(3) & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath))
+                var keyPath = row.KeyPath;
+
+                if (!String.IsNullOrEmpty(keyPath))
                 {
-                    componentKeyPath.Add(row.FieldAsString(0), keyPath);
+                    componentKeyPath.Add(row.Component, keyPath);
                 }
             }
 
             var componentWithChangedKeyPath = new Dictionary<string, string>();
             var componentWithNonKeyPathChanged = new Dictionary<string, string>();
-            // Verify changes in the file table, now that file diffing has occurred
-            foreach (FileRow row in fileTable.Rows)
-            {
-                if (RowOperation.Modify != row.Operation)
-                {
-                    continue;
-                }
 
-                var fileId = row.FieldAsString(0);
-                var componentId = row.FieldAsString(1);
+            // Verify changes in the file table, now that file diffing has occurred
+            foreach (var row in fileTable.Rows.Cast<FileRow>().Where(r => r.Operation == RowOperation.Modify))
+            {
+                var fileId = row.File;
+                var componentId = row.Component;
 
                 // If this file is the keypath of a component
-                if (componentKeyPath.ContainsValue(fileId))
+                if (componentKeyPath.ContainsValue(componentId))
                 {
                     if (!componentWithChangedKeyPath.ContainsKey(componentId))
                     {

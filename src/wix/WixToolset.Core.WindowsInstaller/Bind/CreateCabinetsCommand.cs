@@ -95,6 +95,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var cabinetBuilder = new CabinetBuilder(this.Messaging, this.CabbingThreadCount, maximumCabinetSizeForLargeFileSplitting, maximumUncompressedMediaSize);
 
+            var hashesByFileId = this.Section.Symbols.OfType<MsiFileHashSymbol>().ToDictionary(s => s.Id.Id);
+
             foreach (var entry in this.FileFacadesByCabinet)
             {
                 var mediaSymbol = entry.Key;
@@ -102,7 +104,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var compressionLevel = mediaSymbol.CompressionLevel ?? this.DefaultCompressionLevel ?? CompressionLevel.Medium;
                 var cabinetDir = this.ResolveMedia(mediaSymbol, mediaSymbol.Layout, this.LayoutDirectory);
 
-                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Data, cabinetDir, mediaSymbol, compressionLevel, files);
+                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Data, cabinetDir, mediaSymbol, compressionLevel, files, hashesByFileId);
                 if (null != cabinetWorkItem)
                 {
                     cabinetBuilder.Enqueue(cabinetWorkItem);
@@ -140,16 +142,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return cabbingThreadCount;
         }
 
-        /// <summary>
-        /// Creates a work item to create a cabinet.
-        /// </summary>
-        /// <param name="data">Windows Installer data for the current database.</param>
-        /// <param name="cabinetDir">Directory to create cabinet in.</param>
-        /// <param name="mediaSymbol">Media symbol containing information about the cabinet.</param>
-        /// <param name="compressionLevel">Desired compression level.</param>
-        /// <param name="fileFacades">Collection of files in this cabinet.</param>
-        /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData data, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<IFileFacade> fileFacades)
+        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData data, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<IFileFacade> fileFacades, Dictionary<string, MsiFileHashSymbol> hashesByFileId)
         {
             CabinetWorkItem cabinetWorkItem = null;
 
@@ -171,7 +164,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (CabinetBuildOption.BuildAndCopy == resolvedCabinet.BuildOption || CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption)
             {
                 // Default to the threshold for best smartcabbing (makes smallest cabinet).
-                cabinetWorkItem = new CabinetWorkItem(mediaSymbol.SourceLineNumbers, mediaSymbol.DiskId, resolvedCabinet.Path, fileFacades, maxThreshold: 0, compressionLevel: compressionLevel, modularizationSuffix: this.ModularizationSuffix);
+                cabinetWorkItem = new CabinetWorkItem(mediaSymbol.SourceLineNumbers, mediaSymbol.DiskId, resolvedCabinet.Path, fileFacades, hashesByFileId, maxThreshold: 0, compressionLevel: compressionLevel, modularizationSuffix: this.ModularizationSuffix);
             }
             else // reuse the cabinet from the cabinet cache.
             {

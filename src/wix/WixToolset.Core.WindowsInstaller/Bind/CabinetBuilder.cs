@@ -169,18 +169,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
+            // Calculate the files to be compressed into the cabinet.
+            var compressFiles = new List<CabinetCompressFile>();
+
+            foreach (var facade in cabinetWorkItem.FileFacades.OrderBy(f => f.Sequence))
+            {
+                var modularizedId = facade.Id + cabinetWorkItem.ModularizationSuffix;
+
+                var compressFile = cabinetWorkItem.HashesByFileId.TryGetValue(facade.Id, out var hash) ?
+                    new CabinetCompressFile(facade.SourcePath, modularizedId, hash.HashPart1, hash.HashPart2, hash.HashPart3, hash.HashPart4) :
+                    new CabinetCompressFile(facade.SourcePath, modularizedId);
+
+                compressFiles.Add(compressFile);
+            }
+
             // create the cabinet file
             var cabinetPath = Path.GetFullPath(cabinetWorkItem.CabinetFile);
-
-            var files = cabinetWorkItem.FileFacades
-                .OrderBy(f => f.Sequence)
-                .Select(facade => facade.Hash == null ?
-                    new CabinetCompressFile(facade.SourcePath, facade.Id + cabinetWorkItem.ModularizationSuffix) :
-                    new CabinetCompressFile(facade.SourcePath, facade.Id + cabinetWorkItem.ModularizationSuffix, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
-                .ToList();
-
             var cab = new Cabinet(cabinetPath);
-            var created = cab.Compress(files, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
+            var created = cab.Compress(compressFiles, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
 
             // Best effort check to see if the cabinet is too large for the Windows Installer.
             try

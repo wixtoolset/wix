@@ -19,11 +19,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
-        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IFileFacade> fileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
+        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IFileFacade> allFileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
         {
             this.Messaging = messaging;
             this.Section = section;
-            this.FileFacades = fileFacades;
+            this.AllFileFacades = allFileFacades;
             this.UpdateFileFacades = updateFileFacades;
             this.VariableCache = variableCache;
             this.OverwriteHash = overwriteHash;
@@ -33,7 +33,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IntermediateSection Section { get; }
 
-        private IEnumerable<IFileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> AllFileFacades { get; }
 
         private IEnumerable<IFileFacade> UpdateFileFacades { get; }
 
@@ -43,15 +43,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
+            var assemblySymbols = this.Section.Symbols.OfType<AssemblySymbol>().ToDictionary(t => t.Id.Id);
             var assemblyNameSymbols = this.Section.Symbols.OfType<MsiAssemblyNameSymbol>().ToDictionary(t => t.Id.Id);
 
             foreach (var file in this.UpdateFileFacades.Where(f => f.SourcePath != null))
             {
-                this.UpdateFileFacade(file, assemblyNameSymbols);
+                this.UpdateFileFacade(file, assemblySymbols, assemblyNameSymbols);
             }
         }
 
-        private void UpdateFileFacade(IFileFacade facade, Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols)
+        private void UpdateFileFacade(IFileFacade facade, Dictionary<string, AssemblySymbol> assemblySymbols, Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols)
         {
             FileInfo fileInfo = null;
             try
@@ -124,7 +125,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     //
                     // Also, if we do not find a matching file identifier then the user provided a default version and is providing a version
                     // for unversioned file. That's allowed but generally a dangerous thing to do so let's point that out to the user.
-                    if (!this.FileFacades.Any(r => facade.Version.Equals(r.Id, StringComparison.Ordinal)))
+                    if (!this.AllFileFacades.Any(r => facade.Version.Equals(r.Id, StringComparison.Ordinal)))
                     {
                         this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(facade.SourceLineNumber, facade.Version, facade.Id));
                     }
@@ -153,16 +154,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                     }
 
-                    if (null == facade.Hash)
+                    // Remember the hash symbol for use later.
+                    facade.MsiFileHashSymbol = new MsiFileHashSymbol(facade.SourceLineNumber, facade.Identifier)
                     {
-                        facade.Hash = this.Section.AddSymbol(new MsiFileHashSymbol(facade.SourceLineNumber, facade.Identifier));
-                    }
-
-                    facade.Hash.Options = 0;
-                    facade.Hash.HashPart1 = hash[0];
-                    facade.Hash.HashPart2 = hash[1];
-                    facade.Hash.HashPart3 = hash[2];
-                    facade.Hash.HashPart4 = hash[3];
+                        Options = 0,
+                        HashPart1 = hash[0],
+                        HashPart2 = hash[1],
+                        HashPart3 = hash[2],
+                        HashPart4 = hash[3],
+                    };
                 }
             }
             else // update the file row with the version and language information.
@@ -173,7 +173,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     facade.Version = version;
                 }
-                else if (!this.FileFacades.Any(r => facade.Version.Equals(r.Id, StringComparison.Ordinal))) // this looks expensive, but see explanation below.
+                else if (!this.AllFileFacades.Any(r => facade.Version.Equals(r.Id, StringComparison.Ordinal))) // this looks expensive, but see explanation below.
                 {
                     // The user provided a default version for the file row so we looked for a companion file (a file row with Id matching
                     // the version value). We didn't find it so, we will override the default version they provided with the actual
@@ -204,108 +204,104 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.VariableCache[$"filelanguage.{facade.Id}"] = facade.Language ?? String.Empty;
             }
 
-            // If this is a CLR assembly, load the assembly and get the assembly name information
-            if (AssemblyType.DotNetAssembly == facade.AssemblyType)
+            // If there is an assembly for this file.
+            if (assemblySymbols.TryGetValue(facade.Id, out var assemblySymbol))
             {
-                try
+                // If this is a CLR assembly, load the assembly and get the assembly name information
+                if (AssemblyType.DotNetAssembly == assemblySymbol.Type)
                 {
-                    var assemblyName = AssemblyNameReader.ReadAssembly(facade.SourceLineNumber, fileInfo.FullName, version);
-
-                    this.SetMsiAssemblyName(assemblyNameSymbols, facade, "name", assemblyName.Name);
-                    this.SetMsiAssemblyName(assemblyNameSymbols, facade, "culture", assemblyName.Culture);
-                    this.SetMsiAssemblyName(assemblyNameSymbols, facade, "version", assemblyName.Version);
-
-                    if (!String.IsNullOrEmpty(assemblyName.Architecture))
+                    try
                     {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "processorArchitecture", assemblyName.Architecture);
+                        var assemblyName = AssemblyNameReader.ReadAssembly(facade.SourceLineNumber, fileInfo.FullName, version);
+
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "name", assemblyName.Name);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "culture", assemblyName.Culture);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "version", assemblyName.Version);
+
+                        if (!String.IsNullOrEmpty(assemblyName.Architecture))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "processorArchitecture", assemblyName.Architecture);
+                        }
+                        // TODO: WiX v3 seemed to do this but not clear it should actually be done.
+                        //else if (!String.IsNullOrEmpty(file.WixFile.ProcessorArchitecture))
+                        //{
+                        //    this.SetMsiAssemblyName(assemblyNameSymbols, file, "processorArchitecture", file.WixFile.ProcessorArchitecture);
+                        //}
+
+                        if (assemblyName.StrongNamedSigned)
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "publicKeyToken", assemblyName.PublicKeyToken);
+                        }
+                        else if (assemblySymbol.ApplicationFileRef == null)
+                        {
+                            throw new WixException(ErrorMessages.GacAssemblyNoStrongName(facade.SourceLineNumber, fileInfo.FullName, facade.ComponentRef));
+                        }
+
+                        if (!String.IsNullOrEmpty(assemblyName.FileVersion))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "fileVersion", assemblyName.FileVersion);
+                        }
+
+                        // add the assembly name to the information cache
+                        if (null != this.VariableCache)
+                        {
+                            this.VariableCache[$"assemblyfullname.{facade.Id}"] = assemblyName.GetFullName();
+                        }
                     }
-                    // TODO: WiX v3 seemed to do this but not clear it should actually be done.
-                    //else if (!String.IsNullOrEmpty(file.WixFile.ProcessorArchitecture))
-                    //{
-                    //    this.SetMsiAssemblyName(assemblyNameSymbols, file, "processorArchitecture", file.WixFile.ProcessorArchitecture);
-                    //}
-
-                    if (assemblyName.StrongNamedSigned)
+                    catch (WixException e)
                     {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "publicKeyToken", assemblyName.PublicKeyToken);
-                    }
-                    else if (facade.AssemblyApplicationFileRef == null)
-                    {
-                        throw new WixException(ErrorMessages.GacAssemblyNoStrongName(facade.SourceLineNumber, fileInfo.FullName, facade.ComponentRef));
-                    }
-
-                    if (!String.IsNullOrEmpty(assemblyName.FileVersion))
-                    {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "fileVersion", assemblyName.FileVersion);
-                    }
-
-                    // add the assembly name to the information cache
-                    if (null != this.VariableCache)
-                    {
-                        this.VariableCache[$"assemblyfullname.{facade.Id}"] = assemblyName.GetFullName();
+                        this.Messaging.Write(e.Error);
                     }
                 }
-                catch (WixException e)
+                else if (AssemblyType.Win32Assembly == assemblySymbol.Type)
                 {
-                    this.Messaging.Write(e.Error);
-                }
-            }
-            else if (AssemblyType.Win32Assembly == facade.AssemblyType)
-            {
-                // TODO: Consider passing in the this.FileFacades as an indexed collection instead of searching through
-                // all files like this. Even though this is a rare case it looks like we might be able to index the
-                // file earlier.
-                var fileManifest = this.FileFacades.FirstOrDefault(r => r.Id.Equals(facade.AssemblyManifestFileRef, StringComparison.Ordinal));
-                if (null == fileManifest)
-                {
-                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(facade.SourceLineNumber, facade.Id, facade.AssemblyManifestFileRef));
-                }
-
-                try
-                {
-                    var assemblyName = AssemblyNameReader.ReadAssemblyManifest(facade.SourceLineNumber, fileManifest.SourcePath);
-
-                    if (!String.IsNullOrEmpty(assemblyName.Name))
+                    // TODO: Consider passing in the this.AllFileFacades as an indexed collection instead of searching through
+                    // all files like this. Even though this is a rare case it looks like we might be able to index the
+                    // file earlier.
+                    var fileManifest = this.AllFileFacades.FirstOrDefault(r => r.Id.Equals(assemblySymbol.ManifestFileRef, StringComparison.Ordinal));
+                    if (null == fileManifest)
                     {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "name", assemblyName.Name);
+                        this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(facade.SourceLineNumber, facade.Id, assemblySymbol.ManifestFileRef));
                     }
 
-                    if (!String.IsNullOrEmpty(assemblyName.Version))
+                    try
                     {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "version", assemblyName.Version);
-                    }
+                        var assemblyName = AssemblyNameReader.ReadAssemblyManifest(facade.SourceLineNumber, fileManifest.SourcePath);
 
-                    if (!String.IsNullOrEmpty(assemblyName.Type))
-                    {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "type", assemblyName.Type);
-                    }
+                        if (!String.IsNullOrEmpty(assemblyName.Name))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "name", assemblyName.Name);
+                        }
 
-                    if (!String.IsNullOrEmpty(assemblyName.Architecture))
-                    {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "processorArchitecture", assemblyName.Architecture);
-                    }
+                        if (!String.IsNullOrEmpty(assemblyName.Version))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "version", assemblyName.Version);
+                        }
 
-                    if (!String.IsNullOrEmpty(assemblyName.PublicKeyToken))
-                    {
-                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "publicKeyToken", assemblyName.PublicKeyToken);
+                        if (!String.IsNullOrEmpty(assemblyName.Type))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "type", assemblyName.Type);
+                        }
+
+                        if (!String.IsNullOrEmpty(assemblyName.Architecture))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "processorArchitecture", assemblyName.Architecture);
+                        }
+
+                        if (!String.IsNullOrEmpty(assemblyName.PublicKeyToken))
+                        {
+                            this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "publicKeyToken", assemblyName.PublicKeyToken);
+                        }
                     }
-                }
-                catch (WixException e)
-                {
-                    this.Messaging.Write(e.Error);
+                    catch (WixException e)
+                    {
+                        this.Messaging.Write(e.Error);
+                    }
                 }
             }
         }
 
-        /// <summary>
-        /// Set an MsiAssemblyName row.  If it was directly authored, override the value, otherwise
-        /// create a new row.
-        /// </summary>
-        /// <param name="assemblyNameSymbols">MsiAssemblyName table.</param>
-        /// <param name="facade">FileFacade containing the assembly read for the MsiAssemblyName row.</param>
-        /// <param name="name">MsiAssemblyName name.</param>
-        /// <param name="value">MsiAssemblyName value.</param>
-        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols, IFileFacade facade, string name, string value)
+        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols, IFileFacade facade, AssemblySymbol assemblySymbol, string name, string value)
         {
             // check for null value (this can occur when grabbing the file version from an assembly without one)
             if (String.IsNullOrEmpty(value))
@@ -315,35 +311,31 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             else
             {
                 // if the assembly will be GAC'd and the name in the file table doesn't match the name in the MsiAssemblyName table, error because the install will fail.
-                if ("name" == name && AssemblyType.DotNetAssembly == facade.AssemblyType &&
-                    String.IsNullOrEmpty(facade.AssemblyApplicationFileRef) &&
+                if ("name" == name && AssemblyType.DotNetAssembly == assemblySymbol.Type &&
+                    String.IsNullOrEmpty(assemblySymbol.ApplicationFileRef) &&
                     !String.Equals(Path.GetFileNameWithoutExtension(facade.FileName), value, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Messaging.Write(ErrorMessages.GACAssemblyIdentityWarning(facade.SourceLineNumber, Path.GetFileNameWithoutExtension(facade.FileName), value));
                 }
 
-                // override directly authored value
+                // Override directly authored value, otherwise remember the gathered information on the facade for use later.
                 var lookup = String.Concat(facade.ComponentRef, "/", name);
-                if (!assemblyNameSymbols.TryGetValue(lookup, out var assemblyNameSymbol))
+                if (assemblyNameSymbols.TryGetValue(lookup, out var assemblyNameSymbol))
                 {
-                    assemblyNameSymbol = this.Section.AddSymbol(new MsiAssemblyNameSymbol(facade.SourceLineNumber, new Identifier(AccessModifier.Section, facade.ComponentRef, name))
+                    assemblyNameSymbol.Value = value;
+                }
+                else
+                {
+                    assemblyNameSymbol = new MsiAssemblyNameSymbol(assemblySymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, facade.ComponentRef, name))
                     {
                         ComponentRef = facade.ComponentRef,
                         Name = name,
                         Value = value,
-                    });
+                    };
 
-                    if (null == facade.AssemblyNames)
-                    {
-                        facade.AssemblyNames = new List<MsiAssemblyNameSymbol>();
-                    }
-
-                    facade.AssemblyNames.Add(assemblyNameSymbol);
-
+                    facade.AssemblyNameSymbols.Add(assemblyNameSymbol);
                     assemblyNameSymbols.Add(assemblyNameSymbol.Id.Id, assemblyNameSymbol);
                 }
-
-                assemblyNameSymbol.Value = value;
 
                 if (this.VariableCache != null)
                 {

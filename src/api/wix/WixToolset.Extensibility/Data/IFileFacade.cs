@@ -5,33 +5,12 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller.Rows;
 
     /// <summary>
-    /// Interface that provides a common facade over <c>FileSymbol</c> and <c>FileRow</c>.
+    /// Interface that provides a common facade over file information.
     /// </summary>
     public interface IFileFacade
     {
-        /// <summary>
-        /// Reference to assembly application for this file.
-        /// </summary>
-        string AssemblyApplicationFileRef { get; }
-
-        /// <summary>
-        /// Reference to assembly manifest for this file.
-        /// </summary>
-        string AssemblyManifestFileRef { get; }
-
-        /// <summary>
-        /// List of assembly name values in the file.
-        /// </summary>
-        List<MsiAssemblyNameSymbol> AssemblyNames { get; set; }
-
-        /// <summary>
-        /// Optionally indicates what sort of assembly the file is.
-        /// </summary>
-        AssemblyType? AssemblyType { get; }
-
         /// <summary>
         /// Component containing the file.
         /// </summary>
@@ -56,21 +35,6 @@ namespace WixToolset.Extensibility.Data
         /// Size of the file.
         /// </summary>
         int FileSize { get; set; }
-
-        /// <summary>
-        /// Indicates whether the file came from a merge module.
-        /// </summary>
-        bool FromModule { get; }
-
-        /// <summary>
-        /// Indicates whether the file came from a transform.
-        /// </summary>
-        bool FromTransform { get; }
-
-        /// <summary>
-        /// Hash symbol of the file.
-        /// </summary>
-        MsiFileHashSymbol Hash { get; set; }
 
         /// <summary>
         /// Underlying identifier of the file.
@@ -118,9 +82,13 @@ namespace WixToolset.Extensibility.Data
         string Version { get; set; }
 
         /// <summary>
-        /// Gets the underlying <c>FileRow</c> if one is present.
+        /// Calculated hash of the file.
         /// </summary>
-        /// <returns><c>FileRow</c> if one is present, otherwise throws.</returns>
-        FileRow GetFileRow();
+        MsiFileHashSymbol MsiFileHashSymbol { get; set; }
+
+        /// <summary>
+        /// Assembly names found in the file.
+        /// </summary>
+        ICollection<MsiAssemblyNameSymbol> AssemblyNameSymbols { get; }
     }
 }

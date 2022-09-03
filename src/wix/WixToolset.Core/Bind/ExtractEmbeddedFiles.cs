@@ -4,7 +4,6 @@ namespace WixToolset.Core.Bind
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
@@ -41,9 +40,9 @@ namespace WixToolset.Core.Bind
             {
                 var localFileNameWithoutExtension = Path.GetFileNameWithoutExtension(uri.LocalPath);
                 var unique = this.HashUri(uri.AbsoluteUri);
-                var extractedName = String.Format(CultureInfo.InvariantCulture, @"{0}_{1}\{2}", localFileNameWithoutExtension, unique, embeddedFileId);
+                var extractedName = String.Concat(localFileNameWithoutExtension, "_", unique);
 
-                extractPath = Path.GetFullPath(Path.Combine(extractFolder, extractedName));
+                extractPath = Path.GetFullPath(Path.Combine(extractFolder, extractedName, embeddedFileId));
                 extracts.Add(embeddedFileId, extractPath);
             }
 

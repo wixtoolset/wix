@@ -7706,7 +7706,6 @@ namespace WixToolset.Core
             var validationFlags = TransformFlags.PatchTransformDefault;
             string baselineFile = null;
             string updateFile = null;
-            string transformFile = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -7726,9 +7725,6 @@ namespace WixToolset.Core
                     case "UpdateFile":
                         updateFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
-                    case "TransformFile":
-                        transformFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
                         break;
@@ -7746,26 +7742,14 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            if (!String.IsNullOrEmpty(baselineFile) || !String.IsNullOrEmpty(updateFile))
+            if (String.IsNullOrEmpty(baselineFile))
             {
-                if (String.IsNullOrEmpty(baselineFile))
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BaselineFile", "UpdateFile"));
-                }
-
-                if (String.IsNullOrEmpty(updateFile))
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpdateFile", "BaselineFile"));
-                }
-
-                if (!String.IsNullOrEmpty(transformFile))
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TransformFile", !String.IsNullOrEmpty(baselineFile) ? "BaselineFile" : "UpdateFile"));
-                }
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BaselineFile"));
             }
-            else if (String.IsNullOrEmpty(transformFile))
+
+            if (String.IsNullOrEmpty(updateFile))
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BaselineFile", "TransformFile", true));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpdateFile"));
             }
 
             foreach (var child in node.Elements())
@@ -7805,7 +7789,6 @@ namespace WixToolset.Core
                     ValidationFlags = validationFlags,
                     BaselineFile = new IntermediateFieldPathValue { Path = baselineFile },
                     UpdateFile = new IntermediateFieldPathValue { Path = updateFile },
-                    TransformFile = new IntermediateFieldPathValue { Path = transformFile },
                 });
             }
         }

@@ -3,13 +3,30 @@
 namespace WixToolset.Extensibility.Services
 {
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Interface provided to help Windows Installer backend extensions.
     /// </summary>
     public interface IWindowsInstallerBackendHelper : IBackendHelper
     {
+        /// <summary>
+        /// Creates a file facade from a <c>FileSymbol</c>.
+        /// </summary>
+        /// <param name="file"><c>FileSymbol</c> backing the facade.</param>
+        /// <returns></returns>
+        IFileFacade CreateFileFacade(FileSymbol file);
+
+        /// <summary>
+        /// Creates a file facade from a File row.
+        /// </summary>
+        /// <param name="fileRow"><c>FileRow</c></param>
+        /// <returns>New <c>IFileFacade</c>.</returns>
+        IFileFacade CreateFileFacade(FileRow fileRow);
+
         /// <summary>
         /// Creates a <see cref="Row"/> in the specified table.
         /// </summary>

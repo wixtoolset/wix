@@ -1,51 +1,24 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.Bind
+namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
-    internal class FileResolver
+    internal class FileResolver : IFileResolver
     {
         private const string BindPathOpenString = "!(bindpath.";
 
-        private FileResolver(IEnumerable<IBindPath> bindPaths)
-        {
-            this.BindPaths = (bindPaths ?? Array.Empty<IBindPath>()).ToLookup(b => b.Stage);
-            this.RebaseTarget = this.BindPaths[BindStage.Target].Any();
-            this.RebaseUpdated = this.BindPaths[BindStage.Updated].Any();
-        }
-
-        public FileResolver(IEnumerable<IBindPath> bindPaths, IEnumerable<IResolverExtension> extensions) : this(bindPaths)
-        {
-            this.ResolverExtensions = extensions ?? Array.Empty<IResolverExtension>();
-        }
-
-        public FileResolver(IEnumerable<IBindPath> bindPaths, IEnumerable<ILibrarianExtension> extensions) : this(bindPaths)
-        {
-            this.LibrarianExtensions = extensions ?? Array.Empty<ILibrarianExtension>();
-        }
-
-        private ILookup<BindStage, IBindPath> BindPaths { get; }
-
-        public bool RebaseTarget { get; }
-
-        public bool RebaseUpdated { get; }
-
-        private IEnumerable<IResolverExtension> ResolverExtensions { get; }
-
-        private IEnumerable<ILibrarianExtension> LibrarianExtensions { get; }
-
-        public string Resolve(SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, string source)
+        public string ResolveFile(string source, IEnumerable<ILibrarianExtension> librarianExtensions, IEnumerable<IBindPath> bindPaths, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition)
         {
             var checkedPaths = new List<string>();
 
-            foreach (var extension in this.LibrarianExtensions)
+            foreach (var extension in librarianExtensions)
             {
                 var resolved = extension.ResolveFile(sourceLineNumbers, symbolDefinition, source);
 
@@ -60,19 +33,10 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            return this.MustResolveUsingBindPaths(source, symbolDefinition, sourceLineNumbers, BindStage.Normal, checkedPaths);
+            return this.MustResolveUsingBindPaths(source, symbolDefinition, sourceLineNumbers, bindPaths, checkedPaths);
         }
 
-        /// <summary>
-        /// Resolves the source path of a file using binder extensions.
-        /// </summary>
-        /// <param name="source">Original source value.</param>
-        /// <param name="symbolDefinition">Optional type of source file being resolved.</param>
-        /// <param name="sourceLineNumbers">Optional source line of source file being resolved.</param>
-        /// <param name="bindStage">The binding stage used to determine what collection of bind paths will be used</param>
-        /// <param name="alreadyCheckedPaths">Optional collection of paths already checked.</param>
-        /// <returns>Should return a valid path for the stream to be imported.</returns>
-        public string ResolveFile(string source, IntermediateSymbolDefinition symbolDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, IEnumerable<string> alreadyCheckedPaths = null)
+        public string ResolveFile(string source, IEnumerable<IResolverExtension> resolverExtensions, IEnumerable<IBindPath> bindPaths, BindStage bindStage, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, IEnumerable<string> alreadyCheckedPaths = null)
         {
             var checkedPaths = new List<string>();
 
@@ -81,7 +45,7 @@ namespace WixToolset.Core.Bind
                 checkedPaths.AddRange(alreadyCheckedPaths);
             }
 
-            foreach (var extension in this.ResolverExtensions)
+            foreach (var extension in resolverExtensions)
             {
                 var resolved = extension.ResolveFile(source, symbolDefinition, sourceLineNumbers, bindStage);
 
@@ -96,10 +60,10 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            return this.MustResolveUsingBindPaths(source, symbolDefinition, sourceLineNumbers, bindStage, checkedPaths);
+            return this.MustResolveUsingBindPaths(source, symbolDefinition, sourceLineNumbers, bindPaths, checkedPaths);
         }
 
-        private string MustResolveUsingBindPaths(string source, IntermediateSymbolDefinition symbolDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, List<string> checkedPaths)
+        private string MustResolveUsingBindPaths(string source, IntermediateSymbolDefinition symbolDefinition, SourceLineNumber sourceLineNumbers, IEnumerable<IBindPath> bindPaths, List<string> checkedPaths)
         {
             string resolved = null;
 
@@ -135,8 +99,6 @@ namespace WixToolset.Core.Bind
                     pathWithoutSourceDir = path.Substring(10);
                 }
 
-                var bindPaths = this.BindPaths[bindStage];
-
                 foreach (var bindPath in bindPaths)
                 {
                     if (String.IsNullOrEmpty(bindName))
@@ -145,36 +107,18 @@ namespace WixToolset.Core.Bind
                         {
                             if (!String.IsNullOrEmpty(pathWithoutSourceDir))
                             {
-                                var filePath = Path.Combine(bindPath.Path, pathWithoutSourceDir);
-
-                                checkedPaths.Add(filePath);
-                                if (CheckFileExists(filePath))
-                                {
-                                    resolved = filePath;
-                                }
+                                resolved = ResolveWithBindPath(bindPath.Path, pathWithoutSourceDir, checkedPaths);
                             }
 
                             if (String.IsNullOrEmpty(resolved))
                             {
-                                var filePath = Path.Combine(bindPath.Path, path);
-
-                                checkedPaths.Add(filePath);
-                                if (CheckFileExists(filePath))
-                                {
-                                    resolved = filePath;
-                                }
+                                resolved = ResolveWithBindPath(bindPath.Path, path, checkedPaths);
                             }
                         }
                     }
                     else if (bindName.Equals(bindPath.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        var filePath = Path.Combine(bindPath.Path, path);
-
-                        checkedPaths.Add(filePath);
-                        if (CheckFileExists(filePath))
-                        {
-                            resolved = filePath;
-                        }
+                        resolved = ResolveWithBindPath(bindPath.Path, path, checkedPaths);
                     }
 
                     if (!String.IsNullOrEmpty(resolved))
@@ -186,10 +130,24 @@ namespace WixToolset.Core.Bind
 
             if (null == resolved)
             {
-                throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, source, symbolDefinition.Name, checkedPaths));
+                throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, source, symbolDefinition?.Name, checkedPaths));
             }
 
             return resolved;
+        }
+
+        private static string ResolveWithBindPath(string bindPath, string relativePath, List<string> checkedPaths)
+        {
+            var filePath = Path.Combine(bindPath, relativePath);
+
+            checkedPaths.Add(filePath);
+
+            if (CheckFileExists(filePath))
+            {
+                return filePath;
+            }
+
+            return null;
         }
 
         private static bool CheckFileExists(string path)

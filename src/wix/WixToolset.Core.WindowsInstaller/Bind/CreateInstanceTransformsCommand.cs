@@ -30,8 +30,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private  IBackendHelper BackendHelper { get; }
 
-        public void Execute()
+        public IReadOnlyCollection<SubStorage> SubStorages { get; private set; }
+
+        public IReadOnlyCollection<SubStorage> Execute()
         {
+            var subStorages = new List<SubStorage>();
+
             // Create and add substorages for instance transforms.
             var wixInstanceTransformsSymbols = this.Section.Symbols.OfType<WixInstanceTransformsSymbol>();
 
@@ -252,9 +256,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         summaryRow[1] = "4";
                     }
 
-                    this.Output.SubStorages.Add(new SubStorage(instanceId, instanceTransform));
+                    subStorages.Add(new SubStorage(instanceId, instanceTransform));
                 }
             }
+
+            return this.SubStorages = subStorages;
         }
     }
 }

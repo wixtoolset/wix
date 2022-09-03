@@ -3,11 +3,9 @@
 namespace WixToolset.Core.WindowsInstaller
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
+    using System.ComponentModel.Design;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Native.Msi;
     using WixToolset.Core.WindowsInstaller.Decompile;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
@@ -63,56 +61,32 @@ namespace WixToolset.Core.WindowsInstaller
 
         private IWindowsInstallerDecompileResult Execute(IWindowsInstallerDecompileContext context)
         {
+            // Delete the directory and its files to prevent cab extraction failure due to an existing file.
+            if (Directory.Exists(context.ExtractFolder))
+            {
+                Directory.Delete(context.ExtractFolder, true);
+            }
+
+            var backendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
+
+            var pathResolver = context.ServiceProvider.GetService<IPathResolver>();
+
+            var extractFilesFolder = context.SuppressExtractCabinets || (String.IsNullOrEmpty(context.CabinetExtractFolder) && String.IsNullOrEmpty(context.ExtractFolder)) ? null :
+                String.IsNullOrEmpty(context.CabinetExtractFolder) ? Path.Combine(context.ExtractFolder, "File") : context.CabinetExtractFolder;
+
+            var outputType = context.TreatProductAsModule ? OutputType.Module : context.DecompileType;
+            var unbindCommand = new UnbindDatabaseCommand(this.Messaging, backendHelper, pathResolver, context.DecompilePath, outputType, context.ExtractFolder, extractFilesFolder, context.IntermediateFolder, enableDemodularization: true, skipSummaryInfo: false);
+            var output = unbindCommand.Execute();
+            var extractedFilePaths = unbindCommand.ExportedFiles;
+
+            var decompilerHelper = context.ServiceProvider.GetService<IWindowsInstallerDecompilerHelper>();
+            var decompiler = new Decompiler(this.Messaging, backendHelper, decompilerHelper, context.Extensions, context.ExtensionData, context.SymbolDefinitionCreator, context.BaseSourcePath, context.SuppressCustomTables, context.SuppressDroppingEmptyTables, context.SuppressRelativeActionSequencing, context.SuppressUI, context.TreatProductAsModule);
+            var document = decompiler.Decompile(output);
+
             var result = context.ServiceProvider.GetService<IWindowsInstallerDecompileResult>();
-
-            try
-            {
-                using (var database = new Database(context.DecompilePath, OpenDatabase.ReadOnly))
-                {
-                    // Delete the directory and its files to prevent cab extraction failure due to an existing file.
-                    if (Directory.Exists(context.ExtractFolder))
-                    {
-                        Directory.Delete(context.ExtractFolder, true);
-                    }
-
-                    var backendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
-                    var decompilerHelper = context.ServiceProvider.GetService<IWindowsInstallerDecompilerHelper>();
-
-                    var unbindCommand = new UnbindDatabaseCommand(this.Messaging, backendHelper, database, context.DecompilePath, context.DecompileType, context.ExtractFolder, context.IntermediateFolder, context.IsAdminImage, suppressDemodularization: false, skipSummaryInfo: false);
-                    var output = unbindCommand.Execute();
-                    var extractedFilePaths = new List<string>(unbindCommand.ExportedFiles);
-
-                    var decompiler = new Decompiler(this.Messaging, backendHelper, decompilerHelper, context.Extensions, context.ExtensionData, context.SymbolDefinitionCreator, context.BaseSourcePath, context.SuppressCustomTables, context.SuppressDroppingEmptyTables, context.SuppressRelativeActionSequencing, context.SuppressUI, context.TreatProductAsModule);
-                    result.Document = decompiler.Decompile(output);
-
-                    result.Platform = GetPlatformFromOutput(output);
-
-                    // extract the files from the cabinets
-                    if (!String.IsNullOrEmpty(context.ExtractFolder) && !context.SuppressExtractCabinets)
-                    {
-                        var fileDirectory = String.IsNullOrEmpty(context.CabinetExtractFolder) ? Path.Combine(context.ExtractFolder, "File") : context.CabinetExtractFolder;
-
-                        var extractCommand = new ExtractCabinetsCommand(output, database, context.DecompilePath, fileDirectory, context.IntermediateFolder, context.TreatProductAsModule);
-                        extractCommand.Execute();
-
-                        extractedFilePaths.AddRange(extractCommand.ExtractedFiles);
-                        result.ExtractedFilePaths = extractedFilePaths;
-                    }
-                    else
-                    {
-                        result.ExtractedFilePaths = new string[0];
-                    }
-                }
-            }
-            catch (Win32Exception e)
-            {
-                if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
-                {
-                    throw new WixException(ErrorMessages.OpenDatabaseFailed(context.DecompilePath));
-                }
-
-                throw;
-            }
+            result.Document = document;
+            result.Platform = GetPlatformFromOutput(output);
+            result.ExtractedFilePaths = extractedFilePaths.ToList();
 
             return result;
         }

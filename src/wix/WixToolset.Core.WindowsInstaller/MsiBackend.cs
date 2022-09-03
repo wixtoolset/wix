@@ -2,11 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
-    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
-    using WixToolset.Core.WindowsInstaller.Decompile;
-    using WixToolset.Core.WindowsInstaller.Unbind;
-    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;

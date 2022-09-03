@@ -37,8 +37,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var patchMediaFileRows = new Dictionary<int, RowDictionary<FileRow>>();
 
-            //var patchActualFileTable = this.Output.EnsureTable(this.TableDefinitions["File"]);
-
             // Index paired transforms by name without their "#" prefix.
             var pairedTransforms = this.SubStorages.Where(s => s.Name.StartsWith(PatchConstants.PairedPatchTransformPrefix)).ToDictionary(s => s.Name, s => s.Data);
 
@@ -57,7 +55,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var pairedTransform = pairedTransforms[PatchConstants.PairedPatchTransformPrefix + substorage.Name];
                 var pairedFileRows = new RowDictionary<FileRow>(pairedTransform.Tables["File"]);
 
-                foreach (FileRow mainFileRow in mainFileTable.Rows.Where(f => f.Operation != RowOperation.Delete))
+                foreach (var mainFileRow in mainFileTable.Rows.Where(f => f.Operation != RowOperation.Delete).Cast<FileRow>())
                 {
                     var mainFileId = mainFileRow.File;
 
@@ -89,8 +87,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            // TODO: should this entire condition be placed in the binder file manager?
-                            if (/*(0 == (PatchAttributeType.Ignore & mainWixFileRow.PatchAttributes)) &&*/
+                            if (
+#if TODO_PATCHING_DELTA
+                                (0 == (PatchAttributeType.Ignore & mainWixFileRow.PatchAttributes)) &&
+#endif
                                 !this.FileSystemManager.CompareFiles(objectField.PreviousData, objectField.Data.ToString()))
                             {
                                 // If the file is different, we need to mark the mainFileRow and pairedFileRow as modified.
@@ -133,11 +133,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         patchMediaFileRows.Add(diskId, mediaFileRows);
                     }
 
-                    var patchFileRow = mediaFileRows.Get(mainFileId);
-
-                    if (null == patchFileRow)
+                    if (!mediaFileRows.TryGetValue(mainFileId, out var patchFileRow))
                     {
-                        //patchFileRow = (FileRow)patchFileTable.CreateRow(mainFileRow.SourceLineNumbers);
                         patchFileRow = (FileRow)mainFileRow.TableDefinition.CreateRow(mainFileRow.SourceLineNumbers);
                         mainFileRow.CopyTo(patchFileRow);
 
