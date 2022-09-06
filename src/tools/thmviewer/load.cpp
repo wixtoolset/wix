@@ -69,8 +69,8 @@ static DWORD WINAPI LoadThreadProc(
     LOAD_THREAD_CONTEXT* pContext = static_cast<LOAD_THREAD_CONTEXT*>(pvContext);
     HWND hWnd = pContext->hWnd;
 
-    hr = StrAllocString(&sczThemePath, pContext->wzThemePath, 0);
-    ExitOnFailure(hr, "Failed to copy path to initial theme file.");
+    hr = PathGetFullPathName(pContext->wzThemePath, &sczThemePath, NULL, NULL);
+    ExitOnFailure(hr, "Failed to get full path to initial theme file.");
 
     if (pContext->wzWxlPath)
     {
