@@ -24,6 +24,7 @@ namespace WixToolset.Bal
             BalSymbolDefinitions.WixBalPackageInfo,
             BalSymbolDefinitions.WixDncOptions,
             BalSymbolDefinitions.WixMbaPrereqInformation,
+            BalSymbolDefinitions.WixStdbaCommandLine,
             BalSymbolDefinitions.WixStdbaOptions,
             BalSymbolDefinitions.WixStdbaOverridableVariable,
             BalSymbolDefinitions.WixMbaPrereqOptions,
@@ -52,6 +53,30 @@ namespace WixToolset.Bal
                     if (balPackageInfoSymbol.PrimaryPackageType != BalPrimaryPackageType.None)
                     {
                         writer.WriteAttributeString("PrimaryPackageType", balPackageInfoSymbol.PrimaryPackageType.ToString().ToLower());
+                    }
+
+                    writer.WriteEndElement();
+                }
+
+                this.BackendHelper.AddBootstrapperApplicationData(sb.ToString());
+
+                return true;
+            }
+            else if (symbol is WixStdbaCommandLineSymbol stdbaCommandLineSymbol)
+            {
+                var sb = new StringBuilder();
+                using (var writer = XmlWriter.Create(sb))
+                {
+                    writer.WriteStartElement(symbol.Definition.Name, BurnConstants.BootstrapperApplicationDataNamespace);
+
+                    switch (stdbaCommandLineSymbol.VariableType)
+                    {
+                        case WixStdbaCommandLineVariableType.CaseInsensitive:
+                            writer.WriteAttributeString("VariableType", "caseInsensitive");
+                            break;
+                        default:
+                            writer.WriteAttributeString("VariableType", "caseSensitive");
+                            break;
                     }
 
                     writer.WriteEndElement();
@@ -418,19 +443,24 @@ namespace WixToolset.Bal
 
         private void VerifyOverridableVariables(IntermediateSection section)
         {
-            var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-            if (bundleSymbol.CommandLineVariables != WixBundleCommandLineVariables.UpperCase)
+            var commandLineSymbol = section.Symbols.OfType<WixStdbaCommandLineSymbol>().SingleOrDefault();
+            if (commandLineSymbol?.VariableType != WixStdbaCommandLineVariableType.CaseInsensitive)
             {
                 return;
             }
 
             var overridableVariableSymbols = section.Symbols.OfType<WixStdbaOverridableVariableSymbol>().ToList();
+            var overridableVariables = new Dictionary<string, WixStdbaOverridableVariableSymbol>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var overridableVariableSymbol in overridableVariableSymbols)
             {
-                var upperName = overridableVariableSymbol.Name.ToUpperInvariant();
-                if (upperName != overridableVariableSymbol.Name)
+                if (!overridableVariables.TryGetValue(overridableVariableSymbol.Name, out var collisionVariableSymbol))
                 {
-                    this.Messaging.Write(BalErrors.NonUpperCaseOverridableVariable(overridableVariableSymbol.SourceLineNumbers, overridableVariableSymbol.Name, upperName));
+                    overridableVariables.Add(overridableVariableSymbol.Name, overridableVariableSymbol);
+                }
+                else
+                {
+                    this.Messaging.Write(BalErrors.OverridableVariableCollision(overridableVariableSymbol.SourceLineNumbers, overridableVariableSymbol.Name, collisionVariableSymbol.Name));
+                    this.Messaging.Write(BalErrors.OverridableVariableCollision2(collisionVariableSymbol.SourceLineNumbers));
                 }
             }
         }

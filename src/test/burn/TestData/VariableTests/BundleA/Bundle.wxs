@@ -6,7 +6,7 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
   <!-- CommandLineVariables should be the only thing different from the template -->
-  <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" CommandLineVariables="caseSensitive">
+  <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" bal:CommandLineVariables="caseInsensitive">
     <Log Prefix="~$(var.TestGroupName)_$(var.BundleName)" />
 
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />

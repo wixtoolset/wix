@@ -2203,18 +2203,10 @@ static HRESULT GetSanitizedCommandLine(
                 const wchar_t* pwc = wcschr(argv[i], L'=');
                 if (pwc)
                 {
-                    if (BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE == pVariables->commandLineType)
-                    {
-                        hr = StrAllocStringToUpperInvariant(&sczVariableName, argv[i], pwc - argv[i]);
-                    }
-                    else
-                    {
-                        hr = StrAllocString(&sczVariableName, argv[i], pwc - argv[i]);
-                    }
+                    hr = StrAllocString(&sczVariableName, argv[i], pwc - argv[i]);
                     ExitOnFailure(hr, "Failed to copy variable name.");
 
-                    hr = VariableIsHidden(pVariables, sczVariableName, &fHidden);
-                    ExitOnFailure(hr, "Failed to determine whether variable is hidden.");
+                    fHidden = VariableIsHiddenCommandLine(pVariables, sczVariableName);
 
                     if (fHidden)
                     {

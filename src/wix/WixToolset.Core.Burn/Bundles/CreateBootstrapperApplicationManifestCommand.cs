@@ -71,8 +71,6 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.WriteBundleInfo(writer);
 
-                this.WriteCommandLineInfo(writer);
-
                 this.WriteRollbackBoundaryInfo(writer);
 
                 this.WritePackageInfo(writer);
@@ -100,23 +98,6 @@ namespace WixToolset.Core.Burn.Bundles
             writer.WriteAttributeString("Id", this.BundleSymbol.BundleId.ToUpperInvariant());
             writer.WriteAttributeString("UpgradeCode", this.BundleSymbol.UpgradeCode);
             writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
-
-            writer.WriteEndElement();
-        }
-
-        private void WriteCommandLineInfo(XmlTextWriter writer)
-        {
-            writer.WriteStartElement("CommandLine");
-
-            switch (this.BundleSymbol.CommandLineVariables)
-            {
-                case WixBundleCommandLineVariables.UpperCase:
-                    writer.WriteAttributeString("Variables", "upperCase");
-                    break;
-                case WixBundleCommandLineVariables.CaseSensitive:
-                    writer.WriteAttributeString("Variables", "caseSensitive");
-                    break;
-            }
 
             writer.WriteEndElement();
         }

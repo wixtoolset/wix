@@ -13,5 +13,6 @@
 
     <Variable Name="INSTALLLOCATION" bal:Overridable="yes" />
     <Variable Name="LICENSEKEY" Hidden="yes" bal:Overridable="yes" />
+    <Variable Name="licensekey" Hidden="no" bal:Overridable="yes" />
   </Fragment>
 </Wix>

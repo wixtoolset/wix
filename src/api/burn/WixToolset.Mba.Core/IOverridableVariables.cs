@@ -10,13 +10,13 @@ namespace WixToolset.Mba.Core
     public enum VariableCommandLineType
     {
         /// <summary>
-        /// Similar to Windows Installer, all variable names specified on the command line are automatically converted to upper case.
-        /// </summary>
-        UpperCase,
-        /// <summary>
         /// All variable names specified on the command line must match the case specified when building the bundle.
         /// </summary>
         CaseSensitive,
+        /// <summary>
+        /// Variable names specified on the command line do not have to match the case specified when building the bundle.
+        /// </summary>
+        CaseInsensitive,
     }
 
     /// <summary>

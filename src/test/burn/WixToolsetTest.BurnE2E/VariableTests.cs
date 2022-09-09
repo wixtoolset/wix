@@ -22,12 +22,14 @@ namespace WixToolsetTest.BurnE2E
 
             packageA.VerifyInstalled(false);
 
-            var logFilePath = bundleA.Install(0, "INSTALLLOCATION=nothingtoseehere", "licensekey=supersecretkey");
+            var logFilePath = bundleA.Install(0, "InstallLocation=nothingtoseehere", "licensekey=supersecretkey");
             bundleA.VerifyRegisteredAndInPackageCache();
 
             packageA.VerifyInstalled(true);
 
-            Assert.True(LogVerifier.MessageInLogFile(logFilePath, "INSTALLLOCATION=nothingtoseehere LICENSEKEY=*****"));
+            // Burn logging its command line.
+            Assert.True(LogVerifier.MessageInLogFile(logFilePath, "InstallLocation=nothingtoseehere licensekey=*****"));
+            // Burn logging the MSI install command line.
             Assert.True(LogVerifier.MessageInLogFile(logFilePath, "INSTALLLOCATION=\"nothingtoseehere\" LICENSEKEY=\"*****\""));
             Assert.False(LogVerifier.MessageInLogFile(logFilePath, "supersecretkey"));
         }
@@ -45,7 +47,9 @@ namespace WixToolsetTest.BurnE2E
 
             packageA.VerifyInstalled(true);
 
-            Assert.True(LogVerifier.MessageInLogFile(logFilePath, "InstallLocation=nothingtoseehere licensekey=supersecretkey"));
+            // Burn logging its command line.
+            Assert.True(LogVerifier.MessageInLogFile(logFilePath, "InstallLocation=nothingtoseehere licensekey=*****"));
+            // Burn logging the MSI install command line.
             Assert.True(LogVerifier.MessageInLogFile(logFilePath, "INSTALLLOCATION=\"\" LICENSEKEY=\"*****\""));
         }
     }
