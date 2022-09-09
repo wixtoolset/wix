@@ -2,6 +2,7 @@
 
 namespace WixToolset.Mba.Core
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -21,11 +22,11 @@ namespace WixToolset.Mba.Core
         {
             foreach (var kvp in this.Variables)
             {
-                var key = overridableVariables.CommandLineType == VariableCommandLineType.UpperCase ? kvp.Key.ToUpperInvariant() : kvp.Key;
+                var key = kvp.Key;
 
                 if (!overridableVariables.Variables.TryGetValue(key, out var overridableVariable))
                 {
-                    engine.Log(LogLevel.Error, string.Format("Ignoring attempt to set non-overridable variable: '{0}'.", key));
+                    engine.Log(LogLevel.Error, String.Format("Ignoring attempt to set non-overridable variable: '{0}'.", key));
                 }
                 else
                 {

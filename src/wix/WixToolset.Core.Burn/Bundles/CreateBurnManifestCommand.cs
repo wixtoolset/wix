@@ -696,20 +696,6 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteEndElement();
                 }
 
-                writer.WriteStartElement("CommandLine");
-
-                switch (this.BundleSymbol.CommandLineVariables)
-                {
-                    case WixBundleCommandLineVariables.UpperCase:
-                        writer.WriteAttributeString("Variables", "upperCase");
-                        break;
-                    case WixBundleCommandLineVariables.CaseSensitive:
-                        writer.WriteAttributeString("Variables", "caseSensitive");
-                        break;
-                }
-
-                writer.WriteEndElement();
-
                 writer.WriteEndDocument(); // </BurnManifest>
             }
         }

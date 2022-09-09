@@ -6,6 +6,9 @@
     <UpgradeCode>{B735B6D2-9D4D-4E98-B464-946F7F62AFC8}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
   </ItemGroup>
   <ItemGroup>

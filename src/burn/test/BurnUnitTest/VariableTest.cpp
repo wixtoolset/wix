@@ -92,7 +92,6 @@ namespace Bootstrapper
                     L"    <Variable Id='Var5' Type='string' Value='' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Var6' Type='formatted' Value='[Formatted]' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Formatted' Type='formatted' Value='supersecret' Hidden='yes' Persisted='no' />"
-                    L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
                 hr = VariableInitialize(&variables);
@@ -103,8 +102,6 @@ namespace Bootstrapper
 
                 hr = VariablesParseFromXml(&variables, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse variables from XML.");
-
-                Assert::Equal((int)BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE, (int)variables.commandLineType);
 
                 // get and verify variable values
                 Assert::Equal((int)BURN_VARIANT_TYPE_NUMERIC, VariableGetTypeHelper(&variables, L"Var1"));
@@ -123,6 +120,11 @@ namespace Bootstrapper
                 Assert::Equal<BOOL>(TRUE, fContainsHiddenData);
                 Assert::Equal<String^>(gcnew String(L"String value."), VariableGetFormattedHelper(&variables, L"Var2", &fContainsHiddenData));
                 Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
+
+                Assert::True(VariableIsHiddenCommandLine(&variables, L"Formatted"));
+                Assert::True(VariableIsHiddenCommandLine(&variables, L"FORMATTED"));
+                Assert::True(VariableIsHiddenCommandLine(&variables, L"formatted"));
+                Assert::False(VariableIsHiddenCommandLine(&variables, L"var6"));
             }
             finally
             {
@@ -143,7 +145,6 @@ namespace Bootstrapper
                 LPCWSTR wzDocument =
                     L"<Bundle>"
                     L"    <Variable Id='WixCustomVariable' Type='numeric' Value='1' Hidden='no' Persisted='no' />"
-                    L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
                 hr = VariableInitialize(&variables);
@@ -173,7 +174,6 @@ namespace Bootstrapper
             {
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
                 hr = VariableInitialize(&variables);

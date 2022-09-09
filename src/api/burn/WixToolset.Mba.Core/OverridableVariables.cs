@@ -29,37 +29,43 @@ namespace WixToolset.Mba.Core
         {
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(root.NameTable);
             namespaceManager.AddNamespace("p", BootstrapperApplicationData.XMLNamespace);
-            XPathNavigator commandLineNode = root.SelectSingleNode("/p:BootstrapperApplicationData/p:CommandLine", namespaceManager);
+            XPathNavigator commandLineNode = root.SelectSingleNode("/p:BootstrapperApplicationData/p:WixStdbaCommandLine", namespaceManager);
             XPathNodeIterator nodes = root.Select("/p:BootstrapperApplicationData/p:WixStdbaOverridableVariable", namespaceManager);
 
             var overridableVariables = new OverridableVariablesInfo();
+            IEqualityComparer<string> variableNameComparer;
 
             if (commandLineNode == null)
             {
-                throw new Exception("Failed to select command line information.");
-            }
-
-            string variablesValue = BootstrapperApplicationData.GetAttribute(commandLineNode, "Variables");
-
-            if (variablesValue == null)
-            {
-                throw new Exception("Failed to get command line variable type.");
-            }
-
-            if (variablesValue.Equals("upperCase", StringComparison.InvariantCulture))
-            {
-                overridableVariables.CommandLineType = VariableCommandLineType.UpperCase;
-            }
-            else if (variablesValue.Equals("caseSensitive", StringComparison.InvariantCulture))
-            {
                 overridableVariables.CommandLineType = VariableCommandLineType.CaseSensitive;
+                variableNameComparer = StringComparer.InvariantCulture;
             }
             else
             {
-                throw new Exception(string.Format("Unknown command line variable type: '{0}'", variablesValue));
+                string variablesValue = BootstrapperApplicationData.GetAttribute(commandLineNode, "Variables");
+
+                if (variablesValue == null)
+                {
+                    throw new Exception("Failed to get command line variable type.");
+                }
+
+                if (variablesValue.Equals("caseInsensitive", StringComparison.InvariantCulture))
+                {
+                    overridableVariables.CommandLineType = VariableCommandLineType.CaseInsensitive;
+                    variableNameComparer = StringComparer.InvariantCultureIgnoreCase;
+                }
+                else if (variablesValue.Equals("caseSensitive", StringComparison.InvariantCulture))
+                {
+                    overridableVariables.CommandLineType = VariableCommandLineType.CaseSensitive;
+                    variableNameComparer = StringComparer.InvariantCulture;
+                }
+                else
+                {
+                    throw new Exception(String.Format("Unknown command line variable type: '{0}'", variablesValue));
+                }
             }
 
-            overridableVariables.Variables = new Dictionary<string, IOverridableVariableInfo>();
+            overridableVariables.Variables = new Dictionary<string, IOverridableVariableInfo>(variableNameComparer);
 
             foreach (XPathNavigator node in nodes)
             {

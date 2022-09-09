@@ -157,12 +157,6 @@ namespace WixToolsetTest.CoreIntegration
                         }
                     }
 
-                    var commandLineElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:CommandLine");
-                    WixAssert.CompareLineByLine(new[]
-                    {
-                        "<CommandLine Variables='upperCase' />",
-                    }, commandLineElements);
-
                     var logElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Log");
                     WixAssert.CompareLineByLine(new[]
                     {

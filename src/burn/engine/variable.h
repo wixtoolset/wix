@@ -26,12 +26,6 @@ typedef HRESULT (*PFN_INITIALIZEVARIABLE)(
 
 // constants
 
-enum BURN_VARIABLE_COMMAND_LINE_TYPE
-{
-    BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE,
-    BURN_VARIABLE_COMMAND_LINE_TYPE_CASE_SENSITIVE,
-};
-
 enum BURN_VARIABLE_INTERNAL_TYPE
 {
     BURN_VARIABLE_INTERNAL_TYPE_NORMAL, // the BA can set this variable.
@@ -61,7 +55,6 @@ typedef struct _BURN_VARIABLES
     DWORD dwMaxVariables;
     DWORD cVariables;
     BURN_VARIABLE* rgVariables;
-    BURN_VARIABLE_COMMAND_LINE_TYPE commandLineType;
 } BURN_VARIABLES;
 
 
@@ -186,6 +179,10 @@ HRESULT VariableIsHidden(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
     __out BOOL* pfHidden
+    );
+BOOL VariableIsHiddenCommandLine(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable
     );
 
 #if defined(__cplusplus)

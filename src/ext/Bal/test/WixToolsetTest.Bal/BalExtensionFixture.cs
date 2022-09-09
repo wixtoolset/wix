@@ -78,6 +78,12 @@ namespace WixToolsetTest.Bal
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
+                var balCommandLines = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixStdbaCommandLine");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixStdbaCommandLine VariableType='caseInsensitive' />",
+                }, balCommandLines);
+
                 var balOverridableVariables = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixStdbaOverridableVariable");
                 WixAssert.CompareLineByLine(new[]
                 {
@@ -209,8 +215,9 @@ namespace WixToolsetTest.Bal
                 WixAssert.CompareLineByLine(new[]
                 {
                     "bal:Condition/@Condition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
-                    "Overridable variable 'Test1' must be 'TEST1' with Bundle/@CommandLineVariables value 'upperCase'.",
+                    "Overridable variable 'TEST1' collides with 'Test1' with Bundle/@CommandLineVariables value 'caseInsensitive'.",
                     "The *Package/@bal:DisplayInternalUICondition attribute's value '=' is not a valid bundle condition.",
+                    "The location of the Variable related to the previous error.",
                 }, messages.ToArray());
             }
         }

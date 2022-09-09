@@ -560,7 +560,6 @@ namespace Bootstrapper
                     L"    <Variable Id='MyBurnVariable3' Type='version' Value='v1.1-alpha' Hidden='no' Persisted='yes' />"
                     L"    <Variable Id='MyBurnVariable4' Type='string' Value='foo' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='MyBurnVariable5' Type='version' Hidden='no' Persisted='yes' />"
-                    L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
                 // load XML document
@@ -699,7 +698,6 @@ namespace Bootstrapper
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"
                     L"    <Variable Id='MyBurnVariable2' Type='string' Value='foo' Hidden='no' Persisted='yes' />"
                     L"    <Variable Id='MyBurnVariable3' Type='version' Value='v1.1-alpha' Hidden='no' Persisted='yes' />"
-                    L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
                 // load XML document

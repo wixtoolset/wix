@@ -342,7 +342,6 @@ extern "C" HRESULT VariablesParseFromXml(
 {
     HRESULT hr = S_OK;
     BOOL fXmlFound = FALSE;
-    IXMLDOMNode* pixnCommandLine = NULL;
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
@@ -355,27 +354,6 @@ extern "C" HRESULT VariablesParseFromXml(
     DWORD iVariable = 0;
 
     ::EnterCriticalSection(&pVariables->csAccess);
-
-    // select command-line node
-    hr = XmlSelectSingleNode(pixnBundle, L"CommandLine", &pixnCommandLine);
-    ExitOnRequiredXmlQueryFailure(hr, "Failed to select CommandLine node.");
-
-    // @Variables
-    hr = XmlGetAttributeEx(pixnCommandLine, L"Variables", &scz);
-    ExitOnRequiredXmlQueryFailure(hr, "Failed to get CommandLine/@Variables.");
-
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"upperCase", -1))
-    {
-        pVariables->commandLineType = BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE;
-    }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"caseSensitive", -1))
-    {
-        pVariables->commandLineType = BURN_VARIABLE_COMMAND_LINE_TYPE_CASE_SENSITIVE;
-    }
-    else
-    {
-        ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for CommandLine/@Variables: %ls", scz);
-    }
 
     // select variable nodes
     hr = XmlSelectNodes(pixnBundle, L"Variable", &pixnNodes);
@@ -507,7 +485,6 @@ extern "C" HRESULT VariablesParseFromXml(
 LExit:
     ::LeaveCriticalSection(&pVariables->csAccess);
 
-    ReleaseObject(pixnCommandLine);
     ReleaseObject(pixnNodes);
     ReleaseObject(pixnNode);
     ReleaseStr(scz);
@@ -1150,6 +1127,32 @@ LExit:
     return hr;
 }
 
+extern "C" BOOL VariableIsHiddenCommandLine(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable
+    )
+{
+    BURN_VARIABLE* pVariable = NULL;
+    BOOL fHidden = FALSE;
+
+    ::EnterCriticalSection(&pVariables->csAccess);
+
+    for (DWORD i = 0; i < pVariables->cVariables; ++i)
+    {
+        pVariable = pVariables->rgVariables + i;
+
+        if (pVariable->fHidden && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pVariable->sczName, -1, wzVariable, -1))
+        {
+            fHidden = TRUE;
+            break;
+        }
+    }
+
+    ::LeaveCriticalSection(&pVariables->csAccess);
+
+    return fHidden;
+}
+
 
 // internal function definitions
 
@@ -1587,7 +1590,7 @@ static HRESULT InsertUserVariable(
 
     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, wzVariable, 3, L"Wix", 3))
     {
-            ExitWithRootFailure(hr, E_INVALIDARG, "Attempted to insert variable with reserved prefix: %ls", wzVariable);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Attempted to insert variable with reserved prefix: %ls", wzVariable);
     }
 
     hr = InsertVariable(pVariables, wzVariable, iPosition);

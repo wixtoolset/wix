@@ -78,9 +78,14 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.MultiplePrimaryPackageType2, "The location of the package related to the previous error.");
         }
 
-        public static Message NonUpperCaseOverridableVariable(SourceLineNumber sourceLineNumbers, string name, string expectedName)
+        public static Message OverridableVariableCollision(SourceLineNumber sourceLineNumbers, string name, string collisionName)
         {
-            return Message(sourceLineNumbers, Ids.NonUpperCaseOverridableVariable, "Overridable variable '{0}' must be '{1}' with Bundle/@CommandLineVariables value 'upperCase'.", name, expectedName);
+            return Message(sourceLineNumbers, Ids.OverridableVariableCollision, "Overridable variable '{0}' collides with '{1}' with Bundle/@CommandLineVariables value 'caseInsensitive'.", name, collisionName);
+        }
+
+        public static Message OverridableVariableCollision2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.OverridableVariableCollision2, "The location of the Variable related to the previous error.");
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
@@ -101,7 +106,6 @@ namespace WixToolset.Bal
             MultipleBAFunctions = 6804,
             BAFunctionsPayloadRequiredInUXContainer = 6805,
             MissingDNCPrereq = 6806,
-            NonUpperCaseOverridableVariable = 6807,
             MissingIUIPrimaryPackage = 6808,
             MultiplePrimaryPackageType = 6809,
             MultiplePrimaryPackageType2 = 6810,
@@ -110,6 +114,8 @@ namespace WixToolset.Bal
             IuibaPermanentPrimaryPackageType = 6813,
             IuibaNonMsiPrimaryPackage = 6814,
             IuibaPrimaryPackageEnableFeatureSelection = 6815,
+            OverridableVariableCollision = 6816,
+            OverridableVariableCollision2 = 6817,
         }
     }
 }

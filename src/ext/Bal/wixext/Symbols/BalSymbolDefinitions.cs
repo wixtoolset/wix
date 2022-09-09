@@ -14,6 +14,7 @@ namespace WixToolset.Bal
         WixBalPackageInfo,
         WixDncOptions,
         WixMbaPrereqInformation,
+        WixStdbaCommandLine,
         WixStdbaOptions,
         WixStdbaOverridableVariable,
         WixMbaPrereqOptions,
@@ -55,6 +56,9 @@ namespace WixToolset.Bal
                 case BalSymbolDefinitionType.WixMbaPrereqInformation:
                     return BalSymbolDefinitions.WixMbaPrereqInformation;
 
+                case BalSymbolDefinitionType.WixStdbaCommandLine:
+                    return BalSymbolDefinitions.WixStdbaCommandLine;
+
                 case BalSymbolDefinitionType.WixStdbaOptions:
                     return BalSymbolDefinitions.WixStdbaOptions;
 
@@ -77,6 +81,7 @@ namespace WixToolset.Bal
             WixBalPackageInfo.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixDncOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixStdbaCommandLine.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaOverridableVariable.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixMbaPrereqOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);

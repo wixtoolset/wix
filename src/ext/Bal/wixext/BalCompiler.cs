@@ -119,6 +119,42 @@ namespace WixToolset.Bal
 
             switch (parentElement.Name.LocalName)
             {
+                case "Bundle":
+                    switch (attribute.Name.LocalName)
+                    {
+                        case "CommandLineVariables":
+                            WixStdbaCommandLineVariableType? variableType = null;
+
+                            var commandLineVariablesValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
+                            switch (commandLineVariablesValue)
+                            {
+                                case "caseInsensitive":
+                                    variableType = WixStdbaCommandLineVariableType.CaseInsensitive;
+                                    break;
+                                case "caseSensitive":
+                                    variableType = WixStdbaCommandLineVariableType.CaseSensitive;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, parentElement.Name.LocalName, attribute.Name.LocalName, commandLineVariablesValue, "caseInsensitive", "caseSensitive"));
+                                    break;
+                            }
+
+                            if (variableType.HasValue)
+                            {
+                                // There can only be one.
+                                var id = new Identifier(AccessModifier.Global, "WixStdbaCommandLineVariableType");
+                                section.AddSymbol(new WixStdbaCommandLineSymbol(sourceLineNumbers, id)
+                                {
+                                    VariableType = variableType.Value,
+                                });
+                            }
+
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
+                            break;
+                    }
+                    break;
                 case "BundlePackage":
                 case "ExePackage":
                 case "MsiPackage":

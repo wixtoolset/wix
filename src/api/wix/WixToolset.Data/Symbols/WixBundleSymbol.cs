@@ -33,7 +33,6 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BundleId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.InProgressName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.CommandLineVariables), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.DisableModify), IntermediateFieldType.String),
             },
             typeof(WixBundleSymbol));
@@ -69,7 +68,6 @@ namespace WixToolset.Data.Symbols
         BundleId,
         ProviderKey,
         InProgressName,
-        CommandLineVariables,
         DisableModify,
     }
 
@@ -79,12 +77,6 @@ namespace WixToolset.Data.Symbols
         None = 0x0,
         DisableRemove = 0x1,
         PerMachine = 0x2,
-    }
-
-    public enum WixBundleCommandLineVariables
-    {
-        UpperCase,
-        CaseSensitive,
     }
 
     public enum WixBundleModifyType
@@ -242,12 +234,6 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleSymbolFields.InProgressName];
             set => this.Set((int)WixBundleSymbolFields.InProgressName, value);
-        }
-
-        public WixBundleCommandLineVariables CommandLineVariables
-        {
-            get => (WixBundleCommandLineVariables)this.Fields[(int)WixBundleSymbolFields.CommandLineVariables].AsNumber();
-            set => this.Set((int)WixBundleSymbolFields.CommandLineVariables, (int)value);
         }
 
         public WixBundleModifyType DisableModify
