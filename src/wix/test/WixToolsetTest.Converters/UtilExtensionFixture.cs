@@ -60,8 +60,8 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
                 "  <Fragment>",
-                "    <util:CloseApplication Id=\"EndApp\" Target=\"example.exe\" Condition=\"a&lt;&gt;b\" />",
                 "    <!-- Comment -->",
+                "    <util:CloseApplication Id=\"EndApp\" Target=\"example.exe\" Condition=\"a&lt;&gt;b\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -127,8 +127,8 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
                 "  <Fragment>",
-                "    <util:XmlConfig Id=\"Change\" ElementPath=\"book\" Value=\"a&lt;&gt;b\" />",
                 "    <!-- Comment -->",
+                "    <util:XmlConfig Id=\"Change\" ElementPath=\"book\" Value=\"a&lt;&gt;b\" />",
                 "  </Fragment>",
                 "</Wix>"
             };

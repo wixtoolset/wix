@@ -447,7 +447,7 @@ namespace WixToolset.Converters
         private void ConvertNodes(IEnumerable<XNode> nodes, int level)
         {
             // Note we operate on a copy of the comment list since we may
-            // remove some whitespace remainingNodes during this processing.
+            // remove some whitespace nodes during this processing.
             foreach (var node in nodes.ToList())
             {
                 if (node is XText text)
@@ -923,28 +923,29 @@ namespace WixToolset.Converters
 
         private void ConvertControlElement(XElement element)
         {
-            var xConditions = element.Elements(ConditionElementName).ToList();
-
-            foreach (var xCondition in xConditions)
+            using (var lab = new ConversionLab(element))
             {
-                var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
-                if (!String.IsNullOrEmpty(action) &&
-                    TryGetInnerText(xCondition, out var text, out var comments) &&
-                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
-                {
-                    element.Add(new XAttribute(action + "Condition", text));
-                    // Comments are intentionally omitted here because there
-                    // is no good way to associate them with specific attributes.
-                }
-            }
+                var xConditions = element.Elements(ConditionElementName).ToList();
+                var comments = new List<XNode>();
 
-            if (0 < xConditions.Count)
-            {
-                var nodes = element.Nodes().ToList();
-                foreach (var node in nodes)
+                foreach (var xCondition in xConditions)
                 {
-                    node.Remove();
+                    var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
+                    if (!String.IsNullOrEmpty(action) &&
+                        TryGetInnerText(xCondition, out var text, out comments, comments) &&
+                        this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
+                    {
+                        element.Add(new XAttribute(action + "Condition", text));
+                    }
                 }
+
+                foreach (var xCondition in xConditions)
+                {
+                    xCondition.Remove();
+                }
+
+                lab.RemoveOrphanTextNodes();
+                lab.AddCommentsAsSiblings(comments);
             }
         }
 
@@ -1265,7 +1266,6 @@ namespace WixToolset.Converters
             foreach (var xCondition in xConditions)
             {
                 var message = xCondition.Attribute("Message")?.Value;
-
                 if (!String.IsNullOrEmpty(message) &&
                     TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
@@ -2323,19 +2323,36 @@ namespace WixToolset.Converters
             return value;
         }
 
-        private static bool TryGetInnerText(XElement element, out string value, out IEnumerable<XNode> comments)
+        private static bool TryGetInnerText(XElement element, out string value, out List<XNode> comments)
+        {
+            return TryGetInnerText(element, out value, out comments, new List<XNode>());
+        }
+
+        private static bool TryGetInnerText(XElement element, out string value, out List<XNode> comments, List<XNode> initialComments)
         {
             value = null;
             comments = null;
             var found = false;
 
             var nodes = element.Nodes().ToList();
-            var nonCommentNodes = nodes.Where(e => XmlNodeType.Comment != e.NodeType);
+            comments = initialComments;
+            var nonCommentNodes = new List<XNode>();
+
+            foreach(var node in nodes)
+            {
+                if (XmlNodeType.Comment == node.NodeType)
+                {
+                    comments.Add(node);
+                }
+                else
+                {
+                    nonCommentNodes.Add(node);
+                }
+            }
 
             if (nonCommentNodes.Any() && nonCommentNodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
             {
                 value = String.Join(String.Empty, nonCommentNodes.Cast<XText>().Select(TrimTextValue));
-                comments = nodes.Where(e => XmlNodeType.Comment == e.NodeType);
                 found = true;
             }
 

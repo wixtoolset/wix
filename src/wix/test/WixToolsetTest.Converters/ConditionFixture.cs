@@ -78,6 +78,8 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <UI>",
                 "      <Dialog Id=\"Dlg1\">",
+                "        <!-- Comment 1 -->",
+                "        <!-- Comment 2 -->",
                 "        <Control Id=\"Control1\" DisableCondition=\"x=y\" HideCondition=\"a&lt;&gt;b\" />",
                 "      </Dialog>",
                 "    </UI>",
@@ -167,10 +169,10 @@ namespace WixToolsetTest.Converters
                 "    <UI>",
                 "      <Dialog Id=\"Dlg1\">",
                 "        <Control Id=\"Control1\">",
-                "          <Publish Value=\"abc\" Condition=\"1&lt;2\" />",
                 "          <!-- Comment 1 -->",
-                "          <Publish Value=\"gone\" />",
+                "          <Publish Value=\"abc\" Condition=\"1&lt;2\" />",
                 "          <!-- Comment 2 -->",
+                "          <Publish Value=\"gone\" />",
                 "        </Control>",
                 "      </Dialog>",
                 "    </UI>",
@@ -241,8 +243,8 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2\" />",
                 "    <!-- Comment -->",
+                "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -311,8 +313,8 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <Launch Condition=\"cdatacontent\" Message=\"commented cdata\" />",
                 "    <!-- commented conditional -->",
+                "    <Launch Condition=\"cdatacontent\" Message=\"commented cdata\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -419,8 +421,8 @@ namespace WixToolsetTest.Converters
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Feature Id=\"Feature1\">",
-                "      <Level Value=\"0\" Condition=\"PROP = 1\" />",
                 "      <!-- Comment -->",
+                "      <Level Value=\"0\" Condition=\"PROP = 1\" />",
                 "    </Feature>",
                 "  </Fragment>",
                 "</Wix>"
@@ -496,10 +498,10 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <!-- Comment 1 -->",
-                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
+                "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <!-- Comment 2 -->",
+                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -578,10 +580,10 @@ namespace WixToolsetTest.Converters
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Package Compressed=\"no\">",
                 "  ",
-                "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <!-- Comment 1 -->",
-                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
+                "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <!-- Comment 2 -->",
+                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
                 "  </Package>",
                 "</Wix>"
             };
@@ -658,8 +660,8 @@ namespace WixToolsetTest.Converters
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\">",
-                "      <PermissionEx Sddl=\"sddl\" Condition=\"1&lt;2\" />",
                 "      <!-- Comment 2 -->",
+                "      <PermissionEx Sddl=\"sddl\" Condition=\"1&lt;2\" />",
                 "    </Component>",
                 "  </Fragment>",
                 "</Wix>"
