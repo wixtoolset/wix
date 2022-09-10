@@ -123,21 +123,19 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
-        /// See <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, byte[])"/>.
+        /// See <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/>.
         /// </summary>
         /// <param name="wzLocalSource"></param>
         /// <param name="wzDownloadSource"></param>
         /// <param name="qwValue"></param>
         /// <param name="hashType"></param>
-        /// <param name="rgbHash"></param>
-        /// <param name="cbHash"></param>
+        /// <param name="wzHash"></param>
         void SetUpdate(
             [MarshalAs(UnmanagedType.LPWStr)] string wzLocalSource,
             [MarshalAs(UnmanagedType.LPWStr)] string wzDownloadSource,
             [MarshalAs(UnmanagedType.U8)] long qwValue,
             [MarshalAs(UnmanagedType.U4)] UpdateHashType hashType,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=4)] byte[] rgbHash,
-            [MarshalAs(UnmanagedType.U4)] int cbHash
+            [MarshalAs(UnmanagedType.LPWStr)] string wzHash
             );
 
         /// <summary>

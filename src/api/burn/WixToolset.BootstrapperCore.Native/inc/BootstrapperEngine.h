@@ -381,8 +381,7 @@ typedef struct _BAENGINE_SETUPDATE_ARGS
     LPCWSTR wzDownloadSource;
     DWORD64 qwSize;
     BOOTSTRAPPER_UPDATE_HASH_TYPE hashType;
-    BYTE* rgbHash;
-    DWORD cbHash;
+    LPCWSTR wzHash;
 } BAENGINE_SETUPDATE_ARGS;
 
 typedef struct _BAENGINE_SETUPDATE_RESULTS

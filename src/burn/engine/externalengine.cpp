@@ -269,8 +269,7 @@ HRESULT ExternalEngineSetUpdate(
     __in_z_opt LPCWSTR wzDownloadSource,
     __in const DWORD64 qwSize,
     __in const BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-    __in_opt const BYTE* rgbHash,
-    __in const DWORD cbHash
+    __in_opt LPCWSTR wzHash
     )
 {
     HRESULT hr = S_OK;
@@ -293,11 +292,11 @@ HRESULT ExternalEngineSetUpdate(
 
     if (!fRemove)
     {
-        if (BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE == hashType && (0 != cbHash || rgbHash))
+        if (BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE == hashType && wzHash && *wzHash)
         {
             ExitFunction1(hr = E_INVALIDARG);
         }
-        else if (BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512 == hashType && (SHA512_HASH_LEN != cbHash || !rgbHash))
+        else if (BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512 == hashType && (!wzHash || !*wzHash || SHA512_HASH_LEN != lstrlenW(wzHash)))
         {
             ExitFunction1(hr = E_INVALIDARG);
         }
@@ -335,7 +334,7 @@ HRESULT ExternalEngineSetUpdate(
         wzLocalSource = sczFilePath;
     }
 
-    hr = PseudoBundleInitializeUpdateBundle(&pEngineState->update.package, wzGuid, pEngineState->registration.sczId, sczFilePath, wzLocalSource, wzDownloadSource, qwSize, sczCommandline, rgbHash, cbHash);
+    hr = PseudoBundleInitializeUpdateBundle(&pEngineState->update.package, wzGuid, pEngineState->registration.sczId, sczFilePath, wzLocalSource, wzDownloadSource, qwSize, sczCommandline, wzHash);
     ExitOnFailure(hr, "Failed to set update bundle.");
 
     pEngineState->update.fUpdateAvailable = TRUE;

@@ -240,9 +240,9 @@ namespace WixToolset.Mba.Core
         }
 
         /// <inheritdoc/>
-        public void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, byte[] hash)
+        public void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, string hash)
         {
-            this.engine.SetUpdate(localSource, downloadSource, size, hashType, hash, null == hash ? 0 : hash.Length);
+            this.engine.SetUpdate(localSource, downloadSource, size, hashType, hash);
         }
 
         /// <inheritdoc/>

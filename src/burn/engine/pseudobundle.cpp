@@ -142,9 +142,8 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
     __in_z_opt LPCWSTR wzDownloadSource,
     __in DWORD64 qwSize,
     __in_z LPCWSTR wzInstallArguments,
-    __in_opt const BYTE* pbHash,
-    __in const DWORD cbHash
-    )
+    __in_opt LPCWSTR wzHash
+)
 {
     HRESULT hr = S_OK;
     BURN_PAYLOAD* pPayload = NULL;
@@ -176,13 +175,20 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
         ExitOnFailure(hr, "Failed to copy download source for pseudo bundle.");
     }
 
-    if (pbHash)
+    if (wzHash && *wzHash)
     {
+        BYTE* rgbHash = NULL;
+        DWORD cbHash = 0;
+
+        hr = StrAllocHexDecode(wzHash, &rgbHash, &cbHash);
+        ExitOnFailure(hr, "Failed to decode hash string: %ls.", wzHash);
+
         pPayload->pbHash = static_cast<BYTE*>(MemAlloc(cbHash, FALSE));
         ExitOnNull(pPayload->pbHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for update bundle payload hash.");
 
         pPayload->cbHash = cbHash;
-        memcpy_s(pPayload->pbHash, pPayload->cbHash, pbHash, cbHash);
+
+        memcpy_s(pPayload->pbHash, pPayload->cbHash, rgbHash, cbHash);
     }
 
     pPackage->type = BURN_PACKAGE_TYPE_EXE;

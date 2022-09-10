@@ -197,7 +197,7 @@ static HRESULT BAEngineSetUpdate(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_SETUPDATE_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_SETUPDATE_RESULTS, pResults);
 
-    hr = ExternalEngineSetUpdate(pContext->pEngineState, pArgs->wzLocalSource, pArgs->wzDownloadSource, pArgs->qwSize, pArgs->hashType, pArgs->rgbHash, pArgs->cbHash);
+    hr = ExternalEngineSetUpdate(pContext->pEngineState, pArgs->wzLocalSource, pArgs->wzDownloadSource, pArgs->qwSize, pArgs->hashType, pArgs->wzHash);
 
 LExit:
     return hr;

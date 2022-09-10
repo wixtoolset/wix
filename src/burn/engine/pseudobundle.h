@@ -34,9 +34,8 @@ HRESULT PseudoBundleInitializeUpdateBundle(
     __in_z_opt LPCWSTR wzDownloadSource,
     __in DWORD64 qwSize,
     __in_z LPCWSTR wzInstallArguments,
-    __in_opt const BYTE* pbHash,
-    __in const DWORD cbHash
-    );
+    __in_opt LPCWSTR wzHash
+);
 
 #if defined(__cplusplus)
 }

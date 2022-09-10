@@ -81,9 +81,8 @@ HRESULT ExternalEngineSetUpdate(
     __in_z_opt LPCWSTR wzDownloadSource,
     __in const DWORD64 qwSize,
     __in const BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-    __in_opt const BYTE* rgbHash,
-    __in const DWORD cbHash
-    );
+    __in_opt LPCWSTR wzHash
+);
 
 HRESULT ExternalEngineSetLocalSource(
     __in BURN_ENGINE_STATE* pEngineState,
