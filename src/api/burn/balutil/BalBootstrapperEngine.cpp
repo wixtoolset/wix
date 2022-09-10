@@ -312,8 +312,7 @@ public: // IBootstrapperEngine
         __in_z_opt LPCWSTR wzDownloadSource,
         __in DWORD64 qwSize,
         __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-        __in_bcount_opt(cbHash) BYTE* rgbHash,
-        __in DWORD cbHash
+        __in_z_opt LPCWSTR wzHash
         )
     {
         BAENGINE_SETUPDATE_ARGS args = { };
@@ -324,8 +323,7 @@ public: // IBootstrapperEngine
         args.wzDownloadSource = wzDownloadSource;
         args.qwSize = qwSize;
         args.hashType = hashType;
-        args.rgbHash = rgbHash;
-        args.cbHash = cbHash;
+        args.wzHash = wzHash;
 
         results.cbSize = sizeof(results);
 

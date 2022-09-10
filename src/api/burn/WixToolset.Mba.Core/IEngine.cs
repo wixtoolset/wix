@@ -142,7 +142,7 @@ namespace WixToolset.Mba.Core
         /// <param name="size">Size of the expected update.</param>
         /// <param name="hashType">Type of the hash expected on the update.</param>
         /// <param name="hash">Optional hash expected for the update.</param>
-        void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, byte[] hash);
+        void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, string hash);
 
         /// <summary>
         /// Sets the URL to the update feed.

@@ -65,8 +65,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         __in_z_opt LPCWSTR wzDownloadSource,
         __in DWORD64 qwSize,
         __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-        __in_bcount_opt(cbHash) BYTE* rgbHash,
-        __in DWORD cbHash
+        __in_z_opt LPCWSTR wzHash
         ) = 0;
 
     STDMETHOD(SetLocalSource)(
