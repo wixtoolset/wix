@@ -5,6 +5,8 @@
 <WixLocalization Culture="en-us" Language="1033" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">[WixBundleName] Setup</String>
   <String Id="Title">[WixBundleName]</String>
+  <String Id="CheckingForUpdatesLabel">Checking for updates</String>
+  <String Id="UpdateButton">&amp;Update to version [WixStdBAUpdateAvailable]</String>
   <String Id="InstallHeader">Welcome</String>
   <String Id="InstallMessage">Setup will install [WixBundleName] on your computer. Click Install to continue or Cancel to exit.</String>
   <String Id="InstallMessageOptions">Setup will install [WixBundleName] on your computer. Click Install to continue, Options to set installation options, or Cancel to exit.</String>
