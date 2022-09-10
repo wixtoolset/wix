@@ -220,7 +220,7 @@ namespace WixToolset.Test.BA
             if (!this.UpdateAvailable && this.Engine.CompareVersions(e.Version, this.Version) > 0)
             {
                 this.Log(String.Format("Selected update v{0}", e.Version));
-                this.Engine.SetUpdate(null, e.UpdateLocation, e.Size, UpdateHashType.None, null);
+                this.Engine.SetUpdate(null, e.UpdateLocation, e.Size, e.HashAlgorithm, e.Hash);
                 this.UpdateAvailable = true;
             }
         }

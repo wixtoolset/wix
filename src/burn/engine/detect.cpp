@@ -400,7 +400,7 @@ static HRESULT DetectAtomFeedUpdate(
             APPLICATION_UPDATE_ENTRY* pAppUpdateEntry = &pApupChain->rgEntries[i];
             APPLICATION_UPDATE_ENCLOSURE* pEnclosure = pAppUpdateEntry->rgEnclosures;
 
-            if (pEnclosure)
+            if (pEnclosure && pEnclosure->rgbDigest && *pEnclosure->rgbDigest)
             {
                 hr = StrAllocHexEncode(pEnclosure->rgbDigest, pEnclosure->cbDigest, &sczHash);
                 ExitOnFailure(hr, "Failed to encode hash as string.");

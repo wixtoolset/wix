@@ -5,6 +5,8 @@
 <WixLocalization Culture="en-us" Language="1033" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">[WixBundleName] Setup</String>
   <String Id="Title">[WixBundleName]</String>
+  <String Id="CheckingForUpdatesLabel">Checking for updates</String>
+  <String Id="UpdateButton">&amp;Update to version [WixStdBAUpdateAvailable]</String>
   <String Id="InstallVersion">Version [WixBundleVersion]</String>
   <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
   <String Id="ExecuteUpgradeRelatedBundleMessage">Previous version</String>

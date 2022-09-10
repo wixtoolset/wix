@@ -23,6 +23,7 @@ static const LPCWSTR WIXSTDBA_VARIABLE_LANGUAGE_ID = L"WixStdBALanguageId";
 static const LPCWSTR WIXSTDBA_VARIABLE_RESTART_REQUIRED = L"WixStdBARestartRequired";
 static const LPCWSTR WIXSTDBA_VARIABLE_SHOW_VERSION = L"WixStdBAShowVersion";
 static const LPCWSTR WIXSTDBA_VARIABLE_SUPPRESS_OPTIONS_UI = L"WixStdBASuppressOptionsUI";
+static const LPCWSTR WIXSTDBA_VARIABLE_UPDATE_AVAILABLE = L"WixStdBAUpdateAvailable";
 
 enum WIXSTDBA_STATE
 {
@@ -97,6 +98,11 @@ enum WIXSTDBA_CONTROL
     // Modify page
     WIXSTDBA_CONTROL_REPAIR_BUTTON,
     WIXSTDBA_CONTROL_UNINSTALL_BUTTON,
+
+    // Updates
+    WIXSTDBA_CONTROL_CHECKING_FOR_UPDATES_LABEL,
+    WIXSTDBA_CONTROL_INSTALL_UPDATE_BUTTON,
+    WIXSTDBA_CONTROL_MODIFY_UPDATE_BUTTON,
 
     // Progress page
     WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT,
@@ -339,6 +345,70 @@ public: // IBootstrapperApplication
 
     LExit:
         return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
+    }
+
+
+    virtual STDMETHODIMP OnDetectUpdateBegin(
+        __in_z LPCWSTR wzUpdateLocation,
+        __inout BOOL* pfCancel,
+        __inout BOOL* pfSkip
+    )
+    {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnDetectUpdateBegin() - update location: %ls", wzUpdateLocation);
+#endif
+
+        // Try update detection only if we have a potential update source and are in full UI mode.
+        *pfSkip = !wzUpdateLocation
+            || !*wzUpdateLocation
+            || BOOTSTRAPPER_DISPLAY_FULL != m_command.display;
+
+        ThemeShowControl(m_pControlCheckingForUpdatesLabel, *pfSkip ? SW_HIDE : SW_SHOW);
+
+        return __super::OnDetectUpdateBegin(wzUpdateLocation, pfCancel, pfSkip);
+    }
+
+
+    virtual STDMETHODIMP OnDetectUpdate(
+        __in_z LPCWSTR wzUpdateLocation,
+        __in DWORD64 dw64Size,
+        __in_z_opt LPCWSTR wzHash,
+        __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashAlgorithm,
+        __in LPCWSTR wzUpdateVersion,
+        __in_z LPCWSTR wzTitle,
+        __in_z LPCWSTR wzSummary,
+        __in_z LPCWSTR wzContentType,
+        __in_z LPCWSTR wzContent,
+        __inout BOOL* pfCancel,
+        __inout BOOL* pfStopProcessingUpdates
+    )
+    {
+        HRESULT hr = S_OK;
+        int nResult = 0;
+
+        hr = VerCompareStringVersions(m_sczBundleVersion, wzUpdateVersion, TRUE/*fStrict*/, &nResult);
+        BalExitOnFailure(hr, "Failed to compare bundle version: %ls to update version: %ls.", m_sczBundleVersion, wzUpdateVersion);
+
+        // Burn sends the feed in descending version order so we need only the first one.
+        *pfStopProcessingUpdates = TRUE;
+
+        if (0 <= nResult)
+        {
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "WIXSTDBA: Update version: %ls is a match or downgrade for bundle version: %ls.", wzUpdateVersion, m_sczBundleVersion);
+        }
+        else
+        {
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Update v%ls for bundle v%ls available from: %ls.", wzUpdateVersion, m_sczBundleVersion, wzUpdateLocation);
+
+            hr = BalSetVersionVariable(WIXSTDBA_VARIABLE_UPDATE_AVAILABLE, wzUpdateVersion);
+            BalExitOnFailure(hr, "Failed to set WixStdBAUpdateAvailable value: %ls.", wzUpdateVersion);
+
+            hr = m_pEngine->SetUpdate(NULL, wzUpdateLocation, dw64Size, hashAlgorithm, wzHash);
+            BalExitOnFailure(hr, "Failed to set update location: %ls.", wzUpdateLocation);
+        }
+
+    LExit:
+        return __super::OnDetectUpdate(wzUpdateLocation, dw64Size, wzHash, hashAlgorithm, wzUpdateVersion, wzTitle, wzSummary, wzContentType, wzContent, pfCancel, pfStopProcessingUpdates);
     }
 
 
@@ -3741,10 +3811,10 @@ private:
 
         m_state = state;
 
-        // If our install is at the end (success or failure) and we're not showing full UI or
+        // If our install is at the end (success or failure) and we're not showing full UI or not updating or
         // we successfully installed the prerequisite(s) and either no restart is required or can automatically restart
         // then exit.
-        if ((WIXSTDBA_STATE_APPLIED <= m_state && BOOTSTRAPPER_DISPLAY_FULL > m_command.display) ||
+        if ((WIXSTDBA_STATE_APPLIED <= m_state && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_ACTION_UPDATE_REPLACE == m_plannedAction)) ||
             (WIXSTDBA_STATE_APPLIED == m_state && m_fPrereq && (!m_fRestartRequired || m_fShouldRestart && m_fAllowRestart)))
         {
             // Quietly exit.
@@ -4038,6 +4108,15 @@ private:
 
 
     //
+    // OnClickUpdateButton - start the update process.
+    //
+    void OnClickUpdateButton()
+    {
+        this->OnPlan(BOOTSTRAPPER_ACTION_UPDATE_REPLACE);
+    }
+
+
+    //
     // OnClickCloseButton - close the application.
     //
     void OnClickCloseButton()
@@ -4263,6 +4342,13 @@ private:
                 pResults->lResult = 0;
                 ExitFunction();
 
+            case WIXSTDBA_CONTROL_INSTALL_UPDATE_BUTTON:
+            case WIXSTDBA_CONTROL_MODIFY_UPDATE_BUTTON:
+                OnClickUpdateButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
             case WIXSTDBA_CONTROL_LAUNCH_BUTTON:
                 OnClickLaunchButton();
                 fProcessed = TRUE;
@@ -4381,6 +4467,10 @@ LExit:
         __in HRESULT hrStatus
         )
     {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: SetState() - setting state to %u with status 0x%08x.", state, hrStatus);
+#endif
+
         if (FAILED(hrStatus))
         {
             m_hrFinal = hrStatus;
@@ -4786,6 +4876,27 @@ public:
         m_pControlUninstallButton = NULL;
         ++pAssignControl;
 
+        pAssignControl->wId = WIXSTDBA_CONTROL_CHECKING_FOR_UPDATES_LABEL;
+        pAssignControl->wzName = L"CheckingForUpdatesLabel";
+        pAssignControl->ppControl = &m_pControlCheckingForUpdatesLabel;
+        pAssignControl->dwAutomaticBehaviorType = dwAutomaticBehaviorType;
+        m_pControlCheckingForUpdatesLabel = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_INSTALL_UPDATE_BUTTON;
+        pAssignControl->wzName = L"InstallUpdateButton";
+        pAssignControl->ppControl = &m_pControlInstallUpdateButton;
+        pAssignControl->dwAutomaticBehaviorType = THEME_CONTROL_AUTOMATIC_BEHAVIOR_ALL;
+        m_pControlInstallUpdateButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_MODIFY_UPDATE_BUTTON;
+        pAssignControl->wzName = L"ModifyUpdateButton";
+        pAssignControl->ppControl = &m_pControlModifyUpdateButton;
+        pAssignControl->dwAutomaticBehaviorType = THEME_CONTROL_AUTOMATIC_BEHAVIOR_ALL;
+        m_pControlModifyUpdateButton = NULL;
+        ++pAssignControl;
+
         pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT;
         pAssignControl->wzName = L"CacheProgressPackageText";
         pAssignControl->ppControl = &m_pControlCacheProgressPackageText;
@@ -4929,6 +5040,7 @@ public:
         ReleaseStr(m_sczLicenseUrl);
         ReleaseStr(m_sczBundleVersion);
         ReleaseStr(m_sczAfterForcedRestartPackage);
+
         ReleaseNullObject(m_pEngine);
     }
 
@@ -4965,6 +5077,11 @@ private:
     // Modify page
     const THEME_CONTROL* m_pControlRepairButton;
     const THEME_CONTROL* m_pControlUninstallButton;
+
+    // Update/loading pages
+    const THEME_CONTROL* m_pControlCheckingForUpdatesLabel;
+    const THEME_CONTROL* m_pControlInstallUpdateButton;
+    const THEME_CONTROL* m_pControlModifyUpdateButton;
 
     // Progress page
     const THEME_CONTROL* m_pControlCacheProgressPackageText;

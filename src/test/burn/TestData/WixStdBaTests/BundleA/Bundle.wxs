@@ -4,6 +4,8 @@
   <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" bal:CommandLineVariables="caseSensitive">
     <Log Prefix="~$(var.TestGroupName)_$(var.BundleName)" />
 
+    <Update Location='http://wixtoolset.org/releases/feed/v3.14' />
+    
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
 
     <BootstrapperApplication>
