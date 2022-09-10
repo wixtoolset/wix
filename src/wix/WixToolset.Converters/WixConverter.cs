@@ -351,7 +351,7 @@ namespace WixToolset.Converters
 
             this.XRoot = document.Root;
 
-            // Start converting the nodes at the top.
+            // Start converting the remainingNodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
 
@@ -404,7 +404,7 @@ namespace WixToolset.Converters
                 TrimLeadingText(document);
             }
 
-            // Start converting the nodes at the top.
+            // Start converting the remainingNodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
 
@@ -446,8 +446,8 @@ namespace WixToolset.Converters
 
         private void ConvertNodes(IEnumerable<XNode> nodes, int level)
         {
-            // Note we operate on a copy of the node list since we may
-            // remove some whitespace nodes during this processing.
+            // Note we operate on a copy of the comment list since we may
+            // remove some whitespace remainingNodes during this processing.
             foreach (var node in nodes.ToList())
             {
                 if (node is XText text)
@@ -492,10 +492,9 @@ namespace WixToolset.Converters
                     this.ConvertElement(element);
 
                     var before = element.Nodes().ToList();
-
                     this.ConvertNodes(before, level + 1);
 
-                    // If any nodes were added during the processing of the children,
+                    // If any remainingNodes were added during the processing of the children,
                     // ensure those added children get processed as well.
                     var added = element.Nodes().Except(before).ToList();
 
@@ -525,7 +524,7 @@ namespace WixToolset.Converters
         {
             if (!WixConverter.LeadingWhitespaceValid(this.IndentationAmount, level, whitespace.Value))
             {
-                var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
+                var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this comment is incorrect.";
 
                 if (this.OnInformation(testType, node, message))
                 {
@@ -538,7 +537,7 @@ namespace WixToolset.Converters
         {
             if (!String.IsNullOrEmpty(whitespace.Value) && whitespace.NodeType != XmlNodeType.CDATA)
             {
-                var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
+                var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this comment is incorrect.";
 
                 if (this.OnInformation(testType, node, message))
                 {
@@ -924,23 +923,28 @@ namespace WixToolset.Converters
 
         private void ConvertControlElement(XElement element)
         {
-            var remove = new List<XElement>();
+            var xConditions = element.Elements(ConditionElementName).ToList();
 
-            foreach (var xCondition in element.Elements(ConditionElementName))
+            foreach (var xCondition in xConditions)
             {
                 var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
                 if (!String.IsNullOrEmpty(action) &&
-                    TryGetInnerText(xCondition, out var text) &&
+                    TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
                 {
                     element.Add(new XAttribute(action + "Condition", text));
-                    remove.Add(xCondition);
+                    // Comments are intentionally omitted here because there
+                    // is no good way to associate them with specific attributes.
                 }
             }
 
-            for (var i = remove.Count - 1; i >= 0; i--)
+            if (0 < xConditions.Count)
             {
-                remove[i].Remove();
+                var nodes = element.Nodes().ToList();
+                foreach (var node in nodes)
+                {
+                    node.Remove();
+                }
             }
         }
 
@@ -958,11 +962,16 @@ namespace WixToolset.Converters
             var xCondition = element.Element(ConditionElementName);
             if (xCondition != null)
             {
-                if (TryGetInnerText(xCondition, out var text) &&
+                if (TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
                 {
-                    element.Add(new XAttribute("Condition", text));
-                    xCondition.Remove();
+                    using (var lab = new ConversionLab(element))
+                    {
+                        xCondition.Remove();
+                        element.Add(new XAttribute("Condition", text));
+                        lab.RemoveOrphanTextNodes();
+                        lab.AddCommentsAsSiblings(comments);
+                    }
                 }
             }
 
@@ -1057,14 +1066,16 @@ namespace WixToolset.Converters
             {
                 var level = xCondition.Attribute("Level")?.Value;
                 if (!String.IsNullOrEmpty(level) &&
-                    TryGetInnerText(xCondition, out var text) &&
+                    TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Level' element instead.", xCondition.Name.LocalName))
                 {
-                    xCondition.AddAfterSelf(new XElement(LevelElementName,
-                        new XAttribute("Value", level),
-                        new XAttribute("Condition", text)
-                        ));
-                    xCondition.Remove();
+                    using (var lab = new ConversionLab(xCondition))
+                    {
+                        lab.ReplaceTargetElement(new XElement(LevelElementName,
+                                                              new XAttribute("Value", level),
+                                                              new XAttribute("Condition", text)));
+                        lab.AddCommentsAsSiblings(comments);
+                    }
                 }
             }
         }
@@ -1097,27 +1108,24 @@ namespace WixToolset.Converters
 
         private void ConvertFragmentElement(XElement element)
         {
-            var remove = new List<XElement>();
+            var xConditions = element.Elements(ConditionElementName).ToList();
 
-            foreach (var xCondition in element.Elements(ConditionElementName))
+            foreach (var xCondition in xConditions)
             {
                 var message = xCondition.Attribute("Message")?.Value;
 
                 if (!String.IsNullOrEmpty(message) &&
-                    TryGetInnerText(xCondition, out var text) &&
+                    TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
                 {
-                    xCondition.AddAfterSelf(new XElement(LaunchElementName,
-                        new XAttribute("Condition", text),
-                        new XAttribute("Message", message)
-                        ));
-                    remove.Add(xCondition);
+                    using (var lab = new ConversionLab(xCondition))
+                    {
+                        lab.ReplaceTargetElement(new XElement(LaunchElementName,
+                                                              new XAttribute("Condition", text),
+                                                              new XAttribute("Message", message)));
+                        lab.AddCommentsAsSiblings(comments);
+                    }
                 }
-            }
-
-            for (var i = remove.Count - 1; i >= 0; i--)
-            {
-                remove[i].Remove();
             }
         }
 
@@ -1161,11 +1169,18 @@ namespace WixToolset.Converters
             var xCondition = element.Element(ConditionElementName);
             if (xCondition != null)
             {
-                if (TryGetInnerText(xCondition, out var text) &&
+                if (TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
                 {
-                    element.Add(new XAttribute("Condition", text));
-                    xCondition.Remove();
+                    using (var lab = new ConversionLab(xCondition))
+                    {
+                        lab.RemoveTargetElement();
+                    }
+                    using (var lab = new ConversionLab(element))
+                    {
+                        element.Add(new XAttribute("Condition", text));
+                        lab.AddCommentsAsSiblings(comments);
+                    }
                 }
             }
         }
@@ -1246,19 +1261,22 @@ namespace WixToolset.Converters
             }
 
             var xConditions = element.Elements(ConditionElementName).ToList();
+
             foreach (var xCondition in xConditions)
             {
                 var message = xCondition.Attribute("Message")?.Value;
 
                 if (!String.IsNullOrEmpty(message) &&
-                    TryGetInnerText(xCondition, out var text) &&
+                    TryGetInnerText(xCondition, out var text, out var comments) &&
                     this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
                 {
-                    xCondition.AddAfterSelf(new XElement(LaunchElementName,
-                        new XAttribute("Condition", text),
-                        new XAttribute("Message", message)
-                        ));
-                    xCondition.Remove();
+                    using (var lab = new ConversionLab(xCondition))
+                    {
+                        lab.ReplaceTargetElement(new XElement(LaunchElementName,
+                                                              new XAttribute("Condition", text),
+                                                              new XAttribute("Message", message)));
+                        lab.AddCommentsAsSiblings(comments);
+                    }
                 }
             }
 
@@ -1540,16 +1558,24 @@ namespace WixToolset.Converters
 
         private void ConvertPublishElement(XElement element)
         {
-            this.ConvertInnerTextToAttribute(element, "Condition");
-
-            var xCondition = element.Attribute("Condition");
-            if (xCondition?.Value == "1" &&
-                this.OnInformation(ConverterTestType.PublishConditionOneUnnecessary, element, "Adding Condition='1' on {0} elements is no longer necessary. Remove the Condition attribute.", xCondition.Name.LocalName))
+            if (TryGetInnerText(element, out var text, out var comments) &&
+                this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", element.Name.LocalName))
             {
-                xCondition.Remove();
+                using (var lab = new ConversionLab(element))
+                {
+                    if ("1" == text)
+                    {
+                        this.OnInformation(ConverterTestType.PublishConditionOneUnnecessary, element, "Adding Condition='1' on {0} elements is no longer necessary. Remove the Condition attribute.", element.Name.LocalName);
+                    }
+                    else
+                    {
+                        element.Add(new XAttribute("Condition", text));
+                    }
+                    lab.RemoveOrphanTextNodes();
+                    lab.AddCommentsAsSiblings(comments);
+                }
             }
         }
-
         private void ConvertMultiStringValueElement(XElement element)
         {
             this.ConvertInnerTextToAttribute(element, "Value");
@@ -1824,7 +1850,7 @@ namespace WixToolset.Converters
 
             var xScript = xCustomAction.Attribute("Script");
 
-            if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText))
+            if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText, out var comments))
             {
                 if (this.OnInformation(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptSourceFile' attribute to reference it.", xCustomAction.Name.LocalName))
                 {
@@ -1835,8 +1861,30 @@ namespace WixToolset.Converters
                     var scriptFile = Path.Combine(scriptFolder, id + ext);
                     File.WriteAllText(scriptFile, scriptText);
 
-                    RemoveChildren(xCustomAction);
+                    var nodes = xCustomAction.Nodes().ToList();
+                    foreach (var node in nodes)
+                    {
+                        node.Remove();
+                    }
                     xCustomAction.Add(new XAttribute("ScriptSourceFile", scriptFile));
+                    if (comments.Any())
+                    {
+                        var remainingNodes = xCustomAction.NodesAfterSelf().ToList();
+                        var replacementNodes = remainingNodes.Where(e => XmlNodeType.Text != e.NodeType);
+                        foreach (var node in remainingNodes)
+                        {
+                            node.Remove();
+                        }
+                        foreach (var comment in comments)
+                        {
+                            xCustomAction.Add(comment);
+                            xCustomAction.Add("\n");
+                        }
+                        foreach (var node in replacementNodes)
+                        {
+                            xCustomAction.Add(node);
+                        }
+                    }
                 }
             }
         }
@@ -1956,11 +2004,15 @@ namespace WixToolset.Converters
 
         private void ConvertInnerTextToAttribute(XElement element, string attributeName)
         {
-            if (TryGetInnerText(element, out var text) &&
+            if (TryGetInnerText(element, out var text, out var comments) &&
                 this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
             {
-                element.Add(new XAttribute(attributeName, text));
-                RemoveChildren(element);
+                using (var lab = new ConversionLab(element))
+                {
+                    lab.RemoveOrphanTextNodes();
+                    element.Add(new XAttribute(attributeName, text));
+                    lab.AddCommentsAsSiblings(comments);
+                }
             }
         }
 
@@ -2083,7 +2135,7 @@ namespace WixToolset.Converters
         }
 
         /// <summary>
-        /// Determine if the whitespace preceding a node is appropriate for its depth level.
+        /// Determine if the whitespace preceding a comment is appropriate for its depth level.
         /// </summary>
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="level">The depth level that should match this whitespace.</param>
@@ -2100,11 +2152,11 @@ namespace WixToolset.Converters
         }
 
         /// <summary>
-        /// Fix the whitespace in a whitespace node.
+        /// Fix the whitespace in a whitespace comment.
         /// </summary>
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="level">The depth level of the desired whitespace.</param>
-        /// <param name="whitespace">The whitespace node to fix.</param>
+        /// <param name="whitespace">The whitespace comment to fix.</param>
         private static void FixupWhitespace(int indentationAmount, int level, XText whitespace)
         {
             var value = new StringBuilder(whitespace.Value.Length);
@@ -2166,7 +2218,7 @@ namespace WixToolset.Converters
         /// Output an error message to the console.
         /// </summary>
         /// <param name="converterTestType">The type of converter test.</param>
-        /// <param name="node">The node that caused the error.</param>
+        /// <param name="node">The comment that caused the error.</param>
         /// <param name="message">Detailed error message.</param>
         /// <param name="args">Additional formatted string arguments.</param>
         /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
@@ -2179,7 +2231,7 @@ namespace WixToolset.Converters
         /// Output an information message to the console.
         /// </summary>
         /// <param name="converterTestType">The type of converter test.</param>
-        /// <param name="node">The node that caused the error.</param>
+        /// <param name="node">The comment that caused the error.</param>
         /// <param name="message">Detailed error message.</param>
         /// <param name="args">Additional formatted string arguments.</param>
         /// <returns>Returns true indicating that action should be taken on this message, and false if it should be ignored.</returns>
@@ -2271,16 +2323,19 @@ namespace WixToolset.Converters
             return value;
         }
 
-        private static bool TryGetInnerText(XElement element, out string value)
+        private static bool TryGetInnerText(XElement element, out string value, out IEnumerable<XNode> comments)
         {
             value = null;
+            comments = null;
             var found = false;
 
             var nodes = element.Nodes().ToList();
+            var nonCommentNodes = nodes.Where(e => XmlNodeType.Comment != e.NodeType);
 
-            if (nodes.Any() && nodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
+            if (nonCommentNodes.Any() && nonCommentNodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
             {
-                value = String.Join(String.Empty, nodes.Cast<XText>().Select(TrimTextValue));
+                value = String.Join(String.Empty, nonCommentNodes.Cast<XText>().Select(TrimTextValue));
+                comments = nodes.Where(e => XmlNodeType.Comment == e.NodeType);
                 found = true;
             }
 
@@ -2323,12 +2378,21 @@ namespace WixToolset.Converters
             return value.Trim();
         }
 
-        private static void RemoveChildren(XElement element)
+
+        private static string LeadingWhitespace(XElement element)
         {
-            var nodes = element.Nodes().ToList();
-            foreach (var node in nodes)
+            if (null == element)
             {
-                node.Remove();
+                return null;
+            }
+            var firstNode = element.FirstNode;
+            if (firstNode is XText leadingText && String.IsNullOrWhiteSpace(leadingText.Value))
+            {
+                return leadingText.Value;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -2388,7 +2452,7 @@ namespace WixToolset.Converters
             XmlException,
 
             /// <summary>
-            /// Displayed when the whitespace preceding a node is wrong.
+            /// Displayed when the whitespace preceding a comment is wrong.
             /// </summary>
             WhitespacePrecedingNodeWrong,
 
@@ -2614,7 +2678,7 @@ namespace WixToolset.Converters
             RemotePayloadRenamed,
 
             /// <summary>
-            /// The XxxPackage/@Name attribute must be specified on the child XxxPackagePayload element when using a remote payload.
+            /// The XxxPackage/@Name attribute must be specified on the child XxxPackagePayload xCustomAction when using a remote payload.
             /// </summary>
             NameAttributeMovedToRemotePayload,
 
