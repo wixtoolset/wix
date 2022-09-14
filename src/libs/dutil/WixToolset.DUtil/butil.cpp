@@ -361,6 +361,12 @@ DAPI_(HRESULT) BundleQueryRelatedBundles(
 {
     HRESULT hr = S_OK;
     BUNDLE_QUERY_CONTEXT queryContext = { };
+    BOOL fSearch64 = TRUE;
+
+#if !defined(_WIN64)
+    // On 32-bit OS's, the requested bitness of the key is ignored so need to avoid searching the same place twice.
+    ProcWow64(::GetCurrentProcess(), &fSearch64);
+#endif
 
     queryContext.installContext = installContext;
     queryContext.rgwzDetectCodes = rgwzDetectCodes;
@@ -379,10 +385,13 @@ DAPI_(HRESULT) BundleQueryRelatedBundles(
     hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
     ButilExitOnFailure(hr, "Failed to query 32-bit related bundles.");
 
-    queryContext.regBitness = REG_KEY_64BIT;
+    if (fSearch64)
+    {
+        queryContext.regBitness = REG_KEY_64BIT;
 
-    hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
-    ButilExitOnFailure(hr, "Failed to query 64-bit related bundles.");
+        hr = QueryRelatedBundlesForScopeAndBitness(&queryContext);
+        ButilExitOnFailure(hr, "Failed to query 64-bit related bundles.");
+    }
 
 LExit:
     return hr;
