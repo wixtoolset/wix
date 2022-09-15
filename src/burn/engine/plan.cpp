@@ -871,7 +871,7 @@ static HRESULT PlanPackagesHelper(
     }
 
     // Passthrough packages are never cleaned up by the calling bundle (they delete themselves when appropriate).
-    if (!pPlan->fEnabledForwardCompatibleBundle)
+    if (!pPlan->fEnabledForwardCompatibleBundle && BOOTSTRAPPER_ACTION_LAYOUT != pPlan->action)
     {
         // Plan clean up of packages.
         for (DWORD i = 0; i < cPackages; ++i)

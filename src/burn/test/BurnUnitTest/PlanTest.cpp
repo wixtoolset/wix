@@ -1358,6 +1358,88 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void SingleExeLayoutTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleExeManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_LAYOUT);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_LAYOUT, pPlan->action);
+            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleProviderKey);
+            Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
+            Assert::Equal<BOOL>(FALSE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fCanAffectMachineState);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisallowRemoval);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDowngrade);
+            Assert::Equal<DWORD>(0, pPlan->dwRegistrationOperations);
+            Assert::True(0 != pPlan->sczLayoutDirectory);
+            Assert::NotEqual<WCHAR>(0, *pPlan->sczLayoutDirectory);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRegistrationActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackRegistrationActions);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            ValidateCacheLayoutBundle(pPlan, fRollback, dwIndex++);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"NetFx48Web", TRUE, BURN_CACHE_PACKAGE_TYPE_NONE, BURN_CACHE_PACKAGE_TYPE_NONE);
+            ValidateCachePackage(pPlan, fRollback, dwIndex++, L"ExeA", TRUE, BURN_CACHE_PACKAGE_TYPE_NONE, BURN_CACHE_PACKAGE_TYPE_NONE);
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(4321686ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 1;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 1;
+            ValidateExecuteRollbackBoundaryStart(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteRollbackBoundaryEnd(pPlan, fRollback, dwIndex++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(3ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRestoreRelatedBundleActions);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+
+            Assert::Equal(2ul, pEngineState->packages.cPackages);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[1], L"ExeA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
+        }
+
+        [Fact]
         void SingleMsiCacheTest()
         {
             HRESULT hr = S_OK;
@@ -3167,6 +3249,16 @@ namespace Bootstrapper
             BURN_CACHE_ACTION* pAction = ValidateCacheActionExists(pPlan, fRollback, dwIndex);
             Assert::Equal<DWORD>(BURN_CACHE_ACTION_TYPE_CHECKPOINT, pAction->type);
             Assert::Equal(dwId, pAction->checkpoint.dwId);
+        }
+
+        void ValidateCacheLayoutBundle(
+            __in BURN_PLAN* pPlan,
+            __in BOOL fRollback,
+            __in DWORD dwIndex
+            )
+        {
+            BURN_CACHE_ACTION* pAction = ValidateCacheActionExists(pPlan, fRollback, dwIndex);
+            Assert::Equal<DWORD>(BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE, pAction->type);
         }
 
         DWORD ValidateCachePackage(
