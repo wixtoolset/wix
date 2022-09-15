@@ -4287,8 +4287,6 @@ static HRESULT StopBillboard(
 
     if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
     {
-        ThemeControlEnable(pControl, FALSE);
-
         if (::KillTimer(pTheme->hwndParent, idEvent))
         {
             hr = S_OK;

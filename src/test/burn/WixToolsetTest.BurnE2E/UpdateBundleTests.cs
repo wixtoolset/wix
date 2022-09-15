@@ -242,5 +242,41 @@ namespace WixToolsetTest.BurnE2E
             packageBv1.VerifyInstalled(false);
             packageBv2.VerifyInstalled(false);
         }
+
+        // Installs bundle Bv1.0 then attempts an update to bundle Bv2.0 during modify (server exists, v2.0 feed with wrong hash).
+        [RuntimeFact]
+        public void CanBlockWrongUpdateBundleFromDownloadInsteadOfModify()
+        {
+            var packageBv1 = this.CreatePackageInstaller("PackageBv1");
+            var packageBv2 = this.CreatePackageInstaller("PackageBv2");
+            var bundleBv1 = this.CreateBundleInstaller("BundleBv1");
+            var bundleBv2 = this.CreateBundleInstaller("BundleBv2");
+            var webServer = this.CreateWebServer();
+
+            webServer.AddFiles(new Dictionary<string, string>
+            {
+                { "/BundleB/feed", Path.Combine(this.TestContext.TestDataFolder, "FeedBv2.0_wronghash.xml") },
+                { "/BundleB/2.0/BundleB.exe", bundleBv2.Bundle },
+            });
+            webServer.Start();
+
+            packageBv1.VerifyInstalled(false);
+            packageBv2.VerifyInstalled(false);
+
+            bundleBv1.Install();
+            bundleBv1.VerifyRegisteredAndInPackageCache();
+
+            packageBv1.VerifyInstalled(true);
+            packageBv2.VerifyInstalled(false);
+
+            // Run the v1 bundle requesting an update bundle.
+            bundleBv1.Modify(unchecked((int)0x80091007), arguments: "-checkupdate");
+
+            bundleBv1.VerifyRegisteredAndInPackageCache();
+            bundleBv2.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageBv1.VerifyInstalled(true);
+            packageBv2.VerifyInstalled(false);
+        }
     }
 }

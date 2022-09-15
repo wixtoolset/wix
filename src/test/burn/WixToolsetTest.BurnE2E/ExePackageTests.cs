@@ -143,6 +143,32 @@ namespace WixToolsetTest.BurnE2E
         }
 
         [RuntimeFact]
+        public void CanUseLargeCustomExitCode()
+        {
+            var customExitCodeExePackageBundle = this.CreateBundleInstaller(@"CustomExitCodeExePackage");
+
+            var installLogPath = customExitCodeExePackageBundle.Install(5, "EXEEXITCODE=-2147024891");
+            customExitCodeExePackageBundle.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, "TestExe.exe\" /ec -2147024891"));
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, "The process for package: TestExe exited with code: 0x80070005. The exit code has been translated to type: ErrorScheduleReboot and restart: Required."));
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, "Applied execute package: TestExe, result: 0x80070005, restart: Required"));
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, "Apply complete, result: 0x80070005, restart: Required, ba requested restart:  No"));
+        }
+
+        [RuntimeFact]
+        public void CanUseWildcardCustomExitCode()
+        {
+            var customExitCodeExePackageBundle = this.CreateBundleInstaller(@"CustomExitCodeExePackage");
+
+            var installLogPath = customExitCodeExePackageBundle.Install((int)MSIExec.MSIExecReturnCode.SUCCESS, "EXEEXITCODE=1");
+            customExitCodeExePackageBundle.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, "TestExe.exe\" /ec 1"));
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, "The process for package: TestExe exited with code: 0x1. The exit code has been translated to type: Success and restart: None."));
+        }
+
+        [RuntimeFact]
         public void CanInstallAndUninstallPerUserArpEntryExePackage()
         {
             var perUserArpEntryExePackageBundle = this.CreateBundleInstaller(@"PerUserArpEntryExePackage");

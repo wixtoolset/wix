@@ -399,18 +399,23 @@ static HRESULT DetectAtomFeedUpdate(
         {
             APPLICATION_UPDATE_ENTRY* pAppUpdateEntry = &pApupChain->rgEntries[i];
             APPLICATION_UPDATE_ENCLOSURE* pEnclosure = pAppUpdateEntry->rgEnclosures;
+            LPCWSTR wzHash = L"";
+            BOOTSTRAPPER_UPDATE_HASH_TYPE hashType = BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE;
 
-            if (pEnclosure && pEnclosure->rgbDigest && *pEnclosure->rgbDigest)
+            if (pEnclosure && pEnclosure->rgbDigest && APUP_HASH_ALGORITHM_SHA512 == pEnclosure->digestAlgorithm)
             {
                 hr = StrAllocHexEncode(pEnclosure->rgbDigest, pEnclosure->cbDigest, &sczHash);
                 ExitOnFailure(hr, "Failed to encode hash as string.");
+
+                wzHash = sczHash;
+                hashType = BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512;
             }
 
             hr = UserExperienceOnDetectUpdate(pUX,
                 pEnclosure ? pEnclosure->wzUrl : NULL,
                 pEnclosure ? pEnclosure->dw64Size : 0,
-                sczHash ? sczHash : L"",
-                pEnclosure ? pEnclosure->digestAlgorithm == APUP_HASH_ALGORITHM_SHA512 ? BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512 : BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE : BOOTSTRAPPER_UPDATE_HASH_TYPE_NONE,
+                wzHash,
+                hashType,
                 pAppUpdateEntry->pVersion,
                 pAppUpdateEntry->wzTitle,
                 pAppUpdateEntry->wzSummary,

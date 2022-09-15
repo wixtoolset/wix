@@ -296,7 +296,7 @@ HRESULT ExternalEngineSetUpdate(
         {
             ExitFunction1(hr = E_INVALIDARG);
         }
-        else if (BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512 == hashType && (!wzHash || !*wzHash || SHA512_HASH_LEN != lstrlenW(wzHash)))
+        else if (BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512 == hashType && (!wzHash || !*wzHash || SHA512_HASH_LEN * 2 != lstrlenW(wzHash)))
         {
             ExitFunction1(hr = E_INVALIDARG);
         }

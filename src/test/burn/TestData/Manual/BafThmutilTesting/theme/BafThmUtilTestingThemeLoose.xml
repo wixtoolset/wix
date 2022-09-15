@@ -132,7 +132,7 @@ There are currently four states for a button: default, focus, hover, and selecte
         </Page>
         <Page Name="Billboard">
             <Label X="6" Y="6" Width="-6" Height="43" FontId="Default">
-                This page has a billboard. It loops between two panels every 1.5 seconds.
+                This page has a billboard. It loops between two panels every 1.5 seconds. Press Back to go to another page, and then come back and make sure it still loops.
             </Label>
             <Billboard Name="FirstBillboard" X="11" Y="59" Width="-11" Height="-39" Interval="1500" Loop="yes">
                 <Panel>

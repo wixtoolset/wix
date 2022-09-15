@@ -666,7 +666,13 @@ namespace WixTestTools
             /// A restart is required to complete the install. This message is indicative of a success. 
             /// This does not include installs where the ForceReboot action is run. 
             /// </summary> 
-            ERROR_SUCCESS_REBOOT_REQUIRED = 3010
+            ERROR_SUCCESS_REBOOT_REQUIRED = 3010,
+
+            /// <summary>
+            /// ERROR_SUCCESS_REBOOT_REQUIRED           3017
+            /// The requested operation failed. A system reboot is required to roll back changes made.
+            /// </summary>
+            ERROR_FAIL_REBOOT_REQUIRED = 3017,
         }
 
         /// <summary>
