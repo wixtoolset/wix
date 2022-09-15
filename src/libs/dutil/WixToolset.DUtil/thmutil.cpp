@@ -3777,6 +3777,7 @@ static HRESULT ParseBillboardPanels(
     HRESULT hr = S_OK;
     IXMLDOMNodeList* pixnl = NULL;
     IXMLDOMNode* pixnChild = NULL;
+    IXMLDOMNamedNodeMap* pixnnmAttributes = NULL;
     DWORD dwValue = 0;
     THEME_CONTROL* pControl = NULL;
 
@@ -3796,6 +3797,17 @@ static HRESULT ParseBillboardPanels(
 
     while (S_OK == (hr = XmlNextElement(pixnl, &pixnChild, NULL)))
     {
+        hr = pixnChild->get_attributes(&pixnnmAttributes);
+        ThmExitOnFailure(hr, "Failed to get attributes for billboard panel.");
+
+        hr = pixnnmAttributes->get_length(reinterpret_cast<long*>(&dwValue));
+        ThmExitOnFailure(hr, "Failed to count attributes for billboard panel.");
+
+        if (dwValue)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Billboard panels cannot contain attributes.");
+        }
+
         pControl = pParentControl->rgControls + pParentControl->cControls;
         pParentControl->cControls += 1;
         pControl->type = THEME_CONTROL_TYPE_PANEL;
@@ -3809,11 +3821,13 @@ static HRESULT ParseBillboardPanels(
         hr = ParseControls(hModule, wzRelativePath, pixnChild, pTheme, pControl, pPage, PANEL_CHILD_CONTROL_NAMES);
         ThmExitOnFailure(hr, "Failed to parse control.");
 
+        ReleaseNullObject(pixnnmAttributes);
         ReleaseNullObject(pixnChild);
     }
 
 LExit:
     ReleaseObject(pixnl);
+    ReleaseObject(pixnnmAttributes);
     ReleaseObject(pixnChild);
 
     return hr;
