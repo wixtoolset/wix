@@ -221,6 +221,11 @@ LExit:
         ::DeleteObject(splashScreenInfo.hBitmap);
     }
 
+    if (splashScreenInfo.hwndPrevious)
+    {
+        ::PostMessageW(splashScreenInfo.hwndPrevious, WM_CLOSE, 0, 0);
+    }
+
     return hr;
 }
 
@@ -261,6 +266,7 @@ static LRESULT CALLBACK WndProc(
         return 1;
 
     case WM_ENTERIDLE:
+    case WM_MOVING:
         lres = ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 
         // We had to create our own splash screen so that Windows would automatically transfer focus from the other process's splash screen.

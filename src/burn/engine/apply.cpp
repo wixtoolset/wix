@@ -2547,6 +2547,11 @@ static HRESULT DoExecuteAction(
     } while (fRetry && *pRestart < BOOTSTRAPPER_APPLY_RESTART_INITIATED);
 
 LExit:
+    if (*pRestart < restart)
+    {
+        *pRestart = restart;
+    }
+
     return hr;
 }
 
@@ -2561,6 +2566,7 @@ static HRESULT DoRollbackActions(
     DWORD iCheckpoint = 0;
     BOOL fRetryIgnored = FALSE;
     BOOL fSuspendIgnored = FALSE;
+    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     pContext->fRollback = TRUE;
 
@@ -2598,7 +2604,8 @@ static HRESULT DoRollbackActions(
                 continue;
             }
 
-            BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+            restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+
             switch (pRollbackAction->type)
             {
             case BURN_EXECUTE_ACTION_TYPE_CHECKPOINT:
@@ -2674,6 +2681,11 @@ static HRESULT DoRollbackActions(
     }
 
 LExit:
+    if (*pRestart < restart)
+    {
+        *pRestart = restart;
+    }
+
     return hr;
 }
 
@@ -2791,6 +2803,7 @@ static HRESULT DoRestoreRelatedBundleActions(
     HRESULT hr = S_OK;
     BOOL fRetryIgnored = FALSE;
     BOOL fSuspendIgnored = FALSE;
+    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     // execute restore related bundle actions
     for (DWORD i = 0; i < pEngineState->plan.cRestoreRelatedBundleActions; ++i)
@@ -2804,7 +2817,8 @@ static HRESULT DoRestoreRelatedBundleActions(
         pContext->wzExecutingPackageId = NULL;
         pContext->fAbandonedProcess = FALSE;
 
-        BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+        restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+
         switch (pRestoreRelatedBundleAction->type)
         {
         case BURN_EXECUTE_ACTION_TYPE_RELATED_BUNDLE:
@@ -2824,6 +2838,11 @@ static HRESULT DoRestoreRelatedBundleActions(
     }
 
 LExit:
+    if (*pRestart < restart)
+    {
+        *pRestart = restart;
+    }
+
     return hr;
 }
 
