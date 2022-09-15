@@ -1000,8 +1000,6 @@ extern "C" HRESULT CacheCompleteBundle(
     BOOL fPathEqual = FALSE;
     LPWSTR sczTargetDirectory = NULL;
     LPWSTR sczTargetPath = NULL;
-    LPWSTR sczSourceDirectory = NULL;
-    LPWSTR sczPayloadSourcePath = NULL;
 
     hr = CreateCompletedPath(pCache, fPerMachine, wzBundleId, NULL, &sczTargetDirectory);
     ExitOnFailure(hr, "Failed to create completed cache path for bundle.");
@@ -1028,18 +1026,18 @@ extern "C" HRESULT CacheCompleteBundle(
     FileRemoveFromPendingRename(sczTargetPath); // best effort to ensure bundle is not deleted from cache post restart.
 
     hr = FileEnsureCopyWithRetry(wzSourceBundlePath, sczTargetPath, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
+    if (FAILED(hr) && FileExistsEx(sczTargetPath, NULL))
+    {
+        LogId(REPORT_WARNING, MSG_IGNORING_CACHE_BUNDLE_FAILURE, hr);
+        ExitFunction1(hr = S_OK);
+    }
     ExitOnFailure(hr, "Failed to cache bundle from: '%ls' to '%ls'", wzSourceBundlePath, sczTargetPath);
 
     // Reset the path permissions in the cache.
     hr = ResetPathPermissions(fPerMachine, sczTargetPath);
     ExitOnFailure(hr, "Failed to reset permissions on cached bundle: '%ls'", sczTargetPath);
 
-    hr = PathGetDirectory(wzSourceBundlePath, &sczSourceDirectory);
-    ExitOnFailure(hr, "Failed to get directory from engine working path: %ls", wzSourceBundlePath);
-
 LExit:
-    ReleaseStr(sczPayloadSourcePath);
-    ReleaseStr(sczSourceDirectory);
     ReleaseStr(sczTargetPath);
     ReleaseStr(sczTargetDirectory);
 

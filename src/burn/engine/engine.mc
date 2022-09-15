@@ -862,6 +862,13 @@ Language=English
 Cached non-vital package: %1!ls!, encountered error: 0x%2!x!. Continuing...
 .
 
+MessageId=345
+Severity=Warning
+SymbolicName=MSG_IGNORING_CACHE_BUNDLE_FAILURE
+Language=English
+Ignoring failure to cache bundle because the file already exists, encountered error: 0x%1!x!. Continuing...
+.
+
 MessageId=346
 Severity=Warning
 SymbolicName=MSG_CACHE_RETRYING_PACKAGE

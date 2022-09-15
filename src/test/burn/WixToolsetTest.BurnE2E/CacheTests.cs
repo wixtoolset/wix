@@ -204,6 +204,35 @@ namespace WixToolsetTest.BurnE2E
         }
 
         [RuntimeFact]
+        public void CanHandleCachedBundleInPackageCacheInUse()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleA = this.CreateBundleInstaller("BundleA");
+
+            bundleA.Install();
+
+            var registration = bundleA.VerifyRegisteredAndInPackageCache();
+            var cachedBundlePath = registration.CachePath;
+
+            packageA.VerifyInstalled(true);
+            packageB.VerifyInstalled(true);
+
+            // Lock the bundle file in the package cache.
+            string modifyLogPath;
+            using (FileStream lockTargetFile = new FileStream(cachedBundlePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                modifyLogPath = bundleA.Modify();
+            }
+
+            bundleA.VerifyRegisteredAndInPackageCache();
+            packageA.VerifyInstalled(true);
+            packageB.VerifyInstalled(true);
+
+            Assert.True(LogVerifier.MessageInLogFile(modifyLogPath, "w345: Ignoring failure to cache bundle because the file already exists, encountered error: 0x80070020. Continuing..."));
+        }
+
+        [RuntimeFact]
         public void CanGetEngineWorkingDirectoryFromCommandLine()
         {
             var bundleA = this.CreateBundleInstaller("BundleA");
@@ -215,7 +244,7 @@ namespace WixToolsetTest.BurnE2E
             {
                 var baseTempPath = dfs.GetFolder(true);
                 var logPath = bundleA.Install(0, $"-burn.engine.working.directory=\"{baseTempPath}\"");
-                LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe");
+                Assert.True(LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe"));
             }
         }
 
@@ -251,7 +280,7 @@ namespace WixToolsetTest.BurnE2E
                     }
 
                     var logPath = bundleA.Install();
-                    LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe");
+                    Assert.True(LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe"));
                 }
             }
             finally
