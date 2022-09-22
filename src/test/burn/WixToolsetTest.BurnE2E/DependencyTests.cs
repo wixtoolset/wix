@@ -40,7 +40,7 @@ namespace WixToolsetTest.BurnE2E
             packageFv1.VerifyInstalled(false);
         }
 
-        [RuntimeFact (Skip = "https://github.com/wixtoolset/issues/issues/6401")]
+        [RuntimeFact]
         public void CanKeepSameExactPackageAfterUpgradingBundleWithSlipstreamedPatch()
         {
             var originalVersion = "1.0.0.0";
@@ -181,7 +181,7 @@ namespace WixToolsetTest.BurnE2E
             bundleAv1.VerifyExeTestRegistryRootDeleted(testRegistryValueExe);
         }
 
-        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
+        [RuntimeFact]
         public void CanMinorUpgradeDependencyPackageFromPatchBundle()
         {
             var originalVersion = "1.0.0.0";
@@ -231,7 +231,7 @@ namespace WixToolsetTest.BurnE2E
             }
         }
 
-        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
+        [RuntimeFact]
         public void CanMinorUpgradeDependencyPackageFromPatchBundleThenUninstallToRestoreBase()
         {
             var originalVersion = "1.0.0.0";
@@ -480,7 +480,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6401")]
+        [RuntimeFact]
         public void CanUpgradePatchBundleWithAdditionalPatch()
         {
             var originalVersion = "1.0.0.0";
@@ -489,7 +489,7 @@ namespace WixToolsetTest.BurnE2E
             var testRegistryValue = "PackageA";
 
             var packageA = this.CreatePackageInstaller("PackageAv1");
-            var packageB = this.CreatePackageInstaller("PackageBv1");
+            var packageB = this.CreatePackageInstaller("PackageB");
             var bundleF = this.CreateBundleInstaller("BundleF");
             var bundleF_PatchAv101 = this.CreateBundleInstaller("BundleF_PatchAv1_0_1");
             var bundleF_PatchAv102 = this.CreateBundleInstaller("BundleF_PatchAv1_0_2");
