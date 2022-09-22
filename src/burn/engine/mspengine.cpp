@@ -623,7 +623,7 @@ extern "C" HRESULT MspEngineExecutePackage(
             wzAppend = pMspPackage->Msp.sczPatchCode;
         }
 
-        if (NULL != sczPatches)
+        if (sczPatches)
         {
             hr = StrAllocConcat(&sczPatches, L";", 0);
             ExitOnFailure(hr, "Failed to semi-colon delimit patches.");
@@ -1049,6 +1049,7 @@ static HRESULT AddMsiChainedPatch(
 
     *pdwChainedPatchIndex = pPackage->Msi.cChainedPatches;
     ++pPackage->Msi.cChainedPatches;
+
 LExit:
     return hr;
 }
@@ -1186,7 +1187,7 @@ static HRESULT PlanTargetProduct(
 
     // Add our target product to the array and sort based on their order determined during detection.
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pAction->mspTarget.rgOrderedPatches), pAction->mspTarget.cOrderedPatches + 1, sizeof(BURN_ORDERED_PATCHES), 2);
-    ExitOnFailure(hr, "Failed grow array of ordered patches.");
+    ExitOnFailure(hr, "Failed to grow array of ordered patches.");
 
     pAction->mspTarget.rgOrderedPatches[pAction->mspTarget.cOrderedPatches].pTargetProduct = pTargetProduct;
     pAction->mspTarget.rgOrderedPatches[pAction->mspTarget.cOrderedPatches].pPackage = pPackage;
