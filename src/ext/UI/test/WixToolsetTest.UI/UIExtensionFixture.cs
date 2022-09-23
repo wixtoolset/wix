@@ -138,7 +138,7 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData\data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction");
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "Property");
             Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
@@ -155,6 +155,10 @@ namespace WixToolsetTest.UI
                 "CustomAction:WixUIPrintEula\t65\tWixUiCa_X86\tPrintEula\t",
                 "CustomAction:WixUIValidatePath\t65\tWixUiCa_X86\tValidatePath\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Property:WIXUI_INSTALLDIR\tINSTALLFOLDER",
+            }, results.Where(r => r.StartsWith("Property:WIXUI")).ToArray());
         }
 
         [Fact]
