@@ -55,6 +55,7 @@ namespace WixToolset.UI
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string id = null;
+            string installDirectory = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -64,6 +65,9 @@ namespace WixToolset.UI
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "InstallDirectory":
+                            installDirectory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -111,6 +115,14 @@ namespace WixToolset.UI
                     IgnoreResult = true,
                     ExecutionType = CustomActionExecutionType.Immediate,
                 });
+
+                if (installDirectory != null)
+                {
+                    section.AddSymbol(new PropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WIXUI_INSTALLDIR"))
+                    {
+                        Value = installDirectory
+                    });
+                }
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
