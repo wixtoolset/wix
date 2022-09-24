@@ -61,13 +61,9 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var tempFolder = fs.GetFolder();
 
-                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
-                var update1Pdb = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1");
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
-
-                Assert.True(File.Exists(baselinePdb));
-                Assert.True(File.Exists(update1Pdb));
+                var baselinePath = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
+                var update1Path = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
+                var patchPath = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1");
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(TargetProductCodeName).Value);
@@ -93,8 +89,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
@@ -123,8 +118,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
@@ -153,8 +147,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) }, updateBindpaths: new[] { Path.Combine(this.templateSourceFolder, ".update-data-alternative") });
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) }, updateBindpaths: new[] { Path.Combine(this.templateSourceFolder, ".update-data-alternative") });
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
@@ -186,8 +179,7 @@ namespace WixToolsetTest.CoreIntegration
             CreateAdminImage(this.templateBaselinePdb, adminBaselineFolder);
             CreateAdminImage(this.templateUpdatePdb, adminUpdateFolder);
 
-            var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { adminBaselineFolder, adminUpdateFolder });
-            var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+            var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { adminBaselineFolder, adminUpdateFolder });
 
             var doc = GetExtractPatchXml(patchPath);
             WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
@@ -214,8 +206,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var tempFolder = fs.GetFolder();
 
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdateNoFilesChangedPdb) }, hasNoFiles: true);
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var patchPath = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdateNoFilesChangedPdb) }, hasNoFiles: true);
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
@@ -243,10 +234,9 @@ namespace WixToolsetTest.CoreIntegration
                 var tempFolderUpdate = Path.Combine(baseFolder, "update");
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
-                var update1Pdb = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) });
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var baselinePath = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var update1Path = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPath = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePath), Path.GetDirectoryName(update1Path) });
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(TargetProductCodeName).Value);
@@ -286,8 +276,7 @@ namespace WixToolsetTest.CoreIntegration
                 var tempFolderUpdate = Path.Combine(baseFolder, "update");
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdateNoFilesChangedPdb) }, hasNoFiles: true, warningsAsErrors: false);
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var patchPath = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdateNoFilesChangedPdb) }, hasNoFiles: true, warningsAsErrors: false);
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
@@ -309,10 +298,9 @@ namespace WixToolsetTest.CoreIntegration
                 var tempFolderUpdate = Path.Combine(baseFolder, "update");
                 var tempFolderPatch = Path.Combine(baseFolder, "patch");
 
-                var baselinePdb = BuildMsi("Baseline.msi", sourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
-                var updatePdb = BuildMsi("Update.msi", sourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(updatePdb) }, hasNoFiles: true);
-                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+                var baselinePath = BuildMsi("Baseline.msi", sourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var updatePath = BuildMsi("Update.msi", sourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePath), Path.GetDirectoryName(updatePath) }, hasNoFiles: true);
 
                 var doc = GetExtractPatchXml(patchPath);
                 WixAssert.StringEqual("{7C871EC1-1F89-4850-A6A9-D7A4C21769F6}", doc.Root.Element(TargetProductCodeName).Value);
@@ -328,14 +316,18 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var tempFolder = fs.GetFolder();
 
-                var baselinePdb = BuildMsi("Baseline.msi", Path.Combine(folder, "PackageA"), tempFolder, "1.0.0", "A", "B");
-                var updatePdb = BuildMsi("Update.msi", Path.Combine(folder, "PackageA"), tempFolder, "1.0.1", "A", "B");
-                var patchAPdb = BuildMsp("PatchA.msp", Path.Combine(folder, "PatchA"), tempFolder, "1.0.1", hasNoFiles: true);
-                var patchBPdb = BuildMsp("PatchB.msp", Path.Combine(folder, "PatchB"), tempFolder, "1.0.1", hasNoFiles: true);
-                var patchCPdb = BuildMsp("PatchC.msp", Path.Combine(folder, "PatchC"), tempFolder, "1.0.1", hasNoFiles: true);
-                var bundleAPdb = BuildBundle("BundleA.exe", Path.Combine(folder, "BundleA"), tempFolder);
-                var bundleBPdb = BuildBundle("BundleB.exe", Path.Combine(folder, "BundleB"), tempFolder);
-                var bundleCPdb = BuildBundle("BundleC.exe", Path.Combine(folder, "BundleC"), tempFolder);
+                var baselinePath = BuildMsi("Baseline.msi", Path.Combine(folder, "PackageA"), tempFolder, "1.0.0", "A", "B");
+                var updatePath = BuildMsi("Update.msi", Path.Combine(folder, "PackageA"), tempFolder, "1.0.1", "A", "B");
+                var patchAPath = BuildMsp("PatchA.msp", Path.Combine(folder, "PatchA"), tempFolder, "1.0.1", hasNoFiles: true);
+                var patchBPath = BuildMsp("PatchB.msp", Path.Combine(folder, "PatchB"), tempFolder, "1.0.1", hasNoFiles: true);
+                var patchCPath = BuildMsp("PatchC.msp", Path.Combine(folder, "PatchC"), tempFolder, "1.0.1", hasNoFiles: true);
+                var bundleAPath = BuildBundle("BundleA.exe", Path.Combine(folder, "BundleA"), tempFolder);
+                var bundleBPath = BuildBundle("BundleB.exe", Path.Combine(folder, "BundleB"), tempFolder);
+                var bundleCPath = BuildBundle("BundleC.exe", Path.Combine(folder, "BundleC"), tempFolder);
+
+                var bundleAPdb = Path.ChangeExtension(bundleAPath, ".wixpdb");
+                var bundleBPdb = Path.ChangeExtension(bundleBPath, ".wixpdb");
+                var bundleCPdb = Path.ChangeExtension(bundleCPath, ".wixpdb");
 
                 VerifyPatchTargetCodesInBurnManifest(bundleAPdb, new[]
                 {
@@ -359,10 +351,11 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var tempFolder = fs.GetFolder();
 
-                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
-                var update1Pdb = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1");
-                var bundleAPdb = BuildBundle("BundleA.exe", Path.Combine(folder, "BundleA"), tempFolder);
+                var baselinePath = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
+                var update1Path = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
+                var patchPath = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1");
+                var bundleAPath = BuildBundle("BundleA.exe", Path.Combine(folder, "BundleA"), tempFolder);
+                var bundleAPdb = Path.ChangeExtension(bundleAPath, ".wixpdb");
 
                 using (var wixOutput = WixOutput.Read(bundleAPdb))
                 {
@@ -407,7 +400,7 @@ namespace WixToolsetTest.CoreIntegration
 
             result.AssertSuccess();
 
-            return Path.ChangeExtension(outputPath, ".wixpdb");
+            return outputPath;
         }
 
         private static string BuildMst(string transformName, string baseFolder, string templateBaselinePdb, string templateUpdatePdb)
@@ -431,9 +424,9 @@ namespace WixToolsetTest.CoreIntegration
             return outputPath;
         }
 
-        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, IEnumerable<string> targetBindpaths = null, IEnumerable<string> updateBindpaths = null, bool hasNoFiles = false, bool warningsAsErrors = true)
+        private static WixRunnerResult BuildMspForResult(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, IEnumerable<string> targetBindpaths = null, IEnumerable<string> updateBindpaths = null, bool hasNoFiles = false, bool warningsAsErrors = true)
         {
-            var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
+            var outputPath = Path.Combine(baseFolder, "bin", outputName);
 
             var args = new List<string>
             {
@@ -466,9 +459,16 @@ namespace WixToolsetTest.CoreIntegration
 
             var result = WixRunner.Execute(warningsAsErrors, args.ToArray());
 
+            return result;
+        }
+
+        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, IEnumerable<string> targetBindpaths = null, IEnumerable<string> updateBindpaths = null, bool hasNoFiles = false, bool warningsAsErrors = true)
+        {
+            var result = BuildMspForResult(outputName, sourceFolder, baseFolder, defineV, bindpaths, targetBindpaths, updateBindpaths, hasNoFiles, warningsAsErrors);
+
             result.AssertSuccess();
 
-            return Path.ChangeExtension(outputPath, ".wixpdb");
+            return Path.Combine(baseFolder, "bin", outputName);
         }
 
         private static string BuildBundle(string outputName, string sourceFolder, string baseFolder)
@@ -488,7 +488,7 @@ namespace WixToolsetTest.CoreIntegration
 
             result.AssertSuccess();
 
-            return Path.ChangeExtension(outputPath, ".wixpdb");
+            return outputPath;
         }
 
         private static void CreateAdminImage(string msiPath, string targetDir)
