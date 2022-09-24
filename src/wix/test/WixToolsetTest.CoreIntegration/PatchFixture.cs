@@ -372,6 +372,28 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CannotBuildPatchWithMissingBaseline()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchWithMissingBaseline");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+                var templateBaselineFolder = Path.GetDirectoryName(this.templateBaselinePdb);
+                var templateUpdateFolder = Path.GetDirectoryName(this.templateUpdatePdb);
+
+                var result = BuildMspForResult("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { templateBaselineFolder, templateUpdateFolder });
+
+                var messages = result.Messages.Select(m => m.ToString().Replace(tempFolderPatch, "<tempFolderPatch>").Replace(templateBaselineFolder, "<templateBaselineFolder>").Replace(templateUpdateFolder, "<templateUpdateFolder>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"The system cannot find the file 'Missing.wixpdb' with type 'WixPatchBaseline'. The following paths were checked: Missing.wixpdb, <tempFolderPatch>\bin\Missing.wixpdb, <templateBaselineFolder>\Missing.wixpdb, <templateUpdateFolder>\Missing.wixpdb",
+                }, messages);
+            }
+        }
+
         private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB, IEnumerable<string> bindpaths = null)
         {
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
