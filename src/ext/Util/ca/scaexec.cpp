@@ -965,13 +965,13 @@ extern "C" UINT __stdcall CreateUser(
         MessageExitOnFailure(hr, msierrUSRFailedGrantLogonAsService, "Failed to grant logon as batch job rights to user: %ls", pwzName);
     }
 
-    //
-    // Add the users to groups
-    //
-    while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
-    {
-        hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
-        ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
+//
+// Add the users to groups
+//
+while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
+{
+    hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
+    ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
 
         WcaLog(LOGMSG_STANDARD, "Adding user %ls\\%ls to group %ls\\%ls", pwzDomain, pwzName, pwzGroupDomain, pwzGroup);
         hr = AddUserToGroup(pwzName, pwzDomain, pwzGroup, pwzGroupDomain);
@@ -983,6 +983,8 @@ extern "C" UINT __stdcall CreateUser(
     }
 
     ExitOnFailure(hr, "failed to get next group in which to include user:%ls", pwzName);
+
+ExitOnFailure(hr, "failed to get next group in which to include user:%ls", pwzName);
 
 LExit:
     WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
