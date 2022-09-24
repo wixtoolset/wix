@@ -1183,9 +1183,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var customRow = this.CreateRow(firstCellSymbol, customTableDefinition);
                 var customRowFieldsByColumnName = customRow.Fields.ToDictionary(f => f.Column.Name);
 
-#if TODO // SectionId seems like a good thing to preserve.
-                customRow.SectionId = symbol.SectionId;
-#endif
                 foreach (var cell in rowOfCells)
                 {
                     var data = cell.Data;
