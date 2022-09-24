@@ -22,8 +22,6 @@ namespace WixToolset.Core
     {
         private static readonly string EmptyGuid = Guid.Empty.ToString("B");
 
-        private readonly bool sectionIdOnRows;
-
         /// <summary>
         /// Creates a linker.
         /// </summary>
@@ -31,7 +29,6 @@ namespace WixToolset.Core
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
-            this.sectionIdOnRows = true; // TODO: what is the correct value for this?
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -182,18 +179,8 @@ namespace WixToolset.Core
                 // metadata.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type);
 
-                var sectionCount = 0;
-
                 foreach (var section in sections)
                 {
-                    sectionCount++;
-
-                    var sectionId = section.Id;
-                    if (null == sectionId && this.sectionIdOnRows)
-                    {
-                        sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
-                    }
-
                     foreach (var symbol in section.Symbols)
                     {
                         if (find.RedundantSymbols.Contains(symbol))
@@ -287,22 +274,6 @@ namespace WixToolset.Core
                             WixMergeRef = connectToFeature.ChildId
                         });
                     }
-                }
-
-                // Correct the section Id in FeatureComponents table.
-                if (this.sectionIdOnRows)
-                {
-#if TODO_DO_SYMBOLS_NEED_SECTIONIDS
-                    var componentSectionIds = resolvedSection.Symbols.OfType<ComponentSymbol>().ToDictionary(c => c.Id.Id, c => c.SectionId);
-
-                    foreach (var featureComponentSymbol in resolvedSection.Symbols.OfType<FeatureComponentsSymbol>())
-                    {
-                        if (componentSectionIds.TryGetValue(featureComponentSymbol.ComponentRef, out var componentSectionId))
-                        {
-                            featureComponentSymbol.SectionId = componentSectionId;
-                        }
-                    }
-#endif
                 }
 
                 // Copy the wix variable rows to the output now that all overriding has been accounted for.
