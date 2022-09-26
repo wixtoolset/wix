@@ -16,35 +16,39 @@ Visual Studio 2022 (17.0.4 or higher, NOT the preview release) with the followin
 
 | Workloads |
 | :-------- |
-|ASP.Net and web development |
-|.Net desktop development |
+| ASP.NET and web development |
+| .NET desktop development |
 | Desktop development with C++ |
 
 | Individual components |
-| :-------- |
-|.Net Framework 4.7.2 SDK |
-|.Net Framework 4.7.2 targeting pack |
+| :-------------------- |
+| .NET Framework 4.7.2 SDK |
+| .NET Framework 4.7.2 targeting pack |
 | MSVC v141 - VS 2017 C++ ARM64 build tools (v14.16) |
 | MSVC v141 - VS 2017 C++ x64/x86 build tools (v14.16) |
 | MSVC v143 - VS 2022 C++ ARM64 build tools (Latest) |
 | MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
 
 ##### Getting started:
+
 * Fork the WiX4 repository (https://github.com/wixtoolset/wix4.git)
- into a github domain that you control
+ into a GitHub domain that you control
 * Clone the WiX4 repository from your fork (git clone https://github.com/yourdomain/wix4.git)
  into the directory of your choice
 
 ##### To build the WiX toolset:
+
  * Start a VS2022 'Developer Command Prompt'
  * Change directory to the root of the cloned repository
  * Issue the command `devbuild` (or `devbuild release` if you want to create a release version)
 
  ##### Executing your newly built WiX toolset
- * 'build\wix\Debug\publish\wix\wix --help' (Of course changing Debug to Release if you built in Release mode)
+ 
+ * `build\wix\Debug\publish\wix\wix --help` (Of course changing Debug to Release if you built in Release mode)
 
  ##### Pull request expectations
- * Pick an outstanding Wix4 issue (or create one). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
+ 
+ * Pick an outstanding WiX4 issue (or create one). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
  * To create a PR fork a new branch from the develop branch
  * Make changes to effect whatever changed behaviour is required for the PR
  * Push the changes to your repository origin as needed
