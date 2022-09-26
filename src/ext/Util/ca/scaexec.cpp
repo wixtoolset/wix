@@ -919,7 +919,7 @@ extern "C" UINT __stdcall CreateUser(
                     hr = HRESULT_FROM_WIN32(::SetUserPassword(pwzServerName, pwzName, pwzPassword));
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, $"failed to set user password for user {pwzServerName}\{pwzname}, continuing anyway.");
+                        WcaLogError(hr, "failed to set user password for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
                     }
 
                     if (SCAU_REMOVE_COMMENT & iAttributes)
@@ -927,7 +927,7 @@ extern "C" UINT __stdcall CreateUser(
                         hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, L""));
                         if (FAILED(hr))
                         {
-                            WcaLogError(hr, $"failed to clear user comment for user {pwzServerName}\{pwzname}, continuing anyway.");
+                            WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
                         }
                     }
                     else if (pwzComment && *pwzComment)
@@ -935,7 +935,7 @@ extern "C" UINT __stdcall CreateUser(
                         hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, pwzComment));
                         if (FAILED(hr))
                         {
-                            WcaLogError(hr, $"failed to set user comment to {pwzComment} for user {pwzServerName}\{pwzname}, continuing anyway.");
+                            WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
                         }
                     }
 
@@ -944,13 +944,13 @@ extern "C" UINT __stdcall CreateUser(
                     hr = ApplyAttributes(iAttributes, &flags);
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, $"failed to apply attributes for user {pwzServerName}\{pwzname, continuing anyway.");
+                        WcaLogError(hr, "failed to apply attributes for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
                     }
 
                     hr = HRESULT_FROM_WIN32(SetUserFlags(pwzServerName, pwzName, flags));
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, $"failed to set user flags for user {pwzServerName}\{pwzname, continuing anyway.");
+                        WcaLogError(hr, "failed to set user flags for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
                     }
                 }
             }
@@ -962,7 +962,7 @@ extern "C" UINT __stdcall CreateUser(
                     hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, L""));
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, $"failed to clear user comment for user {pwzServerName}\{pwzname}, continuing anyway.");
+                        WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
                     }
                 }
                 else if (pwzComment && *pwzComment)
@@ -970,7 +970,7 @@ extern "C" UINT __stdcall CreateUser(
                     hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, pwzComment));
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, $"failed to set user comment to {pwzComment} for user {pwzServerName}\{pwzname}, continuing anyway.");
+                        WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
                     }
                 }
             }
