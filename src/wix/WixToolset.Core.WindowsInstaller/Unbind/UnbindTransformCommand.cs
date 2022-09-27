@@ -1,11 +1,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-#if TODO_KEEP_FOR_PATCH_UNBINDING_CONSIDERATION_IN_FUTURE
-
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
@@ -19,10 +16,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class UnbindTransformCommand
     {
-        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, string transformFile, string exportBasePath, string intermediateFolder)
+        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, FileSystemManager fileSystemManager, string transformFile, string exportBasePath, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.PathResolver = pathResolver;
             this.FileSystemManager = fileSystemManager;
             this.TransformFile = transformFile;
             this.ExportBasePath = exportBasePath;
@@ -34,6 +32,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IPathResolver PathResolver { get; }
 
         private FileSystemManager FileSystemManager { get; }
 
@@ -49,8 +49,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public WindowsInstallerData Execute()
         {
-            var transform = new WindowsInstallerData(new SourceLineNumber(this.TransformFile));
-            transform.Type = OutputType.Transform;
+            var transform = new WindowsInstallerData(new SourceLineNumber(this.TransformFile))
+            {
+                Type = OutputType.Transform
+            };
 
             // get the summary information table
             using (var summaryInformation = new SummaryInformation(this.TransformFile))
@@ -71,181 +73,215 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             // create a schema msi which hopefully matches the table schemas in the transform
-            var schemaOutput = new WindowsInstallerData(null);
+            var schemaDatabasePath = Path.Combine(this.IntermediateFolder, "schema.msi");
+            var schemaData = this.CreateSchemaData(schemaDatabasePath);
+
+            // Bind the schema msi.
+            this.GenerateDatabase(schemaData);
+
+            var transformViewTable = this.OpenTransformViewForAddedAndModifiedRows(schemaDatabasePath);
+
+            var addedRows = this.CreatePlaceholdersForModifiedRowsAndIndexAddedRows(schemaData, transformViewTable);
+
+            // Re-bind the schema output with the placeholder rows over top the original schema database.
+            this.GenerateDatabase(schemaData);
+
+            this.PopulateTransformFromView(schemaDatabasePath, transform, transformViewTable, addedRows);
+
+            return transform;
+        }
+
+        private WindowsInstallerData CreateSchemaData(string schemaDatabasePath)
+        {
+            var schemaData = new WindowsInstallerData(new SourceLineNumber(schemaDatabasePath))
+            {
+                Type = OutputType.Product,
+            };
+
             foreach (var tableDefinition in this.TableDefinitions)
             {
                 // skip unreal tables and the Patch table
                 if (!tableDefinition.Unreal && "Patch" != tableDefinition.Name)
                 {
-                    schemaOutput.EnsureTable(tableDefinition);
+                    schemaData.EnsureTable(tableDefinition);
                 }
             }
 
-            var addedRows = new Dictionary<string, Row>();
-            Table transformViewTable;
+            return schemaData;
+        }
 
-            // Bind the schema msi.
-            var msiDatabaseFile = Path.Combine(this.IntermediateFolder, "schema.msi");
-            this.GenerateDatabase(schemaOutput, msiDatabaseFile);
-
-            // Apply the transform to the database and retrieve the modifications.
-            using (var msiDatabase = new Database(msiDatabaseFile, OpenDatabase.Transact))
+        private Table OpenTransformViewForAddedAndModifiedRows(string schemaDatabasePath)
+        {
+            // Apply the transform with the ViewTransform option to collect all the modifications.
+            using (var msiDatabase = this.ApplyTransformToSchemaDatabase(schemaDatabasePath, TransformErrorConditions.All | TransformErrorConditions.ViewTransform))
             {
-                // apply the transform with the ViewTransform option to collect all the modifications
-                msiDatabase.ApplyTransform(this.TransformFile, TransformErrorConditions.All | TransformErrorConditions.ViewTransform);
-
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, schemaDatabasePath, msiDatabase, OutputType.Product, null, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 var transformViewOutput = unbindCommand.Execute();
 
-                // index the added and possibly modified rows (added rows may also appears as modified rows)
-                transformViewTable = transformViewOutput.Tables["_TransformView"];
-                var modifiedRows = new Hashtable();
-                foreach (var row in transformViewTable.Rows)
+                return transformViewOutput.Tables["_TransformView"];
+            }
+        }
+
+        private Dictionary<string, Row> CreatePlaceholdersForModifiedRowsAndIndexAddedRows(WindowsInstallerData schemaData, Table transformViewTable)
+        {
+            // Index the added and possibly modified rows (added rows may also appears as modified rows).
+            var addedRows = new Dictionary<string, Row>();
+            var modifiedRows = new Dictionary<string, TableNameWithPrimaryKeys>();
+
+            foreach (var row in transformViewTable.Rows)
+            {
+                var tableName = row.FieldAsString(0);
+                var columnName = row.FieldAsString(1);
+                var primaryKeys = row.FieldAsString(2);
+
+                if ("INSERT" == columnName)
                 {
-                    var tableName = (string)row[0];
-                    var columnName = (string)row[1];
-                    var primaryKeys = (string)row[2];
-
-                    if ("INSERT" == columnName)
-                    {
-                        var index = String.Concat(tableName, ':', primaryKeys);
-
-                        addedRows.Add(index, null);
-                    }
-                    else if ("CREATE" != columnName && "DELETE" != columnName && "DROP" != columnName && null != primaryKeys) // modified row
-                    {
-                        var index = String.Concat(tableName, ':', primaryKeys);
-
-                        modifiedRows[index] = row;
-                    }
-                }
-
-                // create placeholder rows for modified rows to make the transform insert the updated values when its applied
-                foreach (Row row in modifiedRows.Values)
-                {
-                    var tableName = (string)row[0];
-                    var columnName = (string)row[1];
-                    var primaryKeys = (string)row[2];
-
                     var index = String.Concat(tableName, ':', primaryKeys);
 
-                    // ignore information for added rows
-                    if (!addedRows.ContainsKey(index))
+                    addedRows.Add(index, null);
+                }
+                else if ("CREATE" != columnName && "DELETE" != columnName && "DROP" != columnName && null != primaryKeys) // modified row
+                {
+                    var index = String.Concat(tableName, ':', primaryKeys);
+
+                    if (!modifiedRows.ContainsKey(index))
                     {
-                        var table = schemaOutput.Tables[tableName];
-                        this.CreateRow(table, primaryKeys, true);
+                        modifiedRows.Add(index, new TableNameWithPrimaryKeys { TableName = tableName, PrimaryKeys = primaryKeys });
                     }
                 }
             }
 
-            // Re-bind the schema output with the placeholder rows.
-            this.GenerateDatabase(schemaOutput, msiDatabaseFile);
-
-            // apply the transform to the database and retrieve the modifications
-            using (var msiDatabase = new Database(msiDatabaseFile, OpenDatabase.Transact))
+            // Create placeholder rows for modified rows to make the transform insert the updated values when its applied.
+            foreach (var kvp in modifiedRows)
             {
-                try
-                {
-                    // apply the transform
-                    msiDatabase.ApplyTransform(this.TransformFile, TransformErrorConditions.All);
+                var index = kvp.Key;
+                var tableNameWithPrimaryKey = kvp.Value;
 
-                    // commit the database to guard against weird errors with streams
-                    msiDatabase.Commit();
-                }
-                catch (Win32Exception ex)
+                // Ignore added rows.
+                if (!addedRows.ContainsKey(index))
                 {
-                    if (0x65B == ex.NativeErrorCode)
-                    {
-                        // this commonly happens when the transform was built
-                        // against a database schema different from the internal
-                        // table definitions
-                        throw new WixException(ErrorMessages.TransformSchemaMismatch());
-                    }
+                    var table = schemaData.Tables[tableNameWithPrimaryKey.TableName];
+                    this.CreateRow(table, tableNameWithPrimaryKey.PrimaryKeys, setRequiredFields: true);
                 }
+            }
+
+            return addedRows;
+        }
+
+        private void PopulateTransformFromView(string schemaDatabasePath, WindowsInstallerData transform, Table transformViewTable, Dictionary<string, Row> addedRows)
+        {
+            WindowsInstallerData output;
+            // Apply the transform to the database and retrieve the modifications
+            using (var database = this.ApplyTransformToSchemaDatabase(schemaDatabasePath, TransformErrorConditions.All))
+            {
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
-                var output = unbindCommand.Execute();
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, schemaDatabasePath, database, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
+                output = unbindCommand.Execute();
+            }
 
-                // index all the rows to easily find modified rows
-                var rows = new Dictionary<string, Row>();
-                foreach (var table in output.Tables)
+            // index all the rows to easily find modified rows
+            var rows = new Dictionary<string, Row>();
+            foreach (var table in output.Tables)
+            {
+                foreach (var row in table.Rows)
                 {
-                    foreach (var row in table.Rows)
-                    {
-                        rows.Add(String.Concat(table.Name, ':', row.GetPrimaryKey('\t', " ")), row);
-                    }
-                }
-
-                // process the _TransformView rows into transform rows
-                foreach (var row in transformViewTable.Rows)
-                {
-                    var tableName = (string)row[0];
-                    var columnName = (string)row[1];
-                    var primaryKeys = (string)row[2];
-
-                    var table = transform.EnsureTable(this.TableDefinitions[tableName]);
-
-                    if ("CREATE" == columnName) // added table
-                    {
-                        table.Operation = TableOperation.Add;
-                    }
-                    else if ("DELETE" == columnName) // deleted row
-                    {
-                        var deletedRow = this.CreateRow(table, primaryKeys, false);
-                        deletedRow.Operation = RowOperation.Delete;
-                    }
-                    else if ("DROP" == columnName) // dropped table
-                    {
-                        table.Operation = TableOperation.Drop;
-                    }
-                    else if ("INSERT" == columnName) // added row
-                    {
-                        var index = String.Concat(tableName, ':', primaryKeys);
-                        var addedRow = rows[index];
-                        addedRow.Operation = RowOperation.Add;
-                        table.Rows.Add(addedRow);
-                    }
-                    else if (null != primaryKeys) // modified row
-                    {
-                        var index = String.Concat(tableName, ':', primaryKeys);
-
-                        // the _TransformView table includes information for added rows
-                        // that looks like modified rows so it sometimes needs to be ignored
-                        if (!addedRows.ContainsKey(index))
-                        {
-                            var modifiedRow = rows[index];
-
-                            // mark the field as modified
-                            var indexOfModifiedValue = -1;
-                            for (var i = 0; i < modifiedRow.TableDefinition.Columns.Length; ++i)
-                            {
-                                if (columnName.Equals(modifiedRow.TableDefinition.Columns[i].Name, StringComparison.Ordinal))
-                                {
-                                    indexOfModifiedValue = i;
-                                    break;
-                                }
-                            }
-                            modifiedRow.Fields[indexOfModifiedValue].Modified = true;
-
-                            // move the modified row into the transform the first time its encountered
-                            if (RowOperation.None == modifiedRow.Operation)
-                            {
-                                modifiedRow.Operation = RowOperation.Modify;
-                                table.Rows.Add(modifiedRow);
-                            }
-                        }
-                    }
-                    else // added column
-                    {
-                        var column = table.Definition.Columns.Single(c => c.Name.Equals(columnName, StringComparison.Ordinal));
-                        column.Added = true;
-                    }
+                    rows.Add(String.Concat(table.Name, ':', row.GetPrimaryKey('\t', " ")), row);
                 }
             }
 
-            return transform;
+            // process the _TransformView rows into transform rows
+            foreach (var row in transformViewTable.Rows)
+            {
+                var tableName = row.FieldAsString(0);
+                var columnName = row.FieldAsString(1);
+                var primaryKeys = row.FieldAsString(2);
+
+                var table = transform.EnsureTable(this.TableDefinitions[tableName]);
+
+                if ("CREATE" == columnName) // added table
+                {
+                    table.Operation = TableOperation.Add;
+                }
+                else if ("DELETE" == columnName) // deleted row
+                {
+                    var deletedRow = this.CreateRow(table, primaryKeys, false);
+                    deletedRow.Operation = RowOperation.Delete;
+                }
+                else if ("DROP" == columnName) // dropped table
+                {
+                    table.Operation = TableOperation.Drop;
+                }
+                else if ("INSERT" == columnName) // added row
+                {
+                    var index = String.Concat(tableName, ':', primaryKeys);
+                    var addedRow = rows[index];
+                    addedRow.Operation = RowOperation.Add;
+                    table.Rows.Add(addedRow);
+                }
+                else if (null != primaryKeys) // modified row
+                {
+                    var index = String.Concat(tableName, ':', primaryKeys);
+
+                    // the _TransformView table includes information for added rows
+                    // that looks like modified rows so it sometimes needs to be ignored
+                    if (!addedRows.ContainsKey(index))
+                    {
+                        var modifiedRow = rows[index];
+
+                        // mark the field as modified
+                        var indexOfModifiedValue = -1;
+                        for (var i = 0; i < modifiedRow.TableDefinition.Columns.Length; ++i)
+                        {
+                            if (columnName.Equals(modifiedRow.TableDefinition.Columns[i].Name, StringComparison.Ordinal))
+                            {
+                                indexOfModifiedValue = i;
+                                break;
+                            }
+                        }
+                        modifiedRow.Fields[indexOfModifiedValue].Modified = true;
+
+                        // move the modified row into the transform the first time its encountered
+                        if (RowOperation.None == modifiedRow.Operation)
+                        {
+                            modifiedRow.Operation = RowOperation.Modify;
+                            table.Rows.Add(modifiedRow);
+                        }
+                    }
+                }
+                else // added column
+                {
+                    var column = table.Definition.Columns.Single(c => c.Name.Equals(columnName, StringComparison.Ordinal));
+                    column.Added = true;
+                }
+            }
+        }
+
+        private Database ApplyTransformToSchemaDatabase(string schemaDatabasePath, TransformErrorConditions transformConditions)
+        {
+            var msiDatabase = new Database(schemaDatabasePath, OpenDatabase.Transact);
+
+            try
+            {
+                // apply the transform
+                msiDatabase.ApplyTransform(this.TransformFile, transformConditions);
+
+                // commit the database to guard against weird errors with streams
+                msiDatabase.Commit();
+            }
+            catch (Win32Exception ex)
+            {
+                if (0x65B == ex.NativeErrorCode)
+                {
+                    // this commonly happens when the transform was built
+                    // against a database schema different from the internal
+                    // table definitions
+                    throw new WixException(ErrorMessages.TransformSchemaMismatch());
+                }
+            }
+
+            return msiDatabase;
         }
 
         /// <summary>
@@ -305,11 +341,17 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             return row;
         }
 
-        private void GenerateDatabase(WindowsInstallerData output, string databaseFile)
+        private void GenerateDatabase(WindowsInstallerData data)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, databaseFile, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
+            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, data, data.SourceLineNumbers.FileName, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
             command.Execute();
+        }
+
+        private class TableNameWithPrimaryKeys
+        {
+            public string TableName { get; set; }
+
+            public string PrimaryKeys { get; set; }
         }
     }
 }
-#endif

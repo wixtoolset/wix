@@ -21,12 +21,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     {
         private static readonly Regex Modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
 
-        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, string databasePath, OutputType outputType, string exportBasePath, string extractFilesFolder, string intermediateFolder, bool enableDemodularization, bool skipSummaryInfo)
+        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, string databasePath, Database database, OutputType outputType, string exportBasePath, string extractFilesFolder, string intermediateFolder, bool enableDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
             this.PathResolver = pathResolver;
             this.DatabasePath = databasePath;
+            this.Database = database;
             this.OutputType = outputType;
             this.ExportBasePath = exportBasePath;
             this.ExtractFilesFolder = extractFilesFolder;
@@ -45,21 +46,21 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private Database Database { get; set; }
 
-        public string DatabasePath { get; }
+        private string DatabasePath { get; }
 
-        public OutputType OutputType { get; }
+        private OutputType OutputType { get; }
 
-        public string ExportBasePath { get; }
+        private string ExportBasePath { get; }
 
-        public string ExtractFilesFolder { get; }
+        private string ExtractFilesFolder { get; }
 
-        public string IntermediateFolder { get; }
+        private string IntermediateFolder { get; }
 
-        public bool EnableDemodularization { get; }
+        private bool EnableDemodularization { get; }
 
-        public bool SkipSummaryInfo { get; }
+        private bool SkipSummaryInfo { get; }
 
-        public TableDefinitionCollection TableDefinitions { get; }
+        private TableDefinitionCollection TableDefinitions { get; }
 
         public bool AdminImage { get; private set; }
 
@@ -77,22 +78,24 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 Type = this.OutputType
             };
 
+            Database database = null;
             try
             {
-                using (var database = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
+                if (this.Database == null)
                 {
+                    database = new Database(this.DatabasePath, OpenDatabase.ReadOnly);
                     this.Database = database;
-
-                    Directory.CreateDirectory(this.IntermediateFolder);
-
-                    data.Codepage = this.GetCodePage();
-
-                    var modularizationGuid = this.ProcessTables(data, exportedFiles);
-
-                    var summaryInfo = this.ProcessSummaryInfo(data, modularizationGuid);
-
-                    this.UpdateUnrealFileColumns(this.DatabasePath, data, summaryInfo, exportedFiles);
                 }
+
+                Directory.CreateDirectory(this.IntermediateFolder);
+
+                data.Codepage = this.GetCodePage();
+
+                var modularizationGuid = this.ProcessTables(data, exportedFiles);
+
+                var summaryInfo = this.ProcessSummaryInfo(data, modularizationGuid);
+
+                this.UpdateUnrealFileColumns(this.DatabasePath, data, summaryInfo, exportedFiles);
             }
             catch (Win32Exception e)
             {
@@ -102,6 +105,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
 
                 throw;
+            }
+            finally
+            {
+                database?.Dispose();
             }
 
             this.AdminImage = adminImage;
@@ -542,9 +549,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                             source = Path.Combine(this.ExtractFilesFolder, fileRow.File);
                         }
                     }
-                    else
+                    else if (componentDirectoryIndex.TryGetValue(fileRow.Component, out var directoryId)) // this can happen when unbinding an invalid MSI file or MST file with select table modifications.
                     {
-                        var directoryId = componentDirectoryIndex[fileRow.Component];
                         var relativeFileLayoutPath = this.PathResolver.GetFileSourcePath(directories, directoryId, fileRow.FileName, compressed: false, useLongName: summaryInformation.LongFilenames);
 
                         source = Path.Combine(databaseFolder, relativeFileLayoutPath);

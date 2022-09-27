@@ -34,6 +34,8 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
         private string ExportBasePath { get; set; }
 
+        private bool SaveAsData { get; set; }
+
         private bool SuppressCustomTables { get; set; }
 
         private bool SuppressDroppingEmptyTables { get; set; }
@@ -47,13 +49,14 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             return new CommandLineHelp("Converts a Windows Installer database back into source code.", "msi decompile [options] inputfile", new[]
             {
                 new CommandLineHelpSwitch("-cub", "Optional path to a custom validation .CUBe file."),
+                new CommandLineHelpSwitch("-data", "Save output as data instead of as a source file."),
                 new CommandLineHelpSwitch("-sct", "Suppress decompiling custom tables."),
                 new CommandLineHelpSwitch("-sdet", "Suppress dropping empty tables."),
                 new CommandLineHelpSwitch("-sras", "Suppress relative action sequencing."),
                 new CommandLineHelpSwitch("-sui", "Suppress decompiling UI tables."),
                 new CommandLineHelpSwitch("-type", "Optional specify the input file type: msi or msm. If not specified, type will be inferred by file extension."),
                 new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
-                new CommandLineHelpSwitch("-out", "-o", "Path to output the decompiled .wxs file. If not specified, outputs next to inputfile"),
+                new CommandLineHelpSwitch("-out", "-o", "Path to output the decompiled output file. If not specified, outputs next to inputfile"),
                 new CommandLineHelpSwitch("-x", "Folder to export embedded binaries and icons to."),
             });
         }
@@ -77,7 +80,9 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
                 if (String.IsNullOrEmpty(this.OutputPath))
                 {
-                    this.OutputPath = Path.ChangeExtension(this.InputPath, ".wxs");
+                    var defaultExtension = this.CalculateExtensionFromDecompileType(decompileType);
+
+                    this.OutputPath = Path.ChangeExtension(this.InputPath, defaultExtension);
                 }
 
                 var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
@@ -92,7 +97,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 context.SymbolDefinitionCreator = creator;
                 context.OutputPath = this.OutputPath;
 
-                context.ExtractFolder = this.ExportBasePath ?? this.IntermediateFolder;
+                context.ExtractFolder = this.ExportBasePath;
                 context.SuppressCustomTables = this.SuppressCustomTables;
                 context.SuppressDroppingEmptyTables = this.SuppressDroppingEmptyTables;
                 context.SuppressRelativeActionSequencing = this.SuppressRelativeActionSequencing;
@@ -106,7 +111,17 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                     if (!this.Messaging.EncounteredError)
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(context.OutputPath)));
-                        result.Document.Save(context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
+                        if (this.SaveAsData || result.Document == null)
+                        {
+                            using (var output = WixOutput.Create(context.OutputPath))
+                            {
+                                result.Data.Save(output);
+                            }
+                        }
+                        else
+                        {
+                            result.Document.Save(context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
+                        }
                     }
                 }
                 catch (WixException e)
@@ -127,6 +142,10 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 {
                     case "intermediatefolder":
                         this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(argument);
+                        return true;
+
+                    case "data":
+                        this.SaveAsData = true;
                         return true;
 
                     case "o":
@@ -197,9 +216,33 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 case ".msm":
                     decompileType = OutputType.Module;
                     break;
+
+                case "transform":
+                case "mst":
+                case ".mst":
+                    decompileType = OutputType.Transform;
+                    break;
             }
 
             return decompileType != OutputType.Unknown;
+        }
+
+        private string CalculateExtensionFromDecompileType(OutputType decompileType)
+        {
+            switch (decompileType)
+            {
+                case OutputType.Product:
+                    return this.SaveAsData ? ".wixmsi" : ".wxs";
+
+                case OutputType.Module:
+                    return this.SaveAsData ? ".wixmsm" : ".wxs";
+
+                case OutputType.Transform:
+                    return ".wixmst";
+
+                default:
+                    return this.SaveAsData ? ".wixdata" : ".wxs";
+            }
         }
     }
 }

@@ -18,6 +18,8 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Dtf.Compression.Cab;
     using Xunit;
 
     public class PatchFixture : IDisposable
@@ -395,9 +397,9 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildPatchWithFiltering()
+        public void CanBuildPatchWithFileFiltering()
         {
-            var sourceFolder = TestData.Get(@"TestData", "PatchFamilyFilter");
+            var sourceFolder = TestData.Get(@"TestData", "PatchFamilyFileFilter");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -406,20 +408,47 @@ namespace WixToolsetTest.CoreIntegration
 
                 var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
 
-                var doc = GetExtractPatchXml(patchPath);
-                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
+                var mainTransform = ExtractBaselinePatch(patchPath, "RTM.1", baseFolder);
+                Assert.Null(mainTransform.Tables["Registry"]);
+                var fileRow = mainTransform.Tables["File"].Rows.Single();
+                Assert.Equal("a.txt", fileRow.FieldAsString(0));
+                Assert.Equal(152, fileRow.FieldAsInteger(3));
 
-                var names = Query.GetSubStorageNames(patchPath);
-                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+                var pairedTransform = ExtractBaselinePatch(patchPath, "#RTM.1", baseFolder);
+                fileRow = mainTransform.Tables["File"].Rows.Single();
+                Assert.Equal("a.txt", fileRow.FieldAsString(0));
+                Assert.Equal(152, fileRow.FieldAsInteger(3));
 
-                var cab = Path.Combine(baseFolder, "foo.cab");
-                Query.ExtractStream(patchPath, "foo.cab", cab);
-
-                var files = Query.GetCabinetFiles(cab);
+                var files = ExtractFilesFromPatchCabinet(patchPath, "foo.cab", baseFolder);
                 var file = files.Single();
-                WixAssert.StringEqual("a.txt", file.Name);
                 var contents = file.OpenText().ReadToEnd();
                 WixAssert.StringEqual("This is A v1.0.1 from the '.update-data' folder in 'PatchTemplatePackage'.\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.\r\n", contents);
+            }
+        }
+
+        [Fact]
+        public void CanBuildPatchWithRegistryFiltering()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchFamilyRegistryFilter");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) }, warningsAsErrors: false);
+
+                var mainTransform = ExtractBaselinePatch(patchPath, "RTM.1", baseFolder);
+                Assert.Null(mainTransform.Tables["File"]);
+                var row = mainTransform.Tables["Registry"].Rows.Single();
+                Assert.Equal("regUty0zLJ5uYhRlGzmOzENKmnAtno", row.FieldAsString(0));
+                Assert.Equal("1.0.1", row.FieldAsString(4));
+
+                var pairedTransform = ExtractBaselinePatch(patchPath, "#RTM.1", baseFolder);
+                Assert.Null(pairedTransform.Tables["File"]);
+
+                var files = ExtractFilesFromPatchCabinet(patchPath, "foo.cab", baseFolder);
+                Assert.Empty(files);
             }
         }
 
@@ -550,6 +579,41 @@ namespace WixToolsetTest.CoreIntegration
             proc.WaitForExit(5000);
 
             Assert.Equal(0, proc.ExitCode);
+        }
+
+        private static WindowsInstallerData DecompileMst(string transformPath, string baseFolder)
+        {
+            var outputPath = Path.ChangeExtension(transformPath, ".wixmst");
+
+            var args = new List<string>
+            {
+                "msi", "decompile",
+                transformPath,
+                "-intermediateFolder", Path.Combine(baseFolder),
+                "-o", outputPath,
+            };
+
+            var result = WixRunner.Execute(args.ToArray());
+
+            result.AssertSuccess();
+
+            return WindowsInstallerData.Load(outputPath);
+        }
+
+        private static WindowsInstallerData ExtractBaselinePatch(string patchPath, string substorageName, string baseFolder)
+        {
+            var mstPath = Path.Combine(baseFolder, substorageName, substorageName + ".mst");
+            Query.ExtractSubStorage(patchPath, substorageName, mstPath);
+
+            return DecompileMst(mstPath, baseFolder);
+        }
+
+        private static CabFileInfo[] ExtractFilesFromPatchCabinet(string patchPath, string cabinetName, string baseFolder)
+        {
+            var cab = Path.Combine(baseFolder, cabinetName);
+            Query.ExtractStream(patchPath, cabinetName, cab);
+
+            return Query.GetCabinetFiles(cab);
         }
 
         private static XDocument GetExtractPatchXml(string path)
