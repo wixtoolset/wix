@@ -96,8 +96,6 @@
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
-            <xs:attribute name="redundant" type="YesNoType" />
-            <xs:attribute name="sectionId" type="xs:string" />
             <xs:attribute name="sourceLineNumber" type="xs:string" />
         </xs:complexType>
     </xs:element>

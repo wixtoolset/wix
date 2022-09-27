@@ -34,14 +34,18 @@ namespace WixToolset.Core.WindowsInstaller
 
             // Create transforms named in patch transforms.
             IEnumerable<PatchTransform> patchTransforms;
+            PatchFilterMap patchFilterMap;
             {
-                var command = new CreatePatchTransformsCommand(messaging, backendHelper, pathResolver, fileResolver, resolveExtensions, context.IntermediateRepresentation, context.IntermediateFolder, context.BindPaths);
-                patchTransforms = command.Execute();
+                var command = new CreatePatchTransformsCommand(messaging, backendHelper, pathResolver, fileResolver, resolveExtensions, backendExtensions, context.IntermediateRepresentation, context.IntermediateFolder, context.BindPaths);
+                command.Execute();
+
+                patchTransforms = command.PatchTransforms;
+                patchFilterMap = command.PatchFilterMap;
             }
 
             // Reduce transforms.
             {
-                var command = new ReduceTransformCommand(context.IntermediateRepresentation, patchTransforms);
+                var command = new ReduceTransformCommand(context.IntermediateRepresentation, patchTransforms, patchFilterMap);
                 command.Execute();
             }
 

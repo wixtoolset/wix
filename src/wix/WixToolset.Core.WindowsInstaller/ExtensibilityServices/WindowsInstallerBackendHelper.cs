@@ -141,10 +141,7 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
         {
             var table = data.EnsureTable(tableDefinition);
 
-            var row = table.CreateRow(symbol.SourceLineNumbers);
-            row.SectionId = section.Id;
-
-            return row;
+            return table.CreateRow(symbol.SourceLineNumbers);
         }
 
         public bool TryAddSymbolToMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinitionCollection tableDefinitions)

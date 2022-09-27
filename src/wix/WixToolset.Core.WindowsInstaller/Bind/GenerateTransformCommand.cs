@@ -6,6 +6,7 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Collections.Generic;
     using System.Globalization;
     using WixToolset.Core.Native.Msi;
+    using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -16,18 +17,18 @@ namespace WixToolset.Core.WindowsInstaller
     /// </summary>
     internal class GenerateTransformCommand
     {
-        private const char SectionDelimiter = '/';
         private readonly IMessaging messaging;
         private SummaryInformationStreams transformSummaryInfo;
 
         /// <summary>
         /// Instantiates a new Differ class.
         /// </summary>
-        public GenerateTransformCommand(IMessaging messaging, WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput, bool preserveUnchangedRows, bool showPedanticMessages)
+        public GenerateTransformCommand(IMessaging messaging, WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput, PatchFilterMap patchFilterMap, bool preserveUnchangedRows, bool showPedanticMessages)
         {
             this.messaging = messaging;
             this.TargetOutput = targetOutput;
             this.UpdatedOutput = updatedOutput;
+            this.PatchFilterMap = patchFilterMap;
             this.PreserveUnchangedRows = preserveUnchangedRows;
             this.ShowPedanticMessages = showPedanticMessages;
         }
@@ -35,6 +36,8 @@ namespace WixToolset.Core.WindowsInstaller
         private WindowsInstallerData TargetOutput { get; }
 
         private WindowsInstallerData UpdatedOutput { get; }
+
+        public PatchFilterMap PatchFilterMap { get; }
 
         private TransformFlags ValidationFlags { get; }
 
@@ -112,7 +115,6 @@ namespace WixToolset.Core.WindowsInstaller
                     foreach (var updatedRow in updatedTable.Rows)
                     {
                         updatedRow.Operation = RowOperation.Add;
-                        updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                         addedTable.Rows.Add(updatedRow);
                     }
                 }
@@ -177,7 +179,6 @@ namespace WixToolset.Core.WindowsInstaller
                 else if (null == updatedRow)
                 {
                     targetRow.Operation = RowOperation.Delete;
-                    targetRow.SectionId += SectionDelimiter;
 
                     comparedRow = targetRow;
                     keepRow = true;
@@ -189,9 +190,10 @@ namespace WixToolset.Core.WindowsInstaller
                 if (!this.SuppressKeepingSpecialRows && "_SummaryInformation" == targetTable.Name)
                 {
                     // Include only summary information rows that are allowed in a transform.
-                    if (Enum.IsDefined(typeof(SummaryInformation.Transform), (int)updatedRow[0]))
+                    if (Enum.IsDefined(typeof(SummaryInformation.Transform), updatedRow.FieldAsInteger(0)))
                     {
-                        updatedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
+                        this.PatchFilterMap.AddTargetRowFilterToUpdatedRowFilter(targetRow, updatedRow);
+
                         comparedRow = updatedRow;
                         keepRow = true;
                     }
@@ -273,8 +275,9 @@ namespace WixToolset.Core.WindowsInstaller
 
                     if (keepRow)
                     {
+                        this.PatchFilterMap.AddTargetRowFilterToUpdatedRowFilter(targetRow, updatedRow);
+
                         comparedRow = updatedRow;
-                        comparedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                     }
                 }
             }
@@ -340,7 +343,6 @@ namespace WixToolset.Core.WindowsInstaller
                             var updatedRow = updatedPrimaryKeyEntry.Value;
 
                             updatedRow.Operation = RowOperation.Add;
-                            updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                             rows.Add(updatedRow);
                         }
                     }

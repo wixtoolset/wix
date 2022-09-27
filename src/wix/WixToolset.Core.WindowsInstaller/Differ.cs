@@ -17,7 +17,6 @@ namespace WixToolset.Core.WindowsInstaller
     /// </summary>
     public sealed class Differ
     {
-        private const char SectionDelimiter = '/';
         private readonly IMessaging messaging;
         private SummaryInformationStreams transformSummaryInfo;
 
@@ -111,7 +110,6 @@ namespace WixToolset.Core.WindowsInstaller
                     foreach (var updatedRow in updatedTable.Rows)
                     {
                         updatedRow.Operation = RowOperation.Add;
-                        updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                         addedTable.Rows.Add(updatedRow);
                     }
                 }
@@ -200,7 +198,6 @@ namespace WixToolset.Core.WindowsInstaller
                 else if (null == updatedRow)
                 {
                     operation = targetRow.Operation = RowOperation.Delete;
-                    targetRow.SectionId += SectionDelimiter;
                     comparedRow = targetRow;
                     keepRow = true;
                 }
@@ -211,9 +208,8 @@ namespace WixToolset.Core.WindowsInstaller
                 if (!this.SuppressKeepingSpecialRows && "_SummaryInformation" == targetTable.Name)
                 {
                     // ignore rows that shouldn't be in a transform
-                    if (Enum.IsDefined(typeof(SummaryInformation.Transform), (int)updatedRow[0]))
+                    if (Enum.IsDefined(typeof(SummaryInformation.Transform), updatedRow.FieldAsInteger(0)))
                     {
-                        updatedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                         comparedRow = updatedRow;
                         keepRow = true;
                         operation = RowOperation.Modify;
@@ -297,7 +293,7 @@ namespace WixToolset.Core.WindowsInstaller
                     if (keepRow)
                     {
                         comparedRow = updatedRow;
-                        comparedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
+                        //comparedRow.SectionId = targetRow.SectionId + SectionDelimiter + updatedRow.SectionId;
                     }
                 }
             }
@@ -361,7 +357,6 @@ namespace WixToolset.Core.WindowsInstaller
                             var updatedRow = (Row)updatedPrimaryKeyEntry.Value;
 
                             updatedRow.Operation = RowOperation.Add;
-                            updatedRow.SectionId = SectionDelimiter + updatedRow.SectionId;
                             rows.Add(updatedRow);
                         }
                     }

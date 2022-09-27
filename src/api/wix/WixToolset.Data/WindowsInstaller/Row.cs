@@ -53,17 +53,6 @@ namespace WixToolset.Data.WindowsInstaller
         public RowOperation Operation { get; set; }
 
         /// <summary>
-        /// Gets or sets wether the row is a duplicate of another row thus redundant.
-        /// </summary>
-        public bool Redundant { get; set; }
-
-        /// <summary>
-        /// Gets or sets the SectionId property on the row.
-        /// </summary>
-        /// <value>The SectionId property on the row.</value>
-        public string SectionId { get; set; }
-
-        /// <summary>
         /// Gets the source file and line number for the row.
         /// </summary>
         /// <value>Source file and line number.</value>
@@ -276,8 +265,6 @@ namespace WixToolset.Data.WindowsInstaller
 
             bool empty = reader.IsEmptyElement;
             RowOperation operation = RowOperation.None;
-            bool redundant = false;
-            string sectionId = null;
             SourceLineNumber sourceLineNumbers = null;
 
             while (reader.MoveToNextAttribute())
@@ -287,12 +274,6 @@ namespace WixToolset.Data.WindowsInstaller
                     case "op":
                         operation = (RowOperation)Enum.Parse(typeof(RowOperation), reader.Value, true);
                         break;
-                    case "redundant":
-                        redundant = reader.Value.Equals("yes");
-                        break;
-                    case "sectionId":
-                        sectionId = reader.Value;
-                        break;
                     case "sourceLineNumber":
                         sourceLineNumbers = SourceLineNumber.CreateFromEncoded(reader.Value);
                         break;
@@ -301,8 +282,6 @@ namespace WixToolset.Data.WindowsInstaller
 
             var row = table.CreateRow(sourceLineNumbers);
             row.Operation = operation;
-            row.Redundant = redundant;
-            row.SectionId = sectionId;
 
             // loop through all the fields in a row
             if (!empty)
@@ -362,16 +341,6 @@ namespace WixToolset.Data.WindowsInstaller
             if (RowOperation.None != this.Operation)
             {
                 writer.WriteAttributeString("op", this.Operation.ToString().ToLowerInvariant());
-            }
-
-            if (this.Redundant)
-            {
-                writer.WriteAttributeString("redundant", "yes");
-            }
-
-            if (null != this.SectionId)
-            {
-                writer.WriteAttributeString("sectionId", this.SectionId);
             }
 
             if (null != this.SourceLineNumbers)

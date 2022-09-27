@@ -63,6 +63,13 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.FinalizePatchFilterIds(WindowsInstallerData, IDictionary{Row, string}, string)"/>
+        /// </summary>
+        public virtual void FinalizePatchFilterIds(WindowsInstallerData data, IDictionary<Row, string> rowToFilterId, string filterIdPrefix)
+        {
+        }
+
+        /// <summary>
         /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
         /// </summary>
         public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files)
