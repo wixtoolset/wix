@@ -923,7 +923,7 @@ namespace WixToolset.Data.WindowsInstaller
 
         public static readonly TableDefinition MsiPatchSequence = new TableDefinition(
             "MsiPatchSequence",
-            SymbolDefinitions.MsiPatchSequence,
+            SymbolDefinitions.MsiPatchFamily,
             new[]
             {
                 new ColumnDefinition("PatchFamily", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),

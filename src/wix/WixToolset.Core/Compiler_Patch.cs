@@ -431,7 +431,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new MsiPatchSequenceSymbol(sourceLineNumbers)
+                this.Core.AddSymbol(new MsiPatchFamilySymbol(sourceLineNumbers, new Identifier(id.Access, id.Id, productCode))
                 {
                     PatchFamily = id.Id,
                     ProductCode = productCode,
