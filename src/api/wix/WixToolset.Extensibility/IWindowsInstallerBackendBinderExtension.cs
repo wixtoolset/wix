@@ -30,6 +30,14 @@ namespace WixToolset.Extensibility
         void SymbolsFinalized(IntermediateSection section);
 
         /// <summary>
+        /// Extension can process the filter ids applied to rows when processing patches.
+        /// </summary>
+        /// <param name="data">The <c>WindowsInstallerData</c> with rows to apply filters to.</param>
+        /// <param name="rowToFilterId">The mapping that applies a filter id to a row.</param>
+        /// <param name="filterIdPrefix">The prefix to use applying additional filters to rows.</param>
+        void FinalizePatchFilterIds(WindowsInstallerData data, IDictionary<Row, string> rowToFilterId, string filterIdPrefix);
+
+        /// <summary>
         /// Finds an existing cabinet that contains the provided files.
         /// </summary>
         /// <param name="cabinetPath">Path to the cabinet.</param>

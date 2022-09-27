@@ -11,17 +11,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class ReduceTransformCommand
     {
-        private const char SectionDelimiter = '/';
-
-        public ReduceTransformCommand(Intermediate intermediate, IEnumerable<PatchTransform> patchTransforms)
+        public ReduceTransformCommand(Intermediate intermediate, IEnumerable<PatchTransform> patchTransforms, PatchFilterMap patchFilterMap)
         {
             this.Intermediate = intermediate;
             this.PatchTransforms = patchTransforms;
+            this.PatchFilterMap = patchFilterMap;
         }
 
         private Intermediate Intermediate { get; }
 
         private IEnumerable<PatchTransform> PatchTransforms { get; }
+
+        private PatchFilterMap PatchFilterMap { get; }
 
         public void Execute()
         {
@@ -51,8 +52,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private bool ReduceTransform(WindowsInstallerData transform, IEnumerable<WixPatchRefSymbol> patchRefSymbols)
         {
             // identify sections to keep
-            var oldSections = new Dictionary<string, Row>();
-            var newSections = new Dictionary<string, Row>();
+            var targetFilterIdsToKeep = new Dictionary<string, Row>();
+            var updatedFilterIdsToKeep = new Dictionary<string, Row>();
             var tableKeyRows = new Dictionary<string, Dictionary<string, Row>>();
             var sequenceList = new List<Table>();
             var componentFeatureAddsIndex = new Dictionary<string, List<string>>();
@@ -72,10 +73,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             foreach (var patchRefSymbol in patchRefSymbols)
             {
                 var tableName = patchRefSymbol.Table;
-                var key = patchRefSymbol.PrimaryKeys;
+                var primaryKey = patchRefSymbol.PrimaryKeys;
 
                 // Short circuit filtering if all changes should be included.
-                if ("*" == tableName && "*" == key)
+                if ("*" == tableName && "*" == primaryKey)
                 {
                     RemoveProductCodeFromTransform(transform);
                     return true;
@@ -88,22 +89,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // Index the table.
-                if (!tableKeyRows.TryGetValue(tableName, out var keyRows))
+                if (!tableKeyRows.TryGetValue(tableName, out var rowsByPrimaryKey))
                 {
-                    keyRows = table.Rows.ToDictionary(r => r.GetPrimaryKey());
-                    tableKeyRows.Add(tableName, keyRows);
+                    rowsByPrimaryKey = table.Rows.ToDictionary(r => r.GetPrimaryKey());
+                    tableKeyRows.Add(tableName, rowsByPrimaryKey);
                 }
 
-                if (!keyRows.TryGetValue(key, out var row))
+                if (!rowsByPrimaryKey.TryGetValue(primaryKey, out var row))
                 {
                     // Row not found.
                     continue;
                 }
 
                 // Differ.sectionDelimiter
-                var sections = row.SectionId.Split(SectionDelimiter);
-                oldSections[sections[0]] = row;
-                newSections[sections[1]] = row;
+                if (this.PatchFilterMap.TryGetPatchFiltersForRow(row, out var targetFilterId, out var updatedFilterId))
+                {
+                    targetFilterIdsToKeep[targetFilterId] = row;
+                    updatedFilterIdsToKeep[updatedFilterId] = row;
+                }
             }
 
             // throw away sections not referenced
@@ -221,49 +224,34 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                     }
 
-                    if (null == row.SectionId)
+                    if (this.IsInPatchFamily(row, targetFilterIdsToKeep, updatedFilterIdsToKeep))
+                    {
+                        if ("Component" == table.Name)
+                        {
+                            keptComponents.Add(row.FieldAsString(0), row);
+                        }
+
+                        if ("Directory" == table.Name)
+                        {
+                            keptDirectories.Add(row.FieldAsString(0), row);
+                        }
+
+                        if ("Feature" == table.Name)
+                        {
+                            keptFeatures.Add(row.FieldAsString(0), row);
+                        }
+
+                        keptRows++;
+                    }
+                    else
                     {
                         table.Rows.RemoveAt(i);
                         i--;
                     }
-                    else
-                    {
-                        var sections = row.SectionId.Split(SectionDelimiter);
-                        // ignore the row without section id.
-                        if (0 == sections[0].Length && 0 == sections[1].Length)
-                        {
-                            table.Rows.RemoveAt(i);
-                            i--;
-                        }
-                        else if (IsInPatchFamily(sections[0], sections[1], oldSections, newSections))
-                        {
-                            if ("Component" == table.Name)
-                            {
-                                keptComponents.Add(row.FieldAsString(0), row);
-                            }
-
-                            if ("Directory" == table.Name)
-                            {
-                                keptDirectories.Add(row.FieldAsString(0), row);
-                            }
-
-                            if ("Feature" == table.Name)
-                            {
-                                keptFeatures.Add(row.FieldAsString(0), row);
-                            }
-
-                            keptRows++;
-                        }
-                        else
-                        {
-                            table.Rows.RemoveAt(i);
-                            i--;
-                        }
-                    }
                 }
             }
 
-            keptRows += ReduceTransformSequenceTable(sequenceList, oldSections, newSections, customActionTable);
+            keptRows += ReduceTransformSequenceTable(sequenceList, targetFilterIdsToKeep, updatedFilterIdsToKeep, customActionTable);
 
             if (null != directoryTable)
             {
@@ -345,7 +333,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            keptRows += ReduceTransformSequenceTable(sequenceList, oldSections, newSections, customActionTable);
+            keptRows += ReduceTransformSequenceTable(sequenceList, targetFilterIdsToKeep, updatedFilterIdsToKeep, customActionTable);
 
             // Delete tables that are empty.
             var tablesToDelete = transform.Tables.Where(t => t.Rows.Count == 0).Select(t => t.Name).ToList();
@@ -356,6 +344,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return keptRows > 0;
+        }
+
+        private bool IsInPatchFamily(Row row, Dictionary<string, Row> oldSections, Dictionary<string, Row> newSections)
+        {
+            var result = false;
+
+            if (this.PatchFilterMap.TryGetPatchFiltersForRow(row, out var targetFilterId, out var updatedFilterId))
+            {
+                if ((String.IsNullOrEmpty(targetFilterId) && newSections.ContainsKey(updatedFilterId)) || (String.IsNullOrEmpty(updatedFilterId) && oldSections.ContainsKey(targetFilterId)))
+                {
+                    result = true;
+                }
+                else if (!String.IsNullOrEmpty(targetFilterId) && !String.IsNullOrEmpty(updatedFilterId) && (oldSections.ContainsKey(targetFilterId) || newSections.ContainsKey(updatedFilterId)))
+                {
+                    result = true;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -415,7 +422,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="newSections">Hashtable contains section id should be kept in the target wixout.</param>
         /// <param name="customAction">Hashtable contains all the rows in the CustomAction table.</param>
         /// <returns>Number of rows left</returns>
-        private static int ReduceTransformSequenceTable(List<Table> sequenceList, Dictionary<string, Row> oldSections, Dictionary<string, Row> newSections, Dictionary<string, Row> customAction)
+        private int ReduceTransformSequenceTable(List<Table> sequenceList, Dictionary<string, Row> oldSections, Dictionary<string, Row> newSections, Dictionary<string, Row> customAction)
         {
             var keptRows = 0;
 
@@ -424,19 +431,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 for (var i = 0; i < currentTable.Rows.Count; i++)
                 {
                     var row = currentTable.Rows[i];
-                    var actionName = row.Fields[0].Data.ToString();
-                    var sections = row.SectionId.Split(SectionDelimiter);
-                    var isSectionIdEmpty = (sections[0].Length == 0 && sections[1].Length == 0);
+                    var actionName = row.FieldAsString(0);
 
                     if (row.Operation == RowOperation.None)
                     {
-                        // Ignore the rows without section id.
-                        if (isSectionIdEmpty)
-                        {
-                            currentTable.Rows.RemoveAt(i);
-                            i--;
-                        }
-                        else if (IsInPatchFamily(sections[0], sections[1], oldSections, newSections))
+                        if (this.IsInPatchFamily(row, oldSections, newSections))
                         {
                             keptRows++;
                         }
@@ -457,12 +456,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else if (!sequenceChanged && conditionChanged)
                         {
-                            if (isSectionIdEmpty)
-                            {
-                                currentTable.Rows.RemoveAt(i);
-                                i--;
-                            }
-                            else if (IsInPatchFamily(sections[0], sections[1], oldSections, newSections))
+                            if (this.IsInPatchFamily(row, oldSections, newSections))
                             {
                                 keptRows++;
                             }
@@ -474,12 +468,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else if (sequenceChanged && conditionChanged)
                         {
-                            if (isSectionIdEmpty)
-                            {
-                                row.Fields[1].Modified = false;
-                                keptRows++;
-                            }
-                            else if (IsInPatchFamily(sections[0], sections[1], oldSections, newSections))
+                            if (this.IsInPatchFamily(row, oldSections, newSections))
                             {
                                 keptRows++;
                             }
@@ -492,13 +481,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else if (row.Operation == RowOperation.Delete)
                     {
-                        if (isSectionIdEmpty)
-                        {
-                            // it is a stardard action which is added by wix, we should keep this action.
-                            row.Operation = RowOperation.None;
-                            keptRows++;
-                        }
-                        else if (IsInPatchFamily(sections[0], sections[1], oldSections, newSections))
+                        if (this.IsInPatchFamily(row, oldSections, newSections))
                         {
                             keptRows++;
                         }
@@ -519,11 +502,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else if (row.Operation == RowOperation.Add)
                     {
-                        if (isSectionIdEmpty)
+                        // Keep unfiltered added rows.
+                        if (!this.PatchFilterMap.ContainsPatchFilterForRow(row))
                         {
                             keptRows++;
                         }
-                        else if (IsInPatchFamily(sections[0], sections[1], oldSections, newSections))
+                        else if (this.IsInPatchFamily(row, oldSections, newSections))
                         {
                             keptRows++;
                         }

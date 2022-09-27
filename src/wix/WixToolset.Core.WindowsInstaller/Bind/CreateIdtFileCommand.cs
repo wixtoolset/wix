@@ -71,11 +71,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 foreach (Row row in table.Rows)
                 {
-                    if (row.Redundant)
-                    {
-                        continue;
-                    }
-
                     string rowString = this.RowToIdtDefinition(row, keepAddedColumns);
                     byte[] rowBytes;
 

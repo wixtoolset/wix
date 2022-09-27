@@ -16,13 +16,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreatePatchTransformsCommand
     {
-        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, IFileResolver fileResolver, IReadOnlyCollection<IResolverExtension> resolverExtensions, Intermediate intermediate, string intermediateFolder, IReadOnlyCollection<IBindPath> bindPaths)
+        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, IFileResolver fileResolver, IReadOnlyCollection<IResolverExtension> resolverExtensions, IReadOnlyCollection<IWindowsInstallerBackendBinderExtension> backendExtensions, Intermediate intermediate, string intermediateFolder, IReadOnlyCollection<IBindPath> bindPaths)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
             this.PathResolver = pathResolver;
             this.FileResolver = fileResolver;
             this.ResolverExtensions = resolverExtensions;
+            this.BackendExtensions = backendExtensions;
             this.Intermediate = intermediate;
             this.IntermediateFolder = intermediateFolder;
             this.BindPaths = bindPaths;
@@ -38,16 +39,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IReadOnlyCollection<IResolverExtension> ResolverExtensions { get; }
 
+        private IReadOnlyCollection<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
+
         private Intermediate Intermediate { get; }
 
         private string IntermediateFolder { get; }
 
         private IReadOnlyCollection<IBindPath> BindPaths { get; }
 
+        public PatchFilterMap PatchFilterMap { get; private set; }
+
         public IEnumerable<PatchTransform> PatchTransforms { get; private set; }
 
         public IEnumerable<PatchTransform> Execute()
         {
+            var patchFilterMap = new PatchFilterMap();
             var patchTransforms = new List<PatchTransform>();
 
             var symbols = this.Intermediate.Sections.SelectMany(s => s.Symbols);
@@ -63,19 +69,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (patchRefSymbols.Count > 0)
                 {
-                    var targetCommand = new GenerateSectionIdsCommand(targetData);
+                    var targetCommand = new GeneratePatchFilterIdsCommand(this.BackendExtensions, targetData, "target:");
                     targetCommand.Execute();
 
-                    var updatedCommand = new GenerateSectionIdsCommand(updatedData);
+                    patchFilterMap.AddTargetRowFilterIds(targetCommand.RowToFilterId);
+
+                    var updatedCommand = new GeneratePatchFilterIdsCommand(this.BackendExtensions, updatedData, "updated:");
                     updatedCommand.Execute();
+
+                    patchFilterMap.AddUpdatedRowFilterIds(updatedCommand.RowToFilterId);
                 }
 
-                var command = new GenerateTransformCommand(this.Messaging, targetData, updatedData, preserveUnchangedRows: true, showPedanticMessages: false);
+                var command = new GenerateTransformCommand(this.Messaging, targetData, updatedData, patchFilterMap, preserveUnchangedRows: true, showPedanticMessages: false);
                 var transform = command.Execute();
 
                 patchTransforms.Add(new PatchTransform(symbol.Id.Id, transform));
             }
 
+            this.PatchFilterMap = patchFilterMap;
             this.PatchTransforms = patchTransforms;
 
             return this.PatchTransforms;
