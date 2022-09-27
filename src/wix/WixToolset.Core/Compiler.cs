@@ -5793,13 +5793,13 @@ namespace WixToolset.Core
                         this.ParseCertificatesElement(child);
                         break;
                     case "PatchFamily":
-                        this.ParsePatchFamilyElement(child, ComplexReferenceParentType.Unknown, id.Id);
+                        this.ParsePatchFamilyElement(child, ComplexReferenceParentType.Unknown, id?.Id);
                         break;
                     case "PatchFamilyGroup":
-                        this.ParsePatchFamilyGroupElement(child, ComplexReferenceParentType.Unknown, id.Id);
+                        this.ParsePatchFamilyGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
                         break;
                     case "PatchFamilyGroupRef":
-                        this.ParsePatchFamilyGroupRefElement(child, ComplexReferenceParentType.Unknown, id.Id);
+                        this.ParsePatchFamilyGroupRefElement(child, ComplexReferenceParentType.Unknown, id?.Id);
                         break;
                     case "PayloadGroup":
                         this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Unknown, null);

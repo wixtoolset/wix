@@ -39,10 +39,16 @@ namespace WixToolset.Core.WindowsInstaller
                 patchTransforms = command.Execute();
             }
 
+            // Reduce transforms.
+            {
+                var command = new ReduceTransformCommand(context.IntermediateRepresentation, patchTransforms);
+                command.Execute();
+            }
+
             // Enhance the intermediate by attaching the created patch transforms.
             IEnumerable<SubStorage> subStorages;
             {
-                var command = new AttachPatchTransformsCommand(messaging, backendHelper, context.IntermediateRepresentation, patchTransforms);
+                var command = new CreatePatchSubStoragesCommand(messaging, backendHelper, context.IntermediateRepresentation, patchTransforms);
                 subStorages = command.Execute();
             }
 

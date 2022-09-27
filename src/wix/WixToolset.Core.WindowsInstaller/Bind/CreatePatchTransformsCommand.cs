@@ -50,12 +50,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var patchTransforms = new List<PatchTransform>();
 
-            var symbols = this.Intermediate.Sections.SelectMany(s => s.Symbols).OfType<WixPatchBaselineSymbol>();
+            var symbols = this.Intermediate.Sections.SelectMany(s => s.Symbols);
 
-            foreach (var symbol in symbols)
+            var patchBaselineSymbols = symbols.OfType<WixPatchBaselineSymbol>();
+
+            var patchRefSymbols = symbols.OfType<WixPatchRefSymbol>().ToList();
+
+            foreach (var symbol in patchBaselineSymbols)
             {
                 var targetData = this.GetWindowsInstallerData(symbol.BaselineFile.Path, BindStage.Target);
                 var updatedData = this.GetWindowsInstallerData(symbol.UpdateFile.Path, BindStage.Updated);
+
+                if (patchRefSymbols.Count > 0)
+                {
+                    var targetCommand = new GenerateSectionIdsCommand(targetData);
+                    targetCommand.Execute();
+
+                    var updatedCommand = new GenerateSectionIdsCommand(updatedData);
+                    updatedCommand.Execute();
+                }
 
                 var command = new GenerateTransformCommand(this.Messaging, targetData, updatedData, preserveUnchangedRows: true, showPedanticMessages: false);
                 var transform = command.Execute();
