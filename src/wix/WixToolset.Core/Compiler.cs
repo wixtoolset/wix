@@ -3620,7 +3620,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.MsiPatchSequence, primaryKeys);
+            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.MsiPatchFamily, primaryKeys);
 
             this.Core.ParseForExtensionElements(node);
 

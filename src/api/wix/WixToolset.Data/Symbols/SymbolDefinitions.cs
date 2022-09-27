@@ -74,7 +74,7 @@ namespace WixToolset.Data
         MsiPatchMetadata,
         MsiPatchOldAssemblyFile,
         MsiPatchOldAssemblyName,
-        MsiPatchSequence,
+        MsiPatchFamily,
         MsiServiceConfig,
         MsiServiceConfigFailureActions,
         MsiShortcutProperty,
@@ -422,8 +422,8 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.MsiPatchOldAssemblyName:
                     return SymbolDefinitions.MsiPatchOldAssemblyName;
 
-                case SymbolDefinitionType.MsiPatchSequence:
-                    return SymbolDefinitions.MsiPatchSequence;
+                case SymbolDefinitionType.MsiPatchFamily:
+                    return SymbolDefinitions.MsiPatchFamily;
 
                 case SymbolDefinitionType.MsiServiceConfig:
                     return SymbolDefinitions.MsiServiceConfig;
