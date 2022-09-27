@@ -394,6 +394,35 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildPatchWithFiltering()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchFamilyFilter");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{11111111-2222-3333-4444-555555555555}", doc.Root.Element(TargetProductCodeName).Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(baseFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+
+                var files = Query.GetCabinetFiles(cab);
+                var file = files.Single();
+                WixAssert.StringEqual("a.txt", file.Name);
+                var contents = file.OpenText().ReadToEnd();
+                WixAssert.StringEqual("This is A v1.0.1 from the '.update-data' folder in 'PatchTemplatePackage'.\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.\r\n", contents);
+            }
+        }
+
         private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB, IEnumerable<string> bindpaths = null)
         {
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);

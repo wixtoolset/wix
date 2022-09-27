@@ -21,8 +21,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     {
         private static readonly Regex Modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
 
-        private int sectionCount;
-
         public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, string databasePath, OutputType outputType, string exportBasePath, string extractFilesFolder, string intermediateFolder, bool enableDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
@@ -65,6 +63,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public bool AdminImage { get; private set; }
 
+        public WindowsInstallerData Data { get; private set; }
+
         public IEnumerable<string> ExportedFiles { get; private set; }
 
         public WindowsInstallerData Execute()
@@ -72,7 +72,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             var adminImage = false;
             var exportedFiles = new List<string>();
 
-            var output = new WindowsInstallerData(new SourceLineNumber(this.DatabasePath))
+            var data = new WindowsInstallerData(new SourceLineNumber(this.DatabasePath))
             {
                 Type = this.OutputType
             };
@@ -85,15 +85,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                     Directory.CreateDirectory(this.IntermediateFolder);
 
-                    output.Codepage = this.GetCodePage();
+                    data.Codepage = this.GetCodePage();
 
-                    var modularizationGuid = this.ProcessTables(output, exportedFiles);
+                    var modularizationGuid = this.ProcessTables(data, exportedFiles);
 
-                    var summaryInfo = this.ProcessSummaryInfo(output, modularizationGuid);
+                    var summaryInfo = this.ProcessSummaryInfo(data, modularizationGuid);
 
-                    this.UpdateUnrealFileColumns(this.DatabasePath, output, summaryInfo, exportedFiles);
-
-                    this.GenerateSectionIds(output);
+                    this.UpdateUnrealFileColumns(this.DatabasePath, data, summaryInfo, exportedFiles);
                 }
             }
             catch (Win32Exception e)
@@ -107,9 +105,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             this.AdminImage = adminImage;
+            this.Data = data;
             this.ExportedFiles = exportedFiles;
 
-            return output;
+            return data;
         }
 
         private int GetCodePage()
@@ -655,207 +654,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 return shortname;
             }
-        }
-
-        /// <summary>
-        /// Creates section ids on rows which form logical groupings of resources.
-        /// </summary>
-        /// <param name="output">The Output that represents the msi database.</param>
-        private void GenerateSectionIds(WindowsInstallerData output)
-        {
-            // First assign and index section ids for the tables that are in their own sections.
-            this.AssignSectionIdsToTable(output.Tables["Binary"], 0);
-            var componentSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["Component"], 0);
-            var customActionSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["CustomAction"], 0);
-            this.AssignSectionIdsToTable(output.Tables["Directory"], 0);
-            var featureSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["Feature"], 0);
-            this.AssignSectionIdsToTable(output.Tables["Icon"], 0);
-            var digitalCertificateSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["MsiDigitalCertificate"], 0);
-            this.AssignSectionIdsToTable(output.Tables["Property"], 0);
-
-            // Now handle all the tables that rely on the first set of indexes but also produce their own indexes. Order matters here.
-            var fileSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["File"], componentSectionIdIndex, 1, 0);
-            var appIdSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["Class"], componentSectionIdIndex, 2, 5);
-            var odbcDataSourceSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ODBCDataSource"], componentSectionIdIndex, 1, 0);
-            var odbcDriverSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ODBCDriver"], componentSectionIdIndex, 1, 0);
-            var registrySectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["Registry"], componentSectionIdIndex, 5, 0);
-            var serviceInstallSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ServiceInstall"], componentSectionIdIndex, 11, 0);
-
-            // Now handle all the tables which only rely on previous indexes and order does not matter.
-            foreach (var table in output.Tables)
-            {
-                switch (table.Name)
-                {
-                    case "MsiFileHash":
-                        ConnectTableToSection(table, fileSectionIdIndex, 0);
-                        break;
-                    case "MsiAssembly":
-                    case "MsiAssemblyName":
-                        ConnectTableToSection(table, componentSectionIdIndex, 0);
-                        break;
-                    case "MsiPackageCertificate":
-                    case "MsiPatchCertificate":
-                        ConnectTableToSection(table, digitalCertificateSectionIdIndex, 1);
-                        break;
-                    case "CreateFolder":
-                    case "FeatureComponents":
-                    case "MoveFile":
-                    case "ReserveCost":
-                    case "ODBCTranslator":
-                        ConnectTableToSection(table, componentSectionIdIndex, 1);
-                        break;
-                    case "TypeLib":
-                        ConnectTableToSection(table, componentSectionIdIndex, 2);
-                        break;
-                    case "Shortcut":
-                    case "Environment":
-                        ConnectTableToSection(table, componentSectionIdIndex, 3);
-                        break;
-                    case "RemoveRegistry":
-                        ConnectTableToSection(table, componentSectionIdIndex, 4);
-                        break;
-                    case "ServiceControl":
-                        ConnectTableToSection(table, componentSectionIdIndex, 5);
-                        break;
-                    case "IniFile":
-                    case "RemoveIniFile":
-                        ConnectTableToSection(table, componentSectionIdIndex, 7);
-                        break;
-                    case "AppId":
-                        ConnectTableToSection(table, appIdSectionIdIndex, 0);
-                        break;
-                    case "Condition":
-                        ConnectTableToSection(table, featureSectionIdIndex, 0);
-                        break;
-                    case "ODBCSourceAttribute":
-                        ConnectTableToSection(table, odbcDataSourceSectionIdIndex, 0);
-                        break;
-                    case "ODBCAttribute":
-                        ConnectTableToSection(table, odbcDriverSectionIdIndex, 0);
-                        break;
-                    case "AdminExecuteSequence":
-                    case "AdminUISequence":
-                    case "AdvtExecuteSequence":
-                    case "AdvtUISequence":
-                    case "InstallExecuteSequence":
-                    case "InstallUISequence":
-                        ConnectTableToSection(table, customActionSectionIdIndex, 0);
-                        break;
-                    case "LockPermissions":
-                    case "MsiLockPermissions":
-                        foreach (var row in table.Rows)
-                        {
-                            var lockObject = (string)row[0];
-                            var tableName = (string)row[1];
-                            switch (tableName)
-                            {
-                                case "File":
-                                    row.SectionId = (string)fileSectionIdIndex[lockObject];
-                                    break;
-                                case "Registry":
-                                    row.SectionId = (string)registrySectionIdIndex[lockObject];
-                                    break;
-                                case "ServiceInstall":
-                                    row.SectionId = (string)serviceInstallSectionIdIndex[lockObject];
-                                    break;
-                            }
-                        }
-                        break;
-                }
-            }
-
-            // Now pass the output to each unbinder extension to allow them to analyze the output and determine their proper section ids.
-            //foreach (IUnbinderExtension extension in this.unbinderExtensions)
-            //{
-            //    extension.GenerateSectionIds(output);
-            //}
-        }
-
-        /// <summary>
-        /// Creates new section ids on all the rows in a table.
-        /// </summary>
-        /// <param name="table">The table to add sections to.</param>
-        /// <param name="rowPrimaryKeyIndex">The index of the column which is used by other tables to reference this table.</param>
-        /// <returns>A dictionary containing the tables key for each row paired with its assigned section id.</returns>
-        private Dictionary<string, string> AssignSectionIdsToTable(Table table, int rowPrimaryKeyIndex)
-        {
-            var primaryKeyToSectionId = new Dictionary<string, string>();
-
-            if (null != table)
-            {
-                foreach (var row in table.Rows)
-                {
-                    row.SectionId = this.GetNewSectionId();
-
-                    primaryKeyToSectionId.Add(row.FieldAsString(rowPrimaryKeyIndex), row.SectionId);
-                }
-            }
-
-            return primaryKeyToSectionId;
-        }
-
-        /// <summary>
-        /// Connects a table's rows to an already sectioned table.
-        /// </summary>
-        /// <param name="table">The table containing rows that need to be connected to sections.</param>
-        /// <param name="sectionIdIndex">A hashtable containing keys to map table to its section.</param>
-        /// <param name="rowIndex">The index of the column which is used as the foreign key in to the sectionIdIndex.</param>
-        private static void ConnectTableToSection(Table table, Dictionary<string, string> sectionIdIndex, int rowIndex)
-        {
-            if (null != table)
-            {
-                foreach (var row in table.Rows)
-                {
-                    if (sectionIdIndex.TryGetValue(row.FieldAsString(rowIndex), out var sectionId))
-                    {
-                        row.SectionId = sectionId;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Connects a table's rows to an already sectioned table and produces an index for other tables to connect to it.
-        /// </summary>
-        /// <param name="table">The table containing rows that need to be connected to sections.</param>
-        /// <param name="sectionIdIndex">A dictionary containing keys to map table to its section.</param>
-        /// <param name="rowIndex">The index of the column which is used as the foreign key in to the sectionIdIndex.</param>
-        /// <param name="rowPrimaryKeyIndex">The index of the column which is used by other tables to reference this table.</param>
-        /// <returns>A dictionary containing the tables key for each row paired with its assigned section id.</returns>
-        private static Dictionary<string, string> ConnectTableToSectionAndIndex(Table table, Dictionary<string, string> sectionIdIndex, int rowIndex, int rowPrimaryKeyIndex)
-        {
-            var newPrimaryKeyToSectionId = new Dictionary<string, string>();
-
-            if (null != table)
-            {
-                foreach (var row in table.Rows)
-                {
-                    var foreignKey = row.FieldAsString(rowIndex);
-
-                    if (!sectionIdIndex.TryGetValue(foreignKey, out var sectionId))
-                    {
-                        continue;
-                    }
-
-                    row.SectionId = sectionId;
-
-                    var primaryKey = row.FieldAsString(rowPrimaryKeyIndex);
-
-                    if (!String.IsNullOrEmpty(primaryKey) && sectionIdIndex.ContainsKey(primaryKey))
-                    {
-                        newPrimaryKeyToSectionId.Add(primaryKey, row.SectionId);
-                    }
-                }
-            }
-
-            return newPrimaryKeyToSectionId;
-        }
-
-        private string GetNewSectionId()
-        {
-            this.sectionCount++;
-
-            return "wix.section." + this.sectionCount.ToString(CultureInfo.InvariantCulture);
         }
 
         private class SummaryInformationBits
