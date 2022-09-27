@@ -379,7 +379,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             if (!DataLoader.TryLoadWindowsInstallerData(path, out var data))
             {
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, path, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, path, null, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
                 data = unbindCommand.Execute();
             }
 

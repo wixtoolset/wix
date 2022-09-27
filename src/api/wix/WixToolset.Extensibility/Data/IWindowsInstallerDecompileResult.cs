@@ -5,12 +5,18 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
     /// The result from decompiling a Windows Installer database.
     /// </summary>
     public interface IWindowsInstallerDecompileResult
     {
+        /// <summary>
+        /// Decompiled <c>WindowsInstallerData</c>.
+        /// </summary>
+        WindowsInstallerData Data { get; set; }
+
         /// <summary>
         /// Decompiled document.
         /// </summary>
