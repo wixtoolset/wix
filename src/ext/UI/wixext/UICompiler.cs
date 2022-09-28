@@ -17,6 +17,11 @@ namespace WixToolset.UI
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/ui";
 
         /// <summary>
+        /// Flag to prevent custom action symbols duplication.
+        /// </summary>
+        private bool customActionsAdded = false;
+
+        /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
@@ -88,33 +93,38 @@ namespace WixToolset.UI
             {
                 this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixUI, id);
 
-                // Because these custom actions are "scheduled" via `DoAction` control events, we have to create the
-                // custom action definitions here, so the `DoAction` references are static and the targets are
-                // dynamically created to properly reflect the platform-specific DLL and avoid having duplicate ids
-                // in the UI .wixlib.
-                var platform = this.Context.Platform == Platform.ARM64 ? "A64" : this.Context.Platform.ToString();
-                var source = $"WixUiCa_{platform}";
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, source);
-
-                section.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixUIPrintEula"))
+                if (!customActionsAdded)
                 {
-                    TargetType = CustomActionTargetType.Dll,
-                    Target = "PrintEula",
-                    SourceType = CustomActionSourceType.Binary,
-                    Source = source,
-                    IgnoreResult = true,
-                    ExecutionType = CustomActionExecutionType.Immediate,
-                });
+                    // Because these custom actions are "scheduled" via `DoAction` control events, we have to create the
+                    // custom action definitions here, so the `DoAction` references are static and the targets are
+                    // dynamically created to properly reflect the platform-specific DLL and avoid having duplicate ids
+                    // in the UI .wixlib.
+                    var platform = this.Context.Platform == Platform.ARM64 ? "A64" : this.Context.Platform.ToString();
+                    var source = $"WixUiCa_{platform}";
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, source);
 
-                section.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixUIValidatePath"))
-                {
-                    TargetType = CustomActionTargetType.Dll,
-                    Target = "ValidatePath",
-                    SourceType = CustomActionSourceType.Binary,
-                    Source = source,
-                    IgnoreResult = true,
-                    ExecutionType = CustomActionExecutionType.Immediate,
-                });
+                    section.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixUIPrintEula"))
+                    {
+                        TargetType = CustomActionTargetType.Dll,
+                        Target = "PrintEula",
+                        SourceType = CustomActionSourceType.Binary,
+                        Source = source,
+                        IgnoreResult = true,
+                        ExecutionType = CustomActionExecutionType.Immediate,
+                    });
+
+                    section.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixUIValidatePath"))
+                    {
+                        TargetType = CustomActionTargetType.Dll,
+                        Target = "ValidatePath",
+                        SourceType = CustomActionSourceType.Binary,
+                        Source = source,
+                        IgnoreResult = true,
+                        ExecutionType = CustomActionExecutionType.Immediate,
+                    });
+
+                    customActionsAdded = true;
+                }
 
                 if (installDirectory != null)
                 {
