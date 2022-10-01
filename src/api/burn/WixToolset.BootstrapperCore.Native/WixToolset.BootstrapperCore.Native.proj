@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.Build.NoTargets/3.0.4">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackageId>WixToolset.BootstrapperCore.Native</PackageId>
     <Description>WiX Bootstrapper native interfaces</Description>
   </PropertyGroup>

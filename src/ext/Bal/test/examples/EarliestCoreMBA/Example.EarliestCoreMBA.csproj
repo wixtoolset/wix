@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <IsDncBA>true</IsDncBA>
     <Description>Earliest .NET Core MBA</Description>

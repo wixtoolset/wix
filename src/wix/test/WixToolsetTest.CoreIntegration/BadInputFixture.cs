@@ -260,10 +260,10 @@ namespace WixToolsetTest.CoreIntegration
 
                 WixAssert.CompareLineByLine(new[]
                 {
+                    "The 'REINSTALLMODE' MsiProperty is controlled by the bootstrapper and cannot be authored. (Illegal properties are: 'ACTION', 'ADDLOCAL', 'ADDSOURCE', 'ADDDEFAULT', 'ADVERTISE', 'ALLUSERS', 'REBOOT', 'REINSTALL', 'REINSTALLMODE', or 'REMOVE'.) Remove the MsiProperty element.",
                     "The CommandLine/@Condition attribute's value '=' is not a valid bundle condition.",
                     "The MsiPackage/@InstallCondition attribute's value '=' is not a valid bundle condition.",
                     "The MsiProperty/@Condition attribute's value '=' is not a valid bundle condition.",
-                    "The 'REINSTALLMODE' MsiProperty is controlled by the bootstrapper and cannot be authored. (Illegal properties are: 'ACTION', 'ADDLOCAL', 'ADDSOURCE', 'ADDDEFAULT', 'ADVERTISE', 'ALLUSERS', 'REBOOT', 'REINSTALL', 'REINSTALLMODE', or 'REMOVE'.) Remove the MsiProperty element.",
                 }, errorMessages.ToArray());
 
                 Assert.Equal(409, result.ExitCode);

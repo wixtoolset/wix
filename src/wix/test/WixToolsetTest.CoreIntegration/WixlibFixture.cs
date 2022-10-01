@@ -248,7 +248,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildWithExtensionUsingWixlib()
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -259,7 +258,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(folder, "PackageComponents.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"test.wixlib")
                 });
@@ -272,7 +271,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "Package.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-lib", Path.Combine(intermediateFolder, @"test.wixlib"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
@@ -297,7 +296,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildWithExtensionUsingMultipleWixlibs()
         {
             var folder = TestData.Get(@"TestData\ComplexExampleExtension");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -308,7 +306,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(folder, "PackageComponents.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"components.wixlib")
                 });
@@ -319,7 +317,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(folder, "OtherComponents.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"other.wixlib")
                 });
@@ -333,7 +331,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-lib", Path.Combine(intermediateFolder, @"components.wixlib"),
                     "-lib", Path.Combine(intermediateFolder, @"other.wixlib"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")

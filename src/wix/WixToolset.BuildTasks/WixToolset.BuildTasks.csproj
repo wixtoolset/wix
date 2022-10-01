@@ -3,12 +3,12 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <TargetFrameworks>net6.0;net472</TargetFrameworks>
     <Description></Description>
     <Title>WiX Toolset MSBuild Tasks</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='netcoreapp3.1' ">win-x86;win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='net6.0' ">win-x86;win-x64</RuntimeIdentifiers>
     <!-- https://github.com/Microsoft/msbuild/issues/2360 -->
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
@@ -24,6 +24,6 @@
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' ">
+  <ItemGroup Condition="'$(TargetFramework)'=='net6.0' ">
   </ItemGroup>
 </Project>

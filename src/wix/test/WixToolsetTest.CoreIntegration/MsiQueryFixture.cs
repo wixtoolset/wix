@@ -338,7 +338,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildMsiWithEmptyCustomTableBecauseOfCustomTableRef()
         {
             var folder = TestData.Get(@"TestData");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -352,7 +351,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "EnsureTable", "EnsureCustomTable.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath
@@ -370,7 +369,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildMsiWithEmptyStandardTableBecauseOfEnsureTable()
         {
             var folder = TestData.Get(@"TestData");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -384,7 +382,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "EnsureTable", "EnsureModuleSignature.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath
@@ -402,7 +400,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildMsiWithEmptyTableFromExtensionBecauseOfEnsureTable()
         {
             var folder = TestData.Get(@"TestData");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -416,7 +413,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "EnsureTable", "EnsureExtensionTable.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath

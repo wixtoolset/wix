@@ -9,7 +9,11 @@ namespace WixToolset.BuildTasks
 
     public abstract partial class ToolsetTask : ToolTask
     {
+#if NETFRAMEWORK
         private static readonly string ThisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
+#else
+        private static readonly string ThisDllPath = typeof(ToolsetTask).Assembly.Location;
+#endif
 
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.

@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.Build.NoTargets/3.0.4">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <!-- Disable central package version management since this project will write the central package version management file -->
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
 

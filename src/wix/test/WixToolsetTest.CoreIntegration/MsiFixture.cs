@@ -730,7 +730,6 @@ namespace WixToolsetTest.CoreIntegration
         public void FailsBuildAtBindTimeForMissingEnsureTable()
         {
             var folder = TestData.Get(@"TestData");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -744,7 +743,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BadEnsureTable", "BadEnsureTable.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath

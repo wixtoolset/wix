@@ -14,7 +14,12 @@ namespace WixToolset.HeatTasks
     /// </summary>
     public abstract partial class HeatTask : ToolTask
     {
+#if NETFRAMEWORK
         private static readonly string ThisDllPath = new Uri(typeof(HeatTask).Assembly.CodeBase).AbsolutePath;
+#else
+        private static readonly string ThisDllPath = typeof(HeatTask).Assembly.Location;
+#endif
+
 
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.
