@@ -140,7 +140,7 @@ namespace WixToolsetTest.CoreIntegration
                         switch (attribute.LocalName)
                         {
                             case "EngineVersion":
-                                WixAssert.StringEqual($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
+                                Assert.True(Version.TryParse(attribute.Value, out var _));
                                 break;
                             case "ProtocolVersion":
                                 WixAssert.StringEqual("1", attribute.Value);
@@ -252,7 +252,7 @@ namespace WixToolsetTest.CoreIntegration
                     switch (attribute.LocalName)
                     {
                         case "EngineVersion":
-                            WixAssert.StringEqual($"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}", attribute.Value);
+                            Assert.True(Version.TryParse(attribute.Value, out var _));
                             break;
                         case "ProtocolVersion":
                             WixAssert.StringEqual("1", attribute.Value);
@@ -553,7 +553,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                var attachedContainerWarnings = result.Messages.Where(m => m.Id == (int)BurnBackendWarnings.Ids.AttachedContainerPayloadCollision)
+                var attachedContainerWarnings = result.Messages.Where(m => m.Id == 8500)
                                                                .Select(m => m.ToString())
                                                                .ToArray();
                 WixAssert.CompareLineByLine(new string[]
@@ -561,7 +561,7 @@ namespace WixToolsetTest.CoreIntegration
                     "The Payload 'Auto2' has a duplicate Name 'burn.exe' in the attached container. When extracting the bundle with dark.exe, the file will get overwritten.",
                 }, attachedContainerWarnings);
 
-                var baContainerErrors = result.Messages.Where(m => m.Id == (int)BurnBackendErrors.Ids.BAContainerPayloadCollision)
+                var baContainerErrors = result.Messages.Where(m => m.Id == 8002)
                                                        .Select(m => m.ToString())
                                                        .ToArray();
                 WixAssert.CompareLineByLine(new string[]
@@ -571,7 +571,7 @@ namespace WixToolsetTest.CoreIntegration
                     "The Payload 'uxYRbgitOs0K878jn5L_z7LdJ21KI' has a duplicate Name 'BundleExtensionData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
                 }, baContainerErrors);
 
-                var externalErrors = result.Messages.Where(m => m.Id == (int)BurnBackendErrors.Ids.ExternalPayloadCollision)
+                var externalErrors = result.Messages.Where(m => m.Id == 8004)
                                                     .Select(m => m.ToString())
                                                     .ToArray();
                 WixAssert.CompareLineByLine(new string[]
@@ -580,7 +580,7 @@ namespace WixToolsetTest.CoreIntegration
                     "The external Container 'MsiPackagesContainer' has a duplicate Name 'ContainerCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
                 }, externalErrors);
 
-                var packageCacheErrors = result.Messages.Where(m => m.Id == (int)BurnBackendErrors.Ids.PackageCachePayloadCollision)
+                var packageCacheErrors = result.Messages.Where(m => m.Id == 8006)
                                                         .Select(m => m.ToString())
                                                         .ToArray();
                 WixAssert.CompareLineByLine(new string[]

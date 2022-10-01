@@ -27,7 +27,6 @@ msbuild wix.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\wix_build
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Converters -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Converters.trx" || exit /b
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Converters.Symbolizer -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Converters.Symbolizer.trx" || exit /b
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Core -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Core.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Core.Burn -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Core.Burn.trx" || exit /b
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Core.Native -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Core.Native.trx" || exit /b
 dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.CoreIntegration -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.CoreIntegration.trx" || exit /b
 

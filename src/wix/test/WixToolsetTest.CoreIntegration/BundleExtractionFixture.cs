@@ -46,6 +46,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "burn", "extract",
                     exePath,
+                    "-oba", baFolderPath,
                     "-o", extractFolderPath
                 });
 

@@ -27,13 +27,16 @@ namespace WixToolset.Core.Burn.CommandLine
 
         private string IntermediateFolder { get; set; }
 
-        private string ExtractPath { get; set; }
+        private string ExtractBootstrapperApplicationPath { get; set; }
+
+        private string ExtractContainersPath { get; set; }
 
         public override CommandLineHelp GetCommandLineHelp()
         {
             return new CommandLineHelp("Extracts the internals of a bundle to a folder.", "burn extract [options] bundle.exe -o outputfolder ", new[]
             {
                 new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-outba", "-oba", "Folder to extract the bundle bootstrapper application to."),
                 new CommandLineHelpSwitch("-out", "-o", "Folder to extract the bundle contents to."),
             });
         }
@@ -44,7 +47,7 @@ namespace WixToolset.Core.Burn.CommandLine
             {
                 this.Messaging.Write(ErrorMessages.FilePathRequired("input bundle"));
             }
-            else if (String.IsNullOrEmpty(this.ExtractPath))
+            else if (String.IsNullOrEmpty(this.ExtractBootstrapperApplicationPath) && String.IsNullOrEmpty(this.ExtractContainersPath))
             {
                 this.Messaging.Write(ErrorMessages.FilePathRequired("output the extracted bundle"));
             }
@@ -55,19 +58,23 @@ namespace WixToolset.Core.Burn.CommandLine
                     this.IntermediateFolder = Path.GetTempPath();
                 }
 
-                var uxExtractPath = Path.Combine(this.ExtractPath, "BA");
-
                 using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputPath))
                 {
-                    reader.ExtractUXContainer(uxExtractPath, this.IntermediateFolder);
+                    if (!String.IsNullOrEmpty(this.ExtractBootstrapperApplicationPath))
+                    {
+                        reader.ExtractUXContainer(this.ExtractBootstrapperApplicationPath, this.IntermediateFolder);
+                    }
 
                     try
                     {
-                        reader.ExtractAttachedContainers(this.ExtractPath, this.IntermediateFolder);
+                        if (!String.IsNullOrEmpty(this.ExtractContainersPath))
+                                {
+                            reader.ExtractAttachedContainers(this.ExtractContainersPath, this.IntermediateFolder);
+                        }
                     }
                     catch
                     {
-                        this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new Data.SourceLineNumber(this.ExtractPath)));
+                        this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new SourceLineNumber(this.ExtractContainersPath)));
                     }
                 }
             }
@@ -85,10 +92,15 @@ namespace WixToolset.Core.Burn.CommandLine
                     case "intermediatefolder":
                         this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
+                        
+                    case "oba":
+                    case "outba":
+                        this.ExtractBootstrapperApplicationPath = parser.GetNextArgumentAsDirectoryOrError(argument);
+                        return true;
 
                     case "o":
                     case "out":
-                        this.ExtractPath = parser.GetNextArgumentAsDirectoryOrError(argument);
+                        this.ExtractContainersPath = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
                 }
             }

@@ -11,7 +11,6 @@ build/logs/TestResults/WixToolsetTest.BurnE2E.trx
 build/logs/TestResults/WixToolsetTest.Converters.trx
 build/logs/TestResults/WixToolsetTest.Converters.Symbolizer.trx
 build/logs/TestResults/WixToolsetTest.Core.trx
-build/logs/TestResults/WixToolsetTest.Core.Burn.trx
 build/logs/TestResults/WixToolsetTest.Core.Native.trx
 build/logs/TestResults/WixToolsetTest.CoreIntegration.trx
 build/logs/TestResults/WixToolsetTest.Dnc.HostGenerator.trx

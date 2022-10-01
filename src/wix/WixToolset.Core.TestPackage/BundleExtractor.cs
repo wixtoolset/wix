@@ -2,9 +2,10 @@
 
 namespace WixToolset.Core.TestPackage
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Xml;
-    using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data.Burn;
     using WixToolset.Extensibility.Services;
 
@@ -13,6 +14,10 @@ namespace WixToolset.Core.TestPackage
     /// </summary>
     public class BundleExtractor
     {
+        private const string BurnNamespace = "http://wixtoolset.org/schemas/v4/2008/Burn";
+        private const string BADataFileName = "BootstrapperApplicationData.xml";
+        private const string BundleExtensionDataFileName = "BundleExtensionData.xml";
+
         /// <summary>
         /// Extracts the BA container.
         /// </summary>
@@ -32,25 +37,34 @@ namespace WixToolset.Core.TestPackage
         /// <param name="messaging"></param>
         /// <param name="bundleFilePath">Path to the bundle.</param>
         /// <param name="baFolderPath">Path to extract BA to.</param>
-        /// <param name="otherContainersFolderPath">Path to extract other attached containers to.</param>
+        /// <param name="otherContainersFolderPath">Optional path to extract other attached containers to.</param>
         /// <param name="tempFolderPath">Temp path for extraction.</param>
         /// <returns></returns>
         public static ExtractBAContainerResult ExtractAllContainers(IMessaging messaging, string bundleFilePath, string baFolderPath, string otherContainersFolderPath, string tempFolderPath)
         {
-            var result = new ExtractBAContainerResult();
             Directory.CreateDirectory(tempFolderPath);
-            using (var burnReader = BurnReader.Open(messaging, new TestFileSystem(), bundleFilePath))
-            {
-                result.Success = burnReader.ExtractUXContainer(baFolderPath, tempFolderPath);
 
-                if (otherContainersFolderPath != null)
-                {
-                    result.AttachedContainersSuccess = burnReader.ExtractAttachedContainers(otherContainersFolderPath, tempFolderPath);
-                }
+            var args = new List<string>
+            {
+                "burn", "extract",
+                "-intermediatefolder", tempFolderPath,
+                bundleFilePath,
+                "-oba", baFolderPath
+            };
+
+            if (!String.IsNullOrEmpty(otherContainersFolderPath))
+            {
+                args.Add("-o");
+                args.Add(otherContainersFolderPath);
             }
 
-            if (result.Success)
+            var runnerResult = WixRunner.Execute(args.ToArray());
+
+            var result = new ExtractBAContainerResult();
+
+            if (runnerResult.ExitCode == 0)
             {
+                result.Success = true;
                 result.ManifestDocument = LoadBurnManifest(baFolderPath);
                 result.ManifestNamespaceManager = GetBurnNamespaceManager(result.ManifestDocument, "burn");
 
@@ -99,7 +113,7 @@ namespace WixToolset.Core.TestPackage
         public static XmlNamespaceManager GetBurnNamespaceManager(XmlDocument document, string prefix)
         {
             var namespaceManager = new XmlNamespaceManager(document.NameTable);
-            namespaceManager.AddNamespace(prefix, BurnCommon.BurnNamespace);
+            namespaceManager.AddNamespace(prefix, BurnNamespace);
             return namespaceManager;
         }
 
@@ -111,7 +125,7 @@ namespace WixToolset.Core.TestPackage
         public static XmlDocument LoadBAData(string baFolderPath)
         {
             var document = new XmlDocument();
-            document.Load(Path.Combine(baFolderPath, BurnCommon.BADataFileName));
+            document.Load(Path.Combine(baFolderPath, BADataFileName));
             return document;
         }
 
@@ -123,7 +137,7 @@ namespace WixToolset.Core.TestPackage
         public static XmlDocument LoadBundleExtensionData(string baFolderPath)
         {
             var document = new XmlDocument();
-            document.Load(Path.Combine(baFolderPath, BurnCommon.BundleExtensionDataFileName));
+            document.Load(Path.Combine(baFolderPath, BundleExtensionDataFileName));
             return document;
         }
 
@@ -137,21 +151,6 @@ namespace WixToolset.Core.TestPackage
             var document = new XmlDocument();
             document.Load(Path.Combine(baFolderPath, "manifest.xml"));
             return document;
-        }
-
-        private class TestFileSystem : IFileSystem
-        {
-            public void CopyFile(string source, string destination, bool allowHardlink)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(destination));
-                File.Copy(source, destination);
-            }
-
-            public void MoveFile(string source, string destination)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(destination));
-                File.Move(source, destination);
-            }
         }
     }
 }
