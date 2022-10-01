@@ -12,7 +12,7 @@ This repository contains the WiX Toolset v4 codebase.
 
 ## Prerequisites
 
-Visual Studio 2022 (17.0.4 or higher, NOT the preview release) with the following installed:
+Visual Studio 2022 (17.0.4 or higher) with the following installed:
 
 | Workloads |
 | :-------- |

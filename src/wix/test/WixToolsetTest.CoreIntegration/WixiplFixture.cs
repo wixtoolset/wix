@@ -107,7 +107,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildMsiUsingExtensionLibrary()
         {
             var folder = TestData.Get(@"TestData\Wixipl");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -117,7 +116,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
@@ -151,7 +150,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildWixiplUsingExtensionLibrary()
         {
             var folder = TestData.Get(@"TestData\Wixipl");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -161,7 +159,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-intermediateFolder", intermediateFolder,
@@ -174,7 +172,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(intermediateFolder, @"test.wixipl"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,

@@ -40,8 +40,8 @@ robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x86\wix %_P%\WixToolset.Sdk\too
 robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\buildtasks %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO% /XF Microsoft.Build.*.dll
 robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\wix %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO%
 
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\netcoreapp3.1\buildtasks %_P%\WixToolset.Sdk\tools\netcoreapp3.1 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\netcoreapp3.1\wix %_P%\WixToolset.Sdk\tools\netcoreapp3.1 %_RCO%
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net6.0\buildtasks %_P%\WixToolset.Sdk\tools\net6.0 %_RCO% /XF Microsoft.Build.*.dll
+robocopy %_P_OBJ%\WixToolset.Sdk\separate\net6.0\wix %_P%\WixToolset.Sdk\tools\net6.0 %_RCO%
 
 msbuild -t:Publish -p:Configuration=%_C% -nologo -warnaserror WixToolset.Sdk\WixToolset.Sdk.csproj -bl:%_L%\wix_sdk_publish.binlog || exit /b
 

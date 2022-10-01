@@ -454,7 +454,6 @@ namespace WixToolsetTest.CoreIntegration
 
         private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB, IEnumerable<string> bindpaths = null)
         {
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
             var args = new List<string>
@@ -467,7 +466,7 @@ namespace WixToolsetTest.CoreIntegration
                 "-bindpath", Path.Combine(sourceFolder, ".data"),
                 "-intermediateFolder", Path.Combine(baseFolder, "obj"),
                 "-o", outputPath,
-                "-ext", extensionPath,
+                "-ext", ExtensionPaths.ExampleExtensionPath,
             };
 
             foreach (var additionaBindPath in bindpaths ?? Enumerable.Empty<string>())

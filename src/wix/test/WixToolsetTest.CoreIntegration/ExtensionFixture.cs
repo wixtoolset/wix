@@ -59,7 +59,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildWithExampleExtension()
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -71,7 +70,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\extest.msi")
@@ -101,7 +100,6 @@ namespace WixToolsetTest.CoreIntegration
         public void CanParseCommandLineWithExtension()
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -113,7 +111,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-example", "test",

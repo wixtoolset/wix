@@ -274,7 +274,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimpleBundleUsingExtensionBA()
         {
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var folder = TestData.Get(@"TestData\SimpleBundle");
 
             using (var fs = new DisposableFileSystem())
@@ -287,7 +286,7 @@ namespace WixToolsetTest.CoreIntegration
                     "build",
                     Path.Combine(folder, "MultiFileBundle.wxs"),
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")

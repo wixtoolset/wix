@@ -16,8 +16,8 @@
 msbuild -t:Build -Restore -p:Configuration=%_C% -warnaserror -bl:%_L%\test_burn_build.binlog || exit /b
 msbuild -t:Build -Restore TestData\TestData.proj -p:Configuration=%_C% -m -bl:%_L%\test_burn_data_build.binlog || exit /b
 
-"%_B%\net35\win-x86\testexe.exe" /dm "%_B%\netcoreapp3.1\testhost.exe"
-mt.exe -manifest "WixToolsetTest.BurnE2E\testhost.longpathaware.manifest" -updateresource:"%_B%\netcoreapp3.1\testhost.exe"
+"%_B%\net35\win-x86\testexe.exe" /dm "%_B%\net6.0-windows\testhost.exe"
+mt.exe -manifest "WixToolsetTest.BurnE2E\testhost.longpathaware.manifest" -updateresource:"%_B%\net6.0-windows\testhost.exe"
 
 @if not "%RuntimeTestsEnabled%"=="true" goto :LExit
 

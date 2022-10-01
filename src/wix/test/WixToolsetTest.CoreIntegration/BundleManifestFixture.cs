@@ -281,7 +281,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void PopulatesManifestWithBundleExtensionSearches()
         {
-            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var folder = TestData.Get(@"TestData");
 
             using (var fs = new DisposableFileSystem())
@@ -299,7 +298,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleExtension", "BundleWithSearches.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
-                    "-ext", extensionPath,
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundlePath
