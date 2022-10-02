@@ -242,8 +242,14 @@ namespace WixToolset.Core
                         case "Component":
                             this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, CompilerConstants.IntegerNotSet, null, null);
                             break;
+                        case "ComponentRef":
+                            this.ParseComponentRefElement(child, ComplexReferenceParentType.Product, null, null);
+                            break;
                         case "ComponentGroup":
                             this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, null);
+                            break;
+                        case "ComponentGroupRef":
+                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Product, null, null);
                             break;
                         case "CustomAction":
                             this.ParseCustomActionElement(child);

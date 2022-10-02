@@ -150,13 +150,22 @@ namespace WixToolset.Core
                     return null;
                 }
 
-                // Display an error message for Components that were not referenced by a Feature.
-                foreach (var component in sections.SelectMany(s => s.Symbols.Where(y => y.Definition.Type == SymbolDefinitionType.Component)))
+                // If there are authored features, error for any referenced components that aren't assigned to a feature.
+                // If not, create a default feature and assign the components to it.
+                if (sections.SelectMany(s => s.Symbols).OfType<FeatureSymbol>().Any())
                 {
-                    if (!referencedComponents.Contains(component.Id.Id))
+                    foreach (var component in sections.SelectMany(s => s.Symbols.Where(y => y.Definition.Type == SymbolDefinitionType.Component)))
                     {
-                        this.Messaging.Write(ErrorMessages.OrphanedComponent(component.SourceLineNumbers, component.Id.Id));
+                        if (!referencedComponents.Contains(component.Id.Id))
+                        {
+                            this.Messaging.Write(ErrorMessages.OrphanedComponent(component.SourceLineNumbers, component.Id.Id));
+                        }
                     }
+                }
+                else
+                {
+                    var command = new AssignDefaultFeatureCommand(this.Messaging, find.EntrySection, sections, referencedComponents, componentsToFeatures);
+                    command.Execute();
                 }
 
                 // Report duplicates that would ultimately end up being primary key collisions.
@@ -530,6 +539,10 @@ namespace WixToolset.Core
                                     }
 
                                     featuresToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, null, wixComplexReferenceRow.IsPrimary));
+                                    break;
+
+                                case ComplexReferenceChildType.Component:
+                                case ComplexReferenceChildType.ComponentGroup:
                                     break;
 
                                 default:
