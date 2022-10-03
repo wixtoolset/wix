@@ -5,7 +5,6 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
-    <RollForward>Major</RollForward>
     <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 
