@@ -16,7 +16,7 @@ msbuild -t:Build -Restore TestData\TestData.proj -p:Configuration=%_C% -m -bl:%_
 
 @if not "%RuntimeTestsEnabled%"=="true" goto :LExit
 
-dotnet test -c %_C% --no-build WixToolsetTest.MsiE2E -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.MsiE2E.trx" || exit /b
+dotnet test -c %_C% WixToolsetTest.MsiE2E --nologo --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.MsiE2E.trx" || exit /b
 
 :LExit
 @popd
