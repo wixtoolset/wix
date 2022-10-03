@@ -2,5 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="dutil\dutil_t.proj" />
     <ProjectReference Include="wcautil\wcautil_t.proj" />
+    <ProjectReference Include="WixToolset.Versioning\WixToolset.Versioning.csproj" Targets="Pack" />
+    <ProjectReference Include="test\WixToolsetTest.Versioning\WixToolsetTest.Versioning.csproj" />
   </ItemGroup>
 </Project>

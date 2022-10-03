@@ -17,6 +17,7 @@ namespace WixToolset.Core.Burn
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     /// <summary>
     /// Binds a this.bundle.

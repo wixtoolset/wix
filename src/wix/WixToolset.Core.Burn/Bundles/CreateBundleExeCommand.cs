@@ -15,6 +15,7 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Dtf.Resources;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     internal class CreateBundleExeCommand
     {

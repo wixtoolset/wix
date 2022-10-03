@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Data
+namespace WixToolset.Versioning
 {
     using System;
     using System.Collections.Generic;
@@ -11,13 +11,12 @@ namespace WixToolset.Data
     /// large numbers and semantic versions with 4-part versions with
     /// or without leading "v" indicators.
     /// </summary>
-    [CLSCompliant(false)]
-    public class WixVersion
+    public class WixVersion : IComparable, IComparable<WixVersion>, IEquatable<WixVersion>
     {
         /// <summary>
         /// Gets the prefix of the version if present when parsed. Usually, 'v' or 'V'.
         /// </summary>
-        public char? Prefix { get; set; } 
+        public char? Prefix { get; set; }
 
         /// <summary>
         /// Gets or sets the major version.
@@ -73,6 +72,63 @@ namespace WixToolset.Data
         /// Gets or sets the metadata in the version.
         /// </summary>
         public string Metadata { get; set; }
+
+        /// <summary>
+        /// Compare to another WixVersion.
+        /// </summary>
+        /// <param name="version">WixVersion to compare.</param>
+        /// <returns>A comparison between versions.</returns>
+        public int CompareTo(WixVersion version)
+        {
+            return WixVersionComparer.Default.Compare(this, version);
+        }
+
+        /// <summary>
+        /// Compare to another object.
+        /// </summary>
+        /// <param name="version">Object to compare.</param>
+        /// <returns>A comparison between objects.</returns>
+        public int CompareTo(object version)
+        {
+            return WixVersionComparer.Default.Compare(this, version as WixVersion);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether the current System.Version object is equal to a specified object.
+        /// </summary>
+        /// <param name="version">An WixVersion to compare with the current WixVersion object, or null.</param>
+        /// <returns>
+        /// true if the current WixVersion object and obj are both WixVersion objects,
+        /// and every component of the current System.Version object matches the corresponding
+        /// component of obj; otherwise, false.
+        /// </returns>
+        public bool Equals(WixVersion version)
+        {
+            return WixVersionComparer.Default.Equals(this, version);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether the current WixVersion object is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare with the current WixVersion object, or null.</param>
+        /// <returns>
+        /// true if the current WixVersion object and obj are both WixVersion objects,
+        /// and every component of the current System.Version object matches the corresponding
+        /// component of obj; otherwise, false.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            return WixVersionComparer.Default.Equals(this, obj as WixVersion);
+        }
+
+        /// <summary>
+        /// Returns a hash code for the current WixVersion object.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
+        public override int GetHashCode()
+        {
+            return WixVersionComparer.Default.GetHashCode(this);
+        }
 
         /// <summary>
         /// Parse a string value into a <c>WixVersion</c>. The returned version may be invalid.
@@ -330,6 +386,78 @@ namespace WixToolset.Data
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Determines whether two specified WixVersion objects are equal.
+        /// </summary>
+        /// <param name="v1">The first WixVersion object.</param>
+        /// <param name="v2">The second WixVersion object.</param>
+        /// <returns>true if v1 equals v2; otherwise, false.</returns>
+        public static bool operator ==(WixVersion v1, WixVersion v2)
+        {
+            return WixVersionComparer.Default.Equals(v1, v2);
+        }
+
+        /// <summary>
+        /// Determines whether two specified System.Version objects are not equal.
+        /// </summary>
+        /// <param name="v1">The first WixVersion object.</param>
+        /// <param name="v2">The second WixVersion object.</param>
+        /// <returns>true if v1 does not equal v2; otherwise, false.</returns>
+        public static bool operator !=(WixVersion v1, WixVersion v2)
+        {
+            return !WixVersionComparer.Default.Equals(v1, v2);
+        }
+
+        /// <summary>
+        /// Determines whether the first specified System.Version object is less than the second specified System.Version object.
+        /// </summary>
+        /// <param name="v1">The first WixVersion object.</param>
+        /// <param name="v2">The second WixVersion object.</param>
+        /// <returns>true if v1 is less than v2; otherwise, false.</returns>
+        /// <exception cref="ArgumentNullException">v1 is null.</exception>
+        public static bool operator <(WixVersion v1, WixVersion v2)
+        {
+            return WixVersionComparer.Default.Compare(v1, v2) == -1;
+        }
+
+        /// <summary>
+        /// Determines whether the first specified System.Version object is greater than the second specified System.Version object.
+        /// </summary>
+        /// <param name="v1">The first WixVersion object.</param>
+        /// <param name="v2">The second WixVersion object.</param>
+        /// <returns>true if v1 is greater than v2; otherwise, false.</returns>
+        public static bool operator >(WixVersion v1, WixVersion v2)
+        {
+            return WixVersionComparer.Default.Compare(v1, v2) == 1;
+        }
+
+        /// <summary>
+        /// Determines whether the first specified System.Version object is less than or equal to the second System.Version object.
+        /// </summary>
+        /// <param name="v1">The first WixVersion object.</param>
+        /// <param name="v2">The second WixVersion object.</param>
+        /// <returns>true if v1 is less than or equal to v2; otherwise, false.</returns>
+        /// <exception cref="ArgumentNullException">v1 is null.</exception>
+        public static bool operator <=(WixVersion v1, WixVersion v2)
+        {
+            var result = WixVersionComparer.Default.Compare(v1, v2);
+
+            return result == 0 || result == -1;
+        }
+
+        /// <summary>
+        /// Determines whether the first specified System.Version object is greater than or equal to the second specified System.Version object.
+        /// </summary>
+        /// <param name="v1">The first WixVersion object.</param>
+        /// <param name="v2">The second WixVersion object.</param>
+        /// <returns>true if v1 is greater than or equal to v2; otherwise, false.</returns>
+        public static bool operator >=(WixVersion v1, WixVersion v2)
+        {
+            var result = WixVersionComparer.Default.Compare(v1, v2);
+
+            return result == 0 || result == 1;
         }
     }
 }

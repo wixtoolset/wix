@@ -19,6 +19,7 @@
 
     <PackageVersion Include="WixToolset.Data" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Extensibility" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Versioning" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Burn" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dnc.HostGenerator" Version="{packageversion}" />

@@ -1,10 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.Data
+namespace WixToolsetTest.Versioning
 {
     using System;
     using System.Linq;
-    using WixToolset.Data;
+    using WixToolset.Versioning;
     using Xunit;
 
     public class WixVerFixture
@@ -403,6 +403,49 @@ namespace WixToolsetTest.Data
             Assert.False(version.HasRevision);
             Assert.Equal(String.Empty, version.Metadata);
             Assert.True(version.Invalid);
+        }
+
+        [Fact]
+        public void CanCompareVersions()
+        {
+            var version1 = WixVersion.Parse("1");
+            var version10 = WixVersion.Parse("1.0");
+            var version100 = WixVersion.Parse("1.0.0");
+            var version2 = WixVersion.Parse("2.0.0");
+            var version201 = WixVersion.Parse("2.0.1");
+            var version2a = WixVersion.Parse("2-a");
+            var version2b = WixVersion.Parse("2-b");
+            var versionInvalid3a = WixVersion.Parse("3.-a");
+            var versionInvalid3b = WixVersion.Parse("3.-b");
+
+            Assert.Equal(version1, version1);
+            Assert.Equal(version1, version10);
+            Assert.True(version1 == version10);
+            Assert.True(version1 == version100);
+            Assert.True(version1 <= version10);
+            Assert.True(version1 >= version10);
+            Assert.False(version1 != version10);
+            Assert.False(version1 < version10);
+            Assert.False(version1 < version100);
+            Assert.False(version1 > version10);
+            Assert.False(version1 > version100);
+
+            Assert.NotEqual(version1, version2);
+            Assert.True(version1 < version2);
+            Assert.False(version1 > version2);
+
+            Assert.True(version2 > version2a);
+            Assert.True(version2 != version2a);
+            Assert.False(version2 < version2a);
+
+            Assert.True(version2 < version201);
+
+            Assert.True(version2a < version2b);
+            Assert.False(version2a > version2b);
+
+            Assert.True(versionInvalid3a < versionInvalid3b);
+
+            Assert.True(version1 < versionInvalid3a);
         }
     }
 }
