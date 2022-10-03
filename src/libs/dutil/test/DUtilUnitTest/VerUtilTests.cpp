@@ -606,7 +606,7 @@ namespace DutilTests
 
                 TestVerutilCompareParsedVersions(pVersion1, pVersion2, 1);
                 TestVerutilCompareParsedVersions(pVersion1, pVersion3, 1);
-                TestVerutilCompareParsedVersions(pVersion2, pVersion3, -1);
+                TestVerutilCompareParsedVersions(pVersion2, pVersion3, 1);
             }
             finally
             {
