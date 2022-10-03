@@ -19,6 +19,9 @@
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <NuGetTargetMoniker>native,Version=v0.0</NuGetTargetMoniker>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(CLRSupport)'=='true' ">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CustomizedNativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
