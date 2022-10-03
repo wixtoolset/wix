@@ -41,6 +41,10 @@ dotnet test wix\api_wix.sln -c %_C% --nologo --no-build -l "trx;LogFileName=%_L%
 @del "..\..\build\artifacts\WixToolset.Data.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Extensibility.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Mba.Core.*.nupkg" 2> nul
+@del "%_L%\TestResults\WixToolsetTest.Mba.Core.trx" 2> nul
+@del "%_L%\TestResults\BalUtilUnitTest.trx" 2> nul
+@del "%_L%\TestResults\BextUtilUnitTest.trx" 2> nul
+@del "%_L%\TestResults\api_wix.trx" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.balutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bextutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrappercore.native" 2> nul

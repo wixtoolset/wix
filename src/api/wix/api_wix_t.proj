@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <!-- Build -->
-    <ProjectReference Include="WixToolset.Data\WixToolset.Data.csproj" />
-    <ProjectReference Include="WixToolset.Extensibility\WixToolset.Extensibility.csproj" />
-    <ProjectReference Include="test\WixToolsetTest.Data\WixToolsetTest.Data.csproj" />
-
-    <!-- Pack -->
     <ProjectReference Include="WixToolset.Data\WixToolset.Data.csproj" Targets="Pack" />
     <ProjectReference Include="WixToolset.Extensibility\WixToolset.Extensibility.csproj" Targets="Pack" />
+    <ProjectReference Include="test\WixToolsetTest.Data\WixToolsetTest.Data.csproj" />
   </ItemGroup>
 </Project>
