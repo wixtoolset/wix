@@ -11,6 +11,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     internal class ExtensionManager : IExtensionManager
     {
@@ -169,7 +170,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 extensionVersion = extensionReference.Substring(index + 1);
                 extensionId = extensionReference.Substring(0, index);
 
-                if (!NuGet.Versioning.NuGetVersion.TryParse(extensionVersion, out _))
+                if (!WixVersion.TryParse(extensionVersion, out _))
                 {
                     return false;
                 }
@@ -189,15 +190,15 @@ namespace WixToolset.Core.ExtensibilityServices
 
             try
             {
-                NuGet.Versioning.NuGetVersion version = null;
+                WixVersion highestVersion = null;
                 foreach (var versionPath in Directory.GetDirectories(basePath))
                 {
                     var versionFolder = Path.GetFileName(versionPath);
-                    if (NuGet.Versioning.NuGetVersion.TryParse(versionFolder, out var checkVersion) &&
-                        (version == null || version < checkVersion))
+                    if (WixVersion.TryParse(versionFolder, out var checkVersion) &&
+                        (highestVersion == null || highestVersion < checkVersion))
                     {
                         foundVersionFolder = versionFolder;
-                        version = checkVersion;
+                        highestVersion = checkVersion;
                     }
                 }
             }
