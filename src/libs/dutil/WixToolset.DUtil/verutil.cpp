@@ -660,7 +660,7 @@ static HRESULT CompareVersionSubstring(
     HRESULT hr = S_OK;
     int nResult = 0;
 
-    nResult = ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzString1, cchCount1, wzString2, cchCount2);
+    nResult = ::CompareStringOrdinal(wzString1, cchCount1, wzString2, cchCount2, TRUE);
     if (!nResult)
     {
         VerExitOnLastError(hr, "Failed to compare version substrings");
