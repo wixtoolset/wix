@@ -8,6 +8,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     internal class BackendHelper : LayoutServices, IBackendHelper
     {

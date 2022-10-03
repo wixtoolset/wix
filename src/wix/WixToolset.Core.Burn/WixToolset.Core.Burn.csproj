@@ -15,7 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
     <ProjectReference Include="..\WixToolset.Core.Native\WixToolset.Core.Native.csproj" />
   </ItemGroup>
 
@@ -24,5 +23,6 @@
     <PackageReference Include="WixToolset.Data" />
     <PackageReference Include="WixToolset.Dtf.Resources" />
     <PackageReference Include="WixToolset.Extensibility" />
+    <PackageReference Include="WixToolset.Versioning" />
   </ItemGroup>
 </Project>

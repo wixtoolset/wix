@@ -15,6 +15,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     internal class ParseHelper : IParseHelper
     {

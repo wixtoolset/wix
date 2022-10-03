@@ -5,25 +5,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net472</TargetFrameworks>
-    <Description>Core Windows Installer</Description>
-    <Title>WiX Toolset Core Windows Installer</Title>
+    <LangVersion>7.3</LangVersion>
+    <Description>WiX Toolset Versioning</Description>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Core.Native\WixToolset.Core.Native.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Data" />
-    <PackageReference Include="WixToolset.Extensibility" />
-    <PackageReference Include="WixToolset.Versioning" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Metadata" />
-    <PackageReference Include="System.Text.Encoding.CodePages" />
-  </ItemGroup>
 </Project>

@@ -11,6 +11,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     internal class ProcessPackageSoftwareTagsCommand
     {

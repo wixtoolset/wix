@@ -14,6 +14,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Versioning;
 
     /// <summary>
     /// Common Wix utility methods and types.
