@@ -13,6 +13,7 @@
   <Target Name="__SetAssemblyInfoFromGit" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="GetAssemblyVersion" />
 
   <PropertyGroup Condition=" '$(IsWixTestProject)'=='true' ">
+    <RollForward>Major</RollForward>
     <IsPackable>false</IsPackable>
     <SignOutput>false</SignOutput>
   </PropertyGroup>
