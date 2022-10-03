@@ -21,9 +21,11 @@
 
 msbuild -Restore libs_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\libs_build.binlog || exit /b
 
-dotnet test %_B%\net6.0\WixToolsetTest.Versioning.dll --nologo -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Versioning.trx" || exit /b
-dotnet test %_B%\x86\DUtilUnitTest.dll --nologo -l "trx;LogFileName=%_L%\TestResults\DutilUnitTest32.trx" || exit /b
-dotnet test %_B%\x64\DUtilUnitTest.dll --nologo -l "trx;LogFileName=%_L%\TestResults\DutilUnitTest64.trx" || exit /b
+dotnet test ^
+ %_B%\net6.0\WixToolsetTest.Versioning.dll ^
+ %_B%\x86\DUtilUnitTest.dll ^
+ %_B%\x64\DUtilUnitTest.dll ^
+ --nologo -l "trx;LogFileName=%_L%\TestResults\libs.trx" || exit /b
 
 @goto :end
 
@@ -32,8 +34,7 @@ dotnet test %_B%\x64\DUtilUnitTest.dll --nologo -l "trx;LogFileName=%_L%\TestRes
 @del "..\..\build\artifacts\WixToolset.DUtil.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Versioning.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.WcaUtil.*.nupkg" 2> nul
-@del "%_L%\TestResults\WixToolsetTest.Versioning.trx" 2> nul
-@del "%_L%\TestResults\DutilUnitTest*.trx" 2> nul
+@del "%_L%\TestResults\libs.trx" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.dutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.versioning" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.wcautil" 2> nul

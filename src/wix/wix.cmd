@@ -7,6 +7,7 @@
 @if /i "%1"=="release" set _C=Release
 @if not "%1"=="" shift & goto parse_args
 
+@set _B=%~dp0..\..\build\wix\%_C%
 @set _P_OBJ=%~dp0..\..\build\wix\obj\publish_t\%_C%\
 @set _P=%~dp0..\..\build\wix\%_C%\publish\
 @set _RCO=/S /R:1 /W:1 /NP /XO  /NS /NC /NFL /NDL /NJH /NJS
@@ -24,11 +25,13 @@ msbuild wix.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\wix_build
 
 
 :: Pre-Publish Test
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Converters -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Converters.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Converters.Symbolizer -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Converters.Symbolizer.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Core -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Core.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Core.Native -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Core.Native.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.CoreIntegration -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.CoreIntegration.trx" || exit /b
+dotnet test ^
+ %_B%\test\WixToolsetTest.Converters\net6.0\WixToolsetTest.Converters.dll ^
+ %_B%\test\WixToolsetTest.Converters.Symbolizer\net472\WixToolsetTest.Converters.Symbolizer.dll ^
+ %_B%\test\WixToolsetTest.Core\net6.0\WixToolsetTest.Core.dll ^
+ %_B%\test\WixToolsetTest.Core.Native\net6.0\win-x64\WixToolsetTest.Core.Native.dll ^
+ %_B%\test\WixToolsetTest.CoreIntegration\net6.0\WixToolsetTest.CoreIntegration.dll ^
+ --nologo -l "trx;LogFileName=%_L%\TestResults\wix_prepublish.trx" || exit /b
 
 
 :: Publish
@@ -50,8 +53,11 @@ msbuild -t:Publish -p:Configuration=%_C% -nologo -warnaserror WixToolset.Sdk\Wix
 
 
 :: Test
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.BuildTasks -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.BuildTasks.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Sdk -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Sdk.trx" || exit /b
+dotnet test ^
+ %_B%\test\WixToolsetTest.BuildTasks\net472\win-x64\WixToolsetTest.BuildTasks.dll ^
+ %_B%\test\WixToolsetTest.Sdk\net472\WixToolsetTest.Sdk.dll ^
+ --nologo -l "trx;LogFileName=%_L%\TestResults\wix_postpublish.trx" || exit /b
+
 
 :: Pack
 msbuild pack_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\wix_pack.binlog || exit /b

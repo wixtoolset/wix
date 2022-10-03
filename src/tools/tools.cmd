@@ -10,6 +10,8 @@
 @if /i "%1"=="clean" set _CLEAN=1
 @if not "%1"=="" shift & goto parse_args
 
+@set _B=%~dp0..\..\build\tools\%_C%
+
 :: Clean
 
 @if "%_INC%"=="" call :clean
@@ -24,8 +26,10 @@ msbuild -Restore tools.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L
 msbuild publish_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\tools_publish.binlog || exit /b
 
 :: Test
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.Heat -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Heat.trx" || exit /b
-dotnet test -c %_C% --no-build --nologo test\WixToolsetTest.HeatTasks -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.HeatTasks.trx" || exit /b
+dotnet test ^
+ %_B%\test\WixToolsetTest.Heat\net472\WixToolsetTest.Heat.dll ^
+ %_B%\test\WixToolsetTest.HeatTasks\net472\WixToolsetTest.HeatTasks.dll ^
+ --nologo -l "trx;LogFileName=%_L%\TestResults\tools.trx" || exit /b
 
 :: Pack
 msbuild -t:Pack WixToolset.Heat -p:Configuration=%_C% -p:NoBuild=true -nologo -m -warnaserror -bl:%_L%\tools_pack.binlog || exit /b

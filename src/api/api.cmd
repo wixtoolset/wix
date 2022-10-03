@@ -26,10 +26,12 @@
 msbuild api_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\api_build.binlog || exit /b
 
 :: Test
-dotnet test burn\test\WixToolsetTest.Mba.Core -c %_C% --nologo --no-build -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.Mba.Core.trx" || exit /b
-dotnet test %_B%\x86\BalUtilUnitTest.dll --nologo -l "trx;LogFileName=%_L%\TestResults\BalUtilUnitTest.trx" || exit /b
-dotnet test %_B%\x86\BextUtilUnitTest.dll --nologo -l "trx;LogFileName=%_L%\TestResults\BextUtilUnitTest.trx" || exit /b
-dotnet test wix\api_wix.sln -c %_C% --nologo --no-build -l "trx;LogFileName=%_L%\TestResults\api_wix.trx" || exit /b
+dotnet test ^
+ %_B%\net6.0\WixToolsetTest.Data.dll ^
+ %_B%\net6.0\win-x86\WixToolsetTest.Mba.Core.dll ^
+ %_B%\x86\BalUtilUnitTest.dll ^
+ %_B%\x86\BextUtilUnitTest.dll ^
+ --nologo -l "trx;LogFileName=%_L%\TestResults\api.trx" || exit /b
 
 @goto :end
 
@@ -41,10 +43,7 @@ dotnet test wix\api_wix.sln -c %_C% --nologo --no-build -l "trx;LogFileName=%_L%
 @del "..\..\build\artifacts\WixToolset.Data.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Extensibility.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Mba.Core.*.nupkg" 2> nul
-@del "%_L%\TestResults\WixToolsetTest.Mba.Core.trx" 2> nul
-@del "%_L%\TestResults\BalUtilUnitTest.trx" 2> nul
-@del "%_L%\TestResults\BextUtilUnitTest.trx" 2> nul
-@del "%_L%\TestResults\api_wix.trx" 2> nul
+@del "%_L%\TestResults\api.trx" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.balutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bextutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrappercore.native" 2> nul
