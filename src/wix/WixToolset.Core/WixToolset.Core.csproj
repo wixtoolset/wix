@@ -23,6 +23,5 @@
   <ItemGroup>
     <PackageReference Include="System.IO.FileSystem.AccessControl" />
     <PackageReference Include="System.Text.Encoding.CodePages" />
-    <PackageReference Include="NuGet.Versioning" />
   </ItemGroup>
 </Project>
