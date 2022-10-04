@@ -21,10 +21,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     {
         private static readonly Regex Modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
 
-        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, string databasePath, Database database, OutputType outputType, string exportBasePath, string extractFilesFolder, string intermediateFolder, bool enableDemodularization, bool skipSummaryInfo)
+        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver, string databasePath, Database database, OutputType outputType, string exportBasePath, string extractFilesFolder, string intermediateFolder, bool enableDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.FileSystem = fileSystem;
             this.PathResolver = pathResolver;
             this.DatabasePath = databasePath;
             this.Database = database;
@@ -38,9 +39,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
         }
 
-        public IMessaging Messaging { get; }
+        private IMessaging Messaging { get; }
 
-        public IBackendHelper BackendHelper { get; }
+        private IBackendHelper BackendHelper { get; }
+
+        private  IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -203,7 +206,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                                                     Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
 
-                                                    using (var fs = File.Create(source))
+                                                    using (var fs = this.FileSystem.OpenFile(source, FileMode.Create, FileAccess.Write, FileShare.None))
                                                     {
                                                         int bytesRead;
                                                         var buffer = new byte[4096];
@@ -531,7 +534,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                 if (!String.IsNullOrEmpty(this.ExtractFilesFolder))
                 {
-                    var extractCommand = new ExtractCabinetsCommand(output, this.Database, this.DatabasePath, this.ExtractFilesFolder, this.IntermediateFolder);
+                    var extractCommand = new ExtractCabinetsCommand(this.FileSystem, output, this.Database, this.DatabasePath, this.ExtractFilesFolder, this.IntermediateFolder);
                     extractCommand.Execute();
 
                     extractedFileIds = new HashSet<string>(extractCommand.ExtractedFileIdsWithMediaRow.Keys, StringComparer.OrdinalIgnoreCase);

@@ -3,6 +3,7 @@
 namespace WixToolset.Extensibility.Services
 {
     using System;
+    using System.IO;
 
     /// <summary>
     /// Abstracts basic file system operations.
@@ -31,6 +32,15 @@ namespace WixToolset.Extensibility.Services
         /// <param name="source">The file to move.</param>
         /// <param name="destination">The destination file.</param>
         void MoveFile(string source, string destination);
+
+        /// <summary>
+        /// Opens a file.
+        /// </summary>
+        /// <param name="path">The file to open.</param>
+        /// <param name="mode">A System.IO.FileMode value that specifies whether a file is created if one does not exist, and determines whether the contents of existing files are retained or overwritten.</param>
+        /// <param name="access">A System.IO.FileAccess value that specifies the operations that can be performed on the file.</param>
+        /// <param name="share">A System.IO.FileShare value specifying the type of access other threads have to the file.</param>
+        FileStream OpenFile(string path, FileMode mode, FileAccess access, FileShare share);
 
         /// <summary>
         /// Executes an action and retries on any exception a few times with short pause

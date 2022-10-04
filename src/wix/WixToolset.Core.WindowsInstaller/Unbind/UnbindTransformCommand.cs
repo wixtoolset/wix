@@ -16,10 +16,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class UnbindTransformCommand
     {
-        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, FileSystemManager fileSystemManager, string transformFile, string exportBasePath, string intermediateFolder)
+        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver, FileSystemManager fileSystemManager, string transformFile, string exportBasePath, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.FileSystem = fileSystem;
             this.PathResolver = pathResolver;
             this.FileSystemManager = fileSystemManager;
             this.TransformFile = transformFile;
@@ -32,6 +33,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -116,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             using (var msiDatabase = this.ApplyTransformToSchemaDatabase(schemaDatabasePath, TransformErrorConditions.All | TransformErrorConditions.ViewTransform))
             {
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, schemaDatabasePath, msiDatabase, OutputType.Product, null, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, schemaDatabasePath, msiDatabase, OutputType.Product, null, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 var transformViewOutput = unbindCommand.Execute();
 
                 return transformViewOutput.Tables["_TransformView"];
@@ -177,7 +180,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, schemaDatabasePath, database, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, schemaDatabasePath, database, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 output = unbindCommand.Execute();
             }
 
@@ -324,7 +327,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         if (null == this.EmptyFile)
                         {
                             this.EmptyFile = Path.Combine(this.IntermediateFolder, ".empty");
-                            using (var fileStream = File.Create(this.EmptyFile))
+                            using (var fileStream = this.FileSystem.OpenFile(this.EmptyFile, FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                             }
                         }
@@ -343,7 +346,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private void GenerateDatabase(WindowsInstallerData data)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, data, data.SourceLineNumbers.FileName, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
+            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.FileSystemManager, data, data.SourceLineNumbers.FileName, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
             command.Execute();
         }
 

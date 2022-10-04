@@ -18,10 +18,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     {
         private const string IdtsSubFolder = "_idts";
 
-        public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
+        public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IFileSystem fileSystem, FileSystemManager fileSystemManager, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.FileSystem = fileSystem;
             this.FileSystemManager = fileSystemManager;
             this.Data = data;
             this.OutputPath = outputPath;
@@ -33,6 +34,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private FileSystemManager FileSystemManager { get; }
 
@@ -358,7 +361,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         var transformFile = Path.Combine(this.IntermediateFolder, String.Concat(subStorage.Name, ".mst"));
 
                         // Bind the transform.
-                        var command = new BindTransformCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, this.IntermediateFolder, subStorage.Data, transformFile, this.TableDefinitions);
+                        var command = new BindTransformCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.FileSystemManager, this.IntermediateFolder, subStorage.Data, transformFile, this.TableDefinitions);
                         command.Execute();
 
                         if (this.Messaging.EncounteredError)

@@ -19,6 +19,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
         public InscribeMsiPackageCommand(IServiceProvider serviceProvider, string inputPath, string intermediateFolder, string outputPath)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
             this.WindowsInstallerBackendHelper = serviceProvider.GetService<IWindowsInstallerBackendHelper>();
             this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
             this.InputPath = inputPath;
@@ -34,6 +35,8 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
         private IMessaging Messaging { get; }
 
+        private IFileSystem FileSystem { get; }
+
         private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
@@ -48,8 +51,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
             if (!String.Equals(this.InputPath, this.OutputPath, StringComparison.OrdinalIgnoreCase))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
-                File.Copy(this.InputPath, this.OutputPath, true);
+                this.FileSystem.CopyFile(this.InputPath, this.OutputPath, allowHardlink: false);
             }
 
             var attributes = File.GetAttributes(databasePath);
@@ -96,7 +98,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                                 Directory.CreateDirectory(hashPath);
                                 hashPath = Path.Combine(hashPath, hashFileName);
 
-                                using (var fs = File.Create(hashPath))
+                                using (var fs = this.FileSystem.OpenFile(hashPath, FileMode.Create, FileAccess.Write, FileShare.None))
                                 {
                                     int bytesRead;
                                     var buffer = new byte[1024 * 4];
@@ -127,7 +129,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             Directory.CreateDirectory(certPath);
                             certPath = Path.Combine(certPath, String.Concat(certificateId, ".cer"));
 
-                            using (var fs = File.Create(certPath))
+                            using (var fs = this.FileSystem.OpenFile(certPath, FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                                 int bytesRead;
                                 var buffer = new byte[1024 * 4];
@@ -221,9 +223,9 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             var certPath = Path.Combine(this.IntermediateFolder, "MsiDigitalCertificate");
                             Directory.CreateDirectory(certPath);
                             certPath = Path.Combine(certPath, String.Concat(cert2.Thumbprint, ".cer"));
-                            File.Delete(certPath);
+                            this.FileSystem.DeleteFile(certPath, true);
 
-                            using (var writer = new BinaryWriter(File.Open(certPath, FileMode.Create)))
+                            using (var writer = new BinaryWriter(this.FileSystem.OpenFile(certPath, FileMode.Create, FileAccess.Write, FileShare.Read)))
                             {
                                 writer.Write(cert2.RawData);
                                 writer.Close();

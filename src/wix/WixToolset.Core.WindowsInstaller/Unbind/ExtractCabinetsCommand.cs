@@ -12,11 +12,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Services;
 
     internal class ExtractCabinetsCommand
     {
-        public ExtractCabinetsCommand(WindowsInstallerData output, Database database, string inputFilePath, string exportBasePath, string intermediateFolder, bool treatOutputAsModule = false)
+        public ExtractCabinetsCommand(IFileSystem fileSystem, WindowsInstallerData output, Database database, string inputFilePath, string exportBasePath, string intermediateFolder, bool treatOutputAsModule = false)
         {
+            this.FileSystem = fileSystem;
             this.Output = output;
             this.Database = database;
             this.InputFilePath = inputFilePath;
@@ -26,6 +28,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         }
 
         public Dictionary<string, MediaRow> ExtractedFileIdsWithMediaRow { get; private set; }
+
+        private  IFileSystem FileSystem { get; }
 
         private WindowsInstallerData Output { get; }
 
@@ -100,7 +104,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                 // ensure the parent directory exists
                                 Directory.CreateDirectory(Path.GetDirectoryName(cabinetPath));
 
-                                using (var fs = File.Create(cabinetPath))
+                                using (var fs = this.FileSystem.OpenFile(cabinetPath, FileMode.Create, FileAccess.Write, FileShare.None))
                                 {
                                     int bytesRead;
                                     var buffer = new byte[4096];

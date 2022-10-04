@@ -11,14 +11,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Xml;
     using System.Xml.XPath;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     internal static class AssemblyNameReader
     {
-        public static AssemblyName ReadAssembly(SourceLineNumber sourceLineNumbers, string assemblyPath, string fileVersion)
+        public static AssemblyName ReadAssembly(IFileSystem fileSystem, SourceLineNumber sourceLineNumbers, string assemblyPath, string fileVersion)
         {
             try
             {
-                using (var stream = File.OpenRead(assemblyPath))
+                using (var stream = fileSystem.OpenFile(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var peReader = new PEReader(stream))
                 {
                     var reader = peReader.GetMetadataReader();

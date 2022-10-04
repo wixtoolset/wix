@@ -21,6 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
+            this.FileSystem = serviceProvider.GetService<IFileSystem>();
             this.PathResolver = serviceProvider.GetService<IPathResolver>();
             this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
         }
@@ -28,6 +29,8 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -342,11 +345,11 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             else
             {
                 var fileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
-                var fileSystemManager = new FileSystemManager(fileSystemExtensions);
+                var fileSystemManager = new FileSystemManager(this.FileSystem, fileSystemExtensions);
 
                 var tableDefinitions = this.GetTableDefinitions();
 
-                var bindCommand = new BindTransformCommand(this.Messaging, this.BackendHelper, fileSystemManager, this.IntermediateFolder, transform, this.OutputPath, tableDefinitions);
+                var bindCommand = new BindTransformCommand(this.Messaging, this.BackendHelper, this.FileSystem, fileSystemManager, this.IntermediateFolder, transform, this.OutputPath, tableDefinitions);
                 bindCommand.Execute();
             }
         }
@@ -379,7 +382,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             if (!DataLoader.TryLoadWindowsInstallerData(path, out var data))
             {
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, path, null, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, path, null, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
                 data = unbindCommand.Execute();
             }
 

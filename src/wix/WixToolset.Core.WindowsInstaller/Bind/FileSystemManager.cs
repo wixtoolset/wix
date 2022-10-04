@@ -5,14 +5,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Runtime.CompilerServices;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class FileSystemManager
     {
-        public FileSystemManager(IEnumerable<IFileSystemExtension> fileSystemExtensions)
+        public FileSystemManager(IFileSystem fileSystem, IEnumerable<IFileSystemExtension> fileSystemExtensions)
         {
+            this.FileSystem = fileSystem;
             this.Extensions = fileSystemExtensions;
         }
+
+        private IFileSystem FileSystem { get; }
 
         private IEnumerable<IFileSystemExtension> Extensions { get; }
 
@@ -27,18 +32,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            return BuiltinCompareFiles(firstPath, secondPath);
+            return this.BuiltinCompareFiles(firstPath, secondPath);
         }
 
-        private static bool BuiltinCompareFiles(string firstPath, string secondPath)
+        private bool BuiltinCompareFiles(string firstPath, string secondPath)
         {
             if (String.Equals(firstPath, secondPath, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            using (var firstStream = File.OpenRead(firstPath))
-            using (var secondStream = File.OpenRead(secondPath))
+            using (var firstStream = this.FileSystem.OpenFile(firstPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var secondStream = this.FileSystem.OpenFile(secondPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 if (firstStream.Length != secondStream.Length)
                 {

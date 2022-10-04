@@ -17,6 +17,8 @@ namespace WixToolset.Core.WindowsInstaller
 
             var backendHelper = context.ServiceProvider.GetService<IBackendHelper>();
 
+            var fileSystem = context.ServiceProvider.GetService<IFileSystem>();
+
             var pathResolver = context.ServiceProvider.GetService<IPathResolver>();
 
             var fileResolver = context.ServiceProvider.GetService<IFileResolver>();
@@ -36,7 +38,7 @@ namespace WixToolset.Core.WindowsInstaller
             IEnumerable<PatchTransform> patchTransforms;
             PatchFilterMap patchFilterMap;
             {
-                var command = new CreatePatchTransformsCommand(messaging, backendHelper, pathResolver, fileResolver, resolveExtensions, backendExtensions, context.IntermediateRepresentation, context.IntermediateFolder, context.BindPaths);
+                var command = new CreatePatchTransformsCommand(messaging, backendHelper, fileSystem, pathResolver, fileResolver, resolveExtensions, backendExtensions, context.IntermediateRepresentation, context.IntermediateFolder, context.BindPaths);
                 command.Execute();
 
                 patchTransforms = command.PatchTransforms;
