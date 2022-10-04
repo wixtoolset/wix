@@ -12,13 +12,13 @@ namespace WixToolset.Core.ExtensibilityServices
     {
         public void CopyFile(string source, string destination, bool allowHardlink)
         {
-            EnsureDirectoryWithoutFile(destination);
+            this.EnsureDirectoryWithoutFile(destination);
 
             var hardlinked = false;
 
             if (allowHardlink)
             {
-                ActionWithRetries(() => hardlinked = CreateHardLink(destination, source, IntPtr.Zero));
+                this.ExecuteWithRetries(() => hardlinked = CreateHardLink(destination, source, IntPtr.Zero));
             }
 
             if (!hardlinked)
@@ -27,25 +27,30 @@ namespace WixToolset.Core.ExtensibilityServices
                 var er = Marshal.GetLastWin32Error();
 #endif
 
-                ActionWithRetries(() => File.Copy(source, destination, overwrite: true));
+                this.ExecuteWithRetries(() => File.Copy(source, destination, overwrite: true));
+            }
+        }
+
+        public void DeleteFile(string source, bool throwOnError = false, int maxRetries = 4)
+        {
+            try
+            {
+                this.ExecuteWithRetries(() => File.Delete(source), maxRetries);
+            }
+            catch when (!throwOnError)
+            {
+                // Do nothing on best-effort deletes.
             }
         }
 
         public void MoveFile(string source, string destination)
         {
-            EnsureDirectoryWithoutFile(destination);
+            this.EnsureDirectoryWithoutFile(destination);
 
-            ActionWithRetries(() => File.Move(source, destination));
+            this.ExecuteWithRetries(() => File.Move(source, destination));
         }
 
-        /// <summary>
-        /// Executes an action and retries on any exception up to a few times. Primarily
-        /// intended for use with file system operations that might get interrupted by
-        /// external systems (usually anti-virus).
-        /// </summary>
-        /// <param name="action">Action to execute.</param>
-        /// <param name="maxRetries">Maximum retry attempts.</param>
-        internal static void ActionWithRetries(Action action, int maxRetries = 3)
+        public void ExecuteWithRetries(Action action, int maxRetries = 4)
         {
             for (var attempt = 1; attempt <= maxRetries; ++attempt)
             {
@@ -61,16 +66,16 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
-        private static void EnsureDirectoryWithoutFile(string path)
+        private void EnsureDirectoryWithoutFile(string path)
         {
             var directory = Path.GetDirectoryName(path);
 
             if (!String.IsNullOrEmpty(directory))
             {
-                ActionWithRetries(() => Directory.CreateDirectory(directory));
+                this.ExecuteWithRetries(() => Directory.CreateDirectory(directory));
             }
 
-            ActionWithRetries(() => File.Delete(path));
+            this.ExecuteWithRetries(() => File.Delete(path));
         }
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

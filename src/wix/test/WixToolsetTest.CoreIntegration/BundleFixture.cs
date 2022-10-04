@@ -428,7 +428,7 @@ namespace WixToolsetTest.CoreIntegration
                 var message = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString().Replace(folder, "<testdata>")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"Failed to add resources to the bundle. Ensure the bundle icon file is an icon file at '<testdata>\.Data\burn.exe'"
+                    @"Failed to update resources in the bundle. Ensure the bundle icon file is an icon file at '<testdata>\.Data\burn.exe'. Detail: Failed to save resource. Error: 87"
                 }, message);
             }
         }
