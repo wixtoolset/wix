@@ -204,7 +204,7 @@ namespace WixToolset.Core.Bind
             foreach (var file in files)
             {
                 var fileInfo = new FileInfo(file);
-                ExtensibilityServices.FileSystem.ActionWithRetries(() => fileInfo.SetAccessControl(aclReset));
+                this.FileSystem.ExecuteWithRetries(() => fileInfo.SetAccessControl(aclReset));
             }
         }
     }

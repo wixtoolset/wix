@@ -349,17 +349,11 @@ namespace WixToolset.Core.Burn.Bundles
 
             try
             {
-                resources.Save(bundleTempPath);
+                this.FileSystem.ExecuteWithRetries(() => resources.Save(bundleTempPath));
             }
-            catch (IOException)
+            catch (IOException e)
             {
-                // If there was no icon or splash screen then this is unexpected so rethrow.
-                if (bundleInfo.IconSourceFile == null && bundleInfo.SplashScreenSourceFile == null)
-                {
-                    throw;
-                }
-
-                this.Messaging.Write(BurnBackendErrors.FailedToAddIconOrSplashScreenToBundle(bundleInfo.SourceLineNumbers, bundleInfo.IconSourceFile?.Path, bundleInfo.SplashScreenSourceFile?.Path));
+                this.Messaging.Write(BurnBackendErrors.FailedToUpdateBundleResources(bundleInfo.SourceLineNumbers, bundleInfo.IconSourceFile?.Path, bundleInfo.SplashScreenSourceFile?.Path, e.Message));
             }
         }
 

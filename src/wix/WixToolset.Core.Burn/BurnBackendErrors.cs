@@ -42,7 +42,7 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.ExternalPayloadCollision2, "The location of the symbol related to the previous error.");
         }
 
-        public static Message FailedToAddIconOrSplashScreenToBundle(SourceLineNumber sourceLineNumbers, string iconPath, string splashScreenPath)
+        public static Message FailedToUpdateBundleResources(SourceLineNumber sourceLineNumbers, string iconPath, string splashScreenPath, string detail)
         {
             var additionalDetail = String.Empty;
 
@@ -51,18 +51,18 @@ namespace WixToolset.Core.Burn
             }
             else if (String.IsNullOrEmpty(iconPath))
             {
-                additionalDetail = $" Ensure the splash screen file is a bitmap file at '{splashScreenPath}'";
+                additionalDetail = $" Ensure the splash screen file is a bitmap file at '{splashScreenPath}'.";
             }
             else if (String.IsNullOrEmpty(splashScreenPath))
             {
-                additionalDetail = $" Ensure the bundle icon file is an icon file at '{iconPath}'";
+                additionalDetail = $" Ensure the bundle icon file is an icon file at '{iconPath}'.";
             }
             else
             {
-                additionalDetail = $" Ensure the bundle icon file is an icon file at '{iconPath}' and the splash screen file is a bitmap file at '{splashScreenPath}'";
+                additionalDetail = $" Ensure the bundle icon file is an icon file at '{iconPath}' and the splash screen file is a bitmap file at '{splashScreenPath}'.";
             }
 
-            return Message(sourceLineNumbers, Ids.FailedToAddIconOrSplashScreenToBundle, "Failed to add resources to the bundle.{0}", additionalDetail);
+            return Message(sourceLineNumbers, Ids.FailedToUpdateBundleResources, "Failed to update resources in the bundle.{0} Detail: {1}", additionalDetail, detail);
         }
 
         public static Message PackageCachePayloadCollision(SourceLineNumber sourceLineNumbers, string payloadId, string payloadName, string packageId)
@@ -113,7 +113,7 @@ namespace WixToolset.Core.Burn
             TooManyAttachedContainers = 8008,
             IncompatibleWixBurnSection = 8009,
             UnsupportedRemotePackagePayload = 8010,
-            FailedToAddIconOrSplashScreenToBundle = 8011,
+            FailedToUpdateBundleResources = 8011,
             InvalidBundleManifest = 8012,
             BundleMultipleProviders = 8013,
         } // last available is 8499. 8500 is BurnBackendWarnings.
