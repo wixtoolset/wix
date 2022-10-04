@@ -78,8 +78,8 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     this.UXContainer = container;
 
-                    container.WorkingPath = Path.Combine(this.IntermediateFolder, container.Name);
                     container.AttachedContainerIndex = 0;
+                    container.WorkingPath = Path.Combine(this.IntermediateFolder, container.Name);
 
                     // Gather the list of UX payloads but ensure the BootstrapperApplicationDll Payload is the first
                     // in the list since that is the Payload that Burn attempts to load.
@@ -101,9 +101,9 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     container.WorkingPath = Path.Combine(this.IntermediateFolder, container.Name);
 
-                    // Add detached containers to the list of file transfers.
                     if (ContainerType.Detached == container.Type)
                     {
+                        // Add file transfer to move the detached containers from intermediate build location to the correct output location.
                         var outputPath = Path.Combine(this.LayoutFolder, container.Name);
                         var transfer = this.BackendHelper.CreateFileTransfer(container.WorkingPath, outputPath, true, container.SourceLineNumbers);
                         fileTransfers.Add(transfer);
@@ -116,6 +116,8 @@ namespace WixToolset.Core.Burn.Bundles
 
                         container.AttachedContainerIndex = attachedContainerIndex;
                         ++attachedContainerIndex;
+
+                        trackedFiles.Add(this.BackendHelper.TrackFile(container.WorkingPath, TrackedFileType.Temporary, container.SourceLineNumbers));
                     }
                 }
             }
@@ -125,7 +127,6 @@ namespace WixToolset.Core.Burn.Bundles
                 foreach (var container in this.Containers.Where(c => !String.IsNullOrEmpty(c.WorkingPath) && c.Id.Id != BurnConstants.BurnUXContainerName))
                 {
                     this.CreateContainer(container, payloadsByContainer[container.Id.Id]);
-                    trackedFiles.Add(this.BackendHelper.TrackFile(container.WorkingPath, TrackedFileType.Temporary, container.SourceLineNumbers));
                 }
             }
 

@@ -10,11 +10,6 @@ namespace WixToolset.Extensibility.Data
     public interface ITrackedFile
     {
         /// <summary>
-        /// Indicates whether the tracked file should be cleaned by the project.
-        /// </summary>
-        bool Clean { get; set; }
-
-        /// <summary>
         /// Path to tracked file.
         /// </summary>
         string Path { get; set; }

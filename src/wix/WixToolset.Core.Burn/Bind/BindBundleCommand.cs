@@ -484,7 +484,7 @@ namespace WixToolset.Core.Burn
                 uxContainer.Hash = command.Hash;
                 uxContainer.Size = command.Size;
 
-                trackedFiles.Add(this.BackendHelper.TrackFile(uxContainer.WorkingPath, TrackedFileType.Temporary));
+                trackedFiles.Add(this.BackendHelper.TrackFile(uxContainer.WorkingPath, TrackedFileType.Temporary, uxContainer.SourceLineNumbers));
             }
 
             {
