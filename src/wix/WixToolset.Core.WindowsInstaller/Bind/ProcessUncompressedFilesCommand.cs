@@ -113,9 +113,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             fileTransfers.Add(transfer);
 
                             var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.CopiedOutput, facade.SourceLineNumber);
-
-                            tracked.Clean = !transfer.Redundant;
-
                             trackedFiles.Add(tracked);
                         }
                     }
