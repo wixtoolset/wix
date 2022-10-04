@@ -11,11 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="$(OutputPath)..\util.wixlib" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <ProjectReference Include="..\wixlib\util.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\wixlib\util.wixproj"
+                      OutputItemType="EmbeddedResource"
+                      ReferenceOutputAssembly="false"
+                      SkipGetTargetFrameworkProperties="true"
+                      />
+    <EmbeddedResource Include="$(OutputPath)..\util.wixlib" Condition=" '$(NCrunch)'=='1' " />
   </ItemGroup>
 
   <ItemGroup>
