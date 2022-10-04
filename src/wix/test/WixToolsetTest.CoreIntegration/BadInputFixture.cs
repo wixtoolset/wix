@@ -243,8 +243,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
-                var warningMessages = result.Messages.Where(m => m.Level == MessageLevel.Warning).Select(m => m.ToString()).ToList();
-                warningMessages.Sort();
+                var warningMessages = result.Messages.Where(m => m.Level == MessageLevel.Warning).Select(m => m.ToString()).OrderBy(s => s, StringComparer.Ordinal).ToArray();
 
                 WixAssert.CompareLineByLine(new[]
                 {
@@ -253,10 +252,9 @@ namespace WixToolsetTest.CoreIntegration
                     "ExePackage/@DetectCondition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "The *Search/@Variable attribute's value begins with the reserved prefix 'Wix'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.",
                     "The *Search/@Variable attribute's value references the well-known log Variable 'WixBundleLog' to change its value. This variable is set by the engine and is intended to be read-only. Change your attribute's value to reference a custom variable.",
-                }, warningMessages.ToArray());
+                }, warningMessages);
 
-                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString()).ToList();
-                errorMessages.Sort();
+                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString()).OrderBy(s => s, StringComparer.Ordinal).ToArray();
 
                 WixAssert.CompareLineByLine(new[]
                 {
@@ -264,7 +262,7 @@ namespace WixToolsetTest.CoreIntegration
                     "The CommandLine/@Condition attribute's value '=' is not a valid bundle condition.",
                     "The MsiPackage/@InstallCondition attribute's value '=' is not a valid bundle condition.",
                     "The MsiProperty/@Condition attribute's value '=' is not a valid bundle condition.",
-                }, errorMessages.ToArray());
+                }, errorMessages);
 
                 Assert.Equal(409, result.ExitCode);
             }
