@@ -19,9 +19,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
-        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IFileFacade> allFileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
+        public UpdateFileFacadesCommand(IMessaging messaging, IFileSystem fileSystem, IntermediateSection section, IEnumerable<IFileFacade> allFileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
         {
             this.Messaging = messaging;
+            this.FileSystem = fileSystem;
             this.Section = section;
             this.AllFileFacades = allFileFacades;
             this.UpdateFileFacades = updateFileFacades;
@@ -30,6 +31,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         }
 
         private IMessaging Messaging { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IntermediateSection Section { get; }
 
@@ -212,7 +215,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     try
                     {
-                        var assemblyName = AssemblyNameReader.ReadAssembly(facade.SourceLineNumber, fileInfo.FullName, version);
+                        var assemblyName = AssemblyNameReader.ReadAssembly(this.FileSystem, facade.SourceLineNumber, fileInfo.FullName, version);
 
                         this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "name", assemblyName.Name);
                         this.SetMsiAssemblyName(assemblyNameSymbols, facade, assemblySymbol, "culture", assemblyName.Culture);

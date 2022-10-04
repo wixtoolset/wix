@@ -24,35 +24,33 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private bool disposed;
         private BinaryWriter binaryWriter;
+        private readonly IFileSystem fileSystem;
 
-        /// <summary>
-        /// Creates a BurnWriter for re-writing a PE file.
-        /// </summary>
-        /// <param name="messaging"></param>
-        /// <param name="fileExe">File to modify in-place.</param>
-        private BurnWriter(IMessaging messaging, string fileExe)
+        private BurnWriter(IMessaging messaging, IFileSystem fileSystem, string fileExe)
             : base(messaging, fileExe)
         {
+            this.fileSystem = fileSystem;
         }
 
         /// <summary>
         /// Opens a Burn writer.
         /// </summary>
-        /// <param name="messaging"></param>
+        /// <param name="messaging">Messaging system.</param>
+        /// <param name="fileSystem">File system abstraction.</param>
         /// <param name="fileExe">Path to file.</param>
         /// <returns>Burn writer.</returns>
-        public static BurnWriter Open(IMessaging messaging, string fileExe)
+        public static BurnWriter Open(IMessaging messaging, IFileSystem fileSystem, string fileExe)
         {
-            var writer = new BurnWriter(messaging, fileExe);
+            var writer = new BurnWriter(messaging, fileSystem, fileExe);
 
-            using (var binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
+            using (var binaryReader = new BinaryReader(fileSystem.OpenFile(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
             {
                 writer.Initialize(binaryReader);
             }
 
             if (!writer.Invalid)
             {
-                writer.binaryWriter = new BinaryWriter(File.Open(fileExe, FileMode.Open, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete));
+                writer.binaryWriter = new BinaryWriter(fileSystem.OpenFile(fileExe, FileMode.Open, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete));
             }
 
             return writer;
@@ -109,7 +107,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
         public bool AppendContainer(string fileContainer, BurnCommon.Container container)
         {
-            using (var reader = File.OpenRead(fileContainer))
+            using (var reader = this.fileSystem.OpenFile(fileContainer, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 return this.AppendContainer(reader, reader.Length, container);
             }
@@ -158,7 +156,7 @@ namespace WixToolset.Core.Burn.Bundles
         public bool AppendContainer(Stream containerStream, long containerSize, BurnCommon.Container container)
         {
             var containerCount = (uint)this.AttachedContainers.Count;
-            uint burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + (containerCount * sizeof(uint));
+            var burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + (containerCount * sizeof(uint));
             var containerSlot = new ContainerSlot((uint)containerSize);
 
             switch (container)

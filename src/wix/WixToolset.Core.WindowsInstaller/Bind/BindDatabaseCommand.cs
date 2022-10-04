@@ -28,15 +28,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.WindowsInstallerBackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
-
-            this.PathResolver = this.ServiceProvider.GetService<IPathResolver>();
+            this.FileSystem = context.ServiceProvider.GetService<IFileSystem>();
+            this.PathResolver = context.ServiceProvider.GetService<IPathResolver>();
 
             this.CabbingThreadCount = context.CabbingThreadCount;
             this.CabCachePath = context.CabCachePath;
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
-            this.FileSystemManager = new FileSystemManager(context.FileSystemExtensions);
+            this.FileSystemManager = new FileSystemManager(this.FileSystem, context.FileSystemExtensions);
             this.Intermediate = context.IntermediateRepresentation;
             this.IntermediateFolder = context.IntermediateFolder;
             this.OutputPath = context.OutputPath;
@@ -52,11 +52,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.BackendExtensions = backendExtension;
         }
 
-        public IServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
         private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
+
+        private  IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -279,7 +281,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Gather information about files that do not come from merge modules.
             {
-                var command = new UpdateFileFacadesCommand(this.Messaging, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true);
+                var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true);
                 command.Execute();
             }
 
@@ -323,7 +325,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         var updatedFacades = reresolvedFiles.Select(f => allFileFacades.First(ff => ff.Id == f.Id?.Id));
 
-                        var command = new UpdateFileFacadesCommand(this.Messaging, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false);
+                        var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false);
                         command.Execute();
                     }
                 }
@@ -461,7 +463,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.BuiltTargetOutput);
                 trackedFiles.Add(trackMsi);
 
-                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, data, trackMsi.Path, tableDefinitions, this.IntermediateFolder, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
+                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystem, this.FileSystemManager, data, trackMsi.Path, tableDefinitions, this.IntermediateFolder, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
                 command.Execute();
 
                 trackedFiles.AddRange(command.GeneratedTemporaryFiles);

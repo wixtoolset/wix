@@ -16,10 +16,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreatePatchTransformsCommand
     {
-        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, IPathResolver pathResolver, IFileResolver fileResolver, IReadOnlyCollection<IResolverExtension> resolverExtensions, IReadOnlyCollection<IWindowsInstallerBackendBinderExtension> backendExtensions, Intermediate intermediate, string intermediateFolder, IReadOnlyCollection<IBindPath> bindPaths)
+        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver, IFileResolver fileResolver, IReadOnlyCollection<IResolverExtension> resolverExtensions, IReadOnlyCollection<IWindowsInstallerBackendBinderExtension> backendExtensions, Intermediate intermediate, string intermediateFolder, IReadOnlyCollection<IBindPath> bindPaths)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.FileSystem = fileSystem;
             this.PathResolver = pathResolver;
             this.FileResolver = fileResolver;
             this.ResolverExtensions = resolverExtensions;
@@ -32,6 +33,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -105,7 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var exportBasePath = Path.Combine(this.IntermediateFolder, stageFolder);
                 var extractFilesFolder = Path.Combine(exportBasePath, "File");
 
-                var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.PathResolver, path, null, OutputType.Product, exportBasePath, extractFilesFolder, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, path, null, OutputType.Product, exportBasePath, extractFilesFolder, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
                 data = command.Execute();
             }
 

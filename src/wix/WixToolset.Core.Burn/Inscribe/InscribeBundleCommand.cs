@@ -40,7 +40,7 @@ namespace WixToolset.Core.Burn.Inscribe
             {
                 this.FileSystem.CopyFile(this.SignedEngineFile, tempFile, allowHardlink: false);
 
-                using (var writer = BurnWriter.Open(this.Messaging, tempFile))
+                using (var writer = BurnWriter.Open(this.Messaging, this.FileSystem, tempFile))
                 {
                     inscribed = writer.ReattachContainers(reader);
                 }

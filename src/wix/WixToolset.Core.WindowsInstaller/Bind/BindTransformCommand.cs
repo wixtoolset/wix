@@ -13,10 +13,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class BindTransformCommand
     {
-        public BindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, string intermediateFolder, WindowsInstallerData transform, string outputPath, TableDefinitionCollection tableDefinitions)
+        public BindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, IFileSystem fileSystem, FileSystemManager fileSystemManager, string intermediateFolder, WindowsInstallerData transform, string outputPath, TableDefinitionCollection tableDefinitions)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
+            this.FileSystem = fileSystem;
             this.FileSystemManager = fileSystemManager;
             this.IntermediateFolder = intermediateFolder;
             this.Transform = transform;
@@ -27,6 +28,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private FileSystemManager FileSystemManager { get; }
 
@@ -398,7 +401,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (!String.IsNullOrEmpty(emptyFile))
                 {
-                    using (var fileStream = File.Create(emptyFile))
+                    using (var fileStream = this.FileSystem.OpenFile(emptyFile, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                     }
                 }
@@ -434,7 +437,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void GenerateDatabase(WindowsInstallerData output, string outputPath, bool keepAddedColumns)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, outputPath, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns, suppressAddingValidationRows: true, useSubdirectory: true);
+            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.FileSystemManager, output, outputPath, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns, suppressAddingValidationRows: true, useSubdirectory: true);
             command.Execute();
         }
     }

@@ -112,15 +112,9 @@ namespace WixToolset.Core
             // Clean up temp files.
             foreach (var tempPath in uniqueTempPaths)
             {
-                try
-                {
-                    this.SplitUniqueFolders(intermediateFolder, tempPath, uniqueFolders);
+                this.SplitUniqueFolders(intermediateFolder, tempPath, uniqueFolders);
 
-                    File.Delete(tempPath);
-                }
-                catch // delete is best effort.
-                {
-                }
+                this.FileSystem.DeleteFile(tempPath);
             }
 
             // Clean up empty temp folders.
@@ -140,7 +134,7 @@ namespace WixToolset.Core
         {
             if (tempPath.StartsWith(intermediateFolder, StringComparison.OrdinalIgnoreCase))
             {
-                var folder = Path.GetDirectoryName(tempPath).Substring(intermediateFolder.Length);
+                var folder = Path.GetDirectoryName(tempPath.Substring(intermediateFolder.Length));
 
                 var parts = folder.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
 

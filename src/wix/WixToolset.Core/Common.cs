@@ -362,44 +362,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Recursively loops through a directory, changing an attribute on all of the underlying files.
-        /// An example is to add/remove the ReadOnly flag from each file.
-        /// </summary>
-        /// <param name="path">The directory path to start deleting from.</param>
-        /// <param name="fileAttribute">The FileAttribute to change on each file.</param>
-        /// <param name="messageHandler">The message handler.</param>
-        /// <param name="markAttribute">If true, add the attribute to each file. If false, remove it.</param>
-        private static void RecursiveFileAttributes(string path, FileAttributes fileAttribute, bool markAttribute, IMessaging messageHandler)
-        {
-            foreach (var subDirectory in Directory.GetDirectories(path))
-            {
-                RecursiveFileAttributes(subDirectory, fileAttribute, markAttribute, messageHandler);
-            }
-
-            foreach (var filePath in Directory.GetFiles(path))
-            {
-                var attributes = File.GetAttributes(filePath);
-                if (markAttribute)
-                {
-                    attributes = attributes | fileAttribute; // add to list of attributes
-                }
-                else if (fileAttribute == (attributes & fileAttribute)) // if attribute set
-                {
-                    attributes = attributes ^ fileAttribute; // remove from list of attributes
-                }
-
-                try
-                {
-                    File.SetAttributes(filePath, attributes);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    messageHandler.Write(WarningMessages.AccessDeniedForSettingAttributes(null, filePath));
-                }
-            }
-        }
-
-        /// <summary>
         /// Takes an id, and demodularizes it (if possible).
         /// </summary>
         /// <remarks>

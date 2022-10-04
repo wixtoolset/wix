@@ -34,9 +34,6 @@ namespace WixToolset.Core.WindowsInstaller.Validate
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
-        /// <summary>
-        /// Encountered error implementation for <see cref="IWindowsInstallerValidatorCallback"/>.
-        /// </summary>
         public bool EncounteredError => this.Messaging.EncounteredError;
 
         private IMessaging Messaging { get; }
@@ -84,10 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
             }
             finally
             {
-                if (File.Exists(workingDatabasePath))
-                {
-                    File.Delete(workingDatabasePath);
-                }
+                this.FileSystem.DeleteFile(workingDatabasePath);
             }
 
             stopwatch.Stop();

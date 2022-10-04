@@ -3,6 +3,7 @@
 namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
+    using System.ComponentModel;
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Threading;
@@ -50,6 +51,25 @@ namespace WixToolset.Core.ExtensibilityServices
             this.ExecuteWithRetries(() => File.Move(source, destination));
         }
 
+        public FileStream OpenFile(string path, FileMode mode, FileAccess access, FileShare share)
+        {
+            const int maxRetries = 4;
+
+            for (var attempt = 1; attempt <= maxRetries; ++attempt)
+            {
+                try
+                {
+                    return File.Open(path, mode, access, share);
+                }
+                catch (Exception e) when (attempt < maxRetries && (e is IOException || e is SystemException || e is Win32Exception))
+                {
+                    Thread.Sleep(250);
+                }
+            }
+
+            throw new InvalidOperationException("Cannot reach this code");
+        }
+
         public void ExecuteWithRetries(Action action, int maxRetries = 4)
         {
             for (var attempt = 1; attempt <= maxRetries; ++attempt)
@@ -59,7 +79,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     action();
                     break;
                 }
-                catch when (attempt < maxRetries)
+                catch (Exception e) when (attempt < maxRetries && (e is IOException || e is SystemException || e is Win32Exception))
                 {
                     Thread.Sleep(250);
                 }

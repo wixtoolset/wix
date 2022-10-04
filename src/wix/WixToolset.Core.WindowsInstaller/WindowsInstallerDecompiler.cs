@@ -3,7 +3,6 @@
 namespace WixToolset.Core.WindowsInstaller
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using WixToolset.Core.WindowsInstaller.Bind;
@@ -74,25 +73,27 @@ namespace WixToolset.Core.WindowsInstaller
 
             var backendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
 
+            var fileSystem = context.ServiceProvider.GetService<IFileSystem>();
+
             var pathResolver = context.ServiceProvider.GetService<IPathResolver>();
 
             if (context.DecompileType == OutputType.Transform)
             {
-                return this.DecompileTransform(context, backendHelper, pathResolver);
+                return this.DecompileTransform(context, backendHelper, fileSystem, pathResolver);
             }
             else
             {
-                return this.DecompileDatabase(context, backendHelper, pathResolver);
+                return this.DecompileDatabase(context, backendHelper, fileSystem, pathResolver);
             }
         }
 
-        private IWindowsInstallerDecompileResult DecompileDatabase(IWindowsInstallerDecompileContext context, IWindowsInstallerBackendHelper backendHelper, IPathResolver pathResolver)
+        private IWindowsInstallerDecompileResult DecompileDatabase(IWindowsInstallerDecompileContext context, IWindowsInstallerBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver)
         {
             var extractFilesFolder = context.SuppressExtractCabinets || (String.IsNullOrEmpty(context.CabinetExtractFolder) && String.IsNullOrEmpty(context.ExtractFolder)) ? null :
                 String.IsNullOrEmpty(context.CabinetExtractFolder) ? Path.Combine(context.ExtractFolder, "File") : context.CabinetExtractFolder;
 
             var outputType = context.TreatProductAsModule ? OutputType.Module : context.DecompileType;
-            var unbindCommand = new UnbindDatabaseCommand(this.Messaging, backendHelper, pathResolver, context.DecompilePath, null, outputType, context.ExtractFolder, extractFilesFolder, context.IntermediateFolder, enableDemodularization: true, skipSummaryInfo: false);
+            var unbindCommand = new UnbindDatabaseCommand(this.Messaging, backendHelper, fileSystem, pathResolver, context.DecompilePath, null, outputType, context.ExtractFolder, extractFilesFolder, context.IntermediateFolder, enableDemodularization: true, skipSummaryInfo: false);
             var output = unbindCommand.Execute();
             var extractedFilePaths = unbindCommand.ExportedFiles;
 
@@ -108,13 +109,13 @@ namespace WixToolset.Core.WindowsInstaller
             return result;
         }
 
-        private IWindowsInstallerDecompileResult DecompileTransform(IWindowsInstallerDecompileContext context, IWindowsInstallerBackendHelper backendHelper, IPathResolver pathResolver)
+        private IWindowsInstallerDecompileResult DecompileTransform(IWindowsInstallerDecompileContext context, IWindowsInstallerBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver)
         {
             var fileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
 
-            var fileSystemManager = new FileSystemManager(fileSystemExtensions);
+            var fileSystemManager = new FileSystemManager(fileSystem, fileSystemExtensions);
 
-            var unbindCommand = new UnbindTransformCommand(this.Messaging, backendHelper, pathResolver, fileSystemManager, context.DecompilePath, context.ExtractFolder, context.IntermediateFolder);
+            var unbindCommand = new UnbindTransformCommand(this.Messaging, backendHelper, fileSystem, pathResolver, fileSystemManager, context.DecompilePath, context.ExtractFolder, context.IntermediateFolder);
             var output = unbindCommand.Execute();
 
             var result = context.ServiceProvider.GetService<IWindowsInstallerDecompileResult>();

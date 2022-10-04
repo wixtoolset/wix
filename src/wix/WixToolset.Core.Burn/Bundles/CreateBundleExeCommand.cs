@@ -82,7 +82,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             // Update the .wixburn section to point to at the UX and attached container(s) then attach the containers
             // if they should be attached.
-            using (var writer = BurnWriter.Open(this.Messaging, bundleTempPath))
+            using (var writer = BurnWriter.Open(this.Messaging, this.FileSystem, bundleTempPath))
             {
                 var burnStubFile = new FileInfo(bundleTempPath);
                 writer.InitializeBundleSectionData(burnStubFile.Length, this.BundleSymbol.BundleId);
