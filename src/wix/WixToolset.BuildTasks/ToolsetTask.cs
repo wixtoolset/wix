@@ -9,10 +9,11 @@ namespace WixToolset.BuildTasks
 
     public abstract partial class ToolsetTask : ToolTask
     {
-#if NETFRAMEWORK
-        private static readonly string ThisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
-#else
+#if NETCOREAPP
+        private static readonly string DotnetFullPath = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet";
         private static readonly string ThisDllPath = typeof(ToolsetTask).Assembly.Location;
+#else
+        private static readonly string ThisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
 #endif
 
         /// <summary>
@@ -84,19 +85,19 @@ namespace WixToolset.BuildTasks
         /// </remarks>
         protected sealed override string GenerateFullPathToTool()
         {
-#if !NETCOREAPP
+#if NETCOREAPP
+            if (IsSelfExecutable(this.DefaultToolFullPath, out var toolFullPath))
+            {
+                return toolFullPath;
+            }
+            return DotnetFullPath;
+#else
             if (!this.RunAsSeparateProcess)
             {
                 // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
                 return ThisDllPath;
             }
             return this.DefaultToolFullPath;
-#else
-            if (IsSelfExecutable(this.DefaultToolFullPath, out var toolFullPath))
-            {
-                return toolFullPath;
-            }
-            return DotnetFullPath;
 #endif
         }
 
@@ -124,8 +125,6 @@ namespace WixToolset.BuildTasks
         }
 
 #if NETCOREAPP
-        private static readonly string DotnetFullPath = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet";
-
         protected override string GenerateCommandLineCommands()
         {
             if (IsSelfExecutable(this.ToolFullPath, out var toolFullPath))

@@ -30,7 +30,6 @@ namespace WixToolset.BuildTasks
 
         public ITaskItem[] LibraryFiles { get; set; }
 
-        [Output]
         [Required]
         public ITaskItem OutputFile { get; set; }
 
@@ -47,7 +46,6 @@ namespace WixToolset.BuildTasks
 
         public string[] ReferencePaths { get; set; }
 
-
         public ITaskItem[] BindInputPaths { get; set; }
 
         public bool BindFiles { get; set; }
@@ -59,9 +57,6 @@ namespace WixToolset.BuildTasks
         public int CabinetCreationThreadCount { get; set; }
 
         public string DefaultCompressionLevel { get; set; }
-
-        [Output]
-        public ITaskItem UnreferencedSymbolsFile { get; set; }
 
         public ITaskItem WixProjectFile { get; set; }
 
@@ -80,7 +75,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
             commandLineBuilder.AppendArrayIfNotNull("-I ", this.IncludeSearchPaths);
             commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);
-            commandLineBuilder.AppendSwitchIfNotNull("-usf ", this.UnreferencedSymbolsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
             commandLineBuilder.AppendSwitchIfNotNull("-trackingfile ", this.BindTrackingFile);
