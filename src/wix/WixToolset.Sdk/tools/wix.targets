@@ -663,7 +663,8 @@
 
         RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
-        ToolPath="$(WixToolDir)">
+        ToolPath="$(WixToolDir)"
+        YieldDuringToolExecution="true">
         <Output TaskParameter="ExitCode" PropertyName="_WixBuildExitCode" />
       </WixBuild>
 
@@ -691,7 +692,8 @@
           SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
           TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
           TreatSpecificWarningsAsErrors="$(TreatSpecificWarningsAsErrors)"
-          VerboseOutput="$(VerboseOutput)" />
+          VerboseOutput="$(VerboseOutput)"
+          YieldDuringToolExecution="true" />
   </Target>
 
   <!--
