@@ -10,10 +10,13 @@ namespace WixToolset.Netfx
     {
         NetFxNativeImage,
         NetFxNetCoreSearch,
+        NetFxDotNetCompatibilityCheck
     }
 
     public static partial class NetfxSymbolDefinitions
     {
+        public static readonly Version Version = new Version("4.0.0");
+
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out NetfxSymbolDefinitionType type))
@@ -33,6 +36,9 @@ namespace WixToolset.Netfx
 
                 case NetfxSymbolDefinitionType.NetFxNetCoreSearch:
                     return NetfxSymbolDefinitions.NetFxNetCoreSearch;
+                    
+                case NetfxSymbolDefinitionType.NetFxDotNetCompatibilityCheck:
+                    return NetfxSymbolDefinitions.NetFxDotNetCompatibilityCheck;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

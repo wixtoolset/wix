@@ -22,9 +22,25 @@ namespace WixToolset.Netfx
             symbolIdIsPrimaryKey: true
         );
 
+        public static readonly TableDefinition NetFxDotNetCompatibilityCheck = new TableDefinition(
+            "Wix4NetFxDotNetCompatibilityCheck",
+            NetfxSymbolDefinitions.NetFxDotNetCompatibilityCheck,
+            new[]
+            {
+                new ColumnDefinition("NetFxDotNetCompatibilityCheck", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("RuntimeType", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, description: "The type of .NET runtime being checked for. Possible values: aspnet, desktop and core", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Platform", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Sets the platform for the .NET runtime being checked for. Possible values: x86, x64 and arm64", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Version", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Version, description: "The version of the .NET runtime being checked for (e.g. 3.1.10, 5.0.1).", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("RollForward", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Sets the roll-forward policy that the application is using. Possible values: latestmajor, major, latestminor, minor, latestpatch and disable", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Variable", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, description: "Name of the variable in which to place the result of the check.", modularizeType: ColumnModularizeType.Column),
+            },
+            symbolIdIsPrimaryKey: true
+        );
+
         public static readonly TableDefinition[] All = new[]
         {
             NetFxNativeImage,
+            NetFxDotNetCompatibilityCheck
         };
     }
 }
