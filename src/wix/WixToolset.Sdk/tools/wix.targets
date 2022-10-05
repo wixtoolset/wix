@@ -663,7 +663,9 @@
 
         RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
-        ToolPath="$(WixToolDir)" />
+        ToolPath="$(WixToolDir)">
+        <Output TaskParameter="ExitCode" PropertyName="_WixBuildExitCode" />
+      </WixBuild>
 
     <ItemGroup>
       <_WixBuildOutputFile Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" />
@@ -673,7 +675,7 @@
   <Target
       Name="WindowsInstallerValidation"
       DependsOnTargets="CoreCompile" 
-      Condition=" ('$(OutputType)' == 'Package' or '$(OutputType)' == 'Module') and '$(SuppressValidation)'!='true' ">
+      Condition=" '$(_WixBuildExitCode)' != '' and '$(SuppressValidation)' != 'true' and ('$(OutputType)' == 'Package' or '$(OutputType)' == 'Module') ">
       <WindowsInstallerValidation
           DatabaseFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)"
           WixpdbFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"
