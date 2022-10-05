@@ -652,7 +652,6 @@
         CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
         DefaultCompressionLevel="$(DefaultCompressionLevel)"
 
-        UnreferencedSymbolsFile="$(UnreferencedSymbolsFile)"
         WixProjectFile="$(ProjectPath)"
         WixVariables="$(WixVariables)"
 
