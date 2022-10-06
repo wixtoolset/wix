@@ -1,6 +1,6 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
 
     <?define NetCorePlatform = x86?>
     <?define NetCoreIdVersion = 3112?>
@@ -12,9 +12,9 @@
     <?define DotNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/cbdd1603-7fa9-4957-8869-94e24963ba6c/ca0b7d1be494882d5a7433accfa3c94c/dotnet-runtime-3.1.12-win-x86.exe?>
 
     <Fragment>
-        <util:DirectorySearchRef Id="$(var.AspNetCoreId)" />
+        <netfx:DotNetCoreSearch Id="$(var.AspNetCoreId)" RuntimeType="aspnet" Platform="$(var.NetCorePlatform)" MajorVersion="3" Variable="$(var.AspNetCoreId)" />
 
-        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.AspNetCoreId)" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.AspNetCoreId) &gt;= v$(var.NetCoreVersion)" Overridable="yes" />
         <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
         <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairArguments" Value="" Overridable="yes" />
@@ -27,9 +27,9 @@
     </Fragment>
 
     <Fragment>
-        <util:DirectorySearchRef Id="$(var.DesktopNetCoreId)" />
+        <netfx:DotNetCoreSearch Id="$(var.DesktopNetCoreId)" RuntimeType="desktop" Platform="$(var.NetCorePlatform)" MajorVersion="3" Variable="$(var.DesktopNetCoreId)" />
 
-        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DesktopNetCoreId)" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DesktopNetCoreId) &gt;= v$(var.NetCoreVersion)" Overridable="yes" />
         <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
         <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairArguments" Value="" Overridable="yes" />
@@ -42,9 +42,9 @@
     </Fragment>
 
     <Fragment>
-        <util:DirectorySearchRef Id="$(var.DotNetCoreId)" />
+        <netfx:DotNetCoreSearch Id="$(var.DotNetCoreId)" RuntimeType="core" Platform="$(var.NetCorePlatform)" MajorVersion="3" Variable="$(var.DotNetCoreId)" />
 
-        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DotNetCoreId)" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DotNetCoreId) &gt;= v$(var.NetCoreVersion)" Overridable="yes" />
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairArguments" Value="" Overridable="yes" />

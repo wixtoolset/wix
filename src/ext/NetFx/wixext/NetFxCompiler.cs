@@ -40,10 +40,176 @@ namespace WixToolset.Netfx
                             break;
                     }
                     break;
+                case "Bundle":
+                case "Fragment":
+                    switch (element.Name.LocalName)
+                    {
+                        case "DotNetCoreSearch":
+                            this.ParseDotNetCoreSearchElement(intermediate, section, element);
+                            break;
+                        case "DotNetCoreSearchRef":
+                            this.ParseDotNetCoreSearchRefElement(intermediate, section, element);
+                            break;
+                    }
+
+                    break;
                 default:
                     this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
+        }
+
+        private void ParseDotNetCoreSearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
+            string variable = null;
+            string condition = null;
+            string after = null;
+            NetCoreSearchRuntimeType? runtimeType = null;
+            NetCoreSearchPlatform? platform = null;
+            var majorVersion = CompilerConstants.IntegerNotSet;
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Variable":
+                            variable = this.ParseHelper.GetAttributeBundleVariableNameValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "After":
+                            after = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RuntimeType":
+                            var runtimeTypeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (runtimeTypeValue)
+                            {
+                                case "aspnet":
+                                    runtimeType = NetCoreSearchRuntimeType.Aspnet;
+                                    break;
+                                case "core":
+                                    runtimeType = NetCoreSearchRuntimeType.Core;
+                                    break;
+                                case "desktop":
+                                    runtimeType = NetCoreSearchRuntimeType.Desktop;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "RuntimeType", runtimeTypeValue, "aspnet", "core", "desktop"));
+                                    break;
+                            }
+                            break;
+                        case "Platform":
+                            var platformValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (platformValue)
+                            {
+                                case "arm64":
+                                    platform = NetCoreSearchPlatform.Arm64;
+                                    break;
+                                case "x64":
+                                    platform = NetCoreSearchPlatform.X64;
+                                    break;
+                                case "x86":
+                                    platform = NetCoreSearchPlatform.X86;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Platform", platformValue, "arm64", "x64", "x86"));
+                                    break;
+                            }
+                            break;
+                        case "MajorVersion":
+                            // .NET Core had a different deployment strategy before .NET Core 3.0 which would require different detection logic.
+                            majorVersion = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 3, Int32.MaxValue);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            if (id == null)
+            {
+                id = this.ParseHelper.CreateIdentifier("dncs", variable, condition, after);
+            }
+
+            if (!runtimeType.HasValue)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "RuntimeType"));
+            }
+
+            if (!platform.HasValue)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Platform"));
+            }
+
+            if (majorVersion == CompilerConstants.IntegerNotSet)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "MajorVersion"));
+            }
+            else if (majorVersion == 4)
+            {
+                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "MajorVersion", "4", "3", "5+"));
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bundleExtensionId == null)
+            {
+                this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+
+                section.AddSymbol(new NetFxNetCoreSearchSymbol(sourceLineNumbers, id)
+                {
+                    RuntimeType = runtimeType.Value,
+                    Platform = platform.Value,
+                    MajorVersion = majorVersion,
+                });
+            }
+        }
+
+        private void ParseDotNetCoreSearchRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, NetfxSymbolDefinitions.NetFxNetCoreSearch, refId);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
         }
 
         /// <summary>

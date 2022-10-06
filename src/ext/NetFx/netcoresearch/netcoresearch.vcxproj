@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
-<Project DefaultTargets="Build" Toolsxmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
@@ -11,14 +10,6 @@
       <Configuration>Release</Configuration>
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|X64">
-      <Configuration>Debug</Configuration>
-      <Platform>X64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|X64">
-      <Configuration>Release</Configuration>
-      <Platform>X64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -27,51 +18,56 @@
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{630C1EE7-2517-4A8C-83E3-DA1150308B58}</ProjectGuid>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <TargetName>utilbe</TargetName>
+    <ProjectGuid>{A7FD9EF2-68CF-4C8E-AD81-3E8A6C7E1937}</ProjectGuid>
+    <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <ProjectModuleDefinitionFile>utilbe.def</ProjectModuleDefinitionFile>
-    <Description>WiX Toolset Util BundleExtension</Description>
+    <ProjectSubSystem>Console</ProjectSubSystem>
+    <TargetName>netcoresearch</TargetName>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+    <NetHostPlatform>$(Platform)</NetHostPlatform>
+    <NetHostPlatform Condition=" '$(NetHostPlatform)'=='Win32' ">x86</NetHostPlatform>
+    <NetHostPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetAppHost.6.0.4\runtimes\win-$(NetHostPlatform)\native\</NetHostPath>
+    <HostfxrPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetHostResolver.6.0.4\runtimes\win-$(NetHostPlatform)\native\</HostfxrPath>
+    <ProjectAdditionalIncludeDirectories>$(NetHostPath)</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="detectsha2support.cpp" />
+    <ClCompile Include="netcoresearch.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="utilbe.cpp" />
-    <ClCompile Include="UtilBundleExtension.cpp" />
-    <ClCompile Include="utilsearch.cpp" />
   </ItemGroup>
 
   <ItemGroup>
-    <ClInclude Include="detectsha2support.h" />
+    <ClInclude Include="netcoresearch.h" />
     <ClInclude Include="precomp.h" />
-    <ClInclude Include="UtilBundleExtension.h" />
-    <ClInclude Include="utilsearch.h" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="utilbe.def" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.BextUtil" />
-
+    <PackageReference Include="WixToolset.Dutil" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <Target Name="CopyHostfxr" AfterTargets="Build">
+    <Copy SourceFiles="$(HostfxrPath)hostfxr.dll" DestinationFolder="$(OutputPath)" />
+  </Target>
 </Project>

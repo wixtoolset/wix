@@ -375,6 +375,7 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI ProcExecute(
+    __in_z_opt LPCWSTR wzApplicationName,
     __in_z LPWSTR wzCommand,
     __out HANDLE *phProcess,
     __out_opt HANDLE *phChildStdIn,
@@ -405,7 +406,7 @@ extern "C" HRESULT DAPI ProcExecute(
 
 #pragma prefast(push)
 #pragma prefast(disable:25028)
-    if (::CreateProcessW(NULL,
+    if (::CreateProcessW(wzApplicationName,
         wzCommand, // command line
         NULL, // security info
         NULL, // thread info

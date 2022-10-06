@@ -13,7 +13,7 @@ HRESULT DetectSHA2CodeSigning(
     DWORD er = ERROR_SUCCESS;
 
     hr = LoadSystemLibrary(L"wintrust.dll", &hModule);
-    ExitOnFailure(hr, "Failed to load wintrust.dll");
+    BextExitOnFailure(hr, "Failed to load wintrust.dll");
 
     pfn = ::GetProcAddress(hModule, "CryptCATAdminAcquireContext2");
     if (pfn)
@@ -30,7 +30,7 @@ HRESULT DetectSHA2CodeSigning(
     }
 
     hr = HRESULT_FROM_WIN32(er);
-    ExitOnFailure(hr, "Failed to probe for CryptCATAdminAcquireContext2 in wintrust.dll");
+    BextExitOnFailure(hr, "Failed to probe for CryptCATAdminAcquireContext2 in wintrust.dll");
 
 LExit:
     ::FreeLibrary(hModule);
@@ -48,10 +48,10 @@ HRESULT UtilPerformDetectSHA2CodeSigning(
     BOOL fSupported = FALSE;
 
     hr = DetectSHA2CodeSigning(&fSupported);
-    ExitOnFailure(hr, "DetectSHA2CodeSigning failed.");
+    BextExitOnFailure(hr, "DetectSHA2CodeSigning failed.");
 
     hr = pEngine->SetVariableNumeric(wzVariable, fSupported ? 1 : 0);
-    ExitOnFailure(hr, "Failed to set variable '%ls'", wzVariable);
+    BextExitOnFailure(hr, "Failed to set variable '%ls'", wzVariable);
 
 LExit:
     return hr;

@@ -11,7 +11,7 @@
     </BootstrapperApplication>
 
     <PackageGroup Id="TestBAdnc_x64">
-      <PackageGroupRef Id="NetFx48WebAsPrereq" /> <!-- Yes, this is wrong but we don't have .NET 6 packages yet -->
+      <PackageGroupRef Id="DesktopNetCoreRuntime609Redist_x64AsPrereq" />
     </PackageGroup>
   </Fragment>
   <Fragment>
