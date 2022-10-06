@@ -43,7 +43,7 @@ namespace WixToolsetTest.Sdk
                 });
                 result.AssertSuccess();
 
-                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem, true);
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
                 Assert.Single(heatCommandLines);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
@@ -99,7 +99,7 @@ namespace WixToolsetTest.Sdk
                 });
                 result.AssertSuccess();
 
-                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem, true);
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
                 Assert.Equal(2, heatCommandLines.Count());
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
@@ -185,7 +185,7 @@ namespace WixToolsetTest.Sdk
                  });
                 result.AssertSuccess();
 
-                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "project", buildSystem, true);
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "project", buildSystem);
                 var heatCommandLine = Assert.Single(heatCommandLines);
 
                 if (useToolsVersion && buildSystem != BuildSystem.DotNetCoreSdk)
@@ -306,7 +306,7 @@ namespace WixToolsetTest.Sdk
                  });
                 result.AssertSuccess();
 
-                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "project", buildSystem, true);
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "project", buildSystem);
                 var heatCommandLine = Assert.Single(heatCommandLines);
 
                 if (useToolsVersion && buildSystem != BuildSystem.DotNetCoreSdk)

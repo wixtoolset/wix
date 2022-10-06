@@ -3,14 +3,19 @@
 
 @set _C=Debug
 @set _L=%~dp0..\..\build\logs
+
 :parse_args
 @if /i "%1"=="release" set _C=Release
+@if /i "%1"=="inc" set _INC=1
+@if /i "%1"=="clean" set _CLEAN=1
 @if not "%1"=="" shift & goto parse_args
 
 @set _B=%~dp0..\..\build\wix\%_C%
-@set _P_OBJ=%~dp0..\..\build\wix\obj\publish_t\%_C%\
-@set _P=%~dp0..\..\build\wix\%_C%\publish\
-@set _RCO=/S /R:1 /W:1 /NP /XO  /NS /NC /NFL /NDL /NJH /NJS
+
+:: Clean
+
+@if "%_INC%"=="" call :clean
+@if NOT "%_CLEAN%"=="" goto :end
 
 @echo Building wix %_C%
 
@@ -23,28 +28,7 @@ msbuild wixnative\wixnative_t.proj -p:Configuration=%_C% -nologo -m -warnaserror
 
 msbuild wix.sln -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\wix_build.binlog || exit /b
 
-
-:: Pre-Publish Test
-dotnet test ^
- %_B%\test\WixToolsetTest.Converters\net6.0\WixToolsetTest.Converters.dll ^
- %_B%\test\WixToolsetTest.Converters.Symbolizer\net472\WixToolsetTest.Converters.Symbolizer.dll ^
- %_B%\test\WixToolsetTest.Core\net6.0\WixToolsetTest.Core.dll ^
- %_B%\test\WixToolsetTest.Core.Native\net6.0\win-x64\WixToolsetTest.Core.Native.dll ^
- %_B%\test\WixToolsetTest.CoreIntegration\net6.0\WixToolsetTest.CoreIntegration.dll ^
- --nologo -l "trx;LogFileName=%_L%\TestResults\wix_prepublish.trx" || exit /b
-
-
-:: Publish
 msbuild publish_t.proj -p:Configuration=%_C% -nologo -warnaserror -bl:%_L%\wix_publish.binlog || exit /b
-
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x86\buildtasks %_P%\WixToolset.Sdk\tools\net472\x86 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x86\wix %_P%\WixToolset.Sdk\tools\net472\x86 %_RCO%
-
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\buildtasks %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net472\x64\wix %_P%\WixToolset.Sdk\tools\net472\x64 %_RCO%
-
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net6.0\buildtasks %_P%\WixToolset.Sdk\tools\net6.0 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P_OBJ%\WixToolset.Sdk\separate\net6.0\wix %_P%\WixToolset.Sdk\tools\net6.0 %_RCO%
 
 msbuild -t:Publish -p:Configuration=%_C% -nologo -warnaserror WixToolset.Sdk\WixToolset.Sdk.csproj -bl:%_L%\wix_sdk_publish.binlog || exit /b
 
@@ -54,13 +38,41 @@ msbuild -t:Publish -p:Configuration=%_C% -nologo -warnaserror WixToolset.Sdk\Wix
 
 :: Test
 dotnet test ^
- %_B%\test\WixToolsetTest.BuildTasks\net472\win-x64\WixToolsetTest.BuildTasks.dll ^
+ %_B%\test\WixToolsetTest.Converters\net6.0\WixToolsetTest.Converters.dll ^
+ %_B%\test\WixToolsetTest.Converters.Symbolizer\net472\WixToolsetTest.Converters.Symbolizer.dll ^
+ %_B%\test\WixToolsetTest.Core\net6.0\WixToolsetTest.Core.dll ^
+ %_B%\test\WixToolsetTest.Core.Native\net6.0\win-x64\WixToolsetTest.Core.Native.dll ^
+ %_B%\test\WixToolsetTest.CoreIntegration\net6.0\WixToolsetTest.CoreIntegration.dll ^
+ %_B%\test\WixToolsetTest.BuildTasks\net472\WixToolsetTest.BuildTasks.dll ^
  %_B%\test\WixToolsetTest.Sdk\net472\WixToolsetTest.Sdk.dll ^
- --nologo -l "trx;LogFileName=%_L%\TestResults\wix_postpublish.trx" || exit /b
+ --nologo -l "trx;LogFileName=%_L%\TestResults\wix.trx" || exit /b
 
 
 :: Pack
 msbuild pack_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\wix_pack.binlog || exit /b
 
+@goto :end
+
+:clean
+@rd /s/q "..\..\build\wix" 2> nul
+@del "..\..\build\artifacts\wix.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixToolset.BuildTasks.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixToolset.Converters.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixToolset.Core.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixToolset.Sdk.*.nupkg" 2> nul
+@del "%_L%\TestResults\wix.trx" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wix" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.buildtasks" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.converters" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.converters.symbolizer" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.burn" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.native" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.windowsinstaller" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.testpackage" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.sdk" 2> nul
+@exit /b
+
+:end
 @popd
 @endlocal

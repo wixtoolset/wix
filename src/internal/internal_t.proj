@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj" Targets="Pack" />
+    <ProjectReference Include="WixBuildTools.TestSupport.Native\WixBuildTools.TestSupport.Native.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="WixBuildTools.TestSupport.Native\WixBuildTools.TestSupport.Native.vcxproj" Properties="Platform=x64" />
+  </ItemGroup>
+</Project>
