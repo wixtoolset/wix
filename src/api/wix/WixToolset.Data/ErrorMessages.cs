@@ -1063,7 +1063,7 @@ namespace WixToolset.Data
 
         public static Message IllegalTerminalServerCustomActionAttributes(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.IllegalTerminalServerCustomActionAttributes, "The CustomAction/@TerminalServerAware attribute's value is 'yes' but the Execute attribute is not 'deferred,' 'rollback,' or 'commit.' Terminal-Server-aware custom actions must be deferred, rollback, or commit custom actions. For more information, see http://msdn.microsoft.com/library/aa372071.aspx.\"");
+            return Message(sourceLineNumbers, Ids.IllegalTerminalServerCustomActionAttributes, "The CustomAction/@TerminalServerAware attribute's value is 'yes' but the Execute attribute is not 'deferred,' 'rollback,' or 'commit.' Terminal-Server-aware custom actions must be deferred, rollback, or commit custom actions. For more information, see https://msdn.microsoft.com/library/aa372071.aspx.\"");
         }
 
         public static Message IllegalValidationArguments()
@@ -2048,12 +2048,12 @@ namespace WixToolset.Data
 
         public static Message UnexpectedExternalUIMessage(string message)
         {
-            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing unknown ICE action. The most common cause of this kind of ICE failure is an incorrectly registered scripting engine. See http://wixtoolset.org/documentation/error217/ for details and how to solve this problem. The following string format was not expected by the external UI message logger: \"{0}\".", message);
+            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing unknown ICE action. The most common cause of this kind of ICE failure is an incorrectly registered scripting engine. See https://wixtoolset.org/documentation/error217/ for details and how to solve this problem. The following string format was not expected by the external UI message logger: \"{0}\".", message);
         }
 
         public static Message UnexpectedExternalUIMessage(string message, string action)
         {
-            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing ICE action '{1}'. The most common cause of this kind of ICE failure is an incorrectly registered scripting engine. See http://wixtoolset.org/documentation/error217/ for details and how to solve this problem. The following string format was not expected by the external UI message logger: \"{0}\".", message, action);
+            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing ICE action '{1}'. The most common cause of this kind of ICE failure is an incorrectly registered scripting engine. See https://wixtoolset.org/documentation/error217/ for details and how to solve this problem. The following string format was not expected by the external UI message logger: \"{0}\".", message, action);
         }
 
         public static Message UnexpectedFileExtension(string fileName, string expectedExtensions)
@@ -2183,7 +2183,7 @@ namespace WixToolset.Data
 
         public static Message ValidationFailedDueToMultilanguageMergeModule()
         {
-            return Message(null, Ids.ValidationFailedDueToMultilanguageMergeModule, "Failed to open merge module for validation. The most common cause of this error is specifying that the merge module supports multiple languages (using the Package/@Languages attribute) but not including language-specific embedded transforms. To fix this error, make the merge module language-neutral, make it language-specific, embed language transforms as specified in the MSI SDK at http://msdn.microsoft.com/library/aa367799.aspx, or disable validation.");
+            return Message(null, Ids.ValidationFailedDueToMultilanguageMergeModule, "Failed to open merge module for validation. The most common cause of this error is specifying that the merge module supports multiple languages (using the Package/@Languages attribute) but not including language-specific embedded transforms. To fix this error, make the merge module language-neutral, make it language-specific, embed language transforms as specified in the MSI SDK at https://msdn.microsoft.com/library/aa367799.aspx, or disable validation.");
         }
 
         public static Message ValidationFailedToOpenDatabase()

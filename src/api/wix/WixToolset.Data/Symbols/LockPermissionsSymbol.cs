@@ -33,7 +33,7 @@ namespace WixToolset.Data.Symbols
 
     /// <summary>
     ///-------------------------------------------------------------------------------------------------
-    /// Layout of an Access Mask (from http://technet.microsoft.com/en-us/library/cc783530(WS.10).aspx)
+    /// Layout of an Access Mask (from https://technet.microsoft.com/en-us/library/cc783530(WS.10).aspx)
     ///
     ///  -------------------------------------------------------------------------------------------------
     ///  |31|30|29|28|27|26|25|24|23|22|21|20|19|18|17|16|15|14|13|12|11|10|09|08|07|06|05|04|03|02|01|00|
