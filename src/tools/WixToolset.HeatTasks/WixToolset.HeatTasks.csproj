@@ -7,7 +7,6 @@
     <Title>WiX Toolset Heat MSBuild Tasks</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- https://github.com/Microsoft/msbuild/issues/2360 -->
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 

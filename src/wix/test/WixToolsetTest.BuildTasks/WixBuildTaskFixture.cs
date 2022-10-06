@@ -2,8 +2,10 @@
 
 namespace WixToolsetTest.BuildTasks
 {
+    using System;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using Microsoft.Build.Utilities;
     using WixBuildTools.TestSupport;
     using WixToolset.BuildTasks;
@@ -13,16 +15,22 @@ namespace WixToolsetTest.BuildTasks
 
     public class WixBuildTaskFixture
     {
+        public static readonly string PublishedWixSdkToolsFolder = Path.Combine(Path.GetDirectoryName(new Uri(typeof(WixBuildTaskFixture).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Sdk", "tools");
+
+        // This line replicates what happens in WixBuild task when hosted in the PublishedWixSdkToolsFolder. However, WixBuild task is hosted inproc to this test assembly so the
+        // root folder is relative to the test assembly's folder which does not have wix.exe local. So, we have to find wix.exe relative to PublishedWixSdkToolsFolder.
+        public static readonly string PublishedWixExeFolder = Path.Combine(PublishedWixSdkToolsFolder, "net472", RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant());
+
         [Fact]
         public void CanBuildSimpleMsiPackage()
         {
-            var folder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+            var folder = TestData.Get("TestData", "SimpleMsiPackage", "MsiPackage");
 
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var pdbPath = Path.Combine(baseFolder, @"bin\testpackage.wixpdb");
+                var pdbPath = Path.Combine(baseFolder, "bin", "testpackage.wixpdb");
                 var engine = new FakeBuildEngine();
 
                 var task = new WixBuild
@@ -42,24 +50,25 @@ namespace WixToolsetTest.BuildTasks
                         new TaskItem(Path.Combine(folder, "data")),
                     },
                     IntermediateDirectory = new TaskItem(intermediateFolder),
-                    OutputFile = new TaskItem(Path.Combine(baseFolder, @"bin\test.msi")),
+                    OutputFile = new TaskItem(Path.Combine(baseFolder, "bin", "test.msi")),
                     PdbType = "Full",
                     PdbFile = new TaskItem(pdbPath),
                     DefaultCompressionLevel = "nOnE",
+                    ToolPath = PublishedWixExeFolder
                 };
 
                 var result = task.Execute();
                 Assert.True(result, $"MSBuild task failed unexpectedly. Output:\r\n{engine.Output}");
 
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.msi")));
                 Assert.True(File.Exists(pdbPath));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\cab1.cab")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "cab1.cab")));
 
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                WixAssert.StringEqual(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                WixAssert.StringEqual(Path.Combine(folder, "data", "test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
                 WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }

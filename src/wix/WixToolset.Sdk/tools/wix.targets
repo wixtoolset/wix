@@ -27,10 +27,8 @@
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
     <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)net6.0\</WixBinDir>
-    <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net472\x86\</WixBinDir>
-    <WixBinDir64 Condition=" '$(WixBinDir64)' == '' and '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net472\x64\</WixBinDir64>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net472\</WixBinDir>
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
-    <WixTasksPath64 Condition=" '$(WixTasksPath64)' == '' and '$(WixBinDir64)' != '' ">$(WixBinDir64)WixToolset.BuildTasks.dll</WixTasksPath64>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -147,39 +145,14 @@
   ***********************************************************************************************
   -->
 
-  <!-- These tasks can be used as general-purpose build tasks. -->
-  <UsingTask TaskName="WixBuild" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="WixBuild" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="WixBuild" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <!-- These tasks are specific to the build process defined in this file, and are not considered general-purpose build tasks. -->
-  <UsingTask TaskName="CreateItemAvoidingInference" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="CreateItemAvoidingInference" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="CreateItemAvoidingInference" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <UsingTask TaskName="UpdateProjectReferenceMetadata" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="UpdateProjectReferenceMetadata" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="UpdateProjectReferenceMetadata" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <UsingTask TaskName="ReadTracking" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="ReadTracking" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="ReadTracking" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
-
-  <UsingTask TaskName="WindowsInstallerValidation" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="WindowsInstallerValidation" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
-  <UsingTask TaskName="WindowsInstallerValidation" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+  <UsingTask TaskName="CreateItemAvoidingInference" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="UpdateProjectReferenceMetadata" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixAssignCulture" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ReadTracking" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixBuild" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WindowsInstallerValidation" AssemblyFile="$(WixTasksPath)" />
 
   <!--
   ***********************************************************************************************
@@ -661,7 +634,6 @@
         TreatSpecificWarningsAsErrors="$(TreatSpecificWarningsAsErrors)"
         VerboseOutput="$(VerboseOutput)"
 
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)"
         YieldDuringToolExecution="true">

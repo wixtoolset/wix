@@ -8,22 +8,11 @@
     <Title>WiX Toolset MSBuild Tasks</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='net6.0' ">win-x86;win-x64</RuntimeIdentifiers>
-    <!-- https://github.com/Microsoft/msbuild/issues/2360 -->
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
-    <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
-    <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
-    <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0' ">
   </ItemGroup>
 </Project>

@@ -7,15 +7,8 @@ namespace WixToolset.BuildTasks
     using System.Runtime.InteropServices;
     using Microsoft.Build.Utilities;
 
-    public abstract partial class ToolsetTask : ToolTask
+    public abstract class ToolsetTask : ToolTask
     {
-#if NETCOREAPP
-        private static readonly string DotnetFullPath = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet";
-        private static readonly string ThisDllPath = typeof(ToolsetTask).Assembly.Location;
-#else
-        private static readonly string ThisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
-#endif
-
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.
         /// </summary>
@@ -29,12 +22,6 @@ namespace WixToolset.BuildTasks
         /// Gets or sets whether to display the logo.
         /// </summary>
         public bool NoLogo { get; set; }
-
-        /// <summary>
-        /// Gets or sets a flag indicating whether the task
-        /// should be run as separate process or in-proc.
-        /// </summary>
-        public virtual bool RunAsSeparateProcess { get; set; }
 
         /// <summary>
         /// Gets or sets whether all warnings should be suppressed.
@@ -61,20 +48,6 @@ namespace WixToolset.BuildTasks
         /// </summary>
         public bool VerboseOutput { get; set; }
 
-        private string DefaultToolFullPath => Path.Combine(Path.GetDirectoryName(ThisDllPath), this.ToolExe);
-
-        private string ToolFullPath
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this.ToolPath))
-                {
-                    return this.DefaultToolFullPath;
-                }
-                return Path.Combine(this.ToolPath, this.ToolExe);
-            }
-        }
-
         /// <summary>
         /// Get the path to the executable.
         /// </summary>
@@ -85,27 +58,20 @@ namespace WixToolset.BuildTasks
         /// </remarks>
         protected sealed override string GenerateFullPathToTool()
         {
-#if NETCOREAPP
-            if (IsSelfExecutable(this.DefaultToolFullPath, out var toolFullPath))
-            {
-                return toolFullPath;
-            }
-            return DotnetFullPath;
-#else
-            if (!this.RunAsSeparateProcess)
-            {
-                // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
-                return ThisDllPath;
-            }
-            return this.DefaultToolFullPath;
-#endif
-        }
+            var defaultToolFullPath = this.GetDefaultToolFullPath();
 
-        protected sealed override string GenerateResponseFileCommands()
-        {
-            var commandLineBuilder = new WixCommandLineBuilder();
-            this.BuildCommandLine(commandLineBuilder);
-            return commandLineBuilder.ToString();
+#if NETCOREAPP
+            // If we're pointing at an executable use that.
+            if (IsSelfExecutable(defaultToolFullPath, out var finalToolFullPath))
+            {
+                return finalToolFullPath;
+            }
+
+            // Otherwise, use "dotnet.exe" to run an assembly dll.
+            return Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet";
+#else
+            return defaultToolFullPath;
+#endif
         }
 
         /// <summary>
@@ -124,33 +90,88 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendIfTrue("-wx", this.TreatWarningsAsErrors);
         }
 
+        protected sealed override string GenerateResponseFileCommands()
+        {
+            var commandLineBuilder = new WixCommandLineBuilder();
+            this.BuildCommandLine(commandLineBuilder);
+            return commandLineBuilder.ToString();
+        }
+
 #if NETCOREAPP
         protected override string GenerateCommandLineCommands()
         {
-            if (IsSelfExecutable(this.ToolFullPath, out var toolFullPath))
+            // If the target tool path is an executable, we don't need to add anything to the command-line.
+            var toolFullPath = this.GetToolFullPath();
+
+            if (IsSelfExecutable(toolFullPath, out var finalToolFullPath))
             {
                 return null;
             }
-            else
+            else // we're using "dotnet.exe" to run the assembly so add "exec" plus path to the command-line.
             {
-                return $"exec \"{toolFullPath}\"";
+                return $"exec \"{finalToolFullPath}\"";
             }
         }
 
-        private static bool IsSelfExecutable(string proposedToolFullPath, out string toolFullPath)
+        private static bool IsSelfExecutable(string proposedToolFullPath, out string finalToolFullPath)
         {
             var toolFullPathWithoutExtension = Path.Combine(Path.GetDirectoryName(proposedToolFullPath), Path.GetFileNameWithoutExtension(proposedToolFullPath));
             var exeExtension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : String.Empty;
             var exeToolFullPath = $"{toolFullPathWithoutExtension}{exeExtension}";
             if (File.Exists(exeToolFullPath))
             {
-                toolFullPath = exeToolFullPath;
+                finalToolFullPath = exeToolFullPath;
                 return true;
             }
 
-            toolFullPath = $"{toolFullPathWithoutExtension}.dll";
+            finalToolFullPath = $"{toolFullPathWithoutExtension}.dll";
             return false;
         }
+#else
+        private static string GetArchitectureFolder(string baseFolder)
+        {
+            // First try to find a folder that matches this task's architecture.
+            var folder = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
+
+            if (Directory.Exists(Path.Combine(baseFolder, folder)))
+            {
+                return folder;
+            }
+
+            // Try to fallback to "x86" folder.
+            if (folder != "x86" && Directory.Exists(Path.Combine(baseFolder, "x86")))
+            {
+                return "x86";
+            }
+
+            // Return empty, even though this isn't likely to be useful.
+            return String.Empty;
+        }
 #endif
+
+        private string GetDefaultToolFullPath()
+        {
+#if NETCOREAPP
+                var thisTaskFolder = Path.GetDirectoryName(typeof(ToolsetTask).Assembly.Location);
+
+                return Path.Combine(thisTaskFolder, this.ToolExe);
+#else
+                var thisTaskFolder = Path.GetDirectoryName(new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath);
+
+                var archFolder = GetArchitectureFolder(thisTaskFolder);
+
+                return Path.Combine(thisTaskFolder, archFolder, this.ToolExe);
+#endif
+        }
+
+        private string GetToolFullPath()
+        {
+            if (String.IsNullOrEmpty(this.ToolPath))
+            {
+                return this.GetDefaultToolFullPath();
+            }
+
+            return Path.Combine(this.ToolPath, this.ToolExe);
+        }
     }
 }

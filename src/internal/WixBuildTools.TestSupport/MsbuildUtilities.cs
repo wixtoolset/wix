@@ -17,7 +17,7 @@ namespace WixToolsetTest.Sdk
 
     public static class MsbuildUtilities
     {
-        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal", bool suppressValidation = true)
+        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", string verbosityLevel = "normal", bool suppressValidation = true)
         {
             var allArgs = new List<string>
             {
@@ -29,11 +29,6 @@ namespace WixToolsetTest.Sdk
                 "-nr:false",
                 $"-bl:{Path.ChangeExtension(projectPath, ".binlog")}"
             };
-
-            if (outOfProc.HasValue)
-            {
-                allArgs.Add($"-p:RunWixToolsOutOfProc={outOfProc.Value}");
-            }
 
             if (arguments != null)
             {
@@ -96,11 +91,9 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        public static IEnumerable<string> GetToolCommandLines(MsbuildRunnerResult result, string toolName, string operation, BuildSystem buildSystem, bool? outOfProc = null)
+        public static IEnumerable<string> GetToolCommandLines(MsbuildRunnerResult result, string toolName, string operation, BuildSystem buildSystem)
         {
-            var expectedOutOfProc = buildSystem == BuildSystem.DotNetCoreSdk || outOfProc.HasValue && outOfProc.Value;
-            var expectedToolExe = !expectedOutOfProc ? $"({toolName}.exe)" :
-                                  buildSystem == BuildSystem.DotNetCoreSdk ? $"{toolName}.dll\"" : $"{toolName}.exe";
+            var expectedToolExe = buildSystem == BuildSystem.DotNetCoreSdk ? $"{toolName}.dll\"" : $"{toolName}.exe";
             var expectedToolCommand = $"{expectedToolExe} {operation}";
             return result.Output.Where(line => line.Contains(expectedToolCommand));
         }

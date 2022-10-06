@@ -213,7 +213,6 @@
         VerboseOutput="$(InscribeVerboseOutput)"
         AdditionalOptions="$(InscribeAdditionalOptions)"
 
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)" />
   </Target>
@@ -255,7 +254,6 @@
         VerboseOutput="$(InscribeVerboseOutput)"
         AdditionalOptions="$(InscribeAdditionalOptions)"
 
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)">
       <Output TaskParameter="Output" ItemName="SignBundleEngine" />
@@ -304,7 +302,6 @@
         VerboseOutput="$(InscribeVerboseOutput)"
         AdditionalOptions="$(InscribeAdditionalOptions)"
 
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)">
       <Output TaskParameter="Output" ItemName="SignBundle" />

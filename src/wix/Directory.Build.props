@@ -7,4 +7,8 @@
   </PropertyGroup>
 
   <Import Project="..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <PublishRoot>$(OutputPath)publish\</PublishRoot>
+  </PropertyGroup>
 </Project>

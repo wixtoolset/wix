@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Description>WiX Toolset MSBuild integration</Description>
-    <PublishDir>$(OutputPath)publish\WixToolset.Sdk\</PublishDir>
+    <PublishDir>$(PublishRoot)WixToolset.Sdk\</PublishDir>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <NuspecBasePath>$(PublishDir)</NuspecBasePath>
   </PropertyGroup>

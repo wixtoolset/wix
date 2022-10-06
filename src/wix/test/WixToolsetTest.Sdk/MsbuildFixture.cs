@@ -20,7 +20,7 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleBundle(BuildSystem buildSystem)
         {
-            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage");
+            var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage");
 
             using (var fs = new TestDataFolderFileSystem())
             {
@@ -430,13 +430,10 @@ namespace WixToolsetTest.Sdk
         }
 
         [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk, null)]
-        [InlineData(BuildSystem.DotNetCoreSdk, true)]
-        [InlineData(BuildSystem.MSBuild, null)]
-        [InlineData(BuildSystem.MSBuild, true)]
-        [InlineData(BuildSystem.MSBuild64, null)]
-        [InlineData(BuildSystem.MSBuild64, true)]
-        public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem, bool? outOfProc)
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -451,10 +448,10 @@ namespace WixToolsetTest.Sdk
                 {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     "-p:OutputType=IntermediatePostLink",
-                }, outOfProc: outOfProc);
+                });
                 result.AssertSuccess();
 
-                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem, outOfProc);
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
                 Assert.Single(wixBuildCommands);
 
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
@@ -465,13 +462,10 @@ namespace WixToolsetTest.Sdk
         }
 
         [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk, null)]
-        [InlineData(BuildSystem.DotNetCoreSdk, true)]
-        [InlineData(BuildSystem.MSBuild, null)]
-        [InlineData(BuildSystem.MSBuild, true)]
-        [InlineData(BuildSystem.MSBuild64, null)]
-        [InlineData(BuildSystem.MSBuild64, true)]
-        public void CanBuildSimpleWixlib(BuildSystem buildSystem, bool? outOfProc)
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleWixlib(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "Wixlib", "SimpleWixlib");
 
@@ -485,10 +479,10 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
-                }, outOfProc: outOfProc);
+                });
                 result.AssertSuccess();
 
-                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem, outOfProc);
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
                 Assert.Single(wixBuildCommands);
 
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
@@ -499,13 +493,10 @@ namespace WixToolsetTest.Sdk
         }
 
         [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk, null)]
-        [InlineData(BuildSystem.DotNetCoreSdk, true)]
-        [InlineData(BuildSystem.MSBuild, null)]
-        [InlineData(BuildSystem.MSBuild, true)]
-        [InlineData(BuildSystem.MSBuild64, null)]
-        [InlineData(BuildSystem.MSBuild64, true)]
-        public void CanBuildPackageIncludingSimpleWixlib(BuildSystem buildSystem, bool? outOfProc)
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildPackageIncludingSimpleWixlib(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "Wixlib");
 
@@ -519,7 +510,7 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
-                }, outOfProc: outOfProc);
+                });
                 result.AssertSuccess();
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
@@ -612,7 +603,7 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixToolDir", Path.Combine(MsbuildFixture.WixMsbuildPath, "broken", "net461")),
-                }, outOfProc: true);
+                });
                 Assert.Equal(1, result.ExitCode);
 
                 var expectedMessage = "System.PlatformNotSupportedException: Could not find platform specific 'wixnative.exe' ---> System.IO.FileNotFoundException: Could not find internal piece of WiX Toolset from";

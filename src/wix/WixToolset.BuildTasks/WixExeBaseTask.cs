@@ -5,7 +5,7 @@ namespace WixToolset.BuildTasks
     /// <summary>
     /// An MSBuild task to run WiX to update cabinet signatures in a MSI.
     /// </summary>
-    public abstract partial class WixExeBaseTask : ToolsetTask
+    public abstract class WixExeBaseTask : ToolsetTask
     {
         protected override string ToolName => "wix.exe";
     }
