@@ -73,6 +73,7 @@ namespace WixToolsetTest.Netfx
             var results = build.BuildAndQuery(Build, "Binary", "CustomAction", "Wix4NetFxNativeImage");
             WixAssert.CompareLineByLine(new[]
             {
+                "Binary:Wix4NetCheck_X86\t[Binary data]",
                 "Binary:Wix4NetFxCA_X86\t[Binary data]",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
@@ -92,6 +93,7 @@ namespace WixToolsetTest.Netfx
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4NetFxNativeImage");
             WixAssert.CompareLineByLine(new[]
             {
+                "Binary:Wix4NetCheck_X64\t[Binary data]",
                 "Binary:Wix4NetFxCA_X64\t[Binary data]",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
@@ -111,6 +113,7 @@ namespace WixToolsetTest.Netfx
             var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4NetFxNativeImage");
             WixAssert.CompareLineByLine(new[]
             {
+                "Binary:Wix4NetCheck_A64\t[Binary data]",
                 "Binary:Wix4NetFxCA_A64\t[Binary data]",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",

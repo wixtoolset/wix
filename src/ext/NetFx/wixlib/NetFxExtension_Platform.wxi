@@ -23,5 +23,8 @@
   <!-- NetFx Custom Action DLL Definitions -->
   <Fragment>
     <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))netfxca.dll" />
+    <?foreach PLATFORM in x86;x64;arm64?>
+      <Binary Id="$(var.Prefix)NetCheck_$(var.PLATFORM)" SourceFile="!(bindpath.$(var.PLATFORM))NetCoreCheck.exe" />
+    <?endforeach?>
   </Fragment>
 </Include>
