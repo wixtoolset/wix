@@ -25,6 +25,8 @@ namespace WixToolsetTest.Netfx
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
+                    Path.Combine(bundleSourceFolder, "NetCore3.1.12_x86.wxs"),
+                    Path.Combine(bundleSourceFolder, "NetCore3.1.12_x64.wxs"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
@@ -50,6 +52,7 @@ namespace WixToolsetTest.Netfx
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest_x64.wxs"),
+                    Path.Combine(bundleSourceFolder, "NetCore3.1.12_x64.wxs"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,

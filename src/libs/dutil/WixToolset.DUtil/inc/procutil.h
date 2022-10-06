@@ -62,6 +62,7 @@ HRESULT DAPI ProcExec(
     __out HANDLE *phProcess
     );
 HRESULT DAPI ProcExecute(
+    __in_z_opt LPCWSTR wzApplicationName,
     __in_z LPWSTR wzCommand,
     __out HANDLE *phProcess,
     __out_opt HANDLE *phChildStdIn,
@@ -73,7 +74,7 @@ HRESULT DAPI ProcWaitForCompletion(
     __out_opt DWORD* pdwReturnCode
     );
 HRESULT DAPI ProcWaitForIds(
-    __in_ecount(cProcessIds) const DWORD* pdwProcessIds,
+    __in_ecount(cProcessIds) const DWORD rgdwProcessIds[],
     __in DWORD cProcessIds,
     __in DWORD dwMilliseconds
     );

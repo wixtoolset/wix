@@ -33,8 +33,6 @@ namespace WixToolset.Util
 
     public static partial class UtilSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out UtilSymbolDefinitionType type))

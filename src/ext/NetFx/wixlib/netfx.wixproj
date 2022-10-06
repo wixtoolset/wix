@@ -14,9 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\be\netfxbe.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\be\netfxbe.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\be\netfxbe.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\netcoresearch\netcoresearch.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\netcoresearch\netcoresearch.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\netcoresearch\netcoresearch.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
 
   <ItemGroup>

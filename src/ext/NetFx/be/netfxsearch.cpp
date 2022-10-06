@@ -3,8 +3,8 @@
 #include "precomp.h"
 
 
-STDMETHODIMP UtilSearchParseFromXml(
-    __in UTIL_SEARCHES* pSearches,
+STDMETHODIMP NetfxSearchParseFromXml(
+    __in NETFX_SEARCHES* pSearches,
     __in IXMLDOMNode* pixnBundleExtension
     )
 {
@@ -13,15 +13,14 @@ STDMETHODIMP UtilSearchParseFromXml(
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
     BSTR bstrNodeName = NULL;
-    LPWSTR scz = NULL;
 
-    // Select Util search nodes.
-    hr = XmlSelectNodes(pixnBundleExtension, L"WixWindowsFeatureSearch", &pixnNodes);
-    BextExitOnFailure(hr, "Failed to select Util search nodes.");
+    // Select Netfx search nodes.
+    hr = XmlSelectNodes(pixnBundleExtension, L"NetFxNetCoreSearch", &pixnNodes);
+    BextExitOnFailure(hr, "Failed to select Netfx search nodes.");
 
-    // Get Util search node count.
+    // Get Netfx search node count.
     hr = pixnNodes->get_length((long*)&cNodes);
-    BextExitOnFailure(hr, "Failed to get Util search node count.");
+    BextExitOnFailure(hr, "Failed to get Netfx search node count.");
 
     if (!cNodes)
     {
@@ -29,7 +28,7 @@ STDMETHODIMP UtilSearchParseFromXml(
     }
 
     // Allocate memory for searches.
-    pSearches->rgSearches = (UTIL_SEARCH*)MemAlloc(sizeof(UTIL_SEARCH) * cNodes, TRUE);
+    pSearches->rgSearches = (NETFX_SEARCH*)MemAlloc(sizeof(NETFX_SEARCH) * cNodes, TRUE);
     BextExitOnNull(pSearches->rgSearches, hr, E_OUTOFMEMORY, "Failed to allocate memory for search structs.");
 
     pSearches->cSearches = cNodes;
@@ -37,7 +36,7 @@ STDMETHODIMP UtilSearchParseFromXml(
     // Parse search elements.
     for (DWORD i = 0; i < cNodes; ++i)
     {
-        UTIL_SEARCH* pSearch = &pSearches->rgSearches[i];
+        NETFX_SEARCH* pSearch = &pSearches->rgSearches[i];
 
         hr = XmlNextElement(pixnNodes, &pixnNode, &bstrNodeName);
         BextExitOnFailure(hr, "Failed to get next node.");
@@ -47,22 +46,21 @@ STDMETHODIMP UtilSearchParseFromXml(
         BextExitOnFailure(hr, "Failed to get @Id.");
 
         // Read type specific attributes.
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"WixWindowsFeatureSearch", -1))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"NetFxNetCoreSearch", -1))
         {
-            pSearch->Type = UTIL_SEARCH_TYPE_WINDOWS_FEATURE_SEARCH;
+            pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SEARCH;
 
-            // @Type
-            hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
-            BextExitOnFailure(hr, "Failed to get @Type.");
+            // @RuntimeType
+            hr = XmlGetAttributeUInt32(pixnNode, L"RuntimeType", reinterpret_cast<DWORD*>(&pSearch->NetCoreSearch.runtimeType));
+            BextExitOnFailure(hr, "Failed to get @RuntimeType.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"sha2CodeSigning", -1))
-            {
-                pSearch->WindowsFeatureSearch.type = UTIL_WINDOWS_FEATURE_SEARCH_TYPE_SHA2_CODE_SIGNING;
-            }
-            else
-            {
-                BextExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
-            }
+            // @Platform
+            hr = XmlGetAttributeUInt32(pixnNode, L"Platform", reinterpret_cast<DWORD*>(&pSearch->NetCoreSearch.platform));
+            BextExitOnFailure(hr, "Failed to get @Platform.");
+
+            // @MajorVersion
+            hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &pSearch->NetCoreSearch.sczMajorVersion);
+            BextExitOnFailure(hr, "Failed to get @MajorVersion.");
         }
         else
         {
@@ -75,7 +73,6 @@ STDMETHODIMP UtilSearchParseFromXml(
     }
 
 LExit:
-    ReleaseStr(scz);
     ReleaseBSTR(bstrNodeName);
     ReleaseObject(pixnNode);
     ReleaseObject(pixnNodes);
@@ -83,15 +80,15 @@ LExit:
     return hr;
 }
 
-void UtilSearchUninitialize(
-    __in UTIL_SEARCHES* pSearches
+void NetfxSearchUninitialize(
+    __in NETFX_SEARCHES* pSearches
     )
 {
     if (pSearches->rgSearches)
     {
         for (DWORD i = 0; i < pSearches->cSearches; ++i)
         {
-            UTIL_SEARCH* pSearch = &pSearches->rgSearches[i];
+            NETFX_SEARCH* pSearch = &pSearches->rgSearches[i];
 
             ReleaseStr(pSearch->sczId);
         }
@@ -99,30 +96,24 @@ void UtilSearchUninitialize(
     }
 }
 
-STDMETHODIMP UtilSearchExecute(
-    __in UTIL_SEARCHES* pSearches,
+STDMETHODIMP NetfxSearchExecute(
+    __in NETFX_SEARCHES* pSearches,
     __in LPCWSTR wzSearchId,
     __in LPCWSTR wzVariable,
-    __in IBundleExtensionEngine* pEngine
+    __in IBundleExtensionEngine* pEngine,
+    __in LPCWSTR wzBaseDirectory
     )
 {
     HRESULT hr = S_OK;
-    UTIL_SEARCH* pSearch = NULL;
+    NETFX_SEARCH* pSearch = NULL;
 
-    hr = UtilSearchFindById(pSearches, wzSearchId, &pSearch);
+    hr = NetfxSearchFindById(pSearches, wzSearchId, &pSearch);
     BextExitOnFailure(hr, "Search id '%ls' is unknown to the util extension.", wzSearchId);
 
     switch (pSearch->Type)
     {
-    case UTIL_SEARCH_TYPE_WINDOWS_FEATURE_SEARCH:
-        switch (pSearch->WindowsFeatureSearch.type)
-        {
-        case UTIL_WINDOWS_FEATURE_SEARCH_TYPE_SHA2_CODE_SIGNING:
-            hr = UtilPerformDetectSHA2CodeSigning(wzVariable, pSearch, pEngine);
-            break;
-        default:
-            hr = E_UNEXPECTED;
-        }
+    case NETFX_SEARCH_TYPE_NET_CORE_SEARCH:
+        hr = NetfxPerformDetectNetCore(wzVariable, pSearch, pEngine, wzBaseDirectory);
         break;
     default:
         hr = E_UNEXPECTED;
@@ -132,17 +123,17 @@ LExit:
     return hr;
 }
 
-STDMETHODIMP UtilSearchFindById(
-    __in UTIL_SEARCHES* pSearches,
+STDMETHODIMP NetfxSearchFindById(
+    __in NETFX_SEARCHES* pSearches,
     __in LPCWSTR wzId,
-    __out UTIL_SEARCH** ppSearch
+    __out NETFX_SEARCH** ppSearch
     )
 {
     HRESULT hr = S_OK;
 
     for (DWORD i = 0; i < pSearches->cSearches; ++i)
     {
-        UTIL_SEARCH* pSearch = &pSearches->rgSearches[i];
+        NETFX_SEARCH* pSearch = &pSearches->rgSearches[i];
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pSearch->sczId, -1, wzId, -1))
         {

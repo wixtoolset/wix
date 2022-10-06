@@ -1,26 +1,47 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Netfx.Symbols
+namespace WixToolset.Netfx
 {
+    using System;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
 
-    public static class NetfxSymbolDefinitionNames
+    public enum NetfxSymbolDefinitionType
     {
-        public static string NetFxNativeImage { get; } = "NetFxNativeImage";
+        NetFxNativeImage,
+        NetFxNetCoreSearch,
     }
 
-    public static class NetfxSymbolDefinitions
+    public static partial class NetfxSymbolDefinitions
     {
-        public static readonly IntermediateSymbolDefinition NetFxNativeImage = new IntermediateSymbolDefinition(
-            NetfxSymbolDefinitionNames.NetFxNativeImage,
-            new[]
+        public static IntermediateSymbolDefinition ByName(string name)
+        {
+            if (!Enum.TryParse(name, out NetfxSymbolDefinitionType type))
             {
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.Priority), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.ApplicationFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.ApplicationBaseDirectoryRef), IntermediateFieldType.String),
-            },
-            typeof(NetFxNativeImageSymbol));
+                return null;
+            }
+
+            return ByType(type);
+        }
+
+        public static IntermediateSymbolDefinition ByType(NetfxSymbolDefinitionType type)
+        {
+            switch (type)
+            {
+                case NetfxSymbolDefinitionType.NetFxNativeImage:
+                    return NetfxSymbolDefinitions.NetFxNativeImage;
+
+                case NetfxSymbolDefinitionType.NetFxNetCoreSearch:
+                    return NetfxSymbolDefinitions.NetFxNetCoreSearch;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
+            }
+        }
+
+        static NetfxSymbolDefinitions()
+        {
+            NetFxNetCoreSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
+        }
     }
 }

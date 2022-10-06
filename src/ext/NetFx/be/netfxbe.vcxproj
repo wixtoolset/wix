@@ -30,12 +30,12 @@
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{630C1EE7-2517-4A8C-83E3-DA1150308B58}</ProjectGuid>
+    <ProjectGuid>{B65719C0-B2CC-45F9-AF33-6F147F741ADB}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <TargetName>utilbe</TargetName>
+    <TargetName>netfxbe</TargetName>
     <CharacterSet>Unicode</CharacterSet>
-    <ProjectModuleDefinitionFile>utilbe.def</ProjectModuleDefinitionFile>
-    <Description>WiX Toolset Util BundleExtension</Description>
+    <ProjectModuleDefinitionFile>netfxbe.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset Netfx BundleExtension</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -46,24 +46,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="detectsha2support.cpp" />
+    <ClCompile Include="detectnetcore.cpp" />
+    <ClCompile Include="netfxbe.cpp" />
+    <ClCompile Include="NetfxBundleExtension.cpp" />
+    <ClCompile Include="netfxsearch.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="utilbe.cpp" />
-    <ClCompile Include="UtilBundleExtension.cpp" />
-    <ClCompile Include="utilsearch.cpp" />
   </ItemGroup>
 
   <ItemGroup>
-    <ClInclude Include="detectsha2support.h" />
+    <ClInclude Include="detectnetcore.h" />
+    <ClInclude Include="NetfxBundleExtension.h" />
+    <ClInclude Include="netfxsearch.h" />
     <ClInclude Include="precomp.h" />
-    <ClInclude Include="UtilBundleExtension.h" />
-    <ClInclude Include="utilsearch.h" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="utilbe.def" />
+    <None Include="netfxbe.def" />
   </ItemGroup>
 
   <ItemGroup>

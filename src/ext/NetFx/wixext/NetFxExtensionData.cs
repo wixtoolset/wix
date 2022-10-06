@@ -4,7 +4,6 @@ namespace WixToolset.Netfx
 {
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Netfx.Symbols;
 
     /// <summary>
     /// The WiX Toolset .NET Framework Extension.
@@ -13,7 +12,7 @@ namespace WixToolset.Netfx
     {
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            symbolDefinition = (name == NetfxSymbolDefinitionNames.NetFxNativeImage) ? NetfxSymbolDefinitions.NetFxNativeImage : null;
+            symbolDefinition = NetfxSymbolDefinitions.ByName(name);
             return symbolDefinition != null;
         }
 
