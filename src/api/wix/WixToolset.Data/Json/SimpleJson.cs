@@ -488,7 +488,7 @@ namespace SimpleJson
 {
     /// <summary>
     /// This class encodes and decodes JSON strings.
-    /// Spec. details, see http://www.json.org/
+    /// Spec. details, see https://www.json.org/
     /// 
     /// JSON uses Arrays and Objects. These correspond here to the datatypes JsonArray(IList&lt;object>) and JsonObject(IDictionary&lt;string,object>).
     /// All numbers are parsed to doubles.

@@ -56,7 +56,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.FlattenDependentReferences(constraints);
 
-            // Reorder by topographical sort (http://en.wikipedia.org/wiki/Topological_sorting)
+            // Reorder by topographical sort (https://en.wikipedia.org/wiki/Topological_sorting)
             // We use a variation of Kahn (1962) algorithm as described in
             // Wikipedia, with the additional criteria that start nodes are sorted
             // lexicographically at each step to ensure a deterministic ordering
@@ -198,7 +198,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         /// <remarks>
         /// We use a variation of Kahn (1962) algorithm as described in
-        /// Wikipedia (http://en.wikipedia.org/wiki/Topological_sorting), with
+        /// Wikipedia (https://en.wikipedia.org/wiki/Topological_sorting), with
         /// the additional criteria that start nodes are sorted lexicographically
         /// at each step to ensure a deterministic ordering based on 'after'
         /// dependencies and ID.

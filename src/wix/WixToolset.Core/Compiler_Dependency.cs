@@ -14,7 +14,7 @@ namespace WixToolset.Core
     {
         // The root registry key for the dependency extension. We write to Software\Classes explicitly
         // based on the current security context instead of HKCR. See
-        // http://msdn.microsoft.com/en-us/library/ms724475(VS.85).aspx for more information.
+        // https://msdn.microsoft.com/en-us/library/ms724475(VS.85).aspx for more information.
         private const string DependencyRegistryRoot = @"Software\Classes\Installer\Dependencies\";
 
         private static readonly char[] InvalidDependencyCharacters = new char[] { ' ', '\"', ';', '\\' };
