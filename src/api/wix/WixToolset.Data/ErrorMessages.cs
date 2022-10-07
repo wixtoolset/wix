@@ -1063,7 +1063,7 @@ namespace WixToolset.Data
 
         public static Message IllegalTerminalServerCustomActionAttributes(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.IllegalTerminalServerCustomActionAttributes, "The CustomAction/@TerminalServerAware attribute's value is 'yes' but the Execute attribute is not 'deferred,' 'rollback,' or 'commit.' Terminal-Server-aware custom actions must be deferred, rollback, or commit custom actions. For more information, see https://msdn.microsoft.com/library/aa372071.aspx.\"");
+            return Message(sourceLineNumbers, Ids.IllegalTerminalServerCustomActionAttributes, "The CustomAction/@TerminalServerAware attribute's value is 'yes' but the Execute attribute is not 'deferred,' 'rollback,' or 'commit.' Terminal-Server-aware custom actions must be deferred, rollback, or commit custom actions. For more information, see https://learn.microsoft.com/en-us/windows/win32/msi/terminalserver .\"");
         }
 
         public static Message IllegalValidationArguments()
@@ -2183,7 +2183,7 @@ namespace WixToolset.Data
 
         public static Message ValidationFailedDueToMultilanguageMergeModule()
         {
-            return Message(null, Ids.ValidationFailedDueToMultilanguageMergeModule, "Failed to open merge module for validation. The most common cause of this error is specifying that the merge module supports multiple languages (using the Package/@Languages attribute) but not including language-specific embedded transforms. To fix this error, make the merge module language-neutral, make it language-specific, embed language transforms as specified in the MSI SDK at https://msdn.microsoft.com/library/aa367799.aspx, or disable validation.");
+            return Message(null, Ids.ValidationFailedDueToMultilanguageMergeModule, "Failed to open merge module for validation. The most common cause of this error is specifying that the merge module supports multiple languages (using the Package/@Languages attribute) but not including language-specific embedded transforms. To fix this error, make the merge module language-neutral, make it language-specific, embed language transforms as specified in the MSI SDK at https://learn.microsoft.com/en-us/windows/win32/msi/authoring-multiple-language-merge-modules, or disable validation.");
         }
 
         public static Message ValidationFailedToOpenDatabase()
