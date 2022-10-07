@@ -29,7 +29,7 @@ static LPCWSTR vcszAttributesValue = L"Attributes";
 enum eRequiresAttributes { RequiresAttributesMinVersionInclusive = 256, RequiresAttributesMaxVersionInclusive = 512 };
 
 // We write to Software\Classes explicitly based on the current security context instead of HKCR.
-// See https://msdn.microsoft.com/en-us/library/ms724475(VS.85).aspx for more information.
+// See https://learn.microsoft.com/en-us/windows/win32/sysinfo/hkey-classes-root-key for more information.
 static LPCWSTR vsczRegistryRoot = L"Software\\Classes\\Installer\\Dependencies\\";
 static LPCWSTR vsczRegistryDependents = L"Dependents";
 

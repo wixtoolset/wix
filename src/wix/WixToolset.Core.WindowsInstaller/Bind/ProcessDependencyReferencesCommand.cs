@@ -13,7 +13,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     {
         // The root registry key for the dependency extension. We write to Software\Classes explicitly
         // based on the current security context instead of HKCR. See
-        // http://msdn.microsoft.com/en-us/library/ms724475(VS.85).aspx for more information.
+        // https://learn.microsoft.com/en-us/windows/win32/sysinfo/hkey-classes-root-key for more information.
         private const string DependencyRegistryRoot = @"Software\Classes\Installer\Dependencies\";
         private const string RegistryDependents = "Dependents";
 

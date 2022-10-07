@@ -384,7 +384,7 @@ namespace WixToolset.Data
 
         public static Message MajorUpgradePatchNotRecommended()
         {
-            return Message(null, Ids.MajorUpgradePatchNotRecommended, "Changing the ProductCode in a patch is not recommended because the patch cannot be uninstalled nor can it be sequenced along with other patches for the target product. See https://msdn2.microsoft.com/library/aa367571.aspx for more information.");
+            return Message(null, Ids.MajorUpgradePatchNotRecommended, "Changing the ProductCode in a patch is not recommended because the patch cannot be uninstalled nor can it be sequenced along with other patches for the target product. See https://learn.microsoft.com/en-us/windows/win32/msi/applying-major-upgrades-by-patching-the-local-installation-of-the-product for more information.");
         }
 
         public static Message MediaExternalCabinetFilenameIllegal(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
