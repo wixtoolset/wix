@@ -2,17 +2,24 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
-    <Fragment>
-        <ComponentGroup Id="ProductComponents">
-            <ComponentRef Id="Component1" />
-        </ComponentGroup>
-    </Fragment>
+  <Fragment>
+    <ComponentGroup Id="ProductComponents">
+      <ComponentRef Id="Component1" />
+    </ComponentGroup>
+  </Fragment>
 
-    <Fragment>
-        <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
-            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
-
-            <util:User Id="TEST_USER1" Name="testName1" Password="test123!@#" PasswordExpired="yes" CreateUser="yes" RemoveOnUninstall="yes" Comment="testComment1"/>
-        </Component>
-    </Fragment>
+  <Fragment>
+    <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
+      <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
+      <util:User
+        Id="TEST_USER1"
+        Name="testName1"
+        Password="test123!@#"
+        PasswordExpired="yes"
+        CreateUser="yes"
+        UpdateIfExists="yes"
+        RemoveOnUninstall="yes"
+        Comment="testComment1" />
+    </Component>
+  </Fragment>
 </Wix>

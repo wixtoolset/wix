@@ -273,7 +273,6 @@ LExit:
     return hr;
 }
 
-
 /********************************************************************
  WcaCaScriptWriteNumber() - writes a number to the ca script.
 

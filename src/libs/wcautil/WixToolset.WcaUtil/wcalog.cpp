@@ -212,7 +212,6 @@ extern "C" void __cdecl WcaLog(
     return;
 }
 
-
 /********************************************************************
  WcaDisplayAssert() - called before Assert() dialog shows
 

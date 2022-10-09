@@ -1321,7 +1321,6 @@ LExit:
     return hr;
 }
 
-
 /********************************************************************
 WcaWriteStringToCaData() - adds a string to the CustomActionData to
 feed a deferred CustomAction
@@ -1425,7 +1424,6 @@ LExit:
     ReleaseStr(pwzData);
     return hr;
 }
-
 
 /********************************************************************
 WcaAddTempRecord - adds a temporary record to the active database

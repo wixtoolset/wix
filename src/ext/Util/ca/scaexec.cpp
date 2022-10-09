@@ -656,7 +656,12 @@ static HRESULT RemoveUserInternal(
             }
             if (ERROR_SUCCESS == er)
             {
-                wz = pDomainControllerInfo->DomainControllerName + 2;  //Add 2 so that we don't get the \\ prefix
+                if (2 <= wcslen(pDomainControllerInfo->DomainControllerName))
+                {
+                    wz = pDomainControllerInfo->DomainControllerName + 2; // Add 2 so that we don't get the \\ prefix.
+                                                                          // Pass the entire string if it is too short
+                                                                          // to have a \\ prefix.
+                }
             }
             else
             {
@@ -848,6 +853,8 @@ extern "C" UINT __stdcall CreateUser(
         er = ::NetUserAdd(pwzServerName, 1, reinterpret_cast<LPBYTE>(pUserInfo1), &dw);
         if (NERR_UserExists == er)
         {
+            er = ERROR_SUCCESS; // Make sure that we don't report this situation as an error
+                                // if we fall through the tests that follow.
             if (SCAU_FAIL_IF_EXISTS & iAttributes)
             {
                 hr = HRESULT_FROM_WIN32(er);
@@ -951,26 +958,6 @@ extern "C" UINT __stdcall CreateUser(
                     if (FAILED(hr))
                     {
                         WcaLogError(hr, "failed to set user flags for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
-                    }
-                }
-            }
-            else
-            {
-                // The user exists, but was not updated
-                if (SCAU_REMOVE_COMMENT & iAttributes)
-                {
-                    hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, L""));
-                    if (FAILED(hr))
-                    {
-                        WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
-                    }
-                }
-                else if (pwzComment && *pwzComment)
-                {
-                    hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, pwzComment));
-                    if (FAILED(hr))
-                    {
-                        WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
                     }
                 }
             }

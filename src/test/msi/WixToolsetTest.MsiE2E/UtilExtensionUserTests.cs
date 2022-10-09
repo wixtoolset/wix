@@ -83,6 +83,9 @@ namespace WixToolsetTest.MsiE2E
             };
             var productWithCommandLineParameters = this.CreatePackageInstaller("ProductWithCommandLineParameters");
 
+            // Make sure that the user doesn't exist when we start the test.
+            UserVerifier.DeleteLocalUser("testName1");
+
             // Install
             productWithCommandLineParameters.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
 
