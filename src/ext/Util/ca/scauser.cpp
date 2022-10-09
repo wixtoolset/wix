@@ -506,8 +506,9 @@ HRESULT ScaUserExecute(
     {
         USER_EXISTS ueUserExists = USER_EXISTS_INDETERMINATE;
 
-        // Always put the User Name, Domain, and Comment plus Attributes on the front of the CustomAction
-        // data.  Sometimes we'll add more data.
+        // Always put the User Name, Domain, and Comment on the front of the CustomAction data.
+        // The attributes will be added when we have finished adjusting them. Sometimes we'll
+        // add more data.
         Assert(psu->wzName);
         hr = WcaWriteStringToCaData(psu->wzName, &pwzActionData);
         ExitOnFailure(hr, "Failed to add user name to custom action data: %ls", psu->wzName);
@@ -515,8 +516,6 @@ HRESULT ScaUserExecute(
         ExitOnFailure(hr, "Failed to add user domain to custom action data: %ls", psu->wzDomain);
         hr = WcaWriteStringToCaData(psu->wzComment, &pwzActionData);
         ExitOnFailure(hr, "Failed to add user comment to custom action data: %ls", psu->wzComment);
-        hr = WcaWriteIntegerToCaData(psu->iAttributes, &pwzActionData);
-        ExitOnFailure(hr, "failed to add user attributes to custom action data for user: %ls", psu->wzKey);
 
         // Check to see if the user already exists since we have to be very careful when adding
         // and removing users.  Note: MSDN says that it is safe to call these APIs from any
@@ -536,7 +535,12 @@ HRESULT ScaUserExecute(
             }
             if (ERROR_SUCCESS == er)
             {
-                wzDomain = pDomainControllerInfo->DomainControllerName + 2;  //Add 2 so that we don't get the \\ prefix
+                if (2 <= wcslen(pDomainControllerInfo->DomainControllerName))
+                {
+                    wzDomain = pDomainControllerInfo->DomainControllerName + 2; // Add 2 so that we don't get the \\ prefix.
+                                                                                // Pass the entire string if it is too short
+                                                                                // to have a \\ prefix.
+                }
             }
         }
 
@@ -564,18 +568,27 @@ HRESULT ScaUserExecute(
             // the install.
             if (USER_EXISTS_YES == ueUserExists)
             {
-                // Reinstalls will always fail if we don't remove the check for "fail if exists".
+                // Re-installs will always fail if we don't remove the check for "fail if exists".
                 if (WcaIsReInstalling(psu->isInstalled, psu->isAction))
                 {
                     psu->iAttributes &= ~SCAU_FAIL_IF_EXISTS;
+
+                    // If install would create the user, re-install should be able to update the user.
+                    if (!(psu->iAttributes & SCAU_DONT_CREATE_USER))
+                    {
+                        psu->iAttributes |= SCAU_UPDATE_IF_EXISTS;
+                    }
                 }
 
-                if ((SCAU_FAIL_IF_EXISTS & (psu->iAttributes)) && !(SCAU_UPDATE_IF_EXISTS & (psu->iAttributes)))
+                if (SCAU_FAIL_IF_EXISTS & psu->iAttributes && !(SCAU_UPDATE_IF_EXISTS & psu->iAttributes))
                 {
                     hr = HRESULT_FROM_WIN32(NERR_UserExists);
                     MessageExitOnFailure(hr, msierrUSRFailedUserCreateExists, "Failed to create user: %ls because user already exists.", psu->wzName);
                 }
             }
+
+            hr = WcaWriteIntegerToCaData(psu->iAttributes, &pwzActionData);
+            ExitOnFailure(hr, "failed to add user attributes to custom action data for user: %ls", psu->wzKey);
 
             // Rollback only if the user already exists, we couldn't determine if the user exists, or we are going to create the user
             if ((USER_EXISTS_YES == ueUserExists) || (USER_EXISTS_INDETERMINATE == ueUserExists) || !(psu->iAttributes & SCAU_DONT_CREATE_USER))
@@ -645,11 +658,13 @@ HRESULT ScaUserExecute(
         }
         else if (((USER_EXISTS_YES == ueUserExists) || (USER_EXISTS_INDETERMINATE == ueUserExists)) && WcaIsUninstalling(psu->isInstalled, psu->isAction) && !(psu->iAttributes & SCAU_DONT_REMOVE_ON_UNINSTALL))
         {
+            hr = WcaWriteIntegerToCaData(psu->iAttributes, &pwzActionData);
+            ExitOnFailure(hr, "failed to add user attributes to custom action data for user: %ls", psu->wzKey);
+
             // Add user's group information - this will ensure the user can be removed from any groups they were added to, if the user isn't be deleted
             hr = WriteGroupInfo(psu->psgGroups, &pwzActionData);
             ExitOnFailure(hr, "failed to add group information to custom action data");
 
-            //
             // Schedule the removal because the user exists and we don't have any flags set
             // that say, don't remove the user on uninstall.
             //
@@ -657,7 +672,7 @@ HRESULT ScaUserExecute(
             // CustomAction.
             hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RemoveUser"), pwzActionData, COST_USER_DELETE);
             ExitOnFailure(hr, "failed to schedule RemoveUser");
-        }
+       }
 
         ReleaseNullStr(pwzScriptKey);
         ReleaseNullStr(pwzActionData);
