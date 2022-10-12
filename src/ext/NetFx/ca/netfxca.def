@@ -6,3 +6,4 @@ LIBRARY      "netfxca"
 EXPORTS
 	SchedNetFx
 	ExecNetFx
+	DotNetCompatibilityCheck

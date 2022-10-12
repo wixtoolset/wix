@@ -36,6 +36,10 @@ LPCWSTR vcsNgenStrongName =
     L"SELECT `Name`,`Value` FROM `MsiAssemblyName` WHERE `Component_`=?";
 enum eNgenStrongName { ngsnName = 1, ngsnValue };
 
+LPCWSTR vscDotNetCompatibilityCheckQuery =
+    L"SELECT `Platform`, `RuntimeType`, `Version`, `RollForward`, `Variable` FROM `Wix4NetFxDotNetCompatibilityCheck`";
+enum eDotNetCompatibilityCheckQuery { platform = 1, runtimeType, version, rollForward, variable };
+
 // Searches subdirectories of the given path for the highest version of ngen.exe available
 static HRESULT GetNgenVersion(
     __in LPWSTR pwzParentPath,
@@ -445,6 +449,30 @@ static HRESULT FileIdExists(
     }
 
 LExit:
+
+    return hr;
+}
+
+/******************************************************************
+ GetNetCoreCheckBinaryId - gets NetCoreCheck key from Binary table
+
+********************************************************************/
+static HRESULT GetNetCoreCheckBinaryId(
+    __in LPCWSTR pwzPlatform,
+    __out LPWSTR* ppwzBinaryId
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (0 == lstrcmpW(L"x86", pwzPlatform)) {
+        hr = StrAllocString(ppwzBinaryId, L"Wix4NetCheck_x86", 0);
+    } else if (0 == lstrcmpW(L"x64", pwzPlatform)) {
+        hr = StrAllocString(ppwzBinaryId, L"Wix4NetCheck_x64", 0);
+    } else if (0 == lstrcmpW(L"arm64", pwzPlatform)) {
+        hr = StrAllocString(ppwzBinaryId, L"Wix4NetCheck_arm64", 0);
+    } else {
+        hr = E_INVALIDARG;
+    }
 
     return hr;
 }
@@ -879,3 +907,132 @@ LExit:
     return WcaFinalize(er);
 }
 
+/******************************************************************
+ DotNetCompatibilityCheck - entry point for NetFx Custom Action
+
+*******************************************************************/
+extern "C" UINT __stdcall DotNetCompatibilityCheck(
+    __in MSIHANDLE hInstall
+    )
+{
+//    AssertSz(FALSE, "debug DotNetCompatibilityCheck");
+
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    DWORD dwTempPathLength = 0;
+    LPWSTR pwzTempPath = NULL;
+    PMSIHANDLE hView = NULL;
+    PMSIHANDLE hRec = NULL;
+    LPWSTR pwzPlatform = NULL;
+    LPWSTR pwzNetCoreCheckBinaryId = NULL;
+    LPWSTR pwzNetCoreCheckFilePath = NULL;
+    LPWSTR pwzRuntimeType = NULL;
+    LPWSTR pwzVersion = NULL;
+    LPWSTR pwzRollForward = NULL;
+    LPWSTR pwzVariable = NULL;
+    LPWSTR pwzCommandLine = NULL;
+
+    // Initialize
+    hr = WcaInitialize(hInstall, "DotNetCompatibilityCheck");
+    ExitOnFailure(hr, "failed to initialize");
+
+    // Get temp directory path
+    dwTempPathLength = GetTempPathW(dwTempPathLength, NULL);
+    if (0 == dwTempPathLength)
+    {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+        ExitOnFailure(hr, "failed to get temp path length");
+    }
+
+    hr = StrAlloc(&pwzTempPath, ++dwTempPathLength);
+    ExitOnFailure(hr, "failed to allocate temp path variable");
+
+    dwTempPathLength = GetTempPathW(dwTempPathLength, pwzTempPath);
+    if (0 == dwTempPathLength)
+    {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+        ExitOnFailure(hr, "failed to get temp path value");
+    }
+
+    // Open view on .NET compatibility check table
+    hr = WcaOpenExecuteView(vscDotNetCompatibilityCheckQuery, &hView);
+    ExitOnFailure(hr, "failed to open view on Wix4NetFxDotNetCompatibilityCheck table");
+
+    // Go through all records and run NetCorCheck.exe for each
+    while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
+    {
+        HANDLE hProcess = INVALID_HANDLE_VALUE;
+        DWORD dwExitCode = 0;
+
+        // Extract NetCoreCheck.exe for platform to temp directory
+        hr = WcaGetRecordString(hRec, platform, &pwzPlatform);
+        ExitOnFailure(hr, "failed to get Wix4DotNetCompatibilityCheck.Platform");
+
+        hr = GetNetCoreCheckBinaryId(pwzPlatform, &pwzNetCoreCheckBinaryId);
+        ExitOnFailure(hr, "failed to get NetCoreCheck binary id for platform %ls", pwzPlatform);
+
+        hr = StrAllocFormatted(&pwzNetCoreCheckFilePath, L"%ls%ls", pwzTempPath, L"NetCoreCheck.exe");
+        ExitOnFailure(hr, "failed to set NetCoreCheck file path");
+
+        hr = WcaExtractBinaryToFile(pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath);
+        ExitOnFailure(hr, "failed to extract NetCoreCheck from binary '%ls' to file %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath);
+
+        // Read all NetCoreCheck.exe parameters and variable
+        hr = WcaGetRecordString(hRec, runtimeType, &pwzRuntimeType);
+        ExitOnFailure(hr, "failed to get Wix4DotNetCompatibilityCheck.RuntimeType");
+
+        hr = WcaGetRecordString(hRec, version, &pwzVersion);
+        ExitOnFailure(hr, "failed to get Wix4DotNetCompatibilityCheck.Version");
+
+        hr = WcaGetRecordString(hRec, rollForward, &pwzRollForward);
+        ExitOnFailure(hr, "failed to get Wix4DotNetCompatibilityCheck.RollForward");
+
+        hr = WcaGetRecordString(hRec, variable, &pwzVariable);
+        ExitOnFailure(hr, "failed to get Wix4DotNetCompatibilityCheck.Variable");
+
+        // Run NetCoreCheck.exe and store its result in variable
+        hr = StrAllocFormatted(&pwzCommandLine, L"-n %ls -v %ls -r %ls", pwzRuntimeType, pwzVersion, pwzRollForward);
+        ExitOnFailure(hr, "failed to set NetCoreCheck command line");
+        WcaLog(LOGMSG_VERBOSE, "Command: %ls %ls", pwzNetCoreCheckFilePath, pwzCommandLine);
+
+        hr = ProcExec(pwzNetCoreCheckFilePath, pwzCommandLine, SW_HIDE, &hProcess);
+        ExitOnFailure(hr, "failed to run NetCoreCheck from binary '%ls' with command line: %ls %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath, pwzCommandLine);
+
+        hr = ProcWaitForCompletion(hProcess, INFINITE, &dwExitCode);
+        ExitOnFailure(hr, "failed to finish NetCoreCheck from binary '%ls' with command line: %ls %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath, pwzCommandLine);
+        WcaLog(LOGMSG_VERBOSE, "Exit code: %lu", dwExitCode);
+        CloseHandle(hProcess);
+
+        hr = WcaSetIntProperty(pwzVariable, dwExitCode);
+        ExitOnFailure(hr, "failed to set NetCoreCheck result in %ls", pwzVariable);
+
+        // Delete extracted NetCoreCheck.exe
+        DeleteFileW(pwzNetCoreCheckFilePath);
+    }
+    if (E_NOMOREITEMS == hr)
+        hr = S_OK;
+    ExitOnFailure(hr, "failed while looping through all dot net compatibility checks");
+
+LExit:
+    // Delete extracted NetCoreCheck.exe
+    if (NULL != pwzNetCoreCheckFilePath)
+    {
+        DeleteFileW(pwzNetCoreCheckFilePath);
+    }
+
+    // Release allocated strings
+    ReleaseStr(pwzTempPath);
+    ReleaseStr(pwzPlatform);
+    ReleaseStr(pwzNetCoreCheckBinaryId);
+    ReleaseStr(pwzNetCoreCheckFilePath);
+    ReleaseStr(pwzRuntimeType);
+    ReleaseStr(pwzVersion);
+    ReleaseStr(pwzRollForward);
+    ReleaseStr(pwzVariable);
+    ReleaseStr(pwzCommandLine);
+
+    if (FAILED(hr))
+        er = ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
