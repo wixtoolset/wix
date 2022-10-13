@@ -1,13 +1,13 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.BuildTasks
+namespace WixToolset.BaseBuildTasks
 {
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Build.Utilities;
 
-    public abstract class ToolsetTask : ToolTask
+    public abstract class BaseToolsetTask : ToolTask
     {
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.
@@ -88,6 +88,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendIfTrue("-v", this.VerboseOutput);
             commandLineBuilder.AppendArrayIfNotNull("-wx", this.TreatSpecificWarningsAsErrors);
             commandLineBuilder.AppendIfTrue("-wx", this.TreatWarningsAsErrors);
+            commandLineBuilder.AppendTextIfNotNull(this.AdditionalOptions);
         }
 
         protected sealed override string GenerateResponseFileCommands()
@@ -152,11 +153,11 @@ namespace WixToolset.BuildTasks
         private string GetDefaultToolFullPath()
         {
 #if NETCOREAPP
-                var thisTaskFolder = Path.GetDirectoryName(typeof(ToolsetTask).Assembly.Location);
+                var thisTaskFolder = Path.GetDirectoryName(typeof(BaseToolsetTask).Assembly.Location);
 
                 return Path.Combine(thisTaskFolder, this.ToolExe);
 #else
-                var thisTaskFolder = Path.GetDirectoryName(new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath);
+                var thisTaskFolder = Path.GetDirectoryName(new Uri(typeof(BaseToolsetTask).Assembly.CodeBase).AbsolutePath);
 
                 var archFolder = GetArchitectureFolder(thisTaskFolder);
 

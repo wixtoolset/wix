@@ -3,6 +3,7 @@
 namespace WixToolset.HeatTasks
 {
     using Microsoft.Build.Framework;
+    using WixToolset.BaseBuildTasks;
 
     public sealed class HeatDirectory : HeatTask
     {
