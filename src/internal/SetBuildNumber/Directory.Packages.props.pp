@@ -8,6 +8,7 @@
 
     <PackageVersion Include="WixBuildTools.TestSupport" Version="{packageversion}" />
     <PackageVersion Include="WixBuildTools.TestSupport.Native" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.BaseBuildTasks.Sources" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.DUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.WcaUtil" Version="{packageversion}" />

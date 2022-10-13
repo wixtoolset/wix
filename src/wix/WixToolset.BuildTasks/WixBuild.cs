@@ -5,6 +5,7 @@ namespace WixToolset.BuildTasks
     using System;
     using System.Collections.Generic;
     using Microsoft.Build.Framework;
+    using WixToolset.BaseBuildTasks;
 
     /// <summary>
     /// An MSBuild task to run the WiX compiler.

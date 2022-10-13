@@ -3,6 +3,7 @@
 namespace WixToolset.BuildTasks
 {
     using Microsoft.Build.Framework;
+    using WixToolset.BaseBuildTasks;
 
     /// <summary>
     /// An MSBuild task to run WiX to update cabinet signatures in a MSI.

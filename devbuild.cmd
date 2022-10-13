@@ -12,7 +12,7 @@ if not "%1"=="" shift & goto parse_args
 if not "%_INCREMENTAL%"=="1" call src\clean.cmd
 if not "%_CLEAN%"=="" goto end
 
-src\build_all.cmd %_C%
+call src\build_all.cmd %_C%
 
 :end
 popd
