@@ -29,7 +29,7 @@ namespace WixToolsetTest.Sdk
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "SimpleBundle.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] { 
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
                     "-p:SignOutput=true",
                     });
@@ -162,7 +162,7 @@ namespace WixToolsetTest.Sdk
                 var platformSwitches = result.Output.Where(line => line.Contains("-platform x86"));
                 Assert.Single(platformSwitches);
 
-                var warnings = result.Output.Where(line => line.Contains(": warning")).Select(ExtractWarningFromMessage).ToArray();
+                var warnings = result.Output.Where(line => line.Contains(": warning")).Select(line => ExtractWarningFromMessage(line, baseFolder)).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
                     @"WIX1118: The variable 'Variable' with value 'DifferentValue' was previously declared with value 'Value'.",
@@ -173,7 +173,7 @@ namespace WixToolsetTest.Sdk
                     @"WIX1122: The installer database '<basefolder>\obj\x86\Release\en-US\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build."
                 }, warnings);
 
-                var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(ReplacePathsInMessage).ToArray();
+                var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(line => ReplacePathsInMessage(line, baseFolder)).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
                     @"TEST: SignCabs: <basefolder>\obj\x86\Release\en-US\cab1.cab",
@@ -190,20 +190,6 @@ namespace WixToolsetTest.Sdk
                     @"bin\x86\Release\en-US\MsiPackage.msi",
                     @"bin\x86\Release\en-US\MsiPackage.wixpdb",
                 }, paths);
-            }
-
-            string ExtractWarningFromMessage(string message)
-            {
-                const string prefix = ": warning ";
-
-                var start = message.IndexOf(prefix) + prefix.Length;
-                var end = message.LastIndexOf("[");
-                return ReplacePathsInMessage(message.Substring(start, end - start));
-            }
-
-            string ReplacePathsInMessage(string message)
-            {
-                return message.Replace(baseFolder, "<basefolder>").Trim();
             }
         }
 
@@ -585,6 +571,46 @@ namespace WixToolsetTest.Sdk
             }
         }
 
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildWithWarningWhenExtensionIsMissing(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "WixlibMissingExtension");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "WixlibMissingExtension.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SignOutput=true",
+                    });
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning")).Select(line => ExtractWarningFromMessage(line, baseFolder)).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "WXE0001: Unable to find extension DoesNotExist.wixext.dll.",
+                    "WXE0001: Unable to find extension DoesNotExist.wixext.dll.",
+                }, warnings);
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"bin\Release\WixlibMissingExtension.wixlib",
+                }, paths);
+            }
+        }
+
         [Theory(Skip = "Depends on creating broken publish which is not supported at this time")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
@@ -609,6 +635,21 @@ namespace WixToolsetTest.Sdk
                 var expectedMessage = "System.PlatformNotSupportedException: Could not find platform specific 'wixnative.exe' ---> System.IO.FileNotFoundException: Could not find internal piece of WiX Toolset from";
                 Assert.Contains(result.Output, m => m.Contains(expectedMessage));
             }
+        }
+
+        private static string ExtractWarningFromMessage(string message, string baseFolder)
+        {
+            const string prefix = ": warning ";
+
+            var start = message.IndexOf(prefix) + prefix.Length;
+            var end = message.LastIndexOf("[");
+
+            return ReplacePathsInMessage(message.Substring(start, end - start), baseFolder);
+        }
+
+        private static string ReplacePathsInMessage(string message, string baseFolder)
+        {
+            return message.Replace(baseFolder, "<basefolder>").Trim();
         }
     }
 }

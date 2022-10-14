@@ -129,10 +129,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixBinDir)</WixExtDir>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <BindTrackingFilePrefix Condition=" '$(BindTrackingFilePrefix)' == '' ">$(MSBuildProjectFile).BindTracking</BindTrackingFilePrefix>
     <BindTrackingFileExtension Condition=" '$(BindTrackingFileExtension)' == '' ">.txt</BindTrackingFileExtension>
   </PropertyGroup>
@@ -362,10 +358,9 @@
 
     By default the WixLibrarySearchPaths property is set to find libraries in the following order:
 
-        (1) $(ReferencePaths) - the reference paths property, which comes from the .USER file.
+        (1) $(ReferencePaths) - the reference paths property.
         (2) The hintpath from the referenced item itself, indicated by {HintPathFromItem}.
         (3) Treat the reference's Include as if it were a real file name.
-        (4) Path specified by the WixExtDir property.
 
     [IN]
     @(WixLibrary) - the list of .wixlib files.
@@ -381,39 +376,33 @@
   </PropertyGroup>
   <Target
     Name="ResolveWixLibraryReferences"
-    DependsOnTargets="$(ResolveWixLibraryReferencesDependsOn)">
+    DependsOnTargets="$(ResolveWixLibraryReferencesDependsOn)"
+    Condition=" '@(WixLibrary)' != ''">
 
     <PropertyGroup>
-      <WixLibrarySearchPaths Condition=" '$(WixLibrarySearchPaths)' == '' ">$(ReferencePaths);{HintPathFromItem};{RawFileName};$(WixExtDir)</WixLibrarySearchPaths>
+      <WixLibrarySearchPaths Condition=" '$(WixLibrarySearchPaths)' == '' ">$(ReferencePaths);{HintPathFromItem};{RawFileName}</WixLibrarySearchPaths>
     </PropertyGroup>
 
     <ResolveWixReferences
         WixReferences="@(WixLibrary)"
         SearchPaths="$(WixLibrarySearchPaths)"
-        SearchFilenameExtensions=".wixlib"
-        Condition=" '@(WixLibrary)' != ''">
-      <Output TaskParameter="ResolvedWixReferences" ItemName="_AllResolvedWixLibraryPaths" />
+        SearchFilenameExtensions=".wixlib">
+      <Output TaskParameter="ResolvedWixReferences" ItemName="_ResolvedWixLibraryPaths" />
+      <Output TaskParameter="UnresolvedWixReferences" ItemName="_UnresolvedWixLibraryPaths" />
     </ResolveWixReferences>
-
-    <RemoveDuplicates Inputs="@(_AllResolvedWixLibraryPaths)">
-      <Output TaskParameter="Filtered" ItemName="_ResolvedWixLibraryPaths" />
-    </RemoveDuplicates>
   </Target>
 
   <!--
     ================================================================================================
                                         ResolveWixExtensionReferences
 
-    Resolves WiX extension references to full paths. Any properties you use
-    to resolve paths to extensions must be defined before importing this
-    file or the extensions will be automatically resolved to $(WixExtDir).
+    Resolves WiX extension references to full paths.
 
     By default the WixExtensionSearchPaths property is set to find extensions in the following order:
 
-        (1) $(ReferencePaths) - the reference paths property, which comes from the .USER file.
+        (1) $(ReferencePaths) - the reference paths property.
         (2) The hintpath from the referenced item itself, indicated by {HintPathFromItem}.
         (3) Treat the reference's Include as if it were a real file name.
-        (4) Path specified by the WixExtDir property.
 
     [IN]
     @(WixExtension) - WixExtension item group
@@ -431,20 +420,16 @@
     Condition=" '@(WixExtension)' != ''">
 
     <PropertyGroup>
-      <WixExtensionSearchPaths Condition=" '$(WixExtensionSearchPaths)' == '' ">$(ReferencePaths);{HintPathFromItem};{RawFileName};$(WixExtDir)</WixExtensionSearchPaths>
+      <WixExtensionSearchPaths Condition=" '$(WixExtensionSearchPaths)' == '' ">$(ReferencePaths);{HintPathFromItem};{RawFileName}</WixExtensionSearchPaths>
     </PropertyGroup>
 
     <ResolveWixReferences
       WixReferences="@(WixExtension)"
       SearchPaths="$(WixExtensionSearchPaths)"
       SearchFilenameExtensions=".wixext.dll">
-      <Output TaskParameter="ResolvedWixReferences" ItemName="_AllResolvedWixExtensionPaths" />
+      <Output TaskParameter="ResolvedWixReferences" ItemName="_ResolvedWixExtensionPaths" />
+      <Output TaskParameter="UnresolvedWixReferences" ItemName="_UnresolvedWixExtensionPaths" />
     </ResolveWixReferences>
-
-    <!-- Remove duplicate extension items that would cause build errors -->
-    <RemoveDuplicates Inputs="@(_AllResolvedWixExtensionPaths)">
-      <Output TaskParameter="Filtered" ItemName="_ResolvedWixExtensionPaths" />
-    </RemoveDuplicates>
   </Target>
 
   <!--
@@ -599,7 +584,6 @@
 
         Cultures="%(CultureGroup.Identity)"
 
-        ExtensionDirectory="$(WixExtDir)"
         Extensions="@(_ResolvedWixExtensionPaths)"
 
         IntermediateDirectory="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)"
@@ -615,7 +599,6 @@
         InstallerPlatform="$(InstallerPlatform)"
         NoLogo="true"
         Pedantic="$(Pedantic)"
-        ReferencePaths="$(ReferencePaths)"
 
         BindInputPaths="@(LinkerBindInputPaths)"
         BindFiles="$(BindFiles)"
