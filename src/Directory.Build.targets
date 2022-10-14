@@ -49,6 +49,10 @@
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
       <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(RepositoryUrl)'!='' ">$(RepositoryUrl)</ProjectUrl>
+
+      <WixMajorVersion>$(GitBaseVersionMajor)</WixMajorVersion>
+      <WixMinorVersion>$(GitBaseVersionMinor)</WixMinorVersion>
+      <WixPatchVersion>$(GitBaseVersionPatch)</WixPatchVersion>
     </PropertyGroup>
 
     <Message Importance="$(GitInfoReportImportance)" Text="Properties from Git:

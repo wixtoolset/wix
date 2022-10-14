@@ -6,7 +6,7 @@
     <title>$title$</title>
     <description>$description$</description>
     <authors>$authors$</authors>
-    <icon>wix-white-bg.png</icon>
+    <icon>wix.png</icon>
     <license type="expression">MS-RL</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
@@ -19,7 +19,7 @@
 
   <files>
     <file src="$projectFolder$\$id$.targets" target="build" />
-    <file src="$projectFolder$\..\..\internal\images\wix-white-bg.png" />
+    <file src="$projectFolder$\..\..\internal\images\wix.png" />
     <file src="net472\WixToolset.Dtf.MakeSfxCA.exe" target="tools" />
     <file src="net472\WixToolset.Dtf.MakeSfxCA.exe.config" target="tools" />
     <file src="net472\WixToolset.Dtf.Compression.dll" target="tools" />

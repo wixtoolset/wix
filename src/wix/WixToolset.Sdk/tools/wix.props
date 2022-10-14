@@ -4,8 +4,12 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <WixPropsImported>true</WixPropsImported>
-    <WixToolsetVersion>$$WixToolsetVersion$$</WixToolsetVersion>
+    <WixToolsetMajorVersion>$$WixToolsetMajorVersion$$</WixToolsetMajorVersion>
+    <WixToolsetMinorVersion>$$WixToolsetMinorVersion$$</WixToolsetMinorVersion>
+    <WixToolsetPatchVersion>$$WixToolsetPatchVersion$$</WixToolsetPatchVersion>
     <WixToolsetMajorMinorVersion>$$WixToolsetMajorMinorVersion$$</WixToolsetMajorMinorVersion>
+    <WixToolsetVersion>$$WixToolsetVersion$$</WixToolsetVersion>
+    <WixToolsetExtensionPackageFolder>wixext4</WixToolsetExtensionPackageFolder>
   </PropertyGroup>
 
   <ImportGroup>
