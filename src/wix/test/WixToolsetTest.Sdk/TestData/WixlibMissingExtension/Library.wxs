@@ -1,0 +1,7 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+      <StandardDirectory Id="ProgramFilesFolder">
+          <Directory Id="WixLibFolder" />
+      </StandardDirectory>
+  </Fragment>
+</Wix>

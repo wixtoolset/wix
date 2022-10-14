@@ -18,8 +18,6 @@ namespace WixToolset.BuildTasks
 
         public ITaskItem[] Extensions { get; set; }
 
-        public string ExtensionDirectory { get; set; }
-
         public string[] IncludeSearchPaths { get; set; }
 
         public string InstallerPlatform { get; set; }
@@ -44,8 +42,6 @@ namespace WixToolset.BuildTasks
 
         [Required]
         public ITaskItem[] SourceFiles { get; set; }
-
-        public string[] ReferencePaths { get; set; }
 
         public ITaskItem[] BindInputPaths { get; set; }
 
@@ -75,7 +71,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-culture ", this.Cultures);
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
             commandLineBuilder.AppendArrayIfNotNull("-I ", this.IncludeSearchPaths);
-            commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);
+            commandLineBuilder.AppendArrayIfNotNull("-ext ", this.Extensions);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
             commandLineBuilder.AppendSwitchIfNotNull("-trackingfile ", this.BindTrackingFile);

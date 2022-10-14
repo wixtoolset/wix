@@ -4,9 +4,10 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.Build.Utilities;
-    using Microsoft.Build.Framework;
     using System.IO;
+    using System.Linq;
+    using Microsoft.Build.Framework;
+    using Microsoft.Build.Utilities;
 
     /// <summary>
     /// This task searches for paths to references using the order specified in SearchPaths.
@@ -15,14 +16,14 @@ namespace WixToolset.BuildTasks
     {
         /// <summary>
         /// Token value used in SearchPaths to indicate that the item's HintPath metadata should
-        /// be searched as a full file path to resolve the reference.  
+        /// be searched as a full file path to resolve the reference.
         /// Must match wix.targets, case sensitive.
         /// </summary>
         private const string HintPathToken = "{HintPathFromItem}";
 
         /// <summary>
         /// Token value used in SearchPaths to indicate that the item's Identity should
-        /// be searched as a full file path to resolve the reference.  
+        /// be searched as a full file path to resolve the reference.
         /// Must match wix.targets, case sensitive.
         /// </summary>
         private const string RawFileNameToken = "{RawFileName}";
@@ -34,24 +35,18 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] WixReferences { get; set; }
 
         /// <summary>
-        /// The directories or special locations that are searched to find the files 
-        /// on disk that represent the references. The order in which the search paths are listed 
-        /// is important. For each reference, the list of paths is searched from left to right. 
-        /// When a file that represents the reference is found, that search stops and the search 
-        /// for the next reference starts. 
-        /// 
-        /// This parameter accepts the following types of values: 
-        ///     A directory path. 
-        ///     {HintPathFromItem}: Specifies that the task will examine the HintPath metadata 
-        ///                         of the base item. 
-        ///     TODO : {CandidateAssemblyFiles}: Specifies that the task will examine the files 
-        ///                                      passed in through the CandidateAssemblyFiles parameter. 
-        ///     TODO : {Registry:_AssemblyFoldersBase_, _RuntimeVersion_, _AssemblyFoldersSuffix_}: 
-        ///     TODO : {AssemblyFolders}: Specifies the task will use the Visual Studio.NET 2003 
-        ///                               finding-assemblies-from-registry scheme. 
-        ///     TODO : {GAC}: Specifies the task will search in the GAC. 
-        ///     {RawFileName}: Specifies the task will consider the Include value of the item to be 
-        ///                    an exact path and file name. 
+        /// The directories or special locations that are searched to find the files
+        /// on disk that represent the references. The order in which the search paths are listed
+        /// is important. For each reference, the list of paths is searched from left to right.
+        /// When a file that represents the reference is found, that search stops and the search
+        /// for the next reference starts.
+        ///
+        /// This parameter accepts the following types of values:
+        ///     A directory path.
+        ///     {HintPathFromItem}: Specifies that the task will examine the HintPath metadata
+        ///                         of the base item.
+        ///     {RawFileName}: Specifies the task will consider the Include value of the item to be
+        ///                    an exact path and file name.
         /// </summary>
         public string[] SearchPaths { get; set; }
 
@@ -67,22 +62,37 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] ResolvedWixReferences { get; private set; }
 
         /// <summary>
+        /// Output items that contain the same metadata as input references and cannot be found.
+        /// </summary>
+        [Output]
+        public ITaskItem[] UnresolvedWixReferences { get; private set; }
+
+        /// <summary>
         /// Resolves reference paths by searching for referenced items using the specified SearchPaths.
         /// </summary>
         /// <returns>True on success, or throws an exception on failure.</returns>
         public override bool Execute()
         {
             var resolvedReferences = new List<ITaskItem>();
+            var unresolvedReferences = new List<ITaskItem>();
             var uniqueReferences = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var reference in this.WixReferences)
+            foreach (var reference in this.WixReferences.Where(r => !String.IsNullOrWhiteSpace(r.ItemSpec)))
             {
-                var resolvedReference = ResolveWixReferences.ResolveReference(reference, this.SearchPaths, this.SearchFilenameExtensions, this.Log);
+                (var resolvedReference, var found) = this.ResolveReference(reference, this.SearchPaths, this.SearchFilenameExtensions);
 
                 if (uniqueReferences.Add(resolvedReference.ItemSpec))
                 {
-                    this.Log.LogMessage(MessageImportance.Low, "Resolved path {0}", resolvedReference.ItemSpec);
-                    resolvedReferences.Add(resolvedReference);
+                    if (found)
+                    {
+                        this.Log.LogMessage(MessageImportance.Low, "Resolved path {0}", resolvedReference.ItemSpec);
+                        resolvedReferences.Add(resolvedReference);
+                    }
+                    else
+                    {
+                        this.Log.LogWarning(null, "WXE0001", null, null, 0, 0, 0, 0, "Unable to find extension {0}.", resolvedReference.ItemSpec);
+                        unresolvedReferences.Add(resolvedReference);
+                    }
                 }
                 else
                 {
@@ -91,6 +101,7 @@ namespace WixToolset.BuildTasks
             }
 
             this.ResolvedWixReferences = resolvedReferences.ToArray();
+            this.UnresolvedWixReferences = unresolvedReferences.ToArray();
             return true;
         }
 
@@ -101,80 +112,76 @@ namespace WixToolset.BuildTasks
         /// <param name="reference">The referenced item.</param>
         /// <param name="searchPaths">The paths to search.</param>
         /// <param name="searchFilenameExtensions">Filename extensions to check.</param>
-        /// <param name="log">Logging helper.</param>
         /// <returns>The resolved reference item, or the original reference if it could not be resolved.</returns>
-        public static ITaskItem ResolveReference(ITaskItem reference, string[] searchPaths, string[] searchFilenameExtensions, TaskLoggingHelper log)
+        public (ITaskItem, bool) ResolveReference(ITaskItem reference, string[] searchPaths, string[] searchFilenameExtensions)
         {
-            if (reference == null)
-            {
-                throw new ArgumentNullException("reference");
-            }
-
-            if (searchPaths == null)
-            {
-                // Nothing to search, so just return the original reference item.
-                return reference;
-            }
-
-            if (searchFilenameExtensions == null)
-            {
-                searchFilenameExtensions = new string[] { };
-            }
+            // Ensure we first check the reference without adding additional search filename extensions.
+            searchFilenameExtensions = searchFilenameExtensions == null ? new[] { String.Empty } : searchFilenameExtensions.Prepend(String.Empty).ToArray();
 
             // Copy all the metadata from the source
             var resolvedReference = new TaskItem(reference);
-            log.LogMessage(MessageImportance.Low, "WixReference: {0}", reference.ItemSpec);
+            this.Log.LogMessage(MessageImportance.Low, "WixReference: {0}", reference.ItemSpec);
 
-            // Now find the resolved path based on our order of precedence
+            var found = false;
+
+            // Nothing to search, so just resolve the original reference item.
+            if (searchPaths == null)
+            {
+                if (this.ResolveFilenameExtensions(resolvedReference, resolvedReference.ItemSpec, searchFilenameExtensions))
+                {
+                    found = true;
+                }
+
+                return (resolvedReference, found);
+            }
+
+            // Otherwise, now try to find the resolved path based on the order of precedence from search paths.
             foreach (var searchPath in searchPaths)
             {
-                log.LogMessage(MessageImportance.Low, "Trying {0}", searchPath);
-                if (searchPath.Equals(HintPathToken, StringComparison.Ordinal))
+                this.Log.LogMessage(MessageImportance.Low, "Trying {0}", searchPath);
+                if (HintPathToken.Equals(searchPath, StringComparison.Ordinal))
                 {
                     var path = reference.GetMetadata("HintPath");
-                    log.LogMessage(MessageImportance.Low, "Trying path {0}", path);
+                    if (String.IsNullOrWhiteSpace(path))
+                    {
+                        continue;
+                    }
+
+                    this.Log.LogMessage(MessageImportance.Low, "Trying path {0}", path);
                     if (File.Exists(path))
                     {
                         resolvedReference.ItemSpec = path;
+                        found = true;
                         break;
                     }
                 }
-                else if (searchPath.Equals(RawFileNameToken, StringComparison.Ordinal))
+                else if (RawFileNameToken.Equals(searchPath, StringComparison.Ordinal))
                 {
-                    log.LogMessage(MessageImportance.Low, "Trying path {0}", resolvedReference.ItemSpec);
-                    if (File.Exists(resolvedReference.ItemSpec))
+                    if (this.ResolveFilenameExtensions(resolvedReference, resolvedReference.ItemSpec, searchFilenameExtensions))
                     {
-                        break;
-                    }
-
-                    if (ResolveWixReferences.ResolveFilenameExtensions(resolvedReference,
-                        resolvedReference.ItemSpec, searchFilenameExtensions, log))
-                    {
+                        found = true;
                         break;
                     }
                 }
                 else
                 {
-                    var path = Path.Combine(searchPath, Path.GetFileName(reference.ItemSpec));
-                    log.LogMessage(MessageImportance.Low, "Trying path {0}", path);
-                    if (File.Exists(path))
-                    {
-                        resolvedReference.ItemSpec = path;
-                        break;
-                    }
+                    var path = Path.Combine(searchPath, reference.ItemSpec);
 
-                    if (ResolveWixReferences.ResolveFilenameExtensions(resolvedReference,
-                        path, searchFilenameExtensions, log))
+                    if (this.ResolveFilenameExtensions(resolvedReference, path, searchFilenameExtensions))
                     {
+                        found = true;
                         break;
                     }
                 }
             }
 
-            // Normalize the item path
-            resolvedReference.ItemSpec = resolvedReference.GetMetadata("FullPath");
+            if (found)
+            {
+                // Normalize the item spec to the full path.
+                resolvedReference.ItemSpec = resolvedReference.GetMetadata("FullPath");
+            }
 
-            return resolvedReference;
+            return (resolvedReference, found);
         }
 
         /// <summary>
@@ -183,14 +190,14 @@ namespace WixToolset.BuildTasks
         /// <param name="reference">The reference being resolved.</param>
         /// <param name="basePath">Full filename path without extension.</param>
         /// <param name="filenameExtensions">Filename extensions to check.</param>
-        /// <param name="log">Logging helper.</param>
         /// <returns>True if the item was resolved, else false.</returns>
-        private static bool ResolveFilenameExtensions(ITaskItem reference, string basePath, string[] filenameExtensions, TaskLoggingHelper log)
+        private bool ResolveFilenameExtensions(ITaskItem reference, string basePath, string[] filenameExtensions)
         {
             foreach (var filenameExtension in filenameExtensions)
             {
                 var path = basePath + filenameExtension;
-                log.LogMessage(MessageImportance.Low, "Trying path {0}", path);
+                this.Log.LogMessage(MessageImportance.Low, "Trying path {0}", path);
+
                 if (File.Exists(path))
                 {
                     reference.ItemSpec = path;
