@@ -197,6 +197,8 @@ namespace WixToolset.Core.ExtensionCache
 
                 var extensionFolder = Path.Combine(cacheFolder, id, nugetVersion.ToString());
 
+                var extensionPackageRootFolderName = this.ExtensionManager.GetExtensionPackageRootFolderName();
+
                 foreach (var source in searchSources)
                 {
                     var repository = Repository.Factory.GetCoreV3(source.Source);
@@ -214,7 +216,7 @@ namespace WixToolset.Core.ExtensionCache
 
                             using (var archive = new PackageArchiveReader(stream))
                             {
-                                var files = PackagingConstants.Folders.Known.SelectMany(folder => archive.GetFiles(folder)).Distinct(StringComparer.OrdinalIgnoreCase);
+                                var files = archive.GetFiles(extensionPackageRootFolderName);
                                 await archive.CopyFilesAsync(extensionFolder, files, this.ExtractProgress, logger, cancellationToken);
                             }
 

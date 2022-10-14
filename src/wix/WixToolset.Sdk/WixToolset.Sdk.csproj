@@ -31,13 +31,31 @@
     <XmlPoke
       XmlInputPath="$(PublishDir)tools\wix.props"
       Namespaces="$(Namespaces)"
-      Query="//msb:WixToolsetVersion"
-      Value="$(Version)" />
+      Query="//msb:WixToolsetMajorVersion"
+      Value="$(WixMajorVersion)" />
+
+    <XmlPoke
+      XmlInputPath="$(PublishDir)tools\wix.props"
+      Namespaces="$(Namespaces)"
+      Query="//msb:WixToolsetMinorVersion"
+      Value="$(WixMinorVersion)" />
+
+    <XmlPoke
+      XmlInputPath="$(PublishDir)tools\wix.props"
+      Namespaces="$(Namespaces)"
+      Query="//msb:WixToolsetPatchVersion"
+      Value="$(WixPatchVersion)" />
 
     <XmlPoke
       XmlInputPath="$(PublishDir)tools\wix.props"
       Namespaces="$(Namespaces)"
       Query="//msb:WixToolsetMajorMinorVersion"
       Value="$(MajorMinorVersion)" />
+
+    <XmlPoke
+      XmlInputPath="$(PublishDir)tools\wix.props"
+      Namespaces="$(Namespaces)"
+      Query="//msb:WixToolsetVersion"
+      Value="$(Version)" />
   </Target>
 </Project>

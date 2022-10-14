@@ -15,8 +15,11 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class ExtensionManager : IExtensionManager
     {
-        private const string UserWixFolderName = ".wix4";
-        private const string MachineWixFolderName = "WixToolset4";
+        // This value needs to stay in sync with the Property in "wix.targets" with the same name.
+        private const string WixToolsetExtensionPackageFolder = "wixext4";
+
+        private const string UserWixFolderName = ".wix";
+        private const string MachineWixFolderName = "WixToolset";
         private const string ExtensionsFolderName = "extensions";
         private const string UserEnvironmentName = "WIX_EXTENSIONS";
 
@@ -70,7 +73,7 @@ namespace WixToolset.Core.ExtensibilityServices
                                 continue;
                             }
 
-                            checkPath = Path.Combine(extensionFolder, versionFolder, "tools", extensionId + ".dll");
+                            checkPath = Path.Combine(extensionFolder, versionFolder, WixToolsetExtensionPackageFolder, extensionId + ".dll");
                             checkedPaths.Add(checkPath);
 
                             if (TryLoadFromPath(checkPath, out assembly))
@@ -126,6 +129,11 @@ namespace WixToolset.Core.ExtensibilityServices
             locations.Add(new ExtensionCacheLocation(path, ExtensionCacheLocationScope.Machine));
 
             return locations;
+        }
+
+        public string GetExtensionPackageRootFolderName()
+        {
+            return WixToolsetExtensionPackageFolder;
         }
 
         public IReadOnlyCollection<T> GetServices<T>() where T : class

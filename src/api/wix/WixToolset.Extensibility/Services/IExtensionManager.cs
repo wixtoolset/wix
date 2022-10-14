@@ -40,6 +40,12 @@ namespace WixToolset.Extensibility.Services
         IReadOnlyCollection<IExtensionCacheLocation> GetCacheLocations();
 
         /// <summary>
+        /// Gets the root folder name used in extension's package.
+        /// </summary>
+        /// <returns>Root folder name to find extension in a package.</returns>
+        string GetExtensionPackageRootFolderName();
+
+        /// <summary>
         /// Gets extensions of specified type from factories loaded into the extension manager.
         /// </summary>
         /// <typeparam name="T">Type of extension to get.</typeparam>

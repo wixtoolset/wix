@@ -16,11 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.Core.TestPackage" />
   </ItemGroup>
-
-  <Target Name="CopyExtensions" AfterTargets="Build">
-    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(WixExtension)" />
-  </Target>
 </Project>

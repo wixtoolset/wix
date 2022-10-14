@@ -10,16 +10,13 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\wixlib\util.wixproj"
-                      OutputItemType="EmbeddedResource"
-                      ReferenceOutputAssembly="false"
-                      SkipGetTargetFrameworkProperties="true"
-                      />
-    <EmbeddedResource Include="$(OutputPath)..\util.wixlib" Condition=" '$(NCrunch)'=='1' " />
-  </ItemGroup>
+  <Import Project="..\..\WixExt.props" />
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
+    <EmbeddedResource Include="$(OutputPath)..\util.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\util.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 </Project>

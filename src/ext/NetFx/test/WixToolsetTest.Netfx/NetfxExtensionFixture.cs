@@ -21,13 +21,19 @@ namespace WixToolsetTest.Netfx
                 var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
+                var extensionResult = WixRunner.Execute(new[]
+                {
+                    "extension", "add",
+                    "WixToolset.Bal.wixext"
+                });
+
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
                     Path.Combine(bundleSourceFolder, "NetCore3.1.12_x86.wxs"),
                     Path.Combine(bundleSourceFolder, "NetCore3.1.12_x64.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-ext", "WixToolset.Bal.wixext",
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
@@ -48,12 +54,18 @@ namespace WixToolsetTest.Netfx
                 var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
+                var extensionResult = WixRunner.Execute(new[]
+                {
+                    "extension", "add",
+                    "WixToolset.Bal.wixext"
+                });
+
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest_x64.wxs"),
                     Path.Combine(bundleSourceFolder, "NetCore3.1.12_x64.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-ext", "WixToolset.Bal.wixext",
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,

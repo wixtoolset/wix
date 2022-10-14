@@ -190,7 +190,7 @@ namespace WixToolsetTest.CoreIntegration
 
                     result.AssertSuccess();
 
-                    var cacheFolder = Path.Combine(folder, ".wix4", "extensions", "WixToolset.UI.wixext");
+                    var cacheFolder = Path.Combine(folder, ".wix", "extensions", "WixToolset.UI.wixext");
                     Assert.True(Directory.Exists(cacheFolder), $"Expected folder '{cacheFolder}' to exist");
 
                     result = WixRunner.Execute(new[]

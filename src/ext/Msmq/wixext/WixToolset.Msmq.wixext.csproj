@@ -10,15 +10,13 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
+  <Import Project="..\..\WixExt.props" />
+
   <ItemGroup>
     <EmbeddedResource Include="$(OutputPath)..\msmq.wixlib" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">
     <ProjectReference Include="..\wixlib\msmq.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>
 </Project>
