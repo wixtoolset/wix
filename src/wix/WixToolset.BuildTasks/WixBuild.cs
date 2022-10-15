@@ -43,7 +43,7 @@ namespace WixToolset.BuildTasks
         [Required]
         public ITaskItem[] SourceFiles { get; set; }
 
-        public ITaskItem[] BindInputPaths { get; set; }
+        public ITaskItem[] BindPaths { get; set; }
 
         public bool BindFiles { get; set; }
 
@@ -89,9 +89,9 @@ namespace WixToolset.BuildTasks
 
         private IEnumerable<string> CalculateBindPathStrings()
         {
-            if (null != this.BindInputPaths)
+            if (null != this.BindPaths)
             {
-                foreach (var item in this.BindInputPaths)
+                foreach (var item in this.BindPaths)
                 {
                     var path = item.GetMetadata("FullPath");
 

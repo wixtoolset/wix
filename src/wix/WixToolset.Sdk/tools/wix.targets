@@ -158,21 +158,17 @@
   ***********************************************************************************************
   -->
 
-  <!-- If WixExtension was passed in via the command line, then convert it to an ItemGroup -->
-  <ItemGroup>
-    <WixExtension Include="$(WixExtension)"  Condition=" '$(WixExtension)' != '' " />
-  </ItemGroup>
-
   <!-- Default Compiler properties. -->
   <PropertyGroup>
     <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and '$(Platform)' != 'AnyCPU' and '$(Platform)' != 'Any CPU' ">$(Platform)</InstallerPlatform>
   </PropertyGroup>
 
-  <!-- If BindInputPaths (or LinkerBindInputPaths) was passed in via the command line, then convert it to an ItemGroup -->
+  <!-- Convert legacy BindInputPaths and LinkerBindInputPaths (in the project or passed in via the command line) into the new BindPath items -->
   <ItemGroup>
     <BindInputPaths Include="$(BindInputPaths)"  Condition=" '$(BindInputPaths)' != '' " />
     <LinkerBindInputPaths Include="$(LinkerBindInputPaths)"  Condition=" '$(LinkerBindInputPaths)' != '' " />
-    <LinkerBindInputPaths Condition=" '@(LinkerBindInputPaths)' == '' " Include="@(BindInputPaths)" />
+    <BindPath Include="$(BindPath)"  Condition=" '$(BindPath)' != '' " />
+    <BindPath Include="@(BindInputPaths);@(LinkerBindInputPaths)" />
   </ItemGroup>
 
   <!--
@@ -308,7 +304,7 @@
 
     [OUT]
     $(ProjectReferenceDefineConstants) - Define constants from project references.
-    @(LinkerBindInputPaths) - Bind paths from project references.
+    @(BindPath) - Bind paths from project references.
     @(WixLibrary) - Target paths from .vcxproj outputs added.
     @(_WixReferencedProjectOutputs) - Copy of _ResolvedProjectReferencePaths for use in up-to-date checks.
     @(_ResolvedProjectReferencePaths) - All resolved reference paths emptied.
@@ -336,7 +332,7 @@
     <CreateProjectReferenceDefineConstantsAndBindPaths
         ResolvedProjectReferences="@(_ResolvedProjectReferencePaths)"
         ProjectConfigurations="$(VSProjectConfigurations)">
-      <Output TaskParameter="BindPaths" ItemName="LinkerBindInputPaths" />
+      <Output TaskParameter="BindPaths" ItemName="BindPath" />
       <Output TaskParameter="DefineConstants" PropertyName="ProjectReferenceDefineConstants" />
     </CreateProjectReferenceDefineConstantsAndBindPaths>
 
@@ -603,7 +599,7 @@
         NoLogo="true"
         Pedantic="$(Pedantic)"
 
-        BindInputPaths="@(LinkerBindInputPaths)"
+        BindPaths="@(BindPath)"
         BindFiles="$(BindFiles)"
         BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)"
 

@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <BindInputPaths Include="data" />
+    <BindPath Include="data" />
   </ItemGroup>
 
   <Import Project="$(WixTargetsPath)" />
