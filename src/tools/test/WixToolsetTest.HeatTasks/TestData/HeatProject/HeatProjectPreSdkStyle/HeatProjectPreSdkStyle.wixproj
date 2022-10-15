@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
 
   <ItemGroup>
-    <BindInputPaths Include="." />
+    <BindPath Include="." />
   </ItemGroup>
   
   <PropertyGroup>

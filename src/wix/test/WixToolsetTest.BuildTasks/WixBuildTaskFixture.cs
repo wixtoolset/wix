@@ -45,7 +45,7 @@ namespace WixToolsetTest.BuildTasks
                     {
                         new TaskItem(Path.Combine(folder, "Package.en-us.wxl")),
                     },
-                    BindInputPaths = new[]
+                    BindPaths = new[]
                     {
                         new TaskItem(Path.Combine(folder, "data")),
                     },
