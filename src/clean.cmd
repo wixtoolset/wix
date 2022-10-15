@@ -18,6 +18,7 @@ if exist ..\Directory.Packages.props (del ..\Directory.Packages.props)
 if exist ..\global.json (del ..\global.json)
 
 if exist "%_NUGET_CACHE%\wixbuildtools.testsupport" rd /s/q "%_NUGET_CACHE%\wixbuildtools.testsupport"
+if exist "%_NUGET_CACHE%\wixtoolset.basebuildtasks.sources" rd /s/q "%_NUGET_CACHE%\wixtoolset.basebuildtasks.sources"
 if exist "%_NUGET_CACHE%\wixtoolset.bal.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bal.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.balutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.balutil"
 if exist "%_NUGET_CACHE%\wixtoolset.bextutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.bextutil"
@@ -45,6 +46,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.netfx.wixext" rd /s/q "%_NUGET_CACHE%\wixtoo
 if exist "%_NUGET_CACHE%\wixtoolset.sdk" rd /s/q "%_NUGET_CACHE%\wixtoolset.sdk"
 if exist "%_NUGET_CACHE%\wixtoolset.util.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.util.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.ui.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.ui.wixext"
+if exist "%_NUGET_CACHE%\wixtoolset.versioning" rd /s/q "%_NUGET_CACHE%\wixtoolset.versioning"
 if exist "%_NUGET_CACHE%\wixtoolset.wcautil" rd /s/q "%_NUGET_CACHE%\wixtoolset.wcautil"
 if exist "%_NUGET_CACHE%\wix" rd /s/q "%_NUGET_CACHE%\wix"
 
