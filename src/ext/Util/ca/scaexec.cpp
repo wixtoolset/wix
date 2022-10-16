@@ -519,10 +519,8 @@ static HRESULT ModifyUserLocalBatchRight(
     return hr;
 }
 
-static HRESULT ApplyAttributes(int iAttributes, DWORD* pFlags)
+static void ApplyAttributes(int iAttributes, DWORD* pFlags)
 {
-    HRESULT hr = S_OK;
-
     if (SCAU_DONT_EXPIRE_PASSWRD & iAttributes)
     {
         *pFlags |= UF_DONT_EXPIRE_PASSWD;
@@ -558,14 +556,10 @@ static HRESULT ApplyAttributes(int iAttributes, DWORD* pFlags)
     {
         *pFlags &= ~UF_PASSWORD_EXPIRED;
     }
-
-    return hr;
 }
 
-static HRESULT ApplyComment(int iAttributes, LPWSTR pwzComment, LPWSTR* ppComment)
+static void ApplyComment(int iAttributes, LPWSTR pwzComment, LPWSTR* ppComment)
 {
-    HRESULT hr = S_OK;
-
     if (SCAU_REMOVE_COMMENT & iAttributes)
     {
         *ppComment = L"";
@@ -574,32 +568,36 @@ static HRESULT ApplyComment(int iAttributes, LPWSTR pwzComment, LPWSTR* ppCommen
     {
         *ppComment = pwzComment;
     }
-
-    return hr;
 }
 
 static NET_API_STATUS SetUserPassword(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in LPWSTR pwzPassword)
 {
-    _USER_INFO_1003 userInfo1003;
+    NET_API_STATUS er = NERR_Success;
+    _USER_INFO_1003 userInfo1003 = { };
 
     userInfo1003.usri1003_password = pwzPassword;
-    return ::NetUserSetInfo(pwzServerName, pwzName, 1003, reinterpret_cast<LPBYTE>(&userInfo1003), NULL);
+    er = ::NetUserSetInfo(pwzServerName, pwzName, 1003, reinterpret_cast<LPBYTE>(&userInfo1003), NULL);
+    return HRESULT_FROM_WIN32(er);
 }
 
-static NET_API_STATUS SetUserComment(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in LPWSTR pwzComment)
+static HRESULT SetUserComment(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in LPWSTR pwzComment)
 {
-    _USER_INFO_1007 userInfo1007;
+    NET_API_STATUS er = NERR_Success;
+    _USER_INFO_1007 userInfo1007 = { };
 
     userInfo1007.usri1007_comment = pwzComment;
-    return ::NetUserSetInfo(pwzServerName, pwzName, 1007, reinterpret_cast<LPBYTE>(&userInfo1007), NULL);
+    er = ::NetUserSetInfo(pwzServerName, pwzName, 1007, reinterpret_cast<LPBYTE>(&userInfo1007), NULL);
+    return HRESULT_FROM_WIN32(er);
 }
 
-static NET_API_STATUS SetUserFlags(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in DWORD flags)
+static HRESULT SetUserFlags(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in DWORD flags)
 {
-    _USER_INFO_1008 userInfo1008;
+    NET_API_STATUS er = NERR_Success;
+    _USER_INFO_1008 userInfo1008 = { };
 
     userInfo1008.usri1008_flags = flags;
-    return ::NetUserSetInfo(pwzServerName, pwzName, 1008, reinterpret_cast<LPBYTE>(&userInfo1008), NULL);
+    er = ::NetUserSetInfo(pwzServerName, pwzName, 1008, reinterpret_cast<LPBYTE>(&userInfo1008), NULL);
+    return HRESULT_FROM_WIN32(er);
 }
 
 static HRESULT RemoveUserInternal(
@@ -717,12 +715,10 @@ LExit:
     return hr;
 }
 
-static HRESULT GetServerName(LPWSTR pwzDomain, LPWSTR* ppwzServerName)
+static void GetServerName(LPWSTR pwzDomain, LPWSTR* ppwzServerName)
 {
-    HRESULT hr = S_OK;
-
+    DWORD er = ERROR_SUCCESS;
     PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
-    UINT er;
 
     if (pwzDomain && *pwzDomain)
     {
@@ -732,12 +728,18 @@ static HRESULT GetServerName(LPWSTR pwzDomain, LPWSTR* ppwzServerName)
             // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
             er = ::DsGetDcNameW(NULL, (LPCWSTR)pwzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo);
         }
-        if (ERROR_SUCCESS == er
-         && 2 <= wcslen(pDomainControllerInfo->DomainControllerName)
-         && '\\' == *pDomainControllerInfo->DomainControllerName
-         && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
+
+        if (ERROR_SUCCESS == er && pDomainControllerInfo->DomainControllerName)
         {
-            *ppwzServerName = pDomainControllerInfo->DomainControllerName + 2;  // Skip the \\ prefix
+            // Skip the \\ prefix if present.
+            if ('\\' == *pDomainControllerInfo->DomainControllerName && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
+            {
+                *ppwzServerName = pDomainControllerInfo->DomainControllerName + 2;
+            }
+            else
+            {
+                *ppwzServerName = pDomainControllerInfo->DomainControllerName;
+            }
         }
         else
         {
@@ -749,8 +751,6 @@ static HRESULT GetServerName(LPWSTR pwzDomain, LPWSTR* ppwzServerName)
     {
         ::NetApiBufferFree((LPVOID)pDomainControllerInfo);
     }
-
-    return hr;
 }
 
 /********************************************************************
@@ -837,29 +837,27 @@ extern "C" UINT __stdcall CreateUser(
         pUserInfo1->usri1_password = pwzPassword;
 
         // Set the user's comment
-        hr = ApplyComment(iAttributes, pwzComment, &pUserInfo1->usri1_comment);
-        ExitOnFailure(hr, "failed to apply comment");
+        ApplyComment(iAttributes, pwzComment, &pUserInfo1->usri1_comment);
 
         // Set the user's flags
-        hr = ApplyAttributes(iAttributes, &pUserInfo1->usri1_flags);
-        ExitOnFailure(hr, "failed to apply attributes");
+        ApplyAttributes(iAttributes, &pUserInfo1->usri1_flags);
 
         //
         // Create the User
         //
-        hr = GetServerName(pwzDomain, &pwzServerName);
-        ExitOnFailure(hr, "failed to get server name");
+        GetServerName(pwzDomain, &pwzServerName);
 
         er = ::NetUserAdd(pwzServerName, 1, reinterpret_cast<LPBYTE>(pUserInfo1), &dw);
         if (NERR_UserExists == er)
         {
-            er = ERROR_SUCCESS; // Make sure that we don't report this situation as an error
-                                // if we fall through the tests that follow.
             if (SCAU_FAIL_IF_EXISTS & iAttributes)
             {
                 hr = HRESULT_FROM_WIN32(er);
                 ExitOnFailure(hr, "User was not supposed to exist, but does.");
             }
+
+            er = ERROR_SUCCESS; // Make sure that we don't report this situation as an error
+                                // if we fall through the tests that follow.
 
             if (SCAU_UPDATE_IF_EXISTS & iAttributes)
             {
@@ -890,6 +888,7 @@ extern "C" UINT __stdcall CreateUser(
                             if (FAILED(hr))
                             {
                                 WcaLogError(hr, "failed to get existing user rights: %ls, continuing anyway.", pwzName);
+                                hr = S_OK;
                             }
                             else
                             {
@@ -923,41 +922,41 @@ extern "C" UINT __stdcall CreateUser(
 
                 if (ERROR_SUCCESS == er)
                 {
-                    hr = HRESULT_FROM_WIN32(::SetUserPassword(pwzServerName, pwzName, pwzPassword));
+                    hr = SetUserPassword(pwzServerName, pwzName, pwzPassword);
                     if (FAILED(hr))
                     {
                         WcaLogError(hr, "failed to set user password for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                        hr = S_OK;
                     }
 
                     if (SCAU_REMOVE_COMMENT & iAttributes)
                     {
-                        hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, L""));
+                        hr = SetUserComment(pwzServerName, pwzName, L"");
                         if (FAILED(hr))
                         {
                             WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                            hr = S_OK;
                         }
                     }
                     else if (pwzComment && *pwzComment)
                     {
-                        hr = HRESULT_FROM_WIN32(SetUserComment(pwzServerName, pwzName, pwzComment));
+                        hr = SetUserComment(pwzServerName, pwzName, pwzComment);
                         if (FAILED(hr))
                         {
                             WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
+                            hr = S_OK;
                         }
                     }
 
                     DWORD flags = pUserInfo1->usri1_flags;
 
-                    hr = ApplyAttributes(iAttributes, &flags);
-                    if (FAILED(hr))
-                    {
-                        WcaLogError(hr, "failed to apply attributes for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
-                    }
+                    ApplyAttributes(iAttributes, &flags);
 
-                    hr = HRESULT_FROM_WIN32(SetUserFlags(pwzServerName, pwzName, flags));
+                    hr = SetUserFlags(pwzServerName, pwzName, flags);
                     if (FAILED(hr))
                     {
                         WcaLogError(hr, "failed to set user flags for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                        hr = S_OK;
                     }
                 }
             }
@@ -985,13 +984,13 @@ extern "C" UINT __stdcall CreateUser(
         MessageExitOnFailure(hr, msierrUSRFailedGrantLogonAsService, "Failed to grant logon as batch job rights to user: %ls", pwzName);
     }
 
-//
-// Add the users to groups
-//
-while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
-{
-    hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
-    ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
+    //
+    // Add the users to groups
+    //
+    while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
+    {
+        hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
+        ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
 
         WcaLog(LOGMSG_STANDARD, "Adding user %ls\\%ls to group %ls\\%ls", pwzDomain, pwzName, pwzGroupDomain, pwzGroup);
         hr = AddUserToGroup(pwzName, pwzDomain, pwzGroup, pwzGroupDomain);
@@ -1001,10 +1000,7 @@ while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
     {
         hr = S_OK;
     }
-
-    ExitOnFailure(hr, "failed to get next group in which to include user:%ls", pwzName);
-
-ExitOnFailure(hr, "failed to get next group in which to include user:%ls", pwzName);
+    ExitOnFailure(hr, "failed to get next group in which to include user: %ls", pwzName);
 
 LExit:
     WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
