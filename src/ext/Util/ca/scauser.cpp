@@ -533,13 +533,16 @@ HRESULT ScaUserExecute(
                 // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
                 er = ::DsGetDcNameW(NULL, wzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo);
             }
-            if (ERROR_SUCCESS == er)
+            if (ERROR_SUCCESS == er && pDomainControllerInfo->DomainControllerName)
             {
-                if (2 <= wcslen(pDomainControllerInfo->DomainControllerName))
+                // If the  \\ prefix on the queried domain was present, skip it.
+                if ('\\' == *pDomainControllerInfo->DomainControllerName && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
                 {
-                    wzDomain = pDomainControllerInfo->DomainControllerName + 2; // Add 2 so that we don't get the \\ prefix.
-                                                                                // Pass the entire string if it is too short
-                                                                                // to have a \\ prefix.
+                    wzDomain = pDomainControllerInfo->DomainControllerName + 2;
+                }
+                else
+                {
+                    wzDomain = pDomainControllerInfo->DomainControllerName;
                 }
             }
         }
@@ -672,7 +675,7 @@ HRESULT ScaUserExecute(
             // CustomAction.
             hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RemoveUser"), pwzActionData, COST_USER_DELETE);
             ExitOnFailure(hr, "failed to schedule RemoveUser");
-       }
+        }
 
         ReleaseNullStr(pwzScriptKey);
         ReleaseNullStr(pwzActionData);
