@@ -45,7 +45,6 @@
     <PackageVersion Include="System.DirectoryServices" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
-    <!-- Warning: The version for System.IO.FileSystem.AccessControl must be kept in sync with WixToolset.Core.Native.nuspec -->
     <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
     <PackageVersion Include="System.Reflection.Metadata" Version="1.6.0" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="4.7.0" />
@@ -73,15 +72,14 @@
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
   </ItemGroup>
 
+  <!-- Keep the following versions in sync with internal\WixBuildTools.TestSupport.Native\packages.config -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="GitInfo" Version="2.2.0" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-    <PackageVersion Include="xunit" Version="2.4.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+    <PackageVersion Include="xunit" Version="2.4.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageVersion Include="xunit.assert" Version="2.4.1" />
+    <PackageVersion Include="xunit.assert" Version="2.4.2" />
   </ItemGroup>
 </Project>

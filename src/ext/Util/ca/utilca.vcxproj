@@ -96,8 +96,8 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.WcaUtil" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" />
-    <PackageReference Include="GitInfo" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
