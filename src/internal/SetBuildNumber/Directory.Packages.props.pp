@@ -59,9 +59,9 @@
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.14.114" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="4.7.0" />
 
-    <PackageVersion Include="NuGet.Credentials" Version="5.6.0" />
-    <PackageVersion Include="NuGet.Protocol" Version="5.6.0" />
-    <PackageVersion Include="NuGet.Versioning" Version="5.6.0" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.3.1" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.3.1" />
+    <PackageVersion Include="NuGet.Versioning" Version="6.3.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
