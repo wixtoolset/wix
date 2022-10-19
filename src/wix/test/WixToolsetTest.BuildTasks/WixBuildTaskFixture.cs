@@ -26,6 +26,14 @@ namespace WixToolsetTest.BuildTasks
         {
             var folder = TestData.Get("TestData", "SimpleMsiPackage", "MsiPackage");
 
+            var wixExeFolder = PublishedWixExeFolder;
+
+            // TODO: See https://github.com/wixtoolset/issues/issues/6960 - fallback to x86 until we have a wix.exe that supports all platforms.
+            if (!Directory.Exists(wixExeFolder))
+            {
+                wixExeFolder = Path.Combine(Path.GetDirectoryName(wixExeFolder), "x86");
+            }
+
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
@@ -54,7 +62,7 @@ namespace WixToolsetTest.BuildTasks
                     PdbType = "Full",
                     PdbFile = new TaskItem(pdbPath),
                     DefaultCompressionLevel = "nOnE",
-                    ToolPath = PublishedWixExeFolder
+                    ToolPath = wixExeFolder
                 };
 
                 var result = task.Execute();
