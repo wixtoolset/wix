@@ -45,29 +45,40 @@
     <PackageVersion Include="System.DirectoryServices" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
-    <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
+    <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
     <PackageVersion Include="System.Reflection.Metadata" Version="1.6.0" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="4.7.0" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.6.0" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.7.0" />
     <PackageVersion Include="System.Text.Json" Version="4.6.0" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.14.114" />
+    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.16.30" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="4.7.0" />
+  </ItemGroup>
 
+  <!--
+    Refer to this documentation when updating the versions of these packages:
+    https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md
+  -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageVersion Include="NuGet.Credentials" Version="6.3.1" />
     <PackageVersion Include="NuGet.Protocol" Version="6.3.1" />
     <PackageVersion Include="NuGet.Versioning" Version="6.3.1" />
   </ItemGroup>
 
+  <!--
+    These MSBuild versions are trapped in antiquity for heat.exe.
+  -->
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3"/>
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
   </ItemGroup>
