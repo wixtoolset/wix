@@ -11,8 +11,39 @@ extern "C" {
 typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT
 {
     BURN_ENGINE_STATE* pEngineState;
-    DWORD dwThreadId;
+    QUEUTIL_QUEUE_HANDLE hQueue;
+    HANDLE hQueueSemaphore;
+    CRITICAL_SECTION csQueue;
 } BOOTSTRAPPER_ENGINE_CONTEXT;
+
+typedef struct _BOOTSTRAPPER_ENGINE_ACTION
+{
+    WM_BURN dwMessage;
+    union
+    {
+        struct
+        {
+            HWND hwndParent;
+        } detect;
+        struct
+        {
+            BOOTSTRAPPER_ACTION action;
+        } plan;
+        struct
+        {
+            HWND hwndParent;
+        } elevate;
+        struct
+        {
+            HWND hwndParent;
+        } apply;
+        BURN_LAUNCH_APPROVED_EXE launchApprovedExe;
+        struct
+        {
+            DWORD dwExitCode;
+        } quit;
+    };
+} BOOTSTRAPPER_ENGINE_ACTION;
 
 // function declarations
 

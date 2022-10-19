@@ -106,7 +106,6 @@ extern "C" void ApprovedExesUninitializeLaunch(
         ReleaseStr(pLaunchApprovedExe->sczArguments);
         ReleaseStr(pLaunchApprovedExe->sczExecutablePath);
         ReleaseStr(pLaunchApprovedExe->sczId);
-        MemFree(pLaunchApprovedExe);
     }
 }
 

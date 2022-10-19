@@ -3824,15 +3824,14 @@ static HRESULT OnLaunchApprovedExe(
 {
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
-    BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = NULL;
+    BURN_LAUNCH_APPROVED_EXE launchApprovedExe = { };
+    BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = &launchApprovedExe;
     BURN_APPROVED_EXE* pApprovedExe = NULL;
     HKEY hKey = NULL;
     DWORD dwProcessId = 0;
     BYTE* pbSendData = NULL;
     SIZE_T cbSendData = 0;
     DWORD dwResult = 0;
-
-    pLaunchApprovedExe = (BURN_LAUNCH_APPROVED_EXE*)MemAlloc(sizeof(BURN_LAUNCH_APPROVED_EXE), TRUE);
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &pLaunchApprovedExe->sczId);

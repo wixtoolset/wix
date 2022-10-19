@@ -13,6 +13,10 @@ static HRESULT ProcessUnknownEmbeddedMessages(
     __in_opt LPVOID /*pvContext*/,
     __out DWORD* pdwResult
     );
+static HRESULT EnqueueAction(
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __inout BOOTSTRAPPER_ENGINE_ACTION** ppAction
+    );
 
 // function definitions
 
@@ -582,69 +586,91 @@ HRESULT ExternalEngineCompareVersions(
 }
 
 HRESULT ExternalEngineDetect(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
-    if (!::PostThreadMessageW(dwThreadId, WM_BURN_DETECT, 0, reinterpret_cast<LPARAM>(hwndParent)))
-    {
-        ExitWithLastError(hr, "Failed to post detect message.");
-    }
+    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+
+    pAction->dwMessage = WM_BURN_DETECT;
+    pAction->detect.hwndParent = hwndParent;
+
+    hr = EnqueueAction(pEngineContext, &pAction);
+    ExitOnFailure(hr, "Failed to enqueue detect action.");
 
 LExit:
+    ReleaseMem(pAction);
+
     return hr;
 }
 
 HRESULT ExternalEnginePlan(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in const BOOTSTRAPPER_ACTION action
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
     if (BOOTSTRAPPER_ACTION_LAYOUT > action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED < action)
     {
         ExitOnRootFailure(hr = E_INVALIDARG, "BA passed invalid action to Plan: %u.", action);
     }
 
-    if (!::PostThreadMessageW(dwThreadId, WM_BURN_PLAN, 0, action))
-    {
-        ExitWithLastError(hr, "Failed to post plan message.");
-    }
+    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+
+    pAction->dwMessage = WM_BURN_PLAN;
+    pAction->plan.action = action;
+
+    hr = EnqueueAction(pEngineContext, &pAction);
+    ExitOnFailure(hr, "Failed to enqueue plan action.");
 
 LExit:
+    ReleaseMem(pAction);
+
     return hr;
 }
 
 HRESULT ExternalEngineElevate(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
-    if (INVALID_HANDLE_VALUE != pEngineState->companionConnection.hPipe)
+    if (INVALID_HANDLE_VALUE != pEngineContext->pEngineState->companionConnection.hPipe)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED);
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED));
     }
-    else if (!::PostThreadMessageW(dwThreadId, WM_BURN_ELEVATE, 0, reinterpret_cast<LPARAM>(hwndParent)))
-    {
-        ExitWithLastError(hr, "Failed to post elevate message.");
-    }
+
+    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+
+    pAction->dwMessage = WM_BURN_ELEVATE;
+    pAction->elevate.hwndParent = hwndParent;
+
+    hr = EnqueueAction(pEngineContext, &pAction);
+    ExitOnFailure(hr, "Failed to enqueue elevate action.");
 
 LExit:
+    ReleaseMem(pAction);
+
     return hr;
 }
 
 HRESULT ExternalEngineApply(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
     ExitOnNull(hwndParent, hr, E_INVALIDARG, "BA passed NULL hwndParent to Apply.");
     if (!::IsWindow(hwndParent))
@@ -652,34 +678,46 @@ HRESULT ExternalEngineApply(
         ExitOnRootFailure(hr = E_INVALIDARG, "BA passed invalid hwndParent to Apply.");
     }
 
-    if (!::PostThreadMessageW(dwThreadId, WM_BURN_APPLY, 0, reinterpret_cast<LPARAM>(hwndParent)))
-    {
-        ExitWithLastError(hr, "Failed to post apply message.");
-    }
+    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+
+    pAction->dwMessage = WM_BURN_APPLY;
+    pAction->apply.hwndParent = hwndParent;
+
+    hr = EnqueueAction(pEngineContext, &pAction);
+    ExitOnFailure(hr, "Failed to enqueue apply action.");
 
 LExit:
+    ReleaseMem(pAction);
+
     return hr;
 }
 
 HRESULT ExternalEngineQuit(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in const DWORD dwExitCode
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
-    if (!::PostThreadMessageW(dwThreadId, WM_BURN_QUIT, static_cast<WPARAM>(dwExitCode), 0))
-    {
-        ExitWithLastError(hr, "Failed to post shutdown message.");
-    }
+    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+
+    pAction->dwMessage = WM_BURN_QUIT;
+    pAction->quit.dwExitCode = dwExitCode;
+
+    hr = EnqueueAction(pEngineContext, &pAction);
+    ExitOnFailure(hr, "Failed to enqueue shutdown action.");
 
 LExit:
+    ReleaseMem(pAction);
+
     return hr;
 }
 
 HRESULT ExternalEngineLaunchApprovedExe(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent,
     __in_z LPCWSTR wzApprovedExeForElevationId,
     __in_z_opt LPCWSTR wzArguments,
@@ -688,24 +726,22 @@ HRESULT ExternalEngineLaunchApprovedExe(
 {
     HRESULT hr = S_OK;
     BURN_APPROVED_EXE* pApprovedExe = NULL;
-    BOOL fLeaveCriticalSection = FALSE;
     BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = NULL;
-
-    pLaunchApprovedExe = (BURN_LAUNCH_APPROVED_EXE*)MemAlloc(sizeof(BURN_LAUNCH_APPROVED_EXE), TRUE);
-    ExitOnNull(pLaunchApprovedExe, hr, E_OUTOFMEMORY, "Failed to alloc BURN_LAUNCH_APPROVED_EXE");
-
-    ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
-    fLeaveCriticalSection = TRUE;
-    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
-    ExitOnFailure(hr, "Engine is active, cannot change engine state.");
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
     if (!wzApprovedExeForElevationId || !*wzApprovedExeForElevationId)
     {
         ExitFunction1(hr = E_INVALIDARG);
     }
 
-    hr = ApprovedExesFindById(&pEngineState->approvedExes, wzApprovedExeForElevationId, &pApprovedExe);
+    hr = ApprovedExesFindById(&pEngineContext->pEngineState->approvedExes, wzApprovedExeForElevationId, &pApprovedExe);
     ExitOnFailure(hr, "BA requested unknown approved exe with id: %ls", wzApprovedExeForElevationId);
+
+    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+
+    pAction->dwMessage = WM_BURN_LAUNCH_APPROVED_EXE;
+    pLaunchApprovedExe = &pAction->launchApprovedExe;
 
     hr = StrAllocString(&pLaunchApprovedExe->sczId, wzApprovedExeForElevationId, NULL);
     ExitOnFailure(hr, "Failed to copy the id.");
@@ -720,20 +756,14 @@ HRESULT ExternalEngineLaunchApprovedExe(
 
     pLaunchApprovedExe->hwndParent = hwndParent;
 
-    if (!::PostThreadMessageW(dwThreadId, WM_BURN_LAUNCH_APPROVED_EXE, 0, reinterpret_cast<LPARAM>(pLaunchApprovedExe)))
-    {
-        ExitWithLastError(hr, "Failed to post launch approved exe message.");
-    }
+    hr = EnqueueAction(pEngineContext, &pAction);
+    ExitOnFailure(hr, "Failed to enqueue launch approved exe action.");
 
 LExit:
-    if (fLeaveCriticalSection)
+    if (pAction)
     {
-        ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
-    }
-
-    if (FAILED(hr))
-    {
-        ApprovedExesUninitializeLaunch(pLaunchApprovedExe);
+        CoreBootstrapperEngineActionUninitialize(pAction);
+        MemFree(pAction);
     }
 
     return hr;
@@ -835,4 +865,38 @@ static HRESULT ProcessUnknownEmbeddedMessages(
     *pdwResult = (DWORD)E_NOTIMPL;
 
     return S_OK;
+}
+
+static HRESULT EnqueueAction(
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __inout BOOTSTRAPPER_ENGINE_ACTION** ppAction
+    )
+{
+    HRESULT hr = S_OK;
+
+    ::EnterCriticalSection(&pEngineContext->csQueue);
+
+    if (pEngineContext->pEngineState->fQuit)
+    {
+        LogId(REPORT_WARNING, MSG_IGNORE_OPERATION_AFTER_QUIT, LoggingBurnMessageToString((*ppAction)->dwMessage));
+        hr = E_INVALIDSTATE;
+    }
+    else
+    {
+        hr = QueEnqueue(pEngineContext->hQueue, *ppAction);
+    }
+
+    ::LeaveCriticalSection(&pEngineContext->csQueue);
+
+    ExitOnFailure(hr, "Failed to enqueue action.");
+
+    *ppAction = NULL;
+
+    if (!::ReleaseSemaphore(pEngineContext->hQueueSemaphore, 1, NULL))
+    {
+        ExitWithLastError(hr, "Failed to signal queue semaphore.");
+    }
+
+LExit:
+    return hr;
 }

@@ -325,7 +325,7 @@ static HRESULT BAEngineDetect(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_DETECT_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_DETECT_RESULTS, pResults);
 
-    hr = ExternalEngineDetect(pContext->dwThreadId, pArgs->hwndParent);
+    hr = ExternalEngineDetect(pContext, pArgs->hwndParent);
 
 LExit:
     return hr;
@@ -341,7 +341,7 @@ static HRESULT BAEnginePlan(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_PLAN_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_PLAN_RESULTS, pResults);
 
-    hr = ExternalEnginePlan(pContext->dwThreadId, pArgs->action);
+    hr = ExternalEnginePlan(pContext, pArgs->action);
 
 LExit:
     return hr;
@@ -357,7 +357,7 @@ static HRESULT BAEngineElevate(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_ELEVATE_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_ELEVATE_RESULTS, pResults);
 
-    hr = ExternalEngineElevate(pContext->pEngineState, pContext->dwThreadId, pArgs->hwndParent);
+    hr = ExternalEngineElevate(pContext, pArgs->hwndParent);
 
 LExit:
     return hr;
@@ -373,7 +373,7 @@ static HRESULT BAEngineApply(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_APPLY_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_APPLY_RESULTS, pResults);
 
-    hr = ExternalEngineApply(pContext->dwThreadId, pArgs->hwndParent);
+    hr = ExternalEngineApply(pContext, pArgs->hwndParent);
 
 LExit:
     return hr;
@@ -389,7 +389,7 @@ static HRESULT BAEngineQuit(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_QUIT_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_QUIT_RESULTS, pResults);
 
-    hr = ExternalEngineQuit(pContext->dwThreadId, pArgs->dwExitCode);
+    hr = ExternalEngineQuit(pContext, pArgs->dwExitCode);
 
 LExit:
     return hr;
@@ -405,7 +405,7 @@ static HRESULT BAEngineLaunchApprovedExe(
     ValidateMessageArgs(hr, pvArgs, BAENGINE_LAUNCHAPPROVEDEXE_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BAENGINE_LAUNCHAPPROVEDEXE_RESULTS, pResults);
 
-    hr = ExternalEngineLaunchApprovedExe(pContext->pEngineState, pContext->dwThreadId, pArgs->hwndParent, pArgs->wzApprovedExeForElevationId, pArgs->wzArguments, pArgs->dwWaitForInputIdleTimeout);
+    hr = ExternalEngineLaunchApprovedExe(pContext, pArgs->hwndParent, pArgs->wzApprovedExeForElevationId, pArgs->wzArguments, pArgs->dwWaitForInputIdleTimeout);
 
 LExit:
     return hr;

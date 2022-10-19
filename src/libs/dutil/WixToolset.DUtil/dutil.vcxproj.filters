@@ -135,6 +135,9 @@
     <ClCompile Include="procutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="queutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="resrutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -312,6 +315,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\procutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\queutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\regutil.h">
