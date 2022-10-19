@@ -884,17 +884,16 @@ LExit:
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_APPROVED_EXE_COMPLETE, hr, dwProcessId);
 
-    ApprovedExesUninitializeLaunch(pLaunchApprovedExe);
-
     return hr;
 }
 
-extern "C" HRESULT CoreQuit(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in int nExitCode
+extern "C" void CoreQuit(
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in DWORD dwExitCode
     )
 {
     HRESULT hr = S_OK;
+    BURN_ENGINE_STATE* pEngineState = pEngineContext->pEngineState;
 
     // Save engine state if resume mode is unequal to "none".
     if (BURN_RESUME_MODE_NONE != pEngineState->resumeMode)
@@ -907,13 +906,15 @@ extern "C" HRESULT CoreQuit(
         }
     }
 
-    LogId(REPORT_STANDARD, MSG_QUIT, nExitCode);
+    LogId(REPORT_STANDARD, MSG_QUIT, dwExitCode);
+
+    pEngineState->userExperience.dwExitCode = dwExitCode;
+
+    ::EnterCriticalSection(&pEngineContext->csQueue);
 
     pEngineState->fQuit = TRUE;
 
-    ::PostQuitMessage(nExitCode); // go bye-bye.
-
-    return hr;
+    ::LeaveCriticalSection(&pEngineContext->csQueue);
 }
 
 extern "C" HRESULT CoreSaveEngineState(
@@ -2069,6 +2070,18 @@ extern "C" HRESULT DAPI CoreWaitForUnelevatedLoggingThread(
 
 LExit:
     return hr;
+}
+
+extern "C" void DAPI CoreBootstrapperEngineActionUninitialize(
+    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
+    )
+{
+    switch (pAction->dwMessage)
+    {
+    case WM_BURN_LAUNCH_APPROVED_EXE:
+        ApprovedExesUninitializeLaunch(&pAction->launchApprovedExe);
+        break;
+    }
 }
 
 // internal helper functions

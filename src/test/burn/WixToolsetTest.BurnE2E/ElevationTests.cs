@@ -13,7 +13,7 @@ namespace WixToolsetTest.BurnE2E
         /// This test calls Elevate after Detect, and then calls Plan in OnElevateBegin.
         /// After calling Plan, it pumps some messages to simulate UI like the UAC callback.
         /// </summary>
-        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/6349")] // CAUTION: this test currently hangs because the Plan request gets dropped.
+        [RuntimeFact]
         public void CanExplicitlyElevateAndPlanFromOnElevateBegin()
         {
             var packageA = this.CreatePackageInstaller("PackageA");

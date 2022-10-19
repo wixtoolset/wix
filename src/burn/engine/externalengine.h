@@ -130,34 +130,32 @@ HRESULT ExternalEngineCompareVersions(
     );
 
 HRESULT ExternalEngineDetect(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     );
 
 HRESULT ExternalEnginePlan(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in const BOOTSTRAPPER_ACTION action
     );
 
 HRESULT ExternalEngineElevate(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     );
 
 HRESULT ExternalEngineApply(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     );
 
 HRESULT ExternalEngineQuit(
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in const DWORD dwExitCode
     );
 
 HRESULT ExternalEngineLaunchApprovedExe(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in const DWORD dwThreadId,
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent,
     __in_z LPCWSTR wzApprovedExeForElevationId,
     __in_z_opt LPCWSTR wzArguments,

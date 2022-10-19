@@ -75,6 +75,7 @@
 #include "perfutil.h"
 #include "polcutil.h"
 #include "procutil.h"
+#include "queutil.h"
 #include "regutil.h"
 #include "butil.h"  // NOTE: Butil must come after Regutil.
 #include "resrutil.h"

@@ -262,9 +262,9 @@ HRESULT CoreLaunchApprovedExe(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe
     );
-HRESULT CoreQuit(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in int nExitCode
+void CoreQuit(
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in DWORD dwExitCode
     );
 HRESULT CoreSaveEngineState(
     __in BURN_ENGINE_STATE* pEngineState
@@ -353,6 +353,9 @@ HRESULT DAPI CoreCloseElevatedLoggingThread(
     );
 HRESULT DAPI CoreWaitForUnelevatedLoggingThread(
     __in HANDLE hUnelevatedLoggingThread
+    );
+void DAPI CoreBootstrapperEngineActionUninitialize(
+    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
     );
 
 #if defined(__cplusplus)

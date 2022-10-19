@@ -42,8 +42,8 @@ static HRESULT RunApplication(
     __out BOOL* pfSkipCleanup
     );
 static HRESULT ProcessMessage(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in const MSG* pmsg
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
     );
 static HRESULT DAPI RedirectLoggingOverPipe(
     __in_z LPCSTR szString,
@@ -790,6 +790,19 @@ LExit:
     return hr;
 }
 
+static void CALLBACK FreeQueueItem(
+    __in void* pvValue,
+    __in void* /*pvContext*/
+    )
+{
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = reinterpret_cast<BOOTSTRAPPER_ENGINE_ACTION*>(pvValue);
+
+    LogId(REPORT_WARNING, MSG_IGNORE_OPERATION_AFTER_QUIT, LoggingBurnMessageToString(pAction->dwMessage));
+
+    CoreBootstrapperEngineActionUninitialize(pAction);
+    MemFree(pAction);
+}
+
 static HRESULT RunApplication(
     __in BURN_ENGINE_STATE* pEngineState,
     __out BOOL* pfReloadApp,
@@ -799,15 +812,19 @@ static HRESULT RunApplication(
     HRESULT hr = S_OK;
     BOOTSTRAPPER_ENGINE_CONTEXT engineContext = { };
     BOOL fStartupCalled = FALSE;
-    BOOL fRet = FALSE;
-    MSG msg = { };
     BOOTSTRAPPER_SHUTDOWN_ACTION shutdownAction = BOOTSTRAPPER_SHUTDOWN_ACTION_NONE;
-
-    ::PeekMessageW(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
     // Setup the bootstrapper engine.
-    engineContext.dwThreadId = ::GetCurrentThreadId();
     engineContext.pEngineState = pEngineState;
+
+    ::InitializeCriticalSection(&engineContext.csQueue);
+
+    engineContext.hQueueSemaphore = ::CreateSemaphoreW(NULL, 0, LONG_MAX, NULL);
+    ExitOnNullWithLastError(engineContext.hQueueSemaphore, hr, "Failed to create semaphore for queue.");
+
+    hr = QueCreate(&engineContext.hQueue);
+    ExitOnFailure(hr, "Failed to create queue for bootstrapper engine.");
 
     // Load the bootstrapper application.
     hr = UserExperienceLoad(&pEngineState->userExperience, &engineContext, &pEngineState->command);
@@ -817,28 +834,24 @@ static HRESULT RunApplication(
     hr = UserExperienceOnStartup(&pEngineState->userExperience);
     ExitOnFailure(hr, "Failed to start bootstrapper application.");
 
-    // Enter the message pump.
-    while (0 != (fRet = ::GetMessageW(&msg, NULL, 0, 0)))
+    while (!pEngineState->fQuit)
     {
-        if (-1 == fRet)
-        {
-            hr = E_UNEXPECTED;
-            ExitOnRootFailure(hr, "Unexpected return value from message pump.");
-        }
-        else
-        {
-            // When the BA makes a request from its own thread, it's common for the PostThreadMessage in externalengine.cpp
-            // to block until this thread waits on something. It's also common for Detect and Plan to never wait on something.
-            // In the extreme case, the engine could be elevating in Apply before the Detect call returned to the BA.
-            // This helps to avoid that situation, which could be blocking a UI thread.
-            ::Sleep(0);
+        hr = AppWaitForSingleObject(engineContext.hQueueSemaphore, INFINITE);
+        ExitOnFailure(hr, "Failed to wait on queue event.");
 
-            ProcessMessage(pEngineState, &msg);
-        }
+        ::EnterCriticalSection(&engineContext.csQueue);
+
+        hr = QueDequeue(engineContext.hQueue, reinterpret_cast<void**>(&pAction));
+
+        ::LeaveCriticalSection(&engineContext.csQueue);
+
+        ExitOnFailure(hr, "Failed to dequeue action.");
+
+        ProcessMessage(&engineContext, pAction);
+
+        CoreBootstrapperEngineActionUninitialize(pAction);
+        MemFree(pAction);
     }
-
-    // Get exit code.
-    pEngineState->userExperience.dwExitCode = (DWORD)msg.wParam;
 
 LExit:
     if (fStartupCalled)
@@ -864,52 +877,50 @@ LExit:
     // Unload BA.
     UserExperienceUnload(&pEngineState->userExperience, *pfReloadApp);
 
+    ::DeleteCriticalSection(&engineContext.csQueue);
+    ReleaseHandle(engineContext.hQueueSemaphore);
+    ReleaseQueue(engineContext.hQueue, FreeQueueItem, &engineContext);
+
     return hr;
 }
 
 static HRESULT ProcessMessage(
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in const MSG* pmsg
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
     )
 {
     HRESULT hr = S_OK;
+    BURN_ENGINE_STATE* pEngineState = pEngineContext->pEngineState;
 
     UserExperienceActivateEngine(&pEngineState->userExperience);
 
-    if (pEngineState->fQuit)
-    {
-        LogId(REPORT_WARNING, MSG_IGNORE_OPERATION_AFTER_QUIT, LoggingBurnMessageToString(pmsg->message));
-        ExitFunction1(hr = E_INVALIDSTATE);
-    }
-
-    switch (pmsg->message)
+    switch (pAction->dwMessage)
     {
     case WM_BURN_DETECT:
-        hr = CoreDetect(pEngineState, reinterpret_cast<HWND>(pmsg->lParam));
+        hr = CoreDetect(pEngineState, pAction->detect.hwndParent);
         break;
 
     case WM_BURN_PLAN:
-        hr = CorePlan(pEngineState, static_cast<BOOTSTRAPPER_ACTION>(pmsg->lParam));
+        hr = CorePlan(pEngineState, pAction->plan.action);
         break;
 
     case WM_BURN_ELEVATE:
-        hr = CoreElevate(pEngineState, WM_BURN_ELEVATE, reinterpret_cast<HWND>(pmsg->lParam));
+        hr = CoreElevate(pEngineState, WM_BURN_ELEVATE, pAction->elevate.hwndParent);
         break;
 
     case WM_BURN_APPLY:
-        hr = CoreApply(pEngineState, reinterpret_cast<HWND>(pmsg->lParam));
+        hr = CoreApply(pEngineState, pAction->apply.hwndParent);
         break;
 
     case WM_BURN_LAUNCH_APPROVED_EXE:
-        hr = CoreLaunchApprovedExe(pEngineState, reinterpret_cast<BURN_LAUNCH_APPROVED_EXE*>(pmsg->lParam));
+        hr = CoreLaunchApprovedExe(pEngineState, &pAction->launchApprovedExe);
         break;
 
     case WM_BURN_QUIT:
-        hr = CoreQuit(pEngineState, static_cast<int>(pmsg->wParam));
+        CoreQuit(pEngineContext, pAction->quit.dwExitCode);
         break;
     }
 
-LExit:
     UserExperienceDeactivateEngine(&pEngineState->userExperience);
 
     return hr;

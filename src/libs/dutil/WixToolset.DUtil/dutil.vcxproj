@@ -91,6 +91,7 @@
     <ClCompile Include="proc2utl.cpp" />
     <ClCompile Include="proc3utl.cpp" />
     <ClCompile Include="procutil.cpp" />
+    <ClCompile Include="queutil.cpp" />
     <ClCompile Include="regutil.cpp" />
     <ClCompile Include="resrutil.cpp" />
     <ClCompile Include="reswutil.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="inc\perfutil.h" />
     <ClInclude Include="inc\polcutil.h" />
     <ClInclude Include="inc\procutil.h" />
+    <ClInclude Include="inc\queutil.h" />
     <ClInclude Include="inc\regutil.h" />
     <ClInclude Include="inc\resrutil.h" />
     <ClInclude Include="inc\reswutil.h" />

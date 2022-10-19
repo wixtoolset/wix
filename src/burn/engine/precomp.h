@@ -40,6 +40,7 @@
 #include <pathutil.h>
 #include <polcutil.h>
 #include <procutil.h>
+#include <queutil.h>
 #include <regutil.h>
 #include <resrutil.h>
 #include <shelutil.h>
