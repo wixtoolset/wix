@@ -16,6 +16,6 @@
   <files>
     <file src="build\**\*" target="build" />
     <file src="Sdk\**\*" target="Sdk" />
-    <file src="tools\**\*" target="tools" />
+    <file src="tools\**\*" target="tools" exclude="**\*.xml;**\WixToolset.Core.Native.targets" />
   </files>
 </package>

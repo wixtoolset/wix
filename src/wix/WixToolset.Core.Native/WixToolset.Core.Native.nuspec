@@ -23,7 +23,6 @@
     <file src="$projectFolder$\cubes\darice.cub" target="lib\netstandard2.0\cubes" />
     <file src="$projectFolder$\cubes\mergemod.cub" target="lib\netstandard2.0\cubes" />
 
-    <file src="$projectFolder$\targets\$id$.targets" target="build" />
     <file src="$projectFolder$\targets\$id$.targets" target="buildTransitive" />
 
     <file src="$projectFolder$\..\wixnative\ARM64\mergemod.dll" target="runtimes\win-arm64\native" />
