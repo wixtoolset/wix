@@ -42,7 +42,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>msi.lib;rpcrt4.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
@@ -65,16 +65,7 @@
     <PackageReference Include="WixToolset.WcaUtil" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     <PackageReference Include="GitInfo" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.NET.Tools.NETCoreCheck.x86" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.NET.Tools.NETCoreCheck.x64" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.NET.Tools.NETCoreCheck.arm64" GeneratePathProperty="true" />
   </ItemGroup>
-
-  <Target Name="CopyNetCoreCheck" AfterTargets="Build">
-    <Copy SourceFiles="$(PkgMicrosoft_NET_Tools_NETCoreCheck_x86)\win-x86\NetCoreCheck.exe" DestinationFolder="$(OutputPath)..\x86" />
-    <Copy SourceFiles="$(PkgMicrosoft_NET_Tools_NETCoreCheck_x64)\win-x64\NetCoreCheck.exe" DestinationFolder="$(OutputPath)..\x64" />
-    <Copy SourceFiles="$(PkgMicrosoft_NET_Tools_NETCoreCheck_arm64)\win-arm64\NetCoreCheck.exe" DestinationFolder="$(OutputPath)..\arm64" />
-  </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

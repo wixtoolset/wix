@@ -15,9 +15,9 @@ namespace WixToolset.Netfx
                 new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Platform), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.RollForward), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Variable), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Property), IntermediateFieldType.String),
             },
-            typeof(NetFxNativeImageSymbol));
+            typeof(NetFxDotNetCompatibilityCheckSymbol));
     }
 }
 
@@ -31,7 +31,7 @@ namespace WixToolset.Netfx.Symbols
         Platform,
         Version,
         RollForward,
-        Variable,
+        Property,
     }
 
     public class NetFxDotNetCompatibilityCheckSymbol : IntermediateSymbol
@@ -70,10 +70,10 @@ namespace WixToolset.Netfx.Symbols
             set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.RollForward, value);
         }
 
-        public string Variable
+        public string Property
         {
-            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.Variable].AsString();
-            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.Variable, value);
+            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.Property].AsString();
+            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.Property, value);
         }
     }
 }

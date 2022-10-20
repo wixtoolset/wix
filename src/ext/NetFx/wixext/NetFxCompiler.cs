@@ -370,9 +370,7 @@ namespace WixToolset.Netfx
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
-            string variable = null;
-            string condition = null;
-            string after = null;
+            string property = null;
             string runtimeType = null;
             string platform = null;
             string version = null;
@@ -387,14 +385,8 @@ namespace WixToolset.Netfx
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "Variable":
-                            variable = this.ParseHelper.GetAttributeBundleVariableNameValue(sourceLineNumbers, attrib);
-                            break;
-                        case "Condition":
-                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            break;
-                        case "After":
-                            after = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                        case "Property":
+                            property = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "RuntimeType":
                             runtimeType = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -410,7 +402,7 @@ namespace WixToolset.Netfx
                                     runtimeType = "Microsoft.NETCore.App";
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, runtimeType, "aspnet, desktop and core"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, runtimeType, "aspnet", "desktop", "core"));
                                     break;
                             }
                             break;
@@ -424,7 +416,7 @@ namespace WixToolset.Netfx
                                     platform = platform.ToLower();
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, platform, "x86, x64 and arm64"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, platform, "x86", "x64", "arm64"));
                                     break;
                             }
                             break;
@@ -454,7 +446,7 @@ namespace WixToolset.Netfx
                                     rollForward = "Disable";
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, rollForward, "latestmajor, major, latestminor, minor, latestpatch and disable"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, rollForward, "latestmajor", "major", "latestminor", "minor", "latestpatch", "disable"));
                                     break;
                             }
                             break;
@@ -471,7 +463,12 @@ namespace WixToolset.Netfx
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("ndncc", runtimeType, platform, version, variable);
+                id = this.ParseHelper.CreateIdentifier("ndncc", property, runtimeType, platform, version);
+            }
+
+            if (String.IsNullOrEmpty(property))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Property"));
             }
 
             if (String.IsNullOrEmpty(runtimeType))
@@ -495,16 +492,13 @@ namespace WixToolset.Netfx
 
             if (!this.Messaging.EncounteredError)
             {
-                // TODO: This will eventually be supported under Module/Product, but is not yet.
-                // this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
-
                 section.AddSymbol(new NetFxDotNetCompatibilityCheckSymbol(sourceLineNumbers, id)
                 {
                     RuntimeType = runtimeType,
                     Platform = platform,
                     Version = version,
                     RollForward = rollForward,
-                    Variable = variable,
+                    Property = property,
                 });
             }
         }

@@ -77,12 +77,12 @@ namespace WixToolsetTest.Netfx
                 "Binary:Wix4NetCheck_x64\t[Binary data]",
                 "Binary:Wix4NetCheck_x86\t[Binary data]",
                 "Binary:Wix4NetFxCA_X86\t[Binary data]",
-                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_X86\t65\tWix4NetFxCA_X86\tDotNetCompatibilityCheck\t",
+                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_X86\t1\tWix4NetFxCA_X86\tDotNetCompatibilityCheck\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageInstall_X86\t3137\tWix4NetFxCA_X86\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageUninstall_X86\t3137\tWix4NetFxCA_X86\tExecNetFx\t",
-                "CustomAction:Wix4NetFxScheduleNativeImage_X86\t65\tWix4NetFxCA_X86\tSchedNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_X86\t1\tWix4NetFxCA_X86\tSchedNetFx\t",
                 "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
             }, results.OrderBy(s => s).ToArray());
         }
@@ -100,12 +100,12 @@ namespace WixToolsetTest.Netfx
                 "Binary:Wix4NetCheck_x64\t[Binary data]",
                 "Binary:Wix4NetCheck_x86\t[Binary data]",
                 "Binary:Wix4NetFxCA_X64\t[Binary data]",
-                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_X64\t65\tWix4NetFxCA_X64\tDotNetCompatibilityCheck\t",
+                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_X64\t1\tWix4NetFxCA_X64\tDotNetCompatibilityCheck\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageInstall_X64\t3137\tWix4NetFxCA_X64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageUninstall_X64\t3137\tWix4NetFxCA_X64\tExecNetFx\t",
-                "CustomAction:Wix4NetFxScheduleNativeImage_X64\t65\tWix4NetFxCA_X64\tSchedNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_X64\t1\tWix4NetFxCA_X64\tSchedNetFx\t",
                 "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
             }, results.OrderBy(s => s).ToArray());
         }
@@ -123,12 +123,12 @@ namespace WixToolsetTest.Netfx
                 "Binary:Wix4NetCheck_x64\t[Binary data]",
                 "Binary:Wix4NetCheck_x86\t[Binary data]",
                 "Binary:Wix4NetFxCA_A64\t[Binary data]",
-                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_A64\t65\tWix4NetFxCA_A64\tDotNetCompatibilityCheck\t",
+                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_A64\t1\tWix4NetFxCA_A64\tDotNetCompatibilityCheck\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageInstall_A64\t3137\tWix4NetFxCA_A64\tExecNetFx\t",
                 "CustomAction:Wix4NetFxExecuteNativeImageUninstall_A64\t3137\tWix4NetFxCA_A64\tExecNetFx\t",
-                "CustomAction:Wix4NetFxScheduleNativeImage_A64\t65\tWix4NetFxCA_A64\tSchedNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_A64\t1\tWix4NetFxCA_A64\tSchedNetFx\t",
                 "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
             }, results.OrderBy(s => s).ToArray());
         }
