@@ -676,9 +676,15 @@ namespace WixToolset.Core.Burn
         {
             var symbols = this.Output.Sections.Single().Symbols.OfType<T>().ToList();
 
-            if (1 != symbols.Count)
+            if (0 == symbols.Count)
             {
                 throw new WixException(ErrorMessages.MissingBundleInformation(elementName));
+            }
+            else if (1 < symbols.Count)
+            {
+                // We'll show the first two source line collisions. If there are more than that, the user
+                // may have to build multiple times to find them all. This should be very rare.
+                throw new WixException(BurnBackendErrors.MultipleSingletonSymbolsFound(symbols[0].SourceLineNumbers, elementName, symbols[1].SourceLineNumbers));
             }
 
             return symbols[0];
