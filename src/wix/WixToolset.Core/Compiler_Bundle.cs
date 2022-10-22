@@ -439,6 +439,12 @@ namespace WixToolset.Core
                     });
                 }
 
+                this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnUXContainerId)
+                {
+                    Name = "bundle-ux.cab",
+                    Type = ContainerType.Attached
+                });
+
                 this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnDefaultAttachedContainerId)
                 {
                     Name = "bundle-attached.cab",
@@ -773,11 +779,6 @@ namespace WixToolset.Core
             if (!this.Core.EncounteredError)
             {
                 compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id);
-                this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnUXContainerId)
-                {
-                    Name = "bundle-ux.cab",
-                    Type = ContainerType.Attached
-                });
 
                 this.Core.AddSymbol(new WixBootstrapperApplicationDllSymbol(sourceLineNumbers, compilerPayload.Id)
                 {
