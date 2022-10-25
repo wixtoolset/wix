@@ -3,6 +3,8 @@
 namespace WixToolsetTest.Converters
 {
     using System;
+    using System.IO;
+    using System.Linq;
     using System.Xml.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Converters;
@@ -62,7 +64,7 @@ namespace WixToolsetTest.Converters
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
             var messaging = new MockMessaging();
-            var converter = new WixConverter(messaging, 2, ignoreErrors: new[] { "DeclarationPresent" } );
+            var converter = new WixConverter(messaging, 2, ignoreErrors: new[] { "DeclarationPresent" });
 
             var errors = converter.ConvertDocument(document);
 
@@ -100,6 +102,40 @@ namespace WixToolsetTest.Converters
             Assert.Equal(2, errors);
             //Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
             WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanConvertMainNamespaceFromDisk()
+        {
+            var dataFolder = TestData.Get("TestData", "FixDeclarationAndNamespace");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment />",
+                "</Wix>",
+            };
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(dataFolder);
+                var path = Path.Combine(fs.BaseFolder, "FixDeclarationAndNamespace.wxs");
+
+                var messaging = new MockMessaging();
+                var converter = new WixConverter(messaging, 2, null, null);
+
+                var errors = converter.ConvertFile(path, true);
+
+                var messages = messaging.Messages.Select(m => $"{Path.GetFileName(m.SourceLineNumbers.FileName)}({m.SourceLineNumbers.LineNumber}) {m.ToString()}").ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "FixDeclarationAndNamespace.wxs() [Converted] This file contains an XML declaration on the first line. (DeclarationPresent)",
+                    "FixDeclarationAndNamespace.wxs(1) [Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date.  It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)"
+                }, messages);
+
+                var actual = File.ReadAllLines(path);
+                WixAssert.CompareLineByLine(expected, actual);
+            }
         }
 
         [Fact]

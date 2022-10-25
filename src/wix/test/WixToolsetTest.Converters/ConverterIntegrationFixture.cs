@@ -85,9 +85,14 @@ namespace WixToolsetTest.Converters
 
                 var messaging = new MockMessaging();
                 var converter = new WixConverter(messaging, 4);
-                var errors = converter.ConvertFile(targetFile, true);
+                var convertedCount = converter.ConvertFile(targetFile, true);
 
-                Assert.Single(messaging.Messages.Where(m => m.Id == 5/*WixConverter.ConverterTestType.UnauthorizedAccessException*/));
+                var errors = messaging.Messages.Where(m => m.Level == WixToolset.Data.MessageLevel.Error).Select(m => m.ToString()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Could not write to file. (UnauthorizedAccessException)"
+                }, errors);
+                Assert.Equal(10, convertedCount);
             }
         }
 
