@@ -23,7 +23,10 @@
   PackCustomAction
 
     Creates an MSI managed custom action package that includes the custom action assembly,
-    local assembly dependencies, and project content files.
+    local assembly dependencies, and project content files. This target is skipped until the
+    custom action assembly has been built. This prevents the target from running (and failing)
+    during project restore and other scenarios where the project is executed but the assembly
+    build is skipped.
 
     [IN]
     @(IntermediateAssembly) - Managed custom action assembly.
@@ -36,7 +39,8 @@
   -->
   <Target Name="PackCustomAction"
           Inputs="@(IntermediateAssembly);@(Content);$(CustomActionContents)"
-          Outputs="$(IntermediateOutputPath)$(TargetCAFileName)">
+          Outputs="$(IntermediateOutputPath)$(TargetCAFileName)"
+          Condition=" Exists('@(IntermediateAssembly)') ">
 
     <!-- Find all referenced items marked CopyLocal, but exclude non-binary files. -->
     <ItemGroup>
