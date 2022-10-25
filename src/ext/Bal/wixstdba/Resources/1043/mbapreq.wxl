@@ -1,37 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="nl-nl" Language="1043" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">[WixBundleName] Installatie</String>
-  <String Id="Title">Microsoft .NET Framework is vereist voor installatie [WixBundleName]</String>
-  <String Id="ConfirmCancelMessage">Weet u zeker dat u de installatie wilt annuleren?</String>
-  <String Id="HelpHeader">Help bij Setup</String>
-  <String Id="HelpText">/passive | /quiet - geeft een minimale gebruikersinterface weer zonder prompts
-   of geeft geen gebruikersinterface en geen prompts weer. Gebruikersinterface
-   en alle prompts worden standaard weergegeven.
-
-/norestart   - pogingen tot opnieuw opstarten onderdrukken.
-   Gebruikersinterface vraagt standaard alvorens opnieuw op te starten.
-/log log.txt - registreert gegevens in een specifiek bestand. Een logbestand
-   wordt standaard in %TEMP% gemaakt.</String>
-  <String Id="HelpCloseButton">&amp;Sluiten</String>
-  <String Id="InstallLicenseTerms">Klik op de knop 'Accepteren en installeren' om de &lt;a href="#"&gt;licentievoorwaarden&lt;/a&gt; van het Microsoft .NET Framework te accepteren.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Accepteren en installeren</String>
-  <String Id="InstallDeclineButton">&amp;Weigeren</String>
-  <String Id="ProgressHeader">Voortgang van de installatie</String>
-  <String Id="ProgressLabel">Verwerken:</String>
-  <String Id="ProgressCancelButton">&amp;Annuleren</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Installatie mislukt</String>
-  <String Id="FailureLogLinkText">Er zijn een of meer fouten opgetreden waardoor de installatie is mislukt. Corrigeer de problemen en voer Setup opnieuw uit. Raadpleeg het &lt;a href="#"&gt;log boekbestand&lt;/a&gt; voor meer informatie.</String>
-  <String Id="FailureRestartText">U moet uw computer opnieuw opstarten om het terugdraaien van de software te voltooien.</String>
-  <String Id="FailureRestartButton">&amp;Opnieuw opstarten</String>
-  <String Id="FailureCloseButton">&amp;Sluiten</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="[WixBundleName] Installatie" />
+  <String Id="Title" Value="Microsoft .NET Framework is vereist voor installatie [WixBundleName]" />
+  <String Id="ConfirmCancelMessage" Value="Weet u zeker dat u de installatie wilt annuleren?" />
+  <String Id="HelpHeader" Value="Help bij Setup" />
+  <String Id="HelpText" Value="/passive | /quiet - geeft een minimale gebruikersinterface weer zonder prompts&#xA;   of geeft geen gebruikersinterface en geen prompts weer. Gebruikersinterface&#xA;   en alle prompts worden standaard weergegeven.&#xA;&#xA;/norestart   - pogingen tot opnieuw opstarten onderdrukken.&#xA;   Gebruikersinterface vraagt standaard alvorens opnieuw op te starten.&#xA;/log log.txt - registreert gegevens in een specifiek bestand. Een logbestand&#xA;   wordt standaard in %TEMP% gemaakt." />
+  <String Id="HelpCloseButton" Value="&amp;Sluiten" />
+  <String Id="InstallLicenseTerms" Value="Klik op de knop 'Accepteren en installeren' om de &lt;a href=&quot;#&quot;&gt;licentievoorwaarden&lt;/a&gt; van het Microsoft .NET Framework te accepteren." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Accepteren en installeren" />
+  <String Id="InstallDeclineButton" Value="&amp;Weigeren" />
+  <String Id="ProgressHeader" Value="Voortgang van de installatie" />
+  <String Id="ProgressLabel" Value="Verwerken:" />
+  <String Id="ProgressCancelButton" Value="&amp;Annuleren" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Installatie mislukt" />
+  <String Id="FailureLogLinkText" Value="Er zijn een of meer fouten opgetreden waardoor de installatie is mislukt. Corrigeer de problemen en voer Setup opnieuw uit. Raadpleeg het &lt;a href=&quot;#&quot;&gt;log boekbestand&lt;/a&gt; voor meer informatie." />
+  <String Id="FailureRestartText" Value="U moet uw computer opnieuw opstarten om het terugdraaien van de software te voltooien." />
+  <String Id="FailureRestartButton" Value="&amp;Opnieuw opstarten" />
+  <String Id="FailureCloseButton" Value="&amp;Sluiten" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

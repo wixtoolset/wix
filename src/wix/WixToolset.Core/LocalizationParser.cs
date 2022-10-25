@@ -160,6 +160,7 @@ namespace WixToolset.Core
         {
             string id = null;
             var overridable = false;
+            string value = null;
             var sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
 
             foreach (var attrib in node.Attributes())
@@ -177,6 +178,9 @@ namespace WixToolset.Core
                         case "Localizable":
                             ; // do nothing
                             break;
+                        case "Value":
+                            value = Common.GetAttributeValue(messaging, sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
                         default:
                             messaging.Write(ErrorMessages.UnexpectedAttribute(sourceLineNumbers, attrib.Parent.Name.ToString(), attrib.Name.ToString()));
                             break;
@@ -188,8 +192,6 @@ namespace WixToolset.Core
                 }
             }
 
-            var value = Common.GetInnerText(node);
-
             if (null == id)
             {
                 messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "String", "Id"));
@@ -198,6 +200,8 @@ namespace WixToolset.Core
             {
                 messaging.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, "String", "Id", 0));
             }
+
+            Common.InnerTextDisallowed(messaging, node, "Value");
 
             if (!messaging.EncounteredError)
             {
@@ -223,6 +227,7 @@ namespace WixToolset.Core
         {
             string dialog = null;
             string control = null;
+            string text = null;
             var x = CompilerConstants.IntegerNotSet;
             var y = CompilerConstants.IntegerNotSet;
             var width = CompilerConstants.IntegerNotSet;
@@ -265,6 +270,9 @@ namespace WixToolset.Core
                         case "LeftScroll":
                             leftScroll = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
                             break;
+                        case "Text":
+                            text = Common.GetAttributeValue(messaging, sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
                         default:
                             Common.UnexpectedAttribute(messaging, sourceLineNumbers, attrib);
                             break;
@@ -275,8 +283,6 @@ namespace WixToolset.Core
                     Common.UnexpectedAttribute(messaging, sourceLineNumbers, attrib);
                 }
             }
-
-            var text = Common.GetInnerText(node);
 
             if (String.IsNullOrEmpty(control) && (rightToLeft || rightAligned || leftScroll))
             {
@@ -300,6 +306,8 @@ namespace WixToolset.Core
             {
                 messaging.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.ToString(), "Dialog", "Control"));
             }
+
+            Common.InnerTextDisallowed(messaging, node, "Text");
 
             if (!messaging.EncounteredError)
             {

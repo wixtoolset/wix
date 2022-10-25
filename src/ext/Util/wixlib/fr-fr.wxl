@@ -1,31 +1,31 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <WixLocalization Culture="fr-fr" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="msierrUSRFailedUserCreate" Overridable="yes">La création de l'utilisateur a échoué.  ([2]   [3]   [4]   [5])</String>
-  <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes">La création de l'utilisateur a échoué car le mot de passe est invalide.  ([2]   [3]   [4]   [5])</String>
-  <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes">L'ajout de l'utilisateur au groupe a échoué.  ([2]   [3]   [4]   [5])</String>
-  <String Id="msierrUSRFailedUserCreateExists" Overridable="yes">La création de l'utilisateur a échoué car il existe dejà.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="La création de l'utilisateur a échoué.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="La création de l'utilisateur a échoué car le mot de passe est invalide.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="L'ajout de l'utilisateur au groupe a échoué.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="La création de l'utilisateur a échoué car il existe dejà.  ([2]   [3]   [4]   [5])" />
 
-  <String Id="msierrSMBFailedCreate" Overridable="yes">La création du partage reseau a échoué.  ([2]   [3]   [4]   [5])</String>
-  <String Id="msierrSMBFailedDrop" Overridable="yes">La suppression du partage reseau a échoué.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrSMBFailedCreate" Overridable="yes" Value="La création du partage reseau a échoué.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrSMBFailedDrop" Overridable="yes" Value="La suppression du partage reseau a échoué.  ([2]   [3]   [4]   [5])" />
 
-  <String Id="msierrPERFMONFailedRegisterDLL" Overridable="yes">L'inscription au registre de la DLL avec PerfMon a échoué.  ([2]   [3]   [4]   [5])</String>
-  <String Id="msierrPERFMONFailedUnregisterDLL" Overridable="yes">La desinscription au registre de la DLL avec PerfMon a échoué.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrPERFMONFailedRegisterDLL" Overridable="yes" Value="L'inscription au registre de la DLL avec PerfMon a échoué.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrPERFMONFailedUnregisterDLL" Overridable="yes" Value="La desinscription au registre de la DLL avec PerfMon a échoué.  ([2]   [3]   [4]   [5])" />
 
-  <String Id="msierrInstallPerfCounterData" Overridable="yes">L'installation des compteurs de performance a échoué.  ([2]   [3]   [4]   [5])</String>
-  <String Id="msierrUninstallPerfCounterData" Overridable="yes">La desinstallation des compteurs de performance a échoué.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrInstallPerfCounterData" Overridable="yes" Value="L'installation des compteurs de performance a échoué.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrUninstallPerfCounterData" Overridable="yes" Value="La desinstallation des compteurs de performance a échoué.  ([2]   [3]   [4]   [5])" />
 
-  <String Id="msierrSecureObjectsFailedCreateSD" Overridable="yes">La création des ACLs a échoué pour [3]\[4], erreur systeme: [2]</String>
-  <String Id="msierrSecureObjectsFailedSet" Overridable="yes">Le positionnement des ACLs pour l'objet [3] a échoué, erreur systeme: [2]</String>
-  <String Id="msierrSecureObjectsUnknownType" Overridable="yes">Type d'objet inconnu [3], erreur systeme: [2]</String>
+  <String Id="msierrSecureObjectsFailedCreateSD" Overridable="yes" Value="La création des ACLs a échoué pour [3]\[4], erreur systeme: [2]" />
+  <String Id="msierrSecureObjectsFailedSet" Overridable="yes" Value="Le positionnement des ACLs pour l'objet [3] a échoué, erreur systeme: [2]" />
+  <String Id="msierrSecureObjectsUnknownType" Overridable="yes" Value="Type d'objet inconnu [3], erreur systeme: [2]" />
 
-  <String Id="msierrXmlFileFailedRead" Overridable="yes">Un problème est survenu lors de la configuration des fichiers XML.</String>
-  <String Id="msierrXmlFileFailedOpen" Overridable="yes">Echec de l'ouverture des fichiers XML [3], erreur systeme: [2]</String>
-  <String Id="msierrXmlFileFailedSelect" Overridable="yes">Echec de la recherche du noeud: [3] dans le fichier XML: [4], erreur systeme: [2]</String>
-  <String Id="msierrXmlFileFailedSave" Overridable="yes">Echec lors de la sauvegarde des modifications dans le fichier XML [3], erreur systeme: [2]</String>
+  <String Id="msierrXmlFileFailedRead" Overridable="yes" Value="Un problème est survenu lors de la configuration des fichiers XML." />
+  <String Id="msierrXmlFileFailedOpen" Overridable="yes" Value="Echec de l'ouverture des fichiers XML [3], erreur systeme: [2]" />
+  <String Id="msierrXmlFileFailedSelect" Overridable="yes" Value="Echec de la recherche du noeud: [3] dans le fichier XML: [4], erreur systeme: [2]" />
+  <String Id="msierrXmlFileFailedSave" Overridable="yes" Value="Echec lors de la sauvegarde des modifications dans le fichier XML [3], erreur systeme: [2]" />
 
-  <String Id="msierrXmlConfigFailedRead" Overridable="yes">Un problème est survenu lors de la configuration des fichiers XML.</String>
-  <String Id="msierrXmlConfigFailedOpen" Overridable="yes">Echec de l'ouverture des fichiers XML [3], erreur systeme: [2]</String>
-  <String Id="msierrXmlConfigFailedSelect" Overridable="yes">Echec de la recherche du noeud: [3] dans le fichier XML: [4], erreur systeme: [2]</String>
-  <String Id="msierrXmlConfigFailedSave" Overridable="yes">Echec lors de la sauvegarde des modifications dans le fichier XML [3], erreur systeme: [2]</String>
+  <String Id="msierrXmlConfigFailedRead" Overridable="yes" Value="Un problème est survenu lors de la configuration des fichiers XML." />
+  <String Id="msierrXmlConfigFailedOpen" Overridable="yes" Value="Echec de l'ouverture des fichiers XML [3], erreur systeme: [2]" />
+  <String Id="msierrXmlConfigFailedSelect" Overridable="yes" Value="Echec de la recherche du noeud: [3] dans le fichier XML: [4], erreur systeme: [2]" />
+  <String Id="msierrXmlConfigFailedSave" Overridable="yes" Value="Echec lors de la sauvegarde des modifications dans le fichier XML [3], erreur systeme: [2]" />
 </WixLocalization>

@@ -2,15 +2,15 @@
 
 
 <WixLocalization Culture="pt-pt" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-	<String Id="msierrSQLFailedCreateDatabase" Overridable="yes">Error [2]: falha ao criar a Base de Dados: [3], detalhes: [4].</String>
-	<String Id="msierrSQLFailedDropDatabase" Overridable="yes">Error [2]: falha ao remover a Base de Dados: [3], detalhes: [4].</String>
-	<String Id="msierrSQLFailedConnectDatabase" Overridable="yes">Falhou a ligação à Base de Dados.  ([2]   [3]   [4]   [5])</String>
-	<String Id="msierrSQLFailedExecString" Overridable="yes">Erro [2]: falha ao executar o comando de SQL, detalhes: [3], Comando: [4] Conteúdo: [5]</String>
-	<String Id="msierrSQLDatabaseAlreadyExists" Overridable="yes">A Base de Dados [3] já existe. Deseja continuar?</String>
+	<String Id="msierrSQLFailedCreateDatabase" Overridable="yes" Value="Error [2]: falha ao criar a Base de Dados: [3], detalhes: [4]." />
+	<String Id="msierrSQLFailedDropDatabase" Overridable="yes" Value="Error [2]: falha ao remover a Base de Dados: [3], detalhes: [4]." />
+	<String Id="msierrSQLFailedConnectDatabase" Overridable="yes" Value="Falhou a ligação à Base de Dados.  ([2]   [3]   [4]   [5])" />
+	<String Id="msierrSQLFailedExecString" Overridable="yes" Value="Erro [2]: falha ao executar o comando de SQL, detalhes: [3], Comando: [4] Conteúdo: [5]" />
+	<String Id="msierrSQLDatabaseAlreadyExists" Overridable="yes" Value="A Base de Dados [3] já existe. Deseja continuar?" />
 
-	<String Id="ConfigureSql" Overridable="yes">Configurar o Servidor de SQL</String>
-	<String Id="CreateDatabase" Overridable="yes">Criar as Bases de Dados</String>
-	<String Id="DropDatabase" Overridable="yes">Remover as Bases de Dados</String>
-	<String Id="ExecuteSqlStrings" Overridable="yes">Executar comandos de SQL</String>
-	<String Id="RollbackExecuteSqlStrings" Overridable="yes">Reverter os comandos de SQL</String>
+	<String Id="ConfigureSql" Overridable="yes" Value="Configurar o Servidor de SQL" />
+	<String Id="CreateDatabase" Overridable="yes" Value="Criar as Bases de Dados" />
+	<String Id="DropDatabase" Overridable="yes" Value="Remover as Bases de Dados" />
+	<String Id="ExecuteSqlStrings" Overridable="yes" Value="Executar comandos de SQL" />
+	<String Id="RollbackExecuteSqlStrings" Overridable="yes" Value="Reverter os comandos de SQL" />
 </WixLocalization>

@@ -1,6 +1,6 @@
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
 
-  <String Id="BundleName">~IncludeTestBundle</String>
-  <String Id="BundleInProgressName">~InProgressTestBundle</String>
+  <String Id="BundleName" Value="~IncludeTestBundle" />
+  <String Id="BundleInProgressName" Value="~InProgressTestBundle" />
 
 </WixLocalization>

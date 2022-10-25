@@ -1,37 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="tr-tr" Language="1055" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">[WixBundleName] Kurulumu</String>
-  <String Id="Title">[WixBundleName] kurulumu için Microsoft .NET Framework gerekir</String>
-  <String Id="ConfirmCancelMessage">İptal etmek istediğinizden emin misiniz?</String>
-  <String Id="HelpHeader">Kurulum Yardımı</String>
-  <String Id="HelpText">/passive | /quiet -  komut istemi olmayan olabildiğince küçük bir UI
-   görüntüler veya komut istemi ve UI görüntülemez. Varsayılan olarak UI
-   ve tüm komut istemleri görüntülenir.
-
-/norestart   - yeniden başlatma denemelerini engeller. Varsayılan
-   olarak UI yeniden başlatmadan önce komut isteyecektir.
-/log log.txt - belirli bir dosyayı günlük dosyası olarak kullanır.
-   Varsayılan olarak %TEMP% konumunda bir günlük dosyası oluşturulur.</String>
-  <String Id="HelpCloseButton">&amp;Kapat</String>
-  <String Id="InstallLicenseTerms">Microsoft .NET Framework &lt;a href="#"&gt;lisans şartlarını&lt;/a&gt; kabul etmek için "Kabul Et ve Yükle" düğmesini tıklatın.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Kabul Et ve Yükle</String>
-  <String Id="InstallDeclineButton">&amp;Reddet</String>
-  <String Id="ProgressHeader">Kurulum İlerleme Durumu</String>
-  <String Id="ProgressLabel">İşleniyor:</String>
-  <String Id="ProgressCancelButton">&amp;İptal</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Kurulum Başarısız</String>
-  <String Id="FailureLogLinkText">Bir veya daha fazla sorun kurulumun başarısız olmasına neden oldu. Lütfen sorunları çözün ve kurulumu yeniden deneyin. Daha fazla bilgi için &lt;a href="#"&gt;günlük dosyasına&lt;/a&gt; bakın.</String>
-  <String Id="FailureRestartText">Yazılım geri alma işlemini tamamlamak için bilgisayarınızı yeniden başlatmanız gerekir.</String>
-  <String Id="FailureRestartButton">&amp;Yeniden Başlat</String>
-  <String Id="FailureCloseButton">&amp;Kapat</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="[WixBundleName] Kurulumu" />
+  <String Id="Title" Value="[WixBundleName] kurulumu için Microsoft .NET Framework gerekir" />
+  <String Id="ConfirmCancelMessage" Value="İptal etmek istediğinizden emin misiniz?" />
+  <String Id="HelpHeader" Value="Kurulum Yardımı" />
+  <String Id="HelpText" Value="/passive | /quiet -  komut istemi olmayan olabildiğince küçük bir UI&#xA;   görüntüler veya komut istemi ve UI görüntülemez. Varsayılan olarak UI&#xA;   ve tüm komut istemleri görüntülenir.&#xA;&#xA;/norestart   - yeniden başlatma denemelerini engeller. Varsayılan&#xA;   olarak UI yeniden başlatmadan önce komut isteyecektir.&#xA;/log log.txt - belirli bir dosyayı günlük dosyası olarak kullanır.&#xA;   Varsayılan olarak %TEMP% konumunda bir günlük dosyası oluşturulur." />
+  <String Id="HelpCloseButton" Value="&amp;Kapat" />
+  <String Id="InstallLicenseTerms" Value="Microsoft .NET Framework &lt;a href=&quot;#&quot;&gt;lisans şartlarını&lt;/a&gt; kabul etmek için &quot;Kabul Et ve Yükle&quot; düğmesini tıklatın." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Kabul Et ve Yükle" />
+  <String Id="InstallDeclineButton" Value="&amp;Reddet" />
+  <String Id="ProgressHeader" Value="Kurulum İlerleme Durumu" />
+  <String Id="ProgressLabel" Value="İşleniyor:" />
+  <String Id="ProgressCancelButton" Value="&amp;İptal" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Kurulum Başarısız" />
+  <String Id="FailureLogLinkText" Value="Bir veya daha fazla sorun kurulumun başarısız olmasına neden oldu. Lütfen sorunları çözün ve kurulumu yeniden deneyin. Daha fazla bilgi için &lt;a href=&quot;#&quot;&gt;günlük dosyasına&lt;/a&gt; bakın." />
+  <String Id="FailureRestartText" Value="Yazılım geri alma işlemini tamamlamak için bilgisayarınızı yeniden başlatmanız gerekir." />
+  <String Id="FailureRestartButton" Value="&amp;Yeniden Başlat" />
+  <String Id="FailureCloseButton" Value="&amp;Kapat" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

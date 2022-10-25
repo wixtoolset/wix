@@ -2,15 +2,15 @@
 
 
 <WixLocalization Culture="pt-br" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-	<String Id="msierrSQLFailedCreateDatabase" Overridable="yes">Error [2]: falha ao criar o Banco de Dados: [3], detalhes: [4].</String>
-	<String Id="msierrSQLFailedDropDatabase" Overridable="yes">Error [2]: falha ao remover o Banco de Dados: [3], detalhes: [4].</String>
-	<String Id="msierrSQLFailedConnectDatabase" Overridable="yes">Falhou a ligação ao Banco de Dados.  ([2]   [3]   [4]   [5])</String>
-	<String Id="msierrSQLFailedExecString" Overridable="yes">Erro [2]: falha ao executar o comando de SQL, detalhes: [3], Comando: [4] Conteúdo: [5]</String>
-	<String Id="msierrSQLDatabaseAlreadyExists" Overridable="yes">O Banco de Dados [3] já existe. Deseja continuar?</String>
+	<String Id="msierrSQLFailedCreateDatabase" Overridable="yes" Value="Error [2]: falha ao criar o Banco de Dados: [3], detalhes: [4]." />
+	<String Id="msierrSQLFailedDropDatabase" Overridable="yes" Value="Error [2]: falha ao remover o Banco de Dados: [3], detalhes: [4]." />
+	<String Id="msierrSQLFailedConnectDatabase" Overridable="yes" Value="Falhou a ligação ao Banco de Dados.  ([2]   [3]   [4]   [5])" />
+	<String Id="msierrSQLFailedExecString" Overridable="yes" Value="Erro [2]: falha ao executar o comando de SQL, detalhes: [3], Comando: [4] Conteúdo: [5]" />
+	<String Id="msierrSQLDatabaseAlreadyExists" Overridable="yes" Value="O Banco de Dados [3] já existe. Deseja continuar?" />
 
-	<String Id="ConfigureSql" Overridable="yes">Configurando o Servidor de SQL</String>
-	<String Id="CreateDatabase" Overridable="yes">Criando os Bancos de Dados</String>
-	<String Id="DropDatabase" Overridable="yes">Removendo os Bancos de Dados</String>
-	<String Id="ExecuteSqlStrings" Overridable="yes">Executando comandos de SQL</String>
-	<String Id="RollbackExecuteSqlStrings" Overridable="yes">Revertendo os comandos de SQL</String>
+	<String Id="ConfigureSql" Overridable="yes" Value="Configurando o Servidor de SQL" />
+	<String Id="CreateDatabase" Overridable="yes" Value="Criando os Bancos de Dados" />
+	<String Id="DropDatabase" Overridable="yes" Value="Removendo os Bancos de Dados" />
+	<String Id="ExecuteSqlStrings" Overridable="yes" Value="Executando comandos de SQL" />
+	<String Id="RollbackExecuteSqlStrings" Overridable="yes" Value="Revertendo os comandos de SQL" />
 </WixLocalization>

@@ -1,0 +1,5 @@
+<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+    <UI Control="Control1" X="1" Y="2" Text="This is control #1"></UI>
+    <UI Control="Control2" Width="50" Text="This is control #2" />
+    <UI Control="Control3" Height="150" />
+</WixLocalization>

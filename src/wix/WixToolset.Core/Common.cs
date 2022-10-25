@@ -709,6 +709,23 @@ namespace WixToolset.Core
             return text?.Value;
         }
 
+        internal static void InnerTextDisallowed(IMessaging messaging, XElement element, string attributeName)
+        {
+            var innerText = Common.GetInnerText(element);
+            if (!String.IsNullOrWhiteSpace(innerText))
+            {
+                var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
+                if (attributeName == null)
+                {
+                    messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
+                }
+                else
+                {
+                    messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText, attributeName));
+                }
+            }
+        }
+
         internal static bool TryParseWixVariable(string value, int start, out ParsedWixVariable parsedVariable)
         {
             parsedVariable = null;

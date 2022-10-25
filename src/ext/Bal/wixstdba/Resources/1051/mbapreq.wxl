@@ -1,37 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="sk-sk" Language="1051" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">[WixBundleName] – inštalácia</String>
-  <String Id="Title">Na inštaláciu aplikácie [WixBundleName] sa vyžaduje súčasť Microsoft .NET Framework</String>
-  <String Id="ConfirmCancelMessage">Naozaj chcete zrušiť operáciu?</String>
-  <String Id="HelpHeader">Pomocník pre inštaláciu</String>
-  <String Id="HelpText">/passive | /quiet – zobrazí minimálne používateľské rozhranie bez výziev alebo
-   nezobrazí žiadne používateľské rozhranie ani výzvy. Predvolene sa
-   zobrazuje používateľské rozhranie aj všetky výzvy.
-
-/norestart   – zruší všetky pokusy o reštart. Používateľské rozhranie
-   predvolene zobrazí pred reštartom výzvu.
-/log log.txt – urobí záznam do určeného súboru. Súbor denníka sa predvolene
-   vytvorí v priečinku %TEMP%.</String>
-  <String Id="HelpCloseButton">&amp;Zavrieť</String>
-  <String Id="InstallLicenseTerms">Kliknutím na tlačidlo Súhlasiť a inštalovať vyjadrite svoj súhlas s &lt;a href="#"&gt;licenčnými podmienkami&lt;/a&gt; súčasti Microsoft .NET Framework.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Súhlasiť a inštalovať</String>
-  <String Id="InstallDeclineButton">&amp;Odmietnuť</String>
-  <String Id="ProgressHeader">Priebeh inštalácie</String>
-  <String Id="ProgressLabel">Spracúva sa:</String>
-  <String Id="ProgressCancelButton">&amp;Zrušiť</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Inštalácia zlyhala</String>
-  <String Id="FailureLogLinkText">Inštalácia zlyhala pre jednu alebo viac príčin. Odstráňte problémy a skúste znova spustiť inštaláciu. Ďalšie informácie nájdete v &lt;a href="#"&gt;súbore denníka&lt;/a&gt;.</String>
-  <String Id="FailureRestartText">Dokončenie všetkých zmien softvéru vyžaduje reštart počítača.</String>
-  <String Id="FailureRestartButton">&amp;Reštartovať</String>
-  <String Id="FailureCloseButton">&amp;Zavrieť</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="[WixBundleName] – inštalácia" />
+  <String Id="Title" Value="Na inštaláciu aplikácie [WixBundleName] sa vyžaduje súčasť Microsoft .NET Framework" />
+  <String Id="ConfirmCancelMessage" Value="Naozaj chcete zrušiť operáciu?" />
+  <String Id="HelpHeader" Value="Pomocník pre inštaláciu" />
+  <String Id="HelpText" Value="/passive | /quiet – zobrazí minimálne používateľské rozhranie bez výziev alebo&#xA;   nezobrazí žiadne používateľské rozhranie ani výzvy. Predvolene sa&#xA;   zobrazuje používateľské rozhranie aj všetky výzvy.&#xA;&#xA;/norestart   – zruší všetky pokusy o reštart. Používateľské rozhranie&#xA;   predvolene zobrazí pred reštartom výzvu.&#xA;/log log.txt – urobí záznam do určeného súboru. Súbor denníka sa predvolene&#xA;   vytvorí v priečinku %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Zavrieť" />
+  <String Id="InstallLicenseTerms" Value="Kliknutím na tlačidlo Súhlasiť a inštalovať vyjadrite svoj súhlas s &lt;a href=&quot;#&quot;&gt;licenčnými podmienkami&lt;/a&gt; súčasti Microsoft .NET Framework." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Súhlasiť a inštalovať" />
+  <String Id="InstallDeclineButton" Value="&amp;Odmietnuť" />
+  <String Id="ProgressHeader" Value="Priebeh inštalácie" />
+  <String Id="ProgressLabel" Value="Spracúva sa:" />
+  <String Id="ProgressCancelButton" Value="&amp;Zrušiť" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Inštalácia zlyhala" />
+  <String Id="FailureLogLinkText" Value="Inštalácia zlyhala pre jednu alebo viac príčin. Odstráňte problémy a skúste znova spustiť inštaláciu. Ďalšie informácie nájdete v &lt;a href=&quot;#&quot;&gt;súbore denníka&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Dokončenie všetkých zmien softvéru vyžaduje reštart počítača." />
+  <String Id="FailureRestartButton" Value="&amp;Reštartovať" />
+  <String Id="FailureCloseButton" Value="&amp;Zavrieť" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

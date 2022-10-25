@@ -1422,7 +1422,7 @@ namespace WixToolset.Core
                             }
                         }
 
-                        this.Core.InnerTextDisallowed(child);
+                        this.Core.InnerTextDisallowed(child, "Value");
 
                         if (!String.IsNullOrEmpty(text) && null != sourceFile)
                         {

@@ -124,6 +124,11 @@ namespace WixToolset.Core
             this.parseHelper.InnerTextDisallowed(element);
         }
 
+        internal void InnerTextDisallowed(XElement element, string attributeName)
+        {
+            this.parseHelper.InnerTextDisallowed(element, attributeName);
+        }
+
         /// <summary>
         /// Verifies that a filename is ambiguous.
         /// </summary>

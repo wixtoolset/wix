@@ -369,6 +369,13 @@ namespace WixToolset.Extensibility.Services
         void InnerTextDisallowed(XElement element);
 
         /// <summary>
+        /// Validates that the element does not contain inner text and suggests which attribute to use instead.
+        /// </summary>
+        /// <param name="element">Element to check for inner text.</param>
+        /// <param name="attributeName">Name of attribute to use instead of inner text.</param>
+        void InnerTextDisallowed(XElement element, string attributeName);
+
+        /// <summary>
         /// Verifies that a value is a legal identifier.
         /// </summary>
         /// <param name="value">The value to verify.</param>

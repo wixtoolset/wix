@@ -1,0 +1,6 @@
+<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+    <String Id="Ex1" Overridable="yes" Value="This is example #1" />
+    <String Id="Ex2" Overridable="no" Value="This is example #2"></String>
+    <String Id="Ex3" Value="This is example #3"></String>
+    <String Id="Ex4" />
+</WixLocalization>

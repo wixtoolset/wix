@@ -658,15 +658,12 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void InnerTextDisallowed(XElement element)
         {
-            if (element.Nodes().Any(n => XmlNodeType.Text == n.NodeType || XmlNodeType.CDATA == n.NodeType))
-            {
-                var innerText = Common.GetInnerText(element);
-                if (!String.IsNullOrWhiteSpace(innerText))
-                {
-                    var sourceLineNumbers = this.GetSourceLineNumbers(element);
-                    this.Messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
-                }
-            }
+            Common.InnerTextDisallowed(this.Messaging, element, null);
+        }
+
+        public void InnerTextDisallowed(XElement element, string attributeName)
+        {
+            Common.InnerTextDisallowed(this.Messaging, element, attributeName);
         }
 
         public bool IsValidIdentifier(string value)

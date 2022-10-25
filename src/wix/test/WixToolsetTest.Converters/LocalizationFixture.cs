@@ -23,7 +23,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<WixLocalization Culture=\"en-us\" xmlns=\"http://wixtoolset.org/schemas/v4/wxl\">",
-                "  <String Id=\"SomeId\">Value</String>",
+                "  <String Id=\"SomeId\" Value=\"Value\" />",
                 "</WixLocalization>"
             };
 
@@ -33,7 +33,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
@@ -50,7 +50,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<WixLocalization Culture=\"en-us\" xmlns=\"http://wixtoolset.org/schemas/v4/wxl\">",
-                "  <String Id=\"SomeId\">Value</String>",
+                "  <String Id=\"SomeId\" Value=\"Value\" />",
                 "</WixLocalization>"
             };
 
@@ -60,7 +60,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
@@ -77,7 +77,62 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<WixLocalization Culture=\"en-us\" xmlns=\"http://wixtoolset.org/schemas/v4/wxl\">",
-                "  <String Id=\"SomeId\">Value</String>",
+                "  <String Id=\"SomeId\" Value=\"Value\" />",
+                "</WixLocalization>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(2, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixStringTextWithComment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<WixLocalization Culture='en-us' xmlns='http://wixtoolset.org/schemas/v4/wxl'>",
+                "  <String Id='SomeId'><!-- Comment -->Value</String>",
+                "</WixLocalization>");
+
+            var expected = new[]
+            {
+                "<WixLocalization Culture=\"en-us\" xmlns=\"http://wixtoolset.org/schemas/v4/wxl\">",
+                "  <!-- Comment -->",
+                "  <String Id=\"SomeId\" Value=\"Value\" />",
+                "</WixLocalization>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(1, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixUILocalization()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<WixLocalization Culture='en-us' xmlns='http://wixtoolset.org/schemas/v4/wxl'>",
+                "  <UI Dialog='DialogId' Control='ControlId' X='1' Y='2'>Some text</UI>",
+                "</WixLocalization>");
+
+            var expected = new[]
+            {
+                "<WixLocalization Culture=\"en-us\" xmlns=\"http://wixtoolset.org/schemas/v4/wxl\">",
+                "  <UI Dialog=\"DialogId\" Control=\"ControlId\" X=\"1\" Y=\"2\" Text=\"Some text\" />",
                 "</WixLocalization>"
             };
 
