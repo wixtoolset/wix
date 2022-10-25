@@ -2,12 +2,12 @@
 
 
 <WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-    <String Id="msierrFirewallCannotConnect" Overridable="yes">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
+    <String Id="msierrFirewallCannotConnect" Overridable="yes" Value="Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])" />
     
-    <String Id="WixSchedFirewallExceptionsInstall" Overridable="yes">Configuring Windows Firewall</String>
-    <String Id="WixSchedFirewallExceptionsUninstall" Overridable="yes">Configuring Windows Firewall</String>
-    <String Id="WixRollbackFirewallExceptionsInstall" Overridable="yes">Rolling back Windows Firewall configuration</String>
-    <String Id="WixExecFirewallExceptionsInstall" Overridable="yes">Installing Windows Firewall configuration</String>
-    <String Id="WixRollbackFirewallExceptionsUninstall" Overridable="yes">Rolling back Windows Firewall configuration</String>
-    <String Id="WixExecFirewallExceptionsUninstall" Overridable="yes">Uninstalling Windows Firewall configuration</String>
+    <String Id="WixSchedFirewallExceptionsInstall" Overridable="yes" Value="Configuring Windows Firewall" />
+    <String Id="WixSchedFirewallExceptionsUninstall" Overridable="yes" Value="Configuring Windows Firewall" />
+    <String Id="WixRollbackFirewallExceptionsInstall" Overridable="yes" Value="Rolling back Windows Firewall configuration" />
+    <String Id="WixExecFirewallExceptionsInstall" Overridable="yes" Value="Installing Windows Firewall configuration" />
+    <String Id="WixRollbackFirewallExceptionsUninstall" Overridable="yes" Value="Rolling back Windows Firewall configuration" />
+    <String Id="WixExecFirewallExceptionsUninstall" Overridable="yes" Value="Uninstalling Windows Firewall configuration" />
 </WixLocalization>

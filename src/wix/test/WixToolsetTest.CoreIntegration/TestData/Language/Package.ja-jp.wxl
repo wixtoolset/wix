@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="ja-JP">
 
-  <String Id="DowngradeError">A newer version ja-jp of [ProductName] is already installed.</String>
-  <String Id="FeatureTitle">MsiPackage ja-jp</String>
+  <String Id="DowngradeError" Value="A newer version ja-jp of [ProductName] is already installed." />
+  <String Id="FeatureTitle" Value="MsiPackage ja-jp" />
 
 </WixLocalization>

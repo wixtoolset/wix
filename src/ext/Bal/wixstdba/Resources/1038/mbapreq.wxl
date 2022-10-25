@@ -1,37 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="hu-hu" Language="1038" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">[WixBundleName] telepítő</String>
-  <String Id="Title">A(z) [WixBundleName] telepítéséhez Microsoft .NET-keretrendszer szükséges</String>
-  <String Id="ConfirmCancelMessage">Biztosan megszakítja?</String>
-  <String Id="HelpHeader">A telepítő súgója</String>
-  <String Id="HelpText">/passive | /quiet -  Minimális felhasználói felület megjelenítése kérdések
-   nélkül, illetve felhasználói felület és kérdések megjelenítése nélküli
-   telepítés. Alapesetben a felhasználói felület és minden kérdés megjelenik.
-
-/norestart     - Az újraindítási kérések elrejtése. Alapesetben a felhasználói
-   felületen megjelennek az újraindítási kérések.
-/log naplo.txt - Naplózás a megadott fájlba. Alapesetben a naplófájl a %TEMP%
-   könyvtárban jön létre.</String>
-  <String Id="HelpCloseButton">&amp;Bezárás</String>
-  <String Id="InstallLicenseTerms">A Microsoft .NET-keretrendszer &lt;a href="#"&gt;licencszerződésének&lt;/a&gt; elfogadásához kattintson az „Elfogadás és telepítés” gombra.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Elfogadás és telepítés</String>
-  <String Id="InstallDeclineButton">&amp;Elutasítás</String>
-  <String Id="ProgressHeader">Telepítési folyamat</String>
-  <String Id="ProgressLabel">Feldolgozás:</String>
-  <String Id="ProgressCancelButton">&amp;Mégse</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">A telepítés nem sikerült</String>
-  <String Id="FailureLogLinkText">Legalább egy olyan hiba lépett fel, amely a telepítés meghiúsulását okozta. Hárítsa el a hibákat, majd futtassa újra a telepítőt. További információt a &lt;a href="#"&gt;naplófájlban &lt;/a&gt; talál.</String>
-  <String Id="FailureRestartText">A szoftver visszaállításának befejezéséhez újra kell indítania a számítógépet.</String>
-  <String Id="FailureRestartButton">&amp;Újraindítás</String>
-  <String Id="FailureCloseButton">&amp;Bezárás</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="[WixBundleName] telepítő" />
+  <String Id="Title" Value="A(z) [WixBundleName] telepítéséhez Microsoft .NET-keretrendszer szükséges" />
+  <String Id="ConfirmCancelMessage" Value="Biztosan megszakítja?" />
+  <String Id="HelpHeader" Value="A telepítő súgója" />
+  <String Id="HelpText" Value="/passive | /quiet -  Minimális felhasználói felület megjelenítése kérdések&#xA;   nélkül, illetve felhasználói felület és kérdések megjelenítése nélküli&#xA;   telepítés. Alapesetben a felhasználói felület és minden kérdés megjelenik.&#xA;&#xA;/norestart     - Az újraindítási kérések elrejtése. Alapesetben a felhasználói&#xA;   felületen megjelennek az újraindítási kérések.&#xA;/log naplo.txt - Naplózás a megadott fájlba. Alapesetben a naplófájl a %TEMP%&#xA;   könyvtárban jön létre." />
+  <String Id="HelpCloseButton" Value="&amp;Bezárás" />
+  <String Id="InstallLicenseTerms" Value="A Microsoft .NET-keretrendszer &lt;a href=&quot;#&quot;&gt;licencszerződésének&lt;/a&gt; elfogadásához kattintson az „Elfogadás és telepítés” gombra." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Elfogadás és telepítés" />
+  <String Id="InstallDeclineButton" Value="&amp;Elutasítás" />
+  <String Id="ProgressHeader" Value="Telepítési folyamat" />
+  <String Id="ProgressLabel" Value="Feldolgozás:" />
+  <String Id="ProgressCancelButton" Value="&amp;Mégse" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="A telepítés nem sikerült" />
+  <String Id="FailureLogLinkText" Value="Legalább egy olyan hiba lépett fel, amely a telepítés meghiúsulását okozta. Hárítsa el a hibákat, majd futtassa újra a telepítőt. További információt a &lt;a href=&quot;#&quot;&gt;naplófájlban &lt;/a&gt; talál." />
+  <String Id="FailureRestartText" Value="A szoftver visszaállításának befejezéséhez újra kell indítania a számítógépet." />
+  <String Id="FailureRestartButton" Value="&amp;Újraindítás" />
+  <String Id="FailureCloseButton" Value="&amp;Bezárás" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

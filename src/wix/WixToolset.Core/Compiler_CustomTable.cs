@@ -492,7 +492,7 @@ namespace WixToolset.Core
                             }
                         }
 
-                        this.Core.InnerTextDisallowed(node);
+                        this.Core.InnerTextDisallowed(node, "Value");
 
                         if (null == columnName)
                         {

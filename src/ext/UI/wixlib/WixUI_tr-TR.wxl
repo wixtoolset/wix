@@ -1,598 +1,597 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="tr-tr" Codepage="1254" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-    <String Id="WixUIBack" Overridable="yes">&amp;Geri</String>
-    <String Id="WixUINext" Overridable="yes">İ&amp;leri</String>
-    <String Id="WixUICancel" Overridable="yes">İptal</String>
-    <String Id="WixUIFinish" Overridable="yes">&amp;Son</String>
-    <String Id="WixUIRetry" Overridable="yes">Yeniden &amp;Dene</String>
-    <String Id="WixUIIgnore" Overridable="yes">&amp;Yoksay</String>
-    <String Id="WixUIYes" Overridable="yes">&amp;Evet</String>
-    <String Id="WixUINo" Overridable="yes">&amp;Hayır</String>
-    <String Id="WixUIOK" Overridable="yes">Tamam</String>
-    <String Id="WixUIPrint" Overridable="yes">&amp;Yazdır</String>
+    <String Id="WixUIBack" Overridable="yes" Value="&amp;Geri" />
+    <String Id="WixUINext" Overridable="yes" Value="İ&amp;leri" />
+    <String Id="WixUICancel" Overridable="yes" Value="İptal" />
+    <String Id="WixUIFinish" Overridable="yes" Value="&amp;Son" />
+    <String Id="WixUIRetry" Overridable="yes" Value="Yeniden &amp;Dene" />
+    <String Id="WixUIIgnore" Overridable="yes" Value="&amp;Yoksay" />
+    <String Id="WixUIYes" Overridable="yes" Value="&amp;Evet" />
+    <String Id="WixUINo" Overridable="yes" Value="&amp;Hayır" />
+    <String Id="WixUIOK" Overridable="yes" Value="Tamam" />
+    <String Id="WixUIPrint" Overridable="yes" Value="&amp;Yazdır" />
 
-    <String Id="AdvancedWelcomeEulaDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="AdvancedWelcomeEulaDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="AdvancedWelcomeEulaDlgTitle" Overridable="yes">{\WixUI_Font_Title}Lütfen [ProductName] Lisans Sözleşmesi'ni okuyun</String>
-    <String Id="AdvancedWelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes">Lisans Sözleşmesi'nin koşullarını kabul &amp;ediyorum</String>
-    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Overridable="yes">Ürünü tüm kullanıcılar için varsayılan seçeneklerle yüklemek istiyorsanız Yükle'yi tıklatın. Yükleme seçeneklerini değiştirmek için Gelişmiş'i tıklatın.</String>
-    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Overridable="yes">Ürünü yalnızca sizin için varsayılan seçeneklerle yüklemek istiyorsanız Yükle'yi tıklatın. Yükleme seçeneklerini değiştirmek için Gelişmiş'i tıklatın.</String>
-    <String Id="AdvancedWelcomeEulaDlgInstall" Overridable="yes">Yü&amp;kle</String>
-    <String Id="AdvancedWelcomeEulaDlgAdvanced" Overridable="yes">&amp;Gelişmiş</String>
-    <String Id="Advanced_Font_Normal_Size" Overridable="yes">8</String>
-    <String Id="Advanced_Font_Bigger_Size" Overridable="yes">12</String>
-    <String Id="Advanced_Font_Title_Size" Overridable="yes">9</String>
-    <String Id="Advanced_Font_Emphasized_Size" Overridable="yes">8</String>
-    <String Id="Advanced_Font_FaceName" Overridable="yes">Tahoma</String>
+    <String Id="AdvancedWelcomeEulaDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="AdvancedWelcomeEulaDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="AdvancedWelcomeEulaDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Lütfen [ProductName] Lisans Sözleşmesi'ni okuyun" />
+    <String Id="AdvancedWelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes" Value="Lisans Sözleşmesi'nin koşullarını kabul &amp;ediyorum" />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Overridable="yes" Value="Ürünü tüm kullanıcılar için varsayılan seçeneklerle yüklemek istiyorsanız Yükle'yi tıklatın. Yükleme seçeneklerini değiştirmek için Gelişmiş'i tıklatın." />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Overridable="yes" Value="Ürünü yalnızca sizin için varsayılan seçeneklerle yüklemek istiyorsanız Yükle'yi tıklatın. Yükleme seçeneklerini değiştirmek için Gelişmiş'i tıklatın." />
+    <String Id="AdvancedWelcomeEulaDlgInstall" Overridable="yes" Value="Yü&amp;kle" />
+    <String Id="AdvancedWelcomeEulaDlgAdvanced" Overridable="yes" Value="&amp;Gelişmiş" />
+    <String Id="Advanced_Font_Normal_Size" Overridable="yes" Value="8" />
+    <String Id="Advanced_Font_Bigger_Size" Overridable="yes" Value="12" />
+    <String Id="Advanced_Font_Title_Size" Overridable="yes" Value="9" />
+    <String Id="Advanced_Font_Emphasized_Size" Overridable="yes" Value="8" />
+    <String Id="Advanced_Font_FaceName" Overridable="yes" Value="Tahoma" />
 
-    <String Id="BrowseDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="BrowseDlgComboLabel" Overridable="yes">K&amp;onum:</String>
-    <String Id="BrowseDlgWixUI_Bmp_Up" Overridable="yes">WixUI_Bmp_Up</String>
-    <String Id="BrowseDlgWixUI_Bmp_UpTooltip" Overridable="yes">Bir düzey yukarı</String>
-    <String Id="BrowseDlgNewFolder" Overridable="yes">WixUI_Bmp_New</String>
-    <String Id="BrowseDlgNewFolderTooltip" Overridable="yes">Yeni bir klasör oluştur</String>
-    <String Id="BrowseDlgPathLabel" Overridable="yes">K&amp;lasör adı:</String>
-    <String Id="BrowseDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="BrowseDlgDescription" Overridable="yes">Hedef klasöre gözat</String>
-    <String Id="BrowseDlgTitle" Overridable="yes">{\WixUI_Font_Title}Hedef klasörü değiştir</String>
+    <String Id="BrowseDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="BrowseDlgComboLabel" Overridable="yes" Value="K&amp;onum:" />
+    <String Id="BrowseDlgWixUI_Bmp_Up" Overridable="yes" Value="WixUI_Bmp_Up" />
+    <String Id="BrowseDlgWixUI_Bmp_UpTooltip" Overridable="yes" Value="Bir düzey yukarı" />
+    <String Id="BrowseDlgNewFolder" Overridable="yes" Value="WixUI_Bmp_New" />
+    <String Id="BrowseDlgNewFolderTooltip" Overridable="yes" Value="Yeni bir klasör oluştur" />
+    <String Id="BrowseDlgPathLabel" Overridable="yes" Value="K&amp;lasör adı:" />
+    <String Id="BrowseDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="BrowseDlgDescription" Overridable="yes" Value="Hedef klasöre gözat" />
+    <String Id="BrowseDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Hedef klasörü değiştir" />
 
-    <String Id="CancelDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="CancelDlgText" Overridable="yes">[ProductName] yükleme işlemini iptal etmek istediğinizden emin misiniz?</String>
-    <String Id="CancelDlgIcon" Overridable="yes">WixUI_Ico_Info</String>
-    <String Id="CancelDlgIconTooltip" Overridable="yes">Bilgi simgesi</String>
+    <String Id="CancelDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="CancelDlgText" Overridable="yes" Value="[ProductName] yükleme işlemini iptal etmek istediğinizden emin misiniz?" />
+    <String Id="CancelDlgIcon" Overridable="yes" Value="WixUI_Ico_Info" />
+    <String Id="CancelDlgIconTooltip" Overridable="yes" Value="Bilgi simgesi" />
 
-    <String Id="CustomizeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="CustomizeDlgTree" Overridable="yes">Seçim ağacı</String>
-    <String Id="CustomizeDlgBrowse" Overridable="yes">Gö&amp;zat...</String>
-    <String Id="CustomizeDlgReset" Overridable="yes">&amp;Sıfırla</String>
-    <String Id="CustomizeDlgDiskCost" Overridable="yes">&amp;Disk Kullanımı</String>
-    <String Id="CustomizeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="CustomizeDlgText" Overridable="yes">Özelliklerin yüklenme şeklini değiştirmek için aşağıdaki ağaçtaki simgeleri tıklatın.</String>
-    <String Id="CustomizeDlgDescription" Overridable="yes">Özelliklerin yüklenmesini istediğiniz yöntemi seçin.</String>
-    <String Id="CustomizeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Özel Kurulum</String>
-    <String Id="CustomizeDlgItemDescription" Overridable="yes">CustomizeDlgItemDescription-CustomizeDlgItemDescription</String>
-    <String Id="CustomizeDlgItemSize" Overridable="yes">CustomizeDlgItemSize-CustomizeDlgItemSize</String>
-    <String Id="CustomizeDlgLocation" Overridable="yes">CustomizeDlgLocation-CustomizeDlgLocation</String>
-    <String Id="CustomizeDlgLocationLabel" Overridable="yes">Konum:</String>
+    <String Id="CustomizeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="CustomizeDlgTree" Overridable="yes" Value="Seçim ağacı" />
+    <String Id="CustomizeDlgBrowse" Overridable="yes" Value="Gö&amp;zat..." />
+    <String Id="CustomizeDlgReset" Overridable="yes" Value="&amp;Sıfırla" />
+    <String Id="CustomizeDlgDiskCost" Overridable="yes" Value="&amp;Disk Kullanımı" />
+    <String Id="CustomizeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="CustomizeDlgText" Overridable="yes" Value="Özelliklerin yüklenme şeklini değiştirmek için aşağıdaki ağaçtaki simgeleri tıklatın." />
+    <String Id="CustomizeDlgDescription" Overridable="yes" Value="Özelliklerin yüklenmesini istediğiniz yöntemi seçin." />
+    <String Id="CustomizeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Özel Kurulum" />
+    <String Id="CustomizeDlgItemDescription" Overridable="yes" Value="CustomizeDlgItemDescription-CustomizeDlgItemDescription" />
+    <String Id="CustomizeDlgItemSize" Overridable="yes" Value="CustomizeDlgItemSize-CustomizeDlgItemSize" />
+    <String Id="CustomizeDlgLocation" Overridable="yes" Value="CustomizeDlgLocation-CustomizeDlgLocation" />
+    <String Id="CustomizeDlgLocationLabel" Overridable="yes" Value="Konum:" />
 
-    <String Id="DiskCostDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="DiskCostDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="DiskCostDlgText" Overridable="yes">Vurgulanan birimlerde seçilen özellikler için yeterli disk alanı yok. Vurgulanan birimlerdeki bazı dosyaları kaldırabilir, daha az özellik yükleyebilir ya da farklı hedef sürücüler seçebilirsiniz.</String>
-    <String Id="DiskCostDlgDescription" Overridable="yes">Seçili özelliklerin yüklenmesi için gereken disk alanı.</String>
-    <String Id="DiskCostDlgTitle" Overridable="yes">{\WixUI_Font_Title}Disk Alanı Gereksinimleri</String>
-    <String Id="DiskCostDlgVolumeList" Overridable="yes">{120}{70}{70}{70}{70}</String>
+    <String Id="DiskCostDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="DiskCostDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="DiskCostDlgText" Overridable="yes" Value="Vurgulanan birimlerde seçilen özellikler için yeterli disk alanı yok. Vurgulanan birimlerdeki bazı dosyaları kaldırabilir, daha az özellik yükleyebilir ya da farklı hedef sürücüler seçebilirsiniz." />
+    <String Id="DiskCostDlgDescription" Overridable="yes" Value="Seçili özelliklerin yüklenmesi için gereken disk alanı." />
+    <String Id="DiskCostDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Disk Alanı Gereksinimleri" />
+    <String Id="DiskCostDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
 
-    <String Id="ErrorDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="ErrorDlgErrorText" Overridable="yes">Bilgi metni</String>
-    <String Id="ErrorDlgErrorIcon" Overridable="yes">WixUI_Ico_Info</String>
-    <String Id="ErrorDlgErrorIconTooltip" Overridable="yes">Bilgi simgesi</String>
+    <String Id="ErrorDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="ErrorDlgErrorText" Overridable="yes" Value="Bilgi metni" />
+    <String Id="ErrorDlgErrorIcon" Overridable="yes" Value="WixUI_Ico_Info" />
+    <String Id="ErrorDlgErrorIconTooltip" Overridable="yes" Value="Bilgi simgesi" />
 
-    <String Id="ExitDialog_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="ExitDialogBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="ExitDialogDescription" Overridable="yes">Kurulum Sihirbazı'ndan çıkmak için Son düğmesini tıklatın.</String>
-    <String Id="ExitDialogTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı tamamlandı</String>
+    <String Id="ExitDialog_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="ExitDialogBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="ExitDialogDescription" Overridable="yes" Value="Kurulum Sihirbazı'ndan çıkmak için Son düğmesini tıklatın." />
+    <String Id="ExitDialogTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı tamamlandı" />
 
-    <String Id="FatalError_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="FatalErrorBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="FatalErrorTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı tamamlanmadan sona erdi</String>
-    <String Id="FatalErrorDescription1" Overridable="yes">[ProductName] Kurulum Sihirbazı bir hata nedeniyle tamamlanmadan sona erdi. Sisteminizde değişiklik yapılmadı. Daha sonra bu programı yüklemek için Kurulum Sihirbazı'nı yeniden çalıştırın.</String>
-    <String Id="FatalErrorDescription2" Overridable="yes">Kurulum Sihirbazı'ndan çıkmak için Son düğmesini tıklatın.</String>
+    <String Id="FatalError_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="FatalErrorBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="FatalErrorTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı tamamlanmadan sona erdi" />
+    <String Id="FatalErrorDescription1" Overridable="yes" Value="[ProductName] Kurulum Sihirbazı bir hata nedeniyle tamamlanmadan sona erdi. Sisteminizde değişiklik yapılmadı. Daha sonra bu programı yüklemek için Kurulum Sihirbazı'nı yeniden çalıştırın." />
+    <String Id="FatalErrorDescription2" Overridable="yes" Value="Kurulum Sihirbazı'ndan çıkmak için Son düğmesini tıklatın." />
 
-    <String Id="FeaturesDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="FeaturesDlgTree" Overridable="yes">Ürün özellikleri</String>
-    <String Id="FeaturesDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="FeaturesDlgDescription" Overridable="yes">Özelliklerin yüklenmesini istediğiniz yöntemi seçin.</String>
-    <String Id="FeaturesDlgTitle" Overridable="yes">{\WixUI_Font_Title}Ürün Özellikleri</String>
-    <String Id="FeaturesDlgItemDescription" Overridable="yes">FeaturesDlgItemDescription</String>
-    <String Id="FeaturesDlgItemSize" Overridable="yes">FeaturesDlgItemSize</String>
-    <String Id="FeaturesDlgInstall" Overridable="yes">Yü&amp;kle</String>
-    <String Id="FeaturesDlgChange" Overridable="yes">&amp;Değiştir</String>
+    <String Id="FeaturesDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="FeaturesDlgTree" Overridable="yes" Value="Ürün özellikleri" />
+    <String Id="FeaturesDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="FeaturesDlgDescription" Overridable="yes" Value="Özelliklerin yüklenmesini istediğiniz yöntemi seçin." />
+    <String Id="FeaturesDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Ürün Özellikleri" />
+    <String Id="FeaturesDlgItemDescription" Overridable="yes" Value="FeaturesDlgItemDescription" />
+    <String Id="FeaturesDlgItemSize" Overridable="yes" Value="FeaturesDlgItemSize" />
+    <String Id="FeaturesDlgInstall" Overridable="yes" Value="Yü&amp;kle" />
+    <String Id="FeaturesDlgChange" Overridable="yes" Value="&amp;Değiştir" />
 
-    <String Id="FilesInUse_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="FilesInUseExit" Overridable="yes">Çı&amp;kış</String>
-    <String Id="FilesInUseBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="FilesInUseText" Overridable="yes">Aşağıdaki uygulamalar, bu kurulum tarafından güncelleştirilmesi gereken dosyaları kullanıyor. Söz konusu uygulamaları kapatın ve yükleme işlemine devam etmek için Yeniden &amp;Dene'yi veya yüklemeden çıkmak için Çıkış'ı tıklatın.</String>
-    <String Id="FilesInUseDescription" Overridable="yes">Güncelleştirilmesi gereken bazı dosyalar şu anda kullanılıyor.</String>
-    <String Id="FilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}Kullanılan Dosyalar</String>
+    <String Id="FilesInUse_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="FilesInUseExit" Overridable="yes" Value="Çı&amp;kış" />
+    <String Id="FilesInUseBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="FilesInUseText" Overridable="yes" Value="Aşağıdaki uygulamalar, bu kurulum tarafından güncelleştirilmesi gereken dosyaları kullanıyor. Söz konusu uygulamaları kapatın ve yükleme işlemine devam etmek için Yeniden &amp;Dene'yi veya yüklemeden çıkmak için Çıkış'ı tıklatın." />
+    <String Id="FilesInUseDescription" Overridable="yes" Value="Güncelleştirilmesi gereken bazı dosyalar şu anda kullanılıyor." />
+    <String Id="FilesInUseTitle" Overridable="yes" Value="{\WixUI_Font_Title}Kullanılan Dosyalar" />
 
-    <String Id="InstallDirDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="InstallDirDlgChange" Overridable="yes">&amp;Değiştir...</String>
-    <String Id="InstallDirDlgTitle" Overridable="yes">{\WixUI_Font_Title}Hedef Klasör</String>
-    <String Id="InstallDirDlgDescription" Overridable="yes">Varsayılan klasöre yüklemek için İleri'yi tıklatın veya başka bir klasör seçmek için Değiştir'i tıklatın.</String>
-    <String Id="InstallDirDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="InstallDirDlgFolderLabel" Overridable="yes">[ProductName] ürününün yükleneceği konum:</String>
+    <String Id="InstallDirDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="InstallDirDlgChange" Overridable="yes" Value="&amp;Değiştir..." />
+    <String Id="InstallDirDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Hedef Klasör" />
+    <String Id="InstallDirDlgDescription" Overridable="yes" Value="Varsayılan klasöre yüklemek için İleri'yi tıklatın veya başka bir klasör seçmek için Değiştir'i tıklatın." />
+    <String Id="InstallDirDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="InstallDirDlgFolderLabel" Overridable="yes" Value="[ProductName] ürününün yükleneceği konum:" />
 
-    <String Id="InstallScopeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="InstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="InstallScopeDlgDescription" Overridable="yes">Yükleme kapsamını ve klasörünü seçin</String>
-    <String Id="InstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Yükleme Kapsamı</String>
-    <String Id="InstallScopeDlgPerUser" Overridable="yes">{\WixUI_Font_Emphasized}Yalnızca benim için ([LogonUser]) yükle</String>
-    <String Id="InstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] kullanıcıya özel bir klasöre yüklenecek yalnızca sizin kullanıcı hesabınız tarafından kullanılabilecek. Yerel Yönetici ayrıcalıklarınız olması gerekmez.</String>
-    <String Id="InstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] kullanıcıya özel yüklemeyi desteklemiyor.</String>
-    <String Id="InstallScopeDlgPerMachine" Overridable="yes">{\WixUI_Font_Emphasized}Bu &amp;makinede tüm kullanıcılar için yükle</String>
-    <String Id="InstallScopeDlgPerMachineDescription" Overridable="yes">[ProductName] varsayılan olarak genel bir klasöre yüklenecek ve tüm kullanıcılar tarafından kullanılabilecek. Varsayılan yükleme klasörünü değiştirebilirsiniz. Yerel Yönetici ayrıcalıklarına sahip olmanız gerekir.</String>
-    <String Id="InstallScopeDlgFolderLabel" Overridable="yes">Yü&amp;kleme klasörü:</String>
-    <String Id="InstallScopeDlgChange" Overridable="yes">&amp;Değiştir...</String>
+    <String Id="InstallScopeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="InstallScopeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="InstallScopeDlgDescription" Overridable="yes" Value="Yükleme kapsamını ve klasörünü seçin" />
+    <String Id="InstallScopeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Yükleme Kapsamı" />
+    <String Id="InstallScopeDlgPerUser" Overridable="yes" Value="{\WixUI_Font_Emphasized}Yalnızca benim için ([LogonUser]) yükle" />
+    <String Id="InstallScopeDlgPerUserDescription" Overridable="yes" Value="[ProductName] kullanıcıya özel bir klasöre yüklenecek yalnızca sizin kullanıcı hesabınız tarafından kullanılabilecek. Yerel Yönetici ayrıcalıklarınız olması gerekmez." />
+    <String Id="InstallScopeDlgNoPerUserDescription" Overridable="yes" Value="[ProductName] kullanıcıya özel yüklemeyi desteklemiyor." />
+    <String Id="InstallScopeDlgPerMachine" Overridable="yes" Value="{\WixUI_Font_Emphasized}Bu &amp;makinede tüm kullanıcılar için yükle" />
+    <String Id="InstallScopeDlgPerMachineDescription" Overridable="yes" Value="[ProductName] varsayılan olarak genel bir klasöre yüklenecek ve tüm kullanıcılar tarafından kullanılabilecek. Varsayılan yükleme klasörünü değiştirebilirsiniz. Yerel Yönetici ayrıcalıklarına sahip olmanız gerekir." />
+    <String Id="InstallScopeDlgFolderLabel" Overridable="yes" Value="Yü&amp;kleme klasörü:" />
+    <String Id="InstallScopeDlgChange" Overridable="yes" Value="&amp;Değiştir..." />
 
-    <String Id="InvalidDirDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="InvalidDirDlgText" Overridable="yes">Yükleme dizini yerel bir sabit sürücüde bulunmalıdır.</String>
-    <String Id="InvalidDirDlgIcon" Overridable="yes">WixUI_Ico_Info</String>
-    <String Id="InvalidDirDlgIconTooltip" Overridable="yes">Bilgi simgesi</String>
+    <String Id="InvalidDirDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="InvalidDirDlgText" Overridable="yes" Value="Yükleme dizini yerel bir sabit sürücüde bulunmalıdır." />
+    <String Id="InvalidDirDlgIcon" Overridable="yes" Value="WixUI_Ico_Info" />
+    <String Id="InvalidDirDlgIconTooltip" Overridable="yes" Value="Bilgi simgesi" />
 
-    <String Id="LicenseAgreementDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="LicenseAgreementDlgLicenseAcceptedCheckBox" Overridable="yes">Lisans Sözleşmesi'nin koşullarını kabul &amp;ediyorum</String>
-    <String Id="LicenseAgreementDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="LicenseAgreementDlgDescription" Overridable="yes">Lütfen aşağıdaki lisans sözleşmesini dikkatle okuyun</String>
-    <String Id="LicenseAgreementDlgTitle" Overridable="yes">{\WixUI_Font_Title}Son Kullanıcı Lisans Sözleşmesi</String>
+    <String Id="LicenseAgreementDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="LicenseAgreementDlgLicenseAcceptedCheckBox" Overridable="yes" Value="Lisans Sözleşmesi'nin koşullarını kabul &amp;ediyorum" />
+    <String Id="LicenseAgreementDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="LicenseAgreementDlgDescription" Overridable="yes" Value="Lütfen aşağıdaki lisans sözleşmesini dikkatle okuyun" />
+    <String Id="LicenseAgreementDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Son Kullanıcı Lisans Sözleşmesi" />
 
-    <String Id="MaintenanceTypeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="MaintenanceTypeDlgChangeButton" Overridable="yes">&amp;Değiştir</String>
-    <String Id="MaintenanceTypeDlgChangeButtonTooltip" Overridable="yes">Yüklemeyi Değiştir</String>
-    <String Id="MaintenanceTypeDlgRepairButton" Overridable="yes">&amp;Onar</String>
-    <String Id="MaintenanceTypeDlgRepairButtonTooltip" Overridable="yes">Yüklemeyi Onar</String>
-    <String Id="MaintenanceTypeDlgRemoveButton" Overridable="yes">&amp;Kaldır</String>
-    <String Id="MaintenanceTypeDlgRemoveButtonTooltip" Overridable="yes">Yüklemeyi Kaldır</String>
-    <String Id="MaintenanceTypeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="MaintenanceTypeDlgDescription" Overridable="yes">Gerçekleştirmek istediğiniz işlemi seçin.</String>
-    <String Id="MaintenanceTypeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Yüklemeyi değiştirin, onarın veya kaldırın</String>
-    <String Id="MaintenanceTypeDlgChangeText" Overridable="yes">Özelliklerin yüklenme yöntemini değiştirmenizi sağlar.</String>
-    <String Id="MaintenanceTypeDlgChangeDisabledText" Overridable="yes">[ProductName] ürününde bağımsız olarak seçilebilen özellik yoktur.</String>
-    <String Id="MaintenanceTypeDlgRemoveText" Overridable="yes">[ProductName] ürününü bilgisayarınızdan kaldırır.</String>
-    <String Id="MaintenanceTypeDlgRemoveDisabledText" Overridable="yes">[ProductName] kaldırılamıyor.</String>
-    <String Id="MaintenanceTypeDlgRepairText" Overridable="yes">En son yüklemedeki eksik ve bozuk dosyaları, kısayolları ve kayıt defteri girdilerini düzelterek hataları onarır.</String>
-    <String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes">[ProductName] onarılamıyor.</String>
+    <String Id="MaintenanceTypeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="MaintenanceTypeDlgChangeButton" Overridable="yes" Value="&amp;Değiştir" />
+    <String Id="MaintenanceTypeDlgChangeButtonTooltip" Overridable="yes" Value="Yüklemeyi Değiştir" />
+    <String Id="MaintenanceTypeDlgRepairButton" Overridable="yes" Value="&amp;Onar" />
+    <String Id="MaintenanceTypeDlgRepairButtonTooltip" Overridable="yes" Value="Yüklemeyi Onar" />
+    <String Id="MaintenanceTypeDlgRemoveButton" Overridable="yes" Value="&amp;Kaldır" />
+    <String Id="MaintenanceTypeDlgRemoveButtonTooltip" Overridable="yes" Value="Yüklemeyi Kaldır" />
+    <String Id="MaintenanceTypeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="MaintenanceTypeDlgDescription" Overridable="yes" Value="Gerçekleştirmek istediğiniz işlemi seçin." />
+    <String Id="MaintenanceTypeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Yüklemeyi değiştirin, onarın veya kaldırın" />
+    <String Id="MaintenanceTypeDlgChangeText" Overridable="yes" Value="Özelliklerin yüklenme yöntemini değiştirmenizi sağlar." />
+    <String Id="MaintenanceTypeDlgChangeDisabledText" Overridable="yes" Value="[ProductName] ürününde bağımsız olarak seçilebilen özellik yoktur." />
+    <String Id="MaintenanceTypeDlgRemoveText" Overridable="yes" Value="[ProductName] ürününü bilgisayarınızdan kaldırır." />
+    <String Id="MaintenanceTypeDlgRemoveDisabledText" Overridable="yes" Value="[ProductName] kaldırılamıyor." />
+    <String Id="MaintenanceTypeDlgRepairText" Overridable="yes" Value="En son yüklemedeki eksik ve bozuk dosyaları, kısayolları ve kayıt defteri girdilerini düzelterek hataları onarır." />
+    <String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes" Value="[ProductName] onarılamıyor." />
 
-    <String Id="MaintenanceWelcomeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">Kurulum Sihirbazı, [ProductName] özelliklerinin bilgisayarınıza yüklenme yöntemini değiştirmenize veya ürünü bilgisayarınızdan kaldırmanıza olanak verir. Devam etmek için İleri'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın.</String>
-    <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'na Hoş Geldiniz</String>
+    <String Id="MaintenanceWelcomeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes" Value="Kurulum Sihirbazı, [ProductName] özelliklerinin bilgisayarınıza yüklenme yöntemini değiştirmenize veya ürünü bilgisayarınızdan kaldırmanıza olanak verir. Devam etmek için İleri'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın." />
+    <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'na Hoş Geldiniz" />
 
-    <String Id="MsiRMFilesInUse_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="MsiRMFilesInUseBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="MsiRMFilesInUseText" Overridable="yes">Aşağıdaki uygulamalar, bu kurulum tarafından güncelleştirilmesi gereken dosyaları kullanıyor. Kurulum Sihirbazı'nın söz konusu uygulamaları kapatmasına ve yeniden başlatmayı denemesine izin verebilir veya makineyi daha sonra yeniden başlatabilirsiniz.</String>
-    <String Id="MsiRMFilesInUseDescription" Overridable="yes">Güncelleştirilmesi gereken bazı dosyalar şu anda kullanılıyor.</String>
-    <String Id="MsiRMFilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}Kullanılan Dosyalar</String>
-    <String Id="MsiRMFilesInUseUseRM" Overridable="yes">&amp;Uygulamaları kapat ve bunları yeniden başlatmayı dene.</String>
-    <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">Uygula&amp;maları kapatma. Yeniden başlatma gerekir.</String>
+    <String Id="MsiRMFilesInUse_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="MsiRMFilesInUseBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="MsiRMFilesInUseText" Overridable="yes" Value="Aşağıdaki uygulamalar, bu kurulum tarafından güncelleştirilmesi gereken dosyaları kullanıyor. Kurulum Sihirbazı'nın söz konusu uygulamaları kapatmasına ve yeniden başlatmayı denemesine izin verebilir veya makineyi daha sonra yeniden başlatabilirsiniz." />
+    <String Id="MsiRMFilesInUseDescription" Overridable="yes" Value="Güncelleştirilmesi gereken bazı dosyalar şu anda kullanılıyor." />
+    <String Id="MsiRMFilesInUseTitle" Overridable="yes" Value="{\WixUI_Font_Title}Kullanılan Dosyalar" />
+    <String Id="MsiRMFilesInUseUseRM" Overridable="yes" Value="&amp;Uygulamaları kapat ve bunları yeniden başlatmayı dene." />
+    <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes" Value="Uygula&amp;maları kapatma. Yeniden başlatma gerekir." />
 
-    <String Id="OutOfDiskDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="OutOfDiskDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="OutOfDiskDlgText" Overridable="yes">Vurgulanan birimlerde şu anda seçili olan özellikler için yeterli disk alanı yok. Vurgulanan birimlerden bazı dosyaları kaldırabilir, daha az özellik yükleyebilir veya farklı bir hedef sürücü seçebilirsiniz.</String>
-    <String Id="OutOfDiskDlgDescription" Overridable="yes">Yükleme için gereken disk alanı, kullanılabilir disk alanını aşıyor.</String>
-    <String Id="OutOfDiskDlgTitle" Overridable="yes">{\WixUI_Font_Title}Disk Alanı Yetersiz</String>
-    <String Id="OutOfDiskDlgVolumeList" Overridable="yes">{120}{70}{70}{70}{70}</String>
+    <String Id="OutOfDiskDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="OutOfDiskDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="OutOfDiskDlgText" Overridable="yes" Value="Vurgulanan birimlerde şu anda seçili olan özellikler için yeterli disk alanı yok. Vurgulanan birimlerden bazı dosyaları kaldırabilir, daha az özellik yükleyebilir veya farklı bir hedef sürücü seçebilirsiniz." />
+    <String Id="OutOfDiskDlgDescription" Overridable="yes" Value="Yükleme için gereken disk alanı, kullanılabilir disk alanını aşıyor." />
+    <String Id="OutOfDiskDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Disk Alanı Yetersiz" />
+    <String Id="OutOfDiskDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
 
-    <String Id="OutOfRbDiskDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="OutOfRbDiskDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="OutOfRbDiskDlgText" Overridable="yes">Vurgulanan birimlerde şu anda seçili olan özellikler için yeterli disk alanı yok. Vurgulanan birimlerden bazı dosyaları kaldırabilir, daha az özellik yükleyebilir veya farklı bir hedef sürücü seçebilirsiniz.</String>
-    <String Id="OutOfRbDiskDlgDescription" Overridable="yes">Yükleme için gereken disk alanı, kullanılabilir disk alanını aşıyor.</String>
-    <String Id="OutOfRbDiskDlgTitle" Overridable="yes">{\WixUI_Font_Title}Disk Alanı Yetersiz</String>
-    <String Id="OutOfRbDiskDlgVolumeList" Overridable="yes">{120}{70}{70}{70}{70}</String>
-    <String Id="OutOfRbDiskDlgText2" Overridable="yes">İsterseniz, yükleyicinin geri alma özelliğini devre dışı bırakabilirsiniz. Geri alma işlevini devre dışı bırakmak, yüklemenin herhangi bir şekilde kesilmesi durumunda yükleyicinin bilgisayarınızın özgün durumunu geri yüklemesini engeller. Geri alma işlevini devre dışı bırakma riskini göze alıyorsanız Evet'i tıklatın.</String>
+    <String Id="OutOfRbDiskDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="OutOfRbDiskDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="OutOfRbDiskDlgText" Overridable="yes" Value="Vurgulanan birimlerde şu anda seçili olan özellikler için yeterli disk alanı yok. Vurgulanan birimlerden bazı dosyaları kaldırabilir, daha az özellik yükleyebilir veya farklı bir hedef sürücü seçebilirsiniz." />
+    <String Id="OutOfRbDiskDlgDescription" Overridable="yes" Value="Yükleme için gereken disk alanı, kullanılabilir disk alanını aşıyor." />
+    <String Id="OutOfRbDiskDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Disk Alanı Yetersiz" />
+    <String Id="OutOfRbDiskDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
+    <String Id="OutOfRbDiskDlgText2" Overridable="yes" Value="İsterseniz, yükleyicinin geri alma özelliğini devre dışı bırakabilirsiniz. Geri alma işlevini devre dışı bırakmak, yüklemenin herhangi bir şekilde kesilmesi durumunda yükleyicinin bilgisayarınızın özgün durumunu geri yüklemesini engeller. Geri alma işlevini devre dışı bırakma riskini göze alıyorsanız Evet'i tıklatın." />
 
-    <String Id="PrepareDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="PrepareDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="PrepareDlgDescription" Overridable="yes">Kurulum Sihirbazı yükleme sırasında size yol göstermek için hazırlanırken lütfen bekleyin.</String>
-    <String Id="PrepareDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'na Hoş Geldiniz</String>
+    <String Id="PrepareDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="PrepareDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="PrepareDlgDescription" Overridable="yes" Value="Kurulum Sihirbazı yükleme sırasında size yol göstermek için hazırlanırken lütfen bekleyin." />
+    <String Id="PrepareDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'na Hoş Geldiniz" />
 
-    <String Id="ProgressDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="ProgressDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="ProgressDlgTextInstalling" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü yüklerken lütfen bekleyin.</String>
-    <String Id="ProgressDlgTitleInstalling" Overridable="yes">{\WixUI_Font_Title}[ProductName] yükleniyor</String>
-    <String Id="ProgressDlgTextChanging" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü değiştirirken lütfen bekleyin.</String>
-    <String Id="ProgressDlgTitleChanging" Overridable="yes">{\WixUI_Font_Title}[ProductName] değiştiriliyor</String>
-    <String Id="ProgressDlgTextRepairing" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü onarırken lütfen bekleyin.</String>
-    <String Id="ProgressDlgTitleRepairing" Overridable="yes">{\WixUI_Font_Title}[ProductName] onarılıyor</String>
-    <String Id="ProgressDlgTextRemoving" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü kaldırırken lütfen bekleyin.</String>
-    <String Id="ProgressDlgTitleRemoving" Overridable="yes">{\WixUI_Font_Title}[ProductName] kaldırılıyor</String>
-    <String Id="ProgressDlgTextUpdating" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü güncelleştirirken lütfen bekleyin.</String>
-    <String Id="ProgressDlgTitleUpdating" Overridable="yes">{\WixUI_Font_Title}[ProductName] güncelleştiriliyor</String>
-    <String Id="ProgressDlgProgressBar" Overridable="yes">Tamamlandı</String>
-    <String Id="ProgressDlgStatusLabel" Overridable="yes">Durum:</String>
+    <String Id="ProgressDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="ProgressDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="ProgressDlgTextInstalling" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü yüklerken lütfen bekleyin." />
+    <String Id="ProgressDlgTitleInstalling" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] yükleniyor" />
+    <String Id="ProgressDlgTextChanging" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü değiştirirken lütfen bekleyin." />
+    <String Id="ProgressDlgTitleChanging" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] değiştiriliyor" />
+    <String Id="ProgressDlgTextRepairing" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü onarırken lütfen bekleyin." />
+    <String Id="ProgressDlgTitleRepairing" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] onarılıyor" />
+    <String Id="ProgressDlgTextRemoving" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü kaldırırken lütfen bekleyin." />
+    <String Id="ProgressDlgTitleRemoving" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] kaldırılıyor" />
+    <String Id="ProgressDlgTextUpdating" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü güncelleştirirken lütfen bekleyin." />
+    <String Id="ProgressDlgTitleUpdating" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] güncelleştiriliyor" />
+    <String Id="ProgressDlgProgressBar" Overridable="yes" Value="Tamamlandı" />
+    <String Id="ProgressDlgStatusLabel" Overridable="yes" Value="Durum:" />
 
-    <String Id="ResumeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="ResumeDlgInstall" Overridable="yes">Yü&amp;kle</String>
-    <String Id="ResumeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="ResumeDlgDescription" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü bilgisayarınıza yüklemeyi tamamlayacak. Devam etmek için Yükle'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın.</String>
-    <String Id="ResumeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı sürdürülüyor</String>
+    <String Id="ResumeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="ResumeDlgInstall" Overridable="yes" Value="Yü&amp;kle" />
+    <String Id="ResumeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="ResumeDlgDescription" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü bilgisayarınıza yüklemeyi tamamlayacak. Devam etmek için Yükle'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın." />
+    <String Id="ResumeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı sürdürülüyor" />
 
-    <String Id="SetupTypeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="SetupTypeDlgTypicalButton" Overridable="yes">&amp;Normal</String>
-    <String Id="SetupTypeDlgTypicalButtonTooltip" Overridable="yes">Normal Yükleme</String>
-    <String Id="SetupTypeDlgCustomButton" Overridable="yes">Ö&amp;zel</String>
-    <String Id="SetupTypeDlgCustomButtonTooltip" Overridable="yes">Özel Yükleme</String>
-    <String Id="SetupTypeDlgCompleteButton" Overridable="yes">&amp;Tam</String>
-    <String Id="SetupTypeDlgCompleteButtonTooltip" Overridable="yes">Tam Yükleme</String>
-    <String Id="SetupTypeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="SetupTypeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Kurulum Türünü Seç</String>
-    <String Id="SetupTypeDlgDescription" Overridable="yes">Gereksinimlerinize en uygun kurulum türünü seçin</String>
-    <String Id="SetupTypeDlgTypicalText" Overridable="yes">En sık kullanılan program özelliklerini yükler. Çoğu kullanıcı için önerilir.</String>
-    <String Id="SetupTypeDlgCustomText" Overridable="yes">Kullanıcıların yüklenecek program özelliklerini ve bu özelliklerin yükleneceği yeri seçmesine olanak verir. İleri düzey kullanıcılar için önerilir.</String>
-    <String Id="SetupTypeDlgCompleteText" Overridable="yes">Tüm program özellikleri yüklenecek. En fazla disk alanını gerektirir.</String>
+    <String Id="SetupTypeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="SetupTypeDlgTypicalButton" Overridable="yes" Value="&amp;Normal" />
+    <String Id="SetupTypeDlgTypicalButtonTooltip" Overridable="yes" Value="Normal Yükleme" />
+    <String Id="SetupTypeDlgCustomButton" Overridable="yes" Value="Ö&amp;zel" />
+    <String Id="SetupTypeDlgCustomButtonTooltip" Overridable="yes" Value="Özel Yükleme" />
+    <String Id="SetupTypeDlgCompleteButton" Overridable="yes" Value="&amp;Tam" />
+    <String Id="SetupTypeDlgCompleteButtonTooltip" Overridable="yes" Value="Tam Yükleme" />
+    <String Id="SetupTypeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="SetupTypeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Kurulum Türünü Seç" />
+    <String Id="SetupTypeDlgDescription" Overridable="yes" Value="Gereksinimlerinize en uygun kurulum türünü seçin" />
+    <String Id="SetupTypeDlgTypicalText" Overridable="yes" Value="En sık kullanılan program özelliklerini yükler. Çoğu kullanıcı için önerilir." />
+    <String Id="SetupTypeDlgCustomText" Overridable="yes" Value="Kullanıcıların yüklenecek program özelliklerini ve bu özelliklerin yükleneceği yeri seçmesine olanak verir. İleri düzey kullanıcılar için önerilir." />
+    <String Id="SetupTypeDlgCompleteText" Overridable="yes" Value="Tüm program özellikleri yüklenecek. En fazla disk alanını gerektirir." />
 
-    <String Id="UserExit_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="UserExitBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="UserExitTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'nın çalışması kesildi</String>
-    <String Id="UserExitDescription1" Overridable="yes">[ProductName] kurulumu kesildi. Sisteminizde değişiklik yapılmadı. Daha sonra bu programı yüklemek isterseniz, lütfen yüklemeyi yeniden çalıştırın.</String>
-    <String Id="UserExitDescription2" Overridable="yes">Kurulum Sihirbazı'ndan çıkmak için Son düğmesini tıklatın.</String>
+    <String Id="UserExit_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="UserExitBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="UserExitTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'nın çalışması kesildi" />
+    <String Id="UserExitDescription1" Overridable="yes" Value="[ProductName] kurulumu kesildi. Sisteminizde değişiklik yapılmadı. Daha sonra bu programı yüklemek isterseniz, lütfen yüklemeyi yeniden çalıştırın." />
+    <String Id="UserExitDescription2" Overridable="yes" Value="Kurulum Sihirbazı'ndan çıkmak için Son düğmesini tıklatın." />
 
-    <String Id="VerifyReadyDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="VerifyReadyDlgInstall" Overridable="yes">Yü&amp;kle</String>
-    <String Id="VerifyReadyDlgInstallText" Overridable="yes">Yüklemeyi başlatmak için Yükle'yi tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın.</String>
-    <String Id="VerifyReadyDlgInstallTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] ürünü yüklenmeye hazır</String>
-    <String Id="VerifyReadyDlgChange" Overridable="yes">&amp;Değiştir</String>
-    <String Id="VerifyReadyDlgChangeText" Overridable="yes">Yükleme işlemini başlatmak için Değiştir'i tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın.</String>
-    <String Id="VerifyReadyDlgChangeTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] ürünü değiştirilmeye hazır</String>
-    <String Id="VerifyReadyDlgRepair" Overridable="yes">&amp;Onar</String>
-    <String Id="VerifyReadyDlgRepairText" Overridable="yes">[ProductName] yüklemesini onarmak için Onar'ı tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın.</String>
-    <String Id="VerifyReadyDlgRepairTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] ürünü onarılmaya hazır</String>
-    <String Id="VerifyReadyDlgRemove" Overridable="yes">&amp;Kaldır</String>
-    <String Id="VerifyReadyDlgRemoveText" Overridable="yes">[ProductName] ürününü bilgisayarınızdan kaldırmak için Kaldır'ı tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın.</String>
-    <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] ürünü kaldırılmaya hazır</String>
-    <String Id="VerifyReadyDlgUpdate" Overridable="yes">&amp;Güncelleştir</String>
-    <String Id="VerifyReadyDlgUpdateText" Overridable="yes">[ProductName] ürününü bilgisayarınızdan güncelleştirmek için Güncelleştir'i tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın.</String>
-    <String Id="VerifyReadyDlgUpdateTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] ürünü güncelleştirilmeye hazır</String>
+    <String Id="VerifyReadyDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="VerifyReadyDlgInstall" Overridable="yes" Value="Yü&amp;kle" />
+    <String Id="VerifyReadyDlgInstallText" Overridable="yes" Value="Yüklemeyi başlatmak için Yükle'yi tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın." />
+    <String Id="VerifyReadyDlgInstallTitle" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] ürünü yüklenmeye hazır" />
+    <String Id="VerifyReadyDlgChange" Overridable="yes" Value="&amp;Değiştir" />
+    <String Id="VerifyReadyDlgChangeText" Overridable="yes" Value="Yükleme işlemini başlatmak için Değiştir'i tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın." />
+    <String Id="VerifyReadyDlgChangeTitle" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] ürünü değiştirilmeye hazır" />
+    <String Id="VerifyReadyDlgRepair" Overridable="yes" Value="&amp;Onar" />
+    <String Id="VerifyReadyDlgRepairText" Overridable="yes" Value="[ProductName] yüklemesini onarmak için Onar'ı tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın." />
+    <String Id="VerifyReadyDlgRepairTitle" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] ürünü onarılmaya hazır" />
+    <String Id="VerifyReadyDlgRemove" Overridable="yes" Value="&amp;Kaldır" />
+    <String Id="VerifyReadyDlgRemoveText" Overridable="yes" Value="[ProductName] ürününü bilgisayarınızdan kaldırmak için Kaldır'ı tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın." />
+    <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] ürünü kaldırılmaya hazır" />
+    <String Id="VerifyReadyDlgUpdate" Overridable="yes" Value="&amp;Güncelleştir" />
+    <String Id="VerifyReadyDlgUpdateText" Overridable="yes" Value="[ProductName] ürününü bilgisayarınızdan güncelleştirmek için Güncelleştir'i tıklatın. Yükleme ayarlarınızdan herhangi birini gözden geçirmek veya değiştirmek için Geri'yi tıklatın. Sihirbazdan çıkmak için İptal'i tıklatın." />
+    <String Id="VerifyReadyDlgUpdateTitle" Overridable="yes" Value="{\WixUI_Font_Title}[ProductName] ürünü güncelleştirilmeye hazır" />
 
-    <String Id="WaitForCostingDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="WaitForCostingDlgReturn" Overridable="yes">&amp;Geri Dön</String>
-    <String Id="WaitForCostingDlgText" Overridable="yes">Yükleyici disk alanı gereksinimlerinizi belirlerken lütfen bekleyin.</String>
-    <String Id="WaitForCostingDlgIcon" Overridable="yes">WixUI_Ico_Exclam</String>
-    <String Id="WaitForCostingDlgIconTooltip" Overridable="yes">Ünlem işareti simgesi</String>
+    <String Id="WaitForCostingDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="WaitForCostingDlgReturn" Overridable="yes" Value="&amp;Geri Dön" />
+    <String Id="WaitForCostingDlgText" Overridable="yes" Value="Yükleyici disk alanı gereksinimlerinizi belirlerken lütfen bekleyin." />
+    <String Id="WaitForCostingDlgIcon" Overridable="yes" Value="WixUI_Ico_Exclam" />
+    <String Id="WaitForCostingDlgIconTooltip" Overridable="yes" Value="Ünlem işareti simgesi" />
 
-    <String Id="WelcomeDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="WelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="WelcomeDlgDescription" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü bilgisayarınıza yükleyecek. Devam etmek için İleri'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın.</String>
-    <String Id="WelcomeUpdateDlgDescriptionUpdate" Overridable="yes">Kurulum Sihirbazı [ProductName] ürününü bilgisayarınızda güncelleştirecek. Devam etmek için İleri'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın.</String>
-    <String Id="WelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'na Hoş Geldiniz</String>
+    <String Id="WelcomeDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="WelcomeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="WelcomeDlgDescription" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü bilgisayarınıza yükleyecek. Devam etmek için İleri'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın." />
+    <String Id="WelcomeUpdateDlgDescriptionUpdate" Overridable="yes" Value="Kurulum Sihirbazı [ProductName] ürününü bilgisayarınızda güncelleştirecek. Devam etmek için İleri'yi, Kurulum Sihirbazı'ndan çıkmak içinse İptal'i tıklatın." />
+    <String Id="WelcomeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Kurulum Sihirbazı'na Hoş Geldiniz" />
 
-    <String Id="WelcomeEulaDlg_Title" Overridable="yes">[ProductName] Kurulumu</String>
-    <String Id="WelcomeEulaDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="WelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes">Lisans Sözleşmesi'nin koşullarını kabul &amp;ediyorum</String>
-    <String Id="WelcomeEulaDlgInstall" Overridable="yes">Yü&amp;kle</String>
-    <String Id="WelcomeEulaDlgUpdate" Overridable="yes">&amp;Güncelleştir</String>
-    <String Id="WelcomeEulaDlgTitle" Overridable="yes">{\WixUI_Font_Title}Lütfen [ProductName] Lisans Sözleşmesi'ni okuyun</String>
+    <String Id="WelcomeEulaDlg_Title" Overridable="yes" Value="[ProductName] Kurulumu" />
+    <String Id="WelcomeEulaDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="WelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes" Value="Lisans Sözleşmesi'nin koşullarını kabul &amp;ediyorum" />
+    <String Id="WelcomeEulaDlgInstall" Overridable="yes" Value="Yü&amp;kle" />
+    <String Id="WelcomeEulaDlgUpdate" Overridable="yes" Value="&amp;Güncelleştir" />
+    <String Id="WelcomeEulaDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Lütfen [ProductName] Lisans Sözleşmesi'ni okuyun" />
 
-    <String Id="ProgressTextInstallValidate" Overridable="yes">Yükleme doğrulanıyor</String>
-    <String Id="ProgressTextInstallFiles" Overridable="yes">Yeni dosyalar kopyalanıyor</String>
-    <String Id="ProgressTextInstallFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [9], Boyut: [6]</String>
-    <String Id="ProgressTextInstallAdminPackage" Overridable="yes">Ağ yükleme dosyaları kopyalanıyor</String>
-    <String Id="ProgressTextInstallAdminPackageTemplate" Overridable="yes">Dosya: [1], Dizin: [9], Boyut: [6]</String>
-    <String Id="ProgressTextFileCost" Overridable="yes">Alan gereksinimleri hesaplanıyor</String>
-    <String Id="ProgressTextCostInitialize" Overridable="yes">Alan gereksinimleri hesaplanıyor</String>
-    <String Id="ProgressTextCostFinalize" Overridable="yes">Alan gereksinimleri hesaplanıyor</String>
-    <String Id="ProgressTextCreateShortcuts" Overridable="yes">Kısayollar oluşturuluyor</String>
-    <String Id="ProgressTextCreateShortcutsTemplate" Overridable="yes">Kısayol: [1]</String>
-    <String Id="ProgressTextPublishComponents" Overridable="yes">Uygun Bileşenler Yayımlanıyor</String>
-    <String Id="ProgressTextPublishComponentsTemplate" Overridable="yes">Bileşen Kimliği: [1], Niteleyici: [2]</String>
-    <String Id="ProgressTextPublishFeatures" Overridable="yes">Ürün Özellikleri Yayımlanıyor</String>
-    <String Id="ProgressTextPublishFeaturesTemplate" Overridable="yes">Özellik: [1]</String>
-    <String Id="ProgressTextPublishProduct" Overridable="yes">Ürün bilgisi yayımlanıyor</String>
-    <String Id="ProgressTextRegisterClassInfo" Overridable="yes">Sınıf sunucuları kaydediliyor</String>
-    <String Id="ProgressTextRegisterClassInfoTemplate" Overridable="yes">Sınıf Kimliği: [1]</String>
-    <String Id="ProgressTextRegisterExtensionInfo" Overridable="yes">Uzantı sunucuları kaydediliyor</String>
-    <String Id="ProgressTextRegisterExtensionInfoTemplate" Overridable="yes">Uzantı: [1]</String>
-    <String Id="ProgressTextRegisterMIMEInfo" Overridable="yes">MIME bilgisi kaydediliyor</String>
-    <String Id="ProgressTextRegisterMIMEInfoTemplate" Overridable="yes">MIME İçerik Türü: [1], Uzantı: [2]</String>
-    <String Id="ProgressTextRegisterProgIdInfo" Overridable="yes">Program tanımlayıcıları kaydediliyor</String>
-    <String Id="ProgressTextRegisterProgIdInfoTemplate" Overridable="yes">Program Kimliği: [1]</String>
-    <String Id="ProgressTextAllocateRegistrySpace" Overridable="yes">Kayıt defteri alanı ayrılıyor</String>
-    <String Id="ProgressTextAllocateRegistrySpaceTemplate" Overridable="yes">Boş alan: [1]</String>
-    <String Id="ProgressTextAppSearch" Overridable="yes">Yüklü uygulamalar aranıyor</String>
-    <String Id="ProgressTextAppSearchTemplate" Overridable="yes">Özellik: [1], İmza: [2]</String>
-    <String Id="ProgressTextBindImage" Overridable="yes">Yürütülebilir dosyalar bağlanıyor</String>
-    <String Id="ProgressTextBindImageTemplate" Overridable="yes">Dosya: [1]</String>
-    <String Id="ProgressTextCCPSearch" Overridable="yes">Koşullara uyan ürünler aranıyor</String>
-    <String Id="ProgressTextCreateFolders" Overridable="yes">Klasörler oluşturuluyor</String>
-    <String Id="ProgressTextCreateFoldersTemplate" Overridable="yes">Klasör: [1]</String>
-    <String Id="ProgressTextDeleteServices" Overridable="yes">Hizmetler siliniyor</String>
-    <String Id="ProgressTextDeleteServicesTemplate" Overridable="yes">Hizmet: [1]</String>
-    <String Id="ProgressTextDuplicateFiles" Overridable="yes">Yinelenen dosyalar oluşturuluyor</String>
-    <String Id="ProgressTextDuplicateFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [9], Boyut: [6]</String>
-    <String Id="ProgressTextFindRelatedProducts" Overridable="yes">İlgili uygulamalar aranıyor</String>
-    <String Id="ProgressTextFindRelatedProductsTemplate" Overridable="yes">Bulunan uygulama: [1]</String>
-    <String Id="ProgressTextInstallODBC" Overridable="yes">ODBC bileşenleri yükleniyor</String>
-    <String Id="ProgressTextInstallServices" Overridable="yes">Yeni hizmetler yükleniyor</String>
-    <String Id="ProgressTextInstallServicesTemplate" Overridable="yes">Hizmet: [2]</String>
-    <String Id="ProgressTextLaunchConditions" Overridable="yes">Başlatma koşulları değerlendiriliyor</String>
-    <String Id="ProgressTextMigrateFeatureStates" Overridable="yes">İlgili uygulamalardan özellik durumlarının geçişi yapılıyor</String>
-    <String Id="ProgressTextMigrateFeatureStatesTemplate" Overridable="yes">Uygulama: [1]</String>
-    <String Id="ProgressTextMoveFiles" Overridable="yes">Dosyalar taşınıyor</String>
-    <String Id="ProgressTextMoveFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [9], Boyut: [6]</String>
-    <String Id="ProgressTextPatchFiles" Overridable="yes">Dosyalara düzeltme eki uygulanıyor</String>
-    <String Id="ProgressTextPatchFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [2], Boyut: [3]</String>
-    <String Id="ProgressTextProcessComponents" Overridable="yes">Bileşen kaydı güncelleştiriliyor</String>
-    <String Id="ProgressTextRegisterComPlus" Overridable="yes">COM+ Uygulamaları ve Bileşenleri kaydediliyor</String>
-    <String Id="ProgressTextRegisterComPlusTemplate" Overridable="yes">Uygulama Kimliği: [1]{{, Uygulama Türü: [2], Kullanıcılar: [3], RSN: [4]}}</String>
-    <String Id="ProgressTextRegisterFonts" Overridable="yes">Yazı tipleri kaydediliyor</String>
-    <String Id="ProgressTextRegisterFontsTemplate" Overridable="yes">Yazı Tipi: [1]</String>
-    <String Id="ProgressTextRegisterProduct" Overridable="yes">Ürün kaydediliyor</String>
-    <String Id="ProgressTextRegisterProductTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextRegisterTypeLibraries" Overridable="yes">Tür kitaplıkları kaydediliyor</String>
-    <String Id="ProgressTextRegisterTypeLibrariesTemplate" Overridable="yes">Kitaplık Kimliği: [1]</String>
-    <String Id="ProgressTextRegisterUser" Overridable="yes">Kullanıcı kaydediliyor</String>
-    <String Id="ProgressTextRegisterUserTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextRemoveDuplicateFiles" Overridable="yes">Yinelenen dosyalar kaldırılıyor</String>
-    <String Id="ProgressTextRemoveDuplicateFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [9]</String>
-    <String Id="ProgressTextRemoveEnvironmentStrings" Overridable="yes">Ortam dizeleri güncelleştiriliyor</String>
-    <String Id="ProgressTextRemoveEnvironmentStringsTemplate" Overridable="yes">Ad: [1], Değer: [2], Eylem [3]</String>
-    <String Id="ProgressTextRemoveExistingProducts" Overridable="yes">Uygulamalar kaldırılıyor</String>
-    <String Id="ProgressTextRemoveExistingProductsTemplate" Overridable="yes">Uygulama: [1], Komut satırı: [2]</String>
-    <String Id="ProgressTextRemoveFiles" Overridable="yes">Dosyalar kaldırılıyor</String>
-    <String Id="ProgressTextRemoveFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [9]</String>
-    <String Id="ProgressTextRemoveFolders" Overridable="yes">Klasörler kaldırılıyor</String>
-    <String Id="ProgressTextRemoveFoldersTemplate" Overridable="yes">Klasör: [1]</String>
-    <String Id="ProgressTextRemoveIniValues" Overridable="yes">INI dosyası girdileri kaldırılıyor</String>
-    <String Id="ProgressTextRemoveIniValuesTemplate" Overridable="yes">Dosya: [1], Bölüm: [2], Anahtar: [3], Değer: [4]</String>
-    <String Id="ProgressTextRemoveODBC" Overridable="yes">ODBC bileşenleri kaldırılıyor</String>
-    <String Id="ProgressTextRemoveRegistryValues" Overridable="yes">Sistem kayıt defteri değerleri kaldırılıyor</String>
-    <String Id="ProgressTextRemoveRegistryValuesTemplate" Overridable="yes">Anahtar: [1], Ad: [2]</String>
-    <String Id="ProgressTextRemoveShortcuts" Overridable="yes">Kısayollar kaldırılıyor</String>
-    <String Id="ProgressTextRemoveShortcutsTemplate" Overridable="yes">Kısayol: [1]</String>
-    <String Id="ProgressTextRMCCPSearch" Overridable="yes">Koşullara uyan ürünler aranıyor</String>
-    <String Id="ProgressTextSelfRegModules" Overridable="yes">Modüller kaydediliyor</String>
-    <String Id="ProgressTextSelfRegModulesTemplate" Overridable="yes">Dosya: [1], Klasör: [2]</String>
-    <String Id="ProgressTextSelfUnregModules" Overridable="yes">Modüllerin kaydı siliniyor</String>
-    <String Id="ProgressTextSelfUnregModulesTemplate" Overridable="yes">Dosya: [1], Klasör: [2]</String>
-    <String Id="ProgressTextSetODBCFolders" Overridable="yes">ODBC dizinleri başlatılıyor</String>
-    <String Id="ProgressTextStartServices" Overridable="yes">Hizmetler başlatılıyor</String>
-    <String Id="ProgressTextStartServicesTemplate" Overridable="yes">Hizmet: [1]</String>
-    <String Id="ProgressTextStopServices" Overridable="yes">Hizmetler durduruluyor</String>
-    <String Id="ProgressTextStopServicesTemplate" Overridable="yes">Hizmet: [1]</String>
-    <String Id="ProgressTextUnpublishComponents" Overridable="yes">Uygun Bileşenler yayımdan kaldırılıyor</String>
-    <String Id="ProgressTextUnpublishComponentsTemplate" Overridable="yes">Bileşen Kimliği: [1], Niteleyici: [2]</String>
-    <String Id="ProgressTextUnpublishFeatures" Overridable="yes">Ürün Özellikleri yayımdan kaldırılıyor</String>
-    <String Id="ProgressTextUnpublishFeaturesTemplate" Overridable="yes">Özellik: [1]</String>
-    <String Id="ProgressTextUnregisterClassInfo" Overridable="yes">Sınıf sunucularının kaydını sil</String>
-    <String Id="ProgressTextUnregisterClassInfoTemplate" Overridable="yes">Sınıf Kimliği: [1]</String>
-    <String Id="ProgressTextUnregisterComPlus" Overridable="yes">COM+ Uygulamaları ve Bileşenleri'nin kaydı siliniyor</String>
-    <String Id="ProgressTextUnregisterComPlusTemplate" Overridable="yes">Uygulama Kimliği: [1]{{, Uygulama Türü: [2]}}</String>
-    <String Id="ProgressTextUnregisterExtensionInfo" Overridable="yes">Uzantı sunucularının kaydı siliniyor</String>
-    <String Id="ProgressTextUnregisterExtensionInfoTemplate" Overridable="yes">Uzantı: [1]</String>
-    <String Id="ProgressTextUnregisterFonts" Overridable="yes">Yazı tiplerinin kaydı siliniyor</String>
-    <String Id="ProgressTextUnregisterFontsTemplate" Overridable="yes">Yazı Tipi: [1]</String>
-    <String Id="ProgressTextUnregisterMIMEInfo" Overridable="yes">MIME bilgisinin kaydı siliniyor</String>
-    <String Id="ProgressTextUnregisterMIMEInfoTemplate" Overridable="yes">MIME İçerik Türü: [1], Uzantı: [2]</String>
-    <String Id="ProgressTextUnregisterProgIdInfo" Overridable="yes">Program kimliklerinin kaydı siliniyor</String>
-    <String Id="ProgressTextUnregisterProgIdInfoTemplate" Overridable="yes">Program Kimliği: [1]</String>
-    <String Id="ProgressTextUnregisterTypeLibraries" Overridable="yes">Tür kitaplıklarının kaydı siliniyor</String>
-    <String Id="ProgressTextUnregisterTypeLibrariesTemplate" Overridable="yes">Kitaplık Kimliği: [1]</String>
-    <String Id="ProgressTextWriteEnvironmentStrings" Overridable="yes">Ortam dizeleri güncelleştiriliyor</String>
-    <String Id="ProgressTextWriteEnvironmentStringsTemplate" Overridable="yes">Ad: [1], Değer: [2], Eylem [3]</String>
-    <String Id="ProgressTextWriteIniValues" Overridable="yes">INI dosyası değerleri yazılıyor</String>
-    <String Id="ProgressTextWriteIniValuesTemplate" Overridable="yes">Dosya: [1], Bölüm: [2], Anahtar: [3], Değer: [4]</String>
-    <String Id="ProgressTextWriteRegistryValues" Overridable="yes">Sistem kayıt defteri değerleri yazılıyor</String>
-    <String Id="ProgressTextWriteRegistryValuesTemplate" Overridable="yes">Anahtar: [1], Ad: [2], Değer: [3]</String>
-    <String Id="ProgressTextAdvertise" Overridable="yes">Uygulama tanıtılıyor</String>
-    <String Id="ProgressTextGenerateScript" Overridable="yes">Eylem için komut dosyası işlemleri oluşturuluyor:</String>
-    <String Id="ProgressTextGenerateScriptTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextInstallSFPCatalogFile" Overridable="yes">Sistem kataloğu yükleniyor</String>
-    <String Id="ProgressTextInstallSFPCatalogFileTemplate" Overridable="yes">Dosya: [1], Bağımlılıklar: [2]</String>
-    <String Id="ProgressTextMsiPublishAssemblies" Overridable="yes">Derleme bilgileri yayımlanıyor</String>
-    <String Id="ProgressTextMsiPublishAssembliesTemplate" Overridable="yes">Uygulama Bağlamı: [1], Derleme Adı: [2]</String>
-    <String Id="ProgressTextMsiUnpublishAssemblies" Overridable="yes">Derleme bilgileri yayımdan kaldırılıyor</String>
-    <String Id="ProgressTextMsiUnpublishAssembliesTemplate" Overridable="yes">Uygulama Bağlamı: [1], Derleme Adı: [2]</String>
-    <String Id="ProgressTextRollback" Overridable="yes">Eylem geri alınıyor:</String>
-    <String Id="ProgressTextRollbackTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextRollbackCleanup" Overridable="yes">Yedek dosyalar kaldırılıyor</String>
-    <String Id="ProgressTextRollbackCleanupTemplate" Overridable="yes">Dosya: [1]</String>
-    <String Id="ProgressTextUnmoveFiles" Overridable="yes">Taşınan dosyalar kaldırılıyor</String>
-    <String Id="ProgressTextUnmoveFilesTemplate" Overridable="yes">Dosya: [1], Dizin: [9]</String>
-    <String Id="ProgressTextUnpublishProduct" Overridable="yes">Ürün bilgisi yayımdan kaldırılıyor</String>
+    <String Id="ProgressTextInstallValidate" Overridable="yes" Value="Yükleme doğrulanıyor" />
+    <String Id="ProgressTextInstallFiles" Overridable="yes" Value="Yeni dosyalar kopyalanıyor" />
+    <String Id="ProgressTextInstallFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9], Boyut: [6]" />
+    <String Id="ProgressTextInstallAdminPackage" Overridable="yes" Value="Ağ yükleme dosyaları kopyalanıyor" />
+    <String Id="ProgressTextInstallAdminPackageTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9], Boyut: [6]" />
+    <String Id="ProgressTextFileCost" Overridable="yes" Value="Alan gereksinimleri hesaplanıyor" />
+    <String Id="ProgressTextCostInitialize" Overridable="yes" Value="Alan gereksinimleri hesaplanıyor" />
+    <String Id="ProgressTextCostFinalize" Overridable="yes" Value="Alan gereksinimleri hesaplanıyor" />
+    <String Id="ProgressTextCreateShortcuts" Overridable="yes" Value="Kısayollar oluşturuluyor" />
+    <String Id="ProgressTextCreateShortcutsTemplate" Overridable="yes" Value="Kısayol: [1]" />
+    <String Id="ProgressTextPublishComponents" Overridable="yes" Value="Uygun Bileşenler Yayımlanıyor" />
+    <String Id="ProgressTextPublishComponentsTemplate" Overridable="yes" Value="Bileşen Kimliği: [1], Niteleyici: [2]" />
+    <String Id="ProgressTextPublishFeatures" Overridable="yes" Value="Ürün Özellikleri Yayımlanıyor" />
+    <String Id="ProgressTextPublishFeaturesTemplate" Overridable="yes" Value="Özellik: [1]" />
+    <String Id="ProgressTextPublishProduct" Overridable="yes" Value="Ürün bilgisi yayımlanıyor" />
+    <String Id="ProgressTextRegisterClassInfo" Overridable="yes" Value="Sınıf sunucuları kaydediliyor" />
+    <String Id="ProgressTextRegisterClassInfoTemplate" Overridable="yes" Value="Sınıf Kimliği: [1]" />
+    <String Id="ProgressTextRegisterExtensionInfo" Overridable="yes" Value="Uzantı sunucuları kaydediliyor" />
+    <String Id="ProgressTextRegisterExtensionInfoTemplate" Overridable="yes" Value="Uzantı: [1]" />
+    <String Id="ProgressTextRegisterMIMEInfo" Overridable="yes" Value="MIME bilgisi kaydediliyor" />
+    <String Id="ProgressTextRegisterMIMEInfoTemplate" Overridable="yes" Value="MIME İçerik Türü: [1], Uzantı: [2]" />
+    <String Id="ProgressTextRegisterProgIdInfo" Overridable="yes" Value="Program tanımlayıcıları kaydediliyor" />
+    <String Id="ProgressTextRegisterProgIdInfoTemplate" Overridable="yes" Value="Program Kimliği: [1]" />
+    <String Id="ProgressTextAllocateRegistrySpace" Overridable="yes" Value="Kayıt defteri alanı ayrılıyor" />
+    <String Id="ProgressTextAllocateRegistrySpaceTemplate" Overridable="yes" Value="Boş alan: [1]" />
+    <String Id="ProgressTextAppSearch" Overridable="yes" Value="Yüklü uygulamalar aranıyor" />
+    <String Id="ProgressTextAppSearchTemplate" Overridable="yes" Value="Özellik: [1], İmza: [2]" />
+    <String Id="ProgressTextBindImage" Overridable="yes" Value="Yürütülebilir dosyalar bağlanıyor" />
+    <String Id="ProgressTextBindImageTemplate" Overridable="yes" Value="Dosya: [1]" />
+    <String Id="ProgressTextCCPSearch" Overridable="yes" Value="Koşullara uyan ürünler aranıyor" />
+    <String Id="ProgressTextCreateFolders" Overridable="yes" Value="Klasörler oluşturuluyor" />
+    <String Id="ProgressTextCreateFoldersTemplate" Overridable="yes" Value="Klasör: [1]" />
+    <String Id="ProgressTextDeleteServices" Overridable="yes" Value="Hizmetler siliniyor" />
+    <String Id="ProgressTextDeleteServicesTemplate" Overridable="yes" Value="Hizmet: [1]" />
+    <String Id="ProgressTextDuplicateFiles" Overridable="yes" Value="Yinelenen dosyalar oluşturuluyor" />
+    <String Id="ProgressTextDuplicateFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9], Boyut: [6]" />
+    <String Id="ProgressTextFindRelatedProducts" Overridable="yes" Value="İlgili uygulamalar aranıyor" />
+    <String Id="ProgressTextFindRelatedProductsTemplate" Overridable="yes" Value="Bulunan uygulama: [1]" />
+    <String Id="ProgressTextInstallODBC" Overridable="yes" Value="ODBC bileşenleri yükleniyor" />
+    <String Id="ProgressTextInstallServices" Overridable="yes" Value="Yeni hizmetler yükleniyor" />
+    <String Id="ProgressTextInstallServicesTemplate" Overridable="yes" Value="Hizmet: [2]" />
+    <String Id="ProgressTextLaunchConditions" Overridable="yes" Value="Başlatma koşulları değerlendiriliyor" />
+    <String Id="ProgressTextMigrateFeatureStates" Overridable="yes" Value="İlgili uygulamalardan özellik durumlarının geçişi yapılıyor" />
+    <String Id="ProgressTextMigrateFeatureStatesTemplate" Overridable="yes" Value="Uygulama: [1]" />
+    <String Id="ProgressTextMoveFiles" Overridable="yes" Value="Dosyalar taşınıyor" />
+    <String Id="ProgressTextMoveFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9], Boyut: [6]" />
+    <String Id="ProgressTextPatchFiles" Overridable="yes" Value="Dosyalara düzeltme eki uygulanıyor" />
+    <String Id="ProgressTextPatchFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [2], Boyut: [3]" />
+    <String Id="ProgressTextProcessComponents" Overridable="yes" Value="Bileşen kaydı güncelleştiriliyor" />
+    <String Id="ProgressTextRegisterComPlus" Overridable="yes" Value="COM+ Uygulamaları ve Bileşenleri kaydediliyor" />
+    <String Id="ProgressTextRegisterComPlusTemplate" Overridable="yes" Value="Uygulama Kimliği: [1]{{, Uygulama Türü: [2], Kullanıcılar: [3], RSN: [4]}}" />
+    <String Id="ProgressTextRegisterFonts" Overridable="yes" Value="Yazı tipleri kaydediliyor" />
+    <String Id="ProgressTextRegisterFontsTemplate" Overridable="yes" Value="Yazı Tipi: [1]" />
+    <String Id="ProgressTextRegisterProduct" Overridable="yes" Value="Ürün kaydediliyor" />
+    <String Id="ProgressTextRegisterProductTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextRegisterTypeLibraries" Overridable="yes" Value="Tür kitaplıkları kaydediliyor" />
+    <String Id="ProgressTextRegisterTypeLibrariesTemplate" Overridable="yes" Value="Kitaplık Kimliği: [1]" />
+    <String Id="ProgressTextRegisterUser" Overridable="yes" Value="Kullanıcı kaydediliyor" />
+    <String Id="ProgressTextRegisterUserTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextRemoveDuplicateFiles" Overridable="yes" Value="Yinelenen dosyalar kaldırılıyor" />
+    <String Id="ProgressTextRemoveDuplicateFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9]" />
+    <String Id="ProgressTextRemoveEnvironmentStrings" Overridable="yes" Value="Ortam dizeleri güncelleştiriliyor" />
+    <String Id="ProgressTextRemoveEnvironmentStringsTemplate" Overridable="yes" Value="Ad: [1], Değer: [2], Eylem [3]" />
+    <String Id="ProgressTextRemoveExistingProducts" Overridable="yes" Value="Uygulamalar kaldırılıyor" />
+    <String Id="ProgressTextRemoveExistingProductsTemplate" Overridable="yes" Value="Uygulama: [1], Komut satırı: [2]" />
+    <String Id="ProgressTextRemoveFiles" Overridable="yes" Value="Dosyalar kaldırılıyor" />
+    <String Id="ProgressTextRemoveFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9]" />
+    <String Id="ProgressTextRemoveFolders" Overridable="yes" Value="Klasörler kaldırılıyor" />
+    <String Id="ProgressTextRemoveFoldersTemplate" Overridable="yes" Value="Klasör: [1]" />
+    <String Id="ProgressTextRemoveIniValues" Overridable="yes" Value="INI dosyası girdileri kaldırılıyor" />
+    <String Id="ProgressTextRemoveIniValuesTemplate" Overridable="yes" Value="Dosya: [1], Bölüm: [2], Anahtar: [3], Değer: [4]" />
+    <String Id="ProgressTextRemoveODBC" Overridable="yes" Value="ODBC bileşenleri kaldırılıyor" />
+    <String Id="ProgressTextRemoveRegistryValues" Overridable="yes" Value="Sistem kayıt defteri değerleri kaldırılıyor" />
+    <String Id="ProgressTextRemoveRegistryValuesTemplate" Overridable="yes" Value="Anahtar: [1], Ad: [2]" />
+    <String Id="ProgressTextRemoveShortcuts" Overridable="yes" Value="Kısayollar kaldırılıyor" />
+    <String Id="ProgressTextRemoveShortcutsTemplate" Overridable="yes" Value="Kısayol: [1]" />
+    <String Id="ProgressTextRMCCPSearch" Overridable="yes" Value="Koşullara uyan ürünler aranıyor" />
+    <String Id="ProgressTextSelfRegModules" Overridable="yes" Value="Modüller kaydediliyor" />
+    <String Id="ProgressTextSelfRegModulesTemplate" Overridable="yes" Value="Dosya: [1], Klasör: [2]" />
+    <String Id="ProgressTextSelfUnregModules" Overridable="yes" Value="Modüllerin kaydı siliniyor" />
+    <String Id="ProgressTextSelfUnregModulesTemplate" Overridable="yes" Value="Dosya: [1], Klasör: [2]" />
+    <String Id="ProgressTextSetODBCFolders" Overridable="yes" Value="ODBC dizinleri başlatılıyor" />
+    <String Id="ProgressTextStartServices" Overridable="yes" Value="Hizmetler başlatılıyor" />
+    <String Id="ProgressTextStartServicesTemplate" Overridable="yes" Value="Hizmet: [1]" />
+    <String Id="ProgressTextStopServices" Overridable="yes" Value="Hizmetler durduruluyor" />
+    <String Id="ProgressTextStopServicesTemplate" Overridable="yes" Value="Hizmet: [1]" />
+    <String Id="ProgressTextUnpublishComponents" Overridable="yes" Value="Uygun Bileşenler yayımdan kaldırılıyor" />
+    <String Id="ProgressTextUnpublishComponentsTemplate" Overridable="yes" Value="Bileşen Kimliği: [1], Niteleyici: [2]" />
+    <String Id="ProgressTextUnpublishFeatures" Overridable="yes" Value="Ürün Özellikleri yayımdan kaldırılıyor" />
+    <String Id="ProgressTextUnpublishFeaturesTemplate" Overridable="yes" Value="Özellik: [1]" />
+    <String Id="ProgressTextUnregisterClassInfo" Overridable="yes" Value="Sınıf sunucularının kaydını sil" />
+    <String Id="ProgressTextUnregisterClassInfoTemplate" Overridable="yes" Value="Sınıf Kimliği: [1]" />
+    <String Id="ProgressTextUnregisterComPlus" Overridable="yes" Value="COM+ Uygulamaları ve Bileşenleri'nin kaydı siliniyor" />
+    <String Id="ProgressTextUnregisterComPlusTemplate" Overridable="yes" Value="Uygulama Kimliği: [1]{{, Uygulama Türü: [2]}}" />
+    <String Id="ProgressTextUnregisterExtensionInfo" Overridable="yes" Value="Uzantı sunucularının kaydı siliniyor" />
+    <String Id="ProgressTextUnregisterExtensionInfoTemplate" Overridable="yes" Value="Uzantı: [1]" />
+    <String Id="ProgressTextUnregisterFonts" Overridable="yes" Value="Yazı tiplerinin kaydı siliniyor" />
+    <String Id="ProgressTextUnregisterFontsTemplate" Overridable="yes" Value="Yazı Tipi: [1]" />
+    <String Id="ProgressTextUnregisterMIMEInfo" Overridable="yes" Value="MIME bilgisinin kaydı siliniyor" />
+    <String Id="ProgressTextUnregisterMIMEInfoTemplate" Overridable="yes" Value="MIME İçerik Türü: [1], Uzantı: [2]" />
+    <String Id="ProgressTextUnregisterProgIdInfo" Overridable="yes" Value="Program kimliklerinin kaydı siliniyor" />
+    <String Id="ProgressTextUnregisterProgIdInfoTemplate" Overridable="yes" Value="Program Kimliği: [1]" />
+    <String Id="ProgressTextUnregisterTypeLibraries" Overridable="yes" Value="Tür kitaplıklarının kaydı siliniyor" />
+    <String Id="ProgressTextUnregisterTypeLibrariesTemplate" Overridable="yes" Value="Kitaplık Kimliği: [1]" />
+    <String Id="ProgressTextWriteEnvironmentStrings" Overridable="yes" Value="Ortam dizeleri güncelleştiriliyor" />
+    <String Id="ProgressTextWriteEnvironmentStringsTemplate" Overridable="yes" Value="Ad: [1], Değer: [2], Eylem [3]" />
+    <String Id="ProgressTextWriteIniValues" Overridable="yes" Value="INI dosyası değerleri yazılıyor" />
+    <String Id="ProgressTextWriteIniValuesTemplate" Overridable="yes" Value="Dosya: [1], Bölüm: [2], Anahtar: [3], Değer: [4]" />
+    <String Id="ProgressTextWriteRegistryValues" Overridable="yes" Value="Sistem kayıt defteri değerleri yazılıyor" />
+    <String Id="ProgressTextWriteRegistryValuesTemplate" Overridable="yes" Value="Anahtar: [1], Ad: [2], Değer: [3]" />
+    <String Id="ProgressTextAdvertise" Overridable="yes" Value="Uygulama tanıtılıyor" />
+    <String Id="ProgressTextGenerateScript" Overridable="yes" Value="Eylem için komut dosyası işlemleri oluşturuluyor:" />
+    <String Id="ProgressTextGenerateScriptTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextInstallSFPCatalogFile" Overridable="yes" Value="Sistem kataloğu yükleniyor" />
+    <String Id="ProgressTextInstallSFPCatalogFileTemplate" Overridable="yes" Value="Dosya: [1], Bağımlılıklar: [2]" />
+    <String Id="ProgressTextMsiPublishAssemblies" Overridable="yes" Value="Derleme bilgileri yayımlanıyor" />
+    <String Id="ProgressTextMsiPublishAssembliesTemplate" Overridable="yes" Value="Uygulama Bağlamı: [1], Derleme Adı: [2]" />
+    <String Id="ProgressTextMsiUnpublishAssemblies" Overridable="yes" Value="Derleme bilgileri yayımdan kaldırılıyor" />
+    <String Id="ProgressTextMsiUnpublishAssembliesTemplate" Overridable="yes" Value="Uygulama Bağlamı: [1], Derleme Adı: [2]" />
+    <String Id="ProgressTextRollback" Overridable="yes" Value="Eylem geri alınıyor:" />
+    <String Id="ProgressTextRollbackTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextRollbackCleanup" Overridable="yes" Value="Yedek dosyalar kaldırılıyor" />
+    <String Id="ProgressTextRollbackCleanupTemplate" Overridable="yes" Value="Dosya: [1]" />
+    <String Id="ProgressTextUnmoveFiles" Overridable="yes" Value="Taşınan dosyalar kaldırılıyor" />
+    <String Id="ProgressTextUnmoveFilesTemplate" Overridable="yes" Value="Dosya: [1], Dizin: [9]" />
+    <String Id="ProgressTextUnpublishProduct" Overridable="yes" Value="Ürün bilgisi yayımdan kaldırılıyor" />
 
-    <String Id="Error0" Overridable="yes">{{Önemli hata: }}</String>
-    <String Id="Error1" Overridable="yes">{{Hata [1]. }}</String>
-    <String Id="Error2" Overridable="yes">Uyarı [1]. </String>
-    <String Id="Error4" Overridable="yes">Bilgi [1]. </String>
-    <String Id="Error5" Overridable="yes">Yükleyici bu paketi yüklerken beklenmedik bir hatayla karşılaştı. Bu, pakette sorun olduğunu gösteriyor olabilir. Hata kodu: [1]. {{Bağımsız değişkenler: [2], [3], [4]}}</String>
-    <String Id="Error7" Overridable="yes">{{Disk dolu: }}</String>
-    <String Id="Error8" Overridable="yes">Eylem [Time]: [1]. [2]</String>
-    <String Id="Error9" Overridable="yes">[ProductName]</String>
-    <String Id="Error10" Overridable="yes">{[2]}{, [3]}{, [4]}</String>
-    <String Id="Error11" Overridable="yes">İleti türü: [1], Bağımsız değişken: [2]</String>
-    <String Id="Error12" Overridable="yes">=== Günlük başladı: [Date] [Time] ===</String>
-    <String Id="Error13" Overridable="yes">=== Günlük durdu: [Date] [Time] ===</String>
-    <String Id="Error14" Overridable="yes">Eylem başladı [Time]: [1].</String>
-    <String Id="Error15" Overridable="yes">Eylem sona erdi [Time]: [1]. Dönen değer [2].</String>
-    <String Id="Error16" Overridable="yes">Kalan süre: {[1] dakika }{[2] saniye}</String>
-    <String Id="Error17" Overridable="yes">Bellek yetersiz. Yeniden denemeden önce diğer uygulamaları kapatın.</String>
-    <String Id="Error18" Overridable="yes">Yükleyici artık yanıt vermiyor.</String>
-    <String Id="Error19" Overridable="yes">Yükleyici beklenenden önce durdu.</String>
-    <String Id="Error20" Overridable="yes">Windows, [ProductName] ürününü yapılandırırken lütfen bekleyin</String>
-    <String Id="Error21" Overridable="yes">Gerekli bilgiler toplanıyor...</String>
-    <String Id="Error22" Overridable="yes">Bu uygulamanın eski sürümleri kaldırılıyor...</String>
-    <String Id="Error23" Overridable="yes">Bu uygulamanın eski sürümlerini kaldırma hazırlığı yapılıyor...</String>
-    <String Id="Error32" Overridable="yes">{[ProductName] }Kurulumu başarıyla tamamlandı.</String>
-    <String Id="Error33" Overridable="yes">{[ProductName] }Kurulumu başarısız oldu.</String>
-    <String Id="Error1101" Overridable="yes">Dosyadan okuma hatası: [2]. {{ Sistem hatası [3].}} Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun.</String>
-    <String Id="Error1301" Overridable="yes">'[2]' dosyası oluşturulamıyor. Bu ada sahip bir dizin zaten var. Yüklemeyi iptal edin ve farklı bir konuma yüklemeyi deneyin.</String>
-    <String Id="Error1302" Overridable="yes">Lütfen diski takın: [2]</String>
-    <String Id="Error1303" Overridable="yes">Yükleyicinin [2] dizinine erişmek için yeterli ayrıcalığı yok. Yükleme işlemi devam edemiyor. Yönetici olarak oturum açın veya sistem yöneticinize başvurun.</String>
-    <String Id="Error1304" Overridable="yes">Dosyaya yazma hatası: [2]. Bu dizine erişiminizin olduğundan emin olun.</String>
-    <String Id="Error1305" Overridable="yes">[2] dosyasından okuma hatası. {{ Sistem hatası [3].}} Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun.</String>
-    <String Id="Error1306" Overridable="yes">Başka bir uygulamanın '[2]' dosyasına özel kullanım erişimi var. Lütfen diğer tüm uygulamaları kapatın, sonra Yeniden Dene'yi tıklatın.</String>
-    <String Id="Error1307" Overridable="yes">Bu dosyayı yüklemek için yeterli disk alanı yok: [2]. Bir miktar disk alanı boşaltın ve Yeniden Dene'yi tıklatın veya çıkmak için İptal'i tıklatın.</String>
-    <String Id="Error1308" Overridable="yes">Kaynak dosya bulunamadı: [2]. Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun.</String>
-    <String Id="Error1309" Overridable="yes">Dosyadan okuma hatası: [3]. {{ Sistem hatası [2].}} Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun.</String>
-    <String Id="Error1310" Overridable="yes">Dosyaya yazma hatası: [3]. {{ Sistem hatası [2].}} Bu dizine erişiminiz olduğundan emin olun.</String>
-    <String Id="Error1311" Overridable="yes">Kaynak dosya bulunamadı {{(dolap)}}: [2]. Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun.</String>
-    <String Id="Error1312" Overridable="yes">'[2]' dizini oluşturulamıyor. Bu adda bir dosya zaten var. Lütfen dosyayı yeniden adlandırın veya kaldırın ve Yeniden Dene'yi tıklatın veya çıkmak için İptal'i tıklatın.</String>
-    <String Id="Error1313" Overridable="yes">[2] birimi şu anda kullanılamıyor. Lütfen başka bir birim seçin.</String>
-    <String Id="Error1314" Overridable="yes">Belirtilen '[2]' yolu kullanılamıyor.</String>
-    <String Id="Error1315" Overridable="yes">Belirtilen klasöre yazılamıyor: [2].</String>
-    <String Id="Error1316" Overridable="yes">Dosyadan okunmaya çalışılırken bir ağ hatası oluştu: [2]</String>
-    <String Id="Error1317" Overridable="yes">Dizin oluşturulmaya çalışılırken hata oluştu: [2]</String>
-    <String Id="Error1318" Overridable="yes">Dizin oluşturulmaya çalışılırken bir ağ hatası oluştu: [2]</String>
-    <String Id="Error1319" Overridable="yes">Kaynak dosya dolabı açılmaya çalışılırken bir ağ hatası oluştu: [2]</String>
-    <String Id="Error1320" Overridable="yes">Belirtilen yol çok uzun: [2]</String>
-    <String Id="Error1321" Overridable="yes">Yükleyicinin bu dosyayı değiştirmek için yeterli ayrıcalığı yok: [2].</String>
-    <String Id="Error1322" Overridable="yes">'[2]' klasör yolunun bir bölümü geçersiz. Boş veya sistem tarafından izin verilen uzunluğu aşıyor.</String>
-    <String Id="Error1323" Overridable="yes">'[2]' klasör yolu, klasör yollarında geçerli olmayan sözcükler içeriyor.</String>
-    <String Id="Error1324" Overridable="yes">'[2]' klasör yolu geçersiz karakter içeriyor.</String>
-    <String Id="Error1325" Overridable="yes">'[2]' geçerli bir kısa dosya adı değil.</String>
-    <String Id="Error1326" Overridable="yes">Dosya güvenliğini alma hatası: [3] GetLastError: [2]</String>
-    <String Id="Error1327" Overridable="yes">Geçersiz Sürücü: [2]</String>
-    <String Id="Error1328" Overridable="yes">[2] dosyasına düzeltme eki uygulanırken hata oluştu. Büyük olasılıkla başka bir şekilde güncelleştirilmiş ve artık bu düzeltme eki tarafından değiştirilemiyor. Daha fazla bilgi için düzeltme ekinizin satıcısına başvurun. {{Sistem Hatası: [3]}}</String>
-    <String Id="Error1329" Overridable="yes">[2] dolap dosyası dijital olarak imzalanmadığından gerekli bir dosya yüklenemiyor. Bu, dolap dosyasının bozuk olduğunu gösteriyor olabilir.</String>
-    <String Id="Error1330" Overridable="yes">[2] dolap dosyası geçersiz bir dijital imzaya sahip olduğundan gerekli bir dosya yüklenemiyor. Bu, dolap dosyasının bozuk olduğunu gösteriyor olabilir. {{WinVerifyTrust tarafından [3] hatası döndürüldü.}}</String>
-    <String Id="Error1331" Overridable="yes">[2] dosyası doğru kopyalanamadı: CRC hatası.</String>
-    <String Id="Error1332" Overridable="yes">[2] dosyası doğru taşınamadı: CRC hatası.</String>
-    <String Id="Error1333" Overridable="yes">[2] dosyasına düzeltme eki doğru uygulanamadı: CRC hatası.</String>
-    <String Id="Error1334" Overridable="yes">'[2]' dosyası '[3]' dolap dosyasında bulunamadığından yüklenemiyor. Bu bir ağ hatasını, CD-ROM'dan okuma hatasını veya bu pakette sorun olduğunu gösteriyor olabilir.</String>
-    <String Id="Error1335" Overridable="yes">Bu yükleme için gereken '[2]' dolap dosyası bozuk olduğundan kullanılamıyor. Bu bir ağ hatasını, CD-ROM'dan okuma hatasını veya bu pakette sorun olduğunu gösteriyor olabilir.</String>
-    <String Id="Error1336" Overridable="yes">Bu yüklemeyi tamamlamak için gereken geçici bir dosya oluşturulurken hata oluştu.{{ Klasör: [3]. Sistem hata kodu: [2]}}</String>
-    <String Id="Error1401" Overridable="yes">[2] anahtarı oluşturulamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun. </String>
-    <String Id="Error1402" Overridable="yes">[2] anahtarı açılamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun. </String>
-    <String Id="Error1403" Overridable="yes">[3] anahtarından [2] değeri silinemedi. {{ Sistem hatası [4].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun. </String>
-    <String Id="Error1404" Overridable="yes">[2] anahtarı silinemedi. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun. </String>
-    <String Id="Error1405" Overridable="yes">[3] anahtarından [2] değeri okunamadı. {{ Sistem hatası [4].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun. </String>
-    <String Id="Error1406" Overridable="yes">[2] değeri [3] anahtarına yazılamadı. {{ Sistem hatası [4].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun.</String>
-    <String Id="Error1407" Overridable="yes">[2] anahtarının değer adları alınamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun.</String>
-    <String Id="Error1408" Overridable="yes">[2] anahtarının alt anahtar adları alınamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun.</String>
-    <String Id="Error1409" Overridable="yes">[2] anahtarının güvenlik bilgileri okunamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun.</String>
-    <String Id="Error1410" Overridable="yes">Kullanılabilir kayıt defteri alanı artırılamadı. Bu uygulamanın yüklenmesi için [2] KB boş kayıt defteri alanı gerekiyor.</String>
-    <String Id="Error1500" Overridable="yes">Başka bir yükleme sürüyor. Buna devam etmeden önce söz konusu yükleme işlemini tamamlamalısınız.</String>
-    <String Id="Error1501" Overridable="yes">Güvenli verilere erişim hatası. Lütfen Windows Installer'ın düzgün yapılandırıldığından emin olun ve yüklemeyi yeniden deneyin.</String>
-    <String Id="Error1502" Overridable="yes">'[2]' kullanıcısı '[3]' ürününü yüklemeyi daha önce başlattı. Bu kullanıcının ürünü kullanabilmesi için söz konusu yüklemeyi yeniden çalıştırması gerekecek. Şimdi geçerli yükleme işleminiz devam edecek.</String>
-    <String Id="Error1503" Overridable="yes">'[2]' kullanıcısı '[3]' ürününü yüklemeyi daha önce başlattı. Bu kullanıcının ürünü kullanabilmesi için söz konusu yüklemeyi yeniden çalıştırması gerekecek.</String>
-    <String Id="Error1601" Overridable="yes">Disk alanı yetersiz -- Birim: '[2]'; gerekli alan: [3] KB; kullanılabilir alan: [4] KB. Bir miktar disk alanı boşaltın ve yeniden deneyin.</String>
-    <String Id="Error1602" Overridable="yes">İptal etmek istediğinizden emin misiniz?</String>
-    <String Id="Error1603" Overridable="yes">[2][3] dosyası kullanımda tutulmaktadır {şu işlem tarafından: Ad: [4], Kimlik: [5], Pencere Başlığı: '[6]'}. Bu uygulamayı kapatın ve yeniden deneyin.</String>
-    <String Id="Error1604" Overridable="yes">'[2]' ürünü zaten yüklü olduğundan bu ürünün yüklenmesini engelliyor. İki ürün birbiriyle uyumlu değil.</String>
-    <String Id="Error1605" Overridable="yes">'[2]' birimindeki disk alanı, kurtarma etkinleştirilmiş olarak yüklemeye devam etmek için yeterli değil. [3] KB gerekiyor, ancak yalnızca [4] KB var. Kurtarma bilgilerini kaydetmeden yüklemeye devam etmek için Yoksay'ı, kullanılabilir disk alanını yeniden denetlemek için Yeniden Dene'yi veya yükleme işleminden çıkmak için İptal'i tıklatın.</String>
-    <String Id="Error1606" Overridable="yes">[2] ağ konumuna erişilemedi.</String>
-    <String Id="Error1607" Overridable="yes">Yüklemeye devam etmeden önce aşağıdaki uygulamaların kapatılması gerekiyor:</String>
-    <String Id="Error1608" Overridable="yes">Bu ürünü yüklemek için bu makineye daha önce yüklenmiş uygun bir ürün bulunamadı.</String>
-    <String Id="Error1609" Overridable="yes">Güvenlik ayarları uygulanırken hata oluştu. [2] geçerli bir kullanıcı veya grup değil. Bunun nedeni paketin sorunlu olması veya ağdaki etki alanı denetleyicisiyle bağlantıda bir sorun olması olabilir. Ağ bağlantınızı denetleyip Yeniden Dene'yi veya yüklemeyi sona erdirmek için İptal'i tıklatın. {{Kullanıcının SID'si bulunamadı, sistem hatası [3]}}</String>
-    <String Id="Error1701" Overridable="yes">[2] anahtarı geçerli değil. Doğru anahtarı girdiğinizi doğrulayın.</String>
-    <String Id="Error1702" Overridable="yes">Yükleyicinin [2] yapılandırmasına devam edebilmesi için sisteminizi yeniden başlatmanız gerekiyor. Şimdi yeniden başlatmak için Evet'i veya daha sonra el ile yeniden başlatacaksanız Hayır'ı tıklatın.</String>
-    <String Id="Error1703" Overridable="yes">[2] yapılandırma değişikliklerinin etkinleşmesi için sisteminizi yeniden başlatmalısınız. Şimdi yeniden başlatmak için Evet'i veya daha sonra el ile yeniden başlatacaksanız Hayır'ı tıklatın.</String>
-    <String Id="Error1704" Overridable="yes">Bir [2] yüklemesi şu anda askıya alınmış durumda. Devam etmek için bu yükleme tarafından yapılan değişiklikleri geri almanız gerekiyor. Bu değişiklikleri geri almak istiyor musunuz?</String>
-    <String Id="Error1705" Overridable="yes">Bu ürünün daha önceki bir yüklemesi devam ediyor. Devam etmek için bu yükleme tarafından yapılan değişiklikleri geri almanız gerekiyor. Bu değişiklikleri geri almak istiyor musunuz?</String>
-    <String Id="Error1706" Overridable="yes">[2] ürününün yükleme paketi bulunamadı. '[3]' yükleme paketinin geçerli bir kopyasını kullanarak yüklemeyi yeniden deneyin.</String>
-    <String Id="Error1707" Overridable="yes">Yükleme başarıyla tamamlandı.</String>
-    <String Id="Error1708" Overridable="yes">Yükleme yapılamadı.</String>
-    <String Id="Error1709" Overridable="yes">Ürün: [2] -- [3]</String>
-    <String Id="Error1710" Overridable="yes">Bilgisayarınızı bir önceki durumuna geri yükleyebilir veya yükleme işlemine daha sonra devam edebilirsiniz. Önceki duruma geri yüklemek istiyor musunuz?</String>
-    <String Id="Error1711" Overridable="yes">Yükleme bilgileri diske yazılırken bir hata oluştu. Yeterli disk alanı olup olmadığını denetleyin ve Yeniden Dene'yi tıklatın veya yüklemeyi sona erdirmek için İptal'i tıklatın.</String>
-    <String Id="Error1712" Overridable="yes">Bilgisayarınızı önceki durumuna geri yüklemek için gereken bir veya birden fazla dosya bulunamadı. Önceki duruma geri yüklenemeyecek.</String>
-    <String Id="Error1713" Overridable="yes">[2] gerekli ürünlerinden birini yükleyemiyor. Teknik destek grubunuza başvurun. {{Sistem Hatası: [3].}}</String>
-    <String Id="Error1714" Overridable="yes">Eski [2] sürümü kaldırılamıyor. Teknik destek grubunuza başvurun. {{Sistem Hatası [3].}}</String>
-    <String Id="Error1715" Overridable="yes">[2] yüklendi</String>
-    <String Id="Error1716" Overridable="yes">[2] yapılandırıldı</String>
-    <String Id="Error1717" Overridable="yes">[2] kaldırıldı</String>
-    <String Id="Error1718" Overridable="yes">[2] dosyası dijital imza ilkesi tarafından reddedildi.</String>
-    <String Id="Error1719" Overridable="yes">Windows Installer hizmetine erişilemiyor. Windows'u güvenli modda çalıştırıyorsanız veya Windows Installer doğru yüklenmediyse bu durum ortaya çıkabilir. Yardım için destek sorumlunuza başvurun.</String>
-    <String Id="Error1720" Overridable="yes">Bu Windows Installer paketinde sorun var. Bu yüklemenin tamamlanması için gereken bir komut dosyası çalıştırılamadı. Destek biriminize veya paketin satıcısına başvurun. {{Özel eylem [2] komut dosyası hatası: [3], [4]: [5] Satır [6], Sütun [7], [8]}}</String>
-    <String Id="Error1721" Overridable="yes">Bu Windows Installer paketinde sorun var. Bu yüklemenin tamamlanması için gereken bir program çalıştırılamadı. Destek biriminize veya paketin satıcısına başvurun. {{Eylem: [2], konum: [3], komut: [4] }}</String>
-    <String Id="Error1722" Overridable="yes">Bu Windows Installer paketinde sorun var. Kurulumun parçası olarak çalışan bir program beklendiği gibi bitmedi. Destek biriminize veya paketin satıcısına başvurun. {{Eylem [2], konum: [3], komut: [4]}}</String>
-    <String Id="Error1723" Overridable="yes">Bu Windows Installer paketinde sorun var. Bu yüklemenin tamamlanması için gereken bir DLL çalıştırılamadı. Destek biriminize veya paketin satıcısına başvurun. {{Eylem [2], girdi: [3], kitaplık: [4]}}</String>
-    <String Id="Error1724" Overridable="yes">Kaldırma başarıyla tamamlandı.</String>
-    <String Id="Error1725" Overridable="yes">Kaldırma başarısız oldu.</String>
-    <String Id="Error1726" Overridable="yes">Tanıtım başarıyla tamamlandı.</String>
-    <String Id="Error1727" Overridable="yes">Tanıtım başarısız oldu.</String>
-    <String Id="Error1728" Overridable="yes">Yapılandırma başarıyla tamamlandı.</String>
-    <String Id="Error1729" Overridable="yes">Yapılandırma başarısız oldu.</String>
-    <String Id="Error1730" Overridable="yes">Bu uygulamayı kaldırmak için Yönetici olmanız gerekir. Bu uygulamayı kaldırmak için bir Yönetici olarak oturum açabilir veya yardım için teknik destek grubunuza başvurabilirsiniz.</String>
-    <String Id="Error1731" Overridable="yes">[2] ürününün kaynak yükleme paketi istemci paketi ile eşitlenmemiş. '[3]' yükleme paketinin geçerli bir kopyasını kullanarak yüklemeyi yeniden deneyin.</String>
-    <String Id="Error1732" Overridable="yes">[2] yüklemesini tamamlamak için bilgisayarı yeniden başlatmalısınız. Bu bilgisayara oturum açmış kullanıcılar var ve yeniden başlatma işlemi bu kullanıcıların çalışmalarını kaybetmesine neden olabilir. Şimdi yeniden başlatmak istiyor musunuz?</String>
-    <String Id="Error1801" Overridable="yes">[2] yolu geçerli değil. Lütfen geçerli bir yol belirtin.</String>
-    <String Id="Error1802" Overridable="yes">Bellek yetersiz. Yeniden denemeden önce diğer uygulamaları kapatın.</String>
-    <String Id="Error1803" Overridable="yes">[2] sürücüsünde disk yok. Lütfen bir disk yerleştirip Yeniden Dene'yi veya daha önce seçilen birime dönmek için İptal'i tıklatın.</String>
-    <String Id="Error1804" Overridable="yes">[2] sürücüsünde disk yok. Lütfen bir disk yerleştirip Yeniden Dene'yi veya göz atma iletişim kutusuna dönmek ve farklı bir birim seçmek için İptal'i tıklatın.</String>
-    <String Id="Error1805" Overridable="yes">[2] klasörü yok. Lütfen varolan bir klasörün yolunu girin.</String>
-    <String Id="Error1806" Overridable="yes">Bu klasörü okumak için yeterli ayrıcalığınız yok.</String>
-    <String Id="Error1807" Overridable="yes">Yükleme işlemi için geçerli bir hedef klasör belirlenemedi.</String>
-    <String Id="Error1901" Overridable="yes">Kaynak yükleme veritabanından okuma hatası: [2].</String>
-    <String Id="Error1902" Overridable="yes">Yeniden başlatma işlemi zamanlanıyor: [2] dosyasının adı [3] olarak değiştiriliyor. İşlemi tamamlamak için bilgisayarı yeniden başlatmanız gerekiyor.</String>
-    <String Id="Error1903" Overridable="yes">Yeniden başlatma işlemi zamanlanıyor: [2] dosyası siliniyor. İşlemi tamamlamak için bilgisayarı yeniden başlatmanız gerekiyor.</String>
-    <String Id="Error1904" Overridable="yes">[2] modülü kaydettirilemedi. HRESULT [3]. Destek biriminize başvurun.</String>
-    <String Id="Error1905" Overridable="yes">[2] modülünün kaydı silinemedi. HRESULT [3]. Destek biriminize başvurun.</String>
-    <String Id="Error1906" Overridable="yes">[2] paketi önbelleğe alınamadı. Hata: [3]. Destek biriminize başvurun.</String>
-    <String Id="Error1907" Overridable="yes">[2] yazı tipi kaydedilemedi. Yazı tiplerini yüklemek için yeterli izniniz olduğunu ve sistemin bu yazı tipini desteklediğini doğrulayın.</String>
-    <String Id="Error1908" Overridable="yes">[2] yazı tipinin kaydı silinemedi. Yazı tiplerini kaldırmak için yeterli izniniz olduğunu doğrulayın.</String>
-    <String Id="Error1909" Overridable="yes">[2] Kısayolu oluşturulamadı. Hedef klasörün varolduğunu ve klasöre erişebildiğinizi doğrulayın.</String>
-    <String Id="Error1910" Overridable="yes">[2] Kısayolu kaldırılamadı. Kısayol dosyasının varolduğunu ve dosyaya erişebildiğinizi doğrulayın.</String>
-    <String Id="Error1911" Overridable="yes">[2] dosyası için tür kitaplığı kaydettirilemedi. Destek biriminize başvurun.</String>
-    <String Id="Error1912" Overridable="yes">[2] dosyasının tür kitaplığı kaydı silinemedi. Destek biriminize başvurun.</String>
-    <String Id="Error1913" Overridable="yes">[2] [3] ini dosyası güncelleştirilemedi. Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun.</String>
-    <String Id="Error1914" Overridable="yes">Yeniden başlatma sırasında [3] dosyasının [2] dosyasıyla değiştirilmesi zamanlanamadı. [3] dosyasına yazma izniniz olduğunu doğrulayın.</String>
-    <String Id="Error1915" Overridable="yes">ODBC sürücü yöneticisini kaldırma hatası, ODBC hatası [2]: [3]. Destek biriminize başvurun.</String>
-    <String Id="Error1916" Overridable="yes">ODBC sürücü yöneticisini yükleme hatası, ODBC hatası [2]: [3]. Destek biriminize başvurun.</String>
-    <String Id="Error1917" Overridable="yes">ODBC sürücüsünü kaldırma hatası: [4], ODBC hatası [2]: [3]. ODBC sürücülerini kaldırmak için yeterli ayrıcalığınız olduğunuzu doğrulayın.</String>
-    <String Id="Error1918" Overridable="yes">ODBC sürücüsünü yükleme hatası: [4], ODBC hatası [2]: [3]. [4] dosyasının varolduğunu ve dosyaya erişebildiğinizi doğrulayın.</String>
-    <String Id="Error1919" Overridable="yes">ODBC veri kaynağını yapılandırma hatası: [4], ODBC hatası [2]: [3]. [4] dosyasının varolduğunu ve dosyaya erişebildiğinizi doğrulayın.</String>
-    <String Id="Error1920" Overridable="yes">'[2]' ([3]) hizmeti başlatılamadı. Sistem hizmetlerini başlatmak için yeterli ayrıcalığınız olduğunu doğrulayın.</String>
-    <String Id="Error1921" Overridable="yes">'[2]' ([3]) hizmeti durdurulamadı. Sistem hizmetlerini durdurmak için yeterli ayrıcalığınız olduğunu doğrulayın.</String>
-    <String Id="Error1922" Overridable="yes">'[2]' ([3]) hizmeti silinemedi. Sistem hizmetlerini kaldırmak için yeterli ayrıcalığınız olduğunu doğrulayın.</String>
-    <String Id="Error1923" Overridable="yes">'[2]' ([3]) hizmeti yüklenemedi. Sistem hizmetlerini yüklemek için yeterli ayrıcalığınız olduğunu doğrulayın.</String>
-    <String Id="Error1924" Overridable="yes">'[2]' ortam değişkeni güncelleştirilemedi. Ortam değişkenlerini değiştirmek için yeterli ayrıcalığınız olduğunu doğrulayın.</String>
-    <String Id="Error1925" Overridable="yes">Makinenin tüm kullanıcıları için bu yüklemeyi tamamlamanızı sağlayacak yeterli ayrıcalığa sahip değilsiniz. Yönetici olarak oturum açın ve bu yüklemeyi yeniden deneyin.</String>
-    <String Id="Error1926" Overridable="yes">'[3]' dosyasının dosya güvenliği ayarlanamadı. Hata: [2]. Bu dosyanın güvenlik izinlerini değiştirmek için yeterli ayrıcalığınız olduğunu doğrulayın.</String>
-    <String Id="Error1927" Overridable="yes">Bu bilgisayarda Bileşen Hizmetleri (COM+ 1.0) yüklü değil. Bu yüklemenin başarıyla tamamlanması için Bileşen Hizmetleri gerekir. Bileşen Hizmetleri Windows 2000'de bulunur.</String>
-    <String Id="Error1928" Overridable="yes">COM+ Uygulamasını kaydettirme hatası oluştu. Daha fazla bilgi için destek biriminize başvurun.</String>
-    <String Id="Error1929" Overridable="yes">COM+ Uygulamasının kaydı silinirken hata oluştu. Daha fazla bilgi için destek biriminize başvurun.</String>
-    <String Id="Error1930" Overridable="yes">'[2]' ([3]) hizmetinin tanımı değiştirilemedi.</String>
-    <String Id="Error1931" Overridable="yes">Windows Installer hizmeti, [2] sistem dosyası Windows tarafından korunduğundan bu dosyayı güncelleştiremiyor. Bu programın düzgün çalışabilmesi için işletim sisteminizi güncelleştirmeniz gerekebilir. {{Paket sürümü: [3], İşletim Sistemi Korumalı sürümü: [4]}}</String>
-    <String Id="Error1932" Overridable="yes">Windows Installer hizmeti korumalı [2] Windows dosyasını güncelleştiremiyor.{{Paket sürümü: [3], İşletim Sistemi Korumalı sürümü: [4], SFP Hatası: [5]}}</String>
-    <String Id="Error1933" Overridable="yes">Windows Installer hizmeti Windows tarafından korunan bir veya daha fazla dosyayı güncelleştiremiyor. {{SFP Hatası: [2]. Korunan dosyaların listesi:\r\n[3]}}</String>
-    <String Id="Error1934" Overridable="yes">Kullanıcı yüklemeleri makinedeki ilke aracılığıyla devre dışı bırakıldı.</String>
-    <String Id="Error1935" Overridable="yes">'[6]' derlemesinin yüklenmesi sırasında hata oluştu. Daha fazla bilgi için lütfen Yardım ve Destek bölümüne bakın. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}</String>
-    <String Id="Error1936" Overridable="yes">'[6]' derlemesinin yüklenmesi sırasında hata oluştu. Derleme kesin adlandırılmamış veya en küçük anahtar uzunluğuyla imzalanmamış. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}</String>
-    <String Id="Error1937" Overridable="yes">'[6]' derlemesinin yüklenmesi sırasında hata oluştu. İmza veya katalog doğrulanamadı veya geçerli değil. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}</String>
-    <String Id="Error1938" Overridable="yes">'[6]' derlemesinin yüklenmesi sırasında hata oluştu. Derlemenin bir veya daha fazla modülü bulunamadı. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}</String>
+    <String Id="Error0" Overridable="yes" Value="{{Önemli hata: }}" />
+    <String Id="Error1" Overridable="yes" Value="{{Hata [1]. }}" />
+    <String Id="Error2" Overridable="yes" Value="Uyarı [1]." />
+    <String Id="Error4" Overridable="yes" Value="Bilgi [1]." />
+    <String Id="Error5" Overridable="yes" Value="Yükleyici bu paketi yüklerken beklenmedik bir hatayla karşılaştı. Bu, pakette sorun olduğunu gösteriyor olabilir. Hata kodu: [1]. {{Bağımsız değişkenler: [2], [3], [4]}}" />
+    <String Id="Error7" Overridable="yes" Value="{{Disk dolu: }}" />
+    <String Id="Error8" Overridable="yes" Value="Eylem [Time]: [1]. [2]" />
+    <String Id="Error9" Overridable="yes" Value="[ProductName]" />
+    <String Id="Error10" Overridable="yes" Value="{[2]}{, [3]}{, [4]}" />
+    <String Id="Error11" Overridable="yes" Value="İleti türü: [1], Bağımsız değişken: [2]" />
+    <String Id="Error12" Overridable="yes" Value="=== Günlük başladı: [Date] [Time] ===" />
+    <String Id="Error13" Overridable="yes" Value="=== Günlük durdu: [Date] [Time] ===" />
+    <String Id="Error14" Overridable="yes" Value="Eylem başladı [Time]: [1]." />
+    <String Id="Error15" Overridable="yes" Value="Eylem sona erdi [Time]: [1]. Dönen değer [2]." />
+    <String Id="Error16" Overridable="yes" Value="Kalan süre: {[1] dakika }{[2] saniye}" />
+    <String Id="Error17" Overridable="yes" Value="Bellek yetersiz. Yeniden denemeden önce diğer uygulamaları kapatın." />
+    <String Id="Error18" Overridable="yes" Value="Yükleyici artık yanıt vermiyor." />
+    <String Id="Error19" Overridable="yes" Value="Yükleyici beklenenden önce durdu." />
+    <String Id="Error20" Overridable="yes" Value="Windows, [ProductName] ürününü yapılandırırken lütfen bekleyin" />
+    <String Id="Error21" Overridable="yes" Value="Gerekli bilgiler toplanıyor..." />
+    <String Id="Error22" Overridable="yes" Value="Bu uygulamanın eski sürümleri kaldırılıyor..." />
+    <String Id="Error23" Overridable="yes" Value="Bu uygulamanın eski sürümlerini kaldırma hazırlığı yapılıyor..." />
+    <String Id="Error32" Overridable="yes" Value="{[ProductName] }Kurulumu başarıyla tamamlandı." />
+    <String Id="Error33" Overridable="yes" Value="{[ProductName] }Kurulumu başarısız oldu." />
+    <String Id="Error1101" Overridable="yes" Value="Dosyadan okuma hatası: [2]. {{ Sistem hatası [3].}} Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun." />
+    <String Id="Error1301" Overridable="yes" Value="'[2]' dosyası oluşturulamıyor. Bu ada sahip bir dizin zaten var. Yüklemeyi iptal edin ve farklı bir konuma yüklemeyi deneyin." />
+    <String Id="Error1302" Overridable="yes" Value="Lütfen diski takın: [2]" />
+    <String Id="Error1303" Overridable="yes" Value="Yükleyicinin [2] dizinine erişmek için yeterli ayrıcalığı yok. Yükleme işlemi devam edemiyor. Yönetici olarak oturum açın veya sistem yöneticinize başvurun." />
+    <String Id="Error1304" Overridable="yes" Value="Dosyaya yazma hatası: [2]. Bu dizine erişiminizin olduğundan emin olun." />
+    <String Id="Error1305" Overridable="yes" Value="[2] dosyasından okuma hatası. {{ Sistem hatası [3].}} Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun." />
+    <String Id="Error1306" Overridable="yes" Value="Başka bir uygulamanın '[2]' dosyasına özel kullanım erişimi var. Lütfen diğer tüm uygulamaları kapatın, sonra Yeniden Dene'yi tıklatın." />
+    <String Id="Error1307" Overridable="yes" Value="Bu dosyayı yüklemek için yeterli disk alanı yok: [2]. Bir miktar disk alanı boşaltın ve Yeniden Dene'yi tıklatın veya çıkmak için İptal'i tıklatın." />
+    <String Id="Error1308" Overridable="yes" Value="Kaynak dosya bulunamadı: [2]. Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun." />
+    <String Id="Error1309" Overridable="yes" Value="Dosyadan okuma hatası: [3]. {{ Sistem hatası [2].}} Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun." />
+    <String Id="Error1310" Overridable="yes" Value="Dosyaya yazma hatası: [3]. {{ Sistem hatası [2].}} Bu dizine erişiminiz olduğundan emin olun." />
+    <String Id="Error1311" Overridable="yes" Value="Kaynak dosya bulunamadı {{(dolap)}}: [2]. Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun." />
+    <String Id="Error1312" Overridable="yes" Value="'[2]' dizini oluşturulamıyor. Bu adda bir dosya zaten var. Lütfen dosyayı yeniden adlandırın veya kaldırın ve Yeniden Dene'yi tıklatın veya çıkmak için İptal'i tıklatın." />
+    <String Id="Error1313" Overridable="yes" Value="[2] birimi şu anda kullanılamıyor. Lütfen başka bir birim seçin." />
+    <String Id="Error1314" Overridable="yes" Value="Belirtilen '[2]' yolu kullanılamıyor." />
+    <String Id="Error1315" Overridable="yes" Value="Belirtilen klasöre yazılamıyor: [2]." />
+    <String Id="Error1316" Overridable="yes" Value="Dosyadan okunmaya çalışılırken bir ağ hatası oluştu: [2]" />
+    <String Id="Error1317" Overridable="yes" Value="Dizin oluşturulmaya çalışılırken hata oluştu: [2]" />
+    <String Id="Error1318" Overridable="yes" Value="Dizin oluşturulmaya çalışılırken bir ağ hatası oluştu: [2]" />
+    <String Id="Error1319" Overridable="yes" Value="Kaynak dosya dolabı açılmaya çalışılırken bir ağ hatası oluştu: [2]" />
+    <String Id="Error1320" Overridable="yes" Value="Belirtilen yol çok uzun: [2]" />
+    <String Id="Error1321" Overridable="yes" Value="Yükleyicinin bu dosyayı değiştirmek için yeterli ayrıcalığı yok: [2]." />
+    <String Id="Error1322" Overridable="yes" Value="'[2]' klasör yolunun bir bölümü geçersiz. Boş veya sistem tarafından izin verilen uzunluğu aşıyor." />
+    <String Id="Error1323" Overridable="yes" Value="'[2]' klasör yolu, klasör yollarında geçerli olmayan sözcükler içeriyor." />
+    <String Id="Error1324" Overridable="yes" Value="'[2]' klasör yolu geçersiz karakter içeriyor." />
+    <String Id="Error1325" Overridable="yes" Value="'[2]' geçerli bir kısa dosya adı değil." />
+    <String Id="Error1326" Overridable="yes" Value="Dosya güvenliğini alma hatası: [3] GetLastError: [2]" />
+    <String Id="Error1327" Overridable="yes" Value="Geçersiz Sürücü: [2]" />
+    <String Id="Error1328" Overridable="yes" Value="[2] dosyasına düzeltme eki uygulanırken hata oluştu. Büyük olasılıkla başka bir şekilde güncelleştirilmiş ve artık bu düzeltme eki tarafından değiştirilemiyor. Daha fazla bilgi için düzeltme ekinizin satıcısına başvurun. {{Sistem Hatası: [3]}}" />
+    <String Id="Error1329" Overridable="yes" Value="[2] dolap dosyası dijital olarak imzalanmadığından gerekli bir dosya yüklenemiyor. Bu, dolap dosyasının bozuk olduğunu gösteriyor olabilir." />
+    <String Id="Error1330" Overridable="yes" Value="[2] dolap dosyası geçersiz bir dijital imzaya sahip olduğundan gerekli bir dosya yüklenemiyor. Bu, dolap dosyasının bozuk olduğunu gösteriyor olabilir. {{WinVerifyTrust tarafından [3] hatası döndürüldü.}}" />
+    <String Id="Error1331" Overridable="yes" Value="[2] dosyası doğru kopyalanamadı: CRC hatası." />
+    <String Id="Error1332" Overridable="yes" Value="[2] dosyası doğru taşınamadı: CRC hatası." />
+    <String Id="Error1333" Overridable="yes" Value="[2] dosyasına düzeltme eki doğru uygulanamadı: CRC hatası." />
+    <String Id="Error1334" Overridable="yes" Value="'[2]' dosyası '[3]' dolap dosyasında bulunamadığından yüklenemiyor. Bu bir ağ hatasını, CD-ROM'dan okuma hatasını veya bu pakette sorun olduğunu gösteriyor olabilir." />
+    <String Id="Error1335" Overridable="yes" Value="Bu yükleme için gereken '[2]' dolap dosyası bozuk olduğundan kullanılamıyor. Bu bir ağ hatasını, CD-ROM'dan okuma hatasını veya bu pakette sorun olduğunu gösteriyor olabilir." />
+    <String Id="Error1336" Overridable="yes" Value="Bu yüklemeyi tamamlamak için gereken geçici bir dosya oluşturulurken hata oluştu.{{ Klasör: [3]. Sistem hata kodu: [2]}}" />
+    <String Id="Error1401" Overridable="yes" Value="[2] anahtarı oluşturulamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1402" Overridable="yes" Value="[2] anahtarı açılamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1403" Overridable="yes" Value="[3] anahtarından [2] değeri silinemedi. {{ Sistem hatası [4].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1404" Overridable="yes" Value="[2] anahtarı silinemedi. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1405" Overridable="yes" Value="[3] anahtarından [2] değeri okunamadı. {{ Sistem hatası [4].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1406" Overridable="yes" Value="[2] değeri [3] anahtarına yazılamadı. {{ Sistem hatası [4].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1407" Overridable="yes" Value="[2] anahtarının değer adları alınamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1408" Overridable="yes" Value="[2] anahtarının alt anahtar adları alınamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1409" Overridable="yes" Value="[2] anahtarının güvenlik bilgileri okunamadı. {{ Sistem hatası [3].}} Bu anahtara yeterli erişiminiz olduğunu doğrulayın veya destek sorumlunuza başvurun." />
+    <String Id="Error1410" Overridable="yes" Value="Kullanılabilir kayıt defteri alanı artırılamadı. Bu uygulamanın yüklenmesi için [2] KB boş kayıt defteri alanı gerekiyor." />
+    <String Id="Error1500" Overridable="yes" Value="Başka bir yükleme sürüyor. Buna devam etmeden önce söz konusu yükleme işlemini tamamlamalısınız." />
+    <String Id="Error1501" Overridable="yes" Value="Güvenli verilere erişim hatası. Lütfen Windows Installer'ın düzgün yapılandırıldığından emin olun ve yüklemeyi yeniden deneyin." />
+    <String Id="Error1502" Overridable="yes" Value="'[2]' kullanıcısı '[3]' ürününü yüklemeyi daha önce başlattı. Bu kullanıcının ürünü kullanabilmesi için söz konusu yüklemeyi yeniden çalıştırması gerekecek. Şimdi geçerli yükleme işleminiz devam edecek." />
+    <String Id="Error1503" Overridable="yes" Value="'[2]' kullanıcısı '[3]' ürününü yüklemeyi daha önce başlattı. Bu kullanıcının ürünü kullanabilmesi için söz konusu yüklemeyi yeniden çalıştırması gerekecek." />
+    <String Id="Error1601" Overridable="yes" Value="Disk alanı yetersiz -- Birim: '[2]'; gerekli alan: [3] KB; kullanılabilir alan: [4] KB. Bir miktar disk alanı boşaltın ve yeniden deneyin." />
+    <String Id="Error1602" Overridable="yes" Value="İptal etmek istediğinizden emin misiniz?" />
+    <String Id="Error1603" Overridable="yes" Value="[2][3] dosyası kullanımda tutulmaktadır {şu işlem tarafından: Ad: [4], Kimlik: [5], Pencere Başlığı: '[6]'}. Bu uygulamayı kapatın ve yeniden deneyin." />
+    <String Id="Error1604" Overridable="yes" Value="'[2]' ürünü zaten yüklü olduğundan bu ürünün yüklenmesini engelliyor. İki ürün birbiriyle uyumlu değil." />
+    <String Id="Error1605" Overridable="yes" Value="'[2]' birimindeki disk alanı, kurtarma etkinleştirilmiş olarak yüklemeye devam etmek için yeterli değil. [3] KB gerekiyor, ancak yalnızca [4] KB var. Kurtarma bilgilerini kaydetmeden yüklemeye devam etmek için Yoksay'ı, kullanılabilir disk alanını yeniden denetlemek için Yeniden Dene'yi veya yükleme işleminden çıkmak için İptal'i tıklatın." />
+    <String Id="Error1606" Overridable="yes" Value="[2] ağ konumuna erişilemedi." />
+    <String Id="Error1607" Overridable="yes" Value="Yüklemeye devam etmeden önce aşağıdaki uygulamaların kapatılması gerekiyor:" />
+    <String Id="Error1608" Overridable="yes" Value="Bu ürünü yüklemek için bu makineye daha önce yüklenmiş uygun bir ürün bulunamadı." />
+    <String Id="Error1609" Overridable="yes" Value="Güvenlik ayarları uygulanırken hata oluştu. [2] geçerli bir kullanıcı veya grup değil. Bunun nedeni paketin sorunlu olması veya ağdaki etki alanı denetleyicisiyle bağlantıda bir sorun olması olabilir. Ağ bağlantınızı denetleyip Yeniden Dene'yi veya yüklemeyi sona erdirmek için İptal'i tıklatın. {{Kullanıcının SID'si bulunamadı, sistem hatası [3]}}" />
+    <String Id="Error1701" Overridable="yes" Value="[2] anahtarı geçerli değil. Doğru anahtarı girdiğinizi doğrulayın." />
+    <String Id="Error1702" Overridable="yes" Value="Yükleyicinin [2] yapılandırmasına devam edebilmesi için sisteminizi yeniden başlatmanız gerekiyor. Şimdi yeniden başlatmak için Evet'i veya daha sonra el ile yeniden başlatacaksanız Hayır'ı tıklatın." />
+    <String Id="Error1703" Overridable="yes" Value="[2] yapılandırma değişikliklerinin etkinleşmesi için sisteminizi yeniden başlatmalısınız. Şimdi yeniden başlatmak için Evet'i veya daha sonra el ile yeniden başlatacaksanız Hayır'ı tıklatın." />
+    <String Id="Error1704" Overridable="yes" Value="Bir [2] yüklemesi şu anda askıya alınmış durumda. Devam etmek için bu yükleme tarafından yapılan değişiklikleri geri almanız gerekiyor. Bu değişiklikleri geri almak istiyor musunuz?" />
+    <String Id="Error1705" Overridable="yes" Value="Bu ürünün daha önceki bir yüklemesi devam ediyor. Devam etmek için bu yükleme tarafından yapılan değişiklikleri geri almanız gerekiyor. Bu değişiklikleri geri almak istiyor musunuz?" />
+    <String Id="Error1706" Overridable="yes" Value="[2] ürününün yükleme paketi bulunamadı. '[3]' yükleme paketinin geçerli bir kopyasını kullanarak yüklemeyi yeniden deneyin." />
+    <String Id="Error1707" Overridable="yes" Value="Yükleme başarıyla tamamlandı." />
+    <String Id="Error1708" Overridable="yes" Value="Yükleme yapılamadı." />
+    <String Id="Error1709" Overridable="yes" Value="Ürün: [2] -- [3]" />
+    <String Id="Error1710" Overridable="yes" Value="Bilgisayarınızı bir önceki durumuna geri yükleyebilir veya yükleme işlemine daha sonra devam edebilirsiniz. Önceki duruma geri yüklemek istiyor musunuz?" />
+    <String Id="Error1711" Overridable="yes" Value="Yükleme bilgileri diske yazılırken bir hata oluştu. Yeterli disk alanı olup olmadığını denetleyin ve Yeniden Dene'yi tıklatın veya yüklemeyi sona erdirmek için İptal'i tıklatın." />
+    <String Id="Error1712" Overridable="yes" Value="Bilgisayarınızı önceki durumuna geri yüklemek için gereken bir veya birden fazla dosya bulunamadı. Önceki duruma geri yüklenemeyecek." />
+    <String Id="Error1713" Overridable="yes" Value="[2] gerekli ürünlerinden birini yükleyemiyor. Teknik destek grubunuza başvurun. {{Sistem Hatası: [3].}}" />
+    <String Id="Error1714" Overridable="yes" Value="Eski [2] sürümü kaldırılamıyor. Teknik destek grubunuza başvurun. {{Sistem Hatası [3].}}" />
+    <String Id="Error1715" Overridable="yes" Value="[2] yüklendi" />
+    <String Id="Error1716" Overridable="yes" Value="[2] yapılandırıldı" />
+    <String Id="Error1717" Overridable="yes" Value="[2] kaldırıldı" />
+    <String Id="Error1718" Overridable="yes" Value="[2] dosyası dijital imza ilkesi tarafından reddedildi." />
+    <String Id="Error1719" Overridable="yes" Value="Windows Installer hizmetine erişilemiyor. Windows'u güvenli modda çalıştırıyorsanız veya Windows Installer doğru yüklenmediyse bu durum ortaya çıkabilir. Yardım için destek sorumlunuza başvurun." />
+    <String Id="Error1720" Overridable="yes" Value="Bu Windows Installer paketinde sorun var. Bu yüklemenin tamamlanması için gereken bir komut dosyası çalıştırılamadı. Destek biriminize veya paketin satıcısına başvurun. {{Özel eylem [2] komut dosyası hatası: [3], [4]: [5] Satır [6], Sütun [7], [8]}}" />
+    <String Id="Error1721" Overridable="yes" Value="Bu Windows Installer paketinde sorun var. Bu yüklemenin tamamlanması için gereken bir program çalıştırılamadı. Destek biriminize veya paketin satıcısına başvurun. {{Eylem: [2], konum: [3], komut: [4] }}" />
+    <String Id="Error1722" Overridable="yes" Value="Bu Windows Installer paketinde sorun var. Kurulumun parçası olarak çalışan bir program beklendiği gibi bitmedi. Destek biriminize veya paketin satıcısına başvurun. {{Eylem [2], konum: [3], komut: [4]}}" />
+    <String Id="Error1723" Overridable="yes" Value="Bu Windows Installer paketinde sorun var. Bu yüklemenin tamamlanması için gereken bir DLL çalıştırılamadı. Destek biriminize veya paketin satıcısına başvurun. {{Eylem [2], girdi: [3], kitaplık: [4]}}" />
+    <String Id="Error1724" Overridable="yes" Value="Kaldırma başarıyla tamamlandı." />
+    <String Id="Error1725" Overridable="yes" Value="Kaldırma başarısız oldu." />
+    <String Id="Error1726" Overridable="yes" Value="Tanıtım başarıyla tamamlandı." />
+    <String Id="Error1727" Overridable="yes" Value="Tanıtım başarısız oldu." />
+    <String Id="Error1728" Overridable="yes" Value="Yapılandırma başarıyla tamamlandı." />
+    <String Id="Error1729" Overridable="yes" Value="Yapılandırma başarısız oldu." />
+    <String Id="Error1730" Overridable="yes" Value="Bu uygulamayı kaldırmak için Yönetici olmanız gerekir. Bu uygulamayı kaldırmak için bir Yönetici olarak oturum açabilir veya yardım için teknik destek grubunuza başvurabilirsiniz." />
+    <String Id="Error1731" Overridable="yes" Value="[2] ürününün kaynak yükleme paketi istemci paketi ile eşitlenmemiş. '[3]' yükleme paketinin geçerli bir kopyasını kullanarak yüklemeyi yeniden deneyin." />
+    <String Id="Error1732" Overridable="yes" Value="[2] yüklemesini tamamlamak için bilgisayarı yeniden başlatmalısınız. Bu bilgisayara oturum açmış kullanıcılar var ve yeniden başlatma işlemi bu kullanıcıların çalışmalarını kaybetmesine neden olabilir. Şimdi yeniden başlatmak istiyor musunuz?" />
+    <String Id="Error1801" Overridable="yes" Value="[2] yolu geçerli değil. Lütfen geçerli bir yol belirtin." />
+    <String Id="Error1802" Overridable="yes" Value="Bellek yetersiz. Yeniden denemeden önce diğer uygulamaları kapatın." />
+    <String Id="Error1803" Overridable="yes" Value="[2] sürücüsünde disk yok. Lütfen bir disk yerleştirip Yeniden Dene'yi veya daha önce seçilen birime dönmek için İptal'i tıklatın." />
+    <String Id="Error1804" Overridable="yes" Value="[2] sürücüsünde disk yok. Lütfen bir disk yerleştirip Yeniden Dene'yi veya göz atma iletişim kutusuna dönmek ve farklı bir birim seçmek için İptal'i tıklatın." />
+    <String Id="Error1805" Overridable="yes" Value="[2] klasörü yok. Lütfen varolan bir klasörün yolunu girin." />
+    <String Id="Error1806" Overridable="yes" Value="Bu klasörü okumak için yeterli ayrıcalığınız yok." />
+    <String Id="Error1807" Overridable="yes" Value="Yükleme işlemi için geçerli bir hedef klasör belirlenemedi." />
+    <String Id="Error1901" Overridable="yes" Value="Kaynak yükleme veritabanından okuma hatası: [2]." />
+    <String Id="Error1902" Overridable="yes" Value="Yeniden başlatma işlemi zamanlanıyor: [2] dosyasının adı [3] olarak değiştiriliyor. İşlemi tamamlamak için bilgisayarı yeniden başlatmanız gerekiyor." />
+    <String Id="Error1903" Overridable="yes" Value="Yeniden başlatma işlemi zamanlanıyor: [2] dosyası siliniyor. İşlemi tamamlamak için bilgisayarı yeniden başlatmanız gerekiyor." />
+    <String Id="Error1904" Overridable="yes" Value="[2] modülü kaydettirilemedi. HRESULT [3]. Destek biriminize başvurun." />
+    <String Id="Error1905" Overridable="yes" Value="[2] modülünün kaydı silinemedi. HRESULT [3]. Destek biriminize başvurun." />
+    <String Id="Error1906" Overridable="yes" Value="[2] paketi önbelleğe alınamadı. Hata: [3]. Destek biriminize başvurun." />
+    <String Id="Error1907" Overridable="yes" Value="[2] yazı tipi kaydedilemedi. Yazı tiplerini yüklemek için yeterli izniniz olduğunu ve sistemin bu yazı tipini desteklediğini doğrulayın." />
+    <String Id="Error1908" Overridable="yes" Value="[2] yazı tipinin kaydı silinemedi. Yazı tiplerini kaldırmak için yeterli izniniz olduğunu doğrulayın." />
+    <String Id="Error1909" Overridable="yes" Value="[2] Kısayolu oluşturulamadı. Hedef klasörün varolduğunu ve klasöre erişebildiğinizi doğrulayın." />
+    <String Id="Error1910" Overridable="yes" Value="[2] Kısayolu kaldırılamadı. Kısayol dosyasının varolduğunu ve dosyaya erişebildiğinizi doğrulayın." />
+    <String Id="Error1911" Overridable="yes" Value="[2] dosyası için tür kitaplığı kaydettirilemedi. Destek biriminize başvurun." />
+    <String Id="Error1912" Overridable="yes" Value="[2] dosyasının tür kitaplığı kaydı silinemedi. Destek biriminize başvurun." />
+    <String Id="Error1913" Overridable="yes" Value="[2] [3] ini dosyası güncelleştirilemedi. Dosyanın varolduğundan ve dosyaya erişebildiğinizden emin olun." />
+    <String Id="Error1914" Overridable="yes" Value="Yeniden başlatma sırasında [3] dosyasının [2] dosyasıyla değiştirilmesi zamanlanamadı. [3] dosyasına yazma izniniz olduğunu doğrulayın." />
+    <String Id="Error1915" Overridable="yes" Value="ODBC sürücü yöneticisini kaldırma hatası, ODBC hatası [2]: [3]. Destek biriminize başvurun." />
+    <String Id="Error1916" Overridable="yes" Value="ODBC sürücü yöneticisini yükleme hatası, ODBC hatası [2]: [3]. Destek biriminize başvurun." />
+    <String Id="Error1917" Overridable="yes" Value="ODBC sürücüsünü kaldırma hatası: [4], ODBC hatası [2]: [3]. ODBC sürücülerini kaldırmak için yeterli ayrıcalığınız olduğunuzu doğrulayın." />
+    <String Id="Error1918" Overridable="yes" Value="ODBC sürücüsünü yükleme hatası: [4], ODBC hatası [2]: [3]. [4] dosyasının varolduğunu ve dosyaya erişebildiğinizi doğrulayın." />
+    <String Id="Error1919" Overridable="yes" Value="ODBC veri kaynağını yapılandırma hatası: [4], ODBC hatası [2]: [3]. [4] dosyasının varolduğunu ve dosyaya erişebildiğinizi doğrulayın." />
+    <String Id="Error1920" Overridable="yes" Value="'[2]' ([3]) hizmeti başlatılamadı. Sistem hizmetlerini başlatmak için yeterli ayrıcalığınız olduğunu doğrulayın." />
+    <String Id="Error1921" Overridable="yes" Value="'[2]' ([3]) hizmeti durdurulamadı. Sistem hizmetlerini durdurmak için yeterli ayrıcalığınız olduğunu doğrulayın." />
+    <String Id="Error1922" Overridable="yes" Value="'[2]' ([3]) hizmeti silinemedi. Sistem hizmetlerini kaldırmak için yeterli ayrıcalığınız olduğunu doğrulayın." />
+    <String Id="Error1923" Overridable="yes" Value="'[2]' ([3]) hizmeti yüklenemedi. Sistem hizmetlerini yüklemek için yeterli ayrıcalığınız olduğunu doğrulayın." />
+    <String Id="Error1924" Overridable="yes" Value="'[2]' ortam değişkeni güncelleştirilemedi. Ortam değişkenlerini değiştirmek için yeterli ayrıcalığınız olduğunu doğrulayın." />
+    <String Id="Error1925" Overridable="yes" Value="Makinenin tüm kullanıcıları için bu yüklemeyi tamamlamanızı sağlayacak yeterli ayrıcalığa sahip değilsiniz. Yönetici olarak oturum açın ve bu yüklemeyi yeniden deneyin." />
+    <String Id="Error1926" Overridable="yes" Value="'[3]' dosyasının dosya güvenliği ayarlanamadı. Hata: [2]. Bu dosyanın güvenlik izinlerini değiştirmek için yeterli ayrıcalığınız olduğunu doğrulayın." />
+    <String Id="Error1927" Overridable="yes" Value="Bu bilgisayarda Bileşen Hizmetleri (COM+ 1.0) yüklü değil. Bu yüklemenin başarıyla tamamlanması için Bileşen Hizmetleri gerekir. Bileşen Hizmetleri Windows 2000'de bulunur." />
+    <String Id="Error1928" Overridable="yes" Value="COM+ Uygulamasını kaydettirme hatası oluştu. Daha fazla bilgi için destek biriminize başvurun." />
+    <String Id="Error1929" Overridable="yes" Value="COM+ Uygulamasının kaydı silinirken hata oluştu. Daha fazla bilgi için destek biriminize başvurun." />
+    <String Id="Error1930" Overridable="yes" Value="'[2]' ([3]) hizmetinin tanımı değiştirilemedi." />
+    <String Id="Error1931" Overridable="yes" Value="Windows Installer hizmeti, [2] sistem dosyası Windows tarafından korunduğundan bu dosyayı güncelleştiremiyor. Bu programın düzgün çalışabilmesi için işletim sisteminizi güncelleştirmeniz gerekebilir. {{Paket sürümü: [3], İşletim Sistemi Korumalı sürümü: [4]}}" />
+    <String Id="Error1932" Overridable="yes" Value="Windows Installer hizmeti korumalı [2] Windows dosyasını güncelleştiremiyor.{{Paket sürümü: [3], İşletim Sistemi Korumalı sürümü: [4], SFP Hatası: [5]}}" />
+    <String Id="Error1933" Overridable="yes" Value="Windows Installer hizmeti Windows tarafından korunan bir veya daha fazla dosyayı güncelleştiremiyor. {{SFP Hatası: [2]. Korunan dosyaların listesi:\r\n[3]}}" />
+    <String Id="Error1934" Overridable="yes" Value="Kullanıcı yüklemeleri makinedeki ilke aracılığıyla devre dışı bırakıldı." />
+    <String Id="Error1935" Overridable="yes" Value="'[6]' derlemesinin yüklenmesi sırasında hata oluştu. Daha fazla bilgi için lütfen Yardım ve Destek bölümüne bakın. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}" />
+    <String Id="Error1936" Overridable="yes" Value="'[6]' derlemesinin yüklenmesi sırasında hata oluştu. Derleme kesin adlandırılmamış veya en küçük anahtar uzunluğuyla imzalanmamış. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}" />
+    <String Id="Error1937" Overridable="yes" Value="'[6]' derlemesinin yüklenmesi sırasında hata oluştu. İmza veya katalog doğrulanamadı veya geçerli değil. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}" />
+    <String Id="Error1938" Overridable="yes" Value="'[6]' derlemesinin yüklenmesi sırasında hata oluştu. Derlemenin bir veya daha fazla modülü bulunamadı. HRESULT: [3]. {{derleme arabirimi: [4], işlev: [5], bileşen: [2]}}" />
 
-    <String Id="UITextbytes" Overridable="yes">bayt</String>
-    <String Id="UITextGB" Overridable="yes">GB</String>
-    <String Id="UITextKB" Overridable="yes">KB</String>
-    <String Id="UITextMB" Overridable="yes">MB</String>
-    <String Id="UITextMenuAbsent" Overridable="yes">Tüm özellik kullanılamıyor</String>
-    <String Id="UITextMenuAdvertise" Overridable="yes">Özellik gerektiğinde yüklenecek</String>
-    <String Id="UITextMenuAllCD" Overridable="yes">Tüm özellik CD'den çalışacak şekilde yüklenecek</String>
-    <String Id="UITextMenuAllLocal" Overridable="yes">Tüm özellik yerel sabit sürücüye yüklenecek</String>
-    <String Id="UITextMenuAllNetwork" Overridable="yes">Tüm özellik ağdan çalışacak şekilde yüklenecek</String>
-    <String Id="UITextMenuCD" Overridable="yes">CD'den çalışacak şekilde yüklenecek</String>
-    <String Id="UITextMenuLocal" Overridable="yes">Yerel sabit sürücüye yüklenecek</String>
-    <String Id="UITextMenuNetwork" Overridable="yes">Ağdan çalışacak şekilde yüklenecek</String>
-    <String Id="UITextNewFolder" Overridable="yes">Klasör|Yeni Klasör</String>
-    <String Id="UITextScriptInProgress" Overridable="yes">Gerekli bilgiler toplanıyor...</String>
-    <String Id="UITextSelAbsentAbsent" Overridable="yes">Bu özellik yüklenmemiş olarak kalacak</String>
-    <String Id="UITextSelAbsentAdvertise" Overridable="yes">Bu özellik gerektiğinde yüklenecek şekilde ayarlanacak</String>
-    <String Id="UITextSelAbsentCD" Overridable="yes">Bu özellik CD'den çalışacak şekilde yüklenecek</String>
-    <String Id="UITextSelAbsentLocal" Overridable="yes">Bu özellik yerel sabit sürücüye yüklenecek</String>
-    <String Id="UITextSelAbsentNetwork" Overridable="yes">Bu özellik ağdan çalışacak şekilde yüklenecek</String>
-    <String Id="UITextSelAdvertiseAbsent" Overridable="yes">Bu özellik kullanılamaz duruma gelecek</String>
-    <String Id="UITextSelAdvertiseAdvertise" Overridable="yes">Gerektiğinde yüklenecek</String>
-    <String Id="UITextSelAdvertiseCD" Overridable="yes">Bu özellik CD'den çalıştırılabilecek</String>
-    <String Id="UITextSelAdvertiseLocal" Overridable="yes">Bu özellik yerel sabit sürücünüze yüklenecek</String>
-    <String Id="UITextSelAdvertiseNetwork" Overridable="yes">Bu özellik ağdan çalıştırılabilecek</String>
-    <String Id="UITextSelCDAbsent" Overridable="yes">Bu özellik tamamen kaldırılacak, CD'den çalıştıramayacaksınız</String>
-    <String Id="UITextSelCDAdvertise" Overridable="yes">Bu özellik, CD'den çalıştırılabilir durumdan çıkarak gerektiğinde yüklenecek şekilde ayarlanacak</String>
-    <String Id="UITextSelCDCD" Overridable="yes">Bu özellik CD'den çalıştırılabilecek şekilde kalacak</String>
-    <String Id="UITextSelCDLocal" Overridable="yes">Bu özellik, CD'den çalıştırılabilir durumdan çıkarak yerel sabit sürücüye yüklenebilecek duruma gelecek</String>
-    <String Id="UITextSelChildCostNeg" Overridable="yes">Bu özellik sabit sürücünüzde [1] yer açar.</String>
-    <String Id="UITextSelChildCostPos" Overridable="yes">Bu özellik sabit sürücünüzde [1] alan gerektirir.</String>
-    <String Id="UITextSelCostPending" Overridable="yes">Bu özellik için gerekenler belirleniyor...</String>
-    <String Id="UITextSelLocalAbsent" Overridable="yes">Bu özellik tamamen kaldırılacak</String>
-    <String Id="UITextSelLocalAdvertise" Overridable="yes">Bu özellik yerel sabit sürücünüzden kaldırılacak, ancak gerektiğinde yüklenecek şekilde ayarlanacak</String>
-    <String Id="UITextSelLocalCD" Overridable="yes">Bu özellik yerel sabit sürücünüzden kaldırılacak ancak, yine de CD'den çalıştırılabilecek</String>
-    <String Id="UITextSelLocalLocal" Overridable="yes">Bu özellik yerel sabit sürücünüzde kalacak</String>
-    <String Id="UITextSelLocalNetwork" Overridable="yes">Bu özellik yerel sabit sürücünüzden kaldırılacak ancak, yine de ağdan çalıştırılabilecek</String>
-    <String Id="UITextSelNetworkAbsent" Overridable="yes">Bu özellik tamamen kaldırılacak, ağdan çalıştıramayacaksınız</String>
-    <String Id="UITextSelNetworkAdvertise" Overridable="yes">Bu özellik, ağdan çalıştırılabilir durumdan çıkarak gerektiğinde yüklenecek şekilde ayarlanacak</String>
-    <String Id="UITextSelNetworkLocal" Overridable="yes">Bu özellik, ağdan çalıştırılabilir durumdan çıkarak yerel sabit sürücüye yüklenebilir duruma gelecek</String>
-    <String Id="UITextSelNetworkNetwork" Overridable="yes">Bu özellik ağdan çalıştırılabilecek şekilde kalacak</String>
-    <String Id="UITextSelParentCostNegNeg" Overridable="yes">Bu özellik sabit sürücünüzde [1] yer açar. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] yer açar.</String>
-    <String Id="UITextSelParentCostNegPos" Overridable="yes">Bu özellik sabit sürücünüzde [1] yer açar. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] alan gerektirir.</String>
-    <String Id="UITextSelParentCostPosNeg" Overridable="yes">Bu özellik sabit sürücünüzde [1] alan gerektirir. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] yer açar.</String>
-    <String Id="UITextSelParentCostPosPos" Overridable="yes">Bu özellik sabit sürücünüzde [1] alan gerektirir. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] alan gerektirir.</String>
-    <String Id="UITextTimeRemaining" Overridable="yes">Kalan süre: {[1] dakika }{[2] saniye}</String>
-    <String Id="UITextVolumeCostAvailable" Overridable="yes">Uygun</String>
-    <String Id="UITextVolumeCostDifference" Overridable="yes">Fark</String>
-    <String Id="UITextVolumeCostRequired" Overridable="yes">Gerekli</String>
-    <String Id="UITextVolumeCostSize" Overridable="yes">Disk Boyutu</String>
-    <String Id="UITextVolumeCostVolume" Overridable="yes">Birim</String>
+    <String Id="UITextbytes" Overridable="yes" Value="bayt" />
+    <String Id="UITextGB" Overridable="yes" Value="GB" />
+    <String Id="UITextKB" Overridable="yes" Value="KB" />
+    <String Id="UITextMB" Overridable="yes" Value="MB" />
+    <String Id="UITextMenuAbsent" Overridable="yes" Value="Tüm özellik kullanılamıyor" />
+    <String Id="UITextMenuAdvertise" Overridable="yes" Value="Özellik gerektiğinde yüklenecek" />
+    <String Id="UITextMenuAllCD" Overridable="yes" Value="Tüm özellik CD'den çalışacak şekilde yüklenecek" />
+    <String Id="UITextMenuAllLocal" Overridable="yes" Value="Tüm özellik yerel sabit sürücüye yüklenecek" />
+    <String Id="UITextMenuAllNetwork" Overridable="yes" Value="Tüm özellik ağdan çalışacak şekilde yüklenecek" />
+    <String Id="UITextMenuCD" Overridable="yes" Value="CD'den çalışacak şekilde yüklenecek" />
+    <String Id="UITextMenuLocal" Overridable="yes" Value="Yerel sabit sürücüye yüklenecek" />
+    <String Id="UITextMenuNetwork" Overridable="yes" Value="Ağdan çalışacak şekilde yüklenecek" />
+    <String Id="UITextNewFolder" Overridable="yes" Value="Klasör|Yeni Klasör" />
+    <String Id="UITextScriptInProgress" Overridable="yes" Value="Gerekli bilgiler toplanıyor..." />
+    <String Id="UITextSelAbsentAbsent" Overridable="yes" Value="Bu özellik yüklenmemiş olarak kalacak" />
+    <String Id="UITextSelAbsentAdvertise" Overridable="yes" Value="Bu özellik gerektiğinde yüklenecek şekilde ayarlanacak" />
+    <String Id="UITextSelAbsentCD" Overridable="yes" Value="Bu özellik CD'den çalışacak şekilde yüklenecek" />
+    <String Id="UITextSelAbsentLocal" Overridable="yes" Value="Bu özellik yerel sabit sürücüye yüklenecek" />
+    <String Id="UITextSelAbsentNetwork" Overridable="yes" Value="Bu özellik ağdan çalışacak şekilde yüklenecek" />
+    <String Id="UITextSelAdvertiseAbsent" Overridable="yes" Value="Bu özellik kullanılamaz duruma gelecek" />
+    <String Id="UITextSelAdvertiseAdvertise" Overridable="yes" Value="Gerektiğinde yüklenecek" />
+    <String Id="UITextSelAdvertiseCD" Overridable="yes" Value="Bu özellik CD'den çalıştırılabilecek" />
+    <String Id="UITextSelAdvertiseLocal" Overridable="yes" Value="Bu özellik yerel sabit sürücünüze yüklenecek" />
+    <String Id="UITextSelAdvertiseNetwork" Overridable="yes" Value="Bu özellik ağdan çalıştırılabilecek" />
+    <String Id="UITextSelCDAbsent" Overridable="yes" Value="Bu özellik tamamen kaldırılacak, CD'den çalıştıramayacaksınız" />
+    <String Id="UITextSelCDAdvertise" Overridable="yes" Value="Bu özellik, CD'den çalıştırılabilir durumdan çıkarak gerektiğinde yüklenecek şekilde ayarlanacak" />
+    <String Id="UITextSelCDCD" Overridable="yes" Value="Bu özellik CD'den çalıştırılabilecek şekilde kalacak" />
+    <String Id="UITextSelCDLocal" Overridable="yes" Value="Bu özellik, CD'den çalıştırılabilir durumdan çıkarak yerel sabit sürücüye yüklenebilecek duruma gelecek" />
+    <String Id="UITextSelChildCostNeg" Overridable="yes" Value="Bu özellik sabit sürücünüzde [1] yer açar." />
+    <String Id="UITextSelChildCostPos" Overridable="yes" Value="Bu özellik sabit sürücünüzde [1] alan gerektirir." />
+    <String Id="UITextSelCostPending" Overridable="yes" Value="Bu özellik için gerekenler belirleniyor..." />
+    <String Id="UITextSelLocalAbsent" Overridable="yes" Value="Bu özellik tamamen kaldırılacak" />
+    <String Id="UITextSelLocalAdvertise" Overridable="yes" Value="Bu özellik yerel sabit sürücünüzden kaldırılacak, ancak gerektiğinde yüklenecek şekilde ayarlanacak" />
+    <String Id="UITextSelLocalCD" Overridable="yes" Value="Bu özellik yerel sabit sürücünüzden kaldırılacak ancak, yine de CD'den çalıştırılabilecek" />
+    <String Id="UITextSelLocalLocal" Overridable="yes" Value="Bu özellik yerel sabit sürücünüzde kalacak" />
+    <String Id="UITextSelLocalNetwork" Overridable="yes" Value="Bu özellik yerel sabit sürücünüzden kaldırılacak ancak, yine de ağdan çalıştırılabilecek" />
+    <String Id="UITextSelNetworkAbsent" Overridable="yes" Value="Bu özellik tamamen kaldırılacak, ağdan çalıştıramayacaksınız" />
+    <String Id="UITextSelNetworkAdvertise" Overridable="yes" Value="Bu özellik, ağdan çalıştırılabilir durumdan çıkarak gerektiğinde yüklenecek şekilde ayarlanacak" />
+    <String Id="UITextSelNetworkLocal" Overridable="yes" Value="Bu özellik, ağdan çalıştırılabilir durumdan çıkarak yerel sabit sürücüye yüklenebilir duruma gelecek" />
+    <String Id="UITextSelNetworkNetwork" Overridable="yes" Value="Bu özellik ağdan çalıştırılabilecek şekilde kalacak" />
+    <String Id="UITextSelParentCostNegNeg" Overridable="yes" Value="Bu özellik sabit sürücünüzde [1] yer açar. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] yer açar." />
+    <String Id="UITextSelParentCostNegPos" Overridable="yes" Value="Bu özellik sabit sürücünüzde [1] yer açar. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] alan gerektirir." />
+    <String Id="UITextSelParentCostPosNeg" Overridable="yes" Value="Bu özellik sabit sürücünüzde [1] alan gerektirir. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] yer açar." />
+    <String Id="UITextSelParentCostPosPos" Overridable="yes" Value="Bu özellik sabit sürücünüzde [1] alan gerektirir. [3] alt özellikten [2] tanesi seçili. Alt özellikler sabit sürücünüzde [4] alan gerektirir." />
+    <String Id="UITextTimeRemaining" Overridable="yes" Value="Kalan süre: {[1] dakika }{[2] saniye}" />
+    <String Id="UITextVolumeCostAvailable" Overridable="yes" Value="Uygun" />
+    <String Id="UITextVolumeCostDifference" Overridable="yes" Value="Fark" />
+    <String Id="UITextVolumeCostRequired" Overridable="yes" Value="Gerekli" />
+    <String Id="UITextVolumeCostSize" Overridable="yes" Value="Disk Boyutu" />
+    <String Id="UITextVolumeCostVolume" Overridable="yes" Value="Birim" />
 </WixLocalization>

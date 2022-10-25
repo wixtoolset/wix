@@ -1460,7 +1460,7 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.InnerTextDisallowed(node);
+            this.Core.InnerTextDisallowed(node, "Value");
 
             // see if this property is used for appSearch
             var signatures = this.ParseSearchSignatures(node);
@@ -2635,7 +2635,7 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.InnerTextDisallowed(node);
+            this.Core.InnerTextDisallowed(node, "Condition");
         }
 
 

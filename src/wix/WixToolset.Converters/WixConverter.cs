@@ -162,6 +162,8 @@ namespace WixToolset.Converters
         private static readonly XName DependencyEnforceAttributeName = WixDependencyNamespace + "Enforce";
 
         private static readonly XName WixLocalization4ElementName = WxlNamespace + "WixLocalization";
+        private static readonly XName WixLocalizationStringElementName = WxlNamespace + "String";
+        private static readonly XName WixLocalizationUIElementName = WxlNamespace + "UI";
         private static readonly XName WixLocalization3ElementName = Wxl3Namespace + "WixLocalization";
         private static readonly XName WixLocalizationElementWithoutNamespaceName = XNamespace.None + "WixLocalization";
 
@@ -271,6 +273,8 @@ namespace WixToolset.Converters
                 { WixConverter.VerbElementName, this.ConvertVerbElement },
                 { WixConverter.UIRefElementName, this.ConvertUIRefElement },
                 { WixConverter.WixLocalizationElementWithoutNamespaceName, this.ConvertWixLocalizationElementWithoutNamespace },
+                { WixConverter.WixLocalizationStringElementName, this.ConvertWixLocalizationStringElement},
+                { WixConverter.WixLocalizationUIElementName, this.ConvertWixLocalizationUIElement},
             };
 
             this.ConversionMessages = new List<Message>();
@@ -2016,6 +2020,16 @@ namespace WixToolset.Converters
                     elementWithoutNamespace.Name = WxlNamespace.GetName(elementWithoutNamespace.Name.LocalName);
                 }
             }
+        }
+
+        private void ConvertWixLocalizationStringElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Value");
+        }
+
+        private void ConvertWixLocalizationUIElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Text");
         }
 
         private void ConvertInnerTextToAttribute(XElement element, string attributeName)

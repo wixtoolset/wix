@@ -1,36 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="ru-ru" Language="1049" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">Установка [WixBundleName]</String>
-  <String Id="Title">Для установки [WixBundleName] требуется Microsoft .NET Framework</String>
-  <String Id="ConfirmCancelMessage">Вы действительно хотите отменить операцию?</String>
-  <String Id="HelpHeader">Справка по установке</String>
-  <String Id="HelpText">/passive | /quiet - отображение минимального ИП без запросов или работа без ИП 
-   и беззапросов. По умолчанию отображаются ИП и все запросы.
-
-/norestart   - отключение всех попыток перезагрузки. По умолчанию в ИП перед
-   перезагрузкой отображается запрос.
-/log log.txt - запись журнала в указанный файл. По умолчанию файл журнала
-   создается в папке %TEMP%.</String>
-  <String Id="HelpCloseButton">&amp;Закрыть</String>
-  <String Id="InstallLicenseTerms">Нажмите кнопку "Принять и установить", чтобы принять &lt;a href="#"&gt;условия лицензии&lt;/a&gt; Microsoft .NET Framework.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Принять и установить</String>
-  <String Id="InstallDeclineButton">&amp;Отклонить</String>
-  <String Id="ProgressHeader">Выполнение установки</String>
-  <String Id="ProgressLabel">Обработка:</String>
-  <String Id="ProgressCancelButton">&amp;Отмена</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Сбой установки</String>
-  <String Id="FailureLogLinkText">Не удалось выполнить установку из-за одной или нескольких проблем. Устраните эти проблемы, а затем снова запустите программу установки. Дополнительные сведения см. в &lt;a href="#"&gt;файле журнала&lt;/a&gt;.</String>
-  <String Id="FailureRestartText">Необходимо перезагрузить компьютер, чтобы завершить откат программного обеспечения.</String>
-  <String Id="FailureRestartButton">&amp;Перезагрузить</String>
-  <String Id="FailureCloseButton">&amp;Закрыть</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="Установка [WixBundleName]" />
+  <String Id="Title" Value="Для установки [WixBundleName] требуется Microsoft .NET Framework" />
+  <String Id="ConfirmCancelMessage" Value="Вы действительно хотите отменить операцию?" />
+  <String Id="HelpHeader" Value="Справка по установке" />
+  <String Id="HelpText" Value="/passive | /quiet - отображение минимального ИП без запросов или работа без ИП &#xA;   и беззапросов. По умолчанию отображаются ИП и все запросы.&#xA;&#xA;/norestart   - отключение всех попыток перезагрузки. По умолчанию в ИП перед&#xA;   перезагрузкой отображается запрос.&#xA;/log log.txt - запись журнала в указанный файл. По умолчанию файл журнала&#xA;   создается в папке %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Закрыть" />
+  <String Id="InstallLicenseTerms" Value="Нажмите кнопку &quot;Принять и установить&quot;, чтобы принять &lt;a href=&quot;#&quot;&gt;условия лицензии&lt;/a&gt; Microsoft .NET Framework." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Принять и установить" />
+  <String Id="InstallDeclineButton" Value="&amp;Отклонить" />
+  <String Id="ProgressHeader" Value="Выполнение установки" />
+  <String Id="ProgressLabel" Value="Обработка:" />
+  <String Id="ProgressCancelButton" Value="&amp;Отмена" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Сбой установки" />
+  <String Id="FailureLogLinkText" Value="Не удалось выполнить установку из-за одной или нескольких проблем. Устраните эти проблемы, а затем снова запустите программу установки. Дополнительные сведения см. в &lt;a href=&quot;#&quot;&gt;файле журнала&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Необходимо перезагрузить компьютер, чтобы завершить откат программного обеспечения." />
+  <String Id="FailureRestartButton" Value="&amp;Перезагрузить" />
+  <String Id="FailureCloseButton" Value="&amp;Закрыть" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

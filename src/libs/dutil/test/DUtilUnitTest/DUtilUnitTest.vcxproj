@@ -55,6 +55,7 @@
     <ClCompile Include="FileUtilTest.cpp" />
     <ClCompile Include="GuidUtilTest.cpp" />
     <ClCompile Include="IniUtilTest.cpp" />
+    <ClCompile Include="LocUtilTests.cpp" />
     <ClCompile Include="MemUtilTest.cpp" />
     <ClCompile Include="MonUtilTest.cpp" />
     <ClCompile Include="PathUtilTest.cpp" />
@@ -82,6 +83,8 @@
 
   <ItemGroup>
     <None Include="TestData\ApupUtilTests\FeedBv2.0.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\LocUtilTests\controls.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\LocUtilTests\strings.wxl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

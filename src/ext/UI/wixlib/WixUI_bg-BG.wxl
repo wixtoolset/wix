@@ -1,598 +1,597 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="bg-bg" Codepage="1251" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-    <String Id="WixUIBack" Overridable="yes">&amp;Назад</String>
-    <String Id="WixUINext" Overridable="yes">Н&amp;апред</String>
-    <String Id="WixUICancel" Overridable="yes">Отказ</String>
-    <String Id="WixUIFinish" Overridable="yes">&amp;Готово</String>
-    <String Id="WixUIRetry" Overridable="yes">&amp;Опитай пак</String>
-    <String Id="WixUIIgnore" Overridable="yes">&amp;Игнорирай</String>
-    <String Id="WixUIYes" Overridable="yes">&amp;Да</String>
-    <String Id="WixUINo" Overridable="yes">&amp;Не</String>
-    <String Id="WixUIOK" Overridable="yes">OK</String>
-    <String Id="WixUIPrint" Overridable="yes">Пе&amp;чат</String>
+    <String Id="WixUIBack" Overridable="yes" Value="&amp;Назад" />
+    <String Id="WixUINext" Overridable="yes" Value="Н&amp;апред" />
+    <String Id="WixUICancel" Overridable="yes" Value="Отказ" />
+    <String Id="WixUIFinish" Overridable="yes" Value="&amp;Готово" />
+    <String Id="WixUIRetry" Overridable="yes" Value="&amp;Опитай пак" />
+    <String Id="WixUIIgnore" Overridable="yes" Value="&amp;Игнорирай" />
+    <String Id="WixUIYes" Overridable="yes" Value="&amp;Да" />
+    <String Id="WixUINo" Overridable="yes" Value="&amp;Не" />
+    <String Id="WixUIOK" Overridable="yes" Value="OK" />
+    <String Id="WixUIPrint" Overridable="yes" Value="Пе&amp;чат" />
 
-    <String Id="AdvancedWelcomeEulaDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="AdvancedWelcomeEulaDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="AdvancedWelcomeEulaDlgTitle" Overridable="yes">{\WixUI_Font_Title}Прочетете лицензионното споразумение за [ProductName]</String>
-    <String Id="AdvancedWelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes">&amp;Приемам условията в лицензионното споразумение</String>
-    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Overridable="yes">Щракнете върху "Инсталирай", за да инсталирате продукта с опции по подразбиране за всички потребители. Щракнете върху "Разширени", за да промените опциите за инсталиране.</String>
-    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Overridable="yes">Щракнете върху "Инсталирай", за да инсталирате продукта с опции по подразбиране само за вас. Щракнете върху "Разширени", за да промените опциите за инсталиране.</String>
-    <String Id="AdvancedWelcomeEulaDlgInstall" Overridable="yes">&amp;Инсталирай</String>
-    <String Id="AdvancedWelcomeEulaDlgAdvanced" Overridable="yes">Р&amp;азширени</String>
-    <String Id="Advanced_Font_Normal_Size" Overridable="yes">8</String>
-    <String Id="Advanced_Font_Bigger_Size" Overridable="yes">12</String>
-    <String Id="Advanced_Font_Title_Size" Overridable="yes">9</String>
-    <String Id="Advanced_Font_Emphasized_Size" Overridable="yes">8</String>
-    <String Id="Advanced_Font_FaceName" Overridable="yes">Tahoma</String>
+    <String Id="AdvancedWelcomeEulaDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="AdvancedWelcomeEulaDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="AdvancedWelcomeEulaDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Прочетете лицензионното споразумение за [ProductName]" />
+    <String Id="AdvancedWelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes" Value="&amp;Приемам условията в лицензионното споразумение" />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Overridable="yes" Value="Щракнете върху &quot;Инсталирай&quot;, за да инсталирате продукта с опции по подразбиране за всички потребители. Щракнете върху &quot;Разширени&quot;, за да промените опциите за инсталиране." />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Overridable="yes" Value="Щракнете върху &quot;Инсталирай&quot;, за да инсталирате продукта с опции по подразбиране само за вас. Щракнете върху &quot;Разширени&quot;, за да промените опциите за инсталиране." />
+    <String Id="AdvancedWelcomeEulaDlgInstall" Overridable="yes" Value="&amp;Инсталирай" />
+    <String Id="AdvancedWelcomeEulaDlgAdvanced" Overridable="yes" Value="Р&amp;азширени" />
+    <String Id="Advanced_Font_Normal_Size" Overridable="yes" Value="8" />
+    <String Id="Advanced_Font_Bigger_Size" Overridable="yes" Value="12" />
+    <String Id="Advanced_Font_Title_Size" Overridable="yes" Value="9" />
+    <String Id="Advanced_Font_Emphasized_Size" Overridable="yes" Value="8" />
+    <String Id="Advanced_Font_FaceName" Overridable="yes" Value="Tahoma" />
 
-    <String Id="BrowseDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="BrowseDlgComboLabel" Overridable="yes">&amp;Търси в:</String>
-    <String Id="BrowseDlgWixUI_Bmp_Up" Overridable="yes">WixUI_Bmp_Up</String>
-    <String Id="BrowseDlgWixUI_Bmp_UpTooltip" Overridable="yes">Едно ниво нагоре</String>
-    <String Id="BrowseDlgNewFolder" Overridable="yes">WixUI_Bmp_New</String>
-    <String Id="BrowseDlgNewFolderTooltip" Overridable="yes">Създаване на нова папка</String>
-    <String Id="BrowseDlgPathLabel" Overridable="yes">&amp;Име на папката:</String>
-    <String Id="BrowseDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="BrowseDlgDescription" Overridable="yes">Отидете до папката местоназначение</String>
-    <String Id="BrowseDlgTitle" Overridable="yes">{\WixUI_Font_Title}Промяна на папката местоназначение</String>
+    <String Id="BrowseDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="BrowseDlgComboLabel" Overridable="yes" Value="&amp;Търси в:" />
+    <String Id="BrowseDlgWixUI_Bmp_Up" Overridable="yes" Value="WixUI_Bmp_Up" />
+    <String Id="BrowseDlgWixUI_Bmp_UpTooltip" Overridable="yes" Value="Едно ниво нагоре" />
+    <String Id="BrowseDlgNewFolder" Overridable="yes" Value="WixUI_Bmp_New" />
+    <String Id="BrowseDlgNewFolderTooltip" Overridable="yes" Value="Създаване на нова папка" />
+    <String Id="BrowseDlgPathLabel" Overridable="yes" Value="&amp;Име на папката:" />
+    <String Id="BrowseDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="BrowseDlgDescription" Overridable="yes" Value="Отидете до папката местоназначение" />
+    <String Id="BrowseDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Промяна на папката местоназначение" />
 
-    <String Id="CancelDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="CancelDlgText" Overridable="yes">Наистина ли искате да отмените инсталирането на [ProductName]?</String>
-    <String Id="CancelDlgIcon" Overridable="yes">WixUI_Ico_Info</String>
-    <String Id="CancelDlgIconTooltip" Overridable="yes">Информационна икона</String>
+    <String Id="CancelDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="CancelDlgText" Overridable="yes" Value="Наистина ли искате да отмените инсталирането на [ProductName]?" />
+    <String Id="CancelDlgIcon" Overridable="yes" Value="WixUI_Ico_Info" />
+    <String Id="CancelDlgIconTooltip" Overridable="yes" Value="Информационна икона" />
 
-    <String Id="CustomizeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="CustomizeDlgTree" Overridable="yes">Дърво на възможностите за избор</String>
-    <String Id="CustomizeDlgBrowse" Overridable="yes">&amp;Преглед...</String>
-    <String Id="CustomizeDlgReset" Overridable="yes">Ну&amp;лирай</String>
-    <String Id="CustomizeDlgDiskCost" Overridable="yes">Използване на &amp;диска</String>
-    <String Id="CustomizeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="CustomizeDlgText" Overridable="yes">Щракнете върху иконите на дървото по-долу, за да промените начина на инсталиране на компонентите.</String>
-    <String Id="CustomizeDlgDescription" Overridable="yes">Изберете начина, по който искате да се инсталират компонентите.</String>
-    <String Id="CustomizeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Инсталиране по избор</String>
-    <String Id="CustomizeDlgItemDescription" Overridable="yes">CustomizeDlgItemDescription-CustomizeDlgItemDescription</String>
-    <String Id="CustomizeDlgItemSize" Overridable="yes">CustomizeDlgItemSize-CustomizeDlgItemSize</String>
-    <String Id="CustomizeDlgLocation" Overridable="yes">CustomizeDlgLocation-CustomizeDlgLocation</String>
-    <String Id="CustomizeDlgLocationLabel" Overridable="yes">Местоположение:</String>
+    <String Id="CustomizeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="CustomizeDlgTree" Overridable="yes" Value="Дърво на възможностите за избор" />
+    <String Id="CustomizeDlgBrowse" Overridable="yes" Value="&amp;Преглед..." />
+    <String Id="CustomizeDlgReset" Overridable="yes" Value="Ну&amp;лирай" />
+    <String Id="CustomizeDlgDiskCost" Overridable="yes" Value="Използване на &amp;диска" />
+    <String Id="CustomizeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="CustomizeDlgText" Overridable="yes" Value="Щракнете върху иконите на дървото по-долу, за да промените начина на инсталиране на компонентите." />
+    <String Id="CustomizeDlgDescription" Overridable="yes" Value="Изберете начина, по който искате да се инсталират компонентите." />
+    <String Id="CustomizeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Инсталиране по избор" />
+    <String Id="CustomizeDlgItemDescription" Overridable="yes" Value="CustomizeDlgItemDescription-CustomizeDlgItemDescription" />
+    <String Id="CustomizeDlgItemSize" Overridable="yes" Value="CustomizeDlgItemSize-CustomizeDlgItemSize" />
+    <String Id="CustomizeDlgLocation" Overridable="yes" Value="CustomizeDlgLocation-CustomizeDlgLocation" />
+    <String Id="CustomizeDlgLocationLabel" Overridable="yes" Value="Местоположение:" />
 
-    <String Id="DiskCostDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="DiskCostDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="DiskCostDlgText" Overridable="yes">Маркираните томове нямат достатъчно свободно място за избраните компоненти. Можете да премахнете някои файлове от маркираните томове, да инсталирате по-малко компоненти или да изберете друго устройство за местоназначение.</String>
-    <String Id="DiskCostDlgDescription" Overridable="yes">Дисковото пространство, необходимо за инсталиране на избраните компоненти.</String>
-    <String Id="DiskCostDlgTitle" Overridable="yes">{\WixUI_Font_Title}Изисквания за дисковото пространство</String>
-    <String Id="DiskCostDlgVolumeList" Overridable="yes">{120}{70}{70}{70}{70}</String>
+    <String Id="DiskCostDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="DiskCostDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="DiskCostDlgText" Overridable="yes" Value="Маркираните томове нямат достатъчно свободно място за избраните компоненти. Можете да премахнете някои файлове от маркираните томове, да инсталирате по-малко компоненти или да изберете друго устройство за местоназначение." />
+    <String Id="DiskCostDlgDescription" Overridable="yes" Value="Дисковото пространство, необходимо за инсталиране на избраните компоненти." />
+    <String Id="DiskCostDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Изисквания за дисковото пространство" />
+    <String Id="DiskCostDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
 
-    <String Id="ErrorDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="ErrorDlgErrorText" Overridable="yes">Информационен текст</String>
-    <String Id="ErrorDlgErrorIcon" Overridable="yes">WixUI_Ico_Info</String>
-    <String Id="ErrorDlgErrorIconTooltip" Overridable="yes">Информационна икона</String>
+    <String Id="ErrorDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="ErrorDlgErrorText" Overridable="yes" Value="Информационен текст" />
+    <String Id="ErrorDlgErrorIcon" Overridable="yes" Value="WixUI_Ico_Info" />
+    <String Id="ErrorDlgErrorIconTooltip" Overridable="yes" Value="Информационна икона" />
 
-    <String Id="ExitDialog_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="ExitDialogBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="ExitDialogDescription" Overridable="yes">Щракнете върху бутона "Готово", за да излезете от съветника за инсталиране.</String>
-    <String Id="ExitDialogTitle" Overridable="yes">{\WixUI_Font_Bigger}Съветникът за инсталиране на [ProductName] завърши</String>
+    <String Id="ExitDialog_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="ExitDialogBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="ExitDialogDescription" Overridable="yes" Value="Щракнете върху бутона &quot;Готово&quot;, за да излезете от съветника за инсталиране." />
+    <String Id="ExitDialogTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Съветникът за инсталиране на [ProductName] завърши" />
 
-    <String Id="FatalError_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="FatalErrorBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="FatalErrorTitle" Overridable="yes">{\WixUI_Font_Bigger}Съветникът за инсталиране на [ProductName] завърши преждевременно</String>
-    <String Id="FatalErrorDescription1" Overridable="yes">Съветникът за инсталиране на [ProductName] завърши преждевременно поради грешка. Системата ви не е променена. За да инсталирате тази програма по-късно, изпълнете съветника за инсталиране отново.</String>
-    <String Id="FatalErrorDescription2" Overridable="yes">Щракнете върху бутона "Готово", за да излезете от съветника за инсталиране.</String>
+    <String Id="FatalError_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="FatalErrorBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="FatalErrorTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Съветникът за инсталиране на [ProductName] завърши преждевременно" />
+    <String Id="FatalErrorDescription1" Overridable="yes" Value="Съветникът за инсталиране на [ProductName] завърши преждевременно поради грешка. Системата ви не е променена. За да инсталирате тази програма по-късно, изпълнете съветника за инсталиране отново." />
+    <String Id="FatalErrorDescription2" Overridable="yes" Value="Щракнете върху бутона &quot;Готово&quot;, за да излезете от съветника за инсталиране." />
 
-    <String Id="FeaturesDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="FeaturesDlgTree" Overridable="yes">Компоненти на продукта</String>
-    <String Id="FeaturesDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="FeaturesDlgDescription" Overridable="yes">Изберете начина, по който искате да се инсталират компонентите.</String>
-    <String Id="FeaturesDlgTitle" Overridable="yes">{\WixUI_Font_Title}Компоненти на продукта</String>
-    <String Id="FeaturesDlgItemDescription" Overridable="yes">FeaturesDlgItemDescription</String>
-    <String Id="FeaturesDlgItemSize" Overridable="yes">FeaturesDlgItemSize</String>
-    <String Id="FeaturesDlgInstall" Overridable="yes">&amp;Инсталирай</String>
-    <String Id="FeaturesDlgChange" Overridable="yes">&amp;Промени</String>
+    <String Id="FeaturesDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="FeaturesDlgTree" Overridable="yes" Value="Компоненти на продукта" />
+    <String Id="FeaturesDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="FeaturesDlgDescription" Overridable="yes" Value="Изберете начина, по който искате да се инсталират компонентите." />
+    <String Id="FeaturesDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Компоненти на продукта" />
+    <String Id="FeaturesDlgItemDescription" Overridable="yes" Value="FeaturesDlgItemDescription" />
+    <String Id="FeaturesDlgItemSize" Overridable="yes" Value="FeaturesDlgItemSize" />
+    <String Id="FeaturesDlgInstall" Overridable="yes" Value="&amp;Инсталирай" />
+    <String Id="FeaturesDlgChange" Overridable="yes" Value="&amp;Промени" />
 
-    <String Id="FilesInUse_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="FilesInUseExit" Overridable="yes">И&amp;зход</String>
-    <String Id="FilesInUseBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="FilesInUseText" Overridable="yes">Приложенията по-долу използват файлове, които трябва да се актуализират при това инсталиране. Затворете тези приложения, след което щракнете върху "&amp;Опитай пак", за да продължите инсталирането, или щракнете върху "Изход", за да излезете от него.</String>
-    <String Id="FilesInUseDescription" Overridable="yes">Някои от файловете, които трябва да се актуализират, в момента се използват.</String>
-    <String Id="FilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}Използвани в момента файлове</String>
+    <String Id="FilesInUse_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="FilesInUseExit" Overridable="yes" Value="И&amp;зход" />
+    <String Id="FilesInUseBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="FilesInUseText" Overridable="yes" Value="Приложенията по-долу използват файлове, които трябва да се актуализират при това инсталиране. Затворете тези приложения, след което щракнете върху &quot;&amp;Опитай пак&quot;, за да продължите инсталирането, или щракнете върху &quot;Изход&quot;, за да излезете от него." />
+    <String Id="FilesInUseDescription" Overridable="yes" Value="Някои от файловете, които трябва да се актуализират, в момента се използват." />
+    <String Id="FilesInUseTitle" Overridable="yes" Value="{\WixUI_Font_Title}Използвани в момента файлове" />
 
-    <String Id="InstallDirDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="InstallDirDlgChange" Overridable="yes">&amp;Промяна...</String>
-    <String Id="InstallDirDlgTitle" Overridable="yes">{\WixUI_Font_Title}Папка местоназначение</String>
-    <String Id="InstallDirDlgDescription" Overridable="yes">Щракнете върху "Напред", за да инсталирате в папката по подразбиране, или щракнете върху "Промяна", за да изберете друга.</String>
-    <String Id="InstallDirDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="InstallDirDlgFolderLabel" Overridable="yes">Инсталиране на [ProductName] на:</String>
+    <String Id="InstallDirDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="InstallDirDlgChange" Overridable="yes" Value="&amp;Промяна..." />
+    <String Id="InstallDirDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Папка местоназначение" />
+    <String Id="InstallDirDlgDescription" Overridable="yes" Value="Щракнете върху &quot;Напред&quot;, за да инсталирате в папката по подразбиране, или щракнете върху &quot;Промяна&quot;, за да изберете друга." />
+    <String Id="InstallDirDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="InstallDirDlgFolderLabel" Overridable="yes" Value="Инсталиране на [ProductName] на:" />
 
-    <String Id="InstallScopeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="InstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="InstallScopeDlgDescription" Overridable="yes">Избор на обхвата и папката на инсталиране</String>
-    <String Id="InstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Обхват на инсталиране</String>
-    <String Id="InstallScopeDlgPerUser" Overridable="yes">{\WixUI_Font_Emphasized}Инсталиране &amp;само за вас ([LogonUser])</String>
-    <String Id="InstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] ще се инсталира в отделна папка за всеки потребител и ще бъде достъпно само за вашия потребителски акаунт. Не се нуждаете от привилегии на локален администратор.</String>
-    <String Id="InstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] не поддържа инсталиране в отделна папка за всеки потребител.</String>
-    <String Id="InstallScopeDlgPerMachine" Overridable="yes">{\WixUI_Font_Emphasized}Инсталиране за всички потребители на &amp;машината</String>
-    <String Id="InstallScopeDlgPerMachineDescription" Overridable="yes">По подразбиране приложението [ProductName] ще се инсталира в отделна папка за всеки компютър и ще е достъпно за всички потребители. Можете да промените папката за инсталиране по подразбиране. Трябва да разполагате с привилегии на локален администратор.</String>
-    <String Id="InstallScopeDlgFolderLabel" Overridable="yes">Папка за &amp;инсталиране:</String>
-    <String Id="InstallScopeDlgChange" Overridable="yes">&amp;Промяна...</String>
+    <String Id="InstallScopeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="InstallScopeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="InstallScopeDlgDescription" Overridable="yes" Value="Избор на обхвата и папката на инсталиране" />
+    <String Id="InstallScopeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Обхват на инсталиране" />
+    <String Id="InstallScopeDlgPerUser" Overridable="yes" Value="{\WixUI_Font_Emphasized}Инсталиране &amp;само за вас ([LogonUser])" />
+    <String Id="InstallScopeDlgPerUserDescription" Overridable="yes" Value="[ProductName] ще се инсталира в отделна папка за всеки потребител и ще бъде достъпно само за вашия потребителски акаунт. Не се нуждаете от привилегии на локален администратор." />
+    <String Id="InstallScopeDlgNoPerUserDescription" Overridable="yes" Value="[ProductName] не поддържа инсталиране в отделна папка за всеки потребител." />
+    <String Id="InstallScopeDlgPerMachine" Overridable="yes" Value="{\WixUI_Font_Emphasized}Инсталиране за всички потребители на &amp;машината" />
+    <String Id="InstallScopeDlgPerMachineDescription" Overridable="yes" Value="По подразбиране приложението [ProductName] ще се инсталира в отделна папка за всеки компютър и ще е достъпно за всички потребители. Можете да промените папката за инсталиране по подразбиране. Трябва да разполагате с привилегии на локален администратор." />
+    <String Id="InstallScopeDlgFolderLabel" Overridable="yes" Value="Папка за &amp;инсталиране:" />
+    <String Id="InstallScopeDlgChange" Overridable="yes" Value="&amp;Промяна..." />
 
-    <String Id="InvalidDirDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="InvalidDirDlgText" Overridable="yes">Директорията за инсталиране трябва да се намира на локалния твърд диск.</String>
-    <String Id="InvalidDirDlgIcon" Overridable="yes">WixUI_Ico_Info</String>
-    <String Id="InvalidDirDlgIconTooltip" Overridable="yes">Информационна икона</String>
+    <String Id="InvalidDirDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="InvalidDirDlgText" Overridable="yes" Value="Директорията за инсталиране трябва да се намира на локалния твърд диск." />
+    <String Id="InvalidDirDlgIcon" Overridable="yes" Value="WixUI_Ico_Info" />
+    <String Id="InvalidDirDlgIconTooltip" Overridable="yes" Value="Информационна икона" />
 
-    <String Id="LicenseAgreementDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="LicenseAgreementDlgLicenseAcceptedCheckBox" Overridable="yes">&amp;Приемам условията в лицензионното споразумение</String>
-    <String Id="LicenseAgreementDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="LicenseAgreementDlgDescription" Overridable="yes">Прочетете внимателно следното лицензионно споразумение</String>
-    <String Id="LicenseAgreementDlgTitle" Overridable="yes">{\WixUI_Font_Title}Лицензионно споразумение с краен потребител</String>
+    <String Id="LicenseAgreementDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="LicenseAgreementDlgLicenseAcceptedCheckBox" Overridable="yes" Value="&amp;Приемам условията в лицензионното споразумение" />
+    <String Id="LicenseAgreementDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="LicenseAgreementDlgDescription" Overridable="yes" Value="Прочетете внимателно следното лицензионно споразумение" />
+    <String Id="LicenseAgreementDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Лицензионно споразумение с краен потребител" />
 
-    <String Id="MaintenanceTypeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="MaintenanceTypeDlgChangeButton" Overridable="yes">&amp;Промени</String>
-    <String Id="MaintenanceTypeDlgChangeButtonTooltip" Overridable="yes">Промяна на инсталацията</String>
-    <String Id="MaintenanceTypeDlgRepairButton" Overridable="yes">Поп&amp;рави</String>
-    <String Id="MaintenanceTypeDlgRepairButtonTooltip" Overridable="yes">Поправяне на инсталацията</String>
-    <String Id="MaintenanceTypeDlgRemoveButton" Overridable="yes">&amp;Премахни</String>
-    <String Id="MaintenanceTypeDlgRemoveButtonTooltip" Overridable="yes">Премахване на инсталацията</String>
-    <String Id="MaintenanceTypeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="MaintenanceTypeDlgDescription" Overridable="yes">Изберете операцията, която желаете да изпълните.</String>
-    <String Id="MaintenanceTypeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Промяна, поправяне или премахване на инсталация</String>
-    <String Id="MaintenanceTypeDlgChangeText" Overridable="yes">Позволява ви да промените начина на инсталиране на компонентите.</String>
-    <String Id="MaintenanceTypeDlgChangeDisabledText" Overridable="yes">[ProductName] няма компоненти, които да могат да се избират самостоятелно.</String>
-    <String Id="MaintenanceTypeDlgRemoveText" Overridable="yes">Премахва [ProductName] от компютъра.</String>
-    <String Id="MaintenanceTypeDlgRemoveDisabledText" Overridable="yes">[ProductName] не може да се премахне.</String>
-    <String Id="MaintenanceTypeDlgRepairText" Overridable="yes">Поправя грешки в последната инсталация, като коригира липсващи и повредени файлове, преки пътища и записи в системния регистър.</String>
-    <String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes">[ProductName] не може да се поправи.</String>
+    <String Id="MaintenanceTypeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="MaintenanceTypeDlgChangeButton" Overridable="yes" Value="&amp;Промени" />
+    <String Id="MaintenanceTypeDlgChangeButtonTooltip" Overridable="yes" Value="Промяна на инсталацията" />
+    <String Id="MaintenanceTypeDlgRepairButton" Overridable="yes" Value="Поп&amp;рави" />
+    <String Id="MaintenanceTypeDlgRepairButtonTooltip" Overridable="yes" Value="Поправяне на инсталацията" />
+    <String Id="MaintenanceTypeDlgRemoveButton" Overridable="yes" Value="&amp;Премахни" />
+    <String Id="MaintenanceTypeDlgRemoveButtonTooltip" Overridable="yes" Value="Премахване на инсталацията" />
+    <String Id="MaintenanceTypeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="MaintenanceTypeDlgDescription" Overridable="yes" Value="Изберете операцията, която желаете да изпълните." />
+    <String Id="MaintenanceTypeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Промяна, поправяне или премахване на инсталация" />
+    <String Id="MaintenanceTypeDlgChangeText" Overridable="yes" Value="Позволява ви да промените начина на инсталиране на компонентите." />
+    <String Id="MaintenanceTypeDlgChangeDisabledText" Overridable="yes" Value="[ProductName] няма компоненти, които да могат да се избират самостоятелно." />
+    <String Id="MaintenanceTypeDlgRemoveText" Overridable="yes" Value="Премахва [ProductName] от компютъра." />
+    <String Id="MaintenanceTypeDlgRemoveDisabledText" Overridable="yes" Value="[ProductName] не може да се премахне." />
+    <String Id="MaintenanceTypeDlgRepairText" Overridable="yes" Value="Поправя грешки в последната инсталация, като коригира липсващи и повредени файлове, преки пътища и записи в системния регистър." />
+    <String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes" Value="[ProductName] не може да се поправи." />
 
-    <String Id="MaintenanceWelcomeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">Съветникът за инсталиране ви позволява да променяте начина, по който се инсталират компонентите на [ProductName] на вашия компютър, или да ги премахнете от него. Щракнете върху "Напред", за да продължите, или върху "Отказ", за да излезете от съветника за инсталиране.</String>
-    <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}Добре дошли в съветника за инсталиране на [ProductName]</String>
+    <String Id="MaintenanceWelcomeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes" Value="Съветникът за инсталиране ви позволява да променяте начина, по който се инсталират компонентите на [ProductName] на вашия компютър, или да ги премахнете от него. Щракнете върху &quot;Напред&quot;, за да продължите, или върху &quot;Отказ&quot;, за да излезете от съветника за инсталиране." />
+    <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Добре дошли в съветника за инсталиране на [ProductName]" />
 
-    <String Id="MsiRMFilesInUse_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="MsiRMFilesInUseBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="MsiRMFilesInUseText" Overridable="yes">Приложенията по-долу използват файлове, които трябва да се актуализират при това инсталиране. Можете да позволите на съветника за инсталиране да ги затвори и да се опита да ги стартира отново или да рестартирате компютъра по-късно.</String>
-    <String Id="MsiRMFilesInUseDescription" Overridable="yes">Някои от файловете, които трябва да се актуализират, в момента се използват.</String>
-    <String Id="MsiRMFilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}Използвани в момента файлове</String>
-    <String Id="MsiRMFilesInUseUseRM" Overridable="yes">&amp;Затвори приложенията и направи опит за рестартирането им.</String>
-    <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">&amp;Не затваряй приложенията. Ще се изисква рестартиране.</String>
+    <String Id="MsiRMFilesInUse_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="MsiRMFilesInUseBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="MsiRMFilesInUseText" Overridable="yes" Value="Приложенията по-долу използват файлове, които трябва да се актуализират при това инсталиране. Можете да позволите на съветника за инсталиране да ги затвори и да се опита да ги стартира отново или да рестартирате компютъра по-късно." />
+    <String Id="MsiRMFilesInUseDescription" Overridable="yes" Value="Някои от файловете, които трябва да се актуализират, в момента се използват." />
+    <String Id="MsiRMFilesInUseTitle" Overridable="yes" Value="{\WixUI_Font_Title}Използвани в момента файлове" />
+    <String Id="MsiRMFilesInUseUseRM" Overridable="yes" Value="&amp;Затвори приложенията и направи опит за рестартирането им." />
+    <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes" Value="&amp;Не затваряй приложенията. Ще се изисква рестартиране." />
 
-    <String Id="OutOfDiskDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="OutOfDiskDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="OutOfDiskDlgText" Overridable="yes">Маркираните томове нямат достатъчно свободно място на диска за текущо избраните компоненти. Можете да премахнете някои файлове от маркираните томове, да инсталирате по-малко компоненти или да изберете друго устройство за местоназначение.</String>
-    <String Id="OutOfDiskDlgDescription" Overridable="yes">Дисковото пространство, необходимо за инсталирането, надвишава свободното дисково пространство.</String>
-    <String Id="OutOfDiskDlgTitle" Overridable="yes">{\WixUI_Font_Title}Недостатъчно място на диска</String>
-    <String Id="OutOfDiskDlgVolumeList" Overridable="yes">{120}{70}{70}{70}{70}</String>
+    <String Id="OutOfDiskDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="OutOfDiskDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="OutOfDiskDlgText" Overridable="yes" Value="Маркираните томове нямат достатъчно свободно място на диска за текущо избраните компоненти. Можете да премахнете някои файлове от маркираните томове, да инсталирате по-малко компоненти или да изберете друго устройство за местоназначение." />
+    <String Id="OutOfDiskDlgDescription" Overridable="yes" Value="Дисковото пространство, необходимо за инсталирането, надвишава свободното дисково пространство." />
+    <String Id="OutOfDiskDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Недостатъчно място на диска" />
+    <String Id="OutOfDiskDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
 
-    <String Id="OutOfRbDiskDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="OutOfRbDiskDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="OutOfRbDiskDlgText" Overridable="yes">Маркираните томове нямат достатъчно свободно място на диска за текущо избраните компоненти. Можете да премахнете някои файлове от маркираните томове, да инсталирате по-малко компоненти или да изберете друго устройство за местоназначение.</String>
-    <String Id="OutOfRbDiskDlgDescription" Overridable="yes">Дисковото пространство, необходимо за инсталирането, надвишава свободното дисково пространство.</String>
-    <String Id="OutOfRbDiskDlgTitle" Overridable="yes">{\WixUI_Font_Title}Недостатъчно място на диска</String>
-    <String Id="OutOfRbDiskDlgVolumeList" Overridable="yes">{120}{70}{70}{70}{70}</String>
-    <String Id="OutOfRbDiskDlgText2" Overridable="yes">Също така можете да забраните функцията за възстановяване на инсталиращата програма. Забраняването на възстановяването не позволява на инсталиращата програма да възстанови първоначалното състояние на компютъра, ако инсталацията бъде прекъсната по някакъв начин. Щракнете върху "Да", ако искате да рискувате със забраняване на възстановяването.</String>
+    <String Id="OutOfRbDiskDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="OutOfRbDiskDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="OutOfRbDiskDlgText" Overridable="yes" Value="Маркираните томове нямат достатъчно свободно място на диска за текущо избраните компоненти. Можете да премахнете някои файлове от маркираните томове, да инсталирате по-малко компоненти или да изберете друго устройство за местоназначение." />
+    <String Id="OutOfRbDiskDlgDescription" Overridable="yes" Value="Дисковото пространство, необходимо за инсталирането, надвишава свободното дисково пространство." />
+    <String Id="OutOfRbDiskDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Недостатъчно място на диска" />
+    <String Id="OutOfRbDiskDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
+    <String Id="OutOfRbDiskDlgText2" Overridable="yes" Value="Също така можете да забраните функцията за възстановяване на инсталиращата програма. Забраняването на възстановяването не позволява на инсталиращата програма да възстанови първоначалното състояние на компютъра, ако инсталацията бъде прекъсната по някакъв начин. Щракнете върху &quot;Да&quot;, ако искате да рискувате със забраняване на възстановяването." />
 
-    <String Id="PrepareDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="PrepareDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="PrepareDlgDescription" Overridable="yes">Моля, изчакайте, докато съветникът за инсталиране се подготви да ви направлява в инсталирането.</String>
-    <String Id="PrepareDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}Добре дошли в съветника за инсталиране на [ProductName]</String>
+    <String Id="PrepareDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="PrepareDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="PrepareDlgDescription" Overridable="yes" Value="Моля, изчакайте, докато съветникът за инсталиране се подготви да ви направлява в инсталирането." />
+    <String Id="PrepareDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Добре дошли в съветника за инсталиране на [ProductName]" />
 
-    <String Id="ProgressDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="ProgressDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="ProgressDlgTextInstalling" Overridable="yes">Моля, изчакайте, докато съветникът за инсталиране инсталира [ProductName].</String>
-    <String Id="ProgressDlgTitleInstalling" Overridable="yes">{\WixUI_Font_Title}Инсталиране на [ProductName]</String>
-    <String Id="ProgressDlgTextChanging" Overridable="yes">Моля, изчакайте, докато съветникът за инсталиране промени [ProductName].</String>
-    <String Id="ProgressDlgTitleChanging" Overridable="yes">{\WixUI_Font_Title}Промяна на [ProductName]</String>
-    <String Id="ProgressDlgTextRepairing" Overridable="yes">Моля, изчакайте, докато съветникът за инсталиране поправи [ProductName].</String>
-    <String Id="ProgressDlgTitleRepairing" Overridable="yes">{\WixUI_Font_Title}Поправяне на [ProductName]</String>
-    <String Id="ProgressDlgTextRemoving" Overridable="yes">Моля, изчакайте, докато съветникът за инсталиране премахне [ProductName].</String>
-    <String Id="ProgressDlgTitleRemoving" Overridable="yes">{\WixUI_Font_Title}Премахване на [ProductName]</String>
-    <String Id="ProgressDlgTextUpdating" Overridable="yes">Моля, изчакайте, докато съветникът за инсталиране актуализира [ProductName].</String>
-    <String Id="ProgressDlgTitleUpdating" Overridable="yes">{\WixUI_Font_Title}Актуализиране на [ProductName]</String>
-    <String Id="ProgressDlgProgressBar" Overridable="yes">Операцията завърши</String>
-    <String Id="ProgressDlgStatusLabel" Overridable="yes">Състояние:</String>
+    <String Id="ProgressDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="ProgressDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="ProgressDlgTextInstalling" Overridable="yes" Value="Моля, изчакайте, докато съветникът за инсталиране инсталира [ProductName]." />
+    <String Id="ProgressDlgTitleInstalling" Overridable="yes" Value="{\WixUI_Font_Title}Инсталиране на [ProductName]" />
+    <String Id="ProgressDlgTextChanging" Overridable="yes" Value="Моля, изчакайте, докато съветникът за инсталиране промени [ProductName]." />
+    <String Id="ProgressDlgTitleChanging" Overridable="yes" Value="{\WixUI_Font_Title}Промяна на [ProductName]" />
+    <String Id="ProgressDlgTextRepairing" Overridable="yes" Value="Моля, изчакайте, докато съветникът за инсталиране поправи [ProductName]." />
+    <String Id="ProgressDlgTitleRepairing" Overridable="yes" Value="{\WixUI_Font_Title}Поправяне на [ProductName]" />
+    <String Id="ProgressDlgTextRemoving" Overridable="yes" Value="Моля, изчакайте, докато съветникът за инсталиране премахне [ProductName]." />
+    <String Id="ProgressDlgTitleRemoving" Overridable="yes" Value="{\WixUI_Font_Title}Премахване на [ProductName]" />
+    <String Id="ProgressDlgTextUpdating" Overridable="yes" Value="Моля, изчакайте, докато съветникът за инсталиране актуализира [ProductName]." />
+    <String Id="ProgressDlgTitleUpdating" Overridable="yes" Value="{\WixUI_Font_Title}Актуализиране на [ProductName]" />
+    <String Id="ProgressDlgProgressBar" Overridable="yes" Value="Операцията завърши" />
+    <String Id="ProgressDlgStatusLabel" Overridable="yes" Value="Състояние:" />
 
-    <String Id="ResumeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="ResumeDlgInstall" Overridable="yes">&amp;Инсталирай</String>
-    <String Id="ResumeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="ResumeDlgDescription" Overridable="yes">Съветникът за инсталиране ще завърши инсталирането на [ProductName] на компютъра. Щракнете върху "Инсталирай", за да продължите, или върху "Отказ" за изход от съветника за инсталиране.</String>
-    <String Id="ResumeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}Възобновяване на съветника за инсталиране на [ProductName]</String>
+    <String Id="ResumeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="ResumeDlgInstall" Overridable="yes" Value="&amp;Инсталирай" />
+    <String Id="ResumeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="ResumeDlgDescription" Overridable="yes" Value="Съветникът за инсталиране ще завърши инсталирането на [ProductName] на компютъра. Щракнете върху &quot;Инсталирай&quot;, за да продължите, или върху &quot;Отказ&quot; за изход от съветника за инсталиране." />
+    <String Id="ResumeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Възобновяване на съветника за инсталиране на [ProductName]" />
 
-    <String Id="SetupTypeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="SetupTypeDlgTypicalButton" Overridable="yes">&amp;Типична</String>
-    <String Id="SetupTypeDlgTypicalButtonTooltip" Overridable="yes">Типична инсталация</String>
-    <String Id="SetupTypeDlgCustomButton" Overridable="yes">П&amp;о избор</String>
-    <String Id="SetupTypeDlgCustomButtonTooltip" Overridable="yes">Инсталация по избор</String>
-    <String Id="SetupTypeDlgCompleteButton" Overridable="yes">П&amp;ълна</String>
-    <String Id="SetupTypeDlgCompleteButtonTooltip" Overridable="yes">Пълна инсталация</String>
-    <String Id="SetupTypeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="SetupTypeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Избор на тип инсталация</String>
-    <String Id="SetupTypeDlgDescription" Overridable="yes">Избор на типа инсталация, който отговаря най-добре на вашите нужди</String>
-    <String Id="SetupTypeDlgTypicalText" Overridable="yes">Инсталира най-често използваните програмни компоненти. Препоръчва се за повечето потребители.</String>
-    <String Id="SetupTypeDlgCustomText" Overridable="yes">Позволява на потребителите да изберат кои компоненти на програмата ще се инсталират и къде ще се инсталират. Препоръчва се за опитни потребители.</String>
-    <String Id="SetupTypeDlgCompleteText" Overridable="yes">Всички програмни компоненти ще се инсталират. Изисква най-много дисково пространство.</String>
+    <String Id="SetupTypeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="SetupTypeDlgTypicalButton" Overridable="yes" Value="&amp;Типична" />
+    <String Id="SetupTypeDlgTypicalButtonTooltip" Overridable="yes" Value="Типична инсталация" />
+    <String Id="SetupTypeDlgCustomButton" Overridable="yes" Value="П&amp;о избор" />
+    <String Id="SetupTypeDlgCustomButtonTooltip" Overridable="yes" Value="Инсталация по избор" />
+    <String Id="SetupTypeDlgCompleteButton" Overridable="yes" Value="П&amp;ълна" />
+    <String Id="SetupTypeDlgCompleteButtonTooltip" Overridable="yes" Value="Пълна инсталация" />
+    <String Id="SetupTypeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="SetupTypeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Избор на тип инсталация" />
+    <String Id="SetupTypeDlgDescription" Overridable="yes" Value="Избор на типа инсталация, който отговаря най-добре на вашите нужди" />
+    <String Id="SetupTypeDlgTypicalText" Overridable="yes" Value="Инсталира най-често използваните програмни компоненти. Препоръчва се за повечето потребители." />
+    <String Id="SetupTypeDlgCustomText" Overridable="yes" Value="Позволява на потребителите да изберат кои компоненти на програмата ще се инсталират и къде ще се инсталират. Препоръчва се за опитни потребители." />
+    <String Id="SetupTypeDlgCompleteText" Overridable="yes" Value="Всички програмни компоненти ще се инсталират. Изисква най-много дисково пространство." />
 
-    <String Id="UserExit_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="UserExitBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="UserExitTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] Съветникът за инсталиране беше прекъснат</String>
-    <String Id="UserExitDescription1" Overridable="yes">Инсталирането на [ProductName] е прекъснато. Системата ви не е променена. За да инсталирате тази програма по-късно, изпълнете отново инсталирането.</String>
-    <String Id="UserExitDescription2" Overridable="yes">Щракнете върху бутона "Готово", за да излезете от съветника за инсталиране.</String>
+    <String Id="UserExit_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="UserExitBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="UserExitTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}[ProductName] Съветникът за инсталиране беше прекъснат" />
+    <String Id="UserExitDescription1" Overridable="yes" Value="Инсталирането на [ProductName] е прекъснато. Системата ви не е променена. За да инсталирате тази програма по-късно, изпълнете отново инсталирането." />
+    <String Id="UserExitDescription2" Overridable="yes" Value="Щракнете върху бутона &quot;Готово&quot;, за да излезете от съветника за инсталиране." />
 
-    <String Id="VerifyReadyDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-    <String Id="VerifyReadyDlgInstall" Overridable="yes">&amp;Инсталирай</String>
-    <String Id="VerifyReadyDlgInstallText" Overridable="yes">Щракнете върху "Инсталирай", за да започнете инсталирането. Щракнете върху "Назад", за да прегледате или промените настройките за инсталиране. Щракнете върху "Отказ", за да излезете от съветника.</String>
-    <String Id="VerifyReadyDlgInstallTitle" Overridable="yes">{\WixUI_Font_Title}Всичко е готово за инсталиране на [ProductName]</String>
-    <String Id="VerifyReadyDlgChange" Overridable="yes">&amp;Промени</String>
-    <String Id="VerifyReadyDlgChangeText" Overridable="yes">Щракнете върху "Промени", за да започнете инсталирането. Щракнете върху "Назад", за да прегледате или промените настройките за инсталиране. Щракнете върху "Отказ", за да излезете от съветника.</String>
-    <String Id="VerifyReadyDlgChangeTitle" Overridable="yes">{\WixUI_Font_Title}Всичко е готово за промяна на [ProductName]</String>
-    <String Id="VerifyReadyDlgRepair" Overridable="yes">Поп&amp;рави</String>
-    <String Id="VerifyReadyDlgRepairText" Overridable="yes">Щракнете върху "Поправи", за да поправите инсталацията на [ProductName]. Щракнете върху "Назад", за да прегледате или промените настройките за инсталиране. Щракнете върху "Отказ", за да излезете от съветника.</String>
-    <String Id="VerifyReadyDlgRepairTitle" Overridable="yes">{\WixUI_Font_Title}Всичко е готово за поправяне на [ProductName]</String>
-    <String Id="VerifyReadyDlgRemove" Overridable="yes">&amp;Премахни</String>
-    <String Id="VerifyReadyDlgRemoveText" Overridable="yes">Щракнете върху "Премахни", за да премахнете [ProductName] от компютъра си. Щракнете върху "Назад", за да прегледате или промените настройките за инсталиране. Щракнете върху "Отказ", за да излезете от съветника.</String>
-    <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes">{\WixUI_Font_Title}Готовност за премахване на [ProductName]</String>
-    <String Id="VerifyReadyDlgUpdate" Overridable="yes">&amp;Актуализирай</String>
-    <String Id="VerifyReadyDlgUpdateText" Overridable="yes">Щракнете върху "Актуализирай", за да актуализирате [ProductName] от компютъра. Щракнете върху "Назад", за да прегледате или промените настройките за инсталиране. Щракнете върху "Отказ", за да излезете от съветника.</String>
-    <String Id="VerifyReadyDlgUpdateTitle" Overridable="yes">{\WixUI_Font_Title}Готовност за актуализиране  на [ProductName]</String>
+    <String Id="VerifyReadyDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+    <String Id="VerifyReadyDlgInstall" Overridable="yes" Value="&amp;Инсталирай" />
+    <String Id="VerifyReadyDlgInstallText" Overridable="yes" Value="Щракнете върху &quot;Инсталирай&quot;, за да започнете инсталирането. Щракнете върху &quot;Назад&quot;, за да прегледате или промените настройките за инсталиране. Щракнете върху &quot;Отказ&quot;, за да излезете от съветника." />
+    <String Id="VerifyReadyDlgInstallTitle" Overridable="yes" Value="{\WixUI_Font_Title}Всичко е готово за инсталиране на [ProductName]" />
+    <String Id="VerifyReadyDlgChange" Overridable="yes" Value="&amp;Промени" />
+    <String Id="VerifyReadyDlgChangeText" Overridable="yes" Value="Щракнете върху &quot;Промени&quot;, за да започнете инсталирането. Щракнете върху &quot;Назад&quot;, за да прегледате или промените настройките за инсталиране. Щракнете върху &quot;Отказ&quot;, за да излезете от съветника." />
+    <String Id="VerifyReadyDlgChangeTitle" Overridable="yes" Value="{\WixUI_Font_Title}Всичко е готово за промяна на [ProductName]" />
+    <String Id="VerifyReadyDlgRepair" Overridable="yes" Value="Поп&amp;рави" />
+    <String Id="VerifyReadyDlgRepairText" Overridable="yes" Value="Щракнете върху &quot;Поправи&quot;, за да поправите инсталацията на [ProductName]. Щракнете върху &quot;Назад&quot;, за да прегледате или промените настройките за инсталиране. Щракнете върху &quot;Отказ&quot;, за да излезете от съветника." />
+    <String Id="VerifyReadyDlgRepairTitle" Overridable="yes" Value="{\WixUI_Font_Title}Всичко е готово за поправяне на [ProductName]" />
+    <String Id="VerifyReadyDlgRemove" Overridable="yes" Value="&amp;Премахни" />
+    <String Id="VerifyReadyDlgRemoveText" Overridable="yes" Value="Щракнете върху &quot;Премахни&quot;, за да премахнете [ProductName] от компютъра си. Щракнете върху &quot;Назад&quot;, за да прегледате или промените настройките за инсталиране. Щракнете върху &quot;Отказ&quot;, за да излезете от съветника." />
+    <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes" Value="{\WixUI_Font_Title}Готовност за премахване на [ProductName]" />
+    <String Id="VerifyReadyDlgUpdate" Overridable="yes" Value="&amp;Актуализирай" />
+    <String Id="VerifyReadyDlgUpdateText" Overridable="yes" Value="Щракнете върху &quot;Актуализирай&quot;, за да актуализирате [ProductName] от компютъра. Щракнете върху &quot;Назад&quot;, за да прегледате или промените настройките за инсталиране. Щракнете върху &quot;Отказ&quot;, за да излезете от съветника." />
+    <String Id="VerifyReadyDlgUpdateTitle" Overridable="yes" Value="{\WixUI_Font_Title}Готовност за актуализиране  на [ProductName]" />
 
-    <String Id="WaitForCostingDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="WaitForCostingDlgReturn" Overridable="yes">&amp;Върни се</String>
-    <String Id="WaitForCostingDlgText" Overridable="yes">Моля, изчакайте, докато програмата за инсталиране определи изискванията за свободно пространство на вашия диск.</String>
-    <String Id="WaitForCostingDlgIcon" Overridable="yes">WixUI_Ico_Exclam</String>
-    <String Id="WaitForCostingDlgIconTooltip" Overridable="yes">Икона за възклицание</String>
+    <String Id="WaitForCostingDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="WaitForCostingDlgReturn" Overridable="yes" Value="&amp;Върни се" />
+    <String Id="WaitForCostingDlgText" Overridable="yes" Value="Моля, изчакайте, докато програмата за инсталиране определи изискванията за свободно пространство на вашия диск." />
+    <String Id="WaitForCostingDlgIcon" Overridable="yes" Value="WixUI_Ico_Exclam" />
+    <String Id="WaitForCostingDlgIconTooltip" Overridable="yes" Value="Икона за възклицание" />
 
-    <String Id="WelcomeDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="WelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="WelcomeDlgDescription" Overridable="yes">Съветникът за инсталиране ще инсталира [ProductName] на компютъра. Щракнете върху "Напред", за да продължите, или върху "Отказ", за да излезете от съветника за инсталиране.</String>
-    <String Id="WelcomeUpdateDlgDescriptionUpdate" Overridable="yes">Съветникът за инсталиране ще актуализира [ProductName] на компютъра. Щракнете върху "Напред", за да продължите, или върху "Отказ", за да излезете от съветника за инсталиране.</String>
-    <String Id="WelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}Добре дошли в съветника за инсталиране на [ProductName]</String>
+    <String Id="WelcomeDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="WelcomeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="WelcomeDlgDescription" Overridable="yes" Value="Съветникът за инсталиране ще инсталира [ProductName] на компютъра. Щракнете върху &quot;Напред&quot;, за да продължите, или върху &quot;Отказ&quot;, за да излезете от съветника за инсталиране." />
+    <String Id="WelcomeUpdateDlgDescriptionUpdate" Overridable="yes" Value="Съветникът за инсталиране ще актуализира [ProductName] на компютъра. Щракнете върху &quot;Напред&quot;, за да продължите, или върху &quot;Отказ&quot;, за да излезете от съветника за инсталиране." />
+    <String Id="WelcomeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Добре дошли в съветника за инсталиране на [ProductName]" />
 
-    <String Id="WelcomeEulaDlg_Title" Overridable="yes">Инсталиране на [ProductName]</String>
-    <String Id="WelcomeEulaDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-    <String Id="WelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes">&amp;Приемам условията в лицензионното споразумение</String>
-    <String Id="WelcomeEulaDlgInstall" Overridable="yes">&amp;Инсталирай</String>
-    <String Id="WelcomeEulaDlgUpdate" Overridable="yes">&amp;Актуализирай</String>
-    <String Id="WelcomeEulaDlgTitle" Overridable="yes">{\WixUI_Font_Title}Прочетете лицензионното споразумение за [ProductName]</String>
+    <String Id="WelcomeEulaDlg_Title" Overridable="yes" Value="Инсталиране на [ProductName]" />
+    <String Id="WelcomeEulaDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
+    <String Id="WelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes" Value="&amp;Приемам условията в лицензионното споразумение" />
+    <String Id="WelcomeEulaDlgInstall" Overridable="yes" Value="&amp;Инсталирай" />
+    <String Id="WelcomeEulaDlgUpdate" Overridable="yes" Value="&amp;Актуализирай" />
+    <String Id="WelcomeEulaDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Прочетете лицензионното споразумение за [ProductName]" />
 
-    <String Id="ProgressTextInstallValidate" Overridable="yes">Проверка на инсталирането</String>
-    <String Id="ProgressTextInstallFiles" Overridable="yes">Копиране на нови файлове</String>
-    <String Id="ProgressTextInstallFilesTemplate" Overridable="yes">Файл: [1], директория: [9], размер: [6]</String>
-    <String Id="ProgressTextInstallAdminPackage" Overridable="yes">Копиране на файлове за инсталиране на мрежата</String>
-    <String Id="ProgressTextInstallAdminPackageTemplate" Overridable="yes">Файл: [1], директория: [9], размер: [6]</String>
-    <String Id="ProgressTextFileCost" Overridable="yes">Изчисляване на нужното свободно място</String>
-    <String Id="ProgressTextCostInitialize" Overridable="yes">Изчисляване на нужното свободно място</String>
-    <String Id="ProgressTextCostFinalize" Overridable="yes">Изчисляване на нужното свободно място</String>
-    <String Id="ProgressTextCreateShortcuts" Overridable="yes">Създаване на преки пътища</String>
-    <String Id="ProgressTextCreateShortcutsTemplate" Overridable="yes">Пряк път: [1]</String>
-    <String Id="ProgressTextPublishComponents" Overridable="yes">Публикуване на отговарящи на условията компоненти</String>
-    <String Id="ProgressTextPublishComponentsTemplate" Overridable="yes">ИД на компонент: [1], квалификатор: [2]</String>
-    <String Id="ProgressTextPublishFeatures" Overridable="yes">Публикуване на компонентите на продукта</String>
-    <String Id="ProgressTextPublishFeaturesTemplate" Overridable="yes">Компонент: [1]</String>
-    <String Id="ProgressTextPublishProduct" Overridable="yes">Публикуване на информацията за продукта</String>
-    <String Id="ProgressTextRegisterClassInfo" Overridable="yes">Регистриране на клас сървъри</String>
-    <String Id="ProgressTextRegisterClassInfoTemplate" Overridable="yes">ИД на клас: [1]</String>
-    <String Id="ProgressTextRegisterExtensionInfo" Overridable="yes">Регистриране на сървърите за разширения</String>
-    <String Id="ProgressTextRegisterExtensionInfoTemplate" Overridable="yes">Разширение: [1]</String>
-    <String Id="ProgressTextRegisterMIMEInfo" Overridable="yes">Регистриране на MIME информация</String>
-    <String Id="ProgressTextRegisterMIMEInfoTemplate" Overridable="yes">Тип MIME съдържание: [1], разширение: [2]</String>
-    <String Id="ProgressTextRegisterProgIdInfo" Overridable="yes">Регистриране на програмните идентификатори</String>
-    <String Id="ProgressTextRegisterProgIdInfoTemplate" Overridable="yes">ProgId: [1]</String>
-    <String Id="ProgressTextAllocateRegistrySpace" Overridable="yes">Заделяне на място в системния регистър</String>
-    <String Id="ProgressTextAllocateRegistrySpaceTemplate" Overridable="yes">Свободно място: [1]</String>
-    <String Id="ProgressTextAppSearch" Overridable="yes">Търсене на инсталирани приложения</String>
-    <String Id="ProgressTextAppSearchTemplate" Overridable="yes">Свойство: [1], подпис: [2]</String>
-    <String Id="ProgressTextBindImage" Overridable="yes">Обвързване на изпълнимите файлове</String>
-    <String Id="ProgressTextBindImageTemplate" Overridable="yes">Файл: [1]</String>
-    <String Id="ProgressTextCCPSearch" Overridable="yes">Търсене на отговарящи на условията продукти</String>
-    <String Id="ProgressTextCreateFolders" Overridable="yes">Създаване на папки</String>
-    <String Id="ProgressTextCreateFoldersTemplate" Overridable="yes">Папка: [1]</String>
-    <String Id="ProgressTextDeleteServices" Overridable="yes">Изтриване на услуги</String>
-    <String Id="ProgressTextDeleteServicesTemplate" Overridable="yes">Услуга: [1]</String>
-    <String Id="ProgressTextDuplicateFiles" Overridable="yes">Създаване на дублиращи се файлове</String>
-    <String Id="ProgressTextDuplicateFilesTemplate" Overridable="yes">Файл: [1], директория: [9], размер: [6]</String>
-    <String Id="ProgressTextFindRelatedProducts" Overridable="yes">Търсене на сродни приложения</String>
-    <String Id="ProgressTextFindRelatedProductsTemplate" Overridable="yes">Открито приложение: [1]</String>
-    <String Id="ProgressTextInstallODBC" Overridable="yes">Инсталиране на ODBC компоненти</String>
-    <String Id="ProgressTextInstallServices" Overridable="yes">Инсталиране на нови услуги</String>
-    <String Id="ProgressTextInstallServicesTemplate" Overridable="yes">Услуга: [2]</String>
-    <String Id="ProgressTextLaunchConditions" Overridable="yes">Оценка на условията за стартиране</String>
-    <String Id="ProgressTextMigrateFeatureStates" Overridable="yes">Преместване на състоянията на функциите от сродни приложения</String>
-    <String Id="ProgressTextMigrateFeatureStatesTemplate" Overridable="yes">Приложение: [1]</String>
-    <String Id="ProgressTextMoveFiles" Overridable="yes">Преместване на файлове</String>
-    <String Id="ProgressTextMoveFilesTemplate" Overridable="yes">Файл: [1], директория: [9], размер: [6]</String>
-    <String Id="ProgressTextPatchFiles" Overridable="yes">Коригиране на файлове</String>
-    <String Id="ProgressTextPatchFilesTemplate" Overridable="yes">Файл: [1], директория: [2], размер: [3]</String>
-    <String Id="ProgressTextProcessComponents" Overridable="yes">Актуализиране на регистрацията на компоненти</String>
-    <String Id="ProgressTextRegisterComPlus" Overridable="yes">Регистриране на COM+ приложения и компоненти</String>
-    <String Id="ProgressTextRegisterComPlusTemplate" Overridable="yes">AppId: [1]{{,  AppType: [2], потребители: [3], RSN: [4]}}</String>
-    <String Id="ProgressTextRegisterFonts" Overridable="yes">Регистриране на шрифтове</String>
-    <String Id="ProgressTextRegisterFontsTemplate" Overridable="yes">Шрифт: [1]</String>
-    <String Id="ProgressTextRegisterProduct" Overridable="yes">Регистриране на продукта</String>
-    <String Id="ProgressTextRegisterProductTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextRegisterTypeLibraries" Overridable="yes">Регистриране на библиотеките с типове</String>
-    <String Id="ProgressTextRegisterTypeLibrariesTemplate" Overridable="yes">LibID: [1]</String>
-    <String Id="ProgressTextRegisterUser" Overridable="yes">Регистриране на потребителя</String>
-    <String Id="ProgressTextRegisterUserTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextRemoveDuplicateFiles" Overridable="yes">Премахване на дублиращите се файлове</String>
-    <String Id="ProgressTextRemoveDuplicateFilesTemplate" Overridable="yes">Файл: [1], директория: [9]</String>
-    <String Id="ProgressTextRemoveEnvironmentStrings" Overridable="yes">Актуализиране на низовете за средата</String>
-    <String Id="ProgressTextRemoveEnvironmentStringsTemplate" Overridable="yes">Име: [1], стойност: [2], действие [3]</String>
-    <String Id="ProgressTextRemoveExistingProducts" Overridable="yes">Премахване на приложенията</String>
-    <String Id="ProgressTextRemoveExistingProductsTemplate" Overridable="yes">Приложение: [1], команден ред: [2]</String>
-    <String Id="ProgressTextRemoveFiles" Overridable="yes">Премахване на файловете</String>
-    <String Id="ProgressTextRemoveFilesTemplate" Overridable="yes">Файл: [1], директория: [9]</String>
-    <String Id="ProgressTextRemoveFolders" Overridable="yes">Премахване на папките</String>
-    <String Id="ProgressTextRemoveFoldersTemplate" Overridable="yes">Папка: [1]</String>
-    <String Id="ProgressTextRemoveIniValues" Overridable="yes">Премахване на записи от INI файлове</String>
-    <String Id="ProgressTextRemoveIniValuesTemplate" Overridable="yes">Файл: [1], раздел: [2], ключ: [3], стойност: [4]</String>
-    <String Id="ProgressTextRemoveODBC" Overridable="yes">Премахване на ODBC компонентите</String>
-    <String Id="ProgressTextRemoveRegistryValues" Overridable="yes">Премахване на стойности от системния регистър</String>
-    <String Id="ProgressTextRemoveRegistryValuesTemplate" Overridable="yes">Ключ: [1], име: [2]</String>
-    <String Id="ProgressTextRemoveShortcuts" Overridable="yes">Премахване на преките пътища</String>
-    <String Id="ProgressTextRemoveShortcutsTemplate" Overridable="yes">Пряк път: [1]</String>
-    <String Id="ProgressTextRMCCPSearch" Overridable="yes">Търсене на отговарящи на условията продукти</String>
-    <String Id="ProgressTextSelfRegModules" Overridable="yes">Регистриране на модули</String>
-    <String Id="ProgressTextSelfRegModulesTemplate" Overridable="yes">Файл: [1], папка: [2]</String>
-    <String Id="ProgressTextSelfUnregModules" Overridable="yes">Дерегистриране на модулите</String>
-    <String Id="ProgressTextSelfUnregModulesTemplate" Overridable="yes">Файл: [1], папка: [2]</String>
-    <String Id="ProgressTextSetODBCFolders" Overridable="yes">Инициализиране на ODBC директории</String>
-    <String Id="ProgressTextStartServices" Overridable="yes">Стартиране на услугите</String>
-    <String Id="ProgressTextStartServicesTemplate" Overridable="yes">Услуга: [1]</String>
-    <String Id="ProgressTextStopServices" Overridable="yes">Спиране на услугите</String>
-    <String Id="ProgressTextStopServicesTemplate" Overridable="yes">Услуга: [1]</String>
-    <String Id="ProgressTextUnpublishComponents" Overridable="yes">Премахване на публикуваните отговарящи на условията компоненти</String>
-    <String Id="ProgressTextUnpublishComponentsTemplate" Overridable="yes">ИД на компонент: [1], квалификатор: [2]</String>
-    <String Id="ProgressTextUnpublishFeatures" Overridable="yes">Премахване на публикуваните компоненти на продукта</String>
-    <String Id="ProgressTextUnpublishFeaturesTemplate" Overridable="yes">Компонент: [1]</String>
-    <String Id="ProgressTextUnregisterClassInfo" Overridable="yes">Дерегистриране на клас сървърите</String>
-    <String Id="ProgressTextUnregisterClassInfoTemplate" Overridable="yes">ИД на клас: [1]</String>
-    <String Id="ProgressTextUnregisterComPlus" Overridable="yes">Дерегистриране на COM+ приложенията и компонентите</String>
-    <String Id="ProgressTextUnregisterComPlusTemplate" Overridable="yes">AppId: [1]{{, AppType: [2]}}</String>
-    <String Id="ProgressTextUnregisterExtensionInfo" Overridable="yes">Дерегистриране на сървърите за разширения</String>
-    <String Id="ProgressTextUnregisterExtensionInfoTemplate" Overridable="yes">Разширение: [1]</String>
-    <String Id="ProgressTextUnregisterFonts" Overridable="yes">Дерегистриране на шрифтовете</String>
-    <String Id="ProgressTextUnregisterFontsTemplate" Overridable="yes">Шрифт: [1]</String>
-    <String Id="ProgressTextUnregisterMIMEInfo" Overridable="yes">Дерегистриране на MIME информацията</String>
-    <String Id="ProgressTextUnregisterMIMEInfoTemplate" Overridable="yes">Тип MIME съдържание: [1], разширение: [2]</String>
-    <String Id="ProgressTextUnregisterProgIdInfo" Overridable="yes">Дерегистриране на програмните идентификатори</String>
-    <String Id="ProgressTextUnregisterProgIdInfoTemplate" Overridable="yes">ProgId: [1]</String>
-    <String Id="ProgressTextUnregisterTypeLibraries" Overridable="yes">Дерегистриране на библиотеките с типове</String>
-    <String Id="ProgressTextUnregisterTypeLibrariesTemplate" Overridable="yes">LibID: [1]</String>
-    <String Id="ProgressTextWriteEnvironmentStrings" Overridable="yes">Актуализиране на низовете за средата</String>
-    <String Id="ProgressTextWriteEnvironmentStringsTemplate" Overridable="yes">Име: [1], стойност: [2], действие [3]</String>
-    <String Id="ProgressTextWriteIniValues" Overridable="yes">Записване на стойности в INI файловете</String>
-    <String Id="ProgressTextWriteIniValuesTemplate" Overridable="yes">Файл: [1], раздел: [2], ключ: [3], стойност: [4]</String>
-    <String Id="ProgressTextWriteRegistryValues" Overridable="yes">Записване на стойности в системния регистър</String>
-    <String Id="ProgressTextWriteRegistryValuesTemplate" Overridable="yes">Ключ: [1], име: [2], стойност: [3]</String>
-    <String Id="ProgressTextAdvertise" Overridable="yes">Обявяване на приложението</String>
-    <String Id="ProgressTextGenerateScript" Overridable="yes">Генериране на операции със скриптове за действието:</String>
-    <String Id="ProgressTextGenerateScriptTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextInstallSFPCatalogFile" Overridable="yes">Инсталиране на системния каталог</String>
-    <String Id="ProgressTextInstallSFPCatalogFileTemplate" Overridable="yes">Файл: [1], зависимости: [2]</String>
-    <String Id="ProgressTextMsiPublishAssemblies" Overridable="yes">Публикуване на информация за блок</String>
-    <String Id="ProgressTextMsiPublishAssembliesTemplate" Overridable="yes">Контекст на приложението:[1], Име на блока:[2]</String>
-    <String Id="ProgressTextMsiUnpublishAssemblies" Overridable="yes">Премахване на публикуваната информация за блок</String>
-    <String Id="ProgressTextMsiUnpublishAssembliesTemplate" Overridable="yes">Контекст на приложението:[1], Име на блока:[2]</String>
-    <String Id="ProgressTextRollback" Overridable="yes">Връщане на процеса:</String>
-    <String Id="ProgressTextRollbackTemplate" Overridable="yes">[1]</String>
-    <String Id="ProgressTextRollbackCleanup" Overridable="yes">Премахване на архивните файлове</String>
-    <String Id="ProgressTextRollbackCleanupTemplate" Overridable="yes">Файл: [1]</String>
-    <String Id="ProgressTextUnmoveFiles" Overridable="yes">Премахване на преместените файлове</String>
-    <String Id="ProgressTextUnmoveFilesTemplate" Overridable="yes">Файл: [1], директория: [9]</String>
-    <String Id="ProgressTextUnpublishProduct" Overridable="yes">Премахване на публикуваната информация за продукта</String>
+    <String Id="ProgressTextInstallValidate" Overridable="yes" Value="Проверка на инсталирането" />
+    <String Id="ProgressTextInstallFiles" Overridable="yes" Value="Копиране на нови файлове" />
+    <String Id="ProgressTextInstallFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [9], размер: [6]" />
+    <String Id="ProgressTextInstallAdminPackage" Overridable="yes" Value="Копиране на файлове за инсталиране на мрежата" />
+    <String Id="ProgressTextInstallAdminPackageTemplate" Overridable="yes" Value="Файл: [1], директория: [9], размер: [6]" />
+    <String Id="ProgressTextFileCost" Overridable="yes" Value="Изчисляване на нужното свободно място" />
+    <String Id="ProgressTextCostInitialize" Overridable="yes" Value="Изчисляване на нужното свободно място" />
+    <String Id="ProgressTextCostFinalize" Overridable="yes" Value="Изчисляване на нужното свободно място" />
+    <String Id="ProgressTextCreateShortcuts" Overridable="yes" Value="Създаване на преки пътища" />
+    <String Id="ProgressTextCreateShortcutsTemplate" Overridable="yes" Value="Пряк път: [1]" />
+    <String Id="ProgressTextPublishComponents" Overridable="yes" Value="Публикуване на отговарящи на условията компоненти" />
+    <String Id="ProgressTextPublishComponentsTemplate" Overridable="yes" Value="ИД на компонент: [1], квалификатор: [2]" />
+    <String Id="ProgressTextPublishFeatures" Overridable="yes" Value="Публикуване на компонентите на продукта" />
+    <String Id="ProgressTextPublishFeaturesTemplate" Overridable="yes" Value="Компонент: [1]" />
+    <String Id="ProgressTextPublishProduct" Overridable="yes" Value="Публикуване на информацията за продукта" />
+    <String Id="ProgressTextRegisterClassInfo" Overridable="yes" Value="Регистриране на клас сървъри" />
+    <String Id="ProgressTextRegisterClassInfoTemplate" Overridable="yes" Value="ИД на клас: [1]" />
+    <String Id="ProgressTextRegisterExtensionInfo" Overridable="yes" Value="Регистриране на сървърите за разширения" />
+    <String Id="ProgressTextRegisterExtensionInfoTemplate" Overridable="yes" Value="Разширение: [1]" />
+    <String Id="ProgressTextRegisterMIMEInfo" Overridable="yes" Value="Регистриране на MIME информация" />
+    <String Id="ProgressTextRegisterMIMEInfoTemplate" Overridable="yes" Value="Тип MIME съдържание: [1], разширение: [2]" />
+    <String Id="ProgressTextRegisterProgIdInfo" Overridable="yes" Value="Регистриране на програмните идентификатори" />
+    <String Id="ProgressTextRegisterProgIdInfoTemplate" Overridable="yes" Value="ProgId: [1]" />
+    <String Id="ProgressTextAllocateRegistrySpace" Overridable="yes" Value="Заделяне на място в системния регистър" />
+    <String Id="ProgressTextAllocateRegistrySpaceTemplate" Overridable="yes" Value="Свободно място: [1]" />
+    <String Id="ProgressTextAppSearch" Overridable="yes" Value="Търсене на инсталирани приложения" />
+    <String Id="ProgressTextAppSearchTemplate" Overridable="yes" Value="Свойство: [1], подпис: [2]" />
+    <String Id="ProgressTextBindImage" Overridable="yes" Value="Обвързване на изпълнимите файлове" />
+    <String Id="ProgressTextBindImageTemplate" Overridable="yes" Value="Файл: [1]" />
+    <String Id="ProgressTextCCPSearch" Overridable="yes" Value="Търсене на отговарящи на условията продукти" />
+    <String Id="ProgressTextCreateFolders" Overridable="yes" Value="Създаване на папки" />
+    <String Id="ProgressTextCreateFoldersTemplate" Overridable="yes" Value="Папка: [1]" />
+    <String Id="ProgressTextDeleteServices" Overridable="yes" Value="Изтриване на услуги" />
+    <String Id="ProgressTextDeleteServicesTemplate" Overridable="yes" Value="Услуга: [1]" />
+    <String Id="ProgressTextDuplicateFiles" Overridable="yes" Value="Създаване на дублиращи се файлове" />
+    <String Id="ProgressTextDuplicateFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [9], размер: [6]" />
+    <String Id="ProgressTextFindRelatedProducts" Overridable="yes" Value="Търсене на сродни приложения" />
+    <String Id="ProgressTextFindRelatedProductsTemplate" Overridable="yes" Value="Открито приложение: [1]" />
+    <String Id="ProgressTextInstallODBC" Overridable="yes" Value="Инсталиране на ODBC компоненти" />
+    <String Id="ProgressTextInstallServices" Overridable="yes" Value="Инсталиране на нови услуги" />
+    <String Id="ProgressTextInstallServicesTemplate" Overridable="yes" Value="Услуга: [2]" />
+    <String Id="ProgressTextLaunchConditions" Overridable="yes" Value="Оценка на условията за стартиране" />
+    <String Id="ProgressTextMigrateFeatureStates" Overridable="yes" Value="Преместване на състоянията на функциите от сродни приложения" />
+    <String Id="ProgressTextMigrateFeatureStatesTemplate" Overridable="yes" Value="Приложение: [1]" />
+    <String Id="ProgressTextMoveFiles" Overridable="yes" Value="Преместване на файлове" />
+    <String Id="ProgressTextMoveFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [9], размер: [6]" />
+    <String Id="ProgressTextPatchFiles" Overridable="yes" Value="Коригиране на файлове" />
+    <String Id="ProgressTextPatchFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [2], размер: [3]" />
+    <String Id="ProgressTextProcessComponents" Overridable="yes" Value="Актуализиране на регистрацията на компоненти" />
+    <String Id="ProgressTextRegisterComPlus" Overridable="yes" Value="Регистриране на COM+ приложения и компоненти" />
+    <String Id="ProgressTextRegisterComPlusTemplate" Overridable="yes" Value="AppId: [1]{{,  AppType: [2], потребители: [3], RSN: [4]}}" />
+    <String Id="ProgressTextRegisterFonts" Overridable="yes" Value="Регистриране на шрифтове" />
+    <String Id="ProgressTextRegisterFontsTemplate" Overridable="yes" Value="Шрифт: [1]" />
+    <String Id="ProgressTextRegisterProduct" Overridable="yes" Value="Регистриране на продукта" />
+    <String Id="ProgressTextRegisterProductTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextRegisterTypeLibraries" Overridable="yes" Value="Регистриране на библиотеките с типове" />
+    <String Id="ProgressTextRegisterTypeLibrariesTemplate" Overridable="yes" Value="LibID: [1]" />
+    <String Id="ProgressTextRegisterUser" Overridable="yes" Value="Регистриране на потребителя" />
+    <String Id="ProgressTextRegisterUserTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextRemoveDuplicateFiles" Overridable="yes" Value="Премахване на дублиращите се файлове" />
+    <String Id="ProgressTextRemoveDuplicateFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [9]" />
+    <String Id="ProgressTextRemoveEnvironmentStrings" Overridable="yes" Value="Актуализиране на низовете за средата" />
+    <String Id="ProgressTextRemoveEnvironmentStringsTemplate" Overridable="yes" Value="Име: [1], стойност: [2], действие [3]" />
+    <String Id="ProgressTextRemoveExistingProducts" Overridable="yes" Value="Премахване на приложенията" />
+    <String Id="ProgressTextRemoveExistingProductsTemplate" Overridable="yes" Value="Приложение: [1], команден ред: [2]" />
+    <String Id="ProgressTextRemoveFiles" Overridable="yes" Value="Премахване на файловете" />
+    <String Id="ProgressTextRemoveFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [9]" />
+    <String Id="ProgressTextRemoveFolders" Overridable="yes" Value="Премахване на папките" />
+    <String Id="ProgressTextRemoveFoldersTemplate" Overridable="yes" Value="Папка: [1]" />
+    <String Id="ProgressTextRemoveIniValues" Overridable="yes" Value="Премахване на записи от INI файлове" />
+    <String Id="ProgressTextRemoveIniValuesTemplate" Overridable="yes" Value="Файл: [1], раздел: [2], ключ: [3], стойност: [4]" />
+    <String Id="ProgressTextRemoveODBC" Overridable="yes" Value="Премахване на ODBC компонентите" />
+    <String Id="ProgressTextRemoveRegistryValues" Overridable="yes" Value="Премахване на стойности от системния регистър" />
+    <String Id="ProgressTextRemoveRegistryValuesTemplate" Overridable="yes" Value="Ключ: [1], име: [2]" />
+    <String Id="ProgressTextRemoveShortcuts" Overridable="yes" Value="Премахване на преките пътища" />
+    <String Id="ProgressTextRemoveShortcutsTemplate" Overridable="yes" Value="Пряк път: [1]" />
+    <String Id="ProgressTextRMCCPSearch" Overridable="yes" Value="Търсене на отговарящи на условията продукти" />
+    <String Id="ProgressTextSelfRegModules" Overridable="yes" Value="Регистриране на модули" />
+    <String Id="ProgressTextSelfRegModulesTemplate" Overridable="yes" Value="Файл: [1], папка: [2]" />
+    <String Id="ProgressTextSelfUnregModules" Overridable="yes" Value="Дерегистриране на модулите" />
+    <String Id="ProgressTextSelfUnregModulesTemplate" Overridable="yes" Value="Файл: [1], папка: [2]" />
+    <String Id="ProgressTextSetODBCFolders" Overridable="yes" Value="Инициализиране на ODBC директории" />
+    <String Id="ProgressTextStartServices" Overridable="yes" Value="Стартиране на услугите" />
+    <String Id="ProgressTextStartServicesTemplate" Overridable="yes" Value="Услуга: [1]" />
+    <String Id="ProgressTextStopServices" Overridable="yes" Value="Спиране на услугите" />
+    <String Id="ProgressTextStopServicesTemplate" Overridable="yes" Value="Услуга: [1]" />
+    <String Id="ProgressTextUnpublishComponents" Overridable="yes" Value="Премахване на публикуваните отговарящи на условията компоненти" />
+    <String Id="ProgressTextUnpublishComponentsTemplate" Overridable="yes" Value="ИД на компонент: [1], квалификатор: [2]" />
+    <String Id="ProgressTextUnpublishFeatures" Overridable="yes" Value="Премахване на публикуваните компоненти на продукта" />
+    <String Id="ProgressTextUnpublishFeaturesTemplate" Overridable="yes" Value="Компонент: [1]" />
+    <String Id="ProgressTextUnregisterClassInfo" Overridable="yes" Value="Дерегистриране на клас сървърите" />
+    <String Id="ProgressTextUnregisterClassInfoTemplate" Overridable="yes" Value="ИД на клас: [1]" />
+    <String Id="ProgressTextUnregisterComPlus" Overridable="yes" Value="Дерегистриране на COM+ приложенията и компонентите" />
+    <String Id="ProgressTextUnregisterComPlusTemplate" Overridable="yes" Value="AppId: [1]{{, AppType: [2]}}" />
+    <String Id="ProgressTextUnregisterExtensionInfo" Overridable="yes" Value="Дерегистриране на сървърите за разширения" />
+    <String Id="ProgressTextUnregisterExtensionInfoTemplate" Overridable="yes" Value="Разширение: [1]" />
+    <String Id="ProgressTextUnregisterFonts" Overridable="yes" Value="Дерегистриране на шрифтовете" />
+    <String Id="ProgressTextUnregisterFontsTemplate" Overridable="yes" Value="Шрифт: [1]" />
+    <String Id="ProgressTextUnregisterMIMEInfo" Overridable="yes" Value="Дерегистриране на MIME информацията" />
+    <String Id="ProgressTextUnregisterMIMEInfoTemplate" Overridable="yes" Value="Тип MIME съдържание: [1], разширение: [2]" />
+    <String Id="ProgressTextUnregisterProgIdInfo" Overridable="yes" Value="Дерегистриране на програмните идентификатори" />
+    <String Id="ProgressTextUnregisterProgIdInfoTemplate" Overridable="yes" Value="ProgId: [1]" />
+    <String Id="ProgressTextUnregisterTypeLibraries" Overridable="yes" Value="Дерегистриране на библиотеките с типове" />
+    <String Id="ProgressTextUnregisterTypeLibrariesTemplate" Overridable="yes" Value="LibID: [1]" />
+    <String Id="ProgressTextWriteEnvironmentStrings" Overridable="yes" Value="Актуализиране на низовете за средата" />
+    <String Id="ProgressTextWriteEnvironmentStringsTemplate" Overridable="yes" Value="Име: [1], стойност: [2], действие [3]" />
+    <String Id="ProgressTextWriteIniValues" Overridable="yes" Value="Записване на стойности в INI файловете" />
+    <String Id="ProgressTextWriteIniValuesTemplate" Overridable="yes" Value="Файл: [1], раздел: [2], ключ: [3], стойност: [4]" />
+    <String Id="ProgressTextWriteRegistryValues" Overridable="yes" Value="Записване на стойности в системния регистър" />
+    <String Id="ProgressTextWriteRegistryValuesTemplate" Overridable="yes" Value="Ключ: [1], име: [2], стойност: [3]" />
+    <String Id="ProgressTextAdvertise" Overridable="yes" Value="Обявяване на приложението" />
+    <String Id="ProgressTextGenerateScript" Overridable="yes" Value="Генериране на операции със скриптове за действието:" />
+    <String Id="ProgressTextGenerateScriptTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextInstallSFPCatalogFile" Overridable="yes" Value="Инсталиране на системния каталог" />
+    <String Id="ProgressTextInstallSFPCatalogFileTemplate" Overridable="yes" Value="Файл: [1], зависимости: [2]" />
+    <String Id="ProgressTextMsiPublishAssemblies" Overridable="yes" Value="Публикуване на информация за блок" />
+    <String Id="ProgressTextMsiPublishAssembliesTemplate" Overridable="yes" Value="Контекст на приложението:[1], Име на блока:[2]" />
+    <String Id="ProgressTextMsiUnpublishAssemblies" Overridable="yes" Value="Премахване на публикуваната информация за блок" />
+    <String Id="ProgressTextMsiUnpublishAssembliesTemplate" Overridable="yes" Value="Контекст на приложението:[1], Име на блока:[2]" />
+    <String Id="ProgressTextRollback" Overridable="yes" Value="Връщане на процеса:" />
+    <String Id="ProgressTextRollbackTemplate" Overridable="yes" Value="[1]" />
+    <String Id="ProgressTextRollbackCleanup" Overridable="yes" Value="Премахване на архивните файлове" />
+    <String Id="ProgressTextRollbackCleanupTemplate" Overridable="yes" Value="Файл: [1]" />
+    <String Id="ProgressTextUnmoveFiles" Overridable="yes" Value="Премахване на преместените файлове" />
+    <String Id="ProgressTextUnmoveFilesTemplate" Overridable="yes" Value="Файл: [1], директория: [9]" />
+    <String Id="ProgressTextUnpublishProduct" Overridable="yes" Value="Премахване на публикуваната информация за продукта" />
 
-    <String Id="Error0" Overridable="yes">{{Фатална грешка: }}</String>
-    <String Id="Error1" Overridable="yes">{{Грешка [1]. }}</String>
-    <String Id="Error2" Overridable="yes">Предупреждение [1]. </String>
-    <String Id="Error4" Overridable="yes">Информация [1]. </String>
-    <String Id="Error5" Overridable="yes">В програмата за инсталиране възникна неочаквана грешка по време на инсталиране на пакета. Това може да означава проблем в самия пакет. Кодът на грешката е [1]. {{Аргументите са: [2], [3], [4]}}</String>
-    <String Id="Error7" Overridable="yes">{{Дискът е пълен: }}</String>
-    <String Id="Error8" Overridable="yes">Действие [Time]: [1]. [2]</String>
-    <String Id="Error9" Overridable="yes">[ProductName]</String>
-    <String Id="Error10" Overridable="yes">{[2]}{, [3]}{, [4]}</String>
-    <String Id="Error11" Overridable="yes">Тип съобщение: [1], аргумент: [2]</String>
-    <String Id="Error12" Overridable="yes">=== Начало на регистрирането: [Date] [Time] ===</String>
-    <String Id="Error13" Overridable="yes">=== Край на регистрирането: [Date] [Time] ===</String>
-    <String Id="Error14" Overridable="yes">Стартиране на действието [Time]: [1].</String>
-    <String Id="Error15" Overridable="yes">Спиране на действието [Time]: [1]. Върната стойност [2].</String>
-    <String Id="Error16" Overridable="yes">Оставащо време: {[1] минути }{[2] секунди}</String>
-    <String Id="Error17" Overridable="yes">Няма достатъчно памет. Затворете останалите приложения, преди да опитате отново.</String>
-    <String Id="Error18" Overridable="yes">Програмата за инсталиране не отговаря.</String>
-    <String Id="Error19" Overridable="yes">Програмата за инсталиране спря преждевременно.</String>
-    <String Id="Error20" Overridable="yes">Моля, изчакайте, докато Windows конфигурира [ProductName]</String>
-    <String Id="Error21" Overridable="yes">Събиране на необходимата информация...</String>
-    <String Id="Error22" Overridable="yes">Премахване на по-старите версии на това приложение...</String>
-    <String Id="Error23" Overridable="yes">Подготовка за премахване на по-старите версии на това приложение...</String>
-    <String Id="Error32" Overridable="yes">Инсталирането на [ProductName] завърши успешно.</String>
-    <String Id="Error33" Overridable="yes">Инсталирането на {[ProductName] } е неуспешно.</String>
-    <String Id="Error1101" Overridable="yes">Грешка при четене от файл: [2]. {{ Системна грешка [3].}} Проверете дали файлът съществува и дали имате достъп до него.</String>
-    <String Id="Error1301" Overridable="yes">Файлът "[2]" не може да се създаде. Вече съществува директория с това име. Отменете инсталирането, след което опитайте да инсталирате на друго местоположение.</String>
-    <String Id="Error1302" Overridable="yes">Поставете диска: [2]</String>
-    <String Id="Error1303" Overridable="yes">Инсталиращата програма няма достатъчно привилегии за достъп до тази директория: [2]. Инсталирането не може да продължи. Влезте като администратор или се свържете със системния администратор.</String>
-    <String Id="Error1304" Overridable="yes">Грешка при записване във файла: [2]. Проверете дали имате достъп до тази директория.</String>
-    <String Id="Error1305" Overridable="yes">Грешка при четене от файла [2]. {{ Системна грешка [3].}} Проверете дали файлът съществува и дали имате достъп до него.</String>
-    <String Id="Error1306" Overridable="yes">Друго приложение има изключителен достъп до файла "[2]". Затворете всички останали приложения, след което щракнете върху "Опитай пак".</String>
-    <String Id="Error1307" Overridable="yes">Няма достатъчно свободно място на диска за инсталиране на следния файл: [2]. Освободете място, след което щракнете върху "Опитай пак" или върху "Отказ", за да излезете.</String>
-    <String Id="Error1308" Overridable="yes">Не е намерен файлът източник: [2]. Проверете дали файлът съществува и дали имате достъп до него.</String>
-    <String Id="Error1309" Overridable="yes">Грешка при четене от файл: [3]. {{ Системна грешка [2].}} Проверете дали файлът съществува и дали имате достъп до него.</String>
-    <String Id="Error1310" Overridable="yes">Грешка при записване във файла: [3]. {{ Системна грешка [2].}} Проверете дали имате достъп до тази директория.</String>
-    <String Id="Error1311" Overridable="yes">Не е намерен файлът източник {{(кабинетен файл)}}: [2]. Проверете дали файлът съществува и дали имате достъп до него.</String>
-    <String Id="Error1312" Overridable="yes">Директорията "[2]" не може да се създаде. Вече съществува файл с това име. Преименувайте или премахнете файла, след което щракнете върху "Опитай пак" или върху "Отказ", за да излезете.</String>
-    <String Id="Error1313" Overridable="yes">Том [2] е недостъпен в момента. Изберете друг том.</String>
-    <String Id="Error1314" Overridable="yes">Указаният път "[2]" е недостъпен.</String>
-    <String Id="Error1315" Overridable="yes">Не може да се записва в указаната папка: [2].</String>
-    <String Id="Error1316" Overridable="yes">Възникна грешка в мрежата при опит за четене от файла: [2]</String>
-    <String Id="Error1317" Overridable="yes">Възникна грешка при опит за създаване на директория: [2]</String>
-    <String Id="Error1318" Overridable="yes">Възникна грешка в мрежата при опит за създаване на директория: [2]</String>
-    <String Id="Error1319" Overridable="yes">Възникна грешка в мрежата при опит за отваряне на кабинетния файл източник: [2]</String>
-    <String Id="Error1320" Overridable="yes">Указаният път е твърде дълъг: [2]</String>
-    <String Id="Error1321" Overridable="yes">Програмата за инсталиране няма достатъчно привилегии за промяна на този файл: [2].</String>
-    <String Id="Error1322" Overridable="yes">Част от пътя към папката "[2]" е невалидна. Тя е празна или превишава позволената от системата дължина.</String>
-    <String Id="Error1323" Overridable="yes">Пътят на папката "[2]" съдържа думи, които не са валидни за пътища на папки.</String>
-    <String Id="Error1324" Overridable="yes">Пътят на папката "[2]" съдържа невалиден знак.</String>
-    <String Id="Error1325" Overridable="yes">"[2]" не е валидно кратко име за файл.</String>
-    <String Id="Error1326" Overridable="yes">Грешка при извличането на защитата на файлове: [3] GetLastError: [2]</String>
-    <String Id="Error1327" Overridable="yes">Невалидно устройство: [2]</String>
-    <String Id="Error1328" Overridable="yes">Грешка при прилагането на корекция във файл [2]. Файлът вероятно е актуализиран по друг начин и вече не може да се промени с тази корекция. За повече информация се свържете с доставчика на корекцията. {{Системна грешка: [3]}}</String>
-    <String Id="Error1329" Overridable="yes">Не може да се инсталира задължителен файл, тъй като кабинетният файл [2] няма цифров подпис. Това може да означава, че кабинетният файл е повреден.</String>
-    <String Id="Error1330" Overridable="yes">Не може да се инсталира задължителен файл, тъй като кабинетният файл [2] е с невалиден цифров подпис. Това може да означава, че кабинетният файл е повреден.{{ Върната е грешка [3] от WinVerifyTrust.}}</String>
-    <String Id="Error1331" Overridable="yes">Неуспешно копиране на файла [2]: CRC грешка.</String>
-    <String Id="Error1332" Overridable="yes">Неуспешно преместване на файла [2]: CRC грешка.</String>
-    <String Id="Error1333" Overridable="yes">Неуспешно коригиране на файла [2]: CRC грешка.</String>
-    <String Id="Error1334" Overridable="yes">Файлът "[2]" не може да се инсталира, тъй като не може да се намери в кабинетен файл "[3]". Това може да означава, че има грешка в мрежата, грешка при четене от компактдиска или проблем в самия пакет.</String>
-    <String Id="Error1335" Overridable="yes">Задължителният кабинетен файл "[2]" е повреден и не може да се използва. Това може да означава, че има грешка в мрежата, грешка при четене от компактдиска или проблем в самия пакет.</String>
-    <String Id="Error1336" Overridable="yes">Възникна грешка при създаването на временен файл, който е нужен за завършване на инсталирането.{{ Папка: [3]. Код на системната грешка: [2]}}</String>
-    <String Id="Error1401" Overridable="yes">Ключът не може да се създаде: [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка. </String>
-    <String Id="Error1402" Overridable="yes">Ключът не може да се отвори: [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка. </String>
-    <String Id="Error1403" Overridable="yes">Стойността [2] не може да се изтрие от ключа [3]. {{ Системна грешка [4].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка. </String>
-    <String Id="Error1404" Overridable="yes">Ключът [2] не може да се изтрие. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка. </String>
-    <String Id="Error1405" Overridable="yes">Стойността [2] не може да се прочете от ключа [3]. {{ Системна грешка [4].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка. </String>
-    <String Id="Error1406" Overridable="yes">Стойността [2] не може да се запише в ключа [3]. {{ Системна грешка [4].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка.</String>
-    <String Id="Error1407" Overridable="yes">Не могат да се извлекат имената на стойностите от ключа [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка.</String>
-    <String Id="Error1408" Overridable="yes">Не могат да се извлекат имената на подключовете от ключа [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка.</String>
-    <String Id="Error1409" Overridable="yes">Не може да се прочете информацията за защита за ключа [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка.</String>
-    <String Id="Error1410" Overridable="yes">Не може да се увеличи наличното място за системния регистър. Нужни са [2] КБ свободно място в системния регистър за инсталирането на това приложение.</String>
-    <String Id="Error1500" Overridable="yes">В момента се изпълнява друго инсталиране. Трябва първо да го завършите, за да продължите с това.</String>
-    <String Id="Error1501" Overridable="yes">Грешка при достъп до защитени данни. Уверете се, че Windows Installer е правилно конфигуриран, след което опитайте инсталирането отново.</String>
-    <String Id="Error1502" Overridable="yes">Потребителят "[2]" е започнал инсталиране на продукта "[3]" в предишен момент. Този потребител ще трябва отново да стартира инсталирането, за да може да използва продукта. Текущото инсталиране ще продължи сега.</String>
-    <String Id="Error1503" Overridable="yes">Потребителят "[2]" е започнал инсталиране на продукта "[3]" в предишен момент. Този потребител ще трябва отново да стартира инсталирането, за да може да използва продукта.</String>
-    <String Id="Error1601" Overridable="yes">Няма достатъчно място на диска – Том: "[2]"; необходимо място: [3] КБ; свободно място: [4] КБ. Освободете място на диска, след което опитайте отново.</String>
-    <String Id="Error1602" Overridable="yes">Наистина ли искате да откажете?</String>
-    <String Id="Error1603" Overridable="yes">Файлът [2][3] се използва{ от следния процес: Име: [4], ИД: [5], Заглавие на прозореца: "[6]"}. Затворете съответното приложение, след което опитайте отново.</String>
-    <String Id="Error1604" Overridable="yes">Продуктът "[2]" е вече инсталиран, поради което инсталирането на този продукт не може да продължи. Двата продукта са несъвместими.</String>
-    <String Id="Error1605" Overridable="yes">Няма достатъчно свободно място на том "[2]", за да продължи инсталирането с разрешено възстановяване. Нужни са [3] КБ, но са свободни само [4] КБ. Щракнете върху "Игнорирай", за да продължите инсталирането, без да се записва информация за възстановяване, върху "Опитай пак", за да проверите свободното място отново, или върху "Отказ", за да прекратите инсталирането.</String>
-    <String Id="Error1606" Overridable="yes">Няма достъп до местоположението в мрежата [2].</String>
-    <String Id="Error1607" Overridable="yes">Следните приложения трябва да се затворят, преди да продължи инсталирането:</String>
-    <String Id="Error1608" Overridable="yes">Не са намерени предишно инсталирани съвместими продукти за инсталиране на продукта на машината.</String>
-    <String Id="Error1609" Overridable="yes">Възникна грешка при прилагането на настройките за защита. [2] не е валиден потребител или група. Вероятно има проблем в пакета или във връзката с домейн контролера по мрежата. Проверете връзката с мрежата, след което щракнете върху "Опитай пак" или върху "Отказ", за да прекратите инсталирането. {{Потребителският SID не може да се намери, системна грешка [3]}}</String>
-    <String Id="Error1701" Overridable="yes">Ключът [2] е невалиден. Проверете дали сте въвели правилния ключ.</String>
-    <String Id="Error1702" Overridable="yes">Инсталиращата програма трябва да рестартира компютъра, за да продължи конфигурирането на [2]. Щракнете върху "Да", за да рестартирате сега, или върху "Не", ако искате да рестартирате ръчно по-късно.</String>
-    <String Id="Error1703" Overridable="yes">Трябва да рестартирате системата, за да се активират конфигурационните промени в [2]. Щракнете върху "Да", за да рестартирате сега, или върху "Не", ако искате да рестартирате ръчно по-късно.</String>
-    <String Id="Error1704" Overridable="yes">Инсталирането на [2] е временно преустановено. Трябва да отмените направените от него промени, за да продължите това инсталиране. Искате ли да отмените тези промени?</String>
-    <String Id="Error1705" Overridable="yes">В момента се изпълнява друго инсталиране за този продукт. Трябва да отмените направените от него промени, за да продължите това инсталиране. Искате ли да отмените тези промени?</String>
-    <String Id="Error1706" Overridable="yes">Не може да се намери инсталационен пакет за продукта [2]. Опитайте отново инсталирането, като използвате валидно копие на инсталационния пакет "[3]".</String>
-    <String Id="Error1707" Overridable="yes">Инсталирането завърши успешно.</String>
-    <String Id="Error1708" Overridable="yes">Инсталирането е неуспешно.</String>
-    <String Id="Error1709" Overridable="yes">Продукт: [2] – [3]</String>
-    <String Id="Error1710" Overridable="yes">Можете да възстановите предишното състояние на компютъра или да продължите инсталирането по-късно. Искате ли да възстановите предишното състояние?</String>
-    <String Id="Error1711" Overridable="yes">Възникна грешка при запис на информацията за инсталиране върху диска. Проверете дали има достатъчно свободно място на диска, след което щракнете върху "Опитай пак" или върху "Отказ", за да прекратите инсталирането.</String>
-    <String Id="Error1712" Overridable="yes">Един или повече от нужните файлове за възстановяване на предишното състояние на компютъра не е намерен. Възстановяването не е възможно.</String>
-    <String Id="Error1713" Overridable="yes">[2] не може да инсталира някой от нужните продукти. Свържете се с отдела за техническа поддръжка. {{Системна грешка: [3].}}</String>
-    <String Id="Error1714" Overridable="yes">По-старата версия на [2] не може да се премахне. Свържете се с отдела за техническа поддръжка. {{Системна грешка [3].}}</String>
-    <String Id="Error1715" Overridable="yes">[2] е инсталиран</String>
-    <String Id="Error1716" Overridable="yes">[2] е конфигуриран</String>
-    <String Id="Error1717" Overridable="yes">[2] е премахнат</String>
-    <String Id="Error1718" Overridable="yes">Файлът [2] е отхвърлен от правилата за цифрови подписи.</String>
-    <String Id="Error1719" Overridable="yes">Няма достъп до услугата Windows Installer. Това е възможно, ако Windows работи в безопасен режим или ако Windows Installer не е правилно инсталиран. Свържете се с отдела за техническа поддръжка за повече помощ.</String>
-    <String Id="Error1720" Overridable="yes">Възникна проблем с този пакет с Windows Installer. Не може да се изпълни задължителен скрипт за това инсталиране. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие по избор [2] грешка в скрипт [3], [4]: [5] Ред [6], Колона [7], [8] }}</String>
-    <String Id="Error1721" Overridable="yes">Възникна проблем с този пакет с Windows Installer. Не може да се изпълни задължителна програма за това инсталиране. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие: [2], местоположение: [3], команда: [4] }}</String>
-    <String Id="Error1722" Overridable="yes">Възникна проблем с този пакет с Windows Installer. Програмата, която е изпълнена като част от инсталационния процес, не завърши нормално. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие [2], местоположение: [3], команда: [4] }}</String>
-    <String Id="Error1723" Overridable="yes">Възникна проблем с този пакет с Windows Installer. Не може да се изпълни задължителен DLL файл за това инсталиране. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие [2], запис: [3], библиотека: [4] }}</String>
-    <String Id="Error1724" Overridable="yes">Премахването завърши успешно.</String>
-    <String Id="Error1725" Overridable="yes">Премахването е неуспешно.</String>
-    <String Id="Error1726" Overridable="yes">Обявяването завърши успешно.</String>
-    <String Id="Error1727" Overridable="yes">Обявяването е неуспешно.</String>
-    <String Id="Error1728" Overridable="yes">Конфигурирането завърши успешно.</String>
-    <String Id="Error1729" Overridable="yes">Конфигурирането не е успешно.</String>
-    <String Id="Error1730" Overridable="yes">Трябва да сте администратор, за да премахнете това приложение. За да го премахнете, можете да влезете като администратор или да се свържете с отдела за техническа поддръжка за повече помощ.</String>
-    <String Id="Error1731" Overridable="yes">Инсталационният пакет източник на продукта [2] не е синхронизиран с клиентския пакет. Опитайте отново инсталирането, като използвате валидно копие на инсталационния пакет "[3]".</String>
-    <String Id="Error1732" Overridable="yes">За да завършите инсталирането на [2], трябва да рестартирате компютъра. В момента в компютъра са влезли други потребители и при рестартиране те могат да загубят работата си. Искате ли да рестартирате сега?</String>
-    <String Id="Error1801" Overridable="yes">Пътят [2] не е валиден. Укажете валиден път.</String>
-    <String Id="Error1802" Overridable="yes">Няма достатъчно памет. Затворете останалите приложения, преди да опитате отново.</String>
-    <String Id="Error1803" Overridable="yes">Няма диск в устройство [2]. Поставете диск и щракнете върху "Опитай пак" или върху "Отказ", за да се върнете към предишно избрания том.</String>
-    <String Id="Error1804" Overridable="yes">Няма диск в устройство [2]. Поставете диск, след което щракнете върху "Опитай пак", или върху "Отказ", за да се върнете в каталога за преглед и да изберете друг том.</String>
-    <String Id="Error1805" Overridable="yes">Папката [2] не съществува. Въведете път към съществуваща папка.</String>
-    <String Id="Error1806" Overridable="yes">Нямате достатъчно привилегии, за да четете тази папка.</String>
-    <String Id="Error1807" Overridable="yes">Не е намерена валидна папка местоназначение за инсталирането.</String>
-    <String Id="Error1901" Overridable="yes">Грешка при опит за четене от базата данни за инсталиране: [2].</String>
-    <String Id="Error1902" Overridable="yes">Планиране на операция за рестартиране: Преименуване на файла [2] на [3]. Компютърът трябва да се рестартира, за да завърши операцията.</String>
-    <String Id="Error1903" Overridable="yes">Планиране на операция за рестартиране: Изтриване на файла [2]. Компютърът трябва да се рестартира, за да завърши операцията.</String>
-    <String Id="Error1904" Overridable="yes">Неуспешно регистриране на модула [2]. HRESULT [3]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1905" Overridable="yes">Неуспешно дерегистриране на модула [2]. HRESULT [3]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1906" Overridable="yes">Неуспешно кеширане на пакета [2]. Грешка: [3]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1907" Overridable="yes">Неуспешно регистриране на шрифта [2]. Проверете дали имате достатъчно разрешения да инсталирате шрифтове и дали системата поддържа този шрифт.</String>
-    <String Id="Error1908" Overridable="yes">Неуспешно дерегистриране на шрифта [2]. Проверете дали имате права да премахвате шрифтове.</String>
-    <String Id="Error1909" Overridable="yes">Неуспешно създаване на прекия път [2]. Проверете дали папката местоназначение съществува и дали имате достъп до нея.</String>
-    <String Id="Error1910" Overridable="yes">Неуспешно премахване на прекия път [2]. Проверете дали файлът на прекия път съществува и дали имате достъп до него.</String>
-    <String Id="Error1911" Overridable="yes">Неуспешно регистриране на библиотеката на типовете за файла [2]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1912" Overridable="yes">Неуспешно премахване на регистрацията на библиотеката на типове за файла [2]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1913" Overridable="yes">Неуспешно актуализиране на ini файла [2][3]. Проверете дали файлът съществува и дали имате достъп до него.</String>
-    <String Id="Error1914" Overridable="yes">Неуспешно планиране на заместването на файл [3] с файл [2] при рестартиране. Проверете дали имате разрешение за запис във файла [3].</String>
-    <String Id="Error1915" Overridable="yes">Неуспешно премахване на диспечера на ODBC драйвери, ODBC грешка [2]: [3]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1916" Overridable="yes">Неуспешно инсталиране на диспечера на ODBC драйвери, ODBC грешка [2]: [3]. Свържете се с отдела за поддръжка.</String>
-    <String Id="Error1917" Overridable="yes">Грешка при премахване на ODBC драйвера: [4], ODBC грешка [2]: [3]. Проверете дали имате привилегии да премахвате ODBC драйвери.</String>
-    <String Id="Error1918" Overridable="yes">Грешка при инсталиране на ODBC драйвера: [4], ODBC грешка [2]: [3]. Проверете дали файлът [4] съществува и дали имате достъп до него.</String>
-    <String Id="Error1919" Overridable="yes">Грешка при конфигурирането на източника на ODBC данни: [4], ODBC грешка [2]: [3]. Проверете дали файлът [4] съществува и дали имате достъп до него.</String>
-    <String Id="Error1920" Overridable="yes">Неуспешно стартиране на услугата "[2]" ([3]). Проверете дали имате достатъчно привилегии, за да стартирате системни услуги.</String>
-    <String Id="Error1921" Overridable="yes">Услугата "[2]" ([3]) не може да бъде спряна. Проверете дали имате достатъчно привилегии, за да спирате системни услуги.</String>
-    <String Id="Error1922" Overridable="yes">Услугата "[2]" ([3]) не може да се изтрие. Проверете дали имате достатъчно привилегии, за да премахвате системни услуги.</String>
-    <String Id="Error1923" Overridable="yes">Услугата "[2]" ([3]) не може да се инсталира. Проверете дали имате достатъчно привилегии, за да инсталирате системни услуги.</String>
-    <String Id="Error1924" Overridable="yes">Променливата за средата "[2]" не може да се актуализира. Проверете дали имате достатъчно привилегии, за да променяте променливи за средата.</String>
-    <String Id="Error1925" Overridable="yes">Нямате достатъчно привилегии, за да завършите инсталирането за всички потребители на машината. Влезете като администратор, след което опитайте отново да инсталирате.</String>
-    <String Id="Error1926" Overridable="yes">Неуспешно задаване на защитата за файла "[3]". Грешка: [2]. Проверете дали имате достатъчно привилегии, за да променяте разрешенията за защита на файла.</String>
-    <String Id="Error1927" Overridable="yes">На компютъра няма инсталирани услуги за компоненти (COM+ 1.0). За да завърши успешно, това инсталиране изисква услуги за компоненти. Услуги за компоненти има в Windows 2000.</String>
-    <String Id="Error1928" Overridable="yes">Грешка при регистриране на COM+ приложението. Свържете се с отдела за поддръжка за повече информация.</String>
-    <String Id="Error1929" Overridable="yes">Грешка при премахване на регистрация на COM+ приложението. Свържете се с отдела за поддръжка за повече информация.</String>
-    <String Id="Error1930" Overridable="yes">Описанието на услугата "[2]" ([3]) не може да се промени.</String>
-    <String Id="Error1931" Overridable="yes">Услугата Windows Installer не може да актуализира системния файл [2], тъй като файлът е защитен от Windows. За да работи правилно програмата, трябва да актуализирате операционната система. {{Версия на пакета: [3], Версия на защитената операционна система: [4]}}</String>
-    <String Id="Error1932" Overridable="yes">Услугата Windows Installer не може да актуализира защитения файл на Windows [2]. {{Версия на пакета: [3], Версия на защитената операционна система: [4], SFP грешка: [5]}}</String>
-    <String Id="Error1933" Overridable="yes">Услугата Windows Installer не може да актуализира един или повече защитени файлове на Windows. {{SFP грешка: [2]. Списък със защитени файлове:\r\n[3]}}</String>
-    <String Id="Error1934" Overridable="yes">Потребителските инсталации са забранени от правила на компютъра.</String>
-    <String Id="Error1935" Overridable="yes">Възникна грешка при инсталиране на сбора "[6]". За повече информация вижте в "Помощ и поддръжка". HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент [2]}}</String>
-    <String Id="Error1936" Overridable="yes">Възникна грешка при инсталиране на сбора "[6]". Сборът няма защитено име или не е подписан с ключ с минималната дължина. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент: [2]}}</String>
-    <String Id="Error1937" Overridable="yes">Възникна грешка при инсталиране на сбора "[6]". Подписът или каталогът не могат да се проверят или не са валидни. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент: [2]}}</String>
-    <String Id="Error1938" Overridable="yes">Възникна грешка при инсталиране на сбора "[6]". Един или повече модули не могат да се открият. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент: [2]}}</String>
+    <String Id="Error0" Overridable="yes" Value="{{Фатална грешка: }}" />
+    <String Id="Error1" Overridable="yes" Value="{{Грешка [1]. }}" />
+    <String Id="Error2" Overridable="yes" Value="Предупреждение [1]." />
+    <String Id="Error4" Overridable="yes" Value="Информация [1]." />
+    <String Id="Error5" Overridable="yes" Value="В програмата за инсталиране възникна неочаквана грешка по време на инсталиране на пакета. Това може да означава проблем в самия пакет. Кодът на грешката е [1]. {{Аргументите са: [2], [3], [4]}}" />
+    <String Id="Error7" Overridable="yes" Value="{{Дискът е пълен: }}" />
+    <String Id="Error8" Overridable="yes" Value="Действие [Time]: [1]. [2]" />
+    <String Id="Error9" Overridable="yes" Value="[ProductName]" />
+    <String Id="Error10" Overridable="yes" Value="{[2]}{, [3]}{, [4]}" />
+    <String Id="Error11" Overridable="yes" Value="Тип съобщение: [1], аргумент: [2]" />
+    <String Id="Error12" Overridable="yes" Value="=== Начало на регистрирането: [Date] [Time] ===" />
+    <String Id="Error13" Overridable="yes" Value="=== Край на регистрирането: [Date] [Time] ===" />
+    <String Id="Error14" Overridable="yes" Value="Стартиране на действието [Time]: [1]." />
+    <String Id="Error15" Overridable="yes" Value="Спиране на действието [Time]: [1]. Върната стойност [2]." />
+    <String Id="Error16" Overridable="yes" Value="Оставащо време: {[1] минути }{[2] секунди}" />
+    <String Id="Error17" Overridable="yes" Value="Няма достатъчно памет. Затворете останалите приложения, преди да опитате отново." />
+    <String Id="Error18" Overridable="yes" Value="Програмата за инсталиране не отговаря." />
+    <String Id="Error19" Overridable="yes" Value="Програмата за инсталиране спря преждевременно." />
+    <String Id="Error20" Overridable="yes" Value="Моля, изчакайте, докато Windows конфигурира [ProductName]" />
+    <String Id="Error21" Overridable="yes" Value="Събиране на необходимата информация..." />
+    <String Id="Error22" Overridable="yes" Value="Премахване на по-старите версии на това приложение..." />
+    <String Id="Error23" Overridable="yes" Value="Подготовка за премахване на по-старите версии на това приложение..." />
+    <String Id="Error32" Overridable="yes" Value="Инсталирането на [ProductName] завърши успешно." />
+    <String Id="Error33" Overridable="yes" Value="Инсталирането на {[ProductName] } е неуспешно." />
+    <String Id="Error1101" Overridable="yes" Value="Грешка при четене от файл: [2]. {{ Системна грешка [3].}} Проверете дали файлът съществува и дали имате достъп до него." />
+    <String Id="Error1301" Overridable="yes" Value="Файлът &quot;[2]&quot; не може да се създаде. Вече съществува директория с това име. Отменете инсталирането, след което опитайте да инсталирате на друго местоположение." />
+    <String Id="Error1302" Overridable="yes" Value="Поставете диска: [2]" />
+    <String Id="Error1303" Overridable="yes" Value="Инсталиращата програма няма достатъчно привилегии за достъп до тази директория: [2]. Инсталирането не може да продължи. Влезте като администратор или се свържете със системния администратор." />
+    <String Id="Error1304" Overridable="yes" Value="Грешка при записване във файла: [2]. Проверете дали имате достъп до тази директория." />
+    <String Id="Error1305" Overridable="yes" Value="Грешка при четене от файла [2]. {{ Системна грешка [3].}} Проверете дали файлът съществува и дали имате достъп до него." />
+    <String Id="Error1306" Overridable="yes" Value="Друго приложение има изключителен достъп до файла &quot;[2]&quot;. Затворете всички останали приложения, след което щракнете върху &quot;Опитай пак&quot;." />
+    <String Id="Error1307" Overridable="yes" Value="Няма достатъчно свободно място на диска за инсталиране на следния файл: [2]. Освободете място, след което щракнете върху &quot;Опитай пак&quot; или върху &quot;Отказ&quot;, за да излезете." />
+    <String Id="Error1308" Overridable="yes" Value="Не е намерен файлът източник: [2]. Проверете дали файлът съществува и дали имате достъп до него." />
+    <String Id="Error1309" Overridable="yes" Value="Грешка при четене от файл: [3]. {{ Системна грешка [2].}} Проверете дали файлът съществува и дали имате достъп до него." />
+    <String Id="Error1310" Overridable="yes" Value="Грешка при записване във файла: [3]. {{ Системна грешка [2].}} Проверете дали имате достъп до тази директория." />
+    <String Id="Error1311" Overridable="yes" Value="Не е намерен файлът източник {{(кабинетен файл)}}: [2]. Проверете дали файлът съществува и дали имате достъп до него." />
+    <String Id="Error1312" Overridable="yes" Value="Директорията &quot;[2]&quot; не може да се създаде. Вече съществува файл с това име. Преименувайте или премахнете файла, след което щракнете върху &quot;Опитай пак&quot; или върху &quot;Отказ&quot;, за да излезете." />
+    <String Id="Error1313" Overridable="yes" Value="Том [2] е недостъпен в момента. Изберете друг том." />
+    <String Id="Error1314" Overridable="yes" Value="Указаният път &quot;[2]&quot; е недостъпен." />
+    <String Id="Error1315" Overridable="yes" Value="Не може да се записва в указаната папка: [2]." />
+    <String Id="Error1316" Overridable="yes" Value="Възникна грешка в мрежата при опит за четене от файла: [2]" />
+    <String Id="Error1317" Overridable="yes" Value="Възникна грешка при опит за създаване на директория: [2]" />
+    <String Id="Error1318" Overridable="yes" Value="Възникна грешка в мрежата при опит за създаване на директория: [2]" />
+    <String Id="Error1319" Overridable="yes" Value="Възникна грешка в мрежата при опит за отваряне на кабинетния файл източник: [2]" />
+    <String Id="Error1320" Overridable="yes" Value="Указаният път е твърде дълъг: [2]" />
+    <String Id="Error1321" Overridable="yes" Value="Програмата за инсталиране няма достатъчно привилегии за промяна на този файл: [2]." />
+    <String Id="Error1322" Overridable="yes" Value="Част от пътя към папката &quot;[2]&quot; е невалидна. Тя е празна или превишава позволената от системата дължина." />
+    <String Id="Error1323" Overridable="yes" Value="Пътят на папката &quot;[2]&quot; съдържа думи, които не са валидни за пътища на папки." />
+    <String Id="Error1324" Overridable="yes" Value="Пътят на папката &quot;[2]&quot; съдържа невалиден знак." />
+    <String Id="Error1325" Overridable="yes" Value="&quot;[2]&quot; не е валидно кратко име за файл." />
+    <String Id="Error1326" Overridable="yes" Value="Грешка при извличането на защитата на файлове: [3] GetLastError: [2]" />
+    <String Id="Error1327" Overridable="yes" Value="Невалидно устройство: [2]" />
+    <String Id="Error1328" Overridable="yes" Value="Грешка при прилагането на корекция във файл [2]. Файлът вероятно е актуализиран по друг начин и вече не може да се промени с тази корекция. За повече информация се свържете с доставчика на корекцията. {{Системна грешка: [3]}}" />
+    <String Id="Error1329" Overridable="yes" Value="Не може да се инсталира задължителен файл, тъй като кабинетният файл [2] няма цифров подпис. Това може да означава, че кабинетният файл е повреден." />
+    <String Id="Error1330" Overridable="yes" Value="Не може да се инсталира задължителен файл, тъй като кабинетният файл [2] е с невалиден цифров подпис. Това може да означава, че кабинетният файл е повреден.{{ Върната е грешка [3] от WinVerifyTrust.}}" />
+    <String Id="Error1331" Overridable="yes" Value="Неуспешно копиране на файла [2]: CRC грешка." />
+    <String Id="Error1332" Overridable="yes" Value="Неуспешно преместване на файла [2]: CRC грешка." />
+    <String Id="Error1333" Overridable="yes" Value="Неуспешно коригиране на файла [2]: CRC грешка." />
+    <String Id="Error1334" Overridable="yes" Value="Файлът &quot;[2]&quot; не може да се инсталира, тъй като не може да се намери в кабинетен файл &quot;[3]&quot;. Това може да означава, че има грешка в мрежата, грешка при четене от компактдиска или проблем в самия пакет." />
+    <String Id="Error1335" Overridable="yes" Value="Задължителният кабинетен файл &quot;[2]&quot; е повреден и не може да се използва. Това може да означава, че има грешка в мрежата, грешка при четене от компактдиска или проблем в самия пакет." />
+    <String Id="Error1336" Overridable="yes" Value="Възникна грешка при създаването на временен файл, който е нужен за завършване на инсталирането.{{ Папка: [3]. Код на системната грешка: [2]}}" />
+    <String Id="Error1401" Overridable="yes" Value="Ключът не може да се създаде: [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1402" Overridable="yes" Value="Ключът не може да се отвори: [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1403" Overridable="yes" Value="Стойността [2] не може да се изтрие от ключа [3]. {{ Системна грешка [4].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1404" Overridable="yes" Value="Ключът [2] не може да се изтрие. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1405" Overridable="yes" Value="Стойността [2] не може да се прочете от ключа [3]. {{ Системна грешка [4].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1406" Overridable="yes" Value="Стойността [2] не може да се запише в ключа [3]. {{ Системна грешка [4].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1407" Overridable="yes" Value="Не могат да се извлекат имената на стойностите от ключа [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1408" Overridable="yes" Value="Не могат да се извлекат имената на подключовете от ключа [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1409" Overridable="yes" Value="Не може да се прочете информацията за защита за ключа [2]. {{ Системна грешка [3].}} Проверете дали имате достатъчно права за достъп до този ключ или се свържете с отдела за поддръжка." />
+    <String Id="Error1410" Overridable="yes" Value="Не може да се увеличи наличното място за системния регистър. Нужни са [2] КБ свободно място в системния регистър за инсталирането на това приложение." />
+    <String Id="Error1500" Overridable="yes" Value="В момента се изпълнява друго инсталиране. Трябва първо да го завършите, за да продължите с това." />
+    <String Id="Error1501" Overridable="yes" Value="Грешка при достъп до защитени данни. Уверете се, че Windows Installer е правилно конфигуриран, след което опитайте инсталирането отново." />
+    <String Id="Error1502" Overridable="yes" Value="Потребителят &quot;[2]&quot; е започнал инсталиране на продукта &quot;[3]&quot; в предишен момент. Този потребител ще трябва отново да стартира инсталирането, за да може да използва продукта. Текущото инсталиране ще продължи сега." />
+    <String Id="Error1503" Overridable="yes" Value="Потребителят &quot;[2]&quot; е започнал инсталиране на продукта &quot;[3]&quot; в предишен момент. Този потребител ще трябва отново да стартира инсталирането, за да може да използва продукта." />
+    <String Id="Error1601" Overridable="yes" Value="Няма достатъчно място на диска – Том: &quot;[2]&quot;; необходимо място: [3] КБ; свободно място: [4] КБ. Освободете място на диска, след което опитайте отново." />
+    <String Id="Error1602" Overridable="yes" Value="Наистина ли искате да откажете?" />
+    <String Id="Error1603" Overridable="yes" Value="Файлът [2][3] се използва{ от следния процес: Име: [4], ИД: [5], Заглавие на прозореца: &quot;[6]&quot;}. Затворете съответното приложение, след което опитайте отново." />
+    <String Id="Error1604" Overridable="yes" Value="Продуктът &quot;[2]&quot; е вече инсталиран, поради което инсталирането на този продукт не може да продължи. Двата продукта са несъвместими." />
+    <String Id="Error1605" Overridable="yes" Value="Няма достатъчно свободно място на том &quot;[2]&quot;, за да продължи инсталирането с разрешено възстановяване. Нужни са [3] КБ, но са свободни само [4] КБ. Щракнете върху &quot;Игнорирай&quot;, за да продължите инсталирането, без да се записва информация за възстановяване, върху &quot;Опитай пак&quot;, за да проверите свободното място отново, или върху &quot;Отказ&quot;, за да прекратите инсталирането." />
+    <String Id="Error1606" Overridable="yes" Value="Няма достъп до местоположението в мрежата [2]." />
+    <String Id="Error1607" Overridable="yes" Value="Следните приложения трябва да се затворят, преди да продължи инсталирането:" />
+    <String Id="Error1608" Overridable="yes" Value="Не са намерени предишно инсталирани съвместими продукти за инсталиране на продукта на машината." />
+    <String Id="Error1609" Overridable="yes" Value="Възникна грешка при прилагането на настройките за защита. [2] не е валиден потребител или група. Вероятно има проблем в пакета или във връзката с домейн контролера по мрежата. Проверете връзката с мрежата, след което щракнете върху &quot;Опитай пак&quot; или върху &quot;Отказ&quot;, за да прекратите инсталирането. {{Потребителският SID не може да се намери, системна грешка [3]}}" />
+    <String Id="Error1701" Overridable="yes" Value="Ключът [2] е невалиден. Проверете дали сте въвели правилния ключ." />
+    <String Id="Error1702" Overridable="yes" Value="Инсталиращата програма трябва да рестартира компютъра, за да продължи конфигурирането на [2]. Щракнете върху &quot;Да&quot;, за да рестартирате сега, или върху &quot;Не&quot;, ако искате да рестартирате ръчно по-късно." />
+    <String Id="Error1703" Overridable="yes" Value="Трябва да рестартирате системата, за да се активират конфигурационните промени в [2]. Щракнете върху &quot;Да&quot;, за да рестартирате сега, или върху &quot;Не&quot;, ако искате да рестартирате ръчно по-късно." />
+    <String Id="Error1704" Overridable="yes" Value="Инсталирането на [2] е временно преустановено. Трябва да отмените направените от него промени, за да продължите това инсталиране. Искате ли да отмените тези промени?" />
+    <String Id="Error1705" Overridable="yes" Value="В момента се изпълнява друго инсталиране за този продукт. Трябва да отмените направените от него промени, за да продължите това инсталиране. Искате ли да отмените тези промени?" />
+    <String Id="Error1706" Overridable="yes" Value="Не може да се намери инсталационен пакет за продукта [2]. Опитайте отново инсталирането, като използвате валидно копие на инсталационния пакет &quot;[3]&quot;." />
+    <String Id="Error1707" Overridable="yes" Value="Инсталирането завърши успешно." />
+    <String Id="Error1708" Overridable="yes" Value="Инсталирането е неуспешно." />
+    <String Id="Error1709" Overridable="yes" Value="Продукт: [2] – [3]" />
+    <String Id="Error1710" Overridable="yes" Value="Можете да възстановите предишното състояние на компютъра или да продължите инсталирането по-късно. Искате ли да възстановите предишното състояние?" />
+    <String Id="Error1711" Overridable="yes" Value="Възникна грешка при запис на информацията за инсталиране върху диска. Проверете дали има достатъчно свободно място на диска, след което щракнете върху &quot;Опитай пак&quot; или върху &quot;Отказ&quot;, за да прекратите инсталирането." />
+    <String Id="Error1712" Overridable="yes" Value="Един или повече от нужните файлове за възстановяване на предишното състояние на компютъра не е намерен. Възстановяването не е възможно." />
+    <String Id="Error1713" Overridable="yes" Value="[2] не може да инсталира някой от нужните продукти. Свържете се с отдела за техническа поддръжка. {{Системна грешка: [3].}}" />
+    <String Id="Error1714" Overridable="yes" Value="По-старата версия на [2] не може да се премахне. Свържете се с отдела за техническа поддръжка. {{Системна грешка [3].}}" />
+    <String Id="Error1715" Overridable="yes" Value="[2] е инсталиран" />
+    <String Id="Error1716" Overridable="yes" Value="[2] е конфигуриран" />
+    <String Id="Error1717" Overridable="yes" Value="[2] е премахнат" />
+    <String Id="Error1718" Overridable="yes" Value="Файлът [2] е отхвърлен от правилата за цифрови подписи." />
+    <String Id="Error1719" Overridable="yes" Value="Няма достъп до услугата Windows Installer. Това е възможно, ако Windows работи в безопасен режим или ако Windows Installer не е правилно инсталиран. Свържете се с отдела за техническа поддръжка за повече помощ." />
+    <String Id="Error1720" Overridable="yes" Value="Възникна проблем с този пакет с Windows Installer. Не може да се изпълни задължителен скрипт за това инсталиране. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие по избор [2] грешка в скрипт [3], [4]: [5] Ред [6], Колона [7], [8] }}" />
+    <String Id="Error1721" Overridable="yes" Value="Възникна проблем с този пакет с Windows Installer. Не може да се изпълни задължителна програма за това инсталиране. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие: [2], местоположение: [3], команда: [4] }}" />
+    <String Id="Error1722" Overridable="yes" Value="Възникна проблем с този пакет с Windows Installer. Програмата, която е изпълнена като част от инсталационния процес, не завърши нормално. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие [2], местоположение: [3], команда: [4] }}" />
+    <String Id="Error1723" Overridable="yes" Value="Възникна проблем с този пакет с Windows Installer. Не може да се изпълни задължителен DLL файл за това инсталиране. Свържете се с отдела за техническа поддръжка или с доставчика на пакета. {{Действие [2], запис: [3], библиотека: [4] }}" />
+    <String Id="Error1724" Overridable="yes" Value="Премахването завърши успешно." />
+    <String Id="Error1725" Overridable="yes" Value="Премахването е неуспешно." />
+    <String Id="Error1726" Overridable="yes" Value="Обявяването завърши успешно." />
+    <String Id="Error1727" Overridable="yes" Value="Обявяването е неуспешно." />
+    <String Id="Error1728" Overridable="yes" Value="Конфигурирането завърши успешно." />
+    <String Id="Error1729" Overridable="yes" Value="Конфигурирането не е успешно." />
+    <String Id="Error1730" Overridable="yes" Value="Трябва да сте администратор, за да премахнете това приложение. За да го премахнете, можете да влезете като администратор или да се свържете с отдела за техническа поддръжка за повече помощ." />
+    <String Id="Error1731" Overridable="yes" Value="Инсталационният пакет източник на продукта [2] не е синхронизиран с клиентския пакет. Опитайте отново инсталирането, като използвате валидно копие на инсталационния пакет &quot;[3]&quot;." />
+    <String Id="Error1732" Overridable="yes" Value="За да завършите инсталирането на [2], трябва да рестартирате компютъра. В момента в компютъра са влезли други потребители и при рестартиране те могат да загубят работата си. Искате ли да рестартирате сега?" />
+    <String Id="Error1801" Overridable="yes" Value="Пътят [2] не е валиден. Укажете валиден път." />
+    <String Id="Error1802" Overridable="yes" Value="Няма достатъчно памет. Затворете останалите приложения, преди да опитате отново." />
+    <String Id="Error1803" Overridable="yes" Value="Няма диск в устройство [2]. Поставете диск и щракнете върху &quot;Опитай пак&quot; или върху &quot;Отказ&quot;, за да се върнете към предишно избрания том." />
+    <String Id="Error1804" Overridable="yes" Value="Няма диск в устройство [2]. Поставете диск, след което щракнете върху &quot;Опитай пак&quot;, или върху &quot;Отказ&quot;, за да се върнете в каталога за преглед и да изберете друг том." />
+    <String Id="Error1805" Overridable="yes" Value="Папката [2] не съществува. Въведете път към съществуваща папка." />
+    <String Id="Error1806" Overridable="yes" Value="Нямате достатъчно привилегии, за да четете тази папка." />
+    <String Id="Error1807" Overridable="yes" Value="Не е намерена валидна папка местоназначение за инсталирането." />
+    <String Id="Error1901" Overridable="yes" Value="Грешка при опит за четене от базата данни за инсталиране: [2]." />
+    <String Id="Error1902" Overridable="yes" Value="Планиране на операция за рестартиране: Преименуване на файла [2] на [3]. Компютърът трябва да се рестартира, за да завърши операцията." />
+    <String Id="Error1903" Overridable="yes" Value="Планиране на операция за рестартиране: Изтриване на файла [2]. Компютърът трябва да се рестартира, за да завърши операцията." />
+    <String Id="Error1904" Overridable="yes" Value="Неуспешно регистриране на модула [2]. HRESULT [3]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1905" Overridable="yes" Value="Неуспешно дерегистриране на модула [2]. HRESULT [3]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1906" Overridable="yes" Value="Неуспешно кеширане на пакета [2]. Грешка: [3]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1907" Overridable="yes" Value="Неуспешно регистриране на шрифта [2]. Проверете дали имате достатъчно разрешения да инсталирате шрифтове и дали системата поддържа този шрифт." />
+    <String Id="Error1908" Overridable="yes" Value="Неуспешно дерегистриране на шрифта [2]. Проверете дали имате права да премахвате шрифтове." />
+    <String Id="Error1909" Overridable="yes" Value="Неуспешно създаване на прекия път [2]. Проверете дали папката местоназначение съществува и дали имате достъп до нея." />
+    <String Id="Error1910" Overridable="yes" Value="Неуспешно премахване на прекия път [2]. Проверете дали файлът на прекия път съществува и дали имате достъп до него." />
+    <String Id="Error1911" Overridable="yes" Value="Неуспешно регистриране на библиотеката на типовете за файла [2]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1912" Overridable="yes" Value="Неуспешно премахване на регистрацията на библиотеката на типове за файла [2]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1913" Overridable="yes" Value="Неуспешно актуализиране на ini файла [2][3]. Проверете дали файлът съществува и дали имате достъп до него." />
+    <String Id="Error1914" Overridable="yes" Value="Неуспешно планиране на заместването на файл [3] с файл [2] при рестартиране. Проверете дали имате разрешение за запис във файла [3]." />
+    <String Id="Error1915" Overridable="yes" Value="Неуспешно премахване на диспечера на ODBC драйвери, ODBC грешка [2]: [3]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1916" Overridable="yes" Value="Неуспешно инсталиране на диспечера на ODBC драйвери, ODBC грешка [2]: [3]. Свържете се с отдела за поддръжка." />
+    <String Id="Error1917" Overridable="yes" Value="Грешка при премахване на ODBC драйвера: [4], ODBC грешка [2]: [3]. Проверете дали имате привилегии да премахвате ODBC драйвери." />
+    <String Id="Error1918" Overridable="yes" Value="Грешка при инсталиране на ODBC драйвера: [4], ODBC грешка [2]: [3]. Проверете дали файлът [4] съществува и дали имате достъп до него." />
+    <String Id="Error1919" Overridable="yes" Value="Грешка при конфигурирането на източника на ODBC данни: [4], ODBC грешка [2]: [3]. Проверете дали файлът [4] съществува и дали имате достъп до него." />
+    <String Id="Error1920" Overridable="yes" Value="Неуспешно стартиране на услугата &quot;[2]&quot; ([3]). Проверете дали имате достатъчно привилегии, за да стартирате системни услуги." />
+    <String Id="Error1921" Overridable="yes" Value="Услугата &quot;[2]&quot; ([3]) не може да бъде спряна. Проверете дали имате достатъчно привилегии, за да спирате системни услуги." />
+    <String Id="Error1922" Overridable="yes" Value="Услугата &quot;[2]&quot; ([3]) не може да се изтрие. Проверете дали имате достатъчно привилегии, за да премахвате системни услуги." />
+    <String Id="Error1923" Overridable="yes" Value="Услугата &quot;[2]&quot; ([3]) не може да се инсталира. Проверете дали имате достатъчно привилегии, за да инсталирате системни услуги." />
+    <String Id="Error1924" Overridable="yes" Value="Променливата за средата &quot;[2]&quot; не може да се актуализира. Проверете дали имате достатъчно привилегии, за да променяте променливи за средата." />
+    <String Id="Error1925" Overridable="yes" Value="Нямате достатъчно привилегии, за да завършите инсталирането за всички потребители на машината. Влезете като администратор, след което опитайте отново да инсталирате." />
+    <String Id="Error1926" Overridable="yes" Value="Неуспешно задаване на защитата за файла &quot;[3]&quot;. Грешка: [2]. Проверете дали имате достатъчно привилегии, за да променяте разрешенията за защита на файла." />
+    <String Id="Error1927" Overridable="yes" Value="На компютъра няма инсталирани услуги за компоненти (COM+ 1.0). За да завърши успешно, това инсталиране изисква услуги за компоненти. Услуги за компоненти има в Windows 2000." />
+    <String Id="Error1928" Overridable="yes" Value="Грешка при регистриране на COM+ приложението. Свържете се с отдела за поддръжка за повече информация." />
+    <String Id="Error1929" Overridable="yes" Value="Грешка при премахване на регистрация на COM+ приложението. Свържете се с отдела за поддръжка за повече информация." />
+    <String Id="Error1930" Overridable="yes" Value="Описанието на услугата &quot;[2]&quot; ([3]) не може да се промени." />
+    <String Id="Error1931" Overridable="yes" Value="Услугата Windows Installer не може да актуализира системния файл [2], тъй като файлът е защитен от Windows. За да работи правилно програмата, трябва да актуализирате операционната система. {{Версия на пакета: [3], Версия на защитената операционна система: [4]}}" />
+    <String Id="Error1932" Overridable="yes" Value="Услугата Windows Installer не може да актуализира защитения файл на Windows [2]. {{Версия на пакета: [3], Версия на защитената операционна система: [4], SFP грешка: [5]}}" />
+    <String Id="Error1933" Overridable="yes" Value="Услугата Windows Installer не може да актуализира един или повече защитени файлове на Windows. {{SFP грешка: [2]. Списък със защитени файлове:\r\n[3]}}" />
+    <String Id="Error1934" Overridable="yes" Value="Потребителските инсталации са забранени от правила на компютъра." />
+    <String Id="Error1935" Overridable="yes" Value="Възникна грешка при инсталиране на сбора &quot;[6]&quot;. За повече информация вижте в &quot;Помощ и поддръжка&quot;. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент [2]}}" />
+    <String Id="Error1936" Overridable="yes" Value="Възникна грешка при инсталиране на сбора &quot;[6]&quot;. Сборът няма защитено име или не е подписан с ключ с минималната дължина. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент: [2]}}" />
+    <String Id="Error1937" Overridable="yes" Value="Възникна грешка при инсталиране на сбора &quot;[6]&quot;. Подписът или каталогът не могат да се проверят или не са валидни. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент: [2]}}" />
+    <String Id="Error1938" Overridable="yes" Value="Възникна грешка при инсталиране на сбора &quot;[6]&quot;. Един или повече модули не могат да се открият. HRESULT: [3]. {{интерфейс на сбора: [4], функция: [5], компонент: [2]}}" />
 
-    <String Id="UITextbytes" Overridable="yes">байтове</String>
-    <String Id="UITextGB" Overridable="yes">ГБ</String>
-    <String Id="UITextKB" Overridable="yes">КБ</String>
-    <String Id="UITextMB" Overridable="yes">МБ</String>
-    <String Id="UITextMenuAbsent" Overridable="yes">Целият компонент няма да е наличен</String>
-    <String Id="UITextMenuAdvertise" Overridable="yes">Компонентът ще се инсталира, когато е необходимо</String>
-    <String Id="UITextMenuAllCD" Overridable="yes">Целият компонент ще бъде инсталиран така, че да се изпълнява от компактдиск</String>
-    <String Id="UITextMenuAllLocal" Overridable="yes">Целият компонент ще бъде инсталиран върху локалния твърд диск</String>
-    <String Id="UITextMenuAllNetwork" Overridable="yes">Целият компонент ще бъде инсталиран да се изпълнява от мрежата</String>
-    <String Id="UITextMenuCD" Overridable="yes">Ще се инсталира така, че да се изпълнява от компактдиск</String>
-    <String Id="UITextMenuLocal" Overridable="yes">Ще се инсталира върху локалния твърд диск</String>
-    <String Id="UITextMenuNetwork" Overridable="yes">Ще се инсталира да се изпълнява от мрежата</String>
-    <String Id="UITextNewFolder" Overridable="yes">Папка|Нова папка</String>
-    <String Id="UITextScriptInProgress" Overridable="yes">Събиране на необходимата информация...</String>
-    <String Id="UITextSelAbsentAbsent" Overridable="yes">Този компонент ще остане неинсталиран</String>
-    <String Id="UITextSelAbsentAdvertise" Overridable="yes">Този компонент ще се инсталира при нужда</String>
-    <String Id="UITextSelAbsentCD" Overridable="yes">Този компонент ще се инсталира така, че да се изпълнява от компактдиск</String>
-    <String Id="UITextSelAbsentLocal" Overridable="yes">Този компонент ще се инсталира на локалния твърд диск</String>
-    <String Id="UITextSelAbsentNetwork" Overridable="yes">Този компонент ще се инсталира да се изпълнява от мрежата</String>
-    <String Id="UITextSelAdvertiseAbsent" Overridable="yes">Този компонент няма да е достъпен</String>
-    <String Id="UITextSelAdvertiseAdvertise" Overridable="yes">Ще се инсталира при нужда</String>
-    <String Id="UITextSelAdvertiseCD" Overridable="yes">Този компонент ще се инсталира така, че да се изпълнява от компактдиск</String>
-    <String Id="UITextSelAdvertiseLocal" Overridable="yes">Този компонент ще се инсталира върху локалния твърд диск</String>
-    <String Id="UITextSelAdvertiseNetwork" Overridable="yes">Този компонент ще може да се изпълнява от мрежата</String>
-    <String Id="UITextSelCDAbsent" Overridable="yes">Този компонент ще се деинсталира изцяло, така че няма да можете да го изпълнявате от компактдиск</String>
-    <String Id="UITextSelCDAdvertise" Overridable="yes">Този компонент няма да се изпълнява от компактдиска, а ще се инсталира само при нужда</String>
-    <String Id="UITextSelCDCD" Overridable="yes">Този компонент ще продължава да се изпълнява от компактдиск</String>
-    <String Id="UITextSelCDLocal" Overridable="yes">Този компонент няма да може да се изпълнява от компактдиск, а ще бъде инсталиран на локалния твърд диск</String>
-    <String Id="UITextSelChildCostNeg" Overridable="yes">Този компонент освобождава [1] на твърдия диск.</String>
-    <String Id="UITextSelChildCostPos" Overridable="yes">Този компонент изисква [1] на твърдия диск.</String>
-    <String Id="UITextSelCostPending" Overridable="yes">Изчисляване на изискванията за този компонент...</String>
-    <String Id="UITextSelLocalAbsent" Overridable="yes">Този компонент ще се премахне изцяло</String>
-    <String Id="UITextSelLocalAdvertise" Overridable="yes">Този компонент ще се премахне от локалния твърд диск и ще се инсталира само при нужда</String>
-    <String Id="UITextSelLocalCD" Overridable="yes">Този компонент ще се премахне от локалния ви твърд диск, но все пак ще може да се изпълнява от компактдиск</String>
-    <String Id="UITextSelLocalLocal" Overridable="yes">Този компонент ще остане на вашия локален твърд диск</String>
-    <String Id="UITextSelLocalNetwork" Overridable="yes">Този компонент ще се премахне от локалния ви твърд диск, но все пак ще може да се изпълнява от мрежата</String>
-    <String Id="UITextSelNetworkAbsent" Overridable="yes">Този компонент ще се деинсталира изцяло, така че няма да можете да го изпълнявате от мрежата</String>
-    <String Id="UITextSelNetworkAdvertise" Overridable="yes">Този компонент няма да може да се изпълнява от мрежата, но ще може да се инсталира при необходимост</String>
-    <String Id="UITextSelNetworkLocal" Overridable="yes">Този компонент няма да може да се изпълнява от мрежата, а ще бъде инсталиран на локалния твърд диск</String>
-    <String Id="UITextSelNetworkNetwork" Overridable="yes">Този компонент ще продължава да се изпълнява от мрежата</String>
-    <String Id="UITextSelParentCostNegNeg" Overridable="yes">Този компонент освобождава [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите освобождават [4] на твърдия диск.</String>
-    <String Id="UITextSelParentCostNegPos" Overridable="yes">Този компонент освобождава [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите изискват [4] на твърдия диск.</String>
-    <String Id="UITextSelParentCostPosNeg" Overridable="yes">Този компонент изисква [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите освобождават [4] на твърдия диск.</String>
-    <String Id="UITextSelParentCostPosPos" Overridable="yes">Този компонент изисква [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите изискват [4] на твърдия диск.</String>
-    <String Id="UITextTimeRemaining" Overridable="yes">Оставащо време: {[1] минути }{[2] секунди}</String>
-    <String Id="UITextVolumeCostAvailable" Overridable="yes">Налично</String>
-    <String Id="UITextVolumeCostDifference" Overridable="yes">Разлика</String>
-    <String Id="UITextVolumeCostRequired" Overridable="yes">Задължителен</String>
-    <String Id="UITextVolumeCostSize" Overridable="yes">Размер на диска</String>
-    <String Id="UITextVolumeCostVolume" Overridable="yes">Том</String>
+    <String Id="UITextbytes" Overridable="yes" Value="байтове" />
+    <String Id="UITextGB" Overridable="yes" Value="ГБ" />
+    <String Id="UITextKB" Overridable="yes" Value="КБ" />
+    <String Id="UITextMB" Overridable="yes" Value="МБ" />
+    <String Id="UITextMenuAbsent" Overridable="yes" Value="Целият компонент няма да е наличен" />
+    <String Id="UITextMenuAdvertise" Overridable="yes" Value="Компонентът ще се инсталира, когато е необходимо" />
+    <String Id="UITextMenuAllCD" Overridable="yes" Value="Целият компонент ще бъде инсталиран така, че да се изпълнява от компактдиск" />
+    <String Id="UITextMenuAllLocal" Overridable="yes" Value="Целият компонент ще бъде инсталиран върху локалния твърд диск" />
+    <String Id="UITextMenuAllNetwork" Overridable="yes" Value="Целият компонент ще бъде инсталиран да се изпълнява от мрежата" />
+    <String Id="UITextMenuCD" Overridable="yes" Value="Ще се инсталира така, че да се изпълнява от компактдиск" />
+    <String Id="UITextMenuLocal" Overridable="yes" Value="Ще се инсталира върху локалния твърд диск" />
+    <String Id="UITextMenuNetwork" Overridable="yes" Value="Ще се инсталира да се изпълнява от мрежата" />
+    <String Id="UITextNewFolder" Overridable="yes" Value="Папка|Нова папка" />
+    <String Id="UITextScriptInProgress" Overridable="yes" Value="Събиране на необходимата информация..." />
+    <String Id="UITextSelAbsentAbsent" Overridable="yes" Value="Този компонент ще остане неинсталиран" />
+    <String Id="UITextSelAbsentAdvertise" Overridable="yes" Value="Този компонент ще се инсталира при нужда" />
+    <String Id="UITextSelAbsentCD" Overridable="yes" Value="Този компонент ще се инсталира така, че да се изпълнява от компактдиск" />
+    <String Id="UITextSelAbsentLocal" Overridable="yes" Value="Този компонент ще се инсталира на локалния твърд диск" />
+    <String Id="UITextSelAbsentNetwork" Overridable="yes" Value="Този компонент ще се инсталира да се изпълнява от мрежата" />
+    <String Id="UITextSelAdvertiseAbsent" Overridable="yes" Value="Този компонент няма да е достъпен" />
+    <String Id="UITextSelAdvertiseAdvertise" Overridable="yes" Value="Ще се инсталира при нужда" />
+    <String Id="UITextSelAdvertiseCD" Overridable="yes" Value="Този компонент ще се инсталира така, че да се изпълнява от компактдиск" />
+    <String Id="UITextSelAdvertiseLocal" Overridable="yes" Value="Този компонент ще се инсталира върху локалния твърд диск" />
+    <String Id="UITextSelAdvertiseNetwork" Overridable="yes" Value="Този компонент ще може да се изпълнява от мрежата" />
+    <String Id="UITextSelCDAbsent" Overridable="yes" Value="Този компонент ще се деинсталира изцяло, така че няма да можете да го изпълнявате от компактдиск" />
+    <String Id="UITextSelCDAdvertise" Overridable="yes" Value="Този компонент няма да се изпълнява от компактдиска, а ще се инсталира само при нужда" />
+    <String Id="UITextSelCDCD" Overridable="yes" Value="Този компонент ще продължава да се изпълнява от компактдиск" />
+    <String Id="UITextSelCDLocal" Overridable="yes" Value="Този компонент няма да може да се изпълнява от компактдиск, а ще бъде инсталиран на локалния твърд диск" />
+    <String Id="UITextSelChildCostNeg" Overridable="yes" Value="Този компонент освобождава [1] на твърдия диск." />
+    <String Id="UITextSelChildCostPos" Overridable="yes" Value="Този компонент изисква [1] на твърдия диск." />
+    <String Id="UITextSelCostPending" Overridable="yes" Value="Изчисляване на изискванията за този компонент..." />
+    <String Id="UITextSelLocalAbsent" Overridable="yes" Value="Този компонент ще се премахне изцяло" />
+    <String Id="UITextSelLocalAdvertise" Overridable="yes" Value="Този компонент ще се премахне от локалния твърд диск и ще се инсталира само при нужда" />
+    <String Id="UITextSelLocalCD" Overridable="yes" Value="Този компонент ще се премахне от локалния ви твърд диск, но все пак ще може да се изпълнява от компактдиск" />
+    <String Id="UITextSelLocalLocal" Overridable="yes" Value="Този компонент ще остане на вашия локален твърд диск" />
+    <String Id="UITextSelLocalNetwork" Overridable="yes" Value="Този компонент ще се премахне от локалния ви твърд диск, но все пак ще може да се изпълнява от мрежата" />
+    <String Id="UITextSelNetworkAbsent" Overridable="yes" Value="Този компонент ще се деинсталира изцяло, така че няма да можете да го изпълнявате от мрежата" />
+    <String Id="UITextSelNetworkAdvertise" Overridable="yes" Value="Този компонент няма да може да се изпълнява от мрежата, но ще може да се инсталира при необходимост" />
+    <String Id="UITextSelNetworkLocal" Overridable="yes" Value="Този компонент няма да може да се изпълнява от мрежата, а ще бъде инсталиран на локалния твърд диск" />
+    <String Id="UITextSelNetworkNetwork" Overridable="yes" Value="Този компонент ще продължава да се изпълнява от мрежата" />
+    <String Id="UITextSelParentCostNegNeg" Overridable="yes" Value="Този компонент освобождава [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите освобождават [4] на твърдия диск." />
+    <String Id="UITextSelParentCostNegPos" Overridable="yes" Value="Този компонент освобождава [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите изискват [4] на твърдия диск." />
+    <String Id="UITextSelParentCostPosNeg" Overridable="yes" Value="Този компонент изисква [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите освобождават [4] на твърдия диск." />
+    <String Id="UITextSelParentCostPosPos" Overridable="yes" Value="Този компонент изисква [1] на твърдия диск. Избрани са [2] от [3] подкомпонента. Подкомпонентите изискват [4] на твърдия диск." />
+    <String Id="UITextTimeRemaining" Overridable="yes" Value="Оставащо време: {[1] минути }{[2] секунди}" />
+    <String Id="UITextVolumeCostAvailable" Overridable="yes" Value="Налично" />
+    <String Id="UITextVolumeCostDifference" Overridable="yes" Value="Разлика" />
+    <String Id="UITextVolumeCostRequired" Overridable="yes" Value="Задължителен" />
+    <String Id="UITextVolumeCostSize" Overridable="yes" Value="Размер на диска" />
+    <String Id="UITextVolumeCostVolume" Overridable="yes" Value="Том" />
 </WixLocalization>

@@ -21,6 +21,7 @@
 #include <fileutil.h>
 #include <guidutil.h>
 #include <iniutil.h>
+#include <locutil.h>
 #include <memutil.h>
 #include <pathutil.h>
 #include <procutil.h>

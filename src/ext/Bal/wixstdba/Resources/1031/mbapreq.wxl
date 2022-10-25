@@ -1,40 +1,31 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="de-de" Language="1031" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <UI Control="InstallButton" Width="180" />
   
-  <String Id="Caption">[WixBundleName]-Setup</String>
-  <String Id="Title">Für das [WixBundleName]-Setup ist Microsoft .NET Framework erforderlich.</String>
-  <String Id="ConfirmCancelMessage">Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?</String>
-  <String Id="HelpHeader">Setup-Hilfe</String>
-  <String Id="HelpText">/passive | /quiet - zeigt eine minimale Benutzeroberfläche ohne
-   Eingabeaufforderungen oder keine Benutzeroberfläche und keine
-   Eingabeaufforderungen an. Standardmäßig werden die Benutzeroberfläche und
-   alle Eingabeaufforderungen angezeigt.
-
-/norestart   - unterdrückt alle Neustartversuche. Standardmäßig fordert die
-   Benutzeroberfläche zum Bestätigen eines Neustarts auf.
-/log log.txt - erstellt das Protokoll in einer bestimmten Datei.
-   Standardmäßig wird die  Protokolldatei in "%TEMP%" erstellt.</String>
-  <String Id="HelpCloseButton">&amp;Schließen</String>
-  <String Id="InstallLicenseTerms">Klicken Sie auf die Schaltfläche "Akzeptieren und installieren", um den Microsoft .NET Framework &lt;a href="#"&gt;-Lizenzbedingungen&lt;/a&gt; zuzustimmen.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Akzeptieren und installieren</String>
-  <String Id="InstallDeclineButton">&amp;Ablehnen</String>
-  <String Id="ProgressHeader">Setup-Status</String>
-  <String Id="ProgressLabel">Verarbeitung:</String>
-  <String Id="ProgressCancelButton">&amp;Abbrechen</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Setup-Fehler</String>
-  <String Id="FailureLogLinkText">Beim Setup ist aufgrund mindestens eines Problems ein Fehler aufgetreten. Beheben Sie die Probleme, und wiederholen Sie das Setup. Weitere Informationen finden Sie in der &lt;a href="#"&gt;Protokolldatei&lt;/a&gt;.</String>
-  <String Id="FailureRestartText">Sie müssen den Computer neu starten, um das Zurücksetzen der Software abzuschließen.</String>
-  <String Id="FailureRestartButton">&amp;Neu starten</String>
-  <String Id="FailureCloseButton">&amp;Schließen</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="[WixBundleName]-Setup" />
+  <String Id="Title" Value="Für das [WixBundleName]-Setup ist Microsoft .NET Framework erforderlich." />
+  <String Id="ConfirmCancelMessage" Value="Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?" />
+  <String Id="HelpHeader" Value="Setup-Hilfe" />
+  <String Id="HelpText" Value="/passive | /quiet - zeigt eine minimale Benutzeroberfläche ohne&#xA;   Eingabeaufforderungen oder keine Benutzeroberfläche und keine&#xA;   Eingabeaufforderungen an. Standardmäßig werden die Benutzeroberfläche und&#xA;   alle Eingabeaufforderungen angezeigt.&#xA;&#xA;/norestart   - unterdrückt alle Neustartversuche. Standardmäßig fordert die&#xA;   Benutzeroberfläche zum Bestätigen eines Neustarts auf.&#xA;/log log.txt - erstellt das Protokoll in einer bestimmten Datei.&#xA;   Standardmäßig wird die  Protokolldatei in &quot;%TEMP%&quot; erstellt." />
+  <String Id="HelpCloseButton" Value="&amp;Schließen" />
+  <String Id="InstallLicenseTerms" Value="Klicken Sie auf die Schaltfläche &quot;Akzeptieren und installieren&quot;, um den Microsoft .NET Framework &lt;a href=&quot;#&quot;&gt;-Lizenzbedingungen&lt;/a&gt; zuzustimmen." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Akzeptieren und installieren" />
+  <String Id="InstallDeclineButton" Value="&amp;Ablehnen" />
+  <String Id="ProgressHeader" Value="Setup-Status" />
+  <String Id="ProgressLabel" Value="Verarbeitung:" />
+  <String Id="ProgressCancelButton" Value="&amp;Abbrechen" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Setup-Fehler" />
+  <String Id="FailureLogLinkText" Value="Beim Setup ist aufgrund mindestens eines Problems ein Fehler aufgetreten. Beheben Sie die Probleme, und wiederholen Sie das Setup. Weitere Informationen finden Sie in der &lt;a href=&quot;#&quot;&gt;Protokolldatei&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Sie müssen den Computer neu starten, um das Zurücksetzen der Software abzuschließen." />
+  <String Id="FailureRestartButton" Value="&amp;Neu starten" />
+  <String Id="FailureCloseButton" Value="&amp;Schließen" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

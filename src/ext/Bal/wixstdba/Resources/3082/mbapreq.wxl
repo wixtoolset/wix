@@ -1,38 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="es-es" Language="3082" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">Instalación de [WixBundleName]</String>
-  <String Id="Title">La instalación de [WixBundleName] requiere Microsoft .NET Framework</String>
-  <String Id="ConfirmCancelMessage">¿Está seguro de que desea cancelar?</String>
-  <String Id="HelpHeader">Ayuda del programa de instalación</String>
-  <String Id="HelpText">/passive | /quiet -  muestra una interfaz de usuario mínima y no realiza
-   preguntas, o bien no muestra interfaz de usuario y no realiza preguntas.
-   De manera  predeterminada se muestra la interfaz de usuario completa y se
-   realizan todas las  preguntas necesarias.
-
-/norestart   - suprime cualquier intento de reinicio. De manera predeterminada,
-   la interfaz de usuario preguntará si se desea reiniciar.
-/log log.txt - registra los datos de instalación en un archivo específico.
-   De manera predeterminada se crea un archivo de registro en %TEMP%.</String>
-  <String Id="HelpCloseButton">&amp;Cerrar</String>
-  <String Id="InstallLicenseTerms">Haga clic en el botón "Aceptar e instalar" para aceptar los &lt;a href="#"&gt;términos de licencia&lt;/a&gt; de Microsoft .NET Framework.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Aceptar e instalar</String>
-  <String Id="InstallDeclineButton">&amp;Rechazar</String>
-  <String Id="ProgressHeader">Progreso de la instalación</String>
-  <String Id="ProgressLabel">Procesando:</String>
-  <String Id="ProgressCancelButton">&amp;Cancelar</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Error de la instalación</String>
-  <String Id="FailureLogLinkText">No se pudo completar la instalación a causa de uno o varios problemas. Corrija los problemas y vuelva a intentar la instalación. Para más información, vea el &lt;a href="#"&gt;archivo de registro&lt;/a&gt;.</String>
-  <String Id="FailureRestartText">Debe reiniciar el equipo para completar la reversión del software.</String>
-  <String Id="FailureRestartButton">&amp;Reiniciar</String>
-  <String Id="FailureCloseButton">&amp;Cerrar</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="Instalación de [WixBundleName]" />
+  <String Id="Title" Value="La instalación de [WixBundleName] requiere Microsoft .NET Framework" />
+  <String Id="ConfirmCancelMessage" Value="¿Está seguro de que desea cancelar?" />
+  <String Id="HelpHeader" Value="Ayuda del programa de instalación" />
+  <String Id="HelpText" Value="/passive | /quiet -  muestra una interfaz de usuario mínima y no realiza&#xA;   preguntas, o bien no muestra interfaz de usuario y no realiza preguntas.&#xA;   De manera  predeterminada se muestra la interfaz de usuario completa y se&#xA;   realizan todas las  preguntas necesarias.&#xA;&#xA;/norestart   - suprime cualquier intento de reinicio. De manera predeterminada,&#xA;   la interfaz de usuario preguntará si se desea reiniciar.&#xA;/log log.txt - registra los datos de instalación en un archivo específico.&#xA;   De manera predeterminada se crea un archivo de registro en %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Cerrar" />
+  <String Id="InstallLicenseTerms" Value="Haga clic en el botón &quot;Aceptar e instalar&quot; para aceptar los &lt;a href=&quot;#&quot;&gt;términos de licencia&lt;/a&gt; de Microsoft .NET Framework." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Aceptar e instalar" />
+  <String Id="InstallDeclineButton" Value="&amp;Rechazar" />
+  <String Id="ProgressHeader" Value="Progreso de la instalación" />
+  <String Id="ProgressLabel" Value="Procesando:" />
+  <String Id="ProgressCancelButton" Value="&amp;Cancelar" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Error de la instalación" />
+  <String Id="FailureLogLinkText" Value="No se pudo completar la instalación a causa de uno o varios problemas. Corrija los problemas y vuelva a intentar la instalación. Para más información, vea el &lt;a href=&quot;#&quot;&gt;archivo de registro&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Debe reiniciar el equipo para completar la reversión del software." />
+  <String Id="FailureRestartButton" Value="&amp;Reiniciar" />
+  <String Id="FailureCloseButton" Value="&amp;Cerrar" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

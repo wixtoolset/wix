@@ -1,37 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="sv-se" Language="1053" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">[WixBundleName]-installation</String>
-  <String Id="Title">Microsoft .NET Framework krävs för installation av [WixBundleName]</String>
-  <String Id="ConfirmCancelMessage">Vill du avbryta?</String>
-  <String Id="HelpHeader">Installationshjälp</String>
-  <String Id="HelpText">/passive | /quiet -  visar ett minimalt användargränssnitt utan prompter,
-   alternativt inget användargränssnitt och inga prompter. Som standard visas
-   användargränssnitt och samtliga prompter.
-
-/norestart   - hejdar omstart. Som standard visar användargränssnittet en
-   prompt före omstart.
-/log log.txt - skapar logg till en specifik fil. Som standard skapas loggfilen
-   i %TEMP%.</String>
-  <String Id="HelpCloseButton">&amp;Stäng</String>
-  <String Id="InstallLicenseTerms">Klicka på knappen "Godkänn och installera" för att godkänna &lt;a href="#"&gt;licensvillkoren&lt;/a&gt; för Microsoft .NET Framework.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Godkänn och installera</String>
-  <String Id="InstallDeclineButton">&amp;Avbryt</String>
-  <String Id="ProgressHeader">Installationsförlopp</String>
-  <String Id="ProgressLabel">Bearbetar:</String>
-  <String Id="ProgressCancelButton">&amp;Avbryt</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Installationen misslyckades</String>
-  <String Id="FailureLogLinkText">Installationen misslyckades på grund av ett eller flera problem. Åtgärda problemen och försök igen. Se &lt;a href="#"&gt;loggfilen&lt;/a&gt; för mer information.</String>
-  <String Id="FailureRestartText">Starta om datorn för att återställa programmet.</String>
-  <String Id="FailureRestartButton">&amp;Starta om</String>
-  <String Id="FailureCloseButton">&amp;Stäng</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="[WixBundleName]-installation" />
+  <String Id="Title" Value="Microsoft .NET Framework krävs för installation av [WixBundleName]" />
+  <String Id="ConfirmCancelMessage" Value="Vill du avbryta?" />
+  <String Id="HelpHeader" Value="Installationshjälp" />
+  <String Id="HelpText" Value="/passive | /quiet -  visar ett minimalt användargränssnitt utan prompter,&#xA;   alternativt inget användargränssnitt och inga prompter. Som standard visas&#xA;   användargränssnitt och samtliga prompter.&#xA;&#xA;/norestart   - hejdar omstart. Som standard visar användargränssnittet en&#xA;   prompt före omstart.&#xA;/log log.txt - skapar logg till en specifik fil. Som standard skapas loggfilen&#xA;   i %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Stäng" />
+  <String Id="InstallLicenseTerms" Value="Klicka på knappen &quot;Godkänn och installera&quot; för att godkänna &lt;a href=&quot;#&quot;&gt;licensvillkoren&lt;/a&gt; för Microsoft .NET Framework." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Godkänn och installera" />
+  <String Id="InstallDeclineButton" Value="&amp;Avbryt" />
+  <String Id="ProgressHeader" Value="Installationsförlopp" />
+  <String Id="ProgressLabel" Value="Bearbetar:" />
+  <String Id="ProgressCancelButton" Value="&amp;Avbryt" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Installationen misslyckades" />
+  <String Id="FailureLogLinkText" Value="Installationen misslyckades på grund av ett eller flera problem. Åtgärda problemen och försök igen. Se &lt;a href=&quot;#&quot;&gt;loggfilen&lt;/a&gt; för mer information." />
+  <String Id="FailureRestartText" Value="Starta om datorn för att återställa programmet." />
+  <String Id="FailureRestartButton" Value="&amp;Starta om" />
+  <String Id="FailureCloseButton" Value="&amp;Stäng" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

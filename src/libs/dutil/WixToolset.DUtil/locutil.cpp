@@ -561,10 +561,10 @@ static HRESULT ParseWxlString(
     ReleaseNullBSTR(bstrText);
 
     // Text
-    hr = XmlGetText(pixn, &bstrText);
-    LocExitOnFailure(hr, "Failed to get Xml text in Wxl file.");
+    hr = XmlGetAttribute(pixn, L"Value", &bstrText);
+    LocExitOnFailure(hr, "Failed to get Xml attribute Value in Wxl file.");
 
-    hr = StrAllocString(&pLocString->wzText, bstrText, 0);
+    hr = StrAllocString(&pLocString->wzText, bstrText ? bstrText : L"", 0);
     LocExitOnFailure(hr, "Failed to duplicate Xml text in Wxl file.");
 
 LExit:
@@ -615,10 +615,10 @@ static HRESULT ParseWxlControl(
     LocExitOnFailure(hr, "Failed to get control height attribute.");
 
     // Text
-    hr = XmlGetText(pixn, &bstrText);
-    LocExitOnFailure(hr, "Failed to get control text in Wxl file.");
+    hr = XmlGetAttribute(pixn, L"Text", &bstrText);
+    LocExitOnFailure(hr, "Failed to get Xml attribute Text in Wxl file.");
 
-    hr = StrAllocString(&pLocControl->wzText, bstrText, 0);
+    hr = StrAllocString(&pLocControl->wzText, bstrText ? bstrText : L"", 0);
     LocExitOnFailure(hr, "Failed to duplicate control text in Wxl file.");
 
 LExit:

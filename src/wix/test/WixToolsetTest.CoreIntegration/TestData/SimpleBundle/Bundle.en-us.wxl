@@ -5,7 +5,7 @@ This file contains the declaration of all the localizable strings.
 -->
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
 
-  <String Id="BundleName">~TestBundle</String>
-  <String Id="BundleInProgressName">~InProgressTestBundle</String>
+  <String Id="BundleName" Value="~TestBundle" />
+  <String Id="BundleInProgressName" Value="~InProgressTestBundle" />
 
 </WixLocalization>

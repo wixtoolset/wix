@@ -1,36 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <WixLocalization Culture="pt-pt" Language="2070" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption">Configuração do [WixBundleName]</String>
-  <String Id="Title">O Microsoft .NET Framework é necessário para a configuração do [WixBundleName]</String>
-  <String Id="ConfirmCancelMessage">Tem a certeza de que pretende cancelar?</String>
-  <String Id="HelpHeader">Ajuda da Configuração</String>
-  <String Id="HelpText">/passive | /quiet -  apresenta IU mínima sem mensagens ou não apresenta IU nem
-   mensagens. Por predefinição, são apresentadas a IU e todas as mensagens.
-
-/norestart   - suprimir qualquer tentativa de reinício. Por predefinição, a IU
-   avisará antes de reiniciar.
-/log log.txt - regista num ficheiro específico. Por predefinição, é criado um
-   ficheiro de registo em %TEMP%.</String>
-  <String Id="HelpCloseButton">&amp;Fechar</String>
-  <String Id="InstallLicenseTerms">Clique no botão "Aceitar e Instalar" para aceitar os &lt;a href="#"&gt;termos de licenciamento&lt;/a&gt; do Microsoft .NET Framework.</String>
-  <String Id="InstallAcceptAndInstallButton">&amp;Aceitar e Instalar</String>
-  <String Id="InstallDeclineButton">&amp;Recusar</String>
-  <String Id="ProgressHeader">Progresso da Configuração</String>
-  <String Id="ProgressLabel">A processar:</String>
-  <String Id="ProgressCancelButton">&amp;Cancelar</String>
-  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
-  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
-  <String Id="SuccessRestartButton">&amp;Restart</String>
-  <String Id="SuccessCloseButton">&amp;Close</String>
-  <String Id="FailureHeader">Falha da Configuração</String>
-  <String Id="FailureLogLinkText">Um ou mais problemas provocaram a falha da configuração. Corrija os problemas e repita a configuração. Para mais informações, consulte o &lt;a href="#"&gt;ficheiro de registo&lt;/a&gt;.</String>
-  <String Id="FailureRestartText">Tem de reiniciar o computador para concluir a reversão do software.</String>
-  <String Id="FailureRestartButton">&amp;Reiniciar</String>
-  <String Id="FailureCloseButton">&amp;Fechar</String>
-  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
-  <String Id="PREREQBAINFINITELOOPErrorMessage">[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed.</String>
-  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
+  <String Id="Caption" Value="Configuração do [WixBundleName]" />
+  <String Id="Title" Value="O Microsoft .NET Framework é necessário para a configuração do [WixBundleName]" />
+  <String Id="ConfirmCancelMessage" Value="Tem a certeza de que pretende cancelar?" />
+  <String Id="HelpHeader" Value="Ajuda da Configuração" />
+  <String Id="HelpText" Value="/passive | /quiet -  apresenta IU mínima sem mensagens ou não apresenta IU nem&#xA;   mensagens. Por predefinição, são apresentadas a IU e todas as mensagens.&#xA;&#xA;/norestart   - suprimir qualquer tentativa de reinício. Por predefinição, a IU&#xA;   avisará antes de reiniciar.&#xA;/log log.txt - regista num ficheiro específico. Por predefinição, é criado um&#xA;   ficheiro de registo em %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Fechar" />
+  <String Id="InstallLicenseTerms" Value="Clique no botão &quot;Aceitar e Instalar&quot; para aceitar os &lt;a href=&quot;#&quot;&gt;termos de licenciamento&lt;/a&gt; do Microsoft .NET Framework." />
+  <String Id="InstallAcceptAndInstallButton" Value="&amp;Aceitar e Instalar" />
+  <String Id="InstallDeclineButton" Value="&amp;Recusar" />
+  <String Id="ProgressHeader" Value="Progresso da Configuração" />
+  <String Id="ProgressLabel" Value="A processar:" />
+  <String Id="ProgressCancelButton" Value="&amp;Cancelar" />
+  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
+  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
+  <String Id="SuccessRestartButton" Value="&amp;Restart" />
+  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="FailureHeader" Value="Falha da Configuração" />
+  <String Id="FailureLogLinkText" Value="Um ou mais problemas provocaram a falha da configuração. Corrija os problemas e repita a configuração. Para mais informações, consulte o &lt;a href=&quot;#&quot;&gt;ficheiro de registo&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Tem de reiniciar o computador para concluir a reversão do software." />
+  <String Id="FailureRestartButton" Value="&amp;Reiniciar" />
+  <String Id="FailureCloseButton" Value="&amp;Fechar" />
+  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
+  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
 </WixLocalization>

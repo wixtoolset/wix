@@ -5,7 +5,7 @@ This file contains the declaration of all the localizable strings.
 -->
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
 
-  <String Id="PackageName">WixprojPackageVcxprojWindowsApp</String>
-  <String Id="FeatureTitle">The First Feature in my Product</String>
+  <String Id="PackageName" Value="WixprojPackageVcxprojWindowsApp" />
+  <String Id="FeatureTitle" Value="The First Feature in my Product" />
 
 </WixLocalization>
