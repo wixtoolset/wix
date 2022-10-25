@@ -2,9 +2,7 @@
 
 #include "precomp.h"
 
-#define DNC_ENTRY_TYPE "WixToolset.Dnc.Host.BootstrapperApplicationFactory"
 #define DNC_ENTRY_TYPEW L"WixToolset.Dnc.Host.BootstrapperApplicationFactory"
-#define DNC_STATIC_ENTRY_METHOD "CreateBAFactory"
 #define DNC_STATIC_ENTRY_METHODW L"CreateBAFactory"
 #define DNC_STATIC_ENTRY_DELEGATEW L"WixToolset.Dnc.Host.StaticEntryDelegate"
 
@@ -29,23 +27,7 @@ static HRESULT InitializeHostfxr(
     __in LPCWSTR wzRuntimeConfigPath
     );
 static HRESULT InitializeCoreClr(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzNativeHostPath
-    );
-static HRESULT InitializeCoreClrPre5(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzNativeHostPath
-    );
-static HRESULT LoadCoreClr(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzCoreClrPath
-    );
-static HRESULT StartCoreClr(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzNativeHostPath,
-    __in DWORD cProperties,
-    __in LPCWSTR* propertyKeys,
-    __in LPCWSTR* propertyValues
+    __in HOSTFXR_STATE* pState
     );
 
 
@@ -70,7 +52,7 @@ HRESULT DnchostLoadRuntime(
     hr = InitializeHostfxr(pState, wzManagedHostPath, wzDepsJsonPath, wzRuntimeConfigPath);
     BalExitOnFailure(hr, "Failed to initialize hostfxr.");
 
-    hr = InitializeCoreClr(pState, wzNativeHostPath);
+    hr = InitializeCoreClr(pState);
     BalExitOnFailure(hr, "Failed to initialize coreclr.");
 
 LExit:
@@ -80,7 +62,6 @@ LExit:
 HRESULT DnchostCreateFactory(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzBaFactoryAssemblyName,
-    __in LPCWSTR /*wzBaFactoryAssemblyPath*/,
     __out IBootstrapperApplicationFactory** ppAppFactory
     )
 {
@@ -90,37 +71,20 @@ HRESULT DnchostCreateFactory(
     LPWSTR sczEntryDelegate = NULL;
     LPSTR sczBaFactoryAssemblyName = NULL;
 
-    if (pState->pfnGetFunctionPointer)
-    {
-        hr = StrAllocFormatted(&sczEntryType, L"%ls,%ls", DNC_ENTRY_TYPEW, wzBaFactoryAssemblyName);
-        BalExitOnFailure(hr, "Failed to format entry type.");
+    hr = StrAllocFormatted(&sczEntryType, L"%ls,%ls", DNC_ENTRY_TYPEW, wzBaFactoryAssemblyName);
+    BalExitOnFailure(hr, "Failed to format entry type.");
 
-        hr = StrAllocFormatted(&sczEntryDelegate, L"%ls,%ls", DNC_STATIC_ENTRY_DELEGATEW, wzBaFactoryAssemblyName);
-        BalExitOnFailure(hr, "Failed to format entry delegate.");
+    hr = StrAllocFormatted(&sczEntryDelegate, L"%ls,%ls", DNC_STATIC_ENTRY_DELEGATEW, wzBaFactoryAssemblyName);
+    BalExitOnFailure(hr, "Failed to format entry delegate.");
 
-        hr = pState->pfnGetFunctionPointer(
-            sczEntryType,
-            DNC_STATIC_ENTRY_METHODW,
-            sczEntryDelegate,
-            NULL,
-            NULL,
-            reinterpret_cast<void**>(&pfnCreateBAFactory));
-        BalExitOnFailure(hr, "Failed to create delegate through GetFunctionPointer.");
-    }
-    else
-    {
-        hr = StrAnsiAllocString(&sczBaFactoryAssemblyName, wzBaFactoryAssemblyName, 0, CP_UTF8);
-        BalExitOnFailure(hr, "Failed to convert assembly name to UTF8: %ls", wzBaFactoryAssemblyName);
-
-        hr = pState->pfnCoreclrCreateDelegate(
-            pState->pClrHandle,
-            pState->dwDomainId,
-            sczBaFactoryAssemblyName,
-            DNC_ENTRY_TYPE,
-            DNC_STATIC_ENTRY_METHOD,
-            reinterpret_cast<void**>(&pfnCreateBAFactory));
-        BalExitOnFailure(hr, "Failed to create delegate in app domain.");
-    }
+    hr = pState->pfnGetFunctionPointer(
+        sczEntryType,
+        DNC_STATIC_ENTRY_METHODW,
+        sczEntryDelegate,
+        NULL,
+        NULL,
+        reinterpret_cast<void**>(&pfnCreateBAFactory));
+    BalExitOnFailure(hr, "Failed to create delegate through GetFunctionPointer.");
 
     *ppAppFactory = pfnCreateBAFactory();
 
@@ -182,9 +146,6 @@ static HRESULT LoadHostfxr(
     pState->pfnHostfxrInitializeForApp = reinterpret_cast<hostfxr_initialize_for_dotnet_command_line_fn>(::GetProcAddress(hHostfxr, "hostfxr_initialize_for_dotnet_command_line"));
     BalExitOnNullWithLastError(pState->pfnHostfxrInitializeForApp, hr, "Failed to get procedure address for hostfxr_initialize_for_dotnet_command_line.");
 
-    pState->pfnHostfxrGetRuntimeProperties = reinterpret_cast<hostfxr_get_runtime_properties_fn>(::GetProcAddress(hHostfxr, "hostfxr_get_runtime_properties"));
-    BalExitOnNullWithLastError(pState->pfnHostfxrGetRuntimeProperties, hr, "Failed to get procedure address for hostfxr_get_runtime_properties.");
-
     pState->pfnHostfxrSetErrorWriter = reinterpret_cast<hostfxr_set_error_writer_fn>(::GetProcAddress(hHostfxr, "hostfxr_set_error_writer"));
     BalExitOnNullWithLastError(pState->pfnHostfxrSetErrorWriter, hr, "Failed to get procedure address for hostfxr_set_error_writer.");
 
@@ -204,14 +165,7 @@ static void HOSTFXR_CALLTYPE DnchostErrorWriter(
     __in LPCWSTR wzMessage
     )
 {
-    BOOTSTRAPPER_LOG_LEVEL level = BOOTSTRAPPER_LOG_LEVEL_ERROR;
-
-    if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, 0, wzMessage, -1, L"The requested delegate type is not available in the target framework.", -1))
-    {
-        level = BOOTSTRAPPER_LOG_LEVEL_DEBUG;
-    }
-
-    BalLog(level, "error from hostfxr: %ls", wzMessage);
+    BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "error from hostfxr: %ls", wzMessage);
 }
 
 static HRESULT InitializeHostfxr(
@@ -241,8 +195,7 @@ LExit:
 }
 
 static HRESULT InitializeCoreClr(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzNativeHostPath
+    __in HOSTFXR_STATE* pState
     )
 {
     HRESULT hr = S_OK;
@@ -251,7 +204,7 @@ static HRESULT InitializeCoreClr(
     if (InvalidArgFailure == hr || // old versions of hostfxr don't allow calling GetRuntimeDelegate from InitializeForApp.
         HostApiUnsupportedVersion == hr) // hdt_get_function_pointer was added in .NET 5.
     {
-        hr = InitializeCoreClrPre5(pState, wzNativeHostPath);
+        BalExitOnFailure(hr, "HostfxrGetRuntimeDelegate failed, most likely because the target framework is older than .NET 5.");
     }
     else
     {
@@ -259,177 +212,5 @@ static HRESULT InitializeCoreClr(
     }
 
 LExit:
-    return hr;
-}
-
-static HRESULT InitializeCoreClrPre5(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzNativeHostPath
-    )
-{
-    HRESULT hr = S_OK;
-    int32_t rc = 0;
-    LPCWSTR* rgPropertyKeys = NULL;
-    LPCWSTR* rgPropertyValues = NULL;
-    size_t cProperties = 0;
-    LPWSTR* rgDirectories = NULL;
-    UINT cDirectories = 0;
-    LPWSTR sczCoreClrPath = NULL;
-
-    // We are not using hostfxr as it was intended to be used. We need to initialize hostfxr so that it properly initializes hostpolicy -
-    // there are pieces of the framework such as AssemblyDependencyResolver that won't work without that. We also need hostfxr to find a
-    // compatible framework for framework-dependent deployed BAs. We had to use hostfxr_initialize_for_dotnet_command_line since
-    // hostfxr_initialize_for_runtime_config doesn't currently (3.x) support self-contained deployed BAs. That means we're supposed to
-    // start the runtime through hostfxr_run_app, but that method shuts down the runtime before returning. We actually want to call
-    // hostfxr_get_runtime_delegate, but that method currently requires hostfxr to be initialized through
-    // hostfxr_initialize_for_runtime_config. So we're forced to locate coreclr.dll and manually load the runtime ourselves.
-
-    // Unfortunately, that's not the only problem. hostfxr has global state that tracks whether it started the runtime. While we keep our
-    // hostfxr_handle open, everyone that calls the hostfxr_initialize_* methods will block until we have started the runtime through
-    // hostfxr or closed our handle. If we close the handle, then hostfxr could potentially try to load a second runtime into the
-    // process, which is not supported. We're going to just keep our handle open since no one else in the process should be trying to
-    // start the runtime anyway.
-
-    rc = pState->pfnHostfxrGetRuntimeProperties(pState->hostContextHandle, &cProperties, rgPropertyKeys, rgPropertyValues);
-    if (HostApiBufferTooSmall != rc)
-    {
-        BalExitOnFailure(hr = rc, "HostfxrGetRuntimeProperties failed to return required size.");
-    }
-
-    rgPropertyKeys = static_cast<LPCWSTR*>(MemAlloc(sizeof(LPWSTR) * cProperties, TRUE));
-    rgPropertyValues = static_cast<LPCWSTR*>(MemAlloc(sizeof(LPWSTR) * cProperties, TRUE));
-    if (!rgPropertyKeys || !rgPropertyValues)
-    {
-        BalExitOnFailure(hr = E_OUTOFMEMORY, "Failed to allocate buffers for runtime properties.");
-    }
-
-    hr = pState->pfnHostfxrGetRuntimeProperties(pState->hostContextHandle, &cProperties, rgPropertyKeys, rgPropertyValues);
-    BalExitOnFailure(hr, "HostfxrGetRuntimeProperties failed.");
-
-    for (DWORD i = 0; i < cProperties; ++i)
-    {
-        if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, 0, rgPropertyKeys[i], -1, L"NATIVE_DLL_SEARCH_DIRECTORIES", -1))
-        {
-            hr = StrSplitAllocArray(&rgDirectories, &cDirectories, rgPropertyValues[i], L";");
-            BalExitOnFailure(hr, "Failed to split NATIVE_DLL_SEARCH_DIRECTORIES '%ls'", rgPropertyValues[i]);
-        }
-    }
-
-    for (DWORD i = 0; i < cDirectories; ++i)
-    {
-        Assert(rgDirectories);
-
-        hr = PathConcat(rgDirectories[i], L"coreclr.dll", &sczCoreClrPath);
-        BalExitOnFailure(hr, "Failed to allocate path to coreclr.");
-
-        if (::PathFileExists(sczCoreClrPath))
-        {
-            break;
-        }
-        else
-        {
-            ReleaseNullStr(sczCoreClrPath);
-        }
-    }
-
-    if (!sczCoreClrPath)
-    {
-        for (DWORD i = 0; i < cProperties; ++i)
-        {
-            BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "%ls: %ls", rgPropertyKeys[i], rgPropertyValues[i]);
-        }
-        BalExitWithRootFailure(hr, E_FILENOTFOUND, "Failed to locate coreclr.dll.");
-    }
-
-    hr = LoadCoreClr(pState, sczCoreClrPath);
-    BalExitOnFailure(hr, "Failed to load coreclr.");
-
-    hr = StartCoreClr(pState, wzNativeHostPath, (DWORD)cProperties, rgPropertyKeys, rgPropertyValues);
-    BalExitOnFailure(hr, "Failed to start coreclr.");
-
-LExit:
-    ReleaseMem(rgDirectories);
-    ReleaseMem(rgPropertyValues);
-    ReleaseMem(rgPropertyKeys);
-    ReleaseStr(sczCoreClrPath);
-
-    return hr;
-}
-
-static HRESULT LoadCoreClr(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzCoreClrPath
-    )
-{
-    HRESULT hr = S_OK;
-    HMODULE hModule = NULL;
-
-    hModule = ::LoadLibraryExW(wzCoreClrPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    BalExitOnNullWithLastError(hModule, hr, "Failed to load coreclr.dll from '%ls'.", wzCoreClrPath);
-
-    pState->pfnCoreclrInitialize = reinterpret_cast<coreclr_initialize_ptr>(::GetProcAddress(hModule, "coreclr_initialize"));
-    BalExitOnNullWithLastError(pState->pfnCoreclrInitialize, hr, "Failed to get procedure address for coreclr_initialize.");
-
-    pState->pfnCoreclrCreateDelegate = reinterpret_cast<coreclr_create_delegate_ptr>(::GetProcAddress(hModule, "coreclr_create_delegate"));
-    BalExitOnNullWithLastError(pState->pfnCoreclrCreateDelegate, hr, "Failed to get procedure address for coreclr_create_delegate.");
-
-LExit:
-    // Never unload the module since coreclr doesn't support it.
-
-    return hr;
-}
-
-static HRESULT StartCoreClr(
-    __in HOSTFXR_STATE* pState,
-    __in LPCWSTR wzNativeHostPath,
-    __in DWORD cProperties,
-    __in LPCWSTR* propertyKeys,
-    __in LPCWSTR* propertyValues
-    )
-{
-    HRESULT hr = S_OK;
-    LPSTR szNativeHostPath = NULL;
-    LPSTR* rgPropertyKeys = NULL;
-    LPSTR* rgPropertyValues = NULL;
-    
-    rgPropertyKeys = static_cast<LPSTR*>(MemAlloc(sizeof(LPSTR) * cProperties, TRUE));
-    rgPropertyValues = static_cast<LPSTR*>(MemAlloc(sizeof(LPSTR) * cProperties, TRUE));
-    if (!rgPropertyKeys || !rgPropertyValues)
-    {
-        BalExitOnFailure(hr = E_OUTOFMEMORY, "Failed to allocate buffers for runtime properties.");
-    }
-
-    hr = StrAnsiAllocString(&szNativeHostPath, wzNativeHostPath, 0, CP_UTF8);
-    BalExitOnFailure(hr, "Failed to convert module path to UTF8: %ls", wzNativeHostPath);
-
-    for (DWORD i = 0; i < cProperties; ++i)
-    {
-        hr = StrAnsiAllocString(&rgPropertyKeys[i], propertyKeys[i], 0, CP_UTF8);
-        BalExitOnFailure(hr, "Failed to convert property key to UTF8: %ls", propertyKeys[i]);
-
-        hr = StrAnsiAllocString(&rgPropertyValues[i], propertyValues[i], 0, CP_UTF8);
-        BalExitOnFailure(hr, "Failed to convert property value to UTF8: %ls", propertyValues[i]);
-    }
-
-    hr = pState->pfnCoreclrInitialize(szNativeHostPath, "MBA", cProperties, (LPCSTR*)rgPropertyKeys, (LPCSTR*)rgPropertyValues, &pState->pClrHandle, &pState->dwDomainId);
-    BalExitOnFailure(hr, "CoreclrInitialize failed.");
-
-LExit:
-    for (DWORD i = 0; i < cProperties; ++i)
-    {
-        if (rgPropertyKeys)
-        {
-            ReleaseStr(rgPropertyKeys[i]);
-        }
-
-        if (rgPropertyValues)
-        {
-            ReleaseStr(rgPropertyValues[i]);
-        }
-    }
-    ReleaseMem(rgPropertyValues);
-    ReleaseMem(rgPropertyKeys);
-    ReleaseStr(szNativeHostPath);
-
     return hr;
 }

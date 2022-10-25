@@ -27,6 +27,5 @@
 
 #include <preqba.h>
 
-#include "coreclrhost.h"
 #include "dncutil.h"
 #include "dnchost.h"

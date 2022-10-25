@@ -8,15 +8,10 @@ struct HOSTFXR_STATE
     LPWSTR sczHostfxrPath;
     hostfxr_handle hostContextHandle;
     hostfxr_initialize_for_dotnet_command_line_fn pfnHostfxrInitializeForApp;
-    hostfxr_get_runtime_properties_fn pfnHostfxrGetRuntimeProperties;
     hostfxr_set_error_writer_fn pfnHostfxrSetErrorWriter;
     hostfxr_close_fn pfnHostfxrClose;
     hostfxr_get_runtime_delegate_fn pfnHostfxrGetRuntimeDelegate;
     get_function_pointer_fn pfnGetFunctionPointer;
-    coreclr_initialize_ptr pfnCoreclrInitialize;
-    coreclr_create_delegate_ptr pfnCoreclrCreateDelegate;
-    void* pClrHandle;
-    UINT dwDomainId;
 };
 
 HRESULT DnchostLoadRuntime(
@@ -30,6 +25,5 @@ HRESULT DnchostLoadRuntime(
 HRESULT DnchostCreateFactory(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzBaFactoryAssemblyName,
-    __in LPCWSTR wzBaFactoryAssemblyPath,
     __out IBootstrapperApplicationFactory** ppAppFactory
     );

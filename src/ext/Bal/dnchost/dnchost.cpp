@@ -286,7 +286,6 @@ static HRESULT LoadManagedBootstrapperApplicationFactory(
     hr = DnchostCreateFactory(
         &pState->hostfxrState,
         pState->sczBaFactoryAssemblyName,
-        pState->sczBaFactoryAssemblyPath,
         &pState->pAppFactory);
 
     return hr;
