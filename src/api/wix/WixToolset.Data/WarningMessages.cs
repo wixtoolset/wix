@@ -19,7 +19,7 @@ namespace WixToolset.Data
 
         public static Message ActionSequenceCollision(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName1, string actionName2, int sequenceNumber)
         {
-            return Message(sourceLineNumbers, Ids.ActionSequenceCollision, "The {0} table contains actions '{1}' and '{2}' which both have the same sequence number {3}.  Please change the sequence number for one of these actions to avoid an ICE warning.", sequenceTableName, actionName1, actionName2, sequenceNumber);
+            return Message(sourceLineNumbers, Ids.ActionSequenceCollision, "The {0} table contains actions '{1}' and '{2}' which both have the same sequence number {3}. Please change the sequence number for one of these actions to avoid an ICE warning.", sequenceTableName, actionName1, actionName2, sequenceNumber);
         }
 
         public static Message ActionSequenceCollision2(SourceLineNumber sourceLineNumbers)
@@ -34,7 +34,7 @@ namespace WixToolset.Data
 
         public static Message AmbiguousFileOrDirectoryName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.AmbiguousFileOrDirectoryName, "The {0}/@{1} attribute's value '{2}' is an ambiguous short name because it ends with a '~' character followed by a number.  Under some circumstances, this name could resolve to more than one file or directory name and lead to unpredictable results (for example 'MICROS~1' may correspond to 'Microsoft Shared' or 'Microsoft Foo' or literally 'Micros~1').", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.AmbiguousFileOrDirectoryName, "The {0}/@{1} attribute's value '{2}' is an ambiguous short name because it ends with a '~' character followed by a number. Under some circumstances, this name could resolve to more than one file or directory name and lead to unpredictable results (for example 'MICROS~1' may correspond to 'Microsoft Shared' or 'Microsoft Foo' or literally 'Micros~1').", elementName, attributeName, value);
         }
 
         public static Message AttributeShouldContain(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeValue, string expectedContains, string otherAttributeName, string otherAttributeValue)
@@ -69,12 +69,12 @@ namespace WixToolset.Data
 
         public static Message DangerousTableInMergeModule(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.DangerousTableInMergeModule, "Merge modules should not contain the '{0}' table because all merge conflicts cannot avoided.  However, this warning can be suppressed if all of the consumers of the Merge Module agree to not duplicate identifiers in the '{0}' table.", tableName);
+            return Message(sourceLineNumbers, Ids.DangerousTableInMergeModule, "Merge modules should not contain the '{0}' table because all merge conflicts cannot avoided. However, this warning can be suppressed if all of the consumers of the Merge Module agree to not duplicate identifiers in the '{0}' table.", tableName);
         }
 
         public static Message DecompiledStandardActionRelativelyScheduledInModule(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.DecompiledStandardActionRelativelyScheduledInModule, "The {0} table contains a standard action '{1}' that does not have a sequence number specified.  A value in the Sequence column is required for standard actions in a merge module.  Remove the action from the decompiled authoring to have WiX automatically sequence it.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.DecompiledStandardActionRelativelyScheduledInModule, "The {0} table contains a standard action '{1}' that does not have a sequence number specified. A value in the Sequence column is required for standard actions in a merge module. Remove the action from the decompiled authoring to have WiX automatically sequence it.", sequenceTableName, actionName);
         }
 
         public static Message DecompilingAsCustomTable(SourceLineNumber sourceLineNumbers, string tableName)
@@ -104,12 +104,12 @@ namespace WixToolset.Data
 
         public static Message DeprecatedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string newAttributeName)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedAttribute, "The {0}/@{1} attribute has been deprecated.  Please use the {2} attribute instead.", elementName, attributeName, newAttributeName);
+            return Message(sourceLineNumbers, Ids.DeprecatedAttribute, "The {0}/@{1} attribute has been deprecated. Please use the {2} attribute instead.", elementName, attributeName, newAttributeName);
         }
 
         public static Message DeprecatedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string newAttributeName1, string newAttributeName2)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedAttribute, "The {0}/@{1} attribute has been deprecated.  Please use the {2} or {3} attribute instead.", elementName, attributeName, newAttributeName1, newAttributeName2);
+            return Message(sourceLineNumbers, Ids.DeprecatedAttribute, "The {0}/@{1} attribute has been deprecated. Please use the {2} or {3} attribute instead.", elementName, attributeName, newAttributeName1, newAttributeName2);
         }
 
         public static Message DeprecatedAttributeValue(SourceLineNumber sourceLineNumbers, string attributeValue, string elementName, string attributeName)
@@ -154,52 +154,52 @@ namespace WixToolset.Data
 
         public static Message DeprecatedIgnoreModularizationElement(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedIgnoreModularizationElement, "The IgnoreModularization element has been deprecated.  Use the Binary/@SuppressModularization, CustomAction/@SuppressModularization, or Property/@SuppressModularization attribute instead.");
+            return Message(sourceLineNumbers, Ids.DeprecatedIgnoreModularizationElement, "The IgnoreModularization element has been deprecated. Use the Binary/@SuppressModularization, CustomAction/@SuppressModularization, or Property/@SuppressModularization attribute instead.");
         }
 
         public static Message DeprecatedLocalizationVariablePrefix(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedLocalizationVariablePrefix, "The localization variable $(loc.{0}) uses a deprecated prefix '$'.  Please use the '!' prefix instead.  Since the prefix '$' is also used by the preprocessor, it has been deprecated to avoid namespace collisions.", variableId);
+            return Message(sourceLineNumbers, Ids.DeprecatedLocalizationVariablePrefix, "The localization variable $(loc.{0}) uses a deprecated prefix '$'. Please use the '!' prefix instead. Since the prefix '$' is also used by the preprocessor, it has been deprecated to avoid namespace collisions.", variableId);
         }
 
         public static Message DeprecatedLongNameAttribute(SourceLineNumber sourceLineNumbers, string elementName, string longNameAttributeName, string nameAttributeName, string shortNameAttributeName)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedLongNameAttribute, "The {0}/@{1} attribute has been deprecated.  Since WiX now has the ability to generate short file/directory names, the desired name should be specified in the {2} attribute instead.  If the name specified in the {2} attribute is a short name, then WiX will not generate a short name.  If the name specified in the {2} attribute is a long name and you want to manually specify the short name, please set the short name value in the {3} attribute.", elementName, longNameAttributeName, nameAttributeName, shortNameAttributeName);
+            return Message(sourceLineNumbers, Ids.DeprecatedLongNameAttribute, "The {0}/@{1} attribute has been deprecated. Since WiX now has the ability to generate short file/directory names, the desired name should be specified in the {2} attribute instead. If the name specified in the {2} attribute is a short name, then WiX will not generate a short name. If the name specified in the {2} attribute is a long name and you want to manually specify the short name, please set the short name value in the {3} attribute.", elementName, longNameAttributeName, nameAttributeName, shortNameAttributeName);
         }
 
         public static Message DeprecatedPatchSequenceTargetAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedPatchSequenceTargetAttribute, "The {0}/@{1} attribute has been deprecated in favor of the more strongly-typed ProductCode or TargetImage attributes.  Please use the ProductCode attribute for indicating the ProductCode of a patch family directly, or the TargetImage attribute to specify the TargetImage which in turn will retrieve the ProductCode of the patch family.", elementName, attributeName);
+            return Message(sourceLineNumbers, Ids.DeprecatedPatchSequenceTargetAttribute, "The {0}/@{1} attribute has been deprecated in favor of the more strongly-typed ProductCode or TargetImage attributes. Please use the ProductCode attribute for indicating the ProductCode of a patch family directly, or the TargetImage attribute to specify the TargetImage which in turn will retrieve the ProductCode of the patch family.", elementName, attributeName);
         }
 
         public static Message DeprecatedPreProcVariable(SourceLineNumber sourceLineNumbers, string oldName, string newName)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedPreProcVariable, "The built-in preprocessor variable '{0}' is deprecated.  Please correct your authoring to use the new '{1}' preprocessor variable instead.", oldName, newName);
+            return Message(sourceLineNumbers, Ids.DeprecatedPreProcVariable, "The built-in preprocessor variable '{0}' is deprecated. Please correct your authoring to use the new '{1}' preprocessor variable instead.", oldName, newName);
         }
 
         public static Message DeprecatedQuestionMarksGuid(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedQuestionMarksGuid, "The {0}/@{1} attribute's value '????????-????-????-????-????????????' has been deprecated.  Use '*' instead.", elementName, attributeName);
+            return Message(sourceLineNumbers, Ids.DeprecatedQuestionMarksGuid, "The {0}/@{1} attribute's value '????????-????-????-????-????????????' has been deprecated. Use '*' instead.", elementName, attributeName);
         }
 
         public static Message DeprecatedRegistryElement(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedRegistryElement, "The Registry element has been deprecated.  Please use one of the new elements which replaces its functionality: RegistryKey for creating registry keys, RegistryValue for writing registry values, RemoveRegistryKey for removing registry keys, and RemoveRegistryValue for removing registry values.");
+            return Message(sourceLineNumbers, Ids.DeprecatedRegistryElement, "The Registry element has been deprecated. Please use one of the new elements which replaces its functionality: RegistryKey for creating registry keys, RegistryValue for writing registry values, RemoveRegistryKey for removing registry keys, and RemoveRegistryValue for removing registry values.");
         }
 
         public static Message DeprecatedRegistryKeyActionAttribute(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedRegistryKeyActionAttribute, "The RegistryKey/@Action attribute has been deprecated.  In most cases, you can simply omit @Action.  If you need to force Windows Installer to create an empty key or recursively delete the key, use the ForceCreateOnInstall or ForceDeleteOnUninstall attributes instead.");
+            return Message(sourceLineNumbers, Ids.DeprecatedRegistryKeyActionAttribute, "The RegistryKey/@Action attribute has been deprecated. In most cases, you can simply omit @Action. If you need to force Windows Installer to create an empty key or recursively delete the key, use the ForceCreateOnInstall or ForceDeleteOnUninstall attributes instead.");
         }
 
         public static Message DeprecatedTable(string tableName)
         {
-            return Message(null, Ids.DeprecatedTable, "The {0} table is not supported by the WiX toolset because it has been deprecated by the Windows Installer team.  Any information in this table will be left out of the decompiled output.", tableName);
+            return Message(null, Ids.DeprecatedTable, "The {0} table is not supported by the WiX toolset because it has been deprecated by the Windows Installer team. Any information in this table will be left out of the decompiled output.", tableName);
         }
 
         public static Message DeprecatedUpgradeProperty(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedUpgradeProperty, "Specifying a Property element as a child of an Upgrade element has been deprecated.  Please specify this Property element as a child of a different element such as Product or Fragment.");
+            return Message(sourceLineNumbers, Ids.DeprecatedUpgradeProperty, "Specifying a Property element as a child of an Upgrade element has been deprecated. Please specify this Property element as a child of a different element such as Product or Fragment.");
         }
 
         public static Message DirectoryInUse(SourceLineNumber sourceLineNumbers, string filePath)
@@ -209,12 +209,12 @@ namespace WixToolset.Data
 
         public static Message DirectoryRedundantNames(SourceLineNumber sourceLineNumbers, string elementName, string shortNameAttributeName, string longNameAttributeName, string attributeValue)
         {
-            return Message(sourceLineNumbers, Ids.DirectoryRedundantNames, "The {0} element's {1} and {2} values are both '{3}'.  This is redundant; the {2} attribute should be removed.", elementName, shortNameAttributeName, longNameAttributeName, attributeValue);
+            return Message(sourceLineNumbers, Ids.DirectoryRedundantNames, "The {0} element's {1} and {2} values are both '{3}'. This is redundant; the {2} attribute should be removed.", elementName, shortNameAttributeName, longNameAttributeName, attributeValue);
         }
 
         public static Message DirectoryRedundantNames(SourceLineNumber sourceLineNumbers, string elementName, string sourceNameAttributeName, string longSourceAttributeName)
         {
-            return Message(sourceLineNumbers, Ids.DirectoryRedundantNames, "The {0} element's source and destination names are identical.  This is redundant; the {1} and {2} attributes should be removed if present.", elementName, sourceNameAttributeName, longSourceAttributeName);
+            return Message(sourceLineNumbers, Ids.DirectoryRedundantNames, "The {0} element's source and destination names are identical. This is redundant; the {1} and {2} attributes should be removed if present.", elementName, sourceNameAttributeName, longSourceAttributeName);
         }
 
         public static Message DiscardedRollbackBoundary(SourceLineNumber sourceLineNumbers, string rollbackBoundaryId)
@@ -264,7 +264,7 @@ namespace WixToolset.Data
 
         public static Message EmptyAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
         {
-            return Message(sourceLineNumbers, Ids.EmptyAttributeValue, "The {0}/@{1} attribute's value cannot be an empty string.  If you want the value to be null or empty, simply remove the entire attribute.", elementName, attributeName);
+            return Message(sourceLineNumbers, Ids.EmptyAttributeValue, "The {0}/@{1} attribute's value cannot be an empty string. If you want the value to be null or empty, simply remove the entire attribute.", elementName, attributeName);
         }
 
         public static Message EmptyCabinet(SourceLineNumber sourceLineNumbers, string cabinetName, bool isPatch)
@@ -279,12 +279,12 @@ namespace WixToolset.Data
 
         public static Message ExpectedForeignRow(SourceLineNumber sourceLineNumbers, string tableName, string primaryKey, string columnName, string columnValue, string foreignTableName)
         {
-            return Message(sourceLineNumbers, Ids.ExpectedForeignRow, "The {0} table contains a row with primary key(s) '{1}' whose {2} column contains a value, '{3}', which specifies a foreign key relationship with the {4} table.  However, since the expected foreign row specified by this value does not exist, this will result in some information being left out of the decompiled output.", tableName, primaryKey, columnName, columnValue, foreignTableName);
+            return Message(sourceLineNumbers, Ids.ExpectedForeignRow, "The {0} table contains a row with primary key(s) '{1}' whose {2} column contains a value, '{3}', which specifies a foreign key relationship with the {4} table. However, since the expected foreign row specified by this value does not exist, this will result in some information being left out of the decompiled output.", tableName, primaryKey, columnName, columnValue, foreignTableName);
         }
 
         public static Message ExpectedForeignRow(SourceLineNumber sourceLineNumbers, string tableName, string primaryKey, string columnName1, string columnValue1, string columnName2, string columnValue2, string foreignTableName)
         {
-            return Message(sourceLineNumbers, Ids.ExpectedForeignRow, "The {0} table contains a row with primary key(s) '{1}' whose {2} and {4} columns contain the values, '{3}' and '{5}', which specify a foreign key relationship with the {6} table.  However, since the expected foreign row specified by this value does not exist, this will result in some information being left out of the decompiled output.", tableName, primaryKey, columnName1, columnValue1, columnName2, columnValue2, foreignTableName);
+            return Message(sourceLineNumbers, Ids.ExpectedForeignRow, "The {0} table contains a row with primary key(s) '{1}' whose {2} and {4} columns contain the values, '{3}' and '{5}', which specify a foreign key relationship with the {6} table. However, since the expected foreign row specified by this value does not exist, this will result in some information being left out of the decompiled output.", tableName, primaryKey, columnName1, columnValue1, columnName2, columnValue2, foreignTableName);
         }
 
         public static Message ExternalCabsAreNotSigned(string databaseFile)
@@ -299,12 +299,12 @@ namespace WixToolset.Data
 
         public static Message FileSearchFileNameIssue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName1, string attributeName2)
         {
-            return Message(sourceLineNumbers, Ids.FileSearchFileNameIssue, "The {0} element's {1} and {2} attributes were found.  Due to a bug with the Windows Installer, only the Name or LongName attribute should be used.  Use the Name attribute for 8.3 compliant file names and the LongName attribute for longer ones.  When using only the LongName attribute, ICE03 should be ignored for the Signature table's FileName column.", elementName, attributeName1, attributeName2);
+            return Message(sourceLineNumbers, Ids.FileSearchFileNameIssue, "The {0} element's {1} and {2} attributes were found. Due to a bug with the Windows Installer, only the Name or LongName attribute should be used. Use the Name attribute for 8.3 compliant file names and the LongName attribute for longer ones. When using only the LongName attribute, ICE03 should be ignored for the Signature table's FileName column.", elementName, attributeName1, attributeName2);
         }
 
         public static Message GeneratedShortFileNameConflict(SourceLineNumber sourceLineNumbers, string shortFileName)
         {
-            return Message(sourceLineNumbers, Ids.GeneratedShortFileNameConflict, "The short file name '{0}' was generated for multiple files that may be installed to the same directory.  This could be due to conflicting long file names specified by the File/@Name attribute.  If that is the case, please resolve the conflict in those attributes.  Otherwise, please manually set the File/@ShortName attribute on the conflicting row to fix the collision.  If one of the colliding files was added via a patch, that short file name should be specified manually to avoid disturbing the original short file name.", shortFileName);
+            return Message(sourceLineNumbers, Ids.GeneratedShortFileNameConflict, "The short file name '{0}' was generated for multiple files that may be installed to the same directory. This could be due to conflicting long file names specified by the File/@Name attribute. If that is the case, please resolve the conflict in those attributes. Otherwise, please manually set the File/@ShortName attribute on the conflicting row to fix the collision. If one of the colliding files was added via a patch, that short file name should be specified manually to avoid disturbing the original short file name.", shortFileName);
         }
 
         public static Message GeneratedShortFileNameConflict2(SourceLineNumber sourceLineNumbers)
@@ -314,37 +314,37 @@ namespace WixToolset.Data
 
         public static Message IdentifierCannotBeModularized(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string identifier, int length, int maximumLength)
         {
-            return Message(sourceLineNumbers, Ids.IdentifierCannotBeModularized, "The {0}/@{1} attribute's value, '{2}', is {3} characters long.  It will be too long if modularized.  The identifier shouldn't be longer than {4} characters long to allow for modularization (appending a guid for merge modules).", elementName, attributeName, identifier, length, maximumLength);
+            return Message(sourceLineNumbers, Ids.IdentifierCannotBeModularized, "The {0}/@{1} attribute's value, '{2}', is {3} characters long. It will be too long if modularized. The identifier shouldn't be longer than {4} characters long to allow for modularization (appending a guid for merge modules).", elementName, attributeName, identifier, length, maximumLength);
         }
 
         public static Message IdentifierTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.IdentifierTooLong, "The {0}/@{1} attribute's value, '{2}', is too long for an identifier.  Standard identifiers are 72 characters long or less.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.IdentifierTooLong, "The {0}/@{1} attribute's value, '{2}', is too long for an identifier. Standard identifiers are 72 characters long or less.", elementName, attributeName, value);
         }
 
         public static Message IllegalActionInSequence(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.IllegalActionInSequence, "The {0} table contains an action '{1}' which is not allowed in this table.  If this is a standard action then it is not valid for this table, if it is a custom action or dialog then this table does not accept actions of that type.  This action will be left out of the decompiled output.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.IllegalActionInSequence, "The {0} table contains an action '{1}' which is not allowed in this table. If this is a standard action then it is not valid for this table, if it is a custom action or dialog then this table does not accept actions of that type. This action will be left out of the decompiled output.", sequenceTableName, actionName);
         }
 
         public static Message IllegalColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
         {
-            return Message(sourceLineNumbers, Ids.IllegalColumnValue, "The {0}.{1} column's value, '{2}', is not a recognized legal value.  This information will be left out of the decompiled output.", tableName, columnName, value);
+            return Message(sourceLineNumbers, Ids.IllegalColumnValue, "The {0}.{1} column's value, '{2}', is not a recognized legal value. This information will be left out of the decompiled output.", tableName, columnName, value);
         }
 
         public static Message IllegalPatchCreationTable(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.IllegalPatchCreationTable, "The {0} table is not legal in a patch creation file.  The information in this table will be left out of the decompiled output.", tableName);
+            return Message(sourceLineNumbers, Ids.IllegalPatchCreationTable, "The {0} table is not legal in a patch creation file. The information in this table will be left out of the decompiled output.", tableName);
         }
 
         public static Message IllegalRegistryKeyPath(SourceLineNumber sourceLineNumbers, string componentName, string registryId)
         {
-            return Message(sourceLineNumbers, Ids.IllegalRegistryKeyPath, "Component '{0}' specifies an illegal registry keypath of '{1}'.  Since this entry actually represents a registry key, not a registry value, it cannot be the keypath.", componentName, registryId);
+            return Message(sourceLineNumbers, Ids.IllegalRegistryKeyPath, "Component '{0}' specifies an illegal registry keypath of '{1}'. Since this entry actually represents a registry key, not a registry value, it cannot be the keypath.", componentName, registryId);
         }
 
         public static Message ImplicitComponentPrimaryFeature(string componentId)
         {
-            return Message(null, Ids.ImplicitComponentPrimaryFeature, "The component '{0}' does not have an explicit primary feature parent specified.  If the source files are linked in a different order, the primary parent feature may change.  To prevent accidental changes, the primary feature parent should be set to 'yes' in one of the ComponentRef/@Primary, ComponentGroupRef/@Primary, or FeatureGroupRef/@Primary locations for this component.", componentId);
+            return Message(null, Ids.ImplicitComponentPrimaryFeature, "The component '{0}' does not have an explicit primary feature parent specified. If the source files are linked in a different order, the primary parent feature may change. To prevent accidental changes, the primary feature parent should be set to 'yes' in one of the ComponentRef/@Primary, ComponentGroupRef/@Primary, or FeatureGroupRef/@Primary locations for this component.", componentId);
         }
 
         public static Message ImplicitlyPerUser(SourceLineNumber sourceLineNumbers, string path)
@@ -354,7 +354,7 @@ namespace WixToolset.Data
 
         public static Message ImplicitMergeModulePrimaryFeature(string componentId)
         {
-            return Message(null, Ids.ImplicitMergeModulePrimaryFeature, "The merge module '{0}' does not have an explicit primary feature parent specified.  If the source files are linked in a different order, the primary parent feature may change.  To prevent accidental changes, the primary feature parent should be set to 'yes' in one of the MergeRef/@Primary or FeatureGroupRef/@Primary locations for this component.", componentId);
+            return Message(null, Ids.ImplicitMergeModulePrimaryFeature, "The merge module '{0}' does not have an explicit primary feature parent specified. If the source files are linked in a different order, the primary parent feature may change. To prevent accidental changes, the primary feature parent should be set to 'yes' in one of the MergeRef/@Primary or FeatureGroupRef/@Primary locations for this component.", componentId);
         }
 
         public static Message InsufficientPermissionHarvestTypeLib()
@@ -364,7 +364,7 @@ namespace WixToolset.Data
 
         public static Message InvalidAttributeCombination(SourceLineNumber sourceLineNumbers, string attrib1, string attrib2, string name, string value)
         {
-            return Message(sourceLineNumbers, Ids.InvalidAttributeCombination, "It is invalid to combine attributes {0} and {1}.  The decompiled output will set attribute {2} to {3}.", attrib1, attrib2, name, value);
+            return Message(sourceLineNumbers, Ids.InvalidAttributeCombination, "It is invalid to combine attributes {0} and {1}. The decompiled output will set attribute {2} to {3}.", attrib1, attrib2, name, value);
         }
 
         public static Message InvalidHigherInstallerVersionInModule(SourceLineNumber sourceLineNumbers, string moduleId, int moduleInstallerVersion, int productInstallerVersion)
@@ -389,17 +389,17 @@ namespace WixToolset.Data
 
         public static Message MediaExternalCabinetFilenameIllegal(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.MediaExternalCabinetFilenameIllegal, "The {0}/@{1} attribute's value, '{2}', is not a valid external cabinet name.  Legal cabinet names should follow 8.3 format: they should contain no more than 8 characters followed by an optional extension of no more than 3 characters.  Any character except for the following may be used: \\ ? | > < : / * \" + , ; = [ ] (space).  The Windows Installer team has recommended following the 8.3 format for external cabinet files and any other naming scheme is officially unsupported (which means it is not guaranteed to work on all platforms).", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.MediaExternalCabinetFilenameIllegal, "The {0}/@{1} attribute's value, '{2}', is not a valid external cabinet name. Legal cabinet names should follow 8.3 format: they should contain no more than 8 characters followed by an optional extension of no more than 3 characters. Any character except for the following may be used: \\ ? | > < : / * \" + , ; = [ ] (space). The Windows Installer team has recommended following the 8.3 format for external cabinet files and any other naming scheme is officially unsupported (which means it is not guaranteed to work on all platforms).", elementName, attributeName, value);
         }
 
         public static Message MergeRescheduledAction(SourceLineNumber sourceLineNumbers, string tableName, string actionName, string mergeModuleFile)
         {
-            return Message(sourceLineNumbers, Ids.MergeRescheduledAction, "The {0} table contains an action '{1}' which cannot be merged from the merge module '{2}'.  This action is likely colliding with an action in the database that is being created.  The colliding action may have been authored in the database or merged in from another merge module.  If this is a standard action, it is likely colliding due to a difference in the condition for the action in the database and merge module.  If this is a custom action, it should only be declared in the database or one merge module.", tableName, actionName, mergeModuleFile);
+            return Message(sourceLineNumbers, Ids.MergeRescheduledAction, "The {0} table contains an action '{1}' which cannot be merged from the merge module '{2}'. This action is likely colliding with an action in the database that is being created. The colliding action may have been authored in the database or merged in from another merge module. If this is a standard action, it is likely colliding due to a difference in the condition for the action in the database and merge module. If this is a custom action, it should only be declared in the database or one merge module.", tableName, actionName, mergeModuleFile);
         }
 
         public static Message MergeTableFailed(SourceLineNumber sourceLineNumbers, string tableName, string primaryKeys, string mergeModuleFile)
         {
-            return Message(sourceLineNumbers, Ids.MergeTableFailed, "The {0} table contains a row with primary key(s) '{1}' which cannot be merged from the merge module '{2}'.  This is likely due to collision of rows with the same primary key(s) (but other different values in other columns) between the database and the merge module.", tableName, primaryKeys, mergeModuleFile);
+            return Message(sourceLineNumbers, Ids.MergeTableFailed, "The {0} table contains a row with primary key(s) '{1}' which cannot be merged from the merge module '{2}'. This is likely due to collision of rows with the same primary key(s) (but other different values in other columns) between the database and the merge module.", tableName, primaryKeys, mergeModuleFile);
         }
 
         public static Message MissingUpgradeCode(SourceLineNumber sourceLineNumbers)
@@ -414,7 +414,7 @@ namespace WixToolset.Data
 
         public static Message NestedInstall(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
         {
-            return Message(sourceLineNumbers, Ids.NestedInstall, "The {0}.{1} column's value, '{2}', indicates a nested install.  Nested installations are not supported by the WiX team.  This action will be left out of the decompiled output.", tableName, columnName, value);
+            return Message(sourceLineNumbers, Ids.NestedInstall, "The {0}.{1} column's value, '{2}', indicates a nested install. Nested installations are not supported by the WiX team. This action will be left out of the decompiled output.", tableName, columnName, value);
         }
 
         public static Message NewComponentAddedToExistingFeature(SourceLineNumber sourceLineNumbers, string component, string feature, string transformPath)
@@ -439,12 +439,12 @@ namespace WixToolset.Data
 
         public static Message OrphanedProgId(SourceLineNumber sourceLineNumbers, string progId)
         {
-            return Message(sourceLineNumbers, Ids.OrphanedProgId, "ProgId '{0}' is orphaned.  It has no associated component, so it will never install.  Every ProgId should have either a parent Class element or child Extension element (at any distance).", progId);
+            return Message(sourceLineNumbers, Ids.OrphanedProgId, "ProgId '{0}' is orphaned. It has no associated component, so it will never install. Every ProgId should have either a parent Class element or child Extension element (at any distance).", progId);
         }
 
         public static Message PackageCodeSet(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.PackageCodeSet, "The Package/@Id attribute has been set.  Setting this attribute will allow nonidentical .msi files to have the same package code.  This may be a problem because the package code is the primary identifier used by the installer to search for and validate the correct package for a given installation.  If a package is changed without changing the package code, the installer may not use the newer package if both are still accessible to the installer.  Please remove the Id attribute in order to automatically generate a new package code for each new .msi file.");
+            return Message(sourceLineNumbers, Ids.PackageCodeSet, "The Package/@Id attribute has been set. Setting this attribute will allow nonidentical .msi files to have the same package code. This may be a problem because the package code is the primary identifier used by the installer to search for and validate the correct package for a given installation. If a package is changed without changing the package code, the installer may not use the newer package if both are still accessible to the installer. Please remove the Id attribute in order to automatically generate a new package code for each new .msi file.");
         }
 
         public static Message PatchTable(SourceLineNumber sourceLineNumbers, string tableName)
@@ -464,12 +464,12 @@ namespace WixToolset.Data
 
         public static Message PlaceholderValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.PlaceholderValue, "The {0}/@{1} attribute's value, '{2}', is a placeholder value used in example files.  Please replace this placeholder with the appropriate value.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.PlaceholderValue, "The {0}/@{1} attribute's value, '{2}', is a placeholder value used in example files. Please replace this placeholder with the appropriate value.", elementName, attributeName, value);
         }
 
         public static Message PossiblyIncorrectTypelibVersion(SourceLineNumber sourceLineNumbers, string id)
         {
-            return Message(sourceLineNumbers, Ids.PossiblyIncorrectTypelibVersion, "The Typelib table entry with Id '{0}' could have an incorrect version of '256.0'.  InstallShield has a bug relating to the Typelib Version column: it will incorrectly set the value '65536' in to represent version '1.0'.  However, this number actually corresponds to version '256.0'.  This bug will not affect the typelib version that is registered during installation, however, it will prevent the Windows Installer from correctly identifying whether a typelib is already installed and lead to unnecessary reinstallations of the typelib.", id);
+            return Message(sourceLineNumbers, Ids.PossiblyIncorrectTypelibVersion, "The Typelib table entry with Id '{0}' could have an incorrect version of '256.0'. InstallShield has a bug relating to the Typelib Version column: it will incorrectly set the value '65536' in to represent version '1.0'. However, this number actually corresponds to version '256.0'. This bug will not affect the typelib version that is registered during installation, however, it will prevent the Windows Installer from correctly identifying whether a typelib is already installed and lead to unnecessary reinstallations of the typelib.", id);
         }
 
         public static Message PreprocessorUnknownPragma(SourceLineNumber sourceLineNumbers, string pragmaName)
@@ -484,22 +484,22 @@ namespace WixToolset.Data
 
         public static Message ProductIdAuthored(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.ProductIdAuthored, "The 'ProductID' property should not be directly authored because it will prevent the ValidateProductID standard action from performing any validation during the installation.  This property will be set by the ValidateProductID standard action or control event.");
+            return Message(sourceLineNumbers, Ids.ProductIdAuthored, "The 'ProductID' property should not be directly authored because it will prevent the ValidateProductID standard action from performing any validation during the installation. This property will be set by the ValidateProductID standard action or control event.");
         }
 
         public static Message PropertyModularizationSuppressed(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.PropertyModularizationSuppressed, "The Property/@SuppressModularization attribute has been set to 'yes'.  Using this functionality is strongly discouraged; it should only be necessary as a workaround of last resort in rare scenarios.");
+            return Message(sourceLineNumbers, Ids.PropertyModularizationSuppressed, "The Property/@SuppressModularization attribute has been set to 'yes'. Using this functionality is strongly discouraged; it should only be necessary as a workaround of last resort in rare scenarios.");
         }
 
         public static Message PropertyUseless(SourceLineNumber sourceLineNumbers, string id)
         {
-            return Message(sourceLineNumbers, Ids.PropertyUseless, "Property '{0}' does not contain a Value attribute and is not marked as Admin, Secure, or Hidden.  The Property element is being ignored.", id);
+            return Message(sourceLineNumbers, Ids.PropertyUseless, "Property '{0}' does not contain a Value attribute and is not marked as Admin, Secure, or Hidden. The Property element is being ignored.", id);
         }
 
         public static Message PropertyValueContainsPropertyReference(SourceLineNumber sourceLineNumbers, string propertyId, string otherProperty)
         {
-            return Message(sourceLineNumbers, Ids.PropertyValueContainsPropertyReference, "The '{0}' Property contains '[{1}]' in its value which is an illegal reference to another property.  If this value is a string literal, not a property reference, please ignore this warning.  To set a property with the value of another property, use a CustomAction with Property and Value attributes.", propertyId, otherProperty);
+            return Message(sourceLineNumbers, Ids.PropertyValueContainsPropertyReference, "The '{0}' Property contains '[{1}]' in its value which is an illegal reference to another property. If this value is a string literal, not a property reference, please ignore this warning. To set a property with the value of another property, use a CustomAction with Property and Value attributes.", propertyId, otherProperty);
         }
 
         public static Message RelatedAttributeConditionallyIgnored(SourceLineNumber sourceLineNumbers, string recessiveAttribute, string dominantAttribute, string dominantValue)
@@ -514,7 +514,7 @@ namespace WixToolset.Data
 
         public static Message RemoveFileNameRequired(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.RemoveFileNameRequired, "The RemoveFile/@Name attribute will soon become required.  In order to match the old functionality of not specifying this attribute, please use the new RemoveFolder element instead.");
+            return Message(sourceLineNumbers, Ids.RemoveFileNameRequired, "The RemoveFile/@Name attribute will soon become required. In order to match the old functionality of not specifying this attribute, please use the new RemoveFolder element instead.");
         }
 
         public static Message RequiresMsi200for64bitPackage(SourceLineNumber sourceLineNumbers)
@@ -544,12 +544,12 @@ namespace WixToolset.Data
 
         public static Message SkippingMergeModuleTable(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.SkippingMergeModuleTable, "The {0} table can only be represented in WiX for merge modules.  The information in this table will be left out of the decompiled output.", tableName);
+            return Message(sourceLineNumbers, Ids.SkippingMergeModuleTable, "The {0} table can only be represented in WiX for merge modules. The information in this table will be left out of the decompiled output.", tableName);
         }
 
         public static Message SkippingPatchCreationTable(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.SkippingPatchCreationTable, "The {0} table can only be represented in WiX for patch creation files.  The information in this table will be left out of the decompiled output.", tableName);
+            return Message(sourceLineNumbers, Ids.SkippingPatchCreationTable, "The {0} table can only be represented in WiX for patch creation files. The information in this table will be left out of the decompiled output.", tableName);
         }
 
         public static Message StandardDirectoryConflictInMergeModule(SourceLineNumber sourceLineNumbers, string directory, string standardDirectory)
@@ -595,7 +595,7 @@ namespace WixToolset.Data
 
         public static Message UnableToFindFileFromCabOrImage(SourceLineNumber sourceLineNumbers, string existingFileSpec, string srcFileSpec)
         {
-            return Message(sourceLineNumbers, Ids.UnableToFindFileFromCabOrImage, "Unable to find existing file {0} to place in src location {1}.  Will likely cause a linker break.", existingFileSpec, srcFileSpec);
+            return Message(sourceLineNumbers, Ids.UnableToFindFileFromCabOrImage, "Unable to find existing file {0} to place in src location {1}. Will likely cause a linker break.", existingFileSpec, srcFileSpec);
         }
 
         public static Message UnableToResetAcls(string error)
@@ -620,12 +620,12 @@ namespace WixToolset.Data
 
         public static Message UnexpectedTableInProduct(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.UnexpectedTableInProduct, "An unexpected row in the '{0}' table was found in this product.  Products should not contain the '{0}' table.", tableName);
+            return Message(sourceLineNumbers, Ids.UnexpectedTableInProduct, "An unexpected row in the '{0}' table was found in this product. Products should not contain the '{0}' table.", tableName);
         }
 
         public static Message UnknownAction(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
         {
-            return Message(sourceLineNumbers, Ids.UnknownAction, "The {0} table contains an action '{1}' which is not a known custom action, dialog, or standard action.  This action will be left out of the decompiled output.", sequenceTableName, actionName);
+            return Message(sourceLineNumbers, Ids.UnknownAction, "The {0} table contains an action '{1}' which is not a known custom action, dialog, or standard action. This action will be left out of the decompiled output.", sequenceTableName, actionName);
         }
 
         public static Message UnknownPermission(SourceLineNumber sourceLineNumbers, string tableName, string primaryKey, int bitPosition)
