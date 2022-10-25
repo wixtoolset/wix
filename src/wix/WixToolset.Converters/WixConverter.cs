@@ -11,6 +11,7 @@ namespace WixToolset.Converters
     using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
+    using System.Xml.XPath;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
@@ -272,6 +273,8 @@ namespace WixToolset.Converters
                 { WixConverter.WixLocalizationElementWithoutNamespaceName, this.ConvertWixLocalizationElementWithoutNamespace },
             };
 
+            this.ConversionMessages = new List<Message>();
+
             this.Messaging = messaging;
 
             this.IndentationAmount = indentationAmount;
@@ -285,7 +288,7 @@ namespace WixToolset.Converters
 
         private CustomTableTarget CustomTableSetting { get; }
 
-        private int Messages { get; set; }
+        private List<Message> ConversionMessages { get; }
 
         private HashSet<ConverterTestType> ErrorsAsWarnings { get; set; }
 
@@ -308,54 +311,35 @@ namespace WixToolset.Converters
         /// </summary>
         /// <param name="sourceFile">The file to convert.</param>
         /// <param name="saveConvertedFile">Option to save the converted Messages that are found.</param>
-        /// <returns>The number of Messages found.</returns>
+        /// <returns>The number of conversions found.</returns>
         public int ConvertFile(string sourceFile, bool saveConvertedFile)
         {
-            var document = this.OpenSourceFile(sourceFile);
+            var savedDocument = false;
 
-            if (document is null)
+            if (this.TryOpenSourceFile(sourceFile, out var document))
             {
-                return 1;
+                this.Convert(document);
+
+                // Fix Messages if requested and necessary.
+                if (saveConvertedFile && 0 < this.ConversionMessages.Count)
+                {
+                    savedDocument = this.SaveDocument(document);
+                }
             }
 
-            this.ConvertDocument(document);
-
-            // Fix Messages if requested and necessary.
-            if (saveConvertedFile && 0 < this.Messages)
-            {
-                this.SaveDocument(document);
-            }
-
-            return this.Messages;
+            return this.ReportMessages(document, savedDocument);
         }
 
         /// <summary>
         /// Convert a document.
         /// </summary>
         /// <param name="document">The document to convert.</param>
-        /// <returns>The number of Messages found.</returns>
+        /// <returns>The number of conversions found.</returns>
         public int ConvertDocument(XDocument document)
         {
-            // Reset the instance info.
-            this.Messages = 0;
-            this.SourceVersion = 0;
-            this.Operation = ConvertOperation.Convert;
+            this.Convert(document);
 
-            // Remove the declaration.
-            if (null != document.Declaration
-                && this.OnInformation(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
-            {
-                document.Declaration = null;
-                TrimLeadingText(document);
-            }
-
-            this.XRoot = document.Root;
-
-            // Start converting the nodes at the top.
-            this.ConvertNodes(document.Nodes(), 0);
-            this.RemoveUnusedNamespaces(document.Root);
-
-            return this.Messages;
+            return this.ReportMessages(document, false);
         }
 
         /// <summary>
@@ -366,22 +350,20 @@ namespace WixToolset.Converters
         /// <returns>The number of Messages found.</returns>
         public int FormatFile(string sourceFile, bool saveConvertedFile)
         {
-            var document = this.OpenSourceFile(sourceFile);
+            var savedDocument = false;
 
-            if (document is null)
+            if (this.TryOpenSourceFile(sourceFile, out var document))
             {
-                return 1;
+                this.FormatDocument(document);
+
+                // Fix Messages if requested and necessary.
+                if (saveConvertedFile && 0 < this.ConversionMessages.Count)
+                {
+                    savedDocument = this.SaveDocument(document);
+                }
             }
 
-            this.FormatDocument(document);
-
-            // Fix Messages if requested and necessary.
-            if (saveConvertedFile && 0 < this.Messages)
-            {
-                this.SaveDocument(document);
-            }
-
-            return this.Messages;
+            return this.ReportMessages(document, savedDocument);
         }
 
         /// <summary>
@@ -391,43 +373,73 @@ namespace WixToolset.Converters
         /// <returns>The number of Messages found.</returns>
         public int FormatDocument(XDocument document)
         {
+            this.Format(document);
+
+            return this.ReportMessages(document, false);
+        }
+
+        private void Convert(XDocument document)
+        {
             // Reset the instance info.
-            this.Messages = 0;
+            this.ConversionMessages.Clear();
             this.SourceVersion = 0;
-            this.Operation = ConvertOperation.Format;
+            this.Operation = ConvertOperation.Convert;
 
             // Remove the declaration.
             if (null != document.Declaration
-                && this.OnInformation(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
+                && this.OnInformation(ConverterTestType.DeclarationPresent, document, "This file contains an XML declaration on the first line."))
             {
                 document.Declaration = null;
                 TrimLeadingText(document);
             }
 
+            this.XRoot = document.Root;
+
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
-
-            return this.Messages;
         }
 
-        private XDocument OpenSourceFile(string sourceFile)
+        private void Format(XDocument document)
+        {
+            // Reset the instance info.
+            this.ConversionMessages.Clear();
+            this.SourceVersion = 0;
+            this.Operation = ConvertOperation.Format;
+
+            // Remove the declaration.
+            if (null != document.Declaration
+                && this.OnInformation(ConverterTestType.DeclarationPresent, document, "This file contains an XML declaration on the first line."))
+            {
+                document.Declaration = null;
+                TrimLeadingText(document);
+            }
+
+            this.XRoot = document.Root;
+
+            // Start converting the nodes at the top.
+            this.ConvertNodes(document.Nodes(), 0);
+            this.RemoveUnusedNamespaces(document.Root);
+        }
+
+        private bool TryOpenSourceFile(string sourceFile, out XDocument document)
         {
             this.SourceFile = sourceFile;
 
             try
             {
-                return XDocument.Load(this.SourceFile, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+                document = XDocument.Load(this.SourceFile, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
             }
             catch (XmlException e)
             {
                 this.OnError(ConverterTestType.XmlException, null, "The xml is invalid.  Detail: '{0}'", e.Message);
+                document = null;
             }
 
-            return null;
+            return document != null;
         }
 
-        private void SaveDocument(XDocument document)
+        private bool SaveDocument(XDocument document)
         {
             var ignoreDeclarationError = this.IgnoreErrors.Contains(ConverterTestType.DeclarationPresent);
 
@@ -437,11 +449,15 @@ namespace WixToolset.Converters
                 {
                     document.Save(writer);
                 }
+
+                return true;
             }
             catch (UnauthorizedAccessException)
             {
                 this.OnError(ConverterTestType.UnauthorizedAccessException, null, "Could not write to file.");
             }
+
+            return false;
         }
 
         private void ConvertNodes(IEnumerable<XNode> nodes, int level)
@@ -2129,6 +2145,14 @@ namespace WixToolset.Converters
                         convertedAttribute = new XAttribute(ns.GetName(attribute.Name.LocalName), attribute.Value);
                     }
 
+                    if (convertedAttribute != attribute)
+                    {
+                        foreach (var message in attribute.Annotations<Message>())
+                        {
+                            convertedAttribute.AddAnnotation(message);
+                        }
+                    }
+
                     element.Add(convertedAttribute);
                 }
             }
@@ -2214,6 +2238,110 @@ namespace WixToolset.Converters
             }
         }
 
+        private int ReportMessages(XDocument document, bool saved)
+        {
+            var conversionCount = this.ConversionMessages.Count;
+
+            // If the converted/formatted document was saved, update the source line numbers
+            // in the messages since they will possibly be wrong.
+            if (saved && conversionCount > 0)
+            {
+                var fixedupMessages = new HashSet<Message>();
+
+                // Load the converted document so we can look up new line numbers for
+                // messages.
+                var convertedDocument = XDocument.Load(this.SourceFile, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+                var convertedNavigator = convertedDocument.CreateNavigator();
+
+                // Look through all nodes in the document and try to fix up their line numbers.
+                foreach (var elements in document.Descendants())
+                {
+                    var fixedup = this.FixupMessageLineNumbers(elements, convertedNavigator);
+                    fixedupMessages.AddRange(fixedup);
+
+                    // Attributes are not considered nodes so they must be enumerated independently.
+                    if (elements is XElement element)
+                    {
+                        foreach (var attribute in element.Attributes())
+                        {
+                            fixedup = this.FixupMessageLineNumbers(attribute, convertedNavigator);
+                            fixedupMessages.AddRange(fixedup);
+                        }
+                    }
+                }
+
+                // For any messages that couldn't be fixed up, remove their line numbers since they point at lines
+                // that are possibly wrong after the conversion.
+                for (var i = 0; i < this.ConversionMessages.Count; ++i)
+                {
+                    var message = this.ConversionMessages[i];
+
+                    if (!fixedupMessages.Contains(message))
+                    {
+                        this.ConversionMessages[i] = new Message(new SourceLineNumber(this.SourceFile), message.Level, message.Id, message.ResourceNameOrFormat, message.MessageArgs);
+                    }
+                }
+            }
+
+            foreach (var message in this.ConversionMessages)
+            {
+                this.Messaging.Write(message);
+            }
+
+            return conversionCount;
+        }
+
+        private IReadOnlyCollection<Message> FixupMessageLineNumbers(XObject obj, XPathNavigator savedDocument)
+        {
+            var messages = obj.Annotations<Message>().ToList();
+
+            if (messages.Count == 0)
+            {
+                return Array.Empty<Message>();
+            }
+
+            // We can't fix up line numbers based on attributes but we can fix up using their parent element, so do so.
+            if (obj is XAttribute attribute)
+            {
+                obj = attribute.Parent;
+            }
+
+            var fixedupMessages = new List<Message>();
+
+            var modifiedLineNumber = this.GetModifiedNodeLineNumber((XElement)obj, savedDocument);
+
+            foreach (var message in messages)
+            {
+                var fixedupMessage = message;
+
+                // If the line number wasn't modified, the existing message's source line nuber is correct
+                // so skip creating a new one.
+                if (modifiedLineNumber != null)
+                {
+                    var index = this.ConversionMessages.IndexOf(message);
+
+                    fixedupMessage = new Message(modifiedLineNumber, message.Level, message.Id, message.ResourceNameOrFormat, message.MessageArgs);
+
+                    this.ConversionMessages[index] = fixedupMessage;
+                }
+
+                fixedupMessages.Add(fixedupMessage);
+            }
+
+            return fixedupMessages;
+        }
+
+        private SourceLineNumber GetModifiedNodeLineNumber(XElement element, XPathNavigator savedDocument)
+        {
+            var xpathToOld = CalculateXPath(element);
+
+            var newNode = savedDocument.SelectSingleNode(xpathToOld);
+            var newLineNumber = (newNode as IXmlLineInfo).LineNumber;
+
+            var oldLineNumber = (element as IXmlLineInfo)?.LineNumber;
+            return (oldLineNumber != newLineNumber) ? new SourceLineNumber(this.SourceFile, newLineNumber) : null;
+        }
+
         /// <summary>
         /// Output an error message to the console.
         /// </summary>
@@ -2250,10 +2378,8 @@ namespace WixToolset.Converters
                 return false;
             }
 
-            // Increase the message count.
-            this.Messages++;
+            var sourceLine = SourceLineNumberForXmlLineInfo(this.SourceFile, node);
 
-            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wix.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
             var prefix = String.Empty;
             if (level == MessageLevel.Information)
             {
@@ -2268,9 +2394,32 @@ namespace WixToolset.Converters
 
             var msg = new Message(sourceLine, level, (int)converterTestType, format, args);
 
-            this.Messaging.Write(msg);
+            // Add the message as a node annotation so it could be possible to remap source line numbers
+            // to their new locations after converting/formatting (since lines of code could be moved).
+            node?.AddAnnotation(msg);
+            this.ConversionMessages.Add(msg);
 
             return true;
+        }
+
+        private static string CalculateXPath(XElement element)
+        {
+            var builder = new StringBuilder();
+
+            while (element != null)
+            {
+                var index = element.Parent?.Elements().TakeWhile(e => e != element).Count() ?? 0;
+                builder.Insert(0, $"/*[{index + 1}]");
+
+                element = element.Parent;
+            }
+
+            return builder.ToString();
+        }
+
+        private static SourceLineNumber SourceLineNumberForXmlLineInfo(string sourceFile, IXmlLineInfo lineInfo)
+        {
+            return (lineInfo?.HasLineInfo() == true) ? new SourceLineNumber(sourceFile, lineInfo.LineNumber) : new SourceLineNumber(sourceFile ?? "wix.exe");
         }
 
         /// <summary>
@@ -2338,7 +2487,7 @@ namespace WixToolset.Converters
             comments = initialComments;
             var nonCommentNodes = new List<XNode>();
 
-            foreach(var node in nodes)
+            foreach (var node in nodes)
             {
                 if (XmlNodeType.Comment == node.NodeType)
                 {
