@@ -63,7 +63,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ClInclude Include="coreclrhost.h" />
     <ClInclude Include="dnchost.h" />
     <ClInclude Include="dncutil.h" />
     <ClInclude Include="precomp.h" />
