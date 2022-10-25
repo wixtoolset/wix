@@ -10,6 +10,9 @@
 #include "fileutil.h"
 #include "strutil.h"
 #include "pathutil.h"
+#include "procutil.h"
+#include "dirutil.h"
+#include "guidutil.h"
 
 #include "caDecor.h"
 #include "cost.h"

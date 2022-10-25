@@ -42,7 +42,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>msi.lib;rpcrt4.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>

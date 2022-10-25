@@ -40,7 +40,6 @@ namespace WixToolset.Netfx
                             break;
                     }
                     break;
-                case "Bundle":
                 case "Fragment":
                     switch (element.Name.LocalName)
                     {
@@ -50,8 +49,45 @@ namespace WixToolset.Netfx
                         case "DotNetCoreSearchRef":
                             this.ParseDotNetCoreSearchRefElement(intermediate, section, element);
                             break;
+                        case "DotNetCompatibilityCheck":
+                            this.ParseDotNetCompatibilityCheckElement(intermediate, section, element);
+                            break;
+                        case "DotNetCompatibilityCheckRef":
+                            this.ParseDotNetCompatibilityCheckRefElement(intermediate, section, element);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
+                            break;
                     }
-
+                    break;
+                case "Bundle":
+                    switch (element.Name.LocalName)
+                    {
+                        case "DotNetCoreSearch":
+                            this.ParseDotNetCoreSearchElement(intermediate, section, element);
+                            break;
+                        case "DotNetCoreSearchRef":
+                            this.ParseDotNetCoreSearchRefElement(intermediate, section, element);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
+                            break;
+                    }
+                    break;
+                case "Package":
+                case "Module":
+                    switch (element.Name.LocalName)
+                    {
+                        case "DotNetCompatibilityCheck":
+                            this.ParseDotNetCompatibilityCheckElement(intermediate, section, element);
+                            break;
+                        case "DotNetCompatibilityCheckRef":
+                            this.ParseDotNetCompatibilityCheckRefElement(intermediate, section, element);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
+                            break;
+                    }
                     break;
                 default:
                     this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -324,6 +360,179 @@ namespace WixToolset.Netfx
                     ApplicationBaseDirectoryRef = appBaseDirectory,
                 });
             }
+        }
+
+        /// <summary>
+        /// Parses a DotNetCompatibilityCheck element.
+        /// </summary>
+        /// <param name="element">The element to parse.</param>
+        private void ParseDotNetCompatibilityCheckElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
+            string property = null;
+            string runtimeType = null;
+            string platform = null;
+            string version = null;
+            string rollForward = "Minor";
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Property":
+                            property = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RuntimeType":
+                            runtimeType = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (runtimeType.ToLower())
+                            {
+                                case "aspnet":
+                                    runtimeType = "Microsoft.AspNetCore.App";
+                                    break;
+                                case "desktop":
+                                    runtimeType = "Microsoft.WindowsDesktop.App";
+                                    break;
+                                case "core":
+                                    runtimeType = "Microsoft.NETCore.App";
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, runtimeType, "aspnet", "desktop", "core"));
+                                    break;
+                            }
+                            break;
+                        case "Platform":
+                            platform = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (platform.ToLower())
+                            {
+                                case "x86":
+                                case "x64":
+                                case "arm64":
+                                    platform = platform.ToLower();
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, platform, "x86", "x64", "arm64"));
+                                    break;
+                            }
+                            break;
+                        case "Version":
+                            version = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RollForward":
+                            rollForward = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (rollForward.ToLower())
+                            {
+                                case "latestmajor":
+                                    rollForward = "LatestMajor";
+                                    break;
+                                case "major":
+                                    rollForward = "Major";
+                                    break;
+                                case "latestminor":
+                                    rollForward = "LatestMinor";
+                                    break;
+                                case "minor":
+                                    rollForward = "Minor";
+                                    break;
+                                case "latestpatch":
+                                    rollForward = "LatestPatch";
+                                    break;
+                                case "disable":
+                                    rollForward = "Disable";
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, rollForward, "latestmajor", "major", "latestminor", "minor", "latestpatch", "disable"));
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                id = this.ParseHelper.CreateIdentifier("ndncc", property, runtimeType, platform, version);
+            }
+
+            if (String.IsNullOrEmpty(property))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Property"));
+            }
+
+            if (String.IsNullOrEmpty(runtimeType))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "RuntimeType"));
+            }
+
+            if (String.IsNullOrEmpty(platform))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Platform"));
+            }
+
+            if (String.IsNullOrEmpty(version))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Version"));
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4NetFxDotNetCompatibilityCheck", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+
+            if (!this.Messaging.EncounteredError)
+            {
+                section.AddSymbol(new NetFxDotNetCompatibilityCheckSymbol(sourceLineNumbers, id)
+                {
+                    RuntimeType = runtimeType,
+                    Platform = platform,
+                    Version = version,
+                    RollForward = rollForward,
+                    Property = property,
+                });
+            }
+        }
+
+        /// <summary>
+        /// Parses a DotNetCompatibilityCheckRef element.
+        /// </summary>
+        /// <param name="element">The element to parse.</param>
+        private void ParseDotNetCompatibilityCheckRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, NetfxSymbolDefinitions.NetFxDotNetCompatibilityCheck, refId);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
         }
     }
 }

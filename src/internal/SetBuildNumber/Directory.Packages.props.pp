@@ -93,4 +93,10 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
     <PackageVersion Include="xunit.assert" Version="2.4.2" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.x86" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.x64" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.arm64" Version="6.0.0" />
+  </ItemGroup>
 </Project>
