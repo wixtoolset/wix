@@ -4,6 +4,8 @@
         <ComponentGroup Id="ProductComponents" Directory="BinFolder" />
     </Fragment>
     <Fragment>
+        <StandardDirectory Id="DesktopFolder" />
+        <StandardDirectory Id="ProgramMenuFolder" />
         <StandardDirectory Id="ProgramFilesFolder">
             <Directory Id="CompanyFolder" Name="!(bind.Property.Manufacturer)">
                 <Directory Id="BinFolder" Name="." />
