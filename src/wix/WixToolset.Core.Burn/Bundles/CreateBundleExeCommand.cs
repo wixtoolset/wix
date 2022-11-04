@@ -71,7 +71,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Transfer = this.BackendHelper.CreateFileTransfer(bundleTempPath, this.OutputPath, true, this.BundleSymbol.SourceLineNumbers);
 
-            this.FileSystem.CopyFile(stubFile, bundleTempPath, allowHardlink: false);
+            this.FileSystem.CopyFile(this.BundleSymbol.SourceLineNumbers, stubFile, bundleTempPath, allowHardlink: false);
             File.SetAttributes(bundleTempPath, FileAttributes.Normal);
 
             var fourPartVersion = this.GetFourPartVersion(this.BundleSymbol);
@@ -88,7 +88,7 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.InitializeBundleSectionData(burnStubFile.Length, this.BundleSymbol.BundleId);
 
                 // Always attach the UX container first
-                writer.AppendContainer(this.UXContainer.WorkingPath, BurnWriter.Container.UX);
+                writer.AppendContainer(this.UXContainer.SourceLineNumbers, this.UXContainer.WorkingPath, BurnWriter.Container.UX);
 
                 // Now append all other attached containers
                 foreach (var container in this.Containers)
@@ -98,7 +98,7 @@ namespace WixToolset.Core.Burn.Bundles
                         // The container was only created if it had payloads.
                         if (!String.IsNullOrEmpty(container.WorkingPath) && BurnConstants.BurnUXContainerName != container.Id.Id)
                         {
-                            writer.AppendContainer(container.WorkingPath, BurnWriter.Container.Attached);
+                            writer.AppendContainer(container.SourceLineNumbers, container.WorkingPath, BurnWriter.Container.Attached);
                         }
                     }
                 }

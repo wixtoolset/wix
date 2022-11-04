@@ -38,7 +38,7 @@ namespace WixToolset.Core.Burn.Inscribe
 
             using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputFilePath))
             {
-                this.FileSystem.CopyFile(this.SignedEngineFile, tempFile, allowHardlink: false);
+                this.FileSystem.CopyFile(null, this.SignedEngineFile, tempFile, allowHardlink: false);
 
                 using (var writer = BurnWriter.Open(this.Messaging, this.FileSystem, tempFile))
                 {
@@ -46,7 +46,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 }
             }
 
-            this.FileSystem.MoveFile(tempFile, this.OutputFile);
+            this.FileSystem.MoveFile(null, tempFile, this.OutputFile);
 
             return inscribed;
         }

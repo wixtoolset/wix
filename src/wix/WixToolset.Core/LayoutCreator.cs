@@ -114,7 +114,7 @@ namespace WixToolset.Core
             {
                 this.SplitUniqueFolders(intermediateFolder, tempPath, uniqueFolders);
 
-                this.FileSystem.DeleteFile(tempPath);
+                this.FileSystem.DeleteFile(null, tempPath);
             }
 
             // Clean up empty temp folders.

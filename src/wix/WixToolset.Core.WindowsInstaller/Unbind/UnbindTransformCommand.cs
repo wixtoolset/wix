@@ -327,7 +327,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         if (null == this.EmptyFile)
                         {
                             this.EmptyFile = Path.Combine(this.IntermediateFolder, ".empty");
-                            using (var fileStream = this.FileSystem.OpenFile(this.EmptyFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                            using (var fileStream = this.FileSystem.OpenFile(null, this.EmptyFile, FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                             }
                         }

@@ -5,7 +5,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Runtime.CompilerServices;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
@@ -42,8 +41,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return true;
             }
 
-            using (var firstStream = this.FileSystem.OpenFile(firstPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var secondStream = this.FileSystem.OpenFile(secondPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var firstStream = this.FileSystem.OpenFile(null, firstPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var secondStream = this.FileSystem.OpenFile(null, secondPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 if (firstStream.Length != secondStream.Length)
                 {

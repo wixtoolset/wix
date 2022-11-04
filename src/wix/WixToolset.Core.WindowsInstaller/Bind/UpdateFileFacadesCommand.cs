@@ -84,7 +84,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var fileStream = this.FileSystem.OpenFile(facade.SourceLineNumber, fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 if (Int32.MaxValue < fileStream.Length)
                 {

@@ -206,7 +206,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                                                     Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
 
-                                                    using (var fs = this.FileSystem.OpenFile(source, FileMode.Create, FileAccess.Write, FileShare.None))
+                                                    using (var fs = this.FileSystem.OpenFile(null, source, FileMode.Create, FileAccess.Write, FileShare.None))
                                                     {
                                                         int bytesRead;
                                                         var buffer = new byte[4096];

@@ -212,7 +212,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (softwareTags.Any())
                 {
-                    var command = new ProcessPackageSoftwareTagsCommand(section, this.WindowsInstallerBackendHelper, softwareTags, this.IntermediateFolder);
+                    var command = new ProcessPackageSoftwareTagsCommand(section, this.WindowsInstallerBackendHelper, this.FileSystem, softwareTags, this.IntermediateFolder);
                     command.Execute();
 
                     trackedFiles.AddRange(command.TrackedFiles);

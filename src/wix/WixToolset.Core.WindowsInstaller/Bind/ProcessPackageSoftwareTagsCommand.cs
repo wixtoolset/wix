@@ -15,10 +15,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class ProcessPackageSoftwareTagsCommand
     {
-        public ProcessPackageSoftwareTagsCommand(IntermediateSection section, IBackendHelper backendHelper, IEnumerable<WixPackageTagSymbol> softwareTags, string intermediateFolder)
+        public ProcessPackageSoftwareTagsCommand(IntermediateSection section, IBackendHelper backendHelper, IFileSystem fileSystem, IEnumerable<WixPackageTagSymbol> softwareTags, string intermediateFolder)
         {
             this.Section = section;
             this.BackendHelper = backendHelper;
+            this.FileSystem = fileSystem;
             this.SoftwareTags = softwareTags;
             this.IntermediateFolder = intermediateFolder;
         }
@@ -28,6 +29,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IntermediateSection Section { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IFileSystem FileSystem { get; }
 
         private IEnumerable<WixPackageTagSymbol> SoftwareTags { get; }
 
@@ -61,7 +64,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     trackedFiles.Add(this.BackendHelper.TrackFile(fileSymbol.Source.Path, TrackedFileType.Intermediate, tagRow.SourceLineNumbers));
 
-                    using (var fs = new FileStream(fileSymbol.Source.Path, FileMode.Create))
+                    using (var fs = this.FileSystem.OpenFile(fileSymbol.SourceLineNumbers, fileSymbol.Source.Path, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                     {
                         CreateTagFile(fs, uniqueId, packageSymbol.Name, packageSymbol.Version, tagRow.Regid, packageSymbol.Manufacturer, persistentId);
                     }

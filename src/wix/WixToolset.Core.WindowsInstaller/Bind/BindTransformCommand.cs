@@ -401,7 +401,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (!String.IsNullOrEmpty(emptyFile))
                 {
-                    using (var fileStream = this.FileSystem.OpenFile(emptyFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (var fileStream = this.FileSystem.OpenFile(null, emptyFile, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                     }
                 }
