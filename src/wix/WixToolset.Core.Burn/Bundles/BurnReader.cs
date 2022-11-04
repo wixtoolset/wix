@@ -56,7 +56,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>Burn reader.</returns>
         public static BurnReader Open(IMessaging messaging, IFileSystem fileSystem, string fileExe)
         {
-            var binaryReader = new BinaryReader(fileSystem.OpenFile(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
+            var binaryReader = new BinaryReader(fileSystem.OpenFile(null, fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
             var reader = new BurnReader(messaging, fileSystem, fileExe)
             {
                 binaryReader = binaryReader,
@@ -92,7 +92,7 @@ namespace WixToolset.Core.Burn.Bundles
             var uxContainerSlot = this.AttachedContainers[0];
 
             this.binaryReader.BaseStream.Seek(this.UXAddress, SeekOrigin.Begin);
-            using (Stream tempCab = this.fileSystem.OpenFile(tempCabPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (Stream tempCab = this.fileSystem.OpenFile(null, tempCabPath, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
                 BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)uxContainerSlot.Size);
             }
@@ -100,7 +100,7 @@ namespace WixToolset.Core.Burn.Bundles
             var cabinet = new Cabinet(tempCabPath);
             cabinet.Extract(outputDirectory);
 
-            this.fileSystem.MoveFile(manifestOriginalPath, manifestPath);
+            this.fileSystem.MoveFile(null, manifestOriginalPath, manifestPath);
 
             var document = new XmlDocument();
             document.Load(manifestPath);
@@ -117,7 +117,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var sourcePath = Path.Combine(outputDirectory, sourcePathNode.Value);
                 var destinationPath = Path.Combine(outputDirectory, filePathNode.Value);
 
-                this.fileSystem.MoveFile(sourcePath, destinationPath);
+                this.fileSystem.MoveFile(null, sourcePath, destinationPath);
             }
 
             foreach (XmlNode payload in payloads)
@@ -169,7 +169,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var tempCabPath = Path.Combine(tempDirectory, $"a{i}.cab");
 
                 this.binaryReader.BaseStream.Seek(nextAddress, SeekOrigin.Begin);
-                using (Stream tempCab = this.fileSystem.OpenFile(tempCabPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                using (Stream tempCab = this.fileSystem.OpenFile(null, tempCabPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)cntnr.Size);
                 }
@@ -185,7 +185,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var sourcePath = Path.Combine(outputDirectory, (string)entry.Key);
                 var destinationPath = Path.Combine(outputDirectory, (string)entry.Value);
 
-                this.fileSystem.MoveFile(sourcePath, destinationPath);
+                this.fileSystem.MoveFile(null, sourcePath, destinationPath);
             }
 
             return true;

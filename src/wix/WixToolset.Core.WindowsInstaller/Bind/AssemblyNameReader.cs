@@ -19,7 +19,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             try
             {
-                using (var stream = fileSystem.OpenFile(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var stream = fileSystem.OpenFile(sourceLineNumbers, assemblyPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var peReader = new PEReader(stream))
                 {
                     var reader = peReader.GetMetadataReader();

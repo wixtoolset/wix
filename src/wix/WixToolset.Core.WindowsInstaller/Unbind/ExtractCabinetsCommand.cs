@@ -97,6 +97,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         {
                             if (null != record)
                             {
+                                embeddedCabinetRowsByDiskId.TryGetValue(diskId, out var cabinetMediaRow);
+
                                 // since the cabinets are stored in case-sensitive streams inside the msi, but the file system is not (typically) case-sensitive,
                                 // embedded cabinets must be extracted to a canonical file name (like their diskid) to ensure extraction will always work
                                 var cabinetPath = Path.Combine(this.IntermediateFolder, "Media", diskId.ToString(CultureInfo.InvariantCulture), ".cab");
@@ -104,7 +106,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                 // ensure the parent directory exists
                                 Directory.CreateDirectory(Path.GetDirectoryName(cabinetPath));
 
-                                using (var fs = this.FileSystem.OpenFile(cabinetPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                                using (var fs = this.FileSystem.OpenFile(cabinetMediaRow.SourceLineNumbers, cabinetPath, FileMode.Create, FileAccess.Write, FileShare.None))
                                 {
                                     int bytesRead;
                                     var buffer = new byte[4096];
@@ -115,7 +117,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     }
                                 }
 
-                                embeddedCabinetRowsByDiskId.TryGetValue(diskId, out var cabinetMediaRow);
                                 cabinetPathsWithMediaRow.Add(cabinetPath, cabinetMediaRow);
                             }
                             else

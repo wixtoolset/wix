@@ -71,7 +71,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
             var workingDatabasePath = Path.Combine(this.IntermediateFolder, workingDatabaseFilename);
             try
             {
-                this.FileSystem.CopyFile(this.DatabasePath, workingDatabasePath, allowHardlink: false);
+                this.FileSystem.CopyFile(null, this.DatabasePath, workingDatabasePath, allowHardlink: false);
 
                 var attributes = File.GetAttributes(workingDatabasePath);
                 File.SetAttributes(workingDatabasePath, attributes & ~FileAttributes.ReadOnly);
@@ -81,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
             }
             finally
             {
-                this.FileSystem.DeleteFile(workingDatabasePath);
+                this.FileSystem.DeleteFile(null, workingDatabasePath);
             }
 
             stopwatch.Stop();

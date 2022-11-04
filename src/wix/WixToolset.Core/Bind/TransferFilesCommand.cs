@@ -53,12 +53,12 @@ namespace WixToolset.Core.Bind
                         if (fileTransfer.Move)
                         {
                             this.Messaging.Write(VerboseMessages.MoveFile(fileTransfer.Source, fileTransfer.Destination));
-                            this.MoveFile(fileTransfer.Source, fileTransfer.Destination);
+                            this.MoveFile(fileTransfer.SourceLineNumbers, fileTransfer.Source, fileTransfer.Destination);
                         }
                         else
                         {
                             this.Messaging.Write(VerboseMessages.CopyFile(fileTransfer.Source, fileTransfer.Destination));
-                            this.CopyFile(fileTransfer.Source, fileTransfer.Destination);
+                            this.CopyFile(fileTransfer.SourceLineNumbers, fileTransfer.Source, fileTransfer.Destination);
                         }
 
                         retry = false;
@@ -170,7 +170,7 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        private void CopyFile(string source, string destination)
+        private void CopyFile(SourceLineNumber sourceLineNumbers, string source, string destination)
         {
             foreach (var extension in this.Extensions)
             {
@@ -180,10 +180,10 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            this.FileSystem.CopyFile(source, destination, allowHardlink: true);
+            this.FileSystem.CopyFile(sourceLineNumbers, source, destination, allowHardlink: true);
         }
 
-        private void MoveFile(string source, string destination)
+        private void MoveFile(SourceLineNumber sourceLineNumbers, string source, string destination)
         {
             foreach (var extension in this.Extensions)
             {
@@ -193,7 +193,7 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            this.FileSystem.MoveFile(source, destination);
+            this.FileSystem.MoveFile(sourceLineNumbers, source, destination);
         }
 
         private void AclReset(IEnumerable<string> files)

@@ -51,7 +51,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
             if (!String.Equals(this.InputPath, this.OutputPath, StringComparison.OrdinalIgnoreCase))
             {
-                this.FileSystem.CopyFile(this.InputPath, this.OutputPath, allowHardlink: false);
+                this.FileSystem.CopyFile(null, this.InputPath, this.OutputPath, allowHardlink: false);
             }
 
             var attributes = File.GetAttributes(databasePath);
@@ -98,7 +98,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                                 Directory.CreateDirectory(hashPath);
                                 hashPath = Path.Combine(hashPath, hashFileName);
 
-                                using (var fs = this.FileSystem.OpenFile(hashPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                                using (var fs = this.FileSystem.OpenFile(null, hashPath, FileMode.Create, FileAccess.Write, FileShare.None))
                                 {
                                     int bytesRead;
                                     var buffer = new byte[1024 * 4];
@@ -129,7 +129,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             Directory.CreateDirectory(certPath);
                             certPath = Path.Combine(certPath, String.Concat(certificateId, ".cer"));
 
-                            using (var fs = this.FileSystem.OpenFile(certPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                            using (var fs = this.FileSystem.OpenFile(null, certPath, FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                                 int bytesRead;
                                 var buffer = new byte[1024 * 4];
@@ -223,9 +223,9 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             var certPath = Path.Combine(this.IntermediateFolder, "MsiDigitalCertificate");
                             Directory.CreateDirectory(certPath);
                             certPath = Path.Combine(certPath, String.Concat(cert2.Thumbprint, ".cer"));
-                            this.FileSystem.DeleteFile(certPath, true);
+                            this.FileSystem.DeleteFile(null, certPath, true);
 
-                            using (var writer = new BinaryWriter(this.FileSystem.OpenFile(certPath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+                            using (var writer = new BinaryWriter(this.FileSystem.OpenFile(null, certPath, FileMode.Create, FileAccess.Write, FileShare.Read)))
                             {
                                 writer.Write(cert2.RawData);
                                 writer.Close();

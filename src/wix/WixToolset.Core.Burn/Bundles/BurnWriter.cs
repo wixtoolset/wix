@@ -43,14 +43,14 @@ namespace WixToolset.Core.Burn.Bundles
         {
             var writer = new BurnWriter(messaging, fileSystem, fileExe);
 
-            using (var binaryReader = new BinaryReader(fileSystem.OpenFile(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
+            using (var binaryReader = new BinaryReader(fileSystem.OpenFile(null, fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
             {
                 writer.Initialize(binaryReader);
             }
 
             if (!writer.Invalid)
             {
-                writer.binaryWriter = new BinaryWriter(fileSystem.OpenFile(fileExe, FileMode.Open, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete));
+                writer.binaryWriter = new BinaryWriter(fileSystem.OpenFile(null, fileExe, FileMode.Open, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete));
             }
 
             return writer;
@@ -102,12 +102,13 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Appends a UX or Attached container to the exe and updates the ".wixburn" section data to point to it.
         /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers for the container.</param>
         /// <param name="fileContainer">File path to append to the current exe.</param>
         /// <param name="container">Container section represented by the fileContainer.</param>
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
-        public bool AppendContainer(string fileContainer, BurnCommon.Container container)
+        public bool AppendContainer(SourceLineNumber sourceLineNumbers, string fileContainer, BurnCommon.Container container)
         {
-            using (var reader = this.fileSystem.OpenFile(fileContainer, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var reader = this.fileSystem.OpenFile(sourceLineNumbers, fileContainer, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 return this.AppendContainer(reader, reader.Length, container);
             }

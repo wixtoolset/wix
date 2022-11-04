@@ -33,7 +33,7 @@ namespace WixToolset.Core.Burn.Inscribe
             var tempFile = Path.Combine(this.IntermediateFolder, "bundle_engine_unsigned.exe");
 
             using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputFilePath))
-            using (var writer = this.FileSystem.OpenFile(tempFile, FileMode.Create, FileAccess.Write, FileShare.Read | FileShare.Delete))
+            using (var writer = this.FileSystem.OpenFile(null, tempFile, FileMode.Create, FileAccess.Write, FileShare.Read | FileShare.Delete))
             {
                 reader.Stream.Seek(0, SeekOrigin.Begin);
 
@@ -58,7 +58,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 // TODO: update writer with detached container signatures.
             }
 
-            this.FileSystem.MoveFile(tempFile, this.OutputFile);
+            this.FileSystem.MoveFile(null, tempFile, this.OutputFile);
         }
     }
 }
