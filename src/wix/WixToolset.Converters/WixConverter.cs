@@ -538,7 +538,7 @@ namespace WixToolset.Converters
 
             var message = testType == ConverterTestType.DeprecatedLocalizationVariablePrefixInTextValue ? "The prefix on the localization variable in the inner text is incorrect." : "The prefix on the localization variable in the attribute value is incorrect.";
 
-            return this.OnError(testType, node, message);
+            return this.OnInformation(testType, node, message);
         }
 
         private void EnsurePrecedingWhitespaceCorrect(XText whitespace, XNode node, int level, ConverterTestType testType)
@@ -686,7 +686,7 @@ namespace WixToolset.Converters
                 }
             }
             else if (this.SourceVersion < 4 && xBADll != null &&
-                this.OnError(ConverterTestType.AssignBootstrapperApplicationDpiAwareness, element, "The BootstrapperApplicationDll DpiAwareness attribute is being set to 'unaware' to ensure it remains the same as the v3 default"))
+                this.OnInformation(ConverterTestType.AssignBootstrapperApplicationDpiAwareness, element, "The BootstrapperApplicationDll DpiAwareness attribute is being set to 'unaware' to ensure it remains the same as the v3 default"))
             {
                 xBADll.Add(new XAttribute("DpiAwareness", "unaware"));
             }
@@ -770,7 +770,7 @@ namespace WixToolset.Converters
                 }
 
                 if (balBAName != null && theme != null &&
-                    this.OnError(ConverterTestType.BalBootstrapperApplicationRefToElement, element, "Built-in bootstrapper applications must be referenced through their custom element"))
+                    this.OnInformation(ConverterTestType.BalBootstrapperApplicationRefToElement, element, "Built-in bootstrapper applications must be referenced through their custom element"))
                 {
                     element.Name = BootstrapperApplicationElementName;
                     xId.Remove();
@@ -820,7 +820,7 @@ namespace WixToolset.Converters
             {
                 var camelCaseValue = LowercaseFirstChar(category.Value);
                 if (category.Value != camelCaseValue &&
-                    this.OnError(ConverterTestType.ColumnCategoryCamelCase, element, "The CustomTable Category attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", category.Name))
+                    this.OnInformation(ConverterTestType.ColumnCategoryCamelCase, element, "The CustomTable Category attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", category.Name))
                 {
                     category.Value = camelCaseValue;
                 }
@@ -831,7 +831,7 @@ namespace WixToolset.Converters
             {
                 var camelCaseValue = LowercaseFirstChar(modularization.Value);
                 if (modularization.Value != camelCaseValue &&
-                    this.OnError(ConverterTestType.ColumnModularizeCamelCase, element, "The CustomTable Modularize attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", modularization.Name))
+                    this.OnInformation(ConverterTestType.ColumnModularizeCamelCase, element, "The CustomTable Modularize attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", modularization.Name))
                 {
                     modularization.Value = camelCaseValue;
                 }
@@ -858,7 +858,7 @@ namespace WixToolset.Converters
                         switch (this.CustomTableSetting)
                         {
                             case CustomTableTarget.Bundle:
-                                if (this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'BundleCustomData' element for Bundles.", bootstrapperApplicationData.Name))
+                                if (this.OnInformation(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'BundleCustomData' element for Bundles.", bootstrapperApplicationData.Name))
                                 {
                                     element.Name = WixConverter.BundleCustomDataElementName;
                                     bootstrapperApplicationData.Remove();
@@ -866,7 +866,7 @@ namespace WixToolset.Converters
                                 }
                                 break;
                             case CustomTableTarget.Msi:
-                                if (this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
+                                if (this.OnInformation(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
                                 {
                                     element.Add(new XAttribute("Unreal", bootstrapperApplicationData.Value));
                                     bootstrapperApplicationData.Remove();
@@ -1303,7 +1303,7 @@ namespace WixToolset.Converters
 
             var xMediaTemplate = element.Element(MediaTemplateElementName);
             if (xMediaTemplate?.HasAttributes == false
-                && this.OnError(ConverterTestType.DefaultMediaTemplate, element, "A MediaTemplate with no attributes set is now provided by default. Remove the element."))
+                && this.OnInformation(ConverterTestType.DefaultMediaTemplate, element, "A MediaTemplate with no attributes set is now provided by default. Remove the element."))
             {
                 xMediaTemplate.Remove();
             }
@@ -1523,7 +1523,7 @@ namespace WixToolset.Converters
             }
 
             if (!String.IsNullOrEmpty(newElementName)
-                && this.OnError(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
+                && this.OnInformation(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
             {
                 this.XRoot.SetAttributeValue(XNamespace.Xmlns + newNamespaceName, newNamespace.NamespaceName);
 
@@ -1541,7 +1541,7 @@ namespace WixToolset.Converters
             var id = element.Attribute("Id")?.Value;
 
             if (id?.StartsWith("WixUI_") == true
-                && this.OnError(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
+                && this.OnInformation(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
             {
                 this.XRoot.SetAttributeValue(XNamespace.Xmlns + "ui", WixUiNamespace.NamespaceName);
 
@@ -1636,7 +1636,7 @@ namespace WixToolset.Converters
                 element.Name = ExePackagePayloadElementName;
             }
             else if (xParent.Name == MsuPackageElementName &&
-                     this.OnError(ConverterTestType.RemotePayloadRenamed, element, "The RemotePayload element has been renamed. Use the 'MsuPackagePayload' instead."))
+                     this.OnInformation(ConverterTestType.RemotePayloadRenamed, element, "The RemotePayload element has been renamed. Use the 'MsuPackagePayload' instead."))
             {
                 element.Name = MsuPackagePayloadElementName;
             }
@@ -1715,7 +1715,7 @@ namespace WixToolset.Converters
 
         private void ConvertProvidesElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Provides element has been integrated into the WiX v4 namespace. Remove the namespace."))
+            if (this.OnInformation(ConverterTestType.IntegratedDependencyNamespace, element, "The Provides element has been integrated into the WiX v4 namespace. Remove the namespace."))
             {
                 element.Name = ProvidesElementName;
             }
