@@ -171,12 +171,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            if (section.Type == SectionType.Product || section.Type == SectionType.Module)
-            {
-                var command = new AddRequiredStandardDirectories(section, platform);
-                command.Execute();
-            }
-
             {
                 var command = new CreateSpecialPropertiesCommand(section);
                 command.Execute();

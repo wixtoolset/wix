@@ -90,8 +90,6 @@ namespace WixToolset.Core
                     }
                 }
 
-                //this.activeOutput = null;
-
                 var multipleFeatureComponents = new Hashtable();
 
                 var wixVariables = new Dictionary<string, WixVariableSymbol>();
@@ -178,6 +176,7 @@ namespace WixToolset.Core
                 // Create a new section to hold the linked content. Start with the entry section's
                 // metadata.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type);
+                var references = new List<WixSimpleReferenceSymbol>();
 
                 foreach (var section in sections)
                 {
@@ -248,6 +247,7 @@ namespace WixToolset.Core
 
                             case SymbolDefinitionType.WixSimpleReference:
                                 copySymbol = false;
+                                references.Add(symbol as WixSimpleReferenceSymbol);
                                 break;
 
                             case SymbolDefinitionType.WixVariable:
@@ -286,6 +286,12 @@ namespace WixToolset.Core
                 if (resolvedSection.Type == SectionType.Bundle)
                 {
                     var command = new FlattenAndProcessBundleTablesCommand(resolvedSection, this.Messaging);
+                    command.Execute();
+                }
+                else if (resolvedSection.Type == SectionType.Product || resolvedSection.Type == SectionType.Module)
+                {
+                    // Packages and modules get standard directories add.
+                    var command = new AddRequiredStandardDirectories(resolvedSection, references);
                     command.Execute();
                 }
 
