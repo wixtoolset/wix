@@ -157,7 +157,7 @@ namespace WixToolset.Core
             try
             {
                 this.compilingProduct = true;
-                this.Core.CreateActiveSection(productCode, SectionType.Product, this.Context.CompilationId);
+                this.Core.CreateActiveSection(productCode, SectionType.Package, this.Context.CompilationId);
 
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "Manufacturer"), manufacturer, false, false, false, true);
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductCode"), productCode, false, false, false, true);

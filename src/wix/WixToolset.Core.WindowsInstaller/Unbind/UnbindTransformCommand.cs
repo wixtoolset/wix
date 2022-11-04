@@ -98,7 +98,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         {
             var schemaData = new WindowsInstallerData(new SourceLineNumber(schemaDatabasePath))
             {
-                Type = OutputType.Product,
+                Type = OutputType.Package,
             };
 
             foreach (var tableDefinition in this.TableDefinitions)
@@ -119,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             using (var msiDatabase = this.ApplyTransformToSchemaDatabase(schemaDatabasePath, TransformErrorConditions.All | TransformErrorConditions.ViewTransform))
             {
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, schemaDatabasePath, msiDatabase, OutputType.Product, null, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, schemaDatabasePath, msiDatabase, OutputType.Package, null, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 var transformViewOutput = unbindCommand.Execute();
 
                 return transformViewOutput.Tables["_TransformView"];
@@ -180,7 +180,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, schemaDatabasePath, database, OutputType.Product, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, schemaDatabasePath, database, OutputType.Package, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: true);
                 output = unbindCommand.Execute();
             }
 

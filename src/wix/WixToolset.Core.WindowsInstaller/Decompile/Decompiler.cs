@@ -136,7 +136,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 case OutputType.PatchCreation:
                     this.DecompilerHelper.RootElement = new XElement(Names.PatchCreationElement);
                     break;
-                case OutputType.Product:
+                case OutputType.Package:
                     this.DecompilerHelper.RootElement = new XElement(Names.PackageElement);
                     break;
                 default:
@@ -1234,7 +1234,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     {
                         xFile.SetAttributeValue("Source", String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, fileId, '.', this.ModularizationGuid.Substring(1, 36).Replace('-', '_')));
                     }
-                    else if (fileCompressed == "yes" || (fileCompressed != "no" && this.Compressed) || (OutputType.Product == this.OutputType && this.TreatProductAsModule))
+                    else if (fileCompressed == "yes" || (fileCompressed != "no" && this.Compressed) || (OutputType.Package == this.OutputType && this.TreatProductAsModule))
                     {
                         xFile.SetAttributeValue("Source", String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, fileId));
                     }
@@ -1940,7 +1940,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         private void FinalizeSequenceTables(TableIndexedCollection tables)
         {
             // finalize the normal sequence tables
-            if (OutputType.Product == this.OutputType && !this.TreatProductAsModule)
+            if (OutputType.Package == this.OutputType && !this.TreatProductAsModule)
             {
                 foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
                 {
@@ -3009,7 +3009,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             var table = tables["_SummaryInformation"];
 
-            if (OutputType.Module == this.OutputType || OutputType.Product == this.OutputType)
+            if (OutputType.Module == this.OutputType || OutputType.Package == this.OutputType)
             {
                 var xSummaryInformation = new XElement(Names.SummaryInformationElement);
 
@@ -3071,7 +3071,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                 if (0x1 == (wordCount & 0x1))
                                 {
                                     this.ShortNames = true;
-                                    if (OutputType.Product == this.OutputType)
+                                    if (OutputType.Package == this.OutputType)
                                     {
                                         this.DecompilerHelper.RootElement.SetAttributeValue("ShortNames", "yes");
                                     }
@@ -3082,7 +3082,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                     this.Compressed = true;
                                 }
 
-                                if (OutputType.Product == this.OutputType)
+                                if (OutputType.Package == this.OutputType)
                                 {
                                     if (0x8 == (wordCount & 0x8))
                                     {
@@ -3103,7 +3103,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
 
-                if (OutputType.Product == this.OutputType && !this.Compressed)
+                if (OutputType.Package == this.OutputType && !this.Compressed)
                 {
                     this.DecompilerHelper.RootElement.SetAttributeValue("Compressed", "no");
                 }
@@ -6245,7 +6245,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                     continue;
                 }
-                else if (OutputType.Product == this.OutputType)
+                else if (OutputType.Package == this.OutputType)
                 {
                     switch (id)
                     {
@@ -7522,7 +7522,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         private void SetPrimaryFeature(Row row, int featureColumnIndex, int componentColumnIndex)
         {
             // only products contain primary features
-            if (OutputType.Product == this.OutputType)
+            if (OutputType.Package == this.OutputType)
             {
                 var featureField = row.Fields[featureColumnIndex];
                 var componentField = row.Fields[componentColumnIndex];

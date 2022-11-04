@@ -119,6 +119,7 @@
             <xs:enumeration value="bundle"/>
             <xs:enumeration value="fragment" />
             <xs:enumeration value="module" />
+            <xs:enumeration value="package" />
             <xs:enumeration value="product" />
             <xs:enumeration value="patchCreation" />
             <xs:enumeration value="patch" />

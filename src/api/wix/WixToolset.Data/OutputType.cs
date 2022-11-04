@@ -2,6 +2,8 @@
 
 namespace WixToolset.Data
 {
+    using System;
+
     /// <summary>
     /// Various types of output.
     /// </summary>
@@ -25,8 +27,12 @@ namespace WixToolset.Data
         /// <summary>Patch Creation output type.</summary>
         PatchCreation,
 
-        /// <summary>Product output type.</summary>
-        Product,
+        /// <summary>Package output type.</summary>
+        Package,
+
+        /// <summary>Package output type.</summary>
+        [Obsolete]
+        Product = Package,
 
         /// <summary>Transform output type.</summary>
         Transform,

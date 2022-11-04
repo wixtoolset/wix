@@ -823,7 +823,7 @@ namespace WixToolset.Converters.Symbolizer
             case Wix3.OutputType.PatchCreation:
                 return SectionType.PatchCreation;
             case Wix3.OutputType.Product:
-                return SectionType.Product;
+                return SectionType.Package;
             case Wix3.OutputType.Transform:
             case Wix3.OutputType.Unknown:
             default:

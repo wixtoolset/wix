@@ -418,7 +418,7 @@ namespace WixToolset.Core.CommandLine
                     return ".exe";
                 case SectionType.Module:
                     return ".msm";
-                case SectionType.Product:
+                case SectionType.Package:
                     return ".msi";
                 case SectionType.PatchCreation:
                     return ".pcp";
@@ -445,7 +445,7 @@ namespace WixToolset.Core.CommandLine
                     return ".msp";
                 case OutputType.PatchCreation:
                     return ".pcp";
-                case OutputType.Product:
+                case OutputType.Package:
                     return ".msi";
                 case OutputType.Transform:
                     return ".mst";
@@ -701,7 +701,7 @@ namespace WixToolset.Core.CommandLine
                     case "product":
                     case "package":
                     case ".msi":
-                        return Data.OutputType.Product;
+                        return Data.OutputType.Package;
 
                     case "transform":
                     case ".mst":

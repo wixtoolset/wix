@@ -207,7 +207,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
                 case "package":
                 case "msi":
                 case ".msi":
-                    decompileType = OutputType.Product;
+                    decompileType = OutputType.Package;
                     break;
 
                 case "mergemodule":
@@ -231,7 +231,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
         {
             switch (decompileType)
             {
-                case OutputType.Product:
+                case OutputType.Package:
                     return this.SaveAsData ? ".wixmsi" : ".wxs";
 
                 case OutputType.Module:

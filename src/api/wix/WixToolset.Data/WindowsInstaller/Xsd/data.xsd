@@ -38,6 +38,7 @@
                         <xs:enumeration value="Module" />
                         <xs:enumeration value="Patch" />
                         <xs:enumeration value="PatchCreation" />
+                        <xs:enumeration value="Package" />
                         <xs:enumeration value="Product" />
                         <xs:enumeration value="Transform" />
                     </xs:restriction>
