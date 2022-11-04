@@ -7131,6 +7131,11 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionElement(node, child);
                 }
             }
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, id);
+            }
         }
 
         /// <summary>
