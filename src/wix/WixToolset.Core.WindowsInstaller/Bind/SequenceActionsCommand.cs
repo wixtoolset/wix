@@ -343,7 +343,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var set = new HashSet<string>();
 
             // gather the required actions for the output type
-            if (SectionType.Product == this.Section.Type)
+            if (SectionType.Package == this.Section.Type)
             {
                 // AdminExecuteSequence table
                 set.Add("AdminExecuteSequence/CostFinalize");

@@ -519,7 +519,7 @@
     ================================================================================================
                                         GetTargetPath - OVERRIDE DependsOn
 
-    This stand-alone target returns the name of the build product (i.e. MSI, MSM) that would be
+    This stand-alone target returns the name of the build package (i.e. MSI, MSM) that would be
     produced if we built this project.
     ================================================================================================
     -->

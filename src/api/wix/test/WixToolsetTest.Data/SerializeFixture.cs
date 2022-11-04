@@ -21,7 +21,7 @@ namespace WixToolsetTest.Data
         {
             var sln = new SourceLineNumber("test.wxs", 1);
 
-            var section = new IntermediateSection("test", SectionType.Product);
+            var section = new IntermediateSection("test", SectionType.Package);
 
             section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
@@ -66,7 +66,7 @@ namespace WixToolsetTest.Data
         public void CanUpdateIntermediate()
         {
             var sln = new SourceLineNumber("test.wxs", 1);
-            var section = new IntermediateSection("test", SectionType.Product);
+            var section = new IntermediateSection("test", SectionType.Package);
 
             section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
@@ -123,7 +123,7 @@ namespace WixToolsetTest.Data
         {
             var sln = new SourceLineNumber("test.wxs", 1);
 
-            var section = new IntermediateSection("test", SectionType.Product);
+            var section = new IntermediateSection("test", SectionType.Package);
 
             var fieldDefs = new[]
             {
@@ -182,7 +182,7 @@ namespace WixToolsetTest.Data
             symbol.Set(1, 2);
             symbol.Set(2, true);
 
-            var section = new IntermediateSection("test", SectionType.Product);
+            var section = new IntermediateSection("test", SectionType.Package);
             section.AddSymbol(symbol);
 
             var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
@@ -265,7 +265,7 @@ namespace WixToolsetTest.Data
 
             symbol.AddTag("symbol1tag");
 
-            var section = new IntermediateSection("test", SectionType.Product);
+            var section = new IntermediateSection("test", SectionType.Package);
             section.AddSymbol(symbol);
 
             var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
@@ -358,7 +358,7 @@ namespace WixToolsetTest.Data
                 new Localization(65001, 1252, null, bindVariables.ToDictionary(b => b.Id), controls.ToDictionary(c => c.GetKey()))
             };
 
-            var section = new IntermediateSection("test", SectionType.Product);
+            var section = new IntermediateSection("test", SectionType.Package);
 
             section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
@@ -397,7 +397,7 @@ namespace WixToolsetTest.Data
             var sln = new SourceLineNumber("test.wxs", 1);
             var windowsInstallerData = new Wid.WindowsInstallerData(sln)
             {
-                Type = OutputType.Product,
+                Type = OutputType.Package,
             };
 
             var fileTable = windowsInstallerData.EnsureTable(Wid.WindowsInstallerTableDefinitions.File);

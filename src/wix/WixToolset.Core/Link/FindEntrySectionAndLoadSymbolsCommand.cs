@@ -58,7 +58,7 @@ namespace WixToolset.Core.Link
             foreach (var section in this.Sections)
             {
                 // Try to find the one and only entry section.
-                if (SectionType.Product == section.Type || SectionType.Module == section.Type || SectionType.PatchCreation == section.Type || SectionType.Patch == section.Type || SectionType.Bundle == section.Type)
+                if (SectionType.Package == section.Type || SectionType.Module == section.Type || SectionType.PatchCreation == section.Type || SectionType.Patch == section.Type || SectionType.Bundle == section.Type)
                 {
                     // TODO: remove this?
                     //if (SectionType.Unknown != expectedEntrySectionType && section.Type != expectedEntrySectionType)

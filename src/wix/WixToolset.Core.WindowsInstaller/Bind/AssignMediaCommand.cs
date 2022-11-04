@@ -60,7 +60,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // If neither symbol is authored, default to a media template.
-            if (SectionType.Product == this.Section.Type && mediaTemplateSymbols.Count == 0 && mediaSymbols.Count == 0)
+            if (SectionType.Package == this.Section.Type && mediaTemplateSymbols.Count == 0 && mediaSymbols.Count == 0)
             {
                 var mediaTemplate = new WixMediaTemplateSymbol()
                 {
@@ -166,7 +166,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 // When building a product, if the current file is not to be compressed or if
                 // the package set not to be compressed, don't cab it.
-                if (SectionType.Product == this.Section.Type && (facade.Uncompressed || !this.FilesCompressed))
+                if (SectionType.Package == this.Section.Type && (facade.Uncompressed || !this.FilesCompressed))
                 {
                     uncompressedFiles.Add(facade);
                     continue;
@@ -265,7 +265,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // the package set not to be compressed, don't cab it.
                 var compressed = facade.Compressed;
                 var uncompressed = facade.Uncompressed;
-                if (SectionType.Product == this.Section.Type && (uncompressed || (!compressed && !this.FilesCompressed)))
+                if (SectionType.Package == this.Section.Type && (uncompressed || (!compressed && !this.FilesCompressed)))
                 {
                     uncompressedFiles.Add(facade);
                 }

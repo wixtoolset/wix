@@ -1389,7 +1389,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.Data.EnsureTable(this.TableDefinitions["Properties"]);
                     break;
 
-                case OutputType.Product:
+                case OutputType.Package:
                     this.Data.EnsureTable(this.TableDefinitions["File"]);
                     this.Data.EnsureTable(this.TableDefinitions["Media"]);
                     break;
@@ -1476,7 +1476,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         break;
 
-                    case OutputType.Product:
+                    case OutputType.Package:
                         if ("ModuleAdminExecuteSequence" == table.Name ||
                             "ModuleAdminUISequence" == table.Name ||
                             "ModuleAdvtExecuteSequence" == table.Name ||
@@ -1540,7 +1540,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Ensure the Error table exists if output is marked for MSI 1.0 or below (see ICE40).
-            if (outputInstallerVersion <= 100 && OutputType.Product == this.Data.Type)
+            if (outputInstallerVersion <= 100 && OutputType.Package == this.Data.Type)
             {
                 this.Data.EnsureTable(this.TableDefinitions["Error"]);
             }
@@ -1581,8 +1581,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     return OutputType.Bundle;
                 case SectionType.Module:
                     return OutputType.Module;
-                case SectionType.Product:
-                    return OutputType.Product;
+                case SectionType.Package:
+                    return OutputType.Package;
                 case SectionType.PatchCreation:
                     return OutputType.PatchCreation;
                 case SectionType.Patch:

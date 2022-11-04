@@ -61,7 +61,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 foreach (var mediaRow in mediaTable.Rows.Cast<MediaRow>().Where(r => !String.IsNullOrEmpty(r.Cabinet)))
                 {
-                    if (OutputType.Product == this.Output.Type ||
+                    if (OutputType.Package == this.Output.Type ||
                         (OutputType.Transform == this.Output.Type && RowOperation.Add == mediaRow.Operation))
                     {
                         if (mediaRow.Cabinet.StartsWith("#", StringComparison.Ordinal))

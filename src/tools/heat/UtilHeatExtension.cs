@@ -263,6 +263,7 @@ namespace WixToolset.Harvesters
                             case "module":
                                 utilMutator.TemplateType = TemplateType.Module;
                                 break;
+                            case "package":
                             case "product":
                                 utilMutator.TemplateType = TemplateType.Package ;
                                 break;

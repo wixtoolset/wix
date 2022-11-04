@@ -217,8 +217,9 @@ namespace WixToolset.Data.WindowsInstaller
                             case "PatchCreation":
                                 output.Type = OutputType.PatchCreation;
                                 break;
+                            case "Package":
                             case "Product":
-                                output.Type = OutputType.Product;
+                                output.Type = OutputType.Package;
                                 break;
                             case "Transform":
                                 output.Type = OutputType.Transform;

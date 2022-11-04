@@ -20,7 +20,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void MustCompileBeforeLinking()
         {
-            var intermediate1 = new Intermediate("TestIntermediate1", new[] { new IntermediateSection("test1", SectionType.Product) }, null);
+            var intermediate1 = new Intermediate("TestIntermediate1", new[] { new IntermediateSection("test1", SectionType.Package) }, null);
             var intermediate2 = new Intermediate("TestIntermediate2", new[] { new IntermediateSection("test2", SectionType.Fragment) }, null);
             var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
 

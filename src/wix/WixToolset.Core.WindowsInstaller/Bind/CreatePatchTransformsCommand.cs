@@ -108,7 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var exportBasePath = Path.Combine(this.IntermediateFolder, stageFolder);
                 var extractFilesFolder = Path.Combine(exportBasePath, "File");
 
-                var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, path, null, OutputType.Product, exportBasePath, extractFilesFolder, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, path, null, OutputType.Package, exportBasePath, extractFilesFolder, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
                 data = command.Execute();
             }
 

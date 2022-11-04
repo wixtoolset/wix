@@ -109,7 +109,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var section = this.Intermediate.Sections.Single();
 
-            var packageSymbol = (section.Type == SectionType.Product) ? this.GetSingleSymbol<WixPackageSymbol>(section) : null;
+            var packageSymbol = (section.Type == SectionType.Package) ? this.GetSingleSymbol<WixPackageSymbol>(section) : null;
             var moduleSymbol = (section.Type == SectionType.Module) ? this.GetSingleSymbol<WixModuleSymbol>(section) : null;
             var patchSymbol = (section.Type == SectionType.Patch) ? this.GetSingleSymbol<WixPatchSymbol>(section) : null;
 
@@ -127,7 +127,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 tableDefinitions = command.TableDefinitions;
             }
 
-            if (section.Type == SectionType.Product)
+            if (section.Type == SectionType.Package)
             {
                 this.ProcessProductVersion(packageSymbol, section, validate: false);
             }
@@ -188,7 +188,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Process dependency references.
-            if (SectionType.Product == section.Type || SectionType.Module == section.Type)
+            if (SectionType.Package == section.Type || SectionType.Module == section.Type)
             {
                 var dependencyRefs = section.Symbols.OfType<WixDependencyRefSymbol>().ToList();
 
@@ -200,7 +200,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Process SoftwareTags in MSI packages.
-            if (SectionType.Product == section.Type)
+            if (SectionType.Package == section.Type)
             {
                 var softwareTags = section.Symbols.OfType<WixPackageTagSymbol>().ToList();
 
@@ -250,7 +250,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Retrieve file information from merge modules.
-            if (SectionType.Product == section.Type)
+            if (SectionType.Package == section.Type)
             {
                 var wixMergeSymbols = section.Symbols.OfType<WixMergeSymbol>().ToList();
 
@@ -293,7 +293,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Now that delayed fields are processed, fixup the package version (if needed) and validate it
             // which will short circuit duplicate errors later if the ProductVersion is invalid.
-            if (SectionType.Product == section.Type)
+            if (SectionType.Package == section.Type)
             {
                 this.ProcessProductVersion(packageSymbol, section, validate: true);
             }
@@ -330,7 +330,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            if (SectionType.Product == section.Type)
+            if (SectionType.Package == section.Type)
             {
                 var command = new ValidateWindowsInstallerProductConstraints(this.Messaging, section);
                 command.Execute();
@@ -402,7 +402,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var unsuppress = new AddBackSuppressedSequenceTablesCommand(data, tableDefinitions);
                 suppressedTableNames = unsuppress.Execute();
             }
-            else if (data.Type == OutputType.Product) // we can create instance transforms since Component Guids and Outputs are created.
+            else if (data.Type == OutputType.Package) // we can create instance transforms since Component Guids and Outputs are created.
             {
                 var command = new CreateInstanceTransformsCommand(section, data, tableDefinitions, this.WindowsInstallerBackendHelper);
                 command.Execute();

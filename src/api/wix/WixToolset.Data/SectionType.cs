@@ -2,6 +2,8 @@
 
 namespace WixToolset.Data
 {
+    using System;
+
     /// <summary>
     /// Type of section.
     /// </summary>
@@ -19,8 +21,12 @@ namespace WixToolset.Data
         /// <summary>Module section type.</summary>
         Module,
 
-        /// <summary>Product section type.</summary>
-        Product,
+        /// <summary>Package section type.</summary>
+        Package,
+
+        /// <summary>Package output type.</summary>
+        [Obsolete]
+        Product = Package,
 
         /// <summary>Patch creation section type.</summary>
         PatchCreation,

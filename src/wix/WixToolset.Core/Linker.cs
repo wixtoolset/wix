@@ -193,49 +193,49 @@ namespace WixToolset.Core
                         switch (symbol.Definition.Type)
                         {
                             case SymbolDefinitionType.Class:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, (int)ClassSymbolFields.ComponentRef, (int)ClassSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case SymbolDefinitionType.Extension:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, (int)ExtensionSymbolFields.ComponentRef, (int)ExtensionSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case SymbolDefinitionType.Assembly:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, (int)AssemblySymbolFields.ComponentRef, (int)AssemblySymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case SymbolDefinitionType.PublishComponent:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, (int)PublishComponentSymbolFields.ComponentRef, (int)PublishComponentSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case SymbolDefinitionType.Shortcut:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, (int)ShortcutSymbolFields.ComponentRef, (int)ShortcutSymbolFields.Target, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case SymbolDefinitionType.TypeLib:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, (int)TypeLibSymbolFields.ComponentRef, (int)TypeLibSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case SymbolDefinitionType.WixMerge:
-                                if (SectionType.Product == resolvedSection.Type)
+                                if (SectionType.Package == resolvedSection.Type)
                                 {
                                     this.ResolveFeatures(symbol, -1, (int)WixMergeSymbolFields.FeatureRef, modulesToFeatures, null);
                                 }
@@ -288,7 +288,7 @@ namespace WixToolset.Core
                     var command = new FlattenAndProcessBundleTablesCommand(resolvedSection, this.Messaging);
                     command.Execute();
                 }
-                else if (resolvedSection.Type == SectionType.Product || resolvedSection.Type == SectionType.Module)
+                else if (resolvedSection.Type == SectionType.Package || resolvedSection.Type == SectionType.Module)
                 {
                     // Packages and modules get standard directories add.
                     var command = new AddRequiredStandardDirectories(resolvedSection, references);

@@ -39,7 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             PropertySymbol languageSymbol = null;
             var variableCache = this.PopulateDelayedVariables ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) : null;
 
-            if (SectionType.Product == this.Section.Type || variableCache != null)
+            if (SectionType.Package == this.Section.Type || variableCache != null)
             {
                 foreach (var propertySymbol in this.Section.Symbols.OfType<PropertySymbol>())
                 {
@@ -60,7 +60,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
 
-                if (this.Section.Type == SectionType.Product && String.IsNullOrEmpty(languageSymbol?.Value))
+                if (this.Section.Type == SectionType.Package && String.IsNullOrEmpty(languageSymbol?.Value))
                 {
                     if (languageSymbol == null)
                     {
