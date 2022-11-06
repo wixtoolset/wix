@@ -24,7 +24,7 @@ namespace WixToolset.Core.ExtensionCache
         {
             return new CommandLineHelp("Manage the extension cache.")
             {
-                Commands = new[] { new CommandLineHelpCommand("extension", "Manage extension cache.") }
+                Commands = new[] { new CommandLineHelpCommand("extension", "Manage WiX extension cache.") }
             };
         }
 

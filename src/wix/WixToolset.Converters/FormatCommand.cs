@@ -17,7 +17,7 @@ namespace WixToolset.Converters
 
         public override CommandLineHelp GetCommandLineHelp()
         {
-            return new CommandLineHelp("Ensures consistent formatting of source code.", "format [options] sourceFile [sourceFile ...]")
+            return new CommandLineHelp("Ensure consistent formatting of source code.", "format [options] sourceFile [sourceFile ...]")
             {
                 Switches = new[]
                 {

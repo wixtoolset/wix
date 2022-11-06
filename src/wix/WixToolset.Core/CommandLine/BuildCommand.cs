@@ -58,7 +58,7 @@ namespace WixToolset.Core.CommandLine
                 new CommandLineHelpSwitch("-include", "-i", "Folder to search for include files."),
                 new CommandLineHelpSwitch("-intermediatefolder", "Optional working folder. If not specified a folder in %TMP% will be created."),
                 new CommandLineHelpSwitch("-loc", "Localization file to use in the build. By default, .wxl files are recognized as localization."),
-                new CommandLineHelpSwitch("-lib", "Library file to use in the build. By default, .wixlb files are recognized as libraries."),
+                new CommandLineHelpSwitch("-lib", "Library file to use in the build. By default, .wixlib files are recognized as libraries."),
                 new CommandLineHelpSwitch("-src", "Source file to use in the build. By default, .wxs files are recognized as source code."),
                 new CommandLineHelpSwitch("-out", "-o", "Path to output the build to."),
                 new CommandLineHelpSwitch("-outputtype", "Explicitly set the output type if it cannot be determined from the output."),

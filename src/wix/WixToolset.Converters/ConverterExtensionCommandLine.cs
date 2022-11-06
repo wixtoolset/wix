@@ -27,7 +27,7 @@ namespace WixToolset.Converters
                 Commands = new[]
                 {
                     new CommandLineHelpCommand("convert", "Convert v3 source code to v4 source code."),
-                    new CommandLineHelpCommand("format", "Ensures consistent formatting of source code."),
+                    new CommandLineHelpCommand("format", "Ensure consistent formatting of source code."),
                 }
             };
         }

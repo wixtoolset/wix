@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 Commands = new[]
                 {
-                    new CommandLineHelpCommand("msi", "Windows Installer specialized operations."),
+                    new CommandLineHelpCommand("msi", "Specialized operations for manipulating Windows Installer packages."),
                 }
             };
         }
