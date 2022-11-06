@@ -35,12 +35,12 @@ namespace WixToolset.Core.CommandLine
                 Switches = new[]
                 {
                     new CommandLineHelpSwitch("--help", "-h", "Show command line help."),
-                    new CommandLineHelpSwitch("--version", "-v", "Display WiX Toolset version in use."),
+                    new CommandLineHelpSwitch("--version", "Display WiX Toolset version in use."),
                     new CommandLineHelpSwitch("--nologo", "Suppress displaying the logo information."),
                 },
                 Commands = new[]
                 {
-                    new CommandLineHelpCommand("build", "Build a wixlib, package or bundle.")
+                    new CommandLineHelpCommand("build", "Build a wixlib, package, or bundle.")
                 },
                 Notes = "Run 'wix [command] -h' for more information on a command."
             };

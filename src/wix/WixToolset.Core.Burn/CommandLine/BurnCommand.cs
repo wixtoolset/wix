@@ -33,10 +33,10 @@ namespace WixToolset.Core.Burn.CommandLine
             {
                 Commands = new[]
                 {
-                    new CommandLineHelpCommand("detach", "Detaches the burn engine from a bundle so it can be signed."),
-                    new CommandLineHelpCommand("extract", "Extracts the internals of a bundle to a folder."),
-                    new CommandLineHelpCommand("reattach", "Reattaches a signed burn engine to a bundle."),
-                    new CommandLineHelpCommand("remotepayload", "Extracts the internals of a bundle."),
+                    new CommandLineHelpCommand("detach", "Detach the Burn engine from a bundle so it can be signed."),
+                    new CommandLineHelpCommand("extract", "Extract the internals of a bundle to a folder."),
+                    new CommandLineHelpCommand("reattach", "Reattach a signed Burn engine to a bundle."),
+                    new CommandLineHelpCommand("remotepayload", "Generate source code for a remote payload."),
                 }
             };
         }
