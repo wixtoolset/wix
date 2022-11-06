@@ -578,7 +578,7 @@
 
     <WixBuild
         SourceFiles="@(Compile)"
-        LibraryFiles="@(WixLibProjects);@(_ResolvedWixLibraryPaths)"
+        LibraryFiles="@(_ResolvedWixLibraryPaths)"
         LocalizationFiles="@(_WixLocalizationFile)"
 
         Cultures="%(CultureGroup.Identity)"
@@ -606,9 +606,6 @@
         CabinetCachePath="$(_WixBuildCabinetCachePath)"
         CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
         DefaultCompressionLevel="$(DefaultCompressionLevel)"
-
-        WixProjectFile="$(ProjectPath)"
-        WixVariables="$(WixVariables)"
 
         SuppressAllWarnings="$(SuppressAllWarnings)"
         SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
