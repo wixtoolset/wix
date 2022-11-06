@@ -8,7 +8,7 @@ namespace WixToolset.BuildTasks
     /// <summary>
     /// An MSBuild task to run WiX to detach bundle engine to be signed.
     /// </summary>
-    public sealed partial class WindowsInstallerValidation : WixExeBaseTask
+    public sealed class WindowsInstallerValidation : WixExeBaseTask
     {
         /// <summary>
         /// Gets or sets the path to the database to validate.

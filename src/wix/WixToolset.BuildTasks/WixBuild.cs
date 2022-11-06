@@ -10,7 +10,7 @@ namespace WixToolset.BuildTasks
     /// <summary>
     /// An MSBuild task to run the WiX compiler.
     /// </summary>
-    public sealed partial class WixBuild : WixExeBaseTask
+    public sealed class WixBuild : WixExeBaseTask
     {
         public string[] Cultures { get; set; }
 
@@ -54,10 +54,6 @@ namespace WixToolset.BuildTasks
         public int CabinetCreationThreadCount { get; set; }
 
         public string DefaultCompressionLevel { get; set; }
-
-        public ITaskItem WixProjectFile { get; set; }
-
-        public string[] WixVariables { get; set; }
 
         protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
