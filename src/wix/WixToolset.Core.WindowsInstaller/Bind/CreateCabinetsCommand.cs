@@ -83,17 +83,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            // If the cabbing thread count wasn't provided, default the number of cabbing threads to the number of processors.
-            if (this.CabbingThreadCount <= 0)
-            {
-                this.CabbingThreadCount = this.CalculateCabbingThreadCount();
-
-                this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
-            }
+            var calculatedCabbingThreadCount = this.CalculateCabbingThreadCount();
 
             this.GetMediaTemplateAttributes(out var maximumCabinetSizeForLargeFileSplitting, out var maximumUncompressedMediaSize);
 
-            var cabinetBuilder = new CabinetBuilder(this.Messaging, this.CabbingThreadCount, maximumCabinetSizeForLargeFileSplitting, maximumUncompressedMediaSize);
+            var cabinetBuilder = new CabinetBuilder(this.Messaging, calculatedCabbingThreadCount, maximumCabinetSizeForLargeFileSplitting, maximumUncompressedMediaSize);
 
             var hashesByFileId = this.Section.Symbols.OfType<MsiFileHashSymbol>().ToDictionary(s => s.Id.Id);
 
@@ -130,16 +124,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private int CalculateCabbingThreadCount()
         {
-            var cabbingThreadCount = Environment.ProcessorCount;
+            var processorCount = Environment.ProcessorCount;
 
-            if (cabbingThreadCount <= 0)
+            // If the number of processors is invalid, default to a single processor.
+            if (processorCount == 0)
             {
-                cabbingThreadCount = 1; // reset to 1 when the environment variable is invalid.
+                processorCount = 1;
 
-                this.Messaging.Write(WarningMessages.InvalidEnvironmentVariable("NUMBER_OF_PROCESSORS", Environment.ProcessorCount.ToString(), cabbingThreadCount.ToString()));
+                this.Messaging.Write(WarningMessages.InvalidEnvironmentVariable("NUMBER_OF_PROCESSORS", Environment.ProcessorCount.ToString(), processorCount.ToString()));
             }
 
-            return cabbingThreadCount;
+            // If the cabbing thread count was provided, and it isn't more than double the number of processors, use it.
+            if (this.CabbingThreadCount > 0 && processorCount < this.CabbingThreadCount * 2)
+            {
+                processorCount = this.CabbingThreadCount;
+            }
+
+            this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(processorCount.ToString()));
+
+            return processorCount;
         }
 
         private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData data, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<IFileFacade> fileFacades, Dictionary<string, MsiFileHashSymbol> hashesByFileId)

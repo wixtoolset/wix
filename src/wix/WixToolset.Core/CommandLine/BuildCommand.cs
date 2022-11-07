@@ -52,6 +52,7 @@ namespace WixToolset.Core.CommandLine
                 new CommandLineHelpSwitch("-bindpath:target", "-bt", "Bind path to search for target package's content files. Only used when building a patch."),
                 new CommandLineHelpSwitch("-bindpath:update", "-bu", "Bind path to search for update package's content files. Only used when building a patch."),
                 new CommandLineHelpSwitch("-cabcache", "-cc", "Set a folder to cache cabinets across builds."),
+                new CommandLineHelpSwitch("-cabthreads", "-ct", "Override the number of threads used to create cabinets."),
                 new CommandLineHelpSwitch("-culture", "Adds a culture to filter localization files."),
                 new CommandLineHelpSwitch("-define", "-d", "Sets a preprocessor variable."),
                 new CommandLineHelpSwitch("-defaultcompressionlevel", "-dcl", "Default compression level; see Compression levels below."),
@@ -147,7 +148,7 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, inputsOutputs, cancellationToken);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, inputsOutputs, cancellationToken);
                             }
                         }
                     }
@@ -265,7 +266,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, IReadOnlyCollection<IBindPath> bindPaths, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
         {
             IResolveResult resolveResult;
             {
@@ -295,7 +296,7 @@ namespace WixToolset.Core.CommandLine
                 {
                     var context = this.ServiceProvider.GetService<IBindContext>();
                     context.BindPaths = bindPaths;
-                    //context.CabbingThreadCount = this.CabbingThreadCount;
+                    context.CabbingThreadCount = cabbingThreadCount;
                     context.CabCachePath = cabCachePath;
                     context.ResolvedCodepage = resolveResult.Codepage;
                     context.ResolvedSummaryInformationCodepage = resolveResult.SummaryInformationCodepage;
@@ -467,6 +468,8 @@ namespace WixToolset.Core.CommandLine
 
             public string CabCachePath { get; private set; }
 
+            public int CabbingThreadCount { get; private set; }
+
             public List<string> Cultures { get; } = new List<string>();
 
             public List<string> Defines { get; } = new List<string>();
@@ -565,6 +568,24 @@ namespace WixToolset.Core.CommandLine
                         case "cabcache":
                             this.CabCachePath = parser.GetNextArgumentOrError(arg);
                             return true;
+
+                        case "ct":
+                        case "cabthreads":
+                        {
+                            var value = parser.GetNextArgumentOrError(arg);
+                            if (Int32.TryParse(value, out var cabbingThreads))
+                            {
+                                this.CabbingThreadCount = cabbingThreads;
+                            }
+                            else if (!String.IsNullOrEmpty(value))
+                            {
+                                var processorCount = Environment.ProcessorCount == 0 ? 1 : Environment.ProcessorCount;
+                                var range = Enumerable.Range(1, processorCount * 2).Select(i => i.ToString());
+                                parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, range));
+                            }
+
+                            return true;
+                        }
 
                         case "culture":
                             parser.GetNextArgumentOrError(arg, this.Cultures);
