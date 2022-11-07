@@ -28,6 +28,7 @@ namespace WixToolsetTest.CoreIntegration
                     "build",
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
+                    "-ct", "1000000",
                     "-d", "MediaTemplateCompressionLevel",
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
