@@ -66,6 +66,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -76,18 +77,24 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "does-not-exist"),
                     "-bindpath", Path.Combine(folder, "also-does-not-exist"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                    "-o", Path.Combine(binFolder, "test.msi")
                 }, out var messages);
                 Assert.Equal(103, result);
 
-                var error = messages.Single(m => m.Level == MessageLevel.Error);
-                var errorMessage = error.ToString();
+                var errorMessages = messages.Select(m => m.ToString().Replace(folder, "<folder>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"The system cannot find the file 'test.txt' with type 'File'. The following paths were checked: test.txt, <folder>\does-not-exist\test.txt, <folder>\also-does-not-exist\test.txt",
+                    @"The system cannot find the file 'test.txt' with type 'File'. The following paths were checked: test.txt, <folder>\does-not-exist\test.txt, <folder>\also-does-not-exist\test.txt",
+                }, errorMessages);
+
+                var errorMessage = errorMessages.First();
                 var checkedPaths = errorMessage.Substring(errorMessage.IndexOf(':') + 1).Split(new[] { ',' }).Select(s => s.Trim()).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
                     "test.txt",
-                    Path.Combine(folder, "does-not-exist", "test.txt"),
-                    Path.Combine(folder, "also-does-not-exist", "test.txt"),
+                    Path.Combine("<folder>", "does-not-exist", "test.txt"),
+                    Path.Combine("<folder>", "also-does-not-exist", "test.txt"),
                 }, checkedPaths);
             }
         }
