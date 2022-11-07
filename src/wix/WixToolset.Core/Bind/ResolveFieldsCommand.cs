@@ -86,6 +86,8 @@ namespace WixToolset.Core.Bind
                         }
                     }
 
+                    var beforeErrorCount = this.Messaging.ErrorCount;
+
                     // Check to make sure we're in a scenario where we can handle variable resolution.
                     if (null != delayedFields)
                     {
@@ -110,7 +112,7 @@ namespace WixToolset.Core.Bind
                     }
 
                     // Move to next symbol if we've hit an error resolving variables.
-                    if (this.Messaging.EncounteredError) // TODO: make this error handling more specific to just the failure to resolve variables in this field.
+                    if (beforeErrorCount < this.Messaging.ErrorCount)
                     {
                         continue;
                     }
