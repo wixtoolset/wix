@@ -425,7 +425,7 @@ namespace WixToolset.Netfx
                             break;
                         case "RollForward":
                             rollForward = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            switch (rollForward.ToLower())
+                            switch (rollForward.ToLowerInvariant())
                             {
                                 case "latestmajor":
                                     rollForward = "LatestMajor";

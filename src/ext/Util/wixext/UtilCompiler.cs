@@ -1232,10 +1232,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
-            if (!element.Elements().Any())
-            {
-                this.Messaging.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, element.Name.LocalName, "FileSharePermission"));
-            }
+            var fileSharePermissionCount = 0;
 
             foreach (var child in element.Elements())
             {
@@ -1245,6 +1242,7 @@ namespace WixToolset.Util
                     {
                         case "FileSharePermission":
                             this.ParseFileSharePermissionElement(intermediate, section, child, id);
+                            ++fileSharePermissionCount;
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(element, child);
@@ -1255,6 +1253,11 @@ namespace WixToolset.Util
                 {
                     this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
+            }
+
+            if (fileSharePermissionCount == 0)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, element.Name.LocalName, "FileSharePermission"));
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4ConfigureSmbInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
@@ -3521,7 +3524,7 @@ namespace WixToolset.Util
                             }
                             break;
                         case "SelectionLanguage":
-                            string selectionLanguage = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var selectionLanguage = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (selectionLanguage)
                             {
                                 case "XPath":
@@ -3653,7 +3656,7 @@ namespace WixToolset.Util
                             }
                             else
                             {
-                                string actionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                                var actionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                                 switch (actionValue)
                                 {
                                     case "create":

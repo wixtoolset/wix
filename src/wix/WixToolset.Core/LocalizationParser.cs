@@ -97,10 +97,10 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "Codepage":
-                            codepage = Common.GetValidCodePage(attrib.Value, true, false, sourceLineNumbers);
+                            codepage = Common.GetValidCodePage(attrib.Value, allowNoChange: true, onlyAnsi: false, sourceLineNumbers);
                             break;
                         case "SummaryInformationCodepage":
-                            summaryInformationCodepage = Common.GetValidCodePage(attrib.Value, true, false, sourceLineNumbers);
+                            summaryInformationCodepage = Common.GetValidCodePage(attrib.Value, allowNoChange: true, onlyAnsi: false, sourceLineNumbers);
                             break;
                         case "Culture":
                             culture = attrib.Value;

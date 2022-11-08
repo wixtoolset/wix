@@ -67,7 +67,6 @@ namespace WixToolset.Iis
             {
                 case "Component":
                     var componentId = context["ComponentId"];
-                    var directoryId = context["DirectoryId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -265,7 +264,6 @@ namespace WixToolset.Iis
                 }
             }
 
-
             if (null == id)
             {
                 id = this.ParseHelper.CreateIdentifier("crt", componentId, binaryRef, certificatePath);
@@ -351,7 +349,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("wsc", webId);
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
