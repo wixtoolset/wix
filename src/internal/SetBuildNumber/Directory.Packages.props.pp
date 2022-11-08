@@ -6,9 +6,9 @@
     <PackageVersion Include="WixToolset.Dtf.Resources" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.WindowsInstaller" Version="{packageversion}" />
 
-    <PackageVersion Include="WixBuildTools.TestSupport" Version="{packageversion}" />
-    <PackageVersion Include="WixBuildTools.TestSupport.Native" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.BaseBuildTasks.Sources" Version="{packageversion}" />
+    <PackageVersion Include="WixInternal.TestSupport" Version="{packageversion}" />
+    <PackageVersion Include="WixInternal.TestSupport.Native" Version="{packageversion}" />
+    <PackageVersion Include="WixInternal.BaseBuildTasks.Sources" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.DUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.WcaUtil" Version="{packageversion}" />
@@ -28,7 +28,7 @@
     <PackageVersion Include="WixToolset.Core" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Core.Burn" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Core.WindowsInstaller" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.Core.TestPackage" Version="{packageversion}" />
+    <PackageVersion Include="WixInternal.Core.TestPackage" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Heat" Version="{packageversion}" />
 
@@ -83,7 +83,7 @@
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
   </ItemGroup>
 
-  <!-- Keep the following versions in sync with internal\WixBuildTools.TestSupport.Native\packages.config -->
+  <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="GitInfo" Version="2.2.0" />

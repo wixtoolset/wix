@@ -4,7 +4,7 @@ namespace WixToolsetTest.Heat
 {
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class HeatFixture

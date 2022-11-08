@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
+    <ProjectReference Include="..\..\WixInternal.Core.TestPackage\WixInternal.Core.TestPackage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

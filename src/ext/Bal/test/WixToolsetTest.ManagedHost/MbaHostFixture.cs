@@ -2,7 +2,7 @@
 
 namespace WixToolsetTest.ManagedHost
 {
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class MbaHostFixture

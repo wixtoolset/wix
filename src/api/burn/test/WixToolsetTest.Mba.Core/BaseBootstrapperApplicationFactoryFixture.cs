@@ -5,7 +5,7 @@ namespace WixToolsetTest.Mba.Core
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Mba.Core;
     using Xunit;
 

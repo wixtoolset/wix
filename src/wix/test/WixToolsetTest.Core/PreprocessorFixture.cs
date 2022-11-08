@@ -5,7 +5,7 @@ namespace WixToolsetTest.Core
     using System;
     using System.IO;
     using System.Xml;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Core;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;

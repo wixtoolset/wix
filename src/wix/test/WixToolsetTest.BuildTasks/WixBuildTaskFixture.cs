@@ -7,7 +7,7 @@ namespace WixToolsetTest.BuildTasks
     using System.Linq;
     using System.Runtime.InteropServices;
     using Microsoft.Build.Utilities;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.BuildTasks;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;

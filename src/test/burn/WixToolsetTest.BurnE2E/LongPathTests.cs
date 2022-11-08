@@ -7,7 +7,7 @@ namespace WixToolsetTest.BurnE2E
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Win32;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixTestTools;
     using WixToolset.Mba.Core;
     using Xunit;

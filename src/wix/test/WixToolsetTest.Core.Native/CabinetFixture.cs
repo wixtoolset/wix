@@ -5,7 +5,7 @@ namespace WixToolsetTest.CoreNative
     using System;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using Xunit;
@@ -119,7 +119,7 @@ namespace WixToolsetTest.CoreNative
                         var cabFileInfo = enumerated[i];
                         var fileInfo = new FileInfo(files[i]);
 
-                        WixBuildTools.TestSupport.WixAssert.StringEqual(cabFileInfo.FileId, fileInfo.Name);
+                        WixInternal.TestSupport.WixAssert.StringEqual(cabFileInfo.FileId, fileInfo.Name);
                         Assert.Equal(cabFileInfo.Size, fileInfo.Length);
                         Assert.True(cabFileInfo.SameAsDateTime(fileInfo.CreationTime));
                     }

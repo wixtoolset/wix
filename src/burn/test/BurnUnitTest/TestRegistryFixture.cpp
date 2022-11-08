@@ -165,7 +165,7 @@ LExit:
     return ls;
 }
 
-namespace WixBuildTools
+namespace WixInternal
 {
     namespace TestSupport
     {

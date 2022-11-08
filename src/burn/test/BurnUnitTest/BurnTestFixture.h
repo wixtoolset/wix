@@ -13,7 +13,7 @@ namespace Test
 namespace Bootstrapper
 {
     using namespace System;
-    using namespace WixBuildTools::TestSupport;
+    using namespace WixInternal::TestSupport;
 
     public ref class BurnTestFixture : IDisposable
     {
@@ -31,7 +31,7 @@ namespace Bootstrapper
 
             PlatformInitialize();
 
-            this->testDirectory = WixBuildTools::TestSupport::TestData::Get();
+            this->testDirectory = WixInternal::TestSupport::TestData::Get();
 
             LogInitialize(::GetModuleHandleW(L"BurnUnitTest.dll"));
 

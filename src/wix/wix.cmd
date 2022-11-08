@@ -69,7 +69,7 @@ msbuild pack_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\wix_p
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.burn" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.native" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.windowsinstaller" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.core.testpackage" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixinternal.core.testpackage" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.sdk" 2> nul
 @exit /b
 

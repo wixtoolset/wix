@@ -3,8 +3,8 @@
 namespace WixToolsetTest.Msmq
 {
     using System.Linq;
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
     using WixToolset.Msmq;
     using Xunit;
 

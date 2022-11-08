@@ -2,7 +2,7 @@
 
 namespace WixToolsetTest.Data
 {
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
 

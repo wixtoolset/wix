@@ -13,7 +13,7 @@ namespace Test
 namespace Bootstrapper
 {
     using namespace System;
-    using namespace WixBuildTools::TestSupport;
+    using namespace WixInternal::TestSupport;
 
     public ref struct BurnTestException : public SucceededException
     {

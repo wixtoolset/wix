@@ -31,12 +31,12 @@ msbuild internal_t.proj -p:Configuration=%_C% -nologo -warnaserror -bl:%_L%\inte
 
 :clean
 @rd /s/q "..\..\build\internal" 2> nul
-@del "..\..\build\artifacts\WixBuildTools.TestSupport.*.nupkg" 2> nul
-@del "..\..\build\artifacts\WixBuildTools.TestSupport.Native.*.nupkg" 2> nul
-@del "..\..\build\artifacts\WixToolset.BaseBuildTasks.Sources.*.nupkg" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixbuildtools.testsupport" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixbuildtools.testsupport.native" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.basebuildtasks.sources" 2> nul
+@del "..\..\build\artifacts\WixInternal.TestSupport.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixInternal.TestSupport.Native.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixInternal.BaseBuildTasks.Sources.*.nupkg" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixinternal.testsupport" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixinternal.testsupport.native" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixinternal.basebuildtasks.sources" 2> nul
 @exit /b
 
 :end

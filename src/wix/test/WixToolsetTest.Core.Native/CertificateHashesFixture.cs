@@ -3,7 +3,7 @@
 namespace WixToolsetTest.CoreNative
 {
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Core.Native;
     using Xunit;
 
@@ -17,9 +17,9 @@ namespace WixToolsetTest.CoreNative
             var hashes = CertificateHashes.Read(new[] { cabFile });
 
             var hash = hashes.Single();
-            WixBuildTools.TestSupport.WixAssert.StringEqual(cabFile, hash.Path);
-            WixBuildTools.TestSupport.WixAssert.StringEqual("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hash.PublicKey);
-            WixBuildTools.TestSupport.WixAssert.StringEqual("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hash.Thumbprint);
+            WixInternal.TestSupport.WixAssert.StringEqual(cabFile, hash.Path);
+            WixInternal.TestSupport.WixAssert.StringEqual("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hash.PublicKey);
+            WixInternal.TestSupport.WixAssert.StringEqual("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hash.Thumbprint);
             Assert.Null(hash.Exception);
         }
 
@@ -31,7 +31,7 @@ namespace WixToolsetTest.CoreNative
             var hashes = CertificateHashes.Read(new[] { txtFile });
 
             var hash = hashes.Single();
-            WixBuildTools.TestSupport.WixAssert.StringEqual(txtFile, hash.Path);
+            WixInternal.TestSupport.WixAssert.StringEqual(txtFile, hash.Path);
             Assert.Null(hash.Exception);
         }
 
@@ -43,9 +43,9 @@ namespace WixToolsetTest.CoreNative
 
             var hashes = CertificateHashes.Read(new[] { cabFile, txtFile });
 
-            WixBuildTools.TestSupport.WixAssert.StringEqual(cabFile, hashes[0].Path);
-            WixBuildTools.TestSupport.WixAssert.StringEqual("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hashes[0].PublicKey);
-            WixBuildTools.TestSupport.WixAssert.StringEqual("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hashes[0].Thumbprint);
+            WixInternal.TestSupport.WixAssert.StringEqual(cabFile, hashes[0].Path);
+            WixInternal.TestSupport.WixAssert.StringEqual("7EC90B3FC3D580EB571210011F1095E149DCC6BB", hashes[0].PublicKey);
+            WixInternal.TestSupport.WixAssert.StringEqual("0B13494DB50BC185A34389BBBAA01EDD1CF56350", hashes[0].Thumbprint);
             Assert.Null(hashes[0].Exception);
 
             Assert.Equal(txtFile, hashes[1].Path);

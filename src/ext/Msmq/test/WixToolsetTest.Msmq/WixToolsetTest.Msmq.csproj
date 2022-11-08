@@ -19,6 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Core.TestPackage" />
+    <PackageReference Include="WixInternal.Core.TestPackage" />
   </ItemGroup>
 </Project>

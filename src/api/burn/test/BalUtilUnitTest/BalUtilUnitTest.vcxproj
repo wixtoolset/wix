@@ -3,7 +3,7 @@
 
 
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\..\internal\WixBuildTools.TestSupport.Native\build\WixBuildTools.TestSupport.Native.props" />
+  <Import Project="..\..\..\..\internal\WixInternal.TestSupport.Native\build\WixInternal.TestSupport.Native.props" />
 
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -61,5 +61,5 @@
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Import Project="..\..\..\..\internal\WixBuildTools.TestSupport.Native\build\WixBuildTools.TestSupport.Native.targets" />
+  <Import Project="..\..\..\..\internal\WixInternal.TestSupport.Native\build\WixInternal.TestSupport.Native.targets" />
 </Project>

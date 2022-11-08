@@ -2,8 +2,8 @@
 
 namespace WixToolsetTest.Http
 {
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
     using WixToolset.Http;
     using Xunit;
 

@@ -19,10 +19,10 @@
     <ProjectReference Include="..\..\WixToolset.Core\WixToolset.Core.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
-    <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
+    <ProjectReference Include="..\..\WixInternal.Core.TestPackage\WixInternal.Core.TestPackage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixBuildTools.TestSupport" />
+    <PackageReference Include="WixInternal.TestSupport" />
   </ItemGroup>
 </Project>

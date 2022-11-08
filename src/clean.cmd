@@ -17,8 +17,9 @@ if exist global.json (del global.json)
 if exist ..\Directory.Packages.props (del ..\Directory.Packages.props)
 if exist ..\global.json (del ..\global.json)
 
-if exist "%_NUGET_CACHE%\wixbuildtools.testsupport" rd /s/q "%_NUGET_CACHE%\wixbuildtools.testsupport"
-if exist "%_NUGET_CACHE%\wixtoolset.basebuildtasks.sources" rd /s/q "%_NUGET_CACHE%\wixtoolset.basebuildtasks.sources"
+if exist "%_NUGET_CACHE%\wixinternal.basebuildtasks.sources" rd /s/q "%_NUGET_CACHE%\wixinternal.basebuildtasks.sources"
+if exist "%_NUGET_CACHE%\wixinternal.testsupport" rd /s/q "%_NUGET_CACHE%\wixinternal.testsupport"
+if exist "%_NUGET_CACHE%\wixinternal.core.testpackage" rd /s/q "%_NUGET_CACHE%\wixinternal.core.testpackage"
 if exist "%_NUGET_CACHE%\wixtoolset.bal.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bal.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.balutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.balutil"
 if exist "%_NUGET_CACHE%\wixtoolset.bextutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.bextutil"
@@ -28,7 +29,6 @@ if exist "%_NUGET_CACHE%\wixtoolset.core" rd /s/q "%_NUGET_CACHE%\wixtoolset.cor
 if exist "%_NUGET_CACHE%\wixtoolset.core.burn" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.burn"
 if exist "%_NUGET_CACHE%\wixtoolset.core.extensioncache" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.extensioncache"
 if exist "%_NUGET_CACHE%\wixtoolset.core.native" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.native"
-if exist "%_NUGET_CACHE%\wixtoolset.core.testpackage" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.testpackage"
 if exist "%_NUGET_CACHE%\wixtoolset.core.windowsinstaller" rd /s/q "%_NUGET_CACHE%\wixtoolset.core.windowsinstaller"
 if exist "%_NUGET_CACHE%\wixtoolset.data" rd /s/q "%_NUGET_CACHE%\wixtoolset.data"
 if exist "%_NUGET_CACHE%\wixtoolset.dependency.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.dependency.wixext"

@@ -4,8 +4,8 @@
 
 using namespace System;
 using namespace Xunit;
-using namespace WixBuildTools::TestSupport;
-using namespace WixBuildTools::TestSupport::XunitExtensions;
+using namespace WixInternal::TestSupport;
+using namespace WixInternal::TestSupport::XunitExtensions;
 
 namespace BalUtilTests
 {

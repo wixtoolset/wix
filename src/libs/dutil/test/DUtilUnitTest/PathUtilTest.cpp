@@ -5,7 +5,7 @@
 using namespace System;
 using namespace System::IO;
 using namespace Xunit;
-using namespace WixBuildTools::TestSupport;
+using namespace WixInternal::TestSupport;
 
 // from PathCch.h
 #ifndef PATHCCH_ALLOW_LONG_PATHS

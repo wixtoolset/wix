@@ -13,6 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixBuildTools.TestSupport" />
+    <PackageReference Include="WixInternal.TestSupport" />
   </ItemGroup>
 </Project>

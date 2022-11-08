@@ -3,8 +3,8 @@
 namespace WixToolsetTest.ManagedHost
 {
     using System;
-    using WixBuildTools.TestSupport;
-    using WixBuildTools.TestSupport.XunitExtensions;
+    using WixInternal.TestSupport;
+    using WixInternal.TestSupport.XunitExtensions;
     using Xunit;
 
     public class DncHostFixture

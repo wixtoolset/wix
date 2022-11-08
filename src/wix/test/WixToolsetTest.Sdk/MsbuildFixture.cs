@@ -6,7 +6,7 @@ namespace WixToolsetTest.Sdk
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class MsbuildFixture

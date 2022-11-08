@@ -5,10 +5,10 @@ namespace WixToolsetTest.Converters
     using System;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Converters;
     using WixToolset.Core;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.Core.TestPackage;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
 

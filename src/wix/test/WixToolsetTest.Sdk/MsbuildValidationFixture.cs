@@ -5,7 +5,7 @@ namespace WixToolsetTest.Sdk
     using System;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using Xunit;
 
     // When these tests are run repeatedly, they will expose an issue

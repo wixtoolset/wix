@@ -3,8 +3,8 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
     using Xunit;
 
     public class DecompileFixture
