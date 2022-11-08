@@ -1,15 +1,16 @@
-<?xml version="1.0"?>
-<package >
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <authors>WiX Toolset Team</authors>
-    <owners>WiX Toolset Team</owners>
-    <license type="expression">MS-RL</license>
-    <projectUrl>https://github.com/wixtoolset/Bal.wixext</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <title>$title$</title>
     <description>$description$</description>
+    <authors>$authors$</authors>
+    <icon>wix.png</icon>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
     <dependencies>
       <group targetFramework=".NETFramework2.0" />
@@ -17,6 +18,7 @@
   </metadata>
 
   <files>
+    <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
     <file src="net20\$id$.config" target="samples" />
     <file src="net20\$id$.dll" target="lib\net20" />
   </files>

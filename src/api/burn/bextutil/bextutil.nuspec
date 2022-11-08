@@ -1,11 +1,12 @@
-<?xml version="1.0"?>
-<package >
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
     <description>$description$</description>
     <authors>$authors$</authors>
+    <icon>wix.png</icon>
     <license type="expression">MS-RL</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
@@ -19,6 +20,7 @@
 
   <files>
     <file src="$projectFolder$\build\$id$.props" target="build\" />
+    <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
     <file src="$projectFolder$\inc\*" target="build\native\include" />
     <file src="..\..\v141\x86\bextutil.lib" target="build\native\v14\x86" />
     <file src="..\..\v141\x64\bextutil.lib" target="build\native\v14\x64" />

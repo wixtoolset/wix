@@ -6,6 +6,7 @@
     <title>$title$</title>
     <description>$description$</description>
     <authors>$authors$</authors>
+    <icon>wix.png</icon>
     <license type="expression">MS-RL</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
@@ -15,6 +16,7 @@
 
   <files>
     <file src="$projectFolder$\build\$id$.props" target="build\" />
+    <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
     <file src="$projectFolder$\inc\*" target="build\native\include" />
   </files>
 </package>

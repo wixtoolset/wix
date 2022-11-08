@@ -30,6 +30,7 @@
     <PackageLicenseExpression>MS-RL</PackageLicenseExpression>
     <Product>WiX Toolset</Product>
     <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
+    <PackageIcon>wix.png</PackageIcon>
 
     <GitThisAssembly>false</GitThisAssembly>
     <GitVersionFile>version.txt</GitVersionFile>
