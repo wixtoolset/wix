@@ -11,7 +11,6 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
-    using WixToolset.Extensibility;
 
     /// <summary>
     /// Compiler of the WiX toolset.
@@ -278,7 +277,7 @@ namespace WixToolset.Core
                         case "ProviderKey":
                             this.ParseBundleProviderKeyAttribute(sourceLineNumbers, node, attrib);
                             break;
-                        // Unknown attributes were reported earlier.
+                            // Unknown attributes were reported earlier.
                     }
                 }
                 else
@@ -851,8 +850,6 @@ namespace WixToolset.Core
                 this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBootstrapperApplication, id);
             }
         }
-
-
 
         /// <summary>
         /// Parses a BundleCustomData element.
@@ -1940,7 +1937,7 @@ namespace WixToolset.Core
                     logPathVariable = String.Concat("WixBundleLog_", id.Id);
                 }
             }
-             else if (logPathVariable != null)
+            else if (logPathVariable != null)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "LogPathVariable", logPathVariable, "Transaction"));
             }

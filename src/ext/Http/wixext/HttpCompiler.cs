@@ -81,7 +81,6 @@ namespace WixToolset.Http
             string store = null;
             string thumbprint = null;
             var handleExisting = HandleExisting.Replace;
-            string handleExistingValue = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -96,7 +95,7 @@ namespace WixToolset.Http
                             appId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "HandleExisting":
-                            handleExistingValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var handleExistingValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (handleExistingValue)
                             {
                                 case "replace":
