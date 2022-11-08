@@ -1540,7 +1540,8 @@ namespace WixToolset.Converters
         {
             var id = element.Attribute("Id")?.Value;
 
-            if (id?.StartsWith("WixUI_") == true
+            if (id != null
+                && (id == "WixUI_Advanced" || id == "WixUI_FeatureTree" || id == "WixUI_InstallDir" || id == "WixUI_Minimal" || id == "WixUI_Mondo")
                 && this.OnInformation(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
             {
                 this.XRoot.SetAttributeValue(XNamespace.Xmlns + "ui", WixUiNamespace.NamespaceName);

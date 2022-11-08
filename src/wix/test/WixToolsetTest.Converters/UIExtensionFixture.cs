@@ -34,11 +34,11 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <ui:WixUI Id=\"WixUI_Advanced\" />",
                 "    <ui:WixUI Id=\"WixUI_FeatureTree\" />",
-                "    <ui:WixUI Id=\"WixUI_BobsSpecialUI\" />",
+                "    <UIRef Id=\"WixUI_BobsSpecialUI\" />",
                 "    <UI>",
                 "      <ui:WixUI Id=\"WixUI_Advanced\" />",
                 "      <ui:WixUI Id=\"WixUI_FeatureTree\" />",
-                "      <ui:WixUI Id=\"WixUI_BobsSpecialUI\" />",
+                "      <UIRef Id=\"WixUI_BobsSpecialUI\" />",
                 "    </UI>",
                 "  </Fragment>",
                 "</Wix>"
@@ -50,7 +50,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(7, errors);
+            Assert.Equal(5, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
