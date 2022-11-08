@@ -9,4 +9,8 @@
     <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <DebugType Condition=" '$(DebugType)'=='' ">embedded</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)internal\images\wix.png" PackagePath="/" />
+  </ItemGroup>
 </Project>

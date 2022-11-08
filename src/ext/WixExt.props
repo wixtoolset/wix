@@ -3,14 +3,12 @@
 
 <Project>
   <PropertyGroup>
-    <PackageIcon>wix.png</PackageIcon>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\internal\images\wix.png" PackagePath="/" />
     <Content Include="$(MSBuildProjectName).targets" PackagePath="build" />
     <Content Include="$(TargetPath)" PackagePath="wixext4" />
 
