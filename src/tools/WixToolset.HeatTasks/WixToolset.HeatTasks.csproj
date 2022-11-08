@@ -12,6 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" />
-    <PackageReference Include="WixToolset.BaseBuildTasks.Sources" />
+    <PackageReference Include="WixInternal.BaseBuildTasks.Sources" />
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@ namespace WixToolsetTest.Converters.Symbolizer
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using Wix3 = Microsoft.Tools.WindowsInstallerXml;
     using WixToolset.Converters.Symbolizer;
     using WixToolset.Data;

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixBuildTools.TestSupport", "WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj", "{8E082709-7355-41D5-AF86-6BBF9C89BDD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixInternal.TestSupport", "WixInternal.TestSupport\WixInternal.TestSupport.csproj", "{8E082709-7355-41D5-AF86-6BBF9C89BDD7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WixBuildTools.TestSupport.Native", "WixBuildTools.TestSupport.Native\WixBuildTools.TestSupport.Native.vcxproj", "{95BABD97-FBDB-453A-AF8A-FA031A07B599}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WixInternal.TestSupport.Native", "WixInternal.TestSupport.Native\WixInternal.TestSupport.Native.vcxproj", "{95BABD97-FBDB-453A-AF8A-FA031A07B599}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.BaseBuildTasks.Sources", "WixToolset.BaseBuildTasks.Sources\WixToolset.BaseBuildTasks.Sources.csproj", "{6B654490-AB0D-4F94-B564-DAA80044D5A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixInternal.BaseBuildTasks.Sources", "WixInternal.BaseBuildTasks.Sources\WixInternal.BaseBuildTasks.Sources.csproj", "{6B654490-AB0D-4F94-B564-DAA80044D5A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

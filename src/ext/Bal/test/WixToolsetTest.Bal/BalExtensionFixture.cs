@@ -6,9 +6,9 @@ namespace WixToolsetTest.Bal
     using System.IO;
     using System.Linq;
     using System.Xml;
-    using WixBuildTools.TestSupport;
     using WixToolset.Bal;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class BalExtensionFixture

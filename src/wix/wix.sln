@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Extension", "test\E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.CoreIntegration", "test\WixToolsetTest.CoreIntegration\WixToolsetTest.CoreIntegration.csproj", "{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.TestPackage", "WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj", "{853716DB-C02C-41BD-91BC-79CDC0C17D10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixInternal.Core.TestPackage", "WixInternal.Core.TestPackage\WixInternal.Core.TestPackage.csproj", "{853716DB-C02C-41BD-91BC-79CDC0C17D10}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompileCoreTestExtensionWixlib", "test\CompileCoreTestExtensionWixlib\CompileCoreTestExtensionWixlib.csproj", "{23FC60D7-B101-42F8-9786-DB7A9CD964A2}"
 EndProject

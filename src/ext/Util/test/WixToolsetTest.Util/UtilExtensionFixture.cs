@@ -5,8 +5,8 @@ namespace WixToolsetTest.Util
     using System.IO;
     using System.Linq;
     using System.Xml;
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
     using WixToolset.Util;
     using Xunit;
 

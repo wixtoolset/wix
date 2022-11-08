@@ -5,7 +5,7 @@ namespace WixToolsetTest.Data
     using System;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
+    using WixInternal.TestSupport;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Symbols;

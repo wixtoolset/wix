@@ -6,7 +6,7 @@ namespace DutilTests
 {
     using namespace System;
     using namespace Xunit;
-    using namespace WixBuildTools::TestSupport;
+    using namespace WixInternal::TestSupport;
 
     public ref class AppUtil
     {

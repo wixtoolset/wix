@@ -7,7 +7,7 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
 using namespace Xunit;
-using namespace WixBuildTools::TestSupport;
+using namespace WixInternal::TestSupport;
 
 namespace DutilTests
 {

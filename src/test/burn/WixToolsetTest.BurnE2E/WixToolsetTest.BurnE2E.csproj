@@ -20,7 +20,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Owin" />
     <PackageReference Include="Microsoft.Win32.Registry" />
     <PackageReference Include="System.Security.Principal.Windows" />
-    <PackageReference Include="WixBuildTools.TestSupport" />
+    <PackageReference Include="WixInternal.TestSupport" />
     <PackageReference Include="WixToolset.Data" />
     <PackageReference Include="WixToolset.Mba.Core" />
   </ItemGroup>

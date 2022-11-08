@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" />
-    <PackageReference Include="WixBuildTools.TestSupport" />
+    <PackageReference Include="WixInternal.TestSupport" />
   </ItemGroup>
 
   <ItemGroup>

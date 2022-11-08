@@ -6,8 +6,8 @@ namespace WixToolsetTest.CoreIntegration
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
     using Xunit;
 
     public class BurnRemotePayloadSubcommandFixture

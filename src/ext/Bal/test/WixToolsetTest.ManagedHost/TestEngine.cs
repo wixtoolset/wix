@@ -6,8 +6,8 @@ namespace WixToolsetTest.ManagedHost
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
 
     public class TestEngine
     {

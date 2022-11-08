@@ -2,8 +2,8 @@
 
 namespace WixToolsetTest.VisualStudio
 {
-    using WixBuildTools.TestSupport;
-    using WixToolset.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixInternal.Core.TestPackage;
     using WixToolset.VisualStudio;
     using Xunit;
 
