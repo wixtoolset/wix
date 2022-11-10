@@ -158,6 +158,34 @@ public: // IBootstrapperEngine
         return hr;
     }
 
+    virtual STDMETHODIMP GetRelatedBundleVariable(
+        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzVariable,
+        __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+        __inout SIZE_T* pcchValue
+    )
+    {
+        HRESULT hr = S_OK;
+        BAENGINE_GETRELATEDBUNDLEVARIABLE_ARGS args = { };
+        BAENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS results = { };
+
+        ExitOnNull(pcchValue, hr, E_INVALIDARG, "pcchValue is required");
+
+        args.cbSize = sizeof(args);
+        args.wzBundleId = wzBundleId;
+        args.wzVariable = wzVariable;
+
+        results.cbSize = sizeof(results);
+        results.wzValue = wzValue;
+        results.cchValue = *pcchValue;
+
+        hr = m_pfnBAEngineProc(BOOTSTRAPPER_ENGINE_MESSAGE_GETRELATEDBUNDLEVARIABLE, &args, &results, m_pvBAEngineProcContext);
+
+        *pcchValue = results.cchValue;
+    LExit:
+        return hr;
+    }
+
     virtual STDMETHODIMP FormatString(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,

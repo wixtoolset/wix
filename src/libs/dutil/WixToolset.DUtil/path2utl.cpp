@@ -327,6 +327,7 @@ DAPI_(HRESULT) PathDirectoryContainsPath(
     LPWSTR sczCanonicalizedPath = NULL;
     DWORD dwDefaultFlags = PATH_CANONICALIZE_APPEND_EXTENDED_PATH_PREFIX | PATH_CANONICALIZE_KEEP_UNC_ROOT;
     size_t cchDirectory = 0;
+    size_t cchPath = 0;
 
     if (!wzDirectory || !*wzDirectory)
     {
@@ -355,12 +356,20 @@ DAPI_(HRESULT) PathDirectoryContainsPath(
     hr = ::StringCchLengthW(sczCanonicalizedDirectory, STRSAFE_MAX_CCH, &cchDirectory);
     PathExitOnFailure(hr, "Failed to get length of canonicalized directory.");
 
+    hr = ::StringCchLengthW(sczCanonicalizedPath, STRSAFE_MAX_CCH, &cchPath);
+    PathExitOnFailure(hr, "Failed to get length of canonicalized path.");
+
+    if (cchPath <= cchDirectory)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
+
     if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczCanonicalizedDirectory, (DWORD)cchDirectory, sczCanonicalizedPath, (DWORD)cchDirectory))
     {
         ExitFunction1(hr = S_FALSE);
     }
 
-    hr = sczCanonicalizedPath[cchDirectory] ? S_OK : S_FALSE;
+    hr = S_OK;
 
 LExit:
     ReleaseStr(sczCanonicalizedPath);

@@ -801,6 +801,26 @@ LExit:
     return hr;
 }
 
+HRESULT ExternalEngineGetRelatedBundleVariable(
+    __in BURN_ENGINE_STATE* /*pEngineState*/,
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+    __inout SIZE_T* pcchValue
+    )
+{
+    HRESULT hr = S_OK;
+    if (wzVariable && *wzVariable && pcchValue)
+    {
+        hr = BundleGetBundleVariableFixed(wzBundleId, wzVariable, wzValue, pcchValue);
+    }
+    else
+    {
+        hr = E_INVALIDARG;
+    }
+    return hr;
+}
+
 // TODO: callers need to provide the original size (at the time of first public release) of the struct instead of the current size.
 HRESULT WINAPI ExternalEngineValidateMessageParameter(
     __in_opt const LPVOID pv,

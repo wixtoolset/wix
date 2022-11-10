@@ -140,6 +140,30 @@ DAPI_(HRESULT) BalGetNumericVariable(
     );
 
 /*******************************************************************
+BalGetRelatedBundleVariable - gets a string from a shared variable in the engine.
+
+Note: Use StrFree() to release psczValue.
+********************************************************************/
+DAPI_(HRESULT) BalGetRelatedBundleVariable(
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+);
+
+/*******************************************************************
+BalGetRelatedBundleVariableFromEngine - gets a string from a shared variable in the engine.
+
+ Note: Use StrFree() to release psczValue.
+********************************************************************/
+DAPI_(HRESULT) BalGetRelatedBundleVariableFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+);
+
+
+/*******************************************************************
 BalSetNumericVariable - sets a numeric variable in the engine.
 
 ********************************************************************/

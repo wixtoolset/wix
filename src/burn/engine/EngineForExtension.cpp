@@ -203,6 +203,22 @@ LExit:
     return hr;
 }
 
+static HRESULT BEEngineGetRelatedBundleVariable(
+    __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+)
+{
+    HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS, pResults);
+
+    hr = ExternalEngineGetRelatedBundleVariable(pContext->pEngineState, pArgs->wzBundleId, pArgs->wzVariable, pResults->wzValue, &pResults->cchValue);
+
+LExit:
+    return hr;
+}
+
 HRESULT WINAPI EngineForExtensionProc(
     __in BUNDLE_EXTENSION_ENGINE_MESSAGE message,
     __in const LPVOID pvArgs,
@@ -252,6 +268,9 @@ HRESULT WINAPI EngineForExtensionProc(
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS:
         hr = BEEngineCompareVersions(pContext, pvArgs, pvResults);
+        break;
+    case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETRELATEDBUNDLEVARIABLE:
+        hr = BEEngineGetRelatedBundleVariable(pContext, pvArgs, pvResults);
         break;
     default:
         hr = E_NOTIMPL;
