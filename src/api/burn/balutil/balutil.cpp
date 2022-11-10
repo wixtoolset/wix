@@ -421,6 +421,57 @@ LExit:
     return hr;
 }
 
+DAPI_(HRESULT) BalGetRelatedBundleVariable(
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+)
+{
+    HRESULT hr = S_OK;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BalInitialize() must be called first.");
+    }
+
+    hr = BalGetRelatedBundleVariableFromEngine(vpEngine, wzBundleId, wzVariable, psczValue);
+
+LExit:
+    return hr;
+}
+
+DAPI_(HRESULT) BalGetRelatedBundleVariableFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+)
+{
+    HRESULT hr = S_OK;
+    SIZE_T cch = 0;
+
+    if (*psczValue)
+    {
+        hr = StrMaxLength(*psczValue, reinterpret_cast<DWORD_PTR*>(&cch));
+        ExitOnFailure(hr, "Failed to determine length of value.");
+    }
+
+    hr = pEngine->GetRelatedBundleVariable(wzBundleId, wzVariable, *psczValue, &cch);
+    if (E_MOREDATA == hr)
+    {
+        ++cch;
+
+        hr = StrAllocSecure(psczValue, cch);
+        ExitOnFailure(hr, "Failed to allocate value.");
+
+        hr = pEngine->GetRelatedBundleVariable(wzBundleId, wzVariable, *psczValue, &cch);
+    }
+
+LExit:
+    return hr;
+}
+
 DAPI_(HRESULT) BalSetVersionVariable(
     __in_z LPCWSTR wzVariable,
     __in_z_opt LPCWSTR wzValue

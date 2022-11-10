@@ -1,0 +1,17 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Fragment>
+    <BootstrapperApplication Id="customHyperlinkLicense">
+      <!-- WixStandardBootstrapperApplication.RtfLicense -->
+       <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
+      <Payload SourceFile="$(var.BafRelatedBundleVariableTesting.TargetPath)" bal:BAFunctions="yes" />
+    </BootstrapperApplication>
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" />
+    </PackageGroup>
+    <Variable Name="ANumber" bal:Overridable="yes" Value="42" Persisted="yes" />
+    <Variable Name="AString" bal:Overridable="yes" Value="This is a test" Persisted="yes" /> 
+  </Fragment>
+</Wix>

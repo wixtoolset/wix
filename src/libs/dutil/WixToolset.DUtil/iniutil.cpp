@@ -301,6 +301,8 @@ extern "C" HRESULT DAPI IniParse(
             wzOpenTagPostfix = wcsstr(pi->rgsczLines[i], pi->sczOpenTagPostfix);
         }
 
+        wzValueNameStart = NULL;
+
         if (pi->sczValuePrefix)
         {
             wzValuePrefix = wcsstr(pi->rgsczLines[i], pi->sczValuePrefix);

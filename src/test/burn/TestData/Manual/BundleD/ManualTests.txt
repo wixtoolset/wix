@@ -1,0 +1,10 @@
+BafRelatedBundleVariableTesting
+# Building, Run initial build w/ no parameters, run a second (re)build w/ a /p:Version=1.1.0.0 (ensure it actually builds, as CLI params aren't accounted in the build optimization)
+1. Run BundleD.exe (v1.0).
+2. Click Install.
+3. Verify that the Bundle installs successfully.
+4. Run BundleD.exe (v1.1).
+5. Check the log file in %TEMP% There should be lines reporting:
+[0708:04B4]i000: AString = This is a test
+[0708:04B4]i000: ANumber = 42
+

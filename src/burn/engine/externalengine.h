@@ -129,6 +129,14 @@ HRESULT ExternalEngineCompareVersions(
     __out int* pnResult
     );
 
+HRESULT ExternalEngineGetRelatedBundleVariable(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+    __inout SIZE_T* pcchValue
+);
+
 HRESULT ExternalEngineDetect(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent

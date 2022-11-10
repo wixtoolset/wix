@@ -27,11 +27,9 @@ namespace Bootstrapper
         {
             BURN_VARIANT expectedVariants[10];
             BURN_VARIANT actualVariants[10];
-            for (DWORD i = 0; i < 10; i++)
-            {
-                BVariantUninitialize(expectedVariants + i);
-                BVariantUninitialize(actualVariants + i);
-            }
+
+            memset(expectedVariants, 0, sizeof(expectedVariants));
+            memset(actualVariants, 0, sizeof(actualVariants));
 
             try
             {
