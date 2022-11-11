@@ -4,19 +4,8 @@
 #include "BalBaseBAFunctions.h"
 #include "BalBaseBAFunctionsProc.h"
 
-const DWORD VARIABLE_GROW_FACTOR = 80;
 const LPCWSTR STRING_VARIABLE = L"AString";
 const LPCWSTR NUMBER_VARIABLE = L"ANumber";
-
-static void CALLBACK BafRelatedBundleVariableTestingTraceError(
-    __in_z LPCSTR szFile,
-    __in int iLine,
-    __in REPORT_LEVEL rl,
-    __in UINT source,
-    __in HRESULT hrError,
-    __in_z __format_string LPCSTR szFormat,
-    __in va_list args
-    );
 
 class CBafRelatedBundleVariableTesting : public CBalBaseBAFunctions
 {
@@ -32,7 +21,7 @@ public: //IBootstrapperApplication
         __in LPCWSTR wzVersion,
         __in BOOL fMissingFromCache,
         __inout BOOL* pfCancel
-    )
+        )
     {
 
         HRESULT hr = S_OK;
@@ -44,14 +33,14 @@ public: //IBootstrapperApplication
 
         if (wzValue)
         {
-            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "AString = %ws", wzValue);
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: AString = %ws", wzValue);
         }
 
         hr = BalGetRelatedBundleVariable(wzBundleId, NUMBER_VARIABLE, &wzValue);
 
         if (wzValue)
         {
-            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "ANumber = %ws", wzValue);
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: ANumber = %ws", wzValue);
         }
 
         hr = __super::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
@@ -95,8 +84,6 @@ HRESULT WINAPI CreateBAFunctions(
     CBafRelatedBundleVariableTesting* pBAFunctions = NULL;
     IBootstrapperEngine* pEngine = NULL;
 
-    DutilInitialize(&BafRelatedBundleVariableTestingTraceError);
-
     hr = BalInitializeFromCreateArgs(pArgs->pBootstrapperCreateArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
 
@@ -112,22 +99,4 @@ LExit:
     ReleaseObject(pEngine);
 
     return hr;
-}
-
-static void CALLBACK BafRelatedBundleVariableTestingTraceError(
-    __in_z LPCSTR /*szFile*/,
-    __in int /*iLine*/,
-    __in REPORT_LEVEL /*rl*/,
-    __in UINT source,
-    __in HRESULT hrError,
-    __in_z __format_string LPCSTR szFormat,
-    __in va_list args
-    )
-{
-    // BalLogError currently uses the Exit... macros,
-    // so if expanding the scope need to ensure this doesn't get called recursively.
-    if (DUTIL_SOURCE_THMUTIL == source)
-    {
-        BalLogErrorArgs(hrError, szFormat, args);
-    }
 }
