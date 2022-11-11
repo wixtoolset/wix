@@ -2,7 +2,6 @@
 
 ![latest version](https://img.shields.io/nuget/vpre/wix)
 ![download count](https://img.shields.io/nuget/dt/wix)
-![build status](https://img.shields.io/appveyor/build/wixtoolset/wix4)
 
 # WiX Toolset v4
 
