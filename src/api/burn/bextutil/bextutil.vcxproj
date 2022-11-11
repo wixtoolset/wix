@@ -71,7 +71,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
 
     <PackageReference Include="WixToolset.DUtil" />
   </ItemGroup>

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <Target Name="__SetVersionResource" DependsOnTargets="__SetPropertiesFromGit"
-          Condition=" '$(GitInfoImported)'=='true' and ('$(ConfigurationType)'=='Application' or '$(ConfigurationType)'=='DynamicLibrary') ">
+          Condition=" '$(ConfigurationType)'=='Application' or '$(ConfigurationType)'=='DynamicLibrary' ">
     <PropertyGroup>
       <_ResourceFileType Condition=" '$(ConfigurationType)'=='Application' ">VFT_APP</_ResourceFileType>
       <_ResourceFileType Condition=" '$(ConfigurationType)'=='DynamicLibrary' ">VFT_DLL</_ResourceFileType>

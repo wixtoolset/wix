@@ -35,7 +35,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NET.Tools.NETCoreCheck.x86" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.NET.Tools.NETCoreCheck.x64" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.NET.Tools.NETCoreCheck.arm64" GeneratePathProperty="true" />

@@ -5,18 +5,20 @@
     <BindFiles>true</BindFiles>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
+
   <ItemGroup>
     <BindInputPaths Include="$(OutputPath)x86" BindName="x86" />
     <BindInputPaths Include="$(OutputPath)x64" BindName="x64" />
     <BindInputPaths Include="$(OutputPath)arm64" BindName="arm64" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ca\fwca.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\ca\fwca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\ca\fwca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 </Project>

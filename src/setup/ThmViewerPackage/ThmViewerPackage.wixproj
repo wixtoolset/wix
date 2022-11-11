@@ -3,9 +3,4 @@
   <ItemGroup>
     <LinkerBindInputPaths Include="$(RootBuildFolder)tools\$(Configuration)\x86" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
-  </ItemGroup>
-
 </Project>

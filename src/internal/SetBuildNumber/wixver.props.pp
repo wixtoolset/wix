@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <GitInfoFromCache>true</GitInfoFromCache>
+    <GitInfoImported>true</GitInfoImported>
+    <GitBaseVersionMajor>{GitBaseVersionMajor}</GitBaseVersionMajor>
+    <GitBaseVersionMinor>{GitBaseVersionMinor}</GitBaseVersionMinor>
+    <GitBaseVersionPatch>{GitBaseVersionPatch}</GitBaseVersionPatch>
+    <GitCommits>{GitCommits}</GitCommits>
+    <GitSemVerDashLabel>{GitSemVerDashLabel}</GitSemVerDashLabel>
+    <GitSha>{GitSha}</GitSha>
+    <GitRepositoryUrl>{GitRepositoryUrl}</GitRepositoryUrl>
+  </PropertyGroup>
+</Project>

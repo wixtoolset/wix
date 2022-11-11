@@ -10,8 +10,7 @@
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
-
-    <GitThisAssembly>true</GitThisAssembly>
+    <IncludeThisAssembly>true</IncludeThisAssembly>
   </PropertyGroup>
 
   <ItemGroup>

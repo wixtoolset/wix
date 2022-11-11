@@ -10,19 +10,27 @@
     <!-- Explicitly set the restore sources because this project may run before the build\artifacts folder has been created -->
     <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
     <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+
+    <Language>C#</Language>
+    <DefaultLanguageSourceExtension>.cs</DefaultLanguageSourceExtension>
+    <GitThisAssembly>true</GitThisAssembly>
   </PropertyGroup>
 
   <PropertyGroup>
     <SetBuildNumbersDependsOn>
       __SetPropertiesFromGit;
+      GitThisAssembly;
       SetAppVeyorBuildNumber;
       SetGlobalJson;
       SetDirectoryPackagesProps;
+      SetOverallWixVersions;
       InstallSigningClient
     </SetBuildNumbersDependsOn>
 
     <GlobalJsonPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\global.json))</GlobalJsonPath>
     <CentralPackageVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\Directory.Packages.props))</CentralPackageVersionsPath>
+    <OverallWixVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\wixver.props))</OverallWixVersionsPath>
+    <GitInfoThisAssemblyFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\ThisAssembly.WixVer.cs))</GitInfoThisAssemblyFile>
   </PropertyGroup>
 
   <Target Name="SetAppVeyorBuildNumber"
@@ -86,6 +94,30 @@
                       WriteOnlyWhenDifferent="true" />
 
     <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(CentralPackageVersionsPath)" />
+  </Target>
+
+
+  <Target Name="SetOverallWixVersions"
+          Inputs="wixver.props.pp"
+          Outputs="$(OverallWixVersionsPath)">
+    <PropertyGroup>
+      <OverallWixVersionsTextHeader>&lt;!-- DO NOT MODIFY! Auto-generated from internal\SetBuildNumber\wixver.props.pp --&gt;</OverallWixVersionsTextHeader>
+      <OverallWixVersionsText>$([System.IO.File]::ReadAllText(wixver.props.pp))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitBaseVersionMajor}', $(GitBaseVersionMajor)))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitBaseVersionMinor}', $(GitBaseVersionMinor)))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitBaseVersionPatch}', $(GitBaseVersionPatch)))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitCommits}', $(GitCommits)))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitSemVerDashLabel}', $(GitSemVerDashLabel)))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitSha}', $(GitSha)))</OverallWixVersionsText>
+      <OverallWixVersionsText>$(OverallWixVersionsText.Replace('{GitRepositoryUrl}', $(GitRepositoryUrl.Replace('.git',''))))</OverallWixVersionsText>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(OverallWixVersionsPath)"
+                      Lines="$(OverallWixVersionsTextHeader);$(OverallWixVersionsText)"
+                      Overwrite="true" 
+                      WriteOnlyWhenDifferent="true" />
+
+    <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(OverallWixVersionsPath)" />
   </Target>
 
 

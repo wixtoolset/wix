@@ -9,7 +9,7 @@
     <Title>WiX Toolset .NET Core BA Host Generator</Title>
     <DebugType>embedded</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <GitThisAssembly>true</GitThisAssembly>
+    <IncludeThisAssembly>true</IncludeThisAssembly>
   </PropertyGroup>
 
   <ItemGroup>

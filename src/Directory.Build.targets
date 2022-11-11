@@ -17,6 +17,9 @@
     <ProjectCapability Remove="TestContainer" />
   </ItemGroup>
 
+  <!-- If the GitInfo package wasn't imported, use the calculated version properties. -->
+  <Import Project="$(RootBuildFolder)wixver.props" Condition=" '$(GitInfoImported)'!='true' " />
+
   <Target Name="__FixupGitBaseVersion" BeforeTargets="_GitPopulateVersionInfo">
     <PropertyGroup>
       <GitBaseVersion>$(GitBaseVersion.Replace('{apiversion}', '$(ApiVersion)'))</GitBaseVersion>
@@ -30,9 +33,13 @@
       $(GetPackageVersionDependsOn);
       __SetPropertiesFromGit;
     </GetPackageVersionDependsOn>
+
+    <__SetPropertiesFromGitDependsOn Condition=" '$(GitInfoFromCache)'!='true' ">
+      GitVersion
+    </__SetPropertiesFromGitDependsOn>
   </PropertyGroup>
 
-  <Target Name="__SetPropertiesFromGit" DependsOnTargets="GitVersion" Condition=" '$(GitInfoImported)'=='true' ">
+  <Target Name="__SetPropertiesFromGit" DependsOnTargets="$(__SetPropertiesFromGitDependsOn)">
     <PropertyGroup>
       <AssemblyVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).0.0</AssemblyVersion>
       <FileVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)</FileVersion>
