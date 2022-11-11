@@ -6,6 +6,7 @@ EXPORTS
     BalFormatStringFromEngine
     BalGetStringVariableFromEngine
     BalGetVersionVariableFromEngine
+    BalGetRelatedBundleVariableFromEngine
     BalVariableExistsFromEngine
     InitializeFromCreateArgs
     StoreBAInCreateResults
