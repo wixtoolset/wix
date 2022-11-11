@@ -278,6 +278,17 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion2,
             [MarshalAs(UnmanagedType.I4)] out int pnResult
             );
+
+        /// <summary>
+        /// See <see cref="IEngine.GetRelatedBundleVariable(string, string)"/>.
+        /// </summary>
+        [PreserveSig]
+        int GetRelatedBundleVariable(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
+                                              IntPtr wzValue,
+                                          ref IntPtr pcchValue
+            );
     }
 
     /// <summary>

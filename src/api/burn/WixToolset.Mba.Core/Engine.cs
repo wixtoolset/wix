@@ -216,6 +216,26 @@ namespace WixToolset.Mba.Core
         }
 
         /// <inheritdoc/>
+        public string GetRelatedBundleVariable(string bundleId, string name)
+        {
+            StrUtil.StrHandle handle = new StrUtil.StrHandle();
+            try
+            {
+                int ret = BalUtil.BalGetRelatedBundleVariableFromEngine(this.engine, bundleId, name, ref handle);
+                if (ret != NativeMethods.S_OK)
+                {
+                    throw new Win32Exception(ret);
+                }
+
+                return handle.ToUniString();
+            }
+            finally
+            {
+                handle.Dispose();
+            }
+        }
+
+        /// <inheritdoc/>
         public void LaunchApprovedExe(IntPtr hwndParent, string approvedExeForElevationId, string arguments)
         {
             this.LaunchApprovedExe(hwndParent, approvedExeForElevationId, arguments, 0);
