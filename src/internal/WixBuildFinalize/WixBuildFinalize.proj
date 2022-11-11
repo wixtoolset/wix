@@ -6,10 +6,6 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
-  </ItemGroup>
-
   <Target Name="ZipPdbs" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="AfterBuild">
     <ZipDirectory
         SourceDirectory="$(PdbsFolder)"

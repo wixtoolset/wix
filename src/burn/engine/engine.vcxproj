@@ -180,7 +180,7 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
 #endif
 "/>
     </ItemGroup>
-    
+
     <WriteLinesToFile Overwrite="true" File="$(BurnGeneratedHeaderDirectory)engine.version.h" Lines="@(BurnVersionLines)" />
   </Target>
 
@@ -188,7 +188,6 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
     <PackageReference Include="WixToolset.DUtil" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

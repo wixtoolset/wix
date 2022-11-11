@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" />
-    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
   <UsingTask TaskName="GenerateMetadata" AssemblyFile="$(BaseOutputPath)$(Configuration)\net472\MetadataTask.dll" />
