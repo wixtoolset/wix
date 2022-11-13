@@ -4,17 +4,18 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
     /// <summary>
-    /// This task assigns Culture metadata to files based on the value of the Culture attribute on the
-    /// WixLocalization element inside the file.
+    /// This task creates items from properties without triggering the item creation inference
+    /// MSBuild targets will normally do. There are very specialized cases where this is used.
     /// </summary>
     public class CreateItemAvoidingInference : Task
     {
         /// <summary>
-        /// The properties to converty to items.
+        /// The properties to convert into items.
         /// </summary>
         [Required]
         public string InputProperties { get; set; }
@@ -23,22 +24,18 @@ namespace WixToolset.BuildTasks
         /// The output items.
         /// </summary>
         [Output]
-        public ITaskItem[] OuputItems { get; private set; }
+        public ITaskItem[] OutputItems { get; private set; }
 
         /// <summary>
-        /// Gets a complete list of external cabs referenced by the given installer database file.
+        /// Convert the input properties into output items.
         /// </summary>
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            var newItems = new List<ITaskItem>();
-
-            foreach (var property in this.InputProperties.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                newItems.Add(new TaskItem(property));
-            }
-
-            this.OuputItems = newItems.ToArray();
+            this.OutputItems = this.InputProperties
+                                   .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                   .Select(property => new TaskItem(property))
+                                   .ToArray();
 
             return true;
         }
