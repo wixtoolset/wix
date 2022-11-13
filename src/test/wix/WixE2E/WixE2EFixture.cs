@@ -211,9 +211,9 @@ namespace WixE2E
             }
         }
 
-        private static MsbuildRunnerResult RestoreAndBuild(string projectPath, bool x64 = true)
+        private static MsbuildRunnerResult RestoreAndBuild(string projectPath, bool x64 = true, bool suppressValidation = true)
         {
-            return MsbuildRunner.Execute(projectPath, new[] { "-Restore", "-v:m", "-bl" }, x64);
+            return MsbuildRunner.Execute(projectPath, new[] { "-Restore", "-v:m", "-bl", $"-p:SuppressValidation={suppressValidation}" }, x64);
         }
     }
 }
