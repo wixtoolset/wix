@@ -141,8 +141,8 @@
       Inputs="@(SignTargetPath)"
       Outputs="$(SignedFilePath)">
     <CreateItemAvoidingInference InputProperties="@(SignTargetPath)">
-      <Output TaskParameter="OuputItems" ItemName="SignMsi" />
-      <Output TaskParameter="OuputItems" ItemName="FileWrites" />
+      <Output TaskParameter="OutputItems" ItemName="SignMsi" />
+      <Output TaskParameter="OutputItems" ItemName="FileWrites" />
     </CreateItemAvoidingInference>
   </Target>
 
