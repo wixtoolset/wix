@@ -40,8 +40,8 @@ namespace WixToolset.Iis
             IisSymbolDefinitions.IIsWebSiteCertificates,
             new[]
             {
-                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebSite", keyColumn: 1, description: "The index into the IIsWebSite table.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Certificate_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "Certificate", keyColumn: 1, description: "The index into the Certificate table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4IIsWebSite", keyColumn: 1, description: "The index into the IIsWebSite table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Certificate_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "Wix4Certificate", keyColumn: 1, description: "The index into the Certificate table.", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: false
         );
@@ -55,7 +55,7 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Name to be used for the IIs AppPool.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key referencing Component that controls the app pool", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Attributes of the AppPool"),
-                new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "User", keyColumn: 1, description: "User account to run the app pool as", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4User", keyColumn: 1, description: "User account to run the app pool as", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("RecycleMinutes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Number of minutes between recycling app pool"),
                 new ColumnDefinition("RecycleRequests", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Number of requests between recycling app pool"),
                 new ColumnDefinition("RecycleTimes", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Times to recycle app pool (comma delimited - i.e. 1:45,13:30)"),
@@ -106,7 +106,7 @@ namespace WixToolset.Iis
                 new ColumnDefinition("DirProperties", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token for Web Properties", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Access", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Access rights to the web server"),
                 new ColumnDefinition("Authorization", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Authorization policy to web server (anonymous access, NTLM, etc)"),
-                new ColumnDefinition("AnonymousUser_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "User", keyColumn: 1, description: "Foreign key, User used to log into database", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("AnonymousUser_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4User", keyColumn: 1, description: "Foreign key, User used to log into database", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("IIsControlledPassword", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether IIs is allowed to set the AnonymousUser_ password"),
                 new ColumnDefinition("LogVisits", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether IIs tracks all access to the directory"),
                 new ColumnDefinition("Index", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether IIs searches the directory"),
@@ -128,7 +128,7 @@ namespace WixToolset.Iis
             new[]
             {
                 new ColumnDefinition("Address", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebSite", keyColumn: 1, description: "Foreign key referencing Web that uses the address.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4IIsWebSite", keyColumn: 1, description: "Foreign key referencing Web that uses the address.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("IP", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "String representing IP address (#.#.#.#) or NT machine name (fooserver)", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Port", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Port web site listens on", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Header", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Special header information for the web site"),
@@ -149,11 +149,11 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Directory_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Directory", keyColumn: 1, description: "Foreign key referencing directory that the web site points at", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("State", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1;2", description: "Sets intial state of web site"),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "2", description: "Control the install behavior of web site"),
-                new ColumnDefinition("KeyAddress_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebAddress", keyColumn: 1, description: "Foreign key referencing primary address for the web site", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the web site", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the web site.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("KeyAddress_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4IIsWebAddress", keyColumn: 1, description: "Foreign key referencing primary address for the web site", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the web site", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the web site.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Allows ordering of web site install"),
-                new ColumnDefinition("Log_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, keyTable: "IIsWebLog", keyColumn: 1, description: "Foreign key reference to IIsWebLog data", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Log_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, keyTable: "Wix4IIsWebLog", keyColumn: 1, description: "Foreign key reference to IIsWebLog data", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Id", ColumnType.String, 74, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Optional number or formatted value that resolves to number that acts as the WebSite Id."),
             },
             symbolIdIsPrimaryKey: true
@@ -175,7 +175,7 @@ namespace WixToolset.Iis
                 new ColumnDefinition("ScriptTimeout", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Time ASP application page is permitted to process"),
                 new ColumnDefinition("ServerDebugging", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether to allow ASP server-side script debugging"),
                 new ColumnDefinition("ClientDebugging", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether to allow ASP client-side script debugging"),
-                new ColumnDefinition("AppPool_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsAppPool", keyColumn: 1, description: "App Pool this application should run under", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("AppPool_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsAppPool", keyColumn: 1, description: "App Pool this application should run under", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: true
         );
@@ -185,7 +185,7 @@ namespace WixToolset.Iis
             IisSymbolDefinitions.IIsWebApplicationExtension,
             new[]
             {
-                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the web site", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the web site", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Extension", ColumnType.String, 255, primaryKey: true, nullable: true, ColumnCategory.Text, description: "Primary key, Extension that should be registered for this ASP application"),
                 new ColumnDefinition("Verbs", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Comma delimited list of HTTP verbs the extension should be registered with"),
                 new ColumnDefinition("Executable", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Path to extension (usually file property: [#file])", modularizeType: ColumnModularizeType.Property),
@@ -203,7 +203,7 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Name of the ISAPI Filter in IIS"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key referencing Component that controls the filter", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Path", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Path to filter (usually file property: [#file])", modularizeType: ColumnModularizeType.Property),
-                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebSite", keyColumn: 1, description: "Foreign key referencing web site that loads the filter (NULL == global filter", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebSite", keyColumn: 1, description: "Foreign key referencing web site that loads the filter (NULL == global filter", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Description displayed in IIS MMC applet"),
                 new ColumnDefinition("Flags", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "What do all these numbers mean?"),
                 new ColumnDefinition("LoadOrder", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "-1 == last in order, 0 == first in order, # == place in order"),
@@ -218,10 +218,10 @@ namespace WixToolset.Iis
             {
                 new ColumnDefinition("WebDir", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key referencing Component that controls the virtual directory", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebSite", keyColumn: 1, description: "Foreign key referencing web site that controls the virtual directory", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4IIsWebSite", keyColumn: 1, description: "Foreign key referencing web site that controls the virtual directory", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Path", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Name of web directory displayed in IIS MMC applet", modularizeType: ColumnModularizeType.Property),
-                new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the virtual directory", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the virtual directory. This column is currently unused, but maintained for compatibility reasons.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the virtual directory", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the virtual directory. This column is currently unused, but maintained for compatibility reasons.", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: true
         );
@@ -279,11 +279,11 @@ namespace WixToolset.Iis
             {
                 new ColumnDefinition("VirtualDir", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key referencing Component that controls the virtual directory", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebSite", keyColumn: 1, description: "Foreign key referencing web site that controls the virtual directory", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4IIsWebSite", keyColumn: 1, description: "Foreign key referencing web site that controls the virtual directory", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Alias", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Name of virtual directory displayed in IIS MMC applet", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Directory_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Directory", keyColumn: 1, description: "Foreign key referencing directory that the virtual directory points at", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the virtual directory", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the virtual directory", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the virtual directory", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the virtual directory", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: true
         );
