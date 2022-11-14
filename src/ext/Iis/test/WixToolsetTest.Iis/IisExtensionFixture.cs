@@ -16,7 +16,7 @@ namespace WixToolsetTest.Iis
             var folder = TestData.Get(@"TestData\UsingIis");
             var build = new Builder(folder, typeof(IisExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "Wix4IIsWebSite", "Wix4IIsWebAddress");
+            var results = build.BuildAndQuery(Build, validate: true, "Wix4IIsWebSite", "Wix4IIsWebAddress");
             WixAssert.CompareLineByLine(new[]
             {
                 "Wix4IIsWebAddress:TestAddress\tTest\t\t[PORT]\t\t0",
@@ -26,8 +26,7 @@ namespace WixToolsetTest.Iis
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            WixRunner.Execute(args).AssertSuccess();
         }
     }
 }

@@ -26,6 +26,11 @@ namespace WixInternal.TestSupport
 
         public string[] BuildAndQuery(Action<string[]> buildFunc, params string[] tables)
         {
+            return this.BuildAndQuery(buildFunc, validate: false, tables);
+        }
+
+        public string[] BuildAndQuery(Action<string[]> buildFunc, bool validate, params string[] tables)
+        {
             var sourceFiles = Directory.GetFiles(this.SourceFolder, "*.wxs");
             var wxlFiles = Directory.GetFiles(this.SourceFolder, "*.wxl");
 
@@ -62,6 +67,19 @@ namespace WixInternal.TestSupport
                 }
 
                 buildFunc(args.ToArray());
+
+                if (validate)
+                {
+                    args = new List<string>
+                    {
+                        "msi",
+                        "validate",
+                        "-intermediateFolder", intermediateFolder,
+                        outputPath,
+                    };
+
+                    buildFunc(args.ToArray());
+                }
 
                 return Query.QueryDatabase(outputPath, tables);
             }
