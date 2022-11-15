@@ -160,7 +160,8 @@
 
   <!-- Default Compiler properties. -->
   <PropertyGroup>
-    <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and '$(Platform)' != 'AnyCPU' and '$(Platform)' != 'Any CPU' ">$(Platform)</InstallerPlatform>
+    <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and ('$(Platform)' == '' or '$(Platform)' == 'Win32' or '$(Platform)' == 'AnyCPU' or '$(Platform)' == 'Any CPU') ">x86</InstallerPlatform>
+    <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' ">$(Platform)</InstallerPlatform>
   </PropertyGroup>
 
   <!-- Convert legacy BindInputPaths and LinkerBindInputPaths (in the project or passed in via the command line) into the new BindPath items -->

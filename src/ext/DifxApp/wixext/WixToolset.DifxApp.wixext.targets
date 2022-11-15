@@ -7,5 +7,6 @@
        Condition=" Exists('$(MSBuildThisFileDirectory)..\$(WixToolsetExtensionPackageFolder)\$(MSBuildThisFileName).dll') " />
     <UnsupportedWixExtension Include="$(MSBuildThisFileName)"
       Condition=" !Exists('$(MSBuildThisFileDirectory)..\$(WixToolsetExtensionPackageFolder)\$(MSBuildThisFileName).dll') " />
+    <WixLibrary Include="$(MSBuildThisFileDirectory)..\$(WixToolsetExtensionPackageFolder)\difxapp_$(InstallerPlatform).wixlib" />
   </ItemGroup>
 </Project>

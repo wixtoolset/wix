@@ -14,10 +14,5 @@ namespace WixToolset.DifxApp
             symbolDefinition = DifxAppSymbolDefinitions.ByName(name);
             return symbolDefinition != null;
         }
-
-        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
-        {
-            return Intermediate.Load(typeof(DifxAppExtensionData).Assembly, "WixToolset.DifxApp.difxapp.wixlib", symbolDefinitions);
-        }
     }
 }
