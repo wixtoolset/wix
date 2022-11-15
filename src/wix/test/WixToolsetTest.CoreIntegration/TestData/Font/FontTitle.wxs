@@ -4,6 +4,8 @@
         <ComponentGroup Id="ProductComponents">
             <Component Id="FontComp" Directory="INSTALLFOLDER">
                 <File Id="test.txt" Source="test.txt" FontTitle="FakeFont" />
+
+                <IniFile Id="SetLicenseKey" Action="createLine" Directory="ConfigurationFolder" Name="filename.conf" Section="Connectivity" Key="License" Value="1234" />
             </Component>
         </ComponentGroup>
     </Fragment>
