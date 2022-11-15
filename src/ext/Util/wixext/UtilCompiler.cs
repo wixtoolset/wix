@@ -1286,6 +1286,8 @@ namespace WixToolset.Util
             var bits = new BitArray(32);
             string user = null;
 
+            var validBitNames = new HashSet<string>(UtilConstants.StandardPermissions.Concat(UtilConstants.GenericPermissions).Concat(UtilConstants.FolderPermissions));
+
             foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
@@ -1297,18 +1299,18 @@ namespace WixToolset.Util
                             this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.User, user);
                             break;
                         default:
-                            var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                            if (!this.TrySetBitFromName(UtilConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
+                            if (validBitNames.Contains(attrib.Name.LocalName))
                             {
-                                if (!this.TrySetBitFromName(UtilConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
+                                var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                                if (this.TrySetBitFromName(UtilConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16) ||
+                                    this.TrySetBitFromName(UtilConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28) ||
+                                    this.TrySetBitFromName(UtilConstants.FolderPermissions, attrib.Name.LocalName, attribValue, bits, 0))
                                 {
-                                    if (!this.TrySetBitFromName(UtilConstants.FolderPermissions, attrib.Name.LocalName, attribValue, bits, 0))
-                                    {
-                                        this.ParseHelper.UnexpectedAttribute(element, attrib);
-                                        break;
-                                    }
+                                    break;
                                 }
                             }
+
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
@@ -2477,6 +2479,8 @@ namespace WixToolset.Util
                     break;
             }
 
+            var validBitNames = new HashSet<string>(UtilConstants.StandardPermissions.Concat(UtilConstants.GenericPermissions).Concat(specialPermissions));
+
             foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
@@ -2500,18 +2504,18 @@ namespace WixToolset.Util
                             user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                            if (!this.TrySetBitFromName(UtilConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
+                            if (validBitNames.Contains(attrib.Name.LocalName))
                             {
-                                if (!this.TrySetBitFromName(UtilConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
+                                var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                                if (this.TrySetBitFromName(UtilConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16) ||
+                                    this.TrySetBitFromName(UtilConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28) ||
+                                    this.TrySetBitFromName(specialPermissions, attrib.Name.LocalName, attribValue, bits, 0))
                                 {
-                                    if (!this.TrySetBitFromName(specialPermissions, attrib.Name.LocalName, attribValue, bits, 0))
-                                    {
-                                        this.ParseHelper.UnexpectedAttribute(element, attrib);
-                                        break;
-                                    }
+                                    break;
                                 }
                             }
+
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }

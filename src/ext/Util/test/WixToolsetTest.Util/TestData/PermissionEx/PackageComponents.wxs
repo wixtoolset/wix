@@ -1,4 +1,4 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
     <Fragment>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component>
@@ -15,7 +15,12 @@
                     <util:PermissionEx User="Everyone" GenericAll="yes" />
                 </RegistryKey>
                 <RegistryValue Root="HKLM" Key="TestRegistryValueKey" Value="abc">
-                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                    <!--
+                      Example of placing the namespace on the extension element. This is NOT recommended
+                      in v4 and its converter will move namespaces to the root, but WiX v3 allowed it so
+                      we'll continued to do so for now.
+                    -->
+                    <PermissionEx User="Everyone" GenericAll="yes" xmlns="http://wixtoolset.org/schemas/v4/wxs/util" />
                 </RegistryValue>
             </Component>
         </ComponentGroup>
