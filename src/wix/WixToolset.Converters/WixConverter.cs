@@ -402,6 +402,7 @@ namespace WixToolset.Converters
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
+            this.MoveNamespacesToRoot(document.Root);
         }
 
         private void Format(XDocument document)
@@ -424,6 +425,7 @@ namespace WixToolset.Converters
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
+            this.MoveNamespacesToRoot(document.Root);
         }
 
         private bool TryOpenSourceFile(string sourceFile, out XDocument document)
@@ -2253,6 +2255,50 @@ namespace WixToolset.Converters
             }
         }
 
+        private void MoveNamespacesToRoot(XElement root)
+        {
+            var rootNamespaces = new HashSet<string>();
+            var rootNamespacePrefixes = new HashSet<string>();
+            var nonRootDeclarations = new List<XAttribute>();
+
+            VisitElement(root, x =>
+            {
+                if (x is XAttribute a && a.IsNamespaceDeclaration)
+                {
+                    if (x.Parent == root)
+                    {
+                        rootNamespaces.Add(a.Value);
+                        rootNamespacePrefixes.Add(a.Name.LocalName);
+                    }
+                    else
+                    {
+                        nonRootDeclarations.Add(a);
+                    }
+                }
+
+                return true;
+            });
+
+            foreach (var declaration in nonRootDeclarations)
+            {
+                if (this.OnInformation(ConverterTestType.MoveNamespacesToRoot, declaration, "Namespace should be defined on the root. The '{0}' namespace was move to the root element.", declaration.Value))
+                {
+                    if (!rootNamespaces.Contains(declaration.Value))
+                    {
+                        var prefix = GetNamespacePrefix(declaration, rootNamespacePrefixes);
+
+                        var rootDeclaration = new XAttribute(XNamespace.Xmlns + prefix, declaration.Value);
+                        root.Add(rootDeclaration);
+
+                        rootNamespaces.Add(rootDeclaration.Value);
+                        rootNamespacePrefixes.Add(rootDeclaration.Name.LocalName);
+                    }
+
+                    declaration.Remove();
+                }
+            }
+        }
+
         private int ReportMessages(XDocument document, bool saved)
         {
             var conversionCount = this.ConversionMessages.Count;
@@ -2455,6 +2501,83 @@ namespace WixToolset.Converters
             }
 
             return result;
+        }
+
+        private static string GetNamespacePrefix(XAttribute declaration, HashSet<string> usedPrefixes)
+        {
+            var baseNamespace = String.Empty;
+
+            switch (declaration.Value)
+            {
+                case "http://wixtoolset.org/schemas/v4/wxs/bal":
+                    baseNamespace = "bal";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/complus":
+                    baseNamespace = "complus";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/dependency":
+                    baseNamespace = "dependency";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/difxapp":
+                    baseNamespace = "difx";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/directx":
+                    baseNamespace = "directx";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/firewall":
+                    baseNamespace = "fw";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/http":
+                    baseNamespace = "http";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/iis":
+                    baseNamespace = "iis";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/msmq":
+                    baseNamespace = "msmq";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/netfx":
+                    baseNamespace = "netfx";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/powershell":
+                    baseNamespace = "ps";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/sql":
+                    baseNamespace = "sql";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/ui":
+                    baseNamespace = "ui";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/util":
+                    baseNamespace = "util";
+                    break;
+
+                case "http://wixtoolset.org/schemas/v4/wxs/vs":
+                    baseNamespace = "vs";
+                    break;
+            }
+
+            var ns = baseNamespace;
+
+            for (var i = 1; usedPrefixes.Contains(ns); ++i)
+            {
+                ns = baseNamespace + i;
+            }
+
+            return ns;
         }
 
         private static string LowercaseFirstChar(string value)
@@ -2928,6 +3051,11 @@ namespace WixToolset.Converters
             /// The MsuPackage element contains obsolete '{0}' attribute. MSU packages are now always permanent because Windows no longer supports silently removing MSUs. The attribute will be removed.
             /// </summary>
             MsuPackagePermanentObsolete,
+
+            /// <summary>
+            /// Namespace should be defined on the root. The '{0}' namespace was move to the root element.
+            /// </summary>
+            MoveNamespacesToRoot,
         }
     }
 }
