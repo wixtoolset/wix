@@ -137,15 +137,7 @@ namespace WixToolset.DifxApp
 
             if (!this.Messaging.EncounteredError)
             {
-                switch (this.Context.Platform)
-                {
-                    case Platform.X86:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MsiProcessDrivers");
-                        break;
-                    case Platform.X64:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MsiProcessDrivers_x64");
-                        break;
-                }
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MsiProcessDrivers");
 
                 var symbol = section.AddSymbol(new MsiDriverPackagesSymbol(sourceLineNumbers)
                 {

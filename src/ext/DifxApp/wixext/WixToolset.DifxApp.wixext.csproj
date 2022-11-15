@@ -12,11 +12,13 @@
 
   <Import Project="..\..\WixExt.props" />
 
-  <ItemGroup>
-    <EmbeddedResource Include="$(OutputPath)..\difxapp.wixlib" />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\difxapp.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Properties="Platform=x86" />
+    <ProjectReference Include="..\wixlib\difxapp.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Properties="Platform=x64" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <ProjectReference Include="..\wixlib\difxapp.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+  <ItemGroup>
+    <Content Include="$(OutDir)..\difxapp_x86.wixlib" PackagePath="wixext4\" />
+    <Content Include="$(OutDir)..\difxapp_x64.wixlib" PackagePath="wixext4\" />
   </ItemGroup>
 </Project>
