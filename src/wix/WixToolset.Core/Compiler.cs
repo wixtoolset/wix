@@ -5958,6 +5958,9 @@ namespace WixToolset.Core
                             case "addTag":
                                 action = IniFileActionType.AddTag;
                                 break;
+                            case "createLine":
+                                action = IniFileActionType.CreateLine;
+                                break;
                             case "removeLine":
                                 action = IniFileActionType.RemoveLine;
                                 break;

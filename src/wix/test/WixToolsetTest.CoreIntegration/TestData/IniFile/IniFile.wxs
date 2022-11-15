@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="IniComp" Directory="INSTALLFOLDER">
+                <File Id="test.txt" Source="test.txt" />
+
+                <IniFile Action="createLine" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeKey" Value="SomeValue" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
