@@ -10,7 +10,7 @@
     <DebugType Condition=" '$(DebugType)'=='' ">embedded</DebugType>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(IsWixTestProject)'!='true' ">
     <Content Include="$(MSBuildThisFileDirectory)internal\images\wix.png" PackagePath="/" />
   </ItemGroup>
 </Project>
