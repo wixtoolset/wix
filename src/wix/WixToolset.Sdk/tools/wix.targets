@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvailableItemName Include="BindPath;WixLibrary;WixExtension" />
+    <AvailableItemName Include="BindPath;BindVariable;WixLibrary;WixExtension" />
   </ItemGroup>
 
   <!--
@@ -170,6 +170,7 @@
     <LinkerBindInputPaths Include="$(LinkerBindInputPaths)"  Condition=" '$(LinkerBindInputPaths)' != '' " />
     <BindPath Include="$(BindPath)"  Condition=" '$(BindPath)' != '' " />
     <BindPath Include="@(BindInputPaths);@(LinkerBindInputPaths)" />
+    <BindVariable Include="$(WixVariables)"  Condition=" '$(WixVariables)' != '' " />
   </ItemGroup>
 
   <!--
@@ -601,6 +602,7 @@
         Pedantic="$(Pedantic)"
 
         BindPaths="@(BindPath)"
+        BindVariables="@(BindVariable)"
         BindFiles="$(BindFiles)"
         BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)"
 

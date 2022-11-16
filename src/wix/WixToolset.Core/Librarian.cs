@@ -99,6 +99,11 @@ namespace WixToolset.Core
             {
                 var variableResolver = this.ServiceProvider.GetService<IVariableResolver>();
 
+                foreach (var bindVariable in context.BindVariables)
+                {
+                    variableResolver.AddVariable(null, bindVariable.Key, bindVariable.Value, false);
+                }
+
                 var bindPaths = context.BindPaths.Where(b => b.Stage == BindStage.Normal).ToList();
 
                 foreach (var symbol in sections.SelectMany(s => s.Symbols))

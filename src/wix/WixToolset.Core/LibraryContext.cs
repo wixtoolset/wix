@@ -25,6 +25,8 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
+        public IDictionary<string, string> BindVariables { get; set; }
+
         public IReadOnlyCollection<ILibrarianExtension> Extensions { get; set; }
 
         public string LibraryId { get; set; }

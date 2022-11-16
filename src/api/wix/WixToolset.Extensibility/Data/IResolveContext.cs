@@ -23,6 +23,11 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
         /// <summary>
+        /// Bind variables used during resolution.
+        /// </summary>
+        IDictionary<string, string> BindVariables { get; set; }
+
+        /// <summary>
         /// Resolve extensions.
         /// </summary>
         IReadOnlyCollection<IResolverExtension> Extensions { get; set; }

@@ -88,25 +88,21 @@ namespace WixToolset.Core.Bind
 
                     var beforeErrorCount = this.Messaging.ErrorCount;
 
-                    // Check to make sure we're in a scenario where we can handle variable resolution.
-                    if (null != delayedFields)
+                    // resolve localization and wix variables
+                    if (fieldType == IntermediateFieldType.String)
                     {
-                        // resolve localization and wix variables
-                        if (fieldType == IntermediateFieldType.String)
+                        var original = field.AsString();
+                        if (!String.IsNullOrEmpty(original))
                         {
-                            var original = field.AsString();
-                            if (!String.IsNullOrEmpty(original))
+                            var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, original, !this.AllowUnresolvedVariables);
+                            if (resolution.UpdatedValue)
                             {
-                                var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, original, !this.AllowUnresolvedVariables);
-                                if (resolution.UpdatedValue)
-                                {
-                                    field.Set(resolution.Value);
-                                }
+                                field.Set(resolution.Value);
+                            }
 
-                                if (resolution.DelayedResolve)
-                                {
-                                    delayedFields.Add(new DelayedField(symbol, field));
-                                }
+                            if (resolution.DelayedResolve)
+                            {
+                                delayedFields.Add(new DelayedField(symbol, field));
                             }
                         }
                     }
@@ -136,13 +132,27 @@ namespace WixToolset.Core.Bind
             // If the file is embedded and if the previous value has a bind variable in the path
             // which gets modified by resolving the previous value again then switch to that newly
             // resolved path instead of using the embedded file.
-            if (fieldValue.Embed && field.PreviousValue != null)
+            if (fieldValue.Embed)
             {
-                var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, field.PreviousValue.AsString(), errorOnUnknown: false);
-
-                if (resolution.UpdatedValue && !resolution.IsDefault)
+                if (field.PreviousValue != null)
                 {
-                    fieldValue = new IntermediateFieldPathValue { Path = resolution.Value };
+                    var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, field.PreviousValue.AsString(), errorOnUnknown: false);
+
+                    if (resolution.UpdatedValue && !resolution.IsDefault)
+                    {
+                        fieldValue = new IntermediateFieldPathValue { Path = resolution.Value };
+                    }
+                }
+            }
+            else // resolve path field for bind variables.
+            {
+                var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, fieldValue.Path, errorOnUnknown: false);
+
+                if (resolution.UpdatedValue)
+                {
+                    field.Set(resolution.Value);
+
+                    fieldValue = field.AsPath();
                 }
             }
 

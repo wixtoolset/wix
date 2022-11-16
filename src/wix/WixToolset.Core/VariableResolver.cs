@@ -23,15 +23,12 @@ namespace WixToolset.Core
         /// </summary>
         internal VariableResolver(IServiceProvider serviceProvider)
         {
-            this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
 
             this.locVariables = new Dictionary<string, BindVariable>();
             this.wixVariables = new Dictionary<string, BindVariable>();
             this.localizedControls = new Dictionary<string, LocalizedControl>();
         }
-
-        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -47,7 +44,7 @@ namespace WixToolset.Core
                 }
             }
 
-            foreach (KeyValuePair<string, LocalizedControl> localizedControl in localization.LocalizedControls)
+            foreach (var localizedControl in localization.LocalizedControls)
             {
                 if (!this.localizedControls.ContainsKey(localizedControl.Key))
                 {
@@ -62,7 +59,7 @@ namespace WixToolset.Core
 
             if (!TryAddWixVariable(this.wixVariables, bindVariable))
             {
-                this.Messaging.Write(ErrorMessages.WixVariableCollision(sourceLineNumber, name));
+                this.Messaging.Write(ErrorMessages.BindVariableCollision(sourceLineNumber, name));
             }
         }
 
@@ -166,7 +163,7 @@ namespace WixToolset.Core
                         }
                         else if ("wix" == variableNamespace && errorOnUnknown) // unresolved wix variable
                         {
-                            this.Messaging.Write(ErrorMessages.WixVariableUnknown(sourceLineNumbers, variableId));
+                            this.Messaging.Write(ErrorMessages.BindVariableUnknown(sourceLineNumbers, variableId));
                         }
 
                         start = parsed.Index + parsed.Length;

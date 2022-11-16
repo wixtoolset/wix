@@ -8,7 +8,7 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="WixLibFolder">
        <Component Id="TextFile" Guid="2D93B748-4926-4185-BC84-9F1D6883AF20">
-         <File Source="Library.txt" />
+         <File Source="!(wix.SubfolderVar)\Library.txt" />
        </Component>
     </ComponentGroup>
   </Fragment>

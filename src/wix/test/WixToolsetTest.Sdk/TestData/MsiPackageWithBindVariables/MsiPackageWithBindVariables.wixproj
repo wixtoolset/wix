@@ -1,0 +1,16 @@
+<Project>
+  <Import Project="$(WixMSBuildProps)" />
+  <PropertyGroup>
+    <WixVariables>DataFolderVar=data</WixVariables>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Package.wxs" />
+
+    <EmbeddedResource Include="Package.en-us.wxl" />
+
+    <BindVariable Include="VersionVar=1.2.3" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+</Project>

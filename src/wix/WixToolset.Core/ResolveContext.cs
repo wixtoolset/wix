@@ -8,8 +8,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
-
+    
     internal class ResolveContext : IResolveContext
     {
         internal ResolveContext(IServiceProvider serviceProvider)
@@ -20,6 +19,8 @@ namespace WixToolset.Core
         public IServiceProvider ServiceProvider { get; }
 
         public IReadOnlyCollection<IBindPath> BindPaths { get; set; }
+
+        public IDictionary<string, string> BindVariables { get; set; }
 
         public IReadOnlyCollection<IResolverExtension> Extensions { get; set; }
 
@@ -32,8 +33,6 @@ namespace WixToolset.Core
         public Intermediate IntermediateRepresentation { get; set; }
 
         public IReadOnlyCollection<Localization> Localizations { get; set; }
-
-        public IVariableResolver VariableResolver { get; set; }
 
         public bool AllowUnresolvedVariables { get; set; }
 

@@ -233,6 +233,42 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildMsiPackageWithBindVariables(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get("TestData", "MsiPackageWithBindVariables");
+
+            var baseFolder = String.Empty;
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                baseFolder = fs.BaseFolder;
+
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "MsiPackageWithBindVariables.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"bin\Release\en-US\cab1.cab",
+                    @"bin\Release\en-US\MsiPackageWithBindVariables.msi",
+                    @"bin\Release\en-US\MsiPackageWithBindVariables.wixpdb",
+                }, paths);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildWithDefaultAndExplicitlyFullWixpdbs(BuildSystem buildSystem)
         {
             var expectedOutputs = new[]
@@ -292,33 +328,6 @@ namespace WixToolsetTest.Sdk
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Concat(Directory.EnumerateFiles(pdbFolder, @"*.*", SearchOption.AllDirectories))
-                    .Select(s => s.Substring(baseFolder.Length + 1))
-                    .OrderBy(s => s)
-                    .ToArray();
-                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
-            }
-        }
-
-        private void AssertWixpdb(BuildSystem buildSystem, string debugType, string[] expectedOutputFiles)
-        {
-            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
-
-            using (var fs = new TestDataFolderFileSystem())
-            {
-                fs.Initialize(sourceFolder);
-                var baseFolder = fs.BaseFolder;
-                var binFolder = Path.Combine(baseFolder, @"bin\");
-                var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
-
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
-                {
-                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
-                    debugType == null ? String.Empty : $"-p:DebugType={debugType}",
-                    "-p:SuppressValidation=true"
-                });
-                result.AssertSuccess();
-
-                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
@@ -474,7 +483,7 @@ namespace WixToolsetTest.Sdk
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .Single();
-                WixAssert.StringEqual(@"bin\x86\Release\SimpleWixlib.wixlib", path);
+                WixAssert.StringEqual(@"bin\Release\SimpleWixlib.wixlib", path);
             }
         }
 
@@ -634,6 +643,33 @@ namespace WixToolsetTest.Sdk
 
                 var expectedMessage = "System.PlatformNotSupportedException: Could not find platform specific 'wixnative.exe' ---> System.IO.FileNotFoundException: Could not find internal piece of WiX Toolset from";
                 Assert.Contains(result.Output, m => m.Contains(expectedMessage));
+            }
+        }
+
+        private void AssertWixpdb(BuildSystem buildSystem, string debugType, string[] expectedOutputFiles)
+        {
+            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    debugType == null ? String.Empty : $"-p:DebugType={debugType}",
+                    "-p:SuppressValidation=true"
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
             }
         }
 

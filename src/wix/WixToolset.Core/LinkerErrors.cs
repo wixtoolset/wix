@@ -6,6 +6,11 @@ namespace WixToolset.Core
 
     internal static class LinkerErrors
     {
+        public static Message DuplicateBindPathVariableOnCommandLine(string argument, string bindName, string bindValue, string collisionValue)
+        {
+            return Message(null, Ids.DuplicateBindPathVariableOnCommandLine, "", argument, bindName, bindValue, collisionValue);
+        }
+
         public static Message OrphanedPayload(SourceLineNumber sourceLineNumbers, string payloadId)
         {
             return Message(sourceLineNumbers, Ids.OrphanedPayload, "Found orphaned Payload '{0}'. Make sure to reference it from a Package, the BootstrapperApplication, or the Bundle or move it into its own Fragment so it only gets linked in when actually used.", payloadId);
@@ -55,6 +60,7 @@ namespace WixToolset.Core
             UnscheduledRollbackBoundary = 7004,
             UncompressedPayloadInContainer = 7005,
             BAContainerCannotContainRemotePayload = 7006,
+            DuplicateBindPathVariableOnCommandLine = 7007,
         } // last available is 7099. 7100 is WindowsInstallerBackendWarnings.
     }
 }
