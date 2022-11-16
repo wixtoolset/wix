@@ -28,6 +28,11 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
         /// <summary>
+        /// Bind variables used when binding files.
+        /// </summary>
+        IDictionary<string, string> BindVariables { get; set; }
+
+        /// <summary>
         /// Collection of extensions used during creation of library.
         /// </summary>
         IReadOnlyCollection<ILibrarianExtension> Extensions { get; set; }

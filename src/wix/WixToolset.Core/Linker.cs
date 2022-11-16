@@ -333,7 +333,7 @@ namespace WixToolset.Core
                 }
                 else if (!symbol.Overridable || (collidingSymbol.Overridable && symbol.Overridable))
                 {
-                    this.Messaging.Write(ErrorMessages.WixVariableCollision(symbol.SourceLineNumbers, id));
+                    this.Messaging.Write(ErrorMessages.BindVariableCollision(symbol.SourceLineNumbers, id));
                 }
             }
             else

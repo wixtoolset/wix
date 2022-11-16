@@ -10,6 +10,7 @@ namespace WixToolset.Core.CommandLine
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -115,7 +116,7 @@ namespace WixToolset.Core.CommandLine
             {
                 using (new IntermediateFieldContext("wix.lib"))
                 {
-                    this.LibraryPhase(wixobjs, wxls, inputsOutputs.LibraryPaths, creator, this.commandLine.BindFiles, this.commandLine.BindPaths, inputsOutputs.OutputPath, cancellationToken);
+                    this.LibraryPhase(wixobjs, wxls, inputsOutputs.LibraryPaths, creator, this.commandLine.BindFiles, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs.OutputPath, cancellationToken);
                 }
             }
             else
@@ -148,7 +149,7 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, inputsOutputs, cancellationToken);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken);
                             }
                         }
                     }
@@ -206,7 +207,7 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private void LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, string outputPath, CancellationToken cancellationToken)
+        private void LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, string outputPath, CancellationToken cancellationToken)
         {
             var libraries = this.LoadLibraries(libraryFiles, creator);
 
@@ -218,6 +219,7 @@ namespace WixToolset.Core.CommandLine
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
             context.BindPaths = bindPaths;
+            context.BindVariables = bindVariables;
             context.Extensions = this.ExtensionManager.GetServices<ILibrarianExtension>();
             context.Localizations = localizations;
             context.IntermediateFolder = this.IntermediateFolder;
@@ -266,12 +268,13 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
         {
             IResolveResult resolveResult;
             {
                 var context = this.ServiceProvider.GetService<IResolveContext>();
                 context.BindPaths = bindPaths;
+                context.BindVariables = bindVariables;
                 context.Extensions = this.ExtensionManager.GetServices<IResolverExtension>();
                 context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
                 context.FilterCultures = filterCultures;
@@ -466,6 +469,8 @@ namespace WixToolset.Core.CommandLine
 
             public List<IBindPath> BindPaths { get; } = new List<IBindPath>();
 
+            public Dictionary<string, string> BindVariables { get; } = new Dictionary<string, string>();
+
             public string CabCachePath { get; private set; }
 
             public int CabbingThreadCount { get; private set; }
@@ -564,6 +569,24 @@ namespace WixToolset.Core.CommandLine
                             return true;
                         }
 
+                        case "bv":
+                        case "bindvariable":
+                        {
+                            var value = parser.GetNextArgumentOrError(arg);
+                            if (value != null && TryParseNameValuePair(value, out var parsedName, out var parsedValue))
+                            {
+                                if (this.BindVariables.TryGetValue(parsedName, out var collisionValue))
+                                {
+                                    parser.ReportErrorArgument(arg, LinkerErrors.DuplicateBindPathVariableOnCommandLine(arg, parsedName, parsedValue, collisionValue));
+                                }
+                                else
+                                {
+                                    this.BindVariables.Add(parsedName, parsedValue);
+                                }
+                            }
+                            return true;
+                        }
+
                         case "cc":
                         case "cabcache":
                             this.CabCachePath = parser.GetNextArgumentOrError(arg);
@@ -651,19 +674,19 @@ namespace WixToolset.Core.CommandLine
                             return true;
 
                         case "pdbtype":
+                        {
+                            var value = parser.GetNextArgumentOrError(arg);
+                            if (Enum.TryParse(value, true, out PdbType pdbType))
                             {
-                                var value = parser.GetNextArgumentOrError(arg);
-                                if (Enum.TryParse(value, true, out PdbType pdbType))
-                                {
-                                    this.PdbType = pdbType;
-                                }
-                                else if (!String.IsNullOrEmpty(value))
-                                {
-                                    parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(PdbType)).Select(s => s.ToLowerInvariant())));
-                                }
-
-                                return true;
+                                this.PdbType = pdbType;
                             }
+                            else if (!String.IsNullOrEmpty(value))
+                            {
+                                parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(PdbType)).Select(s => s.ToLowerInvariant())));
+                            }
+
+                            return true;
+                        }
 
                         case "resetacls":
                             this.ResetAcls = true;
@@ -870,18 +893,16 @@ namespace WixToolset.Core.CommandLine
 
             private bool TryParseBindPath(string argument, string bindPath, out IBindPath bp)
             {
-                var namedPath = bindPath.Split(BindPathSplit, 2);
-
                 bp = this.ServiceProvider.GetService<IBindPath>();
 
-                if (1 == namedPath.Length)
+                if (TryParseNameValuePair(bindPath, out var name, out var path))
                 {
-                    bp.Path = namedPath[0];
+                    bp.Name = name;
+                    bp.Path = path;
                 }
                 else
                 {
-                    bp.Name = namedPath[0];
-                    bp.Path = namedPath[1];
+                    bp.Path = bindPath;
                 }
 
                 if (File.Exists(bp.Path))
@@ -889,6 +910,24 @@ namespace WixToolset.Core.CommandLine
                     this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile(argument, bp.Path));
                     return false;
                 }
+
+                return true;
+            }
+
+            private static bool TryParseNameValuePair(string nameValuePair, out string key, out string value)
+            {
+                var split = nameValuePair.Split(BindPathSplit, 2);
+
+                if (1 == split.Length)
+                {
+                    key = null;
+                    value = null;
+
+                    return false;
+                }
+
+                key = split[0];
+                value = split[1];
 
                 return true;
             }

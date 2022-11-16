@@ -598,9 +598,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedVariable, "A required variable was missing in the expression '{0}'.", expression);
         }
 
-        public static Message ExpectedWixVariableValue(string variableId)
+        public static Message ExpectedBindVariableValue(string variableId)
         {
-            return Message(null, Ids.ExpectedWixVariableValue, "The WiX variable '{0}' was declared without a value. Please specify a value for the variable.", variableId);
+            return Message(null, Ids.ExpectedBindVariableValue, "The bind variable '{0}' was declared without a value. Please specify a value for the variable.", variableId);
         }
 
         public static Message FamilyNameTooLong(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, int length)
@@ -1081,9 +1081,9 @@ namespace WixToolset.Data
             return Message(null, Ids.IllegalWarningIdAsError, "Illegal value '{0}' for the -wx<N> command line option. Specify a particular warning number, like '-wx6' to display the warning with ID 6 as an error, or '-wx' alone to suppress all warnings.", warningId);
         }
 
-        public static Message IllegalWixVariablePrefix(SourceLineNumber sourceLineNumbers, string variableId)
+        public static Message IllegalBindVariablePrefix(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.IllegalWixVariablePrefix, "The WiX variable $(wix.{0}) uses an illegal prefix '$'. Please use the '!' prefix instead.", variableId);
+            return Message(sourceLineNumbers, Ids.IllegalBindVariablePrefix, "The bind variable $(wix.{0}) uses an illegal prefix '$'. Please use the '!' prefix instead.", variableId);
         }
 
         public static Message IllegalYesNoAlwaysValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
@@ -2231,14 +2231,14 @@ namespace WixToolset.Data
             return Message(null, Ids.WixFileNotFound, "The file '{0}' cannot be found.", file);
         }
 
-        public static Message WixVariableCollision(SourceLineNumber sourceLineNumbers, string variableId)
+        public static Message BindVariableCollision(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.WixVariableCollision, "The WiX variable '{0}' is declared in more than one location. Please remove one of the declarations.", variableId);
+            return Message(sourceLineNumbers, Ids.BindVariableCollision, "The bind variable '{0}' is declared in more than one location. Please remove one of the declarations.", variableId);
         }
 
-        public static Message WixVariableUnknown(SourceLineNumber sourceLineNumbers, string variableId)
+        public static Message BindVariableUnknown(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.WixVariableUnknown, "The WiX variable !(wix.{0}) is unknown. Please ensure the variable is declared on the command line for light.exe, via a WixVariable element, or inline using the syntax !(wix.{0}=some value which doesn't contain parenthesis).", variableId);
+            return Message(sourceLineNumbers, Ids.BindVariableUnknown, "The bind variable !(wix.{0}) is unknown. Please ensure the variable is declared on the command line for wix.exe, via a BindVariable element, or inline using the syntax !(wix.{0}=some value which doesn't contain parenthesis).", variableId);
         }
 
         public static Message NoSourceFiles()
@@ -2474,10 +2474,10 @@ namespace WixToolset.Data
             VersionIndependentProgIdsCannotHaveIcons = 192,
             IllegalAttributeValueWithOtherAttribute = 193,
             InvalidMergeLanguage = 194,
-            WixVariableCollision = 195,
-            ExpectedWixVariableValue = 196,
-            WixVariableUnknown = 197,
-            IllegalWixVariablePrefix = 198,
+            BindVariableCollision = 195,
+            ExpectedBindVariableValue = 196,
+            BindVariableUnknown = 197,
+            IllegalBindVariablePrefix = 198,
             InvalidWixXmlNamespace = 199,
             UnhandledExtensionElement = 200,
             UnhandledExtensionAttribute = 201,

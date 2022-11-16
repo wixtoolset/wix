@@ -187,6 +187,11 @@ namespace WixToolset.Core
                 variableResolver.AddLocalization(localization);
             }
 
+            foreach (var bindVariable in context.BindVariables)
+            {
+                variableResolver.AddVariable(null, bindVariable.Key, bindVariable.Value, false);
+            }
+
             // Gather all the wix variables.
             var wixVariableSymbols = context.IntermediateRepresentation.Sections.SelectMany(s => s.Symbols).OfType<WixVariableSymbol>();
             foreach (var symbol in wixVariableSymbols)

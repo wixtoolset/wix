@@ -45,6 +45,8 @@ namespace WixToolset.BuildTasks
 
         public ITaskItem[] BindPaths { get; set; }
 
+        public ITaskItem[] BindVariables { get; set; }
+
         public bool BindFiles { get; set; }
 
         public ITaskItem BindTrackingFile { get; set; }
@@ -77,6 +79,7 @@ namespace WixToolset.BuildTasks
 
             commandLineBuilder.AppendIfTrue("-bindFiles", this.BindFiles);
             commandLineBuilder.AppendArrayIfNotNull("-bindPath ", this.CalculateBindPathStrings());
+            commandLineBuilder.AppendArrayIfNotNull("-bindVariable ", this.CalculateBindVariableStrings());
             commandLineBuilder.AppendArrayIfNotNull("-loc ", this.LocalizationFiles);
             commandLineBuilder.AppendArrayIfNotNull("-lib ", this.LibraryFiles);
             commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
@@ -100,6 +103,25 @@ namespace WixToolset.BuildTasks
                     {
                         yield return path;
                     }
+                }
+            }
+        }
+
+        private IEnumerable<string> CalculateBindVariableStrings()
+        {
+            if (null != this.BindVariables)
+            {
+                foreach (var item in this.BindVariables)
+                {
+                    var value = item.ItemSpec;
+
+                    var variableName = item.GetMetadata("Name");
+                    if (!String.IsNullOrEmpty(variableName))
+                    {
+                        value = String.Concat(variableName, "=", value);
+                    }
+
+                    yield return value;
                 }
             }
         }

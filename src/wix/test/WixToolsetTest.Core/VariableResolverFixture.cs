@@ -1,7 +1,6 @@
-
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.CoreIntegration
+namespace WixToolsetTest.Core
 {
     using System.Collections.Generic;
     using WixInternal.TestSupport;
@@ -26,7 +25,7 @@ namespace WixToolsetTest.CoreIntegration
                 { "ProductNameEditionVersion", new BindVariable() { Id = "ProductNameEditionVersion", Value = "!(loc.ProductNameEdition) v1.2.3" } },
             };
 
-            var localization = new Localization(0, null, "x-none", variables, new Dictionary<string,LocalizedControl>());
+            var localization = new Localization(0, null, "x-none", variables, new Dictionary<string, LocalizedControl>());
 
             variableResolver.AddLocalization(localization);
 
