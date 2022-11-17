@@ -512,5 +512,37 @@ namespace WixToolsetTest.Converters
             Assert.Equal(3, errors);
             WixAssert.CompareLineByLine(expected, actual);
         }
+
+        [Fact]
+        public void CantConvertStandardCustomActionRescheduling()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <InstallExecuteSequence>",
+                "     <Custom Action='WixCloseApplications' Before='StopServices' />",
+                "  </InstallExecuteSequence>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <InstallExecuteSequence>",
+                "     <Custom Action=\"WixCloseApplications\" Before=\"StopServices\" />",
+                "  </InstallExecuteSequence>",
+                "</Wix>",
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentLines(document);
+
+            Assert.Equal(2, errors);
+            WixAssert.CompareLineByLine(expected, actual);
+        }
     }
 }
