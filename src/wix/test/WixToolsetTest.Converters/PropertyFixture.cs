@@ -3,6 +3,7 @@
 namespace WixToolsetTest.Converters
 {
     using System;
+    using System.Linq;
     using System.Xml.Linq;
     using WixInternal.TestSupport;
     using WixToolset.Converters;
@@ -109,6 +110,109 @@ namespace WixToolsetTest.Converters
             var actual = UnformattedDocumentLines(document);
 
             WixAssert.CompareLineByLine(expected, actual);
+            Assert.Equal(1, errors);
+        }
+
+        [Fact]
+        public void CanConvertWithValueAndEmptyText()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "    <Property Id='Prop' Value='123'>",
+                "    </Property>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Property Id=\"Prop\" Value=\"123\">",
+                "    </Property>",
+                "  </Fragment>",
+                "</Wix>",
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentLines(document);
+
+            WixAssert.CompareLineByLine(expected, actual);
+            Assert.Equal(0, errors);
+        }
+
+        [Fact]
+        public void CanConvertWithValueAndComment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "    <Property Id='Prop' Value='123'>",
+                "      <!-- this is a comment -->",
+                "    </Property>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Property Id=\"Prop\" Value=\"123\">",
+                "      <!-- this is a comment -->",
+                "    </Property>",
+                "  </Fragment>",
+                "</Wix>",
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentLines(document);
+
+            WixAssert.CompareLineByLine(expected, actual);
+            Assert.Equal(0, errors);
+        }
+
+        [Fact]
+        public void CanErrorWithValueAndText()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "    <Property Id='Prop' Value='123'>Not Allowed Value</Property>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Property Id=\"Prop\" Value=\"123\">Not Allowed Value</Property>",
+                "  </Fragment>",
+                "</Wix>",
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentLines(document);
+
+            WixAssert.CompareLineByLine(expected, actual);
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Using Property element text is deprecated. Remove the element's text and use only the 'Value' attribute. (InnerTextDeprecated)"
+            }, messaging.Messages.Select(m => m.ToString()).ToArray());
             Assert.Equal(1, errors);
         }
     }

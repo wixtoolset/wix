@@ -2109,14 +2109,25 @@ namespace WixToolset.Converters
 
         private void ConvertInnerTextToAttribute(XElement element, string attributeName)
         {
-            if (TryGetInnerText(element, out var text, out var comments) &&
-                this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
+            if (TryGetInnerText(element, out var text, out var comments))
             {
-                using (var lab = new ConversionLab(element))
+                // If the target attribute already exists, error if we have anything more than whitespace.
+                var attribute = element.Attribute(attributeName);
+                if (attribute != null)
                 {
-                    lab.RemoveOrphanTextNodes();
-                    element.Add(new XAttribute(attributeName, text));
-                    lab.AddCommentsAsSiblings(comments);
+                    if (!String.IsNullOrWhiteSpace(text))
+                    {
+                        this.OnError(ConverterTestType.InnerTextDeprecated, attribute, "Using {0} element text is deprecated. Remove the element's text and use only the '{1}' attribute.", element.Name.LocalName, attributeName);
+                    }
+                }
+                else if (this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
+                {
+                    using (var lab = new ConversionLab(element))
+                    {
+                        lab.RemoveOrphanTextNodes();
+                        element.Add(new XAttribute(attributeName, text));
+                        lab.AddCommentsAsSiblings(comments);
+                    }
                 }
             }
         }
