@@ -539,8 +539,7 @@ namespace WixToolset.Core
                         switch (child.Name.LocalName)
                         {
                         case "ODBCDataSource":
-                            string ignoredKeyPath = null;
-                            this.ParseODBCDataSource(child, componentId, name, out ignoredKeyPath);
+                            this.ParseODBCDataSource(child, componentId, name, out _);
                             break;
                         case "Property":
                             this.ParseODBCProperty(child, id.Id, SymbolDefinitionType.ODBCAttribute);
@@ -1009,7 +1008,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var bits = new BitArray(32);
             string domain = null;
-            string[] specialPermissions = null;
+            string[] specialPermissions;
             string user = null;
 
             switch (tableName)
