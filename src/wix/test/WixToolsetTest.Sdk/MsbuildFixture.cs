@@ -252,15 +252,26 @@ namespace WixToolsetTest.Sdk
                 });
                 result.AssertSuccess();
 
+                var trackingContents = File.ReadAllLines(Path.Combine(baseFolder, "obj", "Release", "MsiPackageWithBindVariables.wixproj.BindTracking-neutral.txt"));
+                var lines = trackingContents.Select(l => l.Replace(baseFolder, "<basefolder>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BuiltContentOutput\t<basefolder>\\obj\\Release\\cab1.cab",
+                    "BuiltPdbOutput\t<basefolder>\\obj\\Release\\MsiPackageWithBindVariables.wixpdb",
+                    "BuiltTargetOutput\t<basefolder>\\obj\\Release\\MsiPackageWithBindVariables.msi",
+                    "Input\tdata\\test.txt",
+                    "Intermediate\t<basefolder>\\obj\\Release\\cab1.cab"
+                }, lines);
+
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"bin\Release\en-US\cab1.cab",
-                    @"bin\Release\en-US\MsiPackageWithBindVariables.msi",
-                    @"bin\Release\en-US\MsiPackageWithBindVariables.wixpdb",
+                    @"bin\Release\cab1.cab",
+                    @"bin\Release\MsiPackageWithBindVariables.msi",
+                    @"bin\Release\MsiPackageWithBindVariables.wixpdb",
                 }, paths);
             }
         }
@@ -421,6 +432,85 @@ namespace WixToolsetTest.Sdk
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
                 WixAssert.StringCollectionEmpty(warnings);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSingleCultureWithFallbackMsiPackage(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "SingleCultureWithFallbackMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "SingleCultureWithFallbackMsiPackage.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                });
+                result.AssertSuccess();
+
+                var trackingContents = File.ReadAllLines(Path.Combine(baseFolder, "obj", "Release", "SingleCultureWithFallbackMsiPackage.wixproj.BindTracking-de-DE.txt"));
+                var lines = trackingContents.Select(l => l.Replace(baseFolder, "<basefolder>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BuiltContentOutput\t<basefolder>\\obj\\Release\\de-DE\\cab1.cab",
+                    "BuiltPdbOutput\t<basefolder>\\obj\\Release\\de-DE\\SingleCultureWithFallbackMsiPackage.wixpdb",
+                    "BuiltTargetOutput\t<basefolder>\\obj\\Release\\de-DE\\SingleCultureWithFallbackMsiPackage.msi",
+                    "Input\t<basefolder>\\data\\test.txt",
+                    "Intermediate\t<basefolder>\\obj\\Release\\de-DE\\cab1.cab"
+                }, lines);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildMultiCulturalMsiPackage(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "MultiCulturalMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var slnPath = Path.Combine(baseFolder, "MultiCulturalMsiPackage.sln");
+                var projectFolder = Path.Combine(baseFolder, "MsiPackage");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, slnPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                });
+                result.AssertSuccess();
+
+                var trackingEnuContents = File.ReadAllLines(Path.Combine(projectFolder, "obj", "x64", "Release", "MsiPackage.wixproj.BindTracking-en-US.txt"));
+                var enuLines = trackingEnuContents.Select(l => l.Replace(projectFolder, "<basefolder>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BuiltContentOutput\t<basefolder>\\obj\\x64\\Release\\en-US\\cab1.cab",
+                    "BuiltPdbOutput\t<basefolder>\\obj\\x64\\Release\\en-US\\MsiPackage.wixpdb",
+                    "BuiltTargetOutput\t<basefolder>\\obj\\x64\\Release\\en-US\\MsiPackage.msi",
+                    "Input\t<basefolder>\\data\\test.txt",
+                    "Intermediate\t<basefolder>\\obj\\x64\\Release\\en-US\\cab1.cab"
+                }, enuLines);
+
+                var trackingDeuContents = File.ReadAllLines(Path.Combine(projectFolder, "obj", "x64", "Release", "MsiPackage.wixproj.BindTracking-de-DE.txt"));
+                var deuLines = trackingDeuContents.Select(l => l.Replace(projectFolder, "<basefolder>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BuiltContentOutput\t<basefolder>\\obj\\x64\\Release\\de-DE\\cab1.cab",
+                    "BuiltPdbOutput\t<basefolder>\\obj\\x64\\Release\\de-DE\\MsiPackage.wixpdb",
+                    "BuiltTargetOutput\t<basefolder>\\obj\\x64\\Release\\de-DE\\MsiPackage.msi",
+                    "Input\t<basefolder>\\data\\test.txt",
+                    "Intermediate\t<basefolder>\\obj\\x64\\Release\\de-DE\\cab1.cab"
+                }, deuLines);
             }
         }
 

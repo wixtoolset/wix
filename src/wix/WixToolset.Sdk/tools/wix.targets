@@ -566,7 +566,7 @@
       @(_ResolvedWixLibraryPaths);
       @(_ResolvedWixExtensionPaths);
       @(_BindInputs)"
-      Outputs="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension);@(_BindBuiltOutputs)"
+      Outputs="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension);@(_BindBuiltOutputs)"
       DependsOnTargets="$(CoreCompileDependsOn)" 
       Condition=" '@(Compile)' != '' ">
 
@@ -604,7 +604,7 @@
         BindPaths="@(BindPath)"
         BindVariables="@(BindVariable)"
         BindFiles="$(BindFiles)"
-        BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)"
+        BindTrackingFile="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)"
 
         CabinetCachePath="$(_WixBuildCabinetCachePath)"
         CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
@@ -719,7 +719,7 @@
   <Target
     Name="ReadPreviousBindInputsAndBuiltOutputs">
 
-    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)">
       <Output TaskParameter="Inputs" ItemName="_BindInputs" />
       <Output TaskParameter="BuiltOutputs" ItemName="_BindBuiltOutputs" />
     </ReadTracking>
@@ -748,12 +748,12 @@
       Name="UpdateFileWritesWithBindInformation"
       AfterTargets="CoreCompile">
 
-    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)">
       <Output TaskParameter="Outputs" ItemName="FileWrites" />
     </ReadTracking>
 
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)" Condition=" Exists('$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)') " />
+      <FileWrites Include="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)" Condition=" Exists('$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)') " />
     </ItemGroup>
   </Target>
 
@@ -818,7 +818,7 @@
     <!-- Don't add BuiltProjectOutputGroupKeyOutput - to avoid duplicates, we only want to get the updated list of TargetPaths from the TargetPath property below -->
 
     <!-- Try to read the outputs from the bind tracking text file since that's the output list straight from compiler. -->
-    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)">
       <Output TaskParameter="Outputs" ItemName="_BuiltProjectOutputGroupOutputIntermediate" />
     </ReadTracking>
 
@@ -894,7 +894,7 @@
     </ItemGroup>
 
     <!-- Add the bound content output files to the list to be copied. -->
-    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.Identity)$(BindTrackingFileExtension)">
+    <ReadTracking File="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension)">
       <Output TaskParameter="BuiltContentOutputs" ItemName="_FullPathToCopy" />
       <Output TaskParameter="CopiedOutputs" ItemName="_FullPathToCopy" />
     </ReadTracking>

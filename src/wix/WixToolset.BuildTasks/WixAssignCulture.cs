@@ -17,6 +17,7 @@ namespace WixToolset.BuildTasks
     public class WixAssignCulture : Task
     {
         private const string CultureAttributeName = "Culture";
+        private const string OutputSuffixMetadataName = "OutputSuffix";
         private const string OutputFolderMetadataName = "OutputFolder";
         private const string InvariantCultureIdentifier = "neutral";
         private const string NullCultureIdentifier = "null";
@@ -35,21 +36,13 @@ namespace WixToolset.BuildTasks
         /// The list of files to apply culture information to.
         /// </summary>
         [Required]
-        public ITaskItem[] Files
-        {
-            get;
-            set;
-        }
+        public ITaskItem[] Files { get; set; }
 
         /// <summary>
         /// The files that had culture information applied
         /// </summary>
         [Output]
-        public ITaskItem[] CultureGroups
-        {
-            get;
-            private set;
-        }
+        public ITaskItem[] CultureGroups { get; private set; }
 
         /// <summary>
         /// Applies culture information to the files specified by the Files property.
@@ -60,70 +53,66 @@ namespace WixToolset.BuildTasks
         public override bool Execute()
         {
             // First, process the culture group list the user specified in the cultures property
-            List<CultureGroup> cultureGroups = new List<CultureGroup>();
+            var cultureGroups = new List<CultureGroup>();
 
             if (!String.IsNullOrEmpty(this.Cultures))
             {
                 // Get rid of extra quotes
                 this.Cultures = this.Cultures.Trim('\"');
 
-                foreach (string cultureGroupString in this.Cultures.Split(';'))
+                // MSBuild cannnot handle "" items for the invariant culture we require the neutral keyword
+                foreach (var cultureGroupString in this.Cultures.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    if (0 == cultureGroupString.Length)
-                    {
-                        // MSBuild v2.0.50727 cannnot handle "" items
-                        // for the invariant culture we require the neutral keyword
-                        continue;
-                    }
-                    CultureGroup cultureGroup = new CultureGroup(cultureGroupString);
+                    var cultureGroup = new CultureGroup(cultureGroupString);
                     cultureGroups.Add(cultureGroup);
                 }
             }
             else
             {
                 // Only process the EmbeddedResource items if cultures was unspecified
-                foreach (ITaskItem file in this.Files)
+                foreach (var file in this.Files)
                 {
                     // Ignore non-wxls
                     if (!String.Equals(file.GetMetadata("Extension"), ".wxl", StringComparison.OrdinalIgnoreCase))
                     {
-                        Log.LogError("Unable to retrieve the culture for EmbeddedResource {0}. The file type is not supported.", file.ItemSpec);
+                        this.Log.LogError("Unable to retrieve the culture for EmbeddedResource {0}. The file type is not supported.", file.ItemSpec);
                         return false;
                     }
-                    XmlDocument wxlFile = new XmlDocument();
 
+                    var wxlFile = new XmlDocument();
                     try
                     {
                         wxlFile.Load(file.ItemSpec);
                     }
                     catch (FileNotFoundException)
                     {
-                        Log.LogError("Unable to retrieve the culture for EmbeddedResource {0}. The file was not found.", file.ItemSpec);
+                        this.Log.LogError("Unable to retrieve the culture for EmbeddedResource {0}. The file was not found.", file.ItemSpec);
                         return false;
                     }
                     catch (Exception e)
                     {
-                        Log.LogError("Unable to retrieve the culture for EmbeddedResource {0}: {1}", file.ItemSpec, e.Message);
+                        this.Log.LogError("Unable to retrieve the culture for EmbeddedResource {0}: {1}", file.ItemSpec, e.Message);
                         return false;
                     }
 
                     // Take the culture value and try using it to create a culture.
-                    XmlAttribute cultureAttr = wxlFile.DocumentElement.Attributes[WixAssignCulture.CultureAttributeName];
-                    string wxlCulture = null == cultureAttr ? String.Empty : cultureAttr.Value;
+                    var cultureAttr = wxlFile.DocumentElement.Attributes[WixAssignCulture.CultureAttributeName];
+                    var wxlCulture = cultureAttr?.Value ?? String.Empty;
+
                     if (0 == wxlCulture.Length)
                     {
-                        // We use a keyword for the invariant culture because MSBuild v2.0.50727 cannnot handle "" items
+                        // We use a keyword for the invariant culture because MSBuild cannnot handle "" items.
                         wxlCulture = InvariantCultureIdentifier;
                     }
 
                     // We found the culture for the WXL, we now need to determine if it maps to a culture group specified
                     // in the Cultures property or if we need to create a new one.
-                    Log.LogMessage(MessageImportance.Low, "Culture \"{0}\" from EmbeddedResource {1}.", wxlCulture, file.ItemSpec);
+                    this.Log.LogMessage(MessageImportance.Low, "Culture \"{0}\" from EmbeddedResource {1}.", wxlCulture, file.ItemSpec);
 
-                    bool cultureGroupExists = false;
-                    foreach (CultureGroup cultureGroup in cultureGroups)
+                    var cultureGroupExists = false;
+                    foreach (var cultureGroup in cultureGroups)
                     {
-                        foreach (string culture in cultureGroup.Cultures)
+                        foreach (var culture in cultureGroup.Cultures)
                         {
                             if (String.Equals(wxlCulture, culture, StringComparison.OrdinalIgnoreCase))
                             {
@@ -142,29 +131,32 @@ namespace WixToolset.BuildTasks
             }
 
             // If we didn't create any culture groups the culture was unspecificed and no WXLs were included
-            // Build an unlocalized target in the output folder
+            // then build an unlocalized target in the output folder
             if (cultureGroups.Count == 0)
             {
                 cultureGroups.Add(new CultureGroup());
             }
 
-            List<TaskItem> cultureGroupItems = new List<TaskItem>();
+            var cultureGroupItems = new List<TaskItem>();
 
             if (1 == cultureGroups.Count && 0 == this.Files.Length)
             {
                 // Maintain old behavior, if only one culturegroup is specified and no WXL, output to the default folder
-                TaskItem cultureGroupItem = new TaskItem(cultureGroups[0].ToString());
+                var cultureGroupItem = new TaskItem(cultureGroups[0].ToString());
+                cultureGroupItem.SetMetadata(OutputSuffixMetadataName, cultureGroups[0].OutputSuffix);
                 cultureGroupItem.SetMetadata(OutputFolderMetadataName, CultureGroup.DefaultFolder);
                 cultureGroupItems.Add(cultureGroupItem);
             }
             else
             {
-                foreach (CultureGroup cultureGroup in cultureGroups)
+                foreach (var cultureGroup in cultureGroups)
                 {
-                    TaskItem cultureGroupItem = new TaskItem(cultureGroup.ToString());
+                    var cultureGroupItem = new TaskItem(cultureGroup.ToString());
+                    cultureGroupItem.SetMetadata(OutputSuffixMetadataName, cultureGroup.OutputSuffix);
                     cultureGroupItem.SetMetadata(OutputFolderMetadataName, cultureGroup.OutputFolder);
                     cultureGroupItems.Add(cultureGroupItem);
-                    Log.LogMessage("Culture: {0}", cultureGroup.ToString());
+
+                    this.Log.LogMessage("Culture: {0}", cultureGroup.ToString());
                 }
             }
 
@@ -180,6 +172,11 @@ namespace WixToolset.BuildTasks
             public const string DefaultFolder = "";
 
             /// <summary>
+            /// Language neutral.
+            /// </summary>
+            public const string DefaultSuffix = InvariantCultureIdentifier;
+
+            /// <summary>
             /// Initialize a null culture group
             /// </summary>
             public CultureGroup()
@@ -189,7 +186,7 @@ namespace WixToolset.BuildTasks
             public CultureGroup(string cultureGroupString)
             {
                 Debug.Assert(!String.IsNullOrEmpty(cultureGroupString));
-                foreach (string cultureString in cultureGroupString.Split(','))
+                foreach (var cultureString in cultureGroupString.Split(','))
                 {
                     this.Cultures.Add(cultureString);
                 }
@@ -201,15 +198,19 @@ namespace WixToolset.BuildTasks
             {
                 get
                 {
-                    string result = DefaultFolder;
                     if (this.Cultures.Count > 0 && 
                         !this.Cultures[0].Equals(InvariantCultureIdentifier, StringComparison.OrdinalIgnoreCase))
                     {
-                        result = this.Cultures[0] + "\\";
+                        return this.Cultures[0] + "\\";
                     }
 
-                    return result;
+                    return DefaultFolder;
                 }
+            }
+
+            public string OutputSuffix
+            {
+                get =>  (this.Cultures.Count > 0) ? this.Cultures[0] : InvariantCultureIdentifier;
             }
 
             public override string ToString()
