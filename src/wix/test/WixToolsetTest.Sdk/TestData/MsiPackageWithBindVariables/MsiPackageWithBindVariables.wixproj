@@ -7,8 +7,6 @@
   <ItemGroup>
     <Compile Include="Package.wxs" />
 
-    <EmbeddedResource Include="Package.en-us.wxl" />
-
     <BindVariable Include="VersionVar=1.2.3" />
   </ItemGroup>
 

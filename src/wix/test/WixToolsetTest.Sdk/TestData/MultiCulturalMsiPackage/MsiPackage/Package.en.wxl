@@ -1,0 +1,4 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en">
+  <String Id="DowngradeError" Value="EN Downgrade Error" Overridable="true" />
+  <String Id="FeatureTitle" Value="EN Feature Title" Overridable="true" />
+</WixLocalization>

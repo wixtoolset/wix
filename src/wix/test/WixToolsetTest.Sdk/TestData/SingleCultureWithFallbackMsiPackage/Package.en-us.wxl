@@ -5,7 +5,7 @@ This file contains the declaration of all the localizable strings.
 -->
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
 
-  <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
-  <String Id="FeatureTitle" Value="MsiPackage" />
+  <String Id="DowngradeError" Value="English Downgrade Error" Overridable="true" />
+  <String Id="FeatureTitle" Value="English Feature Title" Overridable="true" />
 
 </WixLocalization>

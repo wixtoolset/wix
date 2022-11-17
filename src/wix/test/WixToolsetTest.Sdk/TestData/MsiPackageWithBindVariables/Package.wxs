@@ -1,8 +1,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="MsiPackage" Language="1033" Version="!(wix.VersionVar)" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+    <MajorUpgrade DowngradeErrorMessage="Downgrade disabled" />
 
-    <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+    <Feature Id="ProductFeature">
       <Component Directory="INSTALLFOLDER">
         <File Source="!(wix.DataFolderVar)\test.txt" />
       </Component>
