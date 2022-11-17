@@ -3981,7 +3981,6 @@ namespace WixToolset.Core
             var depth = CompilerConstants.IntegerNotSet;
             string path = null;
             var assignToProperty = false;
-            string signature = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -4017,7 +4016,7 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("dir", path, depth.ToString());
             }
 
-            signature = id.Id;
+            var signature = id.Id;
 
             var oneChild = false;
             var hasFileSearch = false;
@@ -4132,7 +4131,6 @@ namespace WixToolset.Core
             Identifier id = null;
             Identifier parent = null;
             string path = null;
-            string signature = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -4177,7 +4175,7 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("dsr", parentSignature, path);
             }
 
-            signature = id.Id;
+            var signature = id.Id;
 
             var oneChild = false;
             foreach (var child in node.Elements())
@@ -4258,7 +4256,6 @@ namespace WixToolset.Core
             var typicalDefault = FeatureTypicalDefault.Install;
             var disallowAbsent = false;
             var disallowAdvertise = false;
-            var display = 0;
 
             foreach (var attrib in node.Attributes())
             {
@@ -4410,6 +4407,7 @@ namespace WixToolset.Core
                 }
             }
 
+            int display;
             switch (displayValue)
             {
             case "collapse":
@@ -6067,7 +6065,6 @@ namespace WixToolset.Core
             string name = null;
             string section = null;
             string shortName = null;
-            string signature = null;
             var type = 1; // default is file
 
             foreach (var attrib in node.Attributes())
@@ -6145,7 +6142,7 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("ini", name, section, key, field.ToString(), type.ToString());
             }
 
-            signature = id.Id;
+            var signature = id.Id;
 
             var oneChild = false;
             foreach (var child in node.Elements())
