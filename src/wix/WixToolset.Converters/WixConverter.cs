@@ -78,6 +78,7 @@ namespace WixToolset.Converters
         private static readonly XName BundleCustomDataElementName = WixNamespace + "BundleCustomData";
         private static readonly XName BundleCustomDataRefElementName = WixNamespace + "BundleCustomDataRef";
         private static readonly XName BundleElementElementName = WixNamespace + "BundleElement";
+        private static readonly XName CustomElementName = WixNamespace + "Custom";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName CustomTableRefElementName = WixNamespace + "CustomTableRef";
         private static readonly XName CatalogElementName = WixNamespace + "Catalog";
@@ -97,7 +98,6 @@ namespace WixToolset.Converters
         private static readonly XName FileElementName = WixNamespace + "File";
         private static readonly XName FragmentElementName = WixNamespace + "Fragment";
         private static readonly XName FirewallRemoteAddressElementName = WixFirewallNamespace + "RemoteAddress";
-        private static readonly XName GetCapabilitiesElementName = WixFirewallNamespace + "GetCapabilities";
         private static readonly XName LaunchElementName = WixNamespace + "Launch";
         private static readonly XName LevelElementName = WixNamespace + "Level";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
@@ -196,6 +196,65 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/2006/WixUnit", "http://wixtoolset.org/schemas/v4/wixunit" },
         };
 
+        private static readonly Dictionary<string, string> CustomActionIdsWithPlatformSuffix = new Dictionary<string, string>()
+        {
+            { "ConfigureComPlusUninstall", "Wix4ConfigureComPlusUninstall_<PlatformSuffix>" },
+            { "ConfigureComPlusInstall", "Wix4ConfigureComPlusInstall_<PlatformSuffix>" },
+            { "WixDependencyRequire", "Wix4DependencyRequire_<PlatformSuffix>" },
+            { "WixDependencyCheck", "Wix4DependencyCheck_<PlatformSuffix>" },
+            { "WixQueryDirectXCaps", "Wix4QueryDirectXCaps_<PlatformSuffix>" },
+            { "WixSchedFirewallExceptionsUninstall", "Wix4SchedFirewallExceptionsUninstall_<PlatformSuffix>" },
+            { "WixSchedFirewallExceptionsInstall", "Wix4SchedFirewallExceptionsInstall_<PlatformSuffix>" },
+            { "WixSchedHttpUrlReservationsUninstall", "Wix4SchedHttpUrlReservationsUninstall_<PlatformSuffix>" },
+            { "WixSchedHttpUrlReservationsInstall", "Wix4SchedHttpUrlReservationsInstall_<PlatformSuffix>" },
+            { "ConfigureIIs", "Wix4ConfigureIIs_<PlatformSuffix>" },
+            { "UninstallCertificates", "Wix4UninstallCertificates_<PlatformSuffix>" },
+            { "InstallCertificates", "Wix4_<PlatformSuffix>" },
+            { "MessageQueuingUninstall", "Wix4MessageQueuingUninstall_<PlatformSuffix>" },
+            { "MessageQueuingInstall", "Wix4_MessageQueuingInstall<PlatformSuffix>" },
+            { "NetFxScheduleNativeImage", "Wix4NetFxScheduleNativeImage_<PlatformSuffix>" },
+            { "NetFxExecuteNativeImageCommitUninstall", "Wix4NetFxExecuteNativeImageCommitUninstall_<PlatformSuffix>" },
+            { "NetFxExecuteNativeImageUninstall", "Wix4NetFxExecuteNativeImageUninstall_<PlatformSuffix>" },
+            { "NetFxExecuteNativeImageCommitInstall", "Wix4NetFxExecuteNativeImageCommitInstall_<PlatformSuffix>" },
+            { "NetFxExecuteNativeImageInstall", "Wix4NetFxExecuteNativeImageInstall_<PlatformSuffix>" },
+            { "UninstallSqlData", "Wix4UninstallSqlData_<PlatformSuffix>" },
+            { "InstallSqlData", "Wix4InstallSqlData_<PlatformSuffix>" },
+            { "WixCheckRebootRequired", "Wix4CheckRebootRequired_<PlatformSuffix>" },
+            { "WixCloseApplications", "Wix4CloseApplications_<PlatformSuffix>" },
+            { "WixRegisterRestartResources", "Wix4RegisterRestartResources_<PlatformSuffix>" },
+            { "ConfigureUsers", "Wix4ConfigureUsers_<PlatformSuffix>" },
+            { "ConfigureSmbInstall", "Wix4ConfigureSmbInstall_<PlatformSuffix>" },
+            { "ConfigureSmbUninstall", "Wix4ConfigureSmbUninstall_<PlatformSuffix>" },
+            { "InstallPerfCounterData", "Wix4InstallPerfCounterData_<PlatformSuffix>" },
+            { "UninstallPerfCounterData", "Wix4UninstallPerfCounterData_<PlatformSuffix>" },
+            { "ConfigurePerfmonInstall", "Wix4ConfigurePerfmonInstall_<PlatformSuffix>" },
+            { "ConfigurePerfmonUninstall", "Wix4ConfigurePerfmonUninstall_<PlatformSuffix>" },
+            { "ConfigurePerfmonManifestRegister", "Wix4ConfigurePerfmonManifestRegister_<PlatformSuffix>" },
+            { "ConfigurePerfmonManifestUnregister", "Wix4ConfigurePerfmonManifestUnregister_<PlatformSuffix>" },
+            { "ConfigureEventManifestRegister", "Wix4ConfigureEventManifestRegister_<PlatformSuffix>" },
+            { "ConfigureEventManifestUnregister", "Wix4ConfigureEventManifestUnregister_<PlatformSuffix>" },
+            { "SchedServiceConfig", "Wix4SchedServiceConfig_<PlatformSuffix>" },
+            { "SchedXmlFile", "Wix4SchedXmlFile_<PlatformSuffix>" },
+            { "SchedXmlConfig", "Wix4SchedXmlConfig_<PlatformSuffix>" },
+            { "WixSchedInternetShortcuts", "Wix4SchedInternetShortcuts_<PlatformSuffix>" },
+            { "WixRollbackInternetShortcuts", "Wix4RollbackInternetShortcuts_<PlatformSuffix>" },
+            { "WixCreateInternetShortcuts", "Wix4CreateInternetShortcuts_<PlatformSuffix>" },
+            { "WixQueryOsInfo", "Wix4QueryOsInfo_<PlatformSuffix>" },
+            { "WixQueryOsDirs", "Wix4QueryOsDirs_<PlatformSuffix>" },
+            { "WixQueryOsWellKnownSID", "Wix4QueryOsWellKnownSID_<PlatformSuffix>" },
+            { "WixQueryOsDriverInfo", "Wix4QueryOsDriverInfo_<PlatformSuffix>" },
+            { "WixQueryNativeMachine", "Wix4QueryNativeMachine_<PlatformSuffix>" },
+            { "WixFailWhenDeferred", "Wix4FailWhenDeferred_<PlatformSuffix>" },
+            { "WixWaitForEvent", "Wix4WaitForEvent_<PlatformSuffix>" },
+            { "WixWaitForEventDeferred", "Wix4WaitForEventDeferred_<PlatformSuffix>" },
+            { "WixExitEarlyWithSuccess", "Wix4ExitEarlyWithSuccess_<PlatformSuffix>" },
+            { "WixBroadcastSettingChange", "Wix4BroadcastSettingChange_<PlatformSuffix>" },
+            { "WixBroadcastEnvironmentChange", "Wix4BroadcastEnvironmentChange_<PlatformSuffix>" },
+            { "SchedSecureObjects", "Wix4SchedSecureObjects_<PlatformSuffix>" },
+            { "SchedSecureObjectsRollback", "Wix4SchedSecureObjectsRollback_<PlatformSuffix>" },
+            { "VSFindInstances", "Wix4VSFindInstances_<PlatformSuffix>" },
+        };
+
         private readonly Dictionary<XName, Action<XElement>> ConvertElementMapping;
         private readonly Regex DeprecatedPrefixRegex = new Regex(@"(?<=(^|[^\$])(\$\$)*)\$(?=\(loc\.[^.].*\))",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
@@ -224,6 +283,7 @@ namespace WixToolset.Converters
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
                 { WixConverter.ComponentElementName, this.ConvertComponentElement },
                 { WixConverter.ControlElementName, this.ConvertControlElement },
+                { WixConverter.CustomElementName, this.ConvertCustomElement },
                 { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.DataElementName, this.ConvertDataElement },
@@ -837,6 +897,18 @@ namespace WixToolset.Converters
                 {
                     modularization.Value = camelCaseValue;
                 }
+            }
+        }
+
+        private void ConvertCustomElement(XElement element)
+        {
+            var actionId = element.Attribute("Action")?.Value;
+
+            if (actionId != null
+                && CustomActionIdsWithPlatformSuffix.TryGetValue(actionId, out var replacementId))
+            {
+                this.OnError(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element,
+                    $"Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. The platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom action '{actionId}', you must use the new custom action id '{replacementId}'.");
             }
         }
 
@@ -3056,6 +3128,11 @@ namespace WixToolset.Converters
             /// Namespace should be defined on the root. The '{0}' namespace was move to the root element.
             /// </summary>
             MoveNamespacesToRoot,
+
+            /// <summary>
+            /// Custom action ids have changed in WiX v4 extensions. Because WiX v4 has platform-specific custom actions, the platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom actions, you must use the new custom action id, with platform suffix.
+            /// </summary>
+            CustomActionIdsIncludePlatformSuffix,
         }
     }
 }
