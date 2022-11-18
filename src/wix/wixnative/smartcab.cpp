@@ -123,7 +123,7 @@ static HRESULT CompressFiles(
         hr = StrSplitAllocArray(&rgsczSplit, &cSplit, sczLine, L"\t");
         ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to split smartcab line from stdin: %ls", sczLine);
 
-        if (cSplit != 2 && cSplit != 6)
+        if (!rgsczSplit || (cSplit != 2 && cSplit != 6))
         {
             hr = E_INVALIDARG;
             ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to split smartcab line into hash x 4, token, source file: %ls", sczLine);
@@ -176,5 +176,15 @@ static void __stdcall CabNamesCallback(
     __in_z LPCWSTR wzFileToken
     )
 {
-    ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls\t%ls\t%ls", wzFirstCabName, wzNewCabName, wzFileToken);
+    HRESULT hr;
+    LPWSTR scz = NULL;
+
+    hr = StrAllocFormatted(&scz, L"%s\t%s\t%s\r\n", wzFirstCabName, wzNewCabName, wzFileToken);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to allocate cabinet names message");
+
+    hr = ConsoleWriteW(CONSOLE_COLOR_NORMAL, scz);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to send cabinet names message");
+
+LExit:
+    ReleaseStr(scz);
 }

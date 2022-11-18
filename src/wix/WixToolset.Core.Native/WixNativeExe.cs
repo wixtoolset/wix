@@ -6,6 +6,7 @@ namespace WixToolset.Core.Native
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Text;
 
     internal class WixNativeExe
     {
@@ -40,6 +41,7 @@ namespace WixToolset.Core.Native
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                StandardOutputEncoding = Encoding.UTF8,
                 CreateNoWindow = true,
                 ErrorDialog = false,
                 UseShellExecute = false
@@ -61,7 +63,8 @@ namespace WixToolset.Core.Native
                 {
                     foreach (var line in this.stdinLines)
                     {
-                        process.StandardInput.WriteLine(line);
+                        var bytes = Encoding.UTF8.GetBytes(line + Environment.NewLine);
+                        process.StandardInput.BaseStream.Write(bytes, 0, bytes.Length);
                     }
 
                     // Trailing blank line indicates stdin complete.

@@ -33,16 +33,46 @@ void DAPI ConsoleRed();
 void DAPI ConsoleYellow();
 void DAPI ConsoleNormal();
 
+/********************************************************************
+ ConsoleWrite - full color printfA without libc
+
+ NOTE: only supports ANSI characters
+       assumes already in normal color and resets the screen to normal color
+********************************************************************/
 HRESULT DAPI ConsoleWrite(
     CONSOLE_COLOR cc,
     __in_z __format_string LPCSTR szFormat,
     ...
     );
+
+/********************************************************************
+ ConsoleWriteW - sends UTF-8 characters to console out in color.
+
+ NOTE: assumes already in normal color and resets the screen to normal color
+********************************************************************/
+HRESULT DAPI ConsoleWriteW(
+    __in CONSOLE_COLOR cc,
+    __in_z LPCWSTR wzData
+    );
+
+/********************************************************************
+ ConsoleWriteLine - full color printfA plus newline without libc
+
+ NOTE: only supports ANSI characters
+       assumes already in normal color and resets the screen to normal color
+********************************************************************/
 HRESULT DAPI ConsoleWriteLine(
     CONSOLE_COLOR cc,
     __in_z __format_string LPCSTR szFormat,
     ...
     );
+
+/********************************************************************
+ ConsoleWriteError - display an error to the console out
+
+ NOTE: only supports ANSI characters
+       does not write to stderr
+********************************************************************/
 HRESULT DAPI ConsoleWriteError(
     HRESULT hrError,
     CONSOLE_COLOR cc,
@@ -50,28 +80,58 @@ HRESULT DAPI ConsoleWriteError(
     ...
     );
 
+/********************************************************************
+ ConsoleReadW - reads a line from console in as UTF-8 to populate Unicode buffer
+
+********************************************************************/
 HRESULT DAPI ConsoleReadW(
     __deref_out_z LPWSTR* ppwzBuffer
     );
 
-HRESULT DAPI ConsoleReadStringA(
-    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPSTR* szCharBuffer,
-    CONST DWORD cchCharBuffer,
-    __out DWORD* pcchNumCharReturn
-    );
-HRESULT DAPI ConsoleReadStringW(
-    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPWSTR* szCharBuffer,
-    CONST DWORD cchCharBuffer,
-    __out DWORD* pcchNumCharReturn
-    );
+/********************************************************************
+ ConsoleReadNonBlockingW - Read from the console without blocking
+ Won't work for redirected files (exe < txtfile), but will work for stdin redirected to
+ an anonymous or named pipe
 
+ if (fReadLine), stop reading immediately when \r\n is found
+*********************************************************************/
 HRESULT DAPI ConsoleReadNonBlockingW(
     __deref_out_ecount_opt(*pcchSize) LPWSTR* ppwzBuffer,
     __out DWORD* pcchSize,
     BOOL fReadLine
     );
 
+/********************************************************************
+ ConsoleReadStringA - get console input without libc
+
+ NOTE: only supports ANSI characters
+*********************************************************************/
+HRESULT DAPI ConsoleReadStringA(
+    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPSTR* szCharBuffer,
+    CONST DWORD cchCharBuffer,
+    __out DWORD* pcchNumCharReturn
+    );
+
+/********************************************************************
+ ConsoleReadStringW - get console input without libc
+
+*********************************************************************/
+HRESULT DAPI ConsoleReadStringW(
+    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPWSTR* szCharBuffer,
+    CONST DWORD cchCharBuffer,
+    __out DWORD* pcchNumCharReturn
+    );
+
+/********************************************************************
+ ConsoleSetReadHidden - set console input no echo
+
+*********************************************************************/
 HRESULT DAPI ConsoleSetReadHidden(void);
+
+/********************************************************************
+ ConsoleSetReadNormal - reset to echo
+
+*********************************************************************/
 HRESULT DAPI ConsoleSetReadNormal(void);
 
 #ifdef __cplusplus

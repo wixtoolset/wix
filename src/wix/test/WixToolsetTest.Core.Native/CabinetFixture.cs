@@ -34,6 +34,27 @@ namespace WixToolsetTest.CoreNative
         }
 
         [Fact]
+        public void CanCreateCabinetUsingLocalizedPath()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder(true);
+                var cabPath = Path.Combine(intermediateFolder, "testout.cab");
+
+                var files = new[] { new CabinetCompressFile(TestData.Get(@"TestData", "Testüber", "t道場t.txt"), "test.txt") };
+
+                var cabinet = new Cabinet(cabPath);
+                var created = cabinet.Compress(files, CompressionLevel.Low);
+
+                Assert.True(File.Exists(cabPath));
+                Assert.Equal(new[]
+                {
+                    "testout.cab, test.txt"
+                }, created.Select(c => String.Join(", ", c.CabinetName, c.FirstFileToken)).ToArray());
+            }
+        }
+
+        [Fact]
         public void CanCreateSpannedFileCabinet()
         {
             using (var fs = new DisposableFileSystem())
