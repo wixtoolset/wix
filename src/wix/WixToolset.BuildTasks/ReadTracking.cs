@@ -93,7 +93,7 @@ namespace WixToolset.BuildTasks
                     }
                     else
                     {
-                        this.Log.LogError($"Failed to parse tracked line: {line}");
+                        this.Log.LogError("Failed to parse tracked line: {0}", line);
                     }
                 }
             }
