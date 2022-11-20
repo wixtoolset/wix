@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <WixSigningPropsImported>true</WixSigningPropsImported>
+  </PropertyGroup>
+
+  <!--
+  ==================================================================================================
+  BeforeSigning
+
+    Redefine this target in your project in order to run tasks just before all signing tasks.
+  ==================================================================================================
+  -->
+  <Target Name="BeforeSigning" />
+
+  <!--
+  ==================================================================================================
+  SignMsm
+
+    Redefine this target in your project in order to sign merge modules.
+
+    [IN]
+    @(SignMsm) - merge module files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignMsm" />
+
+  <!--
+  ==================================================================================================
+  SignCabs
+
+    Redefine this target in your project in order to sign the cabs of your database.
+
+    [IN]
+    @(SignCabs) - cabinet files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignCabs" />
+
+  <!--
+  ==================================================================================================
+  SignMsi
+
+    Redefine this target in your project in order to sign your database, after it has been inscribed
+    with the signatures of your signed cabs.
+
+    [IN]
+    @(SignMsi) - database files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignMsi" />
+
+  <!--
+  ==================================================================================================
+  SignContainers
+
+    Redefine this target in your project in order to sign your bundle's detached containers.
+
+    [IN]
+    @(SignContainers) - detached container files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignContainers" />
+
+  <!--
+  ==================================================================================================
+  SignBundleEngine
+
+    Redefine this target in your project in order to sign your bundle, after it has been inscribed
+    with the signatures of your signed containers.
+
+    [IN]
+    @(SignBundleEngine) - bundle engine file to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignBundleEngine" />
+
+  <!--
+  ==================================================================================================
+  SignBundle
+
+    Redefine this target in your project in order to sign your bundle, after the attached container
+    is reattached.
+
+    [IN]
+    @(SignBundle) - bundle file to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignBundle" />
+
+  <!--
+  ==================================================================================================
+  AfterSigning
+
+    Redefine this target in your project in order to run tasks just after all signing tasks.
+  ==================================================================================================
+  -->
+  <Target Name="AfterSigning" />
+
+</Project>

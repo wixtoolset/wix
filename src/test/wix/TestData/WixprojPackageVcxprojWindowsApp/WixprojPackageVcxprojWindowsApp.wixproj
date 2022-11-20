@@ -3,6 +3,7 @@
 <Project Sdk='WixToolset.Sdk'> 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <SignOutput>true</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,4 +13,8 @@
 
     <PackageReference Include="Wixtoolset.UI.wixext" />
   </ItemGroup>
+
+  <Target Name="SignMsi">
+    <Warning Text="SignMsi = @(SignMsi)" />
+  </Target>
 </Project>

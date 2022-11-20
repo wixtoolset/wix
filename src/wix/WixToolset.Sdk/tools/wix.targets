@@ -31,10 +31,6 @@
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(MSBuildThisFileDirectory)WixToolset.Signing.targets</WixSigningTargetsPath>
-  </PropertyGroup>
-
   <ItemGroup Condition=" '$(EnableDefaultItems)' == 'true' ">
     <Compile Include="**/*.wxs" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
     <EmbeddedResource Include="**/*.wxl" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultEmbeddedResourceItems)' == 'true' " />
@@ -937,7 +933,7 @@
     </Copy>
   </Target>
 
-  <Import Project="$(WixSigningTargetsPath)"  />
+  <Import Project="WixToolset.Signing.targets" Condition=" '$(WixSigningTargetsImported)' != 'true' " />
 
   <!-- Extension point: Define CustomAfterWixTargets to a .targets file that you want to include after this file. -->
   <Import Project="$(CustomAfterWixTargets)" Condition=" '$(CustomAfterWixTargets)' != '' and Exists('$(CustomAfterWixTargets)')" />
