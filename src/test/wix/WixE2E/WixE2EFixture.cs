@@ -55,6 +55,14 @@ namespace WixE2E
 
             var result = RestoreAndBuild(projectPath);
             result.AssertSuccess();
+
+            var signingStatement = result.Output.Where(s => s.Contains("warning :"))
+                                                .Select(s => s.Replace(Path.GetDirectoryName(projectPath), "<projectFolder>").Replace(@"\Debug\", @"\<configuration>\").Replace(@"\Release\", @"\<configuration>\"))
+                                                .ToArray();
+            WixAssert.CompareLineByLine(new[]
+            {
+                @"<projectFolder>\WixprojPackageVcxprojWindowsApp.wixproj(18,5): warning : SignMsi = obj\<configuration>\en-US\WixprojPackageVcxprojWindowsApp.msi;obj\<configuration>\ja-JP\WixprojPackageVcxprojWindowsApp.msi"
+            }, signingStatement);
         }
 
         [Fact]
