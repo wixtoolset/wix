@@ -3,6 +3,7 @@
 namespace WixToolset.BaseBuildTasks
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Build.Utilities;
@@ -129,24 +130,48 @@ namespace WixToolset.BaseBuildTasks
             return false;
         }
 #else
-        private static string GetArchitectureFolder(string baseFolder)
+        private string FindArchitectureSpecificToolPath(string baseFolder)
         {
+            var checkedPaths = new List<string>();
+
             // First try to find a folder that matches this task's architecture.
-            var folder = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
+            var archFolder = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
 
-            if (Directory.Exists(Path.Combine(baseFolder, folder)))
+            var path = Path.Combine(baseFolder, archFolder, this.ToolExe);
+
+            if (File.Exists(path))
             {
-                return folder;
+                return path;
             }
 
-            // Try to fallback to "x86" folder.
-            if (folder != "x86" && Directory.Exists(Path.Combine(baseFolder, "x86")))
+            checkedPaths.Add(path);
+
+            // Try to fallback to "x86" folder since it tends to run on all architectures.
+            if (!String.Equals(archFolder, "x86", StringComparison.OrdinalIgnoreCase))
             {
-                return "x86";
+                path = Path.Combine(baseFolder, "x86", this.ToolExe);
+
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+
+                checkedPaths.Add(path);
             }
 
-            // Return empty, even though this isn't likely to be useful.
-            return String.Empty;
+            // Return empty, even though this isn't likely to be there.
+            path = Path.Combine(baseFolder, this.ToolExe);
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
+            checkedPaths.Add(path);
+
+            this.Log.LogError("Cannot find tool executable {0} at any of the checked paths: {1}. This is unexpected and will cause later commands to fail.", this.ToolExe, String.Join(", ", checkedPaths));
+
+            return path;
         }
 #endif
 
@@ -159,9 +184,7 @@ namespace WixToolset.BaseBuildTasks
 #else
                 var thisTaskFolder = Path.GetDirectoryName(new Uri(typeof(BaseToolsetTask).Assembly.CodeBase).AbsolutePath);
 
-                var archFolder = GetArchitectureFolder(thisTaskFolder);
-
-                return Path.Combine(thisTaskFolder, archFolder, this.ToolExe);
+                return this.FindArchitectureSpecificToolPath(thisTaskFolder);
 #endif
         }
 
