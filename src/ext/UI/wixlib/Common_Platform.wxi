@@ -1,16 +1,18 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?include ..\..\caDecor.wxi ?>
 
-    <!-- 
-      Custom actions to print EULA amd validate install directories are defined
-      in WixUIExtension compiler extension, to handle platform-specific custom
-      actions referred to from `DoAction` control events.
-    -->
+    <Fragment>
+        <CustomAction Id="WixUIPrintEula$(Suffix)" BinaryRef="WixUiCa$(Suffix)" DllEntry="PrintEula" Return="ignore" Execute="immediate" />
+    </Fragment>
 
     <Fragment>
-        <Binary Id="WixUiCa$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))uica.dll" />
+        <CustomAction Id="WixUIValidatePath$(Suffix)" BinaryRef="WixUiCa$(Suffix)" DllEntry="ValidatePath" Return="ignore" Execute="immediate" />
+    </Fragment>
+
+    <Fragment>
+        <Binary Id="WixUiCa$(Suffix)" SourceFile="!(bindpath.$(platform))uica.dll" />
     </Fragment>
 </Include>
