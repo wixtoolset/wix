@@ -2048,12 +2048,12 @@ namespace WixToolset.Data
 
         public static Message UnexpectedExternalUIMessage(string message)
         {
-            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing unknown ICE action. The most common cause of this kind of ICE failure is an incorrectly registered scripting engine. See https://wixtoolset.org/documentation/error217/ for details and how to solve this problem. The following string format was not expected by the external UI message logger: \"{0}\".", message);
+            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing unknown ICE action. The following string format was not expected by the external UI message logger: \"{0}\".", message);
         }
 
         public static Message UnexpectedExternalUIMessage(string message, string action)
         {
-            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing ICE action '{1}'. The most common cause of this kind of ICE failure is an incorrectly registered scripting engine. See https://wixtoolset.org/documentation/error217/ for details and how to solve this problem. The following string format was not expected by the external UI message logger: \"{0}\".", message, action);
+            return Message(null, Ids.UnexpectedExternalUIMessage, "Error executing ICE action '{1}'. The following string format was not expected by the external UI message logger: \"{0}\".", message, action);
         }
 
         public static Message UnexpectedFileExtension(string fileName, string expectedExtensions)
