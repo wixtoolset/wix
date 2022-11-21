@@ -51,7 +51,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssetTargetFallback>$(AssetTargetFallback);net6.0-windows;net6.0;net5.0-windows;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.0;net462;net47;net471;net472;net48;native</AssetTargetFallback>
+    <AssetTargetFallback>$(AssetTargetFallback);net7.0-windows;net7.0;net6.0-windows7.0;net6.0-windows;net6.0;net5.0-windows7.0;net5.0-windows;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.0;net462;net47;net471;net472;net48;native</AssetTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup>
