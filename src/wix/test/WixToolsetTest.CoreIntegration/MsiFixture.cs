@@ -84,8 +84,8 @@ namespace WixToolsetTest.CoreIntegration
                 var errorMessages = messages.Select(m => m.ToString().Replace(folder, "<folder>")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"The system cannot find the file 'test.txt' with type 'File'. The following paths were checked: test.txt, <folder>\does-not-exist\test.txt, <folder>\also-does-not-exist\test.txt",
-                    @"The system cannot find the file 'test.txt' with type 'File'. The following paths were checked: test.txt, <folder>\does-not-exist\test.txt, <folder>\also-does-not-exist\test.txt",
+                    @"Cannot find the File file 'test.txt'. The following paths were checked: test.txt, <folder>\does-not-exist\test.txt, <folder>\also-does-not-exist\test.txt",
+                    @"Cannot find the File file 'test.txt'. The following paths were checked: test.txt, <folder>\does-not-exist\test.txt, <folder>\also-does-not-exist\test.txt",
                 }, errorMessages);
 
                 var errorMessage = errorMessages.First();

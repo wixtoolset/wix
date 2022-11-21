@@ -281,7 +281,7 @@ namespace WixToolset.Core.Burn.Bundles
                 if (!payloadNames.Contains(containerFullName))
                 {
                     var generatedId = this.BackendHelper.GenerateIdentifier("hcp", this.PackagePayload.Id.Id, containerName);
-                    var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, containerName, "Container", this.PackagePayload.SourceLineNumbers);
+                    var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, containerName, "container", this.PackagePayload.SourceLineNumbers);
 
                     this.Payloads.Add(new WixBundlePayloadSymbol(this.PackagePayload.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                     {
@@ -341,7 +341,7 @@ namespace WixToolset.Core.Burn.Bundles
                 if (!payloadNames.Contains(payloadFullName))
                 {
                     var generatedId = this.BackendHelper.GenerateIdentifier("hpp", this.PackagePayload.Id.Id, payloadName);
-                    var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, payloadName, "Payload", this.PackagePayload.SourceLineNumbers);
+                    var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, payloadName, "payload", this.PackagePayload.SourceLineNumbers);
 
                     this.Payloads.Add(new WixBundlePayloadSymbol(this.PackagePayload.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                     {
