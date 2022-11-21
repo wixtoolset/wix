@@ -178,11 +178,11 @@ namespace WixToolset.BaseBuildTasks
         private string GetDefaultToolFullPath()
         {
 #if NETCOREAPP
-                var thisTaskFolder = Path.GetDirectoryName(typeof(BaseToolsetTask).Assembly.Location);
+                var thisTaskFolder = Path.GetDirectoryName(Path.GetFullPath(typeof(BaseToolsetTask).Assembly.Location));
 
                 return Path.Combine(thisTaskFolder, this.ToolExe);
 #else
-                var thisTaskFolder = Path.GetDirectoryName(new Uri(typeof(BaseToolsetTask).Assembly.CodeBase).AbsolutePath);
+                var thisTaskFolder = Path.GetDirectoryName(Path.GetFullPath(new Uri(typeof(BaseToolsetTask).Assembly.CodeBase).LocalPath));
 
                 return this.FindArchitectureSpecificToolPath(thisTaskFolder);
 #endif
