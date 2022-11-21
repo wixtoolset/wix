@@ -15,7 +15,7 @@ namespace WixToolsetTest.BuildTasks
 
     public class WixBuildTaskFixture
     {
-        public static readonly string PublishedWixSdkToolsFolder = Path.Combine(Path.GetDirectoryName(new Uri(typeof(WixBuildTaskFixture).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Sdk", "tools");
+        public static readonly string PublishedWixSdkToolsFolder = Path.Combine(Path.GetDirectoryName(new Uri(typeof(WixBuildTaskFixture).Assembly.CodeBase).LocalPath), "..", "..", "..", "publish", "WixToolset.Sdk", "tools");
 
         // This line replicates what happens in WixBuild task when hosted in the PublishedWixSdkToolsFolder. However, WixBuild task is hosted inproc to this test assembly so the
         // root folder is relative to the test assembly's folder which does not have wix.exe local. So, we have to find wix.exe relative to PublishedWixSdkToolsFolder.

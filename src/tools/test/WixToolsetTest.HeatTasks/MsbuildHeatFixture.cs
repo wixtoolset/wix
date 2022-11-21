@@ -13,7 +13,7 @@ namespace WixToolsetTest.Sdk
 
     public class MsbuildHeatFixture
     {
-        public static readonly string HeatTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Heat", "build", "WixToolset.Heat.targets");
+        public static readonly string HeatTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).LocalPath), "..", "..", "..", "publish", "WixToolset.Heat", "build", "WixToolset.Heat.targets");
 
         public MsbuildHeatFixture()
         {

@@ -11,7 +11,7 @@ namespace WixToolsetTest.Sdk
 
     public class MsbuildFixture
     {
-        public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).AbsolutePath), "..", "..", "..", "publish", "WixToolset.Sdk");
+        public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).LocalPath), "..", "..", "..", "publish", "WixToolset.Sdk");
         public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
 
         [Theory]
