@@ -697,7 +697,7 @@ namespace WixToolset.Core.CommandLine
                 }
                 else
                 {
-                    parser.GetArgumentAsFilePathOrError(arg, "input file", this.UnclassifiedInputFilePaths);
+                    parser.GetArgumentAsFilePathOrError(arg, "input", this.UnclassifiedInputFilePaths);
                     return true;
                 }
             }

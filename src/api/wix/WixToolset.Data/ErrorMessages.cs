@@ -640,19 +640,19 @@ namespace WixToolset.Data
 
         public static Message FileNotFound(SourceLineNumber sourceLineNumbers, string file)
         {
-            return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}'.", file);
+            return Message(sourceLineNumbers, Ids.FileNotFound, "Cannot find the file '{0}'.", file);
         }
 
         public static Message FileNotFound(SourceLineNumber sourceLineNumbers, string file, string fileType)
         {
-            return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}' with type '{1}'.", file, fileType);
+            return Message(sourceLineNumbers, Ids.FileNotFound, "Cannot find the {0} file '{1}'.", fileType, file);
         }
 
         public static Message FileNotFound(SourceLineNumber sourceLineNumbers, string file, string fileType, IEnumerable<string> checkedPaths)
         {
             var combinedCheckedPaths = String.Join(", ", checkedPaths);
-            var withType = String.IsNullOrEmpty(fileType) ? String.Empty : $" with type '{fileType}'";
-            return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}'{1}. The following paths were checked: {2}", file, withType, combinedCheckedPaths);
+            var fileTypePrefix = String.IsNullOrEmpty(fileType) ? String.Empty : fileType + " ";
+            return Message(sourceLineNumbers, Ids.FileNotFound, "Cannot find the {0}file '{1}'. The following paths were checked: {2}", fileTypePrefix, file, combinedCheckedPaths);
         }
 
         public static Message FileOrDirectoryPathRequired(string parameter)
@@ -662,12 +662,12 @@ namespace WixToolset.Data
 
         public static Message FilePathRequired(string filePurpose)
         {
-            return Message(null, Ids.FilePathRequired, "The path to {0} is required.", filePurpose);
+            return Message(null, Ids.FilePathRequired, "The path to the {0} is required.", filePurpose);
         }
 
         public static Message FilePathRequired(string parameter, string filePurpose)
         {
-            return Message(null, Ids.FilePathRequired, "The parameter '{0}' must be followed by a file path for {1}.", parameter, filePurpose);
+            return Message(null, Ids.FilePathRequired, "The parameter '{0}' must be followed by a file path for the {1}.", parameter, filePurpose);
         }
 
         public static Message FileTooLarge(SourceLineNumber sourceLineNumbers, string fileName)

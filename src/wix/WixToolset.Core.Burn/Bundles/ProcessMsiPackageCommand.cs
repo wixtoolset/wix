@@ -452,7 +452,7 @@ namespace WixToolset.Core.Burn.Bundles
                             if (!payloadNames.Contains(cabinetName))
                             {
                                 var generatedId = this.BackendHelper.GenerateIdentifier("cab", this.PackagePayload.Id.Id, cabinet);
-                                var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, cabinet, "Cabinet", sourceLineNumbers);
+                                var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, cabinet, "cabinet", sourceLineNumbers);
 
                                 this.Section.AddSymbol(new WixBundlePayloadSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                                 {
@@ -516,7 +516,7 @@ namespace WixToolset.Core.Burn.Bundles
                             if (!payloadNames.Contains(name))
                             {
                                 var generatedId = this.BackendHelper.GenerateIdentifier("f", this.PackagePayload.Id.Id, record.GetString(2));
-                                var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, fileSourcePath, "File", sourceLineNumbers);
+                                var payloadSourceFile = this.ResolveRelatedFile(this.PackagePayload.SourceFile.Path, this.PackagePayload.UnresolvedSourceFile, fileSourcePath, "payload", sourceLineNumbers);
 
                                 this.Section.AddSymbol(new WixBundlePayloadSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                                 {
