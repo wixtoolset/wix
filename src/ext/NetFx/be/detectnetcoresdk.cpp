@@ -2,16 +2,14 @@
 
 #include "precomp.h"
 
-HRESULT DetectNetCore(
+HRESULT DetectNetCoreSdk(
     __in NETFX_NET_CORE_PLATFORM platform,
-    __in NETFX_NET_CORE_RUNTIME_TYPE runtimeType,
-    __in LPCWSTR wzMajorVersion,
+    __in LPCWSTR wzVersion,
     __in LPCWSTR wzBaseDirectory,
     __inout LPWSTR* psczLatestVersion
     )
 {
     HRESULT hr = S_OK;
-    LPCWSTR wzRuntimeType = NULL;
     LPCWSTR wzPlatformName = NULL;
     LPWSTR sczExePath = NULL;
     LPWSTR sczCommandLine = NULL;
@@ -24,22 +22,6 @@ HRESULT DetectNetCore(
     DWORD dwExitCode = 0;
 
     ReleaseNullStr(*psczLatestVersion);
-
-    switch (runtimeType)
-    {
-    case NETFX_NET_CORE_RUNTIME_TYPE_ASPNET:
-        wzRuntimeType = L"Microsoft.AspNetCore.App";
-        break;
-    case NETFX_NET_CORE_RUNTIME_TYPE_CORE:
-        wzRuntimeType = L"Microsoft.NETCore.App";
-        break;
-    case NETFX_NET_CORE_RUNTIME_TYPE_DESKTOP:
-        wzRuntimeType = L"Microsoft.WindowsDesktop.App";
-        break;
-    default:
-        BextExitWithRootFailure(hr, E_INVALIDARG, "Unknown runtime type: %u", runtimeType);
-        break;
-    }
 
     switch (platform)
     {
@@ -60,7 +42,7 @@ HRESULT DetectNetCore(
     hr = StrAllocFormatted(&sczExePath, L"%ls%ls\\netcoresearch.exe", wzBaseDirectory, wzPlatformName);
     BextExitOnFailure(hr, "Failed to build netcoresearch.exe path.");
 
-    hr = StrAllocFormatted(&sczCommandLine, L"\"%ls\" runtime %ls %ls", sczExePath, wzMajorVersion, wzRuntimeType);
+    hr = StrAllocFormatted(&sczCommandLine, L"\"%ls\" sdk %ls", sczExePath, wzVersion);
     BextExitOnFailure(hr, "Failed to build netcoresearch.exe command line.");
 
     hr = ProcExecute(sczExePath, sczCommandLine, &hProcess, NULL, &hStdOutErr);
@@ -72,7 +54,7 @@ HRESULT DetectNetCore(
 
     cbOutput = 64;
 
-    rgbOutput = reinterpret_cast<BYTE*>(MemAlloc(cbOutput, TRUE));
+    rgbOutput = static_cast<BYTE*>(MemAlloc(cbOutput, TRUE));
     BextExitOnNull(rgbOutput, hr, E_OUTOFMEMORY, "Failed to alloc output string.");
 
     while (::ReadFile(hStdOutErr, rgbOutput + cbTotalRead, cbOutput - cbTotalRead, &cbRead, NULL))
@@ -83,10 +65,10 @@ HRESULT DetectNetCore(
         {
             cbOutput *= 2;
 
-            LPVOID pvNew = MemReAlloc(rgbOutput, cbOutput, TRUE);
+            const LPVOID pvNew = MemReAlloc(rgbOutput, cbOutput, TRUE);
             BextExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to realloc output string.");
 
-            rgbOutput = reinterpret_cast<BYTE*>(pvNew);
+            rgbOutput = static_cast<BYTE*>(pvNew);
         }
     }
 
@@ -119,7 +101,7 @@ LExit:
     return hr;
 }
 
-HRESULT NetfxPerformDetectNetCore(
+HRESULT NetfxPerformDetectNetCoreSdk(
     __in LPCWSTR wzVariable,
     __in NETFX_SEARCH* pSearch,
     __in IBundleExtensionEngine* pEngine,
@@ -127,10 +109,10 @@ HRESULT NetfxPerformDetectNetCore(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczLatestVersion = FALSE;
-
-    hr = DetectNetCore(pSearch->NetCoreSearch.platform, pSearch->NetCoreSearch.runtimeType, pSearch->NetCoreSearch.sczMajorVersion, wzBaseDirectory, &sczLatestVersion);
-    BextExitOnFailure(hr, "DetectNetCore failed.");
+    LPWSTR sczLatestVersion = nullptr;
+    const auto& searchParams = pSearch->NetCoreSdkSearch;
+    hr = DetectNetCoreSdk(searchParams.platform, searchParams.sczVersion, wzBaseDirectory, &sczLatestVersion);
+    BextExitOnFailure(hr, "DetectNetCoreSdk failed.");
 
     hr = pEngine->SetVariableVersion(wzVariable, sczLatestVersion);
     BextExitOnFailure(hr, "Failed to set variable '%ls' to '%ls'", wzVariable, sczLatestVersion);

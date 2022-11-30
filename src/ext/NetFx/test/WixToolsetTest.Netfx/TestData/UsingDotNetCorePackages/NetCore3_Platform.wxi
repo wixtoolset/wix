@@ -21,6 +21,12 @@
   <?define DotNetCoreRedistInstallArguments = /install /quiet /log "[$(var.DotNetCoreRedistLog)]"?>
   <?define DotNetCoreRedistUninstallArguments = /uninstall /quiet /log "[$(var.DotNetCoreRedistLog)]"?>
 
+  <?define DotNetCoreSdkId = DOTNETCORESDK3_$(var.NetCoreSdkPlatform)?>
+  <?define DotNetCoreSdkRedistId = DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist_$(var.NetCoreSdkPlatform)?>
+  <?define DotNetCoreSdkRedistLog = DotNetCoreSdk$(var.NetCoreSdkIdVersion)RedistLog?>
+  <?define DotNetCoreSdkRedistInstallArguments = /install /quiet /log "[$(var.DotNetCoreSdkRedistLog)]"?>
+  <?define DotNetCoreSdkRedistUninstallArguments = /uninstall /quiet /log "[$(var.DotNetCoreSdkRedistLog)]"?>
+
   <?define NetCoreEulaLink = https://go.microsoft.com/fwlink/?LinkId=329770?>
 
   <Fragment>
@@ -45,5 +51,13 @@
     </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DotNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
+  </Fragment>
+
+    <Fragment>
+    <PackageGroup Id="$(var.DotNetCoreSdkRedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.DotNetCoreSdkRedistId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DotNetCoreSdkRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
 </Include>

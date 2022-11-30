@@ -11,11 +11,11 @@ namespace WixToolset.Netfx
             NetfxSymbolDefinitionType.NetFxDotNetCompatibilityCheck.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.RuntimeType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Platform), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Version), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.RollForward), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbollFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbolFields.RuntimeType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbolFields.Platform), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbolFields.RollForward), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxDotNetCompatibilityCheckSymbolFields.Property), IntermediateFieldType.String),
             },
             typeof(NetFxDotNetCompatibilityCheckSymbol));
     }
@@ -25,7 +25,7 @@ namespace WixToolset.Netfx.Symbols
 {
     using WixToolset.Data;
 
-    public enum NetFxDotNetCompatibilityCheckSymbollFields
+    public enum NetFxDotNetCompatibilityCheckSymbolFields
     {
         RuntimeType,
         Platform,
@@ -44,36 +44,36 @@ namespace WixToolset.Netfx.Symbols
         {
         }
 
-        public IntermediateField this[NetFxDotNetCompatibilityCheckSymbollFields index] => this.Fields[(int)index];
+        public IntermediateField this[NetFxDotNetCompatibilityCheckSymbolFields index] => this.Fields[(int)index];
 
         public string RuntimeType
         {
-            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.RuntimeType].AsString();
-            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.RuntimeType, value);
+            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbolFields.RuntimeType].AsString();
+            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbolFields.RuntimeType, value);
         }
 
         public string Platform
         {
-            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.Platform].AsString();
-            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.Platform, value);
+            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbolFields.Platform].AsString();
+            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbolFields.Platform, value);
         }
 
         public string Version
         {
-            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.Version].AsString();
-            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.Version, value);
+            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbolFields.Version].AsString();
+            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbolFields.Version, value);
         }
 
         public string RollForward
         {
-            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.RollForward].AsString();
-            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.RollForward, value);
+            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbolFields.RollForward].AsString();
+            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbolFields.RollForward, value);
         }
 
         public string Property
         {
-            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbollFields.Property].AsString();
-            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbollFields.Property, value);
+            get => this.Fields[(int)NetFxDotNetCompatibilityCheckSymbolFields.Property].AsString();
+            set => this.Set((int)NetFxDotNetCompatibilityCheckSymbolFields.Property, value);
         }
     }
 }

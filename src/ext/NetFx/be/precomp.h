@@ -30,4 +30,5 @@
 #include "..\..\beDecor.h"
 #include "netfxsearch.h"
 #include "detectnetcore.h"
+#include "detectnetcoresdk.h"
 #include "NetfxBundleExtension.h"

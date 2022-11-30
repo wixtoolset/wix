@@ -15,7 +15,7 @@ STDMETHODIMP NetfxSearchParseFromXml(
     BSTR bstrNodeName = NULL;
 
     // Select Netfx search nodes.
-    hr = XmlSelectNodes(pixnBundleExtension, L"NetFxNetCoreSearch", &pixnNodes);
+    hr = XmlSelectNodes(pixnBundleExtension, L"NetFxNetCoreSearch|NetFxNetCoreSdkSearch", &pixnNodes);
     BextExitOnFailure(hr, "Failed to select Netfx search nodes.");
 
     // Get Netfx search node count.
@@ -50,17 +50,31 @@ STDMETHODIMP NetfxSearchParseFromXml(
         {
             pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SEARCH;
 
+            auto& netCoreSearch = pSearch->NetCoreSearch;
             // @RuntimeType
-            hr = XmlGetAttributeUInt32(pixnNode, L"RuntimeType", reinterpret_cast<DWORD*>(&pSearch->NetCoreSearch.runtimeType));
+            hr = XmlGetAttributeUInt32(pixnNode, L"RuntimeType", reinterpret_cast<DWORD*>(&netCoreSearch.runtimeType));
             BextExitOnFailure(hr, "Failed to get @RuntimeType.");
 
             // @Platform
-            hr = XmlGetAttributeUInt32(pixnNode, L"Platform", reinterpret_cast<DWORD*>(&pSearch->NetCoreSearch.platform));
+            hr = XmlGetAttributeUInt32(pixnNode, L"Platform", reinterpret_cast<DWORD*>(&netCoreSearch.platform));
             BextExitOnFailure(hr, "Failed to get @Platform.");
 
             // @MajorVersion
-            hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &pSearch->NetCoreSearch.sczMajorVersion);
+            hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &netCoreSearch.sczMajorVersion);
             BextExitOnFailure(hr, "Failed to get @MajorVersion.");
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"NetFxNetCoreSdkSearch", -1))
+        {
+            pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SDK_SEARCH;
+
+            auto& netCoreSdkSearch = pSearch->NetCoreSdkSearch;
+            // @Platform
+            hr = XmlGetAttributeUInt32(pixnNode, L"Platform", reinterpret_cast<DWORD*>(&netCoreSdkSearch.platform));
+            BextExitOnFailure(hr, "Failed to get @Platform.");
+
+            // @Version
+            hr = XmlGetAttributeEx(pixnNode, L"Version", &netCoreSdkSearch.sczVersion);
+            BextExitOnFailure(hr, "Failed to get @Version.");
         }
         else
         {
@@ -114,6 +128,9 @@ STDMETHODIMP NetfxSearchExecute(
     {
     case NETFX_SEARCH_TYPE_NET_CORE_SEARCH:
         hr = NetfxPerformDetectNetCore(wzVariable, pSearch, pEngine, wzBaseDirectory);
+        break;
+    case NETFX_SEARCH_TYPE_NET_CORE_SDK_SEARCH:
+        hr = NetfxPerformDetectNetCoreSdk(wzVariable, pSearch, pEngine, wzBaseDirectory);
         break;
     default:
         hr = E_UNEXPECTED;
