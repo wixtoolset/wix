@@ -40,7 +40,7 @@ namespace WixToolset.Netfx
         public static readonly TableDefinition[] All = new[]
         {
             NetFxNativeImage,
-            NetFxDotNetCompatibilityCheck
+            NetFxDotNetCompatibilityCheck,
         };
     }
 }

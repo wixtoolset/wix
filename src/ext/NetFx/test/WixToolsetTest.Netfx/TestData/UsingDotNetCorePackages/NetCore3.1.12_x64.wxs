@@ -5,11 +5,15 @@
     <?define NetCorePlatform = x64?>
     <?define NetCoreIdVersion = 3112?>
     <?define NetCoreVersion = 3.1.12?>
+    <?define NetCoreSdkPlatform = x64?>
+    <?define NetCoreSdkIdVersion = 31425?>
+    <?define NetCoreSdkVersion = 3.1.425?>
     <?include NetCore3_Platform.wxi?>
 
     <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/20cf277c-2ccf-449f-a0b8-925ba0c175e7/aa50b052ceb8a8d36a5b4f9b8d0bd91c/aspnetcore-runtime-3.1.12-win-x64.exe?>
     <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/076a47e9-c65b-4b78-95a7-93eb988891a4/3574764590cfa650e0aa87c44d3fe384/windowsdesktop-runtime-3.1.12-win-x64.exe?>
     <?define DotNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/2fdc3009-cf5c-4cf6-8f3b-a61e83200cbb/2c71ee04b48103a7464f4e28a8bf339b/dotnet-runtime-3.1.12-win-x64.exe?>
+    <?define DotNetCoreSdkRedistLink = https://download.visualstudio.microsoft.com/download/pr/9cf7e571-76c7-4ce8-9777-37bd6c3540e9/5c01197afed195cdb6cd2ae9e49606fc/dotnet-sdk-3.1.425-win-x64.exe?>
 
     <Fragment>
         <netfx:DotNetCoreSearch Id="$(var.AspNetCoreId)" RuntimeType="aspnet" Platform="$(var.NetCorePlatform)" MajorVersion="3" Variable="$(var.AspNetCoreId)" />
@@ -52,6 +56,21 @@
         <PackageGroup Id="$(var.DotNetCoreRedistId)">
             <ExePackage CacheId="$(var.DotNetCoreRedistId)_2485A7AFA98E178CB8F30C9838346B514AEA4769" InstallArguments="$(var.DotNetCoreRedistInstallArguments)" PerMachine="yes" DetectCondition="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)" InstallCondition="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)" Id="$(var.DotNetCoreRedistId)" Vital="yes" Permanent="yes" Protocol="burn" LogPathVariable="$(var.DotNetCoreRedistLog)" Cache="remove">
                 <ExePackagePayload Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe" DownloadUrl="$(var.DotNetCoreRedistLink)" ProductName="Microsoft .NET Core Runtime - 3.1.12 (x64)" Description="Microsoft .NET Core Runtime - 3.1.12 (x64)" CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18" CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769" Size="26090616" Version="3.1.12.29719" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+
+    <Fragment>
+        <netfx:DotNetCoreSdkSearch Id="$(var.DotNetCoreSdkId)" Platform="$(var.NetCoreSdkPlatform)" Version="3.0.100" Variable="$(var.DotNetCoreSdkId)" />
+
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)DetectCondition" Value="$(var.DotNetCoreSdkId) &gt;= v$(var.NetCoreSdkVersion)" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)RepairArguments" Value="" Overridable="yes" />
+
+        <PackageGroup Id="$(var.DotNetCoreSdkRedistId)">
+            <ExePackage CacheId="$(var.DotNetCoreSdkRedistId)_2485A7AFA98E178CB8F30C9838346B514AEA4769" InstallArguments="$(var.DotNetCoreSdkRedistInstallArguments)" PerMachine="yes" DetectCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)DetectCondition)" InstallCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)InstallCondition)" Id="$(var.DotNetCoreSdkRedistId)" Vital="yes" Permanent="yes" Protocol="burn" LogPathVariable="$(var.DotNetCoreSdkRedistLog)" Cache="remove">
+                <ExePackagePayload Name="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)PackageDirectory)dotnet-sdk-$(var.NetCoreSdkVersion)-win-$(var.NetCoreSdkPlatform).exe" DownloadUrl="$(var.DotNetCoreSdkRedistLink)" ProductName="Microsoft .NET Core Runtime - 3.1.425 (x64)" Description="Microsoft .NET Core Runtime - 3.1.425 (x64)" CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18" CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769" Size="135024384" Version="3.1.425" />
             </ExePackage>
         </PackageGroup>
     </Fragment>

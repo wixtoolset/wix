@@ -8,6 +8,7 @@ enum NETFX_SEARCH_TYPE
 {
     NETFX_SEARCH_TYPE_NONE,
     NETFX_SEARCH_TYPE_NET_CORE_SEARCH,
+    NETFX_SEARCH_TYPE_NET_CORE_SDK_SEARCH,
 };
 
 enum NETFX_NET_CORE_RUNTIME_TYPE
@@ -40,6 +41,11 @@ typedef struct _NETFX_SEARCH
             NETFX_NET_CORE_PLATFORM platform;
             LPWSTR sczMajorVersion;
         } NetCoreSearch;
+        struct
+        {
+            NETFX_NET_CORE_PLATFORM platform;
+            LPWSTR sczVersion;
+        } NetCoreSdkSearch;
     };
 } NETFX_SEARCH;
 

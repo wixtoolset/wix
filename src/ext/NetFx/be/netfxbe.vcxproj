@@ -47,6 +47,7 @@
 
   <ItemGroup>
     <ClCompile Include="detectnetcore.cpp" />
+    <ClCompile Include="detectnetcoresdk.cpp" />
     <ClCompile Include="netfxbe.cpp" />
     <ClCompile Include="NetfxBundleExtension.cpp" />
     <ClCompile Include="netfxsearch.cpp" />
@@ -57,6 +58,7 @@
 
   <ItemGroup>
     <ClInclude Include="detectnetcore.h" />
+    <ClInclude Include="detectnetcoresdk.h" />
     <ClInclude Include="NetfxBundleExtension.h" />
     <ClInclude Include="netfxsearch.h" />
     <ClInclude Include="precomp.h" />
