@@ -45,7 +45,7 @@ namespace WixToolset.Core.CommandLine
 
         public override CommandLineHelp GetCommandLineHelp()
         {
-            return new CommandLineHelp("", "build [options] sourcevile [sourcefile ...] -out output.ext", new[]
+            return new CommandLineHelp("", "build [options] sourcefile [sourcefile ...] -out output.ext", new[]
             {
                 new CommandLineHelpSwitch("-arch", "Set the architecture of the output."),
                 new CommandLineHelpSwitch("-bindfiles", "-bf", "Bind files into an output .wixlib. Ignored if not building a .wixlib."),
