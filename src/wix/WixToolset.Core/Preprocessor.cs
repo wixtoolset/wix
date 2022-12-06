@@ -242,26 +242,26 @@ namespace WixToolset.Core
             expression = expression.ToUpperInvariant();
             switch (operation)
             {
-            case PreprocessorOperation.Not:
-                if (expression.StartsWith("NOT ", StringComparison.Ordinal) || expression.StartsWith("NOT(", StringComparison.Ordinal))
-                {
-                    return true;
-                }
-                break;
-            case PreprocessorOperation.And:
-                if (expression.StartsWith("AND ", StringComparison.Ordinal) || expression.StartsWith("AND(", StringComparison.Ordinal))
-                {
-                    return true;
-                }
-                break;
-            case PreprocessorOperation.Or:
-                if (expression.StartsWith("OR ", StringComparison.Ordinal) || expression.StartsWith("OR(", StringComparison.Ordinal))
-                {
-                    return true;
-                }
-                break;
-            default:
-                break;
+                case PreprocessorOperation.Not:
+                    if (expression.StartsWith("NOT ", StringComparison.Ordinal) || expression.StartsWith("NOT(", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                    break;
+                case PreprocessorOperation.And:
+                    if (expression.StartsWith("AND ", StringComparison.Ordinal) || expression.StartsWith("AND(", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                    break;
+                case PreprocessorOperation.Or:
+                    if (expression.StartsWith("OR ", StringComparison.Ordinal) || expression.StartsWith("OR(", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                    break;
+                default:
+                    break;
             }
             return false;
         }
@@ -298,97 +298,97 @@ namespace WixToolset.Core
 
                     switch (reader.LocalName)
                     {
-                    case "if":
-                        ifStack.Push(ifContext);
-                        if (ifContext.IsTrue)
-                        {
-                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, this.EvaluateExpression(state, reader.Value), IfState.If);
-                        }
-                        else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
-                        {
-                            ifContext = new IfContext();
-                        }
-                        ignore = true;
-                        break;
+                        case "if":
+                            ifStack.Push(ifContext);
+                            if (ifContext.IsTrue)
+                            {
+                                ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, this.EvaluateExpression(state, reader.Value), IfState.If);
+                            }
+                            else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
+                            {
+                                ifContext = new IfContext();
+                            }
+                            ignore = true;
+                            break;
 
-                    case "ifdef":
-                        ifStack.Push(ifContext);
-                        name = reader.Value.Trim();
-                        if (ifContext.IsTrue)
-                        {
-                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null != state.Helper.GetVariableValue(state.Context, name, true)), IfState.If);
-                        }
-                        else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
-                        {
-                            ifContext = new IfContext();
-                        }
-                        ignore = true;
-                        this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, true, ifContext.IsTrue, name));
-                        break;
+                        case "ifdef":
+                            ifStack.Push(ifContext);
+                            name = reader.Value.Trim();
+                            if (ifContext.IsTrue)
+                            {
+                                ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null != state.Helper.GetVariableValue(state.Context, name, true)), IfState.If);
+                            }
+                            else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
+                            {
+                                ifContext = new IfContext();
+                            }
+                            ignore = true;
+                            this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, true, ifContext.IsTrue, name));
+                            break;
 
-                    case "ifndef":
-                        ifStack.Push(ifContext);
-                        name = reader.Value.Trim();
-                        if (ifContext.IsTrue)
-                        {
-                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null == state.Helper.GetVariableValue(state.Context, name, true)), IfState.If);
-                        }
-                        else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
-                        {
-                            ifContext = new IfContext();
-                        }
-                        ignore = true;
-                        this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, false, !ifContext.IsTrue, name));
-                        break;
+                        case "ifndef":
+                            ifStack.Push(ifContext);
+                            name = reader.Value.Trim();
+                            if (ifContext.IsTrue)
+                            {
+                                ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null == state.Helper.GetVariableValue(state.Context, name, true)), IfState.If);
+                            }
+                            else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
+                            {
+                                ifContext = new IfContext();
+                            }
+                            ignore = true;
+                            this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, false, !ifContext.IsTrue, name));
+                            break;
 
-                    case "elseif":
-                        if (0 == ifStack.Count)
-                        {
-                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
-                        }
+                        case "elseif":
+                            if (0 == ifStack.Count)
+                            {
+                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
+                            }
 
-                        if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
-                        {
-                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
-                        }
+                            if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
+                            {
+                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
+                            }
 
-                        ifContext.IfState = IfState.ElseIf;   // we're now in an elseif
-                        if (!ifContext.WasEverTrue)   // if we've never evaluated the if context to true, then we can try this test
-                        {
-                            ifContext.IsTrue = this.EvaluateExpression(state, reader.Value);
-                        }
-                        else if (ifContext.IsTrue)
-                        {
-                            ifContext.IsTrue = false;
-                        }
-                        ignore = true;
-                        break;
+                            ifContext.IfState = IfState.ElseIf;   // we're now in an elseif
+                            if (!ifContext.WasEverTrue)   // if we've never evaluated the if context to true, then we can try this test
+                            {
+                                ifContext.IsTrue = this.EvaluateExpression(state, reader.Value);
+                            }
+                            else if (ifContext.IsTrue)
+                            {
+                                ifContext.IsTrue = false;
+                            }
+                            ignore = true;
+                            break;
 
-                    case "else":
-                        if (0 == ifStack.Count)
-                        {
-                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
-                        }
+                        case "else":
+                            if (0 == ifStack.Count)
+                            {
+                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
+                            }
 
-                        if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
-                        {
-                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
-                        }
+                            if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
+                            {
+                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
+                            }
 
-                        ifContext.IfState = IfState.Else;   // we're now in an else
-                        ifContext.IsTrue = !ifContext.WasEverTrue;   // if we were never true, we can be true now
-                        ignore = true;
-                        break;
+                            ifContext.IfState = IfState.Else;   // we're now in an else
+                            ifContext.IsTrue = !ifContext.WasEverTrue;   // if we were never true, we can be true now
+                            ignore = true;
+                            break;
 
-                    case "endif":
-                        if (0 == ifStack.Count)
-                        {
-                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "endif"));
-                        }
+                        case "endif":
+                            if (0 == ifStack.Count)
+                            {
+                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "endif"));
+                            }
 
-                        ifContext = ifStack.Pop();
-                        ignore = true;
-                        break;
+                            ifContext = ifStack.Pop();
+                            ignore = true;
+                            break;
                     }
 
                     if (ignore)   // ignore this node since we just handled it above
@@ -404,132 +404,132 @@ namespace WixToolset.Core
 
                 switch (reader.NodeType)
                 {
-                case XmlNodeType.XmlDeclaration:
-                    if (currentContainer is XDocument document)
-                    {
-                        document.Declaration = new XDeclaration(null, null, null);
-                        while (reader.MoveToNextAttribute())
+                    case XmlNodeType.XmlDeclaration:
+                        if (currentContainer is XDocument document)
                         {
-                            switch (reader.LocalName)
+                            document.Declaration = new XDeclaration(null, null, null);
+                            while (reader.MoveToNextAttribute())
                             {
-                            case "version":
-                                document.Declaration.Version = reader.Value;
-                                break;
+                                switch (reader.LocalName)
+                                {
+                                    case "version":
+                                        document.Declaration.Version = reader.Value;
+                                        break;
 
-                            case "encoding":
-                                document.Declaration.Encoding = reader.Value;
-                                break;
+                                    case "encoding":
+                                        document.Declaration.Encoding = reader.Value;
+                                        break;
 
-                            case "standalone":
-                                document.Declaration.Standalone = reader.Value;
-                                break;
+                                    case "standalone":
+                                        document.Declaration.Standalone = reader.Value;
+                                        break;
+                                }
                             }
                         }
-                    }
-                    //else
-                    //{
-                    //    display an error? Can this happen?
-                    //}
-                    break;
-
-                case XmlNodeType.ProcessingInstruction:
-                    switch (reader.LocalName)
-                    {
-                    case "define":
-                        this.PreprocessDefine(state, reader.Value);
+                        //else
+                        //{
+                        //    display an error? Can this happen?
+                        //}
                         break;
 
-                    case "error":
-                        this.PreprocessError(state, reader.Value);
+                    case XmlNodeType.ProcessingInstruction:
+                        switch (reader.LocalName)
+                        {
+                            case "define":
+                                this.PreprocessDefine(state, reader.Value);
+                                break;
+
+                            case "error":
+                                this.PreprocessError(state, reader.Value);
+                                break;
+
+                            case "warning":
+                                this.PreprocessWarning(state, reader.Value);
+                                break;
+
+                            case "undef":
+                                this.PreprocessUndef(state, reader.Value);
+                                break;
+
+                            case "include":
+                                this.UpdateCurrentLineNumber(state, reader, offset);
+                                this.PreprocessInclude(state, reader.Value, currentContainer);
+                                break;
+
+                            case "foreach":
+                                this.PreprocessForeach(state, reader, currentContainer, offset);
+                                break;
+
+                            case "endforeach": // endforeach is handled in PreprocessForeach, so seeing it here is an error
+                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
+
+                            case "pragma":
+                                this.PreprocessPragma(state, reader.Value, currentContainer);
+                                break;
+
+                            default:
+                                // unknown processing instructions are currently ignored
+                                break;
+                        }
                         break;
 
-                    case "warning":
-                        this.PreprocessWarning(state, reader.Value);
-                        break;
+                    case XmlNodeType.Element:
+                        if (0 < state.IncludeNextStack.Count && state.IncludeNextStack.Peek())
+                        {
+                            if ("Include" != reader.LocalName)
+                            {
+                                this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
+                            }
 
-                    case "undef":
-                        this.PreprocessUndef(state, reader.Value);
-                        break;
+                            state.IncludeNextStack.Pop();
+                            state.IncludeNextStack.Push(false);
+                            break;
+                        }
 
-                    case "include":
+                        var empty = reader.IsEmptyElement;
+                        var ns = XNamespace.Get(reader.NamespaceURI);
+                        var element = new XElement(ns + reader.LocalName);
+                        currentContainer.Add(element);
+
                         this.UpdateCurrentLineNumber(state, reader, offset);
-                        this.PreprocessInclude(state, reader.Value, currentContainer);
+                        element.AddAnnotation(sourceLineNumbers);
+
+                        while (reader.MoveToNextAttribute())
+                        {
+                            var value = state.Helper.PreprocessString(state.Context, reader.Value);
+
+                            var attribNamespace = XNamespace.Get(reader.NamespaceURI);
+                            attribNamespace = XNamespace.Xmlns == attribNamespace && reader.LocalName.Equals("xmlns") ? XNamespace.None : attribNamespace;
+
+                            element.Add(new XAttribute(attribNamespace + reader.LocalName, value));
+                        }
+
+                        if (!empty)
+                        {
+                            containerStack.Push(currentContainer);
+                            currentContainer = element;
+                        }
                         break;
 
-                    case "foreach":
-                        this.PreprocessForeach(state, reader, currentContainer, offset);
+                    case XmlNodeType.EndElement:
+                        if (0 < reader.Depth || !include)
+                        {
+                            currentContainer = containerStack.Pop();
+                        }
                         break;
 
-                    case "endforeach": // endforeach is handled in PreprocessForeach, so seeing it here is an error
-                        throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
+                    case XmlNodeType.Text:
+                        var postprocessedText = state.Helper.PreprocessString(state.Context, reader.Value);
+                        currentContainer.Add(postprocessedText);
+                        break;
 
-                    case "pragma":
-                        this.PreprocessPragma(state, reader.Value, currentContainer);
+                    case XmlNodeType.CDATA:
+                        var postprocessedValue = state.Helper.PreprocessString(state.Context, reader.Value);
+                        currentContainer.Add(new XCData(postprocessedValue));
                         break;
 
                     default:
-                        // unknown processing instructions are currently ignored
                         break;
-                    }
-                    break;
-
-                case XmlNodeType.Element:
-                    if (0 < state.IncludeNextStack.Count && state.IncludeNextStack.Peek())
-                    {
-                        if ("Include" != reader.LocalName)
-                        {
-                            this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
-                        }
-
-                        state.IncludeNextStack.Pop();
-                        state.IncludeNextStack.Push(false);
-                        break;
-                    }
-
-                    var empty = reader.IsEmptyElement;
-                    var ns = XNamespace.Get(reader.NamespaceURI);
-                    var element = new XElement(ns + reader.LocalName);
-                    currentContainer.Add(element);
-
-                    this.UpdateCurrentLineNumber(state, reader, offset);
-                    element.AddAnnotation(sourceLineNumbers);
-
-                    while (reader.MoveToNextAttribute())
-                    {
-                        var value = state.Helper.PreprocessString(state.Context, reader.Value);
-
-                        var attribNamespace = XNamespace.Get(reader.NamespaceURI);
-                        attribNamespace = XNamespace.Xmlns == attribNamespace && reader.LocalName.Equals("xmlns") ? XNamespace.None : attribNamespace;
-
-                        element.Add(new XAttribute(attribNamespace + reader.LocalName, value));
-                    }
-
-                    if (!empty)
-                    {
-                        containerStack.Push(currentContainer);
-                        currentContainer = element;
-                    }
-                    break;
-
-                case XmlNodeType.EndElement:
-                    if (0 < reader.Depth || !include)
-                    {
-                        currentContainer = containerStack.Pop();
-                    }
-                    break;
-
-                case XmlNodeType.Text:
-                    var postprocessedText = state.Helper.PreprocessString(state.Context, reader.Value);
-                    currentContainer.Add(postprocessedText);
-                    break;
-
-                case XmlNodeType.CDATA:
-                    var postprocessedValue = state.Helper.PreprocessString(state.Context, reader.Value);
-                    currentContainer.Add(new XCData(postprocessedValue));
-                    break;
-
-                default:
-                    break;
                 }
             }
 
@@ -695,6 +695,17 @@ namespace WixToolset.Core
             var varName = reader.Value.Substring(0, indexOfInToken).Trim();
             var varValuesString = reader.Value.Substring(indexOfInToken + 4).Trim();
 
+            if (varValuesString.StartsWith("\"", StringComparison.Ordinal))
+            {
+                if (!varValuesString.EndsWith("\"", StringComparison.Ordinal))
+                {
+                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, varValuesString));
+                }
+
+                // cut the quotes off the string
+                varValuesString = varValuesString.Substring(1, varValuesString.Length - 2);
+            }
+
             // preprocess the variable values string because it might be a variable itself
             varValuesString = state.Helper.PreprocessString(state.Context, varValuesString);
 
@@ -725,23 +736,23 @@ namespace WixToolset.Core
                 {
                     switch (reader.LocalName)
                     {
-                    case "foreach":
-                        ++nestedForeachCount;
-                        // Output the foreach statement
-                        fragmentBuilder.AppendFormat("<?foreach {0}?>", reader.Value);
-                        break;
+                        case "foreach":
+                            ++nestedForeachCount;
+                            // Output the foreach statement
+                            fragmentBuilder.AppendFormat("<?foreach {0}?>", reader.Value);
+                            break;
 
-                    case "endforeach":
-                        --nestedForeachCount;
-                        if (0 != nestedForeachCount)
-                        {
-                            fragmentBuilder.Append("<?endforeach ?>");
-                        }
-                        break;
+                        case "endforeach":
+                            --nestedForeachCount;
+                            if (0 != nestedForeachCount)
+                            {
+                                fragmentBuilder.Append("<?endforeach ?>");
+                            }
+                            break;
 
-                    default:
-                        fragmentBuilder.AppendFormat("<?{0} {1}?>", reader.LocalName, reader.Value);
-                        break;
+                        default:
+                            fragmentBuilder.AppendFormat("<?{0} {1}?>", reader.LocalName, reader.Value);
+                            break;
                     }
                 }
                 else if (reader.NodeType == XmlNodeType.Element)
@@ -1224,17 +1235,17 @@ namespace WixToolset.Core
         {
             switch (operation)
             {
-            case PreprocessorOperation.And:
-                currentValue = currentValue && prevResult;
-                break;
-            case PreprocessorOperation.Or:
-                currentValue = currentValue || prevResult;
-                break;
-            case PreprocessorOperation.Not:
-                currentValue = !currentValue;
-                break;
-            default:
-                throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(state.Context.CurrentSourceLineNumber, operation.ToString()));
+                case PreprocessorOperation.And:
+                    currentValue = currentValue && prevResult;
+                    break;
+                case PreprocessorOperation.Or:
+                    currentValue = currentValue || prevResult;
+                    break;
+                case PreprocessorOperation.Not:
+                    currentValue = !currentValue;
+                    break;
+                default:
+                    throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(state.Context.CurrentSourceLineNumber, operation.ToString()));
             }
         }
 

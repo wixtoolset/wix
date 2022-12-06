@@ -266,6 +266,56 @@ namespace WixToolsetTest.Core
             WixAssert.CompareLineByLine(expected, actual);
         }
 
+        [Fact]
+        public void CanPreprocessForeach()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?foreach value in  A ; B ; C  ?>",
+                "  <Fragment Id='$(value)' />",
+                "<?endforeach?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment Id=\"A \" />",
+                "  <Fragment Id=\" B \" />",
+                "  <Fragment Id=\" C\" />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
+        [Fact]
+        public void CanPreprocessForeachWithQuotes()
+        {
+            var input = String.Join(Environment.NewLine,
+                "<Wix>",
+                "<?foreach value in \" A ; B ; C \" ?>",
+                "  <Fragment Id='$(value)' />",
+                "<?endforeach?>",
+                "</Wix>"
+            );
+            var expected = new[]
+            {
+                "<Wix>",
+                "  <Fragment Id=\" A \" />",
+                "  <Fragment Id=\" B \" />",
+                "  <Fragment Id=\" C \" />",
+                "</Wix>"
+            };
+
+            var result = PreprocessFromString(input);
+
+            var actual = result.Document.ToString().Split("\r\n");
+            WixAssert.CompareLineByLine(expected, actual);
+        }
+
         private static IPreprocessResult PreprocessFromString(string xml)
         {
             using var stringReader = new StringReader(xml);
