@@ -30,7 +30,6 @@ namespace WixToolsetTest.Heat
                 var wxs = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<?xml version='1.0' encoding='utf-8'?>",
                     "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                     "    <Fragment>",
                     "        <StandardDirectory Id='TARGETDIR'>",
@@ -50,6 +49,46 @@ namespace WixToolsetTest.Heat
         }
 
         [Fact]
+        public void CanHarvestSimpleDirectoryToComponentGroup()
+        {
+            var folder = TestData.Get("TestData", "SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var outputPath = Path.Combine(fs.GetFolder(), "out.wxs");
+
+                var args = new[]
+                {
+                    "dir", folder,
+                    "-cg", "CG1",
+                    "-o", outputPath
+                };
+
+                var result = HeatRunner.Execute(args);
+                result.AssertSuccess();
+
+                var wxs = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                    "    <Fragment>",
+                    "        <StandardDirectory Id='TARGETDIR'>",
+                    "            <Directory Id='dirwsJn0Cqs9KdlDSFdQsu9ygYvMF8' Name='SingleFile' />",
+                    "        </StandardDirectory>",
+                    "    </Fragment>",
+                    "    <Fragment>",
+                    "        <ComponentGroup Id='CG1'>",
+                    "            <Component Id='cmp0i3dThrp4nheCteEmXvHxBDa_VE' Directory='dirwsJn0Cqs9KdlDSFdQsu9ygYvMF8' Guid='PUT-GUID-HERE'>",
+                    "                <File Id='filziMcXYgrmcbVF8PuTUfIB9Vgqo0' KeyPath='yes' Source='SourceDir\\a.txt' />",
+                    "            </Component>",
+                    "        </ComponentGroup>",
+                    "    </Fragment>",
+                    "</Wix>",
+                }, wxs);
+            }
+        }
+
+        [Fact]
         public void CanHarvestSimpleDirectoryToInstallFolder()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -62,6 +101,7 @@ namespace WixToolsetTest.Heat
                 {
                     "dir", folder,
                     "-dr", "INSTALLFOLDER",
+                    "-indent", "2",
                     "-o", outputPath
                 };
 
@@ -71,20 +111,19 @@ namespace WixToolsetTest.Heat
                 var wxs = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<?xml version='1.0' encoding='utf-8'?>",
                     "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                    "    <Fragment>",
-                    "        <DirectoryRef Id='INSTALLFOLDER'>",
-                    "            <Directory Id='dirlooNEIrtEBL2w_RhFEIgiKcUlxE' Name='SingleFile' />",
-                    "        </DirectoryRef>",
-                    "    </Fragment>",
-                    "    <Fragment>",
-                    "        <DirectoryRef Id='dirlooNEIrtEBL2w_RhFEIgiKcUlxE'>",
-                    "            <Component Id='cmpxHVF6oXohc0EWgRphmYZvw5.GGU' Guid='PUT-GUID-HERE'>",
-                    "                <File Id='filk_7KUAfL4VfzxSRsGFf_XOBHln0' KeyPath='yes' Source='SourceDir\\a.txt' />",
-                    "            </Component>",
-                    "        </DirectoryRef>",
-                    "    </Fragment>",
+                    "  <Fragment>",
+                    "    <DirectoryRef Id='INSTALLFOLDER'>",
+                    "      <Directory Id='dirlooNEIrtEBL2w_RhFEIgiKcUlxE' Name='SingleFile' />",
+                    "    </DirectoryRef>",
+                    "  </Fragment>",
+                    "  <Fragment>",
+                    "    <DirectoryRef Id='dirlooNEIrtEBL2w_RhFEIgiKcUlxE'>",
+                    "      <Component Id='cmpxHVF6oXohc0EWgRphmYZvw5.GGU' Guid='PUT-GUID-HERE'>",
+                    "        <File Id='filk_7KUAfL4VfzxSRsGFf_XOBHln0' KeyPath='yes' Source='SourceDir\\a.txt' />",
+                    "      </Component>",
+                    "    </DirectoryRef>",
+                    "  </Fragment>",
                     "</Wix>",
                 }, wxs);
             }
@@ -114,7 +153,6 @@ namespace WixToolsetTest.Heat
                 var wxs = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<?xml version='1.0' encoding='utf-8'?>",
                     "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                     "    <Fragment>",
                     "        <StandardDirectory Id='ProgramFiles6432Folder'>",
@@ -130,6 +168,55 @@ namespace WixToolsetTest.Heat
                     "    </Fragment>",
                     "</Wix>",
                 }, wxs);
+            }
+        }
+
+        [Fact]
+        public void CanHarvestRegistry()
+        {
+            var folder = TestData.Get("TestData", "RegFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var outputPath = Path.Combine(fs.GetFolder(), "out.wxs");
+
+                var args = new[]
+                {
+                    "reg", Path.Combine(folder, "input.reg"),
+                    "-o", outputPath
+                };
+
+                var result = HeatRunner.Execute(args);
+                result.AssertSuccess();
+
+                var actual = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
+                var expected = File.ReadAllLines(Path.Combine(folder, "Expected.wxs")).Select(s => s.Replace("\"", "'")).ToArray();
+                WixAssert.CompareLineByLine(expected, actual);
+            }
+        }
+
+        [Fact]
+        public void CanHarvestRegistryIntoComponentGroup()
+        {
+            var folder = TestData.Get("TestData", "RegFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var outputPath = Path.Combine(fs.GetFolder(), "out.wxs");
+
+                var args = new[]
+                {
+                    "reg", Path.Combine(folder, "input.reg"),
+                    "-cg", "CG1",
+                    "-o", outputPath
+                };
+
+                var result = HeatRunner.Execute(args);
+                result.AssertSuccess();
+
+                var actual = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
+                var expected = File.ReadAllLines(Path.Combine(folder, "ExpectedWithComponentGroup.wxs")).Select(s => s.Replace("\"", "'")).ToArray();
+                WixAssert.CompareLineByLine(expected, actual);
             }
         }
     }

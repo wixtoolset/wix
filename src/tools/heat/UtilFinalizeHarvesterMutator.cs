@@ -1076,9 +1076,9 @@ namespace WixToolset.Harvesters
                     foreach (Wix.MultiStringValue multiStringValue in registryValue.Children)
                     {
                         // first replace file paths with their MSI tokens
-                        multiStringValue.Content = this.MutateRegistryString(multiStringValue.Content, (ICollection)this.filePaths);
+                        multiStringValue.Value = this.MutateRegistryString(multiStringValue.Value, (ICollection)this.filePaths);
                         // next replace directory paths with their MSI tokens
-                        multiStringValue.Content = this.MutateRegistryString(multiStringValue.Content, (ICollection)reversedDirectoryPaths);
+                        multiStringValue.Value = this.MutateRegistryString(multiStringValue.Value, (ICollection)reversedDirectoryPaths);
                     }
                 }
                 else
