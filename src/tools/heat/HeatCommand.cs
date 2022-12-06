@@ -68,7 +68,7 @@ namespace WixToolset.Harvesters
             }
             else if ('-' == arg[0] || '/' == arg[0])
             {
-                string parameter = arg.Substring(1);
+                var parameter = arg.Substring(1);
                 if ("nologo" == parameter)
                 {
                     this.showLogo = false;
@@ -89,7 +89,7 @@ namespace WixToolset.Harvesters
                 }
                 else if (parameter.StartsWith("sw"))
                 {
-                    string paramArg = parameter.Substring(2);
+                    var paramArg = parameter.Substring(2);
                     try
                     {
                         if (0 == paramArg.Length)
@@ -98,7 +98,7 @@ namespace WixToolset.Harvesters
                         }
                         else
                         {
-                            int suppressWarning = Convert.ToInt32(paramArg, CultureInfo.InvariantCulture.NumberFormat);
+                            var suppressWarning = Convert.ToInt32(paramArg, CultureInfo.InvariantCulture.NumberFormat);
                             if (0 >= suppressWarning)
                             {
                                 this.Messaging.Write(ErrorMessages.IllegalSuppressWarningId(paramArg));
@@ -123,7 +123,7 @@ namespace WixToolset.Harvesters
                 }
                 else if (parameter.StartsWith("wx"))
                 {
-                    string paramArg = parameter.Substring(2);
+                    var paramArg = parameter.Substring(2);
                     try
                     {
                         if (0 == paramArg.Length)
@@ -132,7 +132,7 @@ namespace WixToolset.Harvesters
                         }
                         else
                         {
-                            int elevateWarning = Convert.ToInt32(paramArg, CultureInfo.InvariantCulture.NumberFormat);
+                            var elevateWarning = Convert.ToInt32(paramArg, CultureInfo.InvariantCulture.NumberFormat);
                             if (0 >= elevateWarning)
                             {
                                 this.Messaging.Write(ErrorMessages.IllegalWarningIdAsError(paramArg));
@@ -212,7 +212,7 @@ namespace WixToolset.Harvesters
                 }
 
                 // harvest the output
-                Wix.Wix wix = heatCore.Harvester.Harvest(this.ExtensionArgument);
+                var wix = heatCore.Harvester.Harvest(this.ExtensionArgument);
                 if (null == wix)
                 {
                     return this.Messaging.LastErrorNumber;
@@ -224,15 +224,15 @@ namespace WixToolset.Harvesters
                     return this.Messaging.LastErrorNumber;
                 }
 
-                XmlWriterSettings xmlSettings = new XmlWriterSettings();
+                var xmlSettings = new XmlWriterSettings();
                 xmlSettings.Indent = true;
                 xmlSettings.IndentChars = new string(' ', this.Indent);
                 xmlSettings.OmitXmlDeclaration = true;
 
                 string wixString;
-                using (StringWriter stringWriter = new StringWriter())
+                using (var stringWriter = new StringWriter())
                 {
-                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, xmlSettings))
+                    using (var xmlWriter = XmlWriter.Create(stringWriter, xmlSettings))
                     {
                         wix.OutputXml(xmlWriter);
                     }
@@ -240,7 +240,7 @@ namespace WixToolset.Harvesters
                     wixString = stringWriter.ToString();
                 }
 
-                string mutatedWixString = heatCore.Mutator.Mutate(wixString);
+                var mutatedWixString = heatCore.Mutator.Mutate(wixString);
                 if (String.IsNullOrEmpty(mutatedWixString))
                 {
                     return this.Messaging.LastErrorNumber;
@@ -248,17 +248,14 @@ namespace WixToolset.Harvesters
 
                 Directory.CreateDirectory(Path.GetDirectoryName(this.OutputFile));
 
-                using (StreamWriter streamWriter = new StreamWriter(this.OutputFile, false, System.Text.Encoding.UTF8))
+                using (var streamWriter = new StreamWriter(this.OutputFile, false, System.Text.Encoding.UTF8))
                 {
-                    xmlSettings.OmitXmlDeclaration = false;
-                    xmlSettings.Encoding = System.Text.Encoding.UTF8;
-                    using (XmlWriter xmlWriter = XmlWriter.Create(streamWriter, xmlSettings))
+                    using (var xmlWriter = XmlWriter.Create(streamWriter, xmlSettings))
                     {
                         xmlWriter.WriteStartDocument();
                         xmlWriter.Flush();
                     }
 
-                    streamWriter.WriteLine();
                     streamWriter.Write(mutatedWixString);
                 }
             }
