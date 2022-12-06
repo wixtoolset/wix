@@ -27422,9 +27422,9 @@ namespace WixToolset.Harvesters.Serialize
 
         private ISchemaElement parentElement;
 
-        private string contentField;
+        private string valueField;
 
-        private bool contentFieldSet;
+        private bool valueFieldSet;
 
         public virtual ISchemaElement ParentElement
         {
@@ -27441,18 +27441,18 @@ namespace WixToolset.Harvesters.Serialize
         /// <summary>
         /// Use several of these elements to specify each registry value in a multiString registry value.  This element
         /// cannot be used if the Value attribute is specified unless the Type attribute is set to 'multiString'.  The
-        /// values should go in the text area of the MultiStringValue element.
+        /// values should go in the Value attribute of the MultiStringValue element.
         /// </summary>
-        public string Content
+        public string Value
         {
             get
             {
-                return this.contentField;
+                return this.valueField;
             }
             set
             {
-                this.contentFieldSet = true;
-                this.contentField = value;
+                this.valueFieldSet = true;
+                this.valueField = value;
             }
         }
 
@@ -27463,10 +27463,10 @@ namespace WixToolset.Harvesters.Serialize
             {
                 throw new ArgumentNullException("name");
             }
-            if (("Content" == name))
+            if (("Value" == name))
             {
-                this.contentField = value;
-                this.contentFieldSet = true;
+                this.valueField = value;
+                this.valueFieldSet = true;
             }
         }
 
@@ -27480,9 +27480,9 @@ namespace WixToolset.Harvesters.Serialize
                 throw new ArgumentNullException("writer");
             }
             writer.WriteStartElement("MultiStringValue", "http://wixtoolset.org/schemas/v4/wxs");
-            if (this.contentFieldSet)
+            if (this.valueFieldSet)
             {
-                writer.WriteString(this.contentField);
+                writer.WriteAttributeString("Value", this.valueField);
             }
             writer.WriteEndElement();
         }

@@ -295,7 +295,7 @@ namespace WixToolset.Harvesters
                     {
                         Wix.MultiStringValue multiStringValue = new Wix.MultiStringValue();
 
-                        multiStringValue.Content = String.Empty;
+                        multiStringValue.Value = String.Empty;
 
                         registryValue.AddChild(multiStringValue);
                     }
@@ -305,7 +305,7 @@ namespace WixToolset.Harvesters
                         {
                             Wix.MultiStringValue multiStringValue = new Wix.MultiStringValue();
 
-                            multiStringValue.Content = multiStringValueContent;
+                            multiStringValue.Value = multiStringValueContent;
 
                             registryValue.AddChild(multiStringValue);
                         }

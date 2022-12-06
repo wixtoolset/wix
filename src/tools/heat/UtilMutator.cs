@@ -246,7 +246,7 @@ namespace WixToolset.Harvesters
                         c.Directory = parentDirectory.Id;
                         parentDirectory.RemoveChild(c);
                     }
-                    else if (c.ParentElement is Wix.DirectoryRef)
+                    else if (c.ParentElement is Wix.DirectoryRef || c.ParentElement is Wix.StandardDirectory)
                     {
                         var parentDirectory = c.ParentElement as Wix.DirectoryBase;
 

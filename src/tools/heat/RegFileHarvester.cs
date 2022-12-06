@@ -200,7 +200,7 @@ namespace WixToolset.Harvesters
                         foreach (string part in parts)
                         {
                             Wix.MultiStringValue multiStringValue = new Wix.MultiStringValue();
-                            multiStringValue.Content = part;
+                            multiStringValue.Value = part;
                             registryValue.AddChild(multiStringValue);
                         }
 
