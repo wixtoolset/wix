@@ -45,10 +45,50 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
+            Assert.Equal(3, errors);
+        }
+
+        [Fact]
+        public void RemoveTargetDirRef()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <DirectoryRef Id='TARGETDIR'>",
+                "      <!-- Comment -->",
+                "      <Directory Id='RootFolder' Name='Root'>",
+                "        <Directory Id='ChildFolder' Name='Child' />",
+                "      </Directory>",
+                "    </DirectoryRef>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "      <!-- Comment -->",
+                "      <Directory Id=\"RootFolder\" Name=\"Root\">",
+                "        <Directory Id=\"ChildFolder\" Name=\"Child\" />",
+                "      </Directory>",
+                "    </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+            Assert.Equal(3, errors);
         }
 
         [Fact]
@@ -83,10 +123,48 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(4, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
+            Assert.Equal(4, errors);
+        }
+
+        [Fact]
+        public void RemoveTargetDirRefAndFixStandardDirectory()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <DirectoryRef Id='TARGETDIR'>",
+                "      <Directory Id='ProgramFilesFolder' Name='PFiles'>",
+                "        <Directory Id='ChildFolder' Name='Child' />",
+                "      </Directory>",
+                "    </DirectoryRef>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "      <StandardDirectory Id=\"ProgramFilesFolder\">",
+                "        <Directory Id=\"ChildFolder\" Name=\"Child\" />",
+                "      </StandardDirectory>",
+                "    </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+            Assert.Equal(4, errors);
         }
     }
 }

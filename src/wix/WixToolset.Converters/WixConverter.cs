@@ -92,6 +92,7 @@ namespace WixToolset.Converters
         private static readonly XName OldRequiresElementName = WixDependencyNamespace + "Requires";
         private static readonly XName OldRequiresRefElementName = WixDependencyNamespace + "RequiresRef";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
+        private static readonly XName DirectoryRefElementName = WixNamespace + "DirectoryRef";
         private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName ErrorElementName = WixNamespace + "Error";
         private static readonly XName FeatureElementName = WixNamespace + "Feature";
@@ -288,6 +289,7 @@ namespace WixToolset.Converters
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.DataElementName, this.ConvertDataElement },
                 { WixConverter.DirectoryElementName, this.ConvertDirectoryElement },
+                { WixConverter.DirectoryRefElementName, this.ConvertDirectoryRefElement },
                 { WixConverter.FeatureElementName, this.ConvertFeatureElement },
                 { WixConverter.FileElementName, this.ConvertFileElement },
                 { WixConverter.FragmentElementName, this.ConvertFragmentElement },
@@ -1125,6 +1127,36 @@ namespace WixToolset.Converters
                 foreach (var attrib in element.Attributes().Where(a => a.Name.LocalName != "Id").ToList())
                 {
                     attrib.Remove();
+                }
+            }
+        }
+
+        private void ConvertDirectoryRefElement(XElement element)
+        {
+            var id = element.Attribute("Id")?.Value;
+
+            if (id == "TARGETDIR" &&
+                this.OnInformation(ConverterTestType.TargetDirRefDeprecated, element, "The TARGETDIR directory should not longer be explicitly referenced. Remove the DirectoryRef element with Id attribute 'TARGETDIR'."))
+            {
+                var parentElement = element.Parent;
+
+                element.Remove();
+
+                if (parentElement.FirstNode is XText text && String.IsNullOrWhiteSpace(text.Value))
+                {
+                    parentElement.FirstNode.Remove();
+                }
+
+                foreach (var child in element.Nodes())
+                {
+                    parentElement.Add(child);
+                }
+
+                element.RemoveAll();
+
+                if (parentElement.FirstNode is XText textAgain && String.IsNullOrWhiteSpace(textAgain.Value))
+                {
+                    parentElement.FirstNode.Remove();
                 }
             }
         }
@@ -3144,6 +3176,11 @@ namespace WixToolset.Converters
             /// Custom action ids have changed in WiX v4 extensions. Because WiX v4 has platform-specific custom actions, the platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom actions, you must use the new custom action id, with platform suffix.
             /// </summary>
             CustomActionIdsIncludePlatformSuffix,
+
+            /// <summary>
+            /// The TARGETDIR directory should not longer be explicitly referenced.
+            /// </summary>
+            TargetDirRefDeprecated,
         }
     }
 }
