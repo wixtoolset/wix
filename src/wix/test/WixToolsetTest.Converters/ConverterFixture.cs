@@ -282,10 +282,8 @@ namespace WixToolsetTest.Converters
                 "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <?define Version = 1.2.3 ?>",
                 "  <Fragment>",
-                "    <DirectoryRef Id=\"TARGETDIR\">",
                 "      <Directory Id=\"ANOTHERDIR\" Name=\"Another\" />",
-                "    </DirectoryRef>",
-                "  </Fragment>",
+                "    </Fragment>",
                 "</Include>",
             };
 
@@ -298,9 +296,9 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentLines(document);
 
-            Assert.Equal(2, errors);
             WixAssert.CompareLineByLine(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
+            Assert.Equal(3, errors);
         }
 
         [Fact]
