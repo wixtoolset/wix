@@ -362,7 +362,6 @@ namespace WixToolset.Harvesters
 
                 this.currentLineNumber++;
                 line = line.Trim();
-                Console.Write("Processing line: {0}\r", this.currentLineNumber);
 
                 if (line.EndsWith("\\"))
                 {

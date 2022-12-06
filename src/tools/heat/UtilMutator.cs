@@ -182,11 +182,11 @@ namespace WixToolset.Harvesters
             // add the components to the product feature after all the identifiers have been set
             if (TemplateType.Package  == this.templateType)
             {
-                Wix.Feature feature = (Wix.Feature)this.features[0];
+                var feature = (Wix.Feature)this.features[0];
 
                 foreach (Wix.ComponentGroup group in this.componentGroups)
                 {
-                    Wix.ComponentGroupRef componentGroupRef = new Wix.ComponentGroupRef();
+                    var componentGroupRef = new Wix.ComponentGroupRef();
                     componentGroupRef.Id = group.Id;
 
                     feature.AddChild(componentGroupRef);
@@ -200,7 +200,7 @@ namespace WixToolset.Harvesters
                     {
                         foreach (Wix.ComponentGroup group in this.componentGroups)
                         {
-                            Wix.ComponentGroupRef componentGroupRef = new Wix.ComponentGroupRef();
+                            var componentGroupRef = new Wix.ComponentGroupRef();
                             componentGroupRef.Id = group.Id;
 
                             ((Wix.IParentElement)element).AddChild(componentGroupRef);
@@ -223,24 +223,24 @@ namespace WixToolset.Harvesters
         /// <param name="wix">The Wix document element.</param>
         private void CreateComponentGroup(Wix.Wix wix)
         {
-            Wix.ComponentGroup componentGroup = new Wix.ComponentGroup();
+            var componentGroup = new Wix.ComponentGroup();
             componentGroup.Id = this.componentGroupName;
             this.componentGroups.Add(componentGroup);
 
-            Wix.Fragment cgFragment = new Wix.Fragment();
+            var cgFragment = new Wix.Fragment();
             cgFragment.AddChild(componentGroup);
             wix.AddChild(cgFragment);
 
-            int componentCount = 0;
+            var componentCount = 0;
             for (; componentCount < this.components.Count; componentCount++)
             {
-                Wix.Component c = this.components[componentCount] as Wix.Component;
+                var c = this.components[componentCount] as Wix.Component;
 
                 if (this.createFragments)
                 {
                     if (c.ParentElement is Wix.Directory)
                     {
-                        Wix.Directory parentDirectory = c.ParentElement as Wix.Directory;
+                        var parentDirectory = c.ParentElement as Wix.Directory;
 
                         componentGroup.AddChild(c);
                         c.Directory = parentDirectory.Id;
@@ -248,7 +248,7 @@ namespace WixToolset.Harvesters
                     }
                     else if (c.ParentElement is Wix.DirectoryRef)
                     {
-                        Wix.DirectoryRef parentDirectory = c.ParentElement as Wix.DirectoryRef;
+                        var parentDirectory = c.ParentElement as Wix.DirectoryBase;
 
                         componentGroup.AddChild(c);
                         c.Directory = parentDirectory.Id;
@@ -257,8 +257,8 @@ namespace WixToolset.Harvesters
                         // Remove whole fragment if moving the component to the component group just leaves an empty DirectoryRef
                         if (0 < this.fragments.Count && parentDirectory.ParentElement is Wix.Fragment)
                         {
-                            Wix.Fragment parentFragment = parentDirectory.ParentElement as Wix.Fragment;
-                            int childCount = 0;
+                            var parentFragment = parentDirectory.ParentElement as Wix.Fragment;
+                            var childCount = 0;
                             foreach (Wix.ISchemaElement element in parentFragment.Children)
                             {
                                 childCount++;
@@ -267,7 +267,7 @@ namespace WixToolset.Harvesters
                             // Component should always have an Id but the SortedList creation allows for null and bases the name on the fragment count which we cannot reverse engineer here.
                             if (1 == childCount && !String.IsNullOrEmpty(c.Id))
                             {
-                                int removeIndex = this.fragments.IndexOfKey(String.Concat("Component:", c.Id));
+                                var removeIndex = this.fragments.IndexOfKey(String.Concat("Component:", c.Id));
                                 if (0 <= removeIndex)
                                 {
                                     this.fragments.RemoveAt(removeIndex);
@@ -278,7 +278,7 @@ namespace WixToolset.Harvesters
                 }
                 else
                 {
-                    Wix.ComponentRef componentRef = new Wix.ComponentRef();
+                    var componentRef = new Wix.ComponentRef();
                     componentRef.Id = c.Id;
                     componentGroup.AddChild(componentRef);
                 }
@@ -322,9 +322,9 @@ namespace WixToolset.Harvesters
             }
 
             // index the child elements
-            if (element is Wix.IParentElement)
+            if (element is Wix.IParentElement parentElement)
             {
-                foreach (Wix.ISchemaElement childElement in ((Wix.IParentElement)element).Children)
+                foreach (Wix.ISchemaElement childElement in parentElement.Children)
                 {
                     this.IndexElement(childElement);
                 }
@@ -336,7 +336,7 @@ namespace WixToolset.Harvesters
         /// </summary>
         private void MutateComponents()
         {
-            IdentifierGenerator identifierGenerator = new IdentifierGenerator("Component", this.Core);
+            var identifierGenerator = new IdentifierGenerator("Component", this.Core);
             if (TemplateType.Module == this.templateType)
             {
                 identifierGenerator.MaxIdentifierLength = IdentifierGenerator.MaxModuleIdentifierLength;
@@ -346,7 +346,7 @@ namespace WixToolset.Harvesters
             {
                 if (null == component.Id)
                 {
-                    string firstFileId = string.Empty;
+                    var firstFileId = String.Empty;
 
                     // attempt to create a possible identifier from the first file identifier in the component
                     foreach (Wix.File file in component[typeof(Wix.File)])
@@ -355,7 +355,7 @@ namespace WixToolset.Harvesters
                         break;
                     }
 
-                    if (string.IsNullOrEmpty(firstFileId))
+                    if (String.IsNullOrEmpty(firstFileId))
                     {
                         firstFileId = this.GetGuid();
                     }
@@ -375,10 +375,8 @@ namespace WixToolset.Harvesters
                     }
                 }
 
-                if (this.createFragments && component.ParentElement is Wix.Directory)
+                if (this.createFragments && component.ParentElement is Wix.Directory directory)
                 {
-                    Wix.Directory directory = (Wix.Directory)component.ParentElement;
-
                     // parent directory must have an identifier to create a reference to it
                     if (null == directory.Id)
                     {
@@ -388,14 +386,14 @@ namespace WixToolset.Harvesters
                     if (this.rootElement is Wix.Module)
                     {
                         // add a ComponentRef for the Component
-                        Wix.ComponentRef componentRef = new Wix.ComponentRef();
+                        var componentRef = new Wix.ComponentRef();
                         componentRef.Id = component.Id;
                         this.rootElement.AddChild(componentRef);
                     }
 
                     // create a new Fragment
-                    Wix.Fragment fragment = new Wix.Fragment();
-                    this.fragments.Add(String.Concat("Component:", (null != component.Id ? component.Id : this.fragments.Count.ToString())), fragment);
+                    var fragment = new Wix.Fragment();
+                    this.fragments.Add(String.Concat("Component:", component.Id ?? this.fragments.Count.ToString()), fragment);
 
                     // create a new DirectoryRef
                     var directoryRef = DirectoryHelper.CreateDirectoryReference(directory.Id);
@@ -416,7 +414,7 @@ namespace WixToolset.Harvesters
             if (!this.setUniqueIdentifiers)
             {
                 // assign all identifiers before fragmenting (because fragmenting requires them all to be present)
-                IdentifierGenerator identifierGenerator = new IdentifierGenerator("Directory", this.Core);
+                var identifierGenerator = new IdentifierGenerator("Directory", this.Core);
                 if (TemplateType.Module == this.templateType)
                 {
                     identifierGenerator.MaxIdentifierLength = IdentifierGenerator.MaxModuleIdentifierLength;
@@ -446,7 +444,7 @@ namespace WixToolset.Harvesters
                         }
 
                         // create a new Fragment
-                        Wix.Fragment fragment = new Wix.Fragment();
+                        var fragment = new Wix.Fragment();
                         this.fragments.Add(String.Concat("Directory:", ("TARGETDIR" == directory.Id ? null : (null != directory.Id ? directory.Id : this.fragments.Count.ToString()))), fragment);
 
                         // create a new DirectoryRef
@@ -457,11 +455,10 @@ namespace WixToolset.Harvesters
                         parentDirectory.RemoveChild(directory);
                         directoryRef.AddChild(directory);
                     }
-                    else if (directory.ParentElement is Wix.Fragment)
+                    else if (directory.ParentElement is Wix.Fragment parent)
                     {
                         // When creating fragments, remove any top-level Directory elements;
                         // the fragments should be pulled in by their DirectoryRefs instead.
-                        Wix.Fragment parent = (Wix.Fragment)directory.ParentElement;
                         parent.RemoveChild(directory);
 
                         // Remove the fragment if it is empty.
@@ -473,7 +470,7 @@ namespace WixToolset.Harvesters
                     else if (directory.ParentElement == this.rootElement)
                     {
                         // create a new Fragment
-                        Wix.Fragment fragment = new Wix.Fragment();
+                        var fragment = new Wix.Fragment();
                         this.fragments.Add(String.Concat("Directory:", ("TARGETDIR" == directory.Id ? null : (null != directory.Id ? directory.Id : this.fragments.Count.ToString()))), fragment);
 
                         // move the Directory from the root element to the Fragment
@@ -489,7 +486,7 @@ namespace WixToolset.Harvesters
         /// </summary>
         private void MutateFiles()
         {
-            IdentifierGenerator identifierGenerator = new IdentifierGenerator("File", this.Core);
+            var identifierGenerator = new IdentifierGenerator("File", this.Core);
             if (TemplateType.Module == this.templateType)
             {
                 identifierGenerator.MaxIdentifierLength = IdentifierGenerator.MaxModuleIdentifierLength;
@@ -518,7 +515,7 @@ namespace WixToolset.Harvesters
                 }
 
                 // create a package element although it won't always be used
-                Wix.SummaryInformation package = new Wix.SummaryInformation();
+                var package = new Wix.SummaryInformation();
                 if (TemplateType.Module == this.templateType)
                 {
                     package.Id = this.GetGuid();
@@ -530,7 +527,7 @@ namespace WixToolset.Harvesters
 
                 package.InstallerVersion = 200;
 
-                Wix.Directory targetDir = new Wix.Directory();
+                var targetDir = new Wix.Directory();
                 targetDir.Id = "TARGETDIR";
                 targetDir.Name = "SourceDir";
 
@@ -538,7 +535,7 @@ namespace WixToolset.Harvesters
                 {
                     if (String.Equals(directoryRef.Id, "TARGETDIR", StringComparison.OrdinalIgnoreCase))
                     {
-                        Wix.IParentElement parent = directoryRef.ParentElement as Wix.IParentElement;
+                        var parent = directoryRef.ParentElement as Wix.IParentElement;
 
                         foreach (Wix.ISchemaElement element in directoryRef.Children)
                         {
@@ -549,7 +546,7 @@ namespace WixToolset.Harvesters
 
                         if (null != ((Wix.ISchemaElement)parent).ParentElement)
                         {
-                            int i = 0;
+                            var i = 0;
 
                             foreach (Wix.ISchemaElement element in parent.Children)
                             {
@@ -558,7 +555,7 @@ namespace WixToolset.Harvesters
 
                             if (0 == i)
                             {
-                                Wix.IParentElement supParent = (Wix.IParentElement)((Wix.ISchemaElement)parent).ParentElement;
+                                var supParent = (Wix.IParentElement)((Wix.ISchemaElement)parent).ParentElement;
                                 supParent.RemoveChild((Wix.ISchemaElement)parent);
                             }
                         }
@@ -569,7 +566,7 @@ namespace WixToolset.Harvesters
 
                 if (TemplateType.Module == this.templateType)
                 {
-                    Wix.Module module = new Wix.Module();
+                    var module = new Wix.Module();
                     module.Id = "PUT-MODULE-NAME-HERE";
                     module.Language = "1033";
                     module.Version = "1.0.0.0";
@@ -583,7 +580,7 @@ namespace WixToolset.Harvesters
                 }
                 else // product
                 {
-                    Wix.Package product = new Wix.Package();
+                    var product = new Wix.Package();
                     product.Id = this.GetGuid();
                     product.Language = "1033";
                     product.Manufacturer = "PUT-COMPANY-NAME-HERE";
@@ -593,13 +590,13 @@ namespace WixToolset.Harvesters
                     product.AddChild(package);
                     product.AddChild(targetDir);
 
-                    Wix.Media media = new Wix.Media();
+                    var media = new Wix.Media();
                     media.Id = "1";
                     media.Cabinet = "product.cab";
                     media.EmbedCab = Wix.YesNoType.yes;
                     product.AddChild(media);
 
-                    Wix.Feature feature = new Wix.Feature();
+                    var feature = new Wix.Feature();
                     feature.Id = "ProductFeature";
                     feature.Title = "PUT-FEATURE-TITLE-HERE";
                     feature.Level = 1;

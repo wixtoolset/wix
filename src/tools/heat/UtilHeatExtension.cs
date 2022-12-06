@@ -60,13 +60,13 @@ namespace WixToolset.Harvesters
         /// <param name="args">The option arguments.</param>
         public override void ParseOptions(string type, string[] args)
         {
-            bool active = false;
+            var active = false;
             IHarvesterExtension harvesterExtension = null;
-            bool suppressHarvestingRegistryValues = false;
-            UtilFinalizeHarvesterMutator utilFinalizeHarvesterMutator = new UtilFinalizeHarvesterMutator();
-            UtilMutator utilMutator = new UtilMutator();
-            List<UtilTransformMutator> transformMutators = new List<UtilTransformMutator>();
-            GenerateType generateType = GenerateType.Components;
+            var suppressHarvestingRegistryValues = false;
+            var utilFinalizeHarvesterMutator = new UtilFinalizeHarvesterMutator();
+            var utilMutator = new UtilMutator();
+            var transformMutators = new List<UtilTransformMutator>();
+            var generateType = GenerateType.Components;
 
             // select the harvester
             switch (type)
@@ -94,9 +94,9 @@ namespace WixToolset.Harvesters
             utilMutator.SetUniqueIdentifiers = true;
 
             // parse the options
-            for (int i = 0; i < args.Length; i++)
+            for (var i = 0; i < args.Length; i++)
             {
-                string commandSwitch = args[i];
+                var commandSwitch = args[i];
 
                 if (null == commandSwitch || 0 == commandSwitch.Length) // skip blank arguments
                 {
@@ -105,7 +105,7 @@ namespace WixToolset.Harvesters
 
                 if ('-' == commandSwitch[0] || '/' == commandSwitch[0])
                 {
-                    string truncatedCommandSwitch = commandSwitch.Substring(1);
+                    var truncatedCommandSwitch = commandSwitch.Substring(1);
 
                     if ("ag" == truncatedCommandSwitch)
                     {
@@ -122,20 +122,20 @@ namespace WixToolset.Harvesters
                     }
                     else if ("dr" == truncatedCommandSwitch)
                     {
-                        string dr = this.GetArgumentParameter(args, i);
+                        var dr = this.GetArgumentParameter(args, i);
 
                         if (this.Core.Messaging.EncounteredError)
                         {
                             return;
                         }
 
-                        if (harvesterExtension is DirectoryHarvester)
+                        if (harvesterExtension is DirectoryHarvester directoryHarvester)
                         {
-                            ((DirectoryHarvester)harvesterExtension).RootedDirectoryRef = dr;
+                            directoryHarvester.RootedDirectoryRef = dr;
                         }
-                        else if (harvesterExtension is FileHarvester)
+                        else if (harvesterExtension is FileHarvester fileHarvester)
                         {
-                            ((FileHarvester)harvesterExtension).RootedDirectoryRef = dr;
+                            fileHarvester.RootedDirectoryRef = dr;
                         }
                     }
                     else if ("gg" == truncatedCommandSwitch)
@@ -288,7 +288,7 @@ namespace WixToolset.Harvesters
                     {
                         if (harvesterExtension is DirectoryHarvester)
                         {
-                            string genType = this.GetArgumentParameter(args, i).ToUpperInvariant();
+                            var genType = this.GetArgumentParameter(args, i).ToUpperInvariant();
                             switch (genType)
                             {
                                 case "COMPONENTS":
@@ -349,7 +349,7 @@ namespace WixToolset.Harvesters
             this.Core.Mutator.AddExtension(utilMutator);
 
             // add the transforms
-            foreach (UtilTransformMutator transformMutator in transformMutators)
+            foreach (var transformMutator in transformMutators)
             {
                 this.Core.Mutator.AddExtension(transformMutator);
             }
@@ -362,8 +362,8 @@ namespace WixToolset.Harvesters
 
         private string GetArgumentParameter(string[] args, int index, bool allowSpaces)
         {
-            string truncatedCommandSwitch = args[index];
-            string commandSwitchValue = args[index + 1];
+            var truncatedCommandSwitch = args[index];
+            var commandSwitchValue = args[index + 1];
 
             //increment the index to the switch value
             index++;
