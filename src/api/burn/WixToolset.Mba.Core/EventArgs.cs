@@ -568,7 +568,7 @@ namespace WixToolset.Mba.Core
     public class DetectPatchTargetEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="packageId"></param>
         /// <param name="productCode"></param>
@@ -944,7 +944,7 @@ namespace WixToolset.Mba.Core
     public class PlanPatchTargetEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="packageId"></param>
         /// <param name="productCode"></param>
@@ -1086,7 +1086,7 @@ namespace WixToolset.Mba.Core
     public class PlanPackageCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="packageId"></param>
         /// <param name="hrStatus"></param>
@@ -2117,19 +2117,25 @@ namespace WixToolset.Mba.Core
     /// Additional arguments passed by the engine after committing an MSI transaction.
     /// </summary>
     [Serializable]
-    public class CommitMsiTransactionCompleteEventArgs : StatusEventArgs
+    public class CommitMsiTransactionCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION>
     {
         /// <summary />
-        public CommitMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
-            : base(hrStatus)
+        public CommitMsiTransactionCompleteEventArgs(string transactionId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION action)
+            : base(hrStatus, recommendation, action)
         {
             this.TransactionId = transactionId;
+            this.Restart = restart;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
         public string TransactionId { get; private set; }
+
+        /// <summary>
+        /// Gets the package restart state after being applied.
+        /// </summary>
+        public ApplyRestart Restart { get; private set; }
     }
 
     /// <summary>
@@ -2154,19 +2160,25 @@ namespace WixToolset.Mba.Core
     /// Additional arguments passed by the engine after rolling back an MSI transaction.
     /// </summary>
     [Serializable]
-    public class RollbackMsiTransactionCompleteEventArgs : StatusEventArgs
+    public class RollbackMsiTransactionCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION>
     {
         /// <summary />
-        public RollbackMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
-            : base(hrStatus)
+        public RollbackMsiTransactionCompleteEventArgs(string transactionId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION action)
+            : base(hrStatus, recommendation, action)
         {
             this.TransactionId = transactionId;
+            this.Restart = restart;
         }
 
         /// <summary>
         /// Gets the MSI transaction Id.
         /// </summary>
         public string TransactionId { get; private set; }
+
+        /// <summary>
+        /// Gets the package restart state after being applied.
+        /// </summary>
+        public ApplyRestart Restart { get; private set; }
     }
 
     /// <summary>
@@ -2176,7 +2188,7 @@ namespace WixToolset.Mba.Core
     public class PauseAutomaticUpdatesBeginEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public PauseAutomaticUpdatesBeginEventArgs()
         {
@@ -2190,7 +2202,7 @@ namespace WixToolset.Mba.Core
     public class PauseAutomaticUpdatesCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="hrStatus"></param>
         public PauseAutomaticUpdatesCompleteEventArgs(int hrStatus)
@@ -2206,7 +2218,7 @@ namespace WixToolset.Mba.Core
     public class SystemRestorePointBeginEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public SystemRestorePointBeginEventArgs()
         {
@@ -2220,7 +2232,7 @@ namespace WixToolset.Mba.Core
     public class SystemRestorePointCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="hrStatus"></param>
         public SystemRestorePointCompleteEventArgs(int hrStatus)

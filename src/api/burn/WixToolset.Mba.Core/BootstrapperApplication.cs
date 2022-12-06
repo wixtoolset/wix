@@ -60,7 +60,7 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<DetectCompatibleMsiPackageEventArgs> DetectCompatibleMsiPackage;
-        
+
         /// <inheritdoc/>
         public event EventHandler<DetectRelatedMsiPackageEventArgs> DetectRelatedMsiPackage;
 
@@ -1985,11 +1985,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnCommitMsiTransactionComplete(string transactionId, int hrStatus)
+        int IBootstrapperApplication.OnCommitMsiTransactionComplete(string transactionId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation, ref BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION pAction)
         {
-            CommitMsiTransactionCompleteEventArgs args = new CommitMsiTransactionCompleteEventArgs(transactionId, hrStatus);
+            CommitMsiTransactionCompleteEventArgs args = new CommitMsiTransactionCompleteEventArgs(transactionId, hrStatus, restart, recommendation, pAction);
             this.OnCommitMsiTransactionComplete(args);
 
+            pAction = args.Action;
             return args.HResult;
         }
 
@@ -2001,11 +2002,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnRollbackMsiTransactionComplete(string transactionId, int hrStatus)
+        int IBootstrapperApplication.OnRollbackMsiTransactionComplete(string transactionId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation, ref BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION pAction)
         {
-            RollbackMsiTransactionCompleteEventArgs args = new RollbackMsiTransactionCompleteEventArgs(transactionId, hrStatus);
+            RollbackMsiTransactionCompleteEventArgs args = new RollbackMsiTransactionCompleteEventArgs(transactionId, hrStatus, restart, recommendation, pAction);
             this.OnRollbackMsiTransactionComplete(args);
 
+            pAction = args.Action;
             return args.HResult;
         }
 

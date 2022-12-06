@@ -392,7 +392,8 @@ HRESULT DAPI WiuBeginTransaction(
 HRESULT DAPI WiuEndTransaction(
     __in DWORD dwTransactionState,
     __in DWORD dwLogMode,
-    __in_z LPCWSTR szLogPath
+    __in_z LPCWSTR szLogPath,
+    __out WIU_RESTART *pRestart
     );
 BOOL DAPI WiuIsMsiTransactionSupported(
     );

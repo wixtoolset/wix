@@ -371,12 +371,14 @@ static HRESULT OnMsiBeginTransaction(
 static HRESULT OnMsiCommitTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART *pRestart
     );
 static HRESULT OnMsiRollbackTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART *pRestart
     );
 static HRESULT ElevatedOnPauseAUBegin(
     __in HANDLE hPipe
@@ -496,7 +498,7 @@ extern "C" HRESULT ElevationApplyInitialize(
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)!pPlan->pInternalCommand->fDisableSystemRestore);
     ExitOnFailure(hr, "Failed to write system restore point action to message buffer.");
-    
+
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
 
@@ -544,7 +546,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationSessionBegin - 
+ ElevationSessionBegin -
 
 *******************************************************************/
 extern "C" HRESULT ElevationSessionBegin(
@@ -602,7 +604,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationSessionEnd - 
+ ElevationSessionEnd -
 
 *******************************************************************/
 extern "C" HRESULT ElevationSessionEnd(
@@ -648,7 +650,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationSaveState - 
+ ElevationSaveState -
 
 *******************************************************************/
 HRESULT ElevationSaveState(
@@ -697,7 +699,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationCacheCompletePayload - 
+ ElevationCacheCompletePayload -
 
 *******************************************************************/
 extern "C" HRESULT ElevationCacheCompletePayload(
@@ -785,7 +787,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationCacheCleanup - 
+ ElevationCacheCleanup -
 
 *******************************************************************/
 extern "C" HRESULT ElevationCacheCleanup(
@@ -838,7 +840,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationExecuteRelatedBundle - 
+ ElevationExecuteRelatedBundle -
 
 *******************************************************************/
 extern "C" HRESULT ElevationExecuteRelatedBundle(
@@ -899,7 +901,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationExecuteBundlePackage - 
+ ElevationExecuteBundlePackage -
 
 *******************************************************************/
 extern "C" HRESULT ElevationExecuteBundlePackage(
@@ -963,7 +965,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationExecuteExePackage - 
+ ElevationExecuteExePackage -
 
 *******************************************************************/
 extern "C" HRESULT ElevationExecuteExePackage(
@@ -1047,12 +1049,16 @@ LExit:
 
 extern "C" HRESULT ElevationMsiCommitTransaction(
     __in HANDLE hPipe,
-    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
+    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = { };
     DWORD dwResult = ERROR_SUCCESS;
 
     // serialize message data
@@ -1062,10 +1068,15 @@ extern "C" HRESULT ElevationMsiCommitTransaction(
     hr = BuffWriteString(&pbData, &cbData, pRollbackBoundary->sczLogPath);
     ExitOnFailure(hr, "Failed to write transaction log path to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
+    // send message
+    context.pfnMessageHandler = pfnMessageHandler;
+    context.pvContext = pvContext;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1075,12 +1086,16 @@ LExit:
 
 extern "C" HRESULT ElevationMsiRollbackTransaction(
     __in HANDLE hPipe,
-    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
+    __in LPVOID pvContext,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
+    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = { };
     DWORD dwResult = ERROR_SUCCESS;
 
     // serialize message data
@@ -1090,10 +1105,15 @@ extern "C" HRESULT ElevationMsiRollbackTransaction(
     hr = BuffWriteString(&pbData, &cbData, pRollbackBoundary->sczLogPath);
     ExitOnFailure(hr, "Failed to write transaction log path to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
+    // send message
+    context.pfnMessageHandler = pfnMessageHandler;
+    context.pvContext = pvContext;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
+    *pRestart = context.restart;
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1104,7 +1124,7 @@ LExit:
 
 
 /*******************************************************************
- ElevationExecuteMsiPackage - 
+ ElevationExecuteMsiPackage -
 
 *******************************************************************/
 extern "C" HRESULT ElevationExecuteMsiPackage(
@@ -1189,7 +1209,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationExecuteMspPackage - 
+ ElevationExecuteMspPackage -
 
 *******************************************************************/
 extern "C" HRESULT ElevationExecuteMspPackage(
@@ -1269,7 +1289,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationExecuteMsuPackage - 
+ ElevationExecuteMsuPackage -
 
 *******************************************************************/
 extern "C" HRESULT ElevationExecuteMsuPackage(
@@ -1480,7 +1500,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationCleanPackage - 
+ ElevationCleanPackage -
 
 *******************************************************************/
 extern "C" HRESULT ElevationCleanPackage(
@@ -1545,7 +1565,7 @@ LExit:
 }
 
 /*******************************************************************
- ElevationChildPumpMessages - 
+ ElevationChildPumpMessages -
 
 *******************************************************************/
 extern "C" HRESULT ElevationChildPumpMessages(
@@ -1875,7 +1895,7 @@ static HRESULT ProcessGenericExecuteMessages(
 
     hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwUIHint);
     ExitOnFailure(hr, "Failed to allowed results.");
-    
+
     // Process the message.
     switch (pMsg->dwMessage)
     {
@@ -2052,7 +2072,7 @@ static HRESULT ProcessMsiPackageMessages(
         ExitOnRootFailure(hr, "Invalid package message.");
         break;
     }
-    
+
     // send message
     *pdwResult = (DWORD)pContext->pfnMessageHandler(&message, pContext->pvContext);
 
@@ -2154,11 +2174,13 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION:
-        hrResult = OnMsiCommitTransaction(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnMsiCommitTransaction(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION:
-        hrResult = OnMsiRollbackTransaction(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnMsiRollbackTransaction(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData, &restart);
+        fSendRestart = TRUE;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE:
@@ -3922,7 +3944,8 @@ LExit:
 static HRESULT OnMsiCommitTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART *pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -3946,7 +3969,7 @@ static HRESULT OnMsiCommitTransaction(
         pRollbackBoundary->sczLogPath = sczLogPath;
     }
 
-    hr = MsiEngineCommitTransaction(pRollbackBoundary);
+    hr = MsiEngineCommitTransaction(pRollbackBoundary, pRestart);
 
 LExit:
     ReleaseStr(sczId);
@@ -3963,7 +3986,8 @@ LExit:
 static HRESULT OnMsiRollbackTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in SIZE_T cbData
+    __in SIZE_T cbData,
+    __out BOOTSTRAPPER_APPLY_RESTART *pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -3987,7 +4011,7 @@ static HRESULT OnMsiRollbackTransaction(
         pRollbackBoundary->sczLogPath = sczLogPath;
     }
 
-    hr = MsiEngineRollbackTransaction(pRollbackBoundary);
+    hr = MsiEngineRollbackTransaction(pRollbackBoundary, pRestart);
 
 LExit:
     ReleaseStr(sczId);

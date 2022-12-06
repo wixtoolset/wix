@@ -60,10 +60,12 @@ HRESULT MsiEngineBeginTransaction(
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT MsiEngineCommitTransaction(
-    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 HRESULT MsiEngineRollbackTransaction(
-    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 HRESULT MsiEngineExecutePackage(
     __in_opt HWND hwndParent,
