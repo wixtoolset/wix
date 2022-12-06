@@ -579,10 +579,10 @@ static HRESULT BalBaseBAProcOnCommitMsiTransactionBegin(
 static HRESULT BalBaseBAProcOnCommitMsiTransactionComplete(
     __in IBootstrapperApplication* pBA,
     __in BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS* pArgs,
-    __inout BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS* /*pResults*/
+    __inout BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS* pResults
     )
 {
-    return pBA->OnCommitMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus);
+    return pBA->OnCommitMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus, pArgs->restart, pArgs->recommendation, &pResults->action);
 }
 
 static HRESULT BalBaseBAProcOnRollbackMsiTransactionBegin(
@@ -597,10 +597,10 @@ static HRESULT BalBaseBAProcOnRollbackMsiTransactionBegin(
 static HRESULT BalBaseBAProcOnRollbackMsiTransactionComplete(
     __in IBootstrapperApplication* pBA,
     __in BA_ONROLLBACKMSITRANSACTIONCOMPLETE_ARGS* pArgs,
-    __inout BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS* /*pResults*/
+    __inout BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS* pResults
     )
 {
-    return pBA->OnRollbackMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus);
+    return pBA->OnRollbackMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus, pArgs->restart, pArgs->recommendation, &pResults->action);
 }
 
 static HRESULT BalBaseBAProcOnPauseAutomaticUpdatesBegin(
@@ -780,7 +780,7 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
 {
     IBootstrapperApplication* pBA = reinterpret_cast<IBootstrapperApplication*>(pvContext);
     HRESULT hr = pBA->BAProc(message, pvArgs, pvResults, pvContext);
-    
+
     if (E_NOTIMPL == hr)
     {
         switch (message)

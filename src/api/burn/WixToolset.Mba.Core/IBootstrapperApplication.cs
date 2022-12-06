@@ -933,12 +933,18 @@ namespace WixToolset.Mba.Core
         /// </summary>
         /// <param name="wzTransactionId"></param>
         /// <param name="hrStatus"></param>
+        /// <param name="restart"></param>
+        /// <param name="recommendation"></param>
+        /// <param name="pAction"></param>
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCommitMsiTransactionComplete(
             [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
-            int hrStatus
+            int hrStatus,
+            [MarshalAs(UnmanagedType.U4)] ApplyRestart restart,
+            [MarshalAs(UnmanagedType.I4)] BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation,
+            [MarshalAs(UnmanagedType.I4)] ref BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION pAction
             );
 
         /// <summary>
@@ -957,12 +963,18 @@ namespace WixToolset.Mba.Core
         /// </summary>
         /// <param name="wzTransactionId"></param>
         /// <param name="hrStatus"></param>
+        /// <param name="restart"></param>
+        /// <param name="recommendation"></param>
+        /// <param name="pAction"></param>
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnRollbackMsiTransactionComplete(
             [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
-            int hrStatus
+            int hrStatus,
+            [MarshalAs(UnmanagedType.U4)] ApplyRestart restart,
+            [MarshalAs(UnmanagedType.I4)] BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation,
+            [MarshalAs(UnmanagedType.I4)] ref BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION pAction
             );
 
         /// <summary>
@@ -1199,27 +1211,27 @@ namespace WixToolset.Mba.Core
     public enum Display
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Embedded,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Passive,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Full,
     }
@@ -1331,27 +1343,27 @@ namespace WixToolset.Mba.Core
     public enum Restart
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Never,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Prompt,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Automatic,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Always,
     }
@@ -1384,47 +1396,47 @@ namespace WixToolset.Mba.Core
     public enum Result
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Error = -1,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Ok,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Cancel,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Abort,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Retry,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Ignore,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Yes,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         No,
 
@@ -1434,17 +1446,17 @@ namespace WixToolset.Mba.Core
         Close,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Help,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         TryAgain,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Continue,
     }
@@ -1455,7 +1467,7 @@ namespace WixToolset.Mba.Core
     public enum ResumeType
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1546,7 +1558,7 @@ namespace WixToolset.Mba.Core
     public enum RelatedOperation
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1685,47 +1697,47 @@ namespace WixToolset.Mba.Core
     public enum RelationType
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Detect,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Upgrade,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Addon,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Patch,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         DependentAddon,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         DependentPatch,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Update,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ChainPackage,
     }
@@ -1736,37 +1748,37 @@ namespace WixToolset.Mba.Core
     public enum RelatedBundlePlanType
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Downgrade,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Upgrade,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Addon,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Patch,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         DependentAddon,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         DependentPatch,
     }
@@ -1804,7 +1816,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_APPLYCOMPLETE_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1843,7 +1855,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1860,7 +1872,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1883,7 +1895,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1900,7 +1912,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1921,7 +1933,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 
@@ -1948,6 +1960,23 @@ namespace WixToolset.Mba.Core
         /// </summary>
         Suspend,
     }
+
+    /// <summary>
+    /// The available actions for <see cref="IDefaultBootstrapperApplication.CommitMsiTransactionComplete"/> and <see cref="IDefaultBootstrapperApplication.RollbackMsiTransactionComplete"/>.
+    /// </summary>
+    public enum BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Instructs the engine to stop processing the chain and restart.
+        /// The engine will launch again after the machine is restarted.
+        /// </summary>
+        Restart,
+    };
 
     /// <summary>
     /// The available actions for <see cref="IDefaultBootstrapperApplication.ExecuteProcessCancel"/>.
@@ -2017,7 +2046,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_SHUTDOWN_ACTION
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         None,
 

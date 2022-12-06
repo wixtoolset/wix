@@ -251,8 +251,10 @@ BAAPI UserExperienceOnCommitMsiTransactionBegin(
 BAAPI UserExperienceOnCommitMsiTransactionComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId,
-    __in HRESULT hrStatus
-    );
+    __in HRESULT hrStatus,
+    __in BOOTSTRAPPER_APPLY_RESTART restart,
+    __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* pAction
+);
 BAAPI UserExperienceOnDetectBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fCached,
@@ -567,8 +569,10 @@ BAAPI UserExperienceOnRollbackMsiTransactionBegin(
 BAAPI UserExperienceOnRollbackMsiTransactionComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId,
-    __in HRESULT hrStatus
-    );
+    __in HRESULT hrStatus,
+    __in BOOTSTRAPPER_APPLY_RESTART restart,
+    __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* pAction
+);
 BAAPI UserExperienceOnSetUpdateBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience
     );

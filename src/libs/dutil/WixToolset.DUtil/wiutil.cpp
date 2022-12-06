@@ -317,7 +317,7 @@ extern "C" HRESULT DAPI WiuGetComponentPath(
     }
 
     // If the actual path length is greater than or equal to the original buffer
-    // allocate a larger buffer and get the path again, just in case we are 
+    // allocate a larger buffer and get the path again, just in case we are
     // missing any part of the path.
     if (cchCompare <= cch)
     {
@@ -369,7 +369,7 @@ extern "C" HRESULT DAPI WiuLocateComponent(
     }
 
     // If the actual path length is greater than or equal to the original buffer
-    // allocate a larger buffer and get the path again, just in case we are 
+    // allocate a larger buffer and get the path again, just in case we are
     // missing any part of the path.
     if (cchCompare <= cch)
     {
@@ -993,7 +993,8 @@ LExit:
 extern "C" HRESULT DAPI WiuEndTransaction(
     __in DWORD dwTransactionState,
     __in DWORD dwLogMode,
-    __in_z LPCWSTR szLogPath
+    __in_z LPCWSTR szLogPath,
+    __out WIU_RESTART *pRestart
     )
 {
     HRESULT hr = S_OK;
@@ -1008,6 +1009,7 @@ extern "C" HRESULT DAPI WiuEndTransaction(
     WiuExitOnFailure(hr, "Failed to enable logging for MSI transaction");
 
     er = vpfnMsiEndTransaction(dwTransactionState);
+    er = CheckForRestartErrorCode(er, pRestart);
     WiuExitOnWin32Error(er, hr, "Failed to end transaction.");
 
 LExit:

@@ -574,7 +574,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         ) = 0;
 
     // OnLaunchApprovedExeBegin - called before trying to launch the preapproved executable.
-    // 
+    //
     STDMETHOD(OnLaunchApprovedExeBegin)(
         __inout BOOL* pfCancel
         ) = 0;
@@ -603,7 +603,10 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     STDMETHOD(OnCommitMsiTransactionComplete)(
         __in_z LPCWSTR wzTransactionId,
-        __in HRESULT hrStatus
+        __in HRESULT hrStatus,
+        __in BOOTSTRAPPER_APPLY_RESTART restart,
+        __in BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation,
+        __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* pAction
         ) = 0;
 
     STDMETHOD(OnRollbackMsiTransactionBegin)(
@@ -612,7 +615,10 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     STDMETHOD(OnRollbackMsiTransactionComplete)(
         __in_z LPCWSTR wzTransactionId,
-        __in HRESULT hrStatus
+        __in HRESULT hrStatus,
+        __in BOOTSTRAPPER_APPLY_RESTART restart,
+        __in BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation,
+        __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* pAction
         ) = 0;
 
     STDMETHOD(OnPauseAutomaticUpdatesBegin)(

@@ -710,7 +710,10 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnCommitMsiTransactionComplete(
         __in_z LPCWSTR /*wzTransactionId*/,
-        __in HRESULT /*hrStatus*/
+        __in HRESULT /*hrStatus*/,
+        __in BOOTSTRAPPER_APPLY_RESTART /*restart*/,
+        __in BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION /*recommendation*/,
+        __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* /*pAction*/
         )
     {
         return S_OK;
@@ -725,7 +728,10 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnRollbackMsiTransactionComplete(
         __in_z LPCWSTR /*wzTransactionId*/,
-        __in HRESULT /*hrStatus*/
+        __in HRESULT /*hrStatus*/,
+        __in BOOTSTRAPPER_APPLY_RESTART /*restart*/,
+        __in BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION /*recommendation*/,
+        __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* /*pAction*/
         )
     {
         return S_OK;

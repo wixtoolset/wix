@@ -35,7 +35,7 @@ static HRESULT SendBAMessageFromInactiveEngine(
 // function definitions
 
 /*******************************************************************
- UserExperienceParseFromXml - 
+ UserExperienceParseFromXml -
 
 *******************************************************************/
 extern "C" HRESULT UserExperienceParseFromXml(
@@ -72,7 +72,7 @@ LExit:
 }
 
 /*******************************************************************
- UserExperienceUninitialize - 
+ UserExperienceUninitialize -
 
 *******************************************************************/
 extern "C" void UserExperienceUninitialize(
@@ -87,7 +87,7 @@ extern "C" void UserExperienceUninitialize(
 }
 
 /*******************************************************************
- UserExperienceLoad - 
+ UserExperienceLoad -
 
 *******************************************************************/
 extern "C" HRESULT UserExperienceLoad(
@@ -129,7 +129,7 @@ LExit:
 }
 
 /*******************************************************************
- UserExperienceUnload - 
+ UserExperienceUnload -
 
 *******************************************************************/
 extern "C" HRESULT UserExperienceUnload(
@@ -380,7 +380,7 @@ EXTERN_C BAAPI UserExperienceOnBeginMsiTransactionBegin(
     args.wzTransactionId = wzTransactionId;
 
     results.cbSize = sizeof(results);
-    
+
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnBeginMsiTransactionBegin failed.");
 
@@ -1017,7 +1017,7 @@ EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionBegin(
     args.wzTransactionId = wzTransactionId;
 
     results.cbSize = sizeof(results);
-    
+
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCommitMsiTransactionBegin failed.");
 
@@ -1033,8 +1033,10 @@ LExit:
 EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId,
-    __in HRESULT hrStatus
-    )
+    __in HRESULT hrStatus,
+    __in BOOTSTRAPPER_APPLY_RESTART restart,
+    __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION* pAction
+)
 {
     HRESULT hr = S_OK;
     BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS args = { };
@@ -1043,11 +1045,16 @@ EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionComplete(
     args.cbSize = sizeof(args);
     args.wzTransactionId = wzTransactionId;
     args.hrStatus = hrStatus;
+    args.restart = restart;
+    args.recommendation = *pAction;
 
     results.cbSize = sizeof(results);
+    results.action = *pAction;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCommitMsiTransactionComplete failed.");
+
+    *pAction = results.action;
 
 LExit:
     return hr;
@@ -1908,7 +1915,7 @@ EXTERN_C BAAPI UserExperienceOnPauseAUBegin(
     args.cbSize = sizeof(args);
 
     results.cbSize = sizeof(results);
-    
+
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnPauseAUBegin failed.");
 
@@ -2523,7 +2530,7 @@ EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionBegin(
     args.wzTransactionId = wzTransactionId;
 
     results.cbSize = sizeof(results);
-    
+
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnRollbackMsiTransactionBegin failed.");
 
@@ -2534,7 +2541,9 @@ LExit:
 EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId,
-    __in HRESULT hrStatus
+    __in HRESULT hrStatus,
+    __in BOOTSTRAPPER_APPLY_RESTART restart,
+    __inout BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION *pAction
     )
 {
     HRESULT hr = S_OK;
@@ -2544,11 +2553,16 @@ EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionComplete(
     args.cbSize = sizeof(args);
     args.wzTransactionId = wzTransactionId;
     args.hrStatus = hrStatus;
+    args.restart = restart;
+    args.recommendation = *pAction;
 
     results.cbSize = sizeof(results);
+    results.action = *pAction;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnRollbackMsiTransactionComplete failed.");
+
+    *pAction = results.action;
 
 LExit:
     return hr;
@@ -2651,7 +2665,7 @@ EXTERN_C BAAPI UserExperienceOnSystemRestorePointBegin(
     args.cbSize = sizeof(args);
 
     results.cbSize = sizeof(results);
-    
+
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnSystemRestorePointBegin failed.");
 

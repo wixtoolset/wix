@@ -1139,33 +1139,65 @@ LExit:
 }
 
 extern "C" HRESULT MsiEngineCommitTransaction(
-    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
+    WIU_RESTART restart = WIU_RESTART_NONE;
 
     LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_COMMIT, pRollbackBoundary->sczId);
 
-    hr = WiuEndTransaction(MSITRANSACTIONSTATE_COMMIT, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath);
+    hr = WiuEndTransaction(MSITRANSACTIONSTATE_COMMIT, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath, &restart);
     ExitOnFailure(hr, "Failed to commit the MSI transaction");
 
 LExit:
+    switch (restart)
+    {
+        case WIU_RESTART_NONE:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+            break;
+
+        case WIU_RESTART_REQUIRED:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
+            break;
+
+        case WIU_RESTART_INITIATED:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
+            break;
+    }
 
     return hr;
 }
 
 extern "C" HRESULT MsiEngineRollbackTransaction(
-    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
     HRESULT hr = S_OK;
+    WIU_RESTART restart = WIU_RESTART_NONE;
 
     LogId(REPORT_WARNING, MSG_MSI_TRANSACTION_ROLLBACK, pRollbackBoundary->sczId);
 
-    hr = WiuEndTransaction(MSITRANSACTIONSTATE_ROLLBACK, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath);
+    hr = WiuEndTransaction(MSITRANSACTIONSTATE_ROLLBACK, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath, &restart);
     ExitOnFailure(hr, "Failed to rollback the MSI transaction");
 
 LExit:
+    switch (restart)
+    {
+        case WIU_RESTART_NONE:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+            break;
+
+        case WIU_RESTART_REQUIRED:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
+            break;
+
+        case WIU_RESTART_INITIATED:
+            *pRestart = BOOTSTRAPPER_APPLY_RESTART_INITIATED;
+            break;
+    }
 
     return hr;
 }
@@ -1246,7 +1278,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
 
     // Best effort to set the execute package action variable.
     VariableSetNumeric(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, pExecuteAction->msiPackage.action, TRUE);
-    
+
     // Wire up the external UI handler and logging.
     if (pExecuteAction->msiPackage.fDisableExternalUiHandler)
     {
