@@ -500,7 +500,7 @@ namespace WixToolset.Converters
             }
             catch (XmlException e)
             {
-                this.OnError(ConverterTestType.XmlException, null, "The xml is invalid.  Detail: '{0}'", e.Message);
+                this.OnError(ConverterTestType.XmlException, null, "The xml is invalid. Detail: '{0}'", e.Message);
                 document = null;
             }
 
@@ -653,7 +653,7 @@ namespace WixToolset.Converters
 
                     if (WixConverter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
                     {
-                        if (this.OnInformation(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
+                        if (this.OnInformation(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date. It must be '{1}'.", declaration.Value, ns.NamespaceName))
                         {
                             deprecatedToUpdatedNamespaces.Add(declaration.Value, ns);
                         }
@@ -2096,7 +2096,7 @@ namespace WixToolset.Converters
         /// <returns>The converted element.</returns>
         private void ConvertElementWithoutNamespace(XElement element)
         {
-            if (this.OnInformation(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
+            if (this.OnInformation(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing. It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
             {
                 element.Name = WixNamespace.GetName(element.Name.LocalName);
 
@@ -2116,7 +2116,7 @@ namespace WixToolset.Converters
         /// <returns>The converted element.</returns>
         private void ConvertWixLocalizationElementWithoutNamespace(XElement element)
         {
-            if (this.OnInformation(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WxlNamespace.NamespaceName))
+            if (this.OnInformation(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing. It must be present with a value of '{0}'.", WxlNamespace.NamespaceName))
             {
                 element.Name = WxlNamespace.GetName(element.Name.LocalName);
 
@@ -2847,7 +2847,7 @@ namespace WixToolset.Converters
         }
 
         /// <summary>
-        /// Converter test types.  These are used to condition error messages down to warnings.
+        /// Converter test types. These are used to condition error messages down to warnings.
         /// </summary>
         private enum ConverterTestType
         {

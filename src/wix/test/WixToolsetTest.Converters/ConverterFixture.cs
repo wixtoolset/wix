@@ -130,7 +130,7 @@ namespace WixToolsetTest.Converters
                 WixAssert.CompareLineByLine(new[]
                 {
                     "FixDeclarationAndNamespace.wxs() [Converted] This file contains an XML declaration on the first line. (DeclarationPresent)",
-                    "FixDeclarationAndNamespace.wxs(1) [Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date.  It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)"
+                    "FixDeclarationAndNamespace.wxs(1) [Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)"
                 }, messages);
 
                 var actual = File.ReadAllLines(path);
