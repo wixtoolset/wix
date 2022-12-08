@@ -74,8 +74,8 @@ namespace WixToolsetTest.Converters
             var errors = converter.ConvertDocument(document);
             WixAssert.CompareLineByLine(new[]
             {
-                "[Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date.  It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)",
-                "[Converted] The namespace 'http://schemas.microsoft.com/wix/FirewallExtension' is out of date.  It must be 'http://wixtoolset.org/schemas/v4/wxs/firewall'. (XmlnsValueWrong)",
+                "[Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)",
+                "[Converted] The namespace 'http://schemas.microsoft.com/wix/FirewallExtension' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs/firewall'. (XmlnsValueWrong)",
                 "[Converted] Using RemoteAddress element text is deprecated. Use the 'Value' attribute instead. (InnerTextDeprecated)",
                 "[Converted] Namespace should be defined on the root. The 'http://wixtoolset.org/schemas/v4/wxs/firewall' namespace was move to the root element. (MoveNamespacesToRoot)"
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
@@ -115,8 +115,8 @@ namespace WixToolsetTest.Converters
             var errors = converter.ConvertDocument(document);
             WixAssert.CompareLineByLine(new[]
             {
-                "[Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date.  It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)",
-                "[Converted] The namespace 'http://schemas.microsoft.com/wix/FirewallExtension' is out of date.  It must be 'http://wixtoolset.org/schemas/v4/wxs/firewall'. (XmlnsValueWrong)",
+                "[Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)",
+                "[Converted] The namespace 'http://schemas.microsoft.com/wix/FirewallExtension' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs/firewall'. (XmlnsValueWrong)",
                 "[Converted] Using RemoteAddress element text is deprecated. Use the 'Value' attribute instead. (InnerTextDeprecated)",
                 "[Converted] Namespace should be defined on the root. The 'http://wixtoolset.org/schemas/v4/wxs/firewall' namespace was move to the root element. (MoveNamespacesToRoot)"
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
