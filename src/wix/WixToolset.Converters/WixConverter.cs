@@ -1094,40 +1094,18 @@ namespace WixToolset.Converters
 
             var id = element.Attribute("Id")?.Value;
 
-            if (id == "TARGETDIR" &&
-                this.OnInformation(ConverterTestType.TargetDirDeprecated, element, "The TARGETDIR directory should not longer be explicitly defined. Remove the Directory element with Id attribute 'TARGETDIR'."))
+            if (id == "TARGETDIR")
             {
-                var parentElement = element.Parent;
-
-                element.Remove();
-
-                if (parentElement.FirstNode is XText text && String.IsNullOrWhiteSpace(text.Value))
+                if (this.OnInformation(ConverterTestType.TargetDirDeprecated, element, "The TARGETDIR directory should no longer be explicitly defined. Remove the Directory element with Id attribute 'TARGETDIR'."))
                 {
-                    parentElement.FirstNode.Remove();
-                }
-
-                foreach (var child in element.Nodes())
-                {
-                    parentElement.Add(child);
-                }
-
-                element.RemoveAll();
-
-                if (parentElement.FirstNode is XText textAgain && String.IsNullOrWhiteSpace(textAgain.Value))
-                {
-                    parentElement.FirstNode.Remove();
+                    RemoveElementKeepChildren(element);
                 }
             }
             else if (id != null &&
                      WindowsInstallerStandard.IsStandardDirectory(id) &&
                      this.OnInformation(ConverterTestType.DefiningStandardDirectoryDeprecated, element, "Standard directories such as '{0}' should no longer be defined using the Directory element. Use the StandardDirectory element instead.", id))
             {
-                element.Name = StandardDirectoryElementName;
-
-                foreach (var attrib in element.Attributes().Where(a => a.Name.LocalName != "Id").ToList())
-                {
-                    attrib.Remove();
-                }
+                RenameElementToStandardDirectory(element);
             }
         }
 
@@ -1135,28 +1113,22 @@ namespace WixToolset.Converters
         {
             var id = element.Attribute("Id")?.Value;
 
-            if (id == "TARGETDIR" &&
-                this.OnInformation(ConverterTestType.TargetDirRefDeprecated, element, "The TARGETDIR directory should not longer be explicitly referenced. Remove the DirectoryRef element with Id attribute 'TARGETDIR'."))
+            if (id != null && WindowsInstallerStandard.IsStandardDirectory(id))
             {
-                var parentElement = element.Parent;
-
-                element.Remove();
-
-                if (parentElement.FirstNode is XText text && String.IsNullOrWhiteSpace(text.Value))
+                if (!element.HasElements)
                 {
-                    parentElement.FirstNode.Remove();
+                    this.OnError(ConverterTestType.EmptyStandardDirectoryRefNotConvertable, element, "Referencing '{0}' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory.", id);
                 }
-
-                foreach (var child in element.Nodes())
+                else if (id == "TARGETDIR")
                 {
-                    parentElement.Add(child);
+                    if (this.OnInformation(ConverterTestType.StandardDirectoryRefDeprecated, element, "The {0} directory should no longer be explicitly referenced. Remove the DirectoryRef element with Id attribute '{0}'.", id))
+                    {
+                        RemoveElementKeepChildren(element);
+                    }
                 }
-
-                element.RemoveAll();
-
-                if (parentElement.FirstNode is XText textAgain && String.IsNullOrWhiteSpace(textAgain.Value))
+                else if (this.OnInformation(ConverterTestType.StandardDirectoryRefDeprecated, element, "The standard directory '{0}' should no longer be directly referenced. Use the StandardDirectory element instead.", id))
                 {
-                    parentElement.FirstNode.Remove();
+                    RenameElementToStandardDirectory(element);
                 }
             }
         }
@@ -2725,6 +2697,40 @@ namespace WixToolset.Converters
             return value;
         }
 
+        private static void RemoveElementKeepChildren(XElement element)
+        {
+            var parentElement = element.Parent;
+
+            element.Remove();
+
+            if (parentElement.FirstNode is XText text && String.IsNullOrWhiteSpace(text.Value))
+            {
+                parentElement.FirstNode.Remove();
+            }
+
+            foreach (var child in element.Nodes())
+            {
+                parentElement.Add(child);
+            }
+
+            element.RemoveAll();
+
+            if (parentElement.FirstNode is XText textAgain && String.IsNullOrWhiteSpace(textAgain.Value))
+            {
+                parentElement.FirstNode.Remove();
+            }
+        }
+
+        private static void RenameElementToStandardDirectory(XElement element)
+        {
+            element.Name = StandardDirectoryElementName;
+
+            foreach (var attrib in element.Attributes().Where(a => a.Name.LocalName != "Id").ToList())
+            {
+                attrib.Remove();
+            }
+        }
+
         private static bool TryGetInnerText(XElement element, out string value, out List<XNode> comments)
         {
             return TryGetInnerText(element, out value, out comments, new List<XNode>());
@@ -3138,7 +3144,7 @@ namespace WixToolset.Converters
             SoftwareTagTypeObsolete,
 
             /// <summary>
-            /// TARGETDIR directory should not longer be explicitly defined.
+            /// TARGETDIR directory should no longer be explicitly defined.
             /// </summary>
             TargetDirDeprecated,
 
@@ -3178,9 +3184,14 @@ namespace WixToolset.Converters
             CustomActionIdsIncludePlatformSuffix,
 
             /// <summary>
-            /// The TARGETDIR directory should not longer be explicitly referenced.
+            /// The {0} directory should no longer be explicitly referenced. Remove the DirectoryRef element with Id attribute '{0}'.
             /// </summary>
-            TargetDirRefDeprecated,
+            StandardDirectoryRefDeprecated,
+
+            /// <summary>
+            /// Referencing '{0}' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory.
+            /// </summary>
+            EmptyStandardDirectoryRefNotConvertable,
         }
     }
 }
