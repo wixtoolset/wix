@@ -1,0 +1,14 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" Name="ProgIdComp.txt"></File>
+                <ProgId Id="Example.Foo" IconIndex="0" Advertise="yes">
+                    <Extension Id="foo" Advertise="yes">
+                        <Verb Id="OpenVerb" Command="open" Argument="&quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

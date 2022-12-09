@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Module Id="ProgId" Guid="047730a5-30fe-4a62-a520-da9381b8226a" Language="1033" Version="1.0.0.0">
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" />
+        </StandardDirectory>
+
+        <ComponentGroupRef Id="ProductComponents" />
+    </Module>
+</Wix>
