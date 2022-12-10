@@ -6,10 +6,14 @@
           DependsOnTargets="__SetPropertiesFromGit"
           AfterTargets="_CreateProjectDefineConstants">
     <PropertyGroup>
+      <PrereleaseSuffix Condition=" '$(GitSemVerDashLabel)'!='' ">-prerelease</PrereleaseSuffix>
+
       <DefineConstants>
         $(DefineConstants);
         SetupVersion=$(PackageVersion);
         SetupMajorMinorVersion=$(GitBaseVersionMajor).$(GitBaseVersionMinor);
+        SetupDashedMajorMinorVersion=$(GitBaseVersionMajor)-$(GitBaseVersionMinor);
+        SetupDashedPrerelease=$(PrereleaseSuffix)
       </DefineConstants>
     </PropertyGroup>
   </Target>
