@@ -30,13 +30,13 @@ static CONSOLE_SCREEN_BUFFER_INFO vcsbiInfo;
 
 static HRESULT DAPI ReadInteractiveStdIn(
     __deref_out_z LPWSTR* ppwzBuffer
-);
+    );
 static HRESULT ReadRedirectedStdIn(
     __deref_out_ecount_opt(*pcchSize) LPWSTR* ppwzBuffer,
     __out DWORD* pcchSize,
     BOOL fReadLine,
     DWORD dwMaxRead
-);
+    );
 
 
 extern "C" HRESULT DAPI ConsoleInitialize()
@@ -207,7 +207,7 @@ LExit:
 extern "C" HRESULT DAPI ConsoleWriteW(
     __in CONSOLE_COLOR cc,
     __in_z LPCWSTR wzData
-)
+    )
 {
     AssertSz(INVALID_HANDLE_VALUE != vhStdOut, "ConsoleInitialize() has not been called");
     HRESULT hr = S_OK;
@@ -616,7 +616,7 @@ LExit:
 
 static HRESULT DAPI ReadInteractiveStdIn(
     __deref_out_z LPWSTR* ppwzBuffer
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR pwz = NULL;
@@ -678,7 +678,7 @@ static HRESULT ReadRedirectedStdIn(
     __out DWORD* pcchSize,
     BOOL fReadLine,
     DWORD dwMaxRead
-)
+    )
 {
     HRESULT hr = S_OK;
     LPSTR psz = NULL;

@@ -25,6 +25,10 @@ typedef enum CONSOLE_COLOR { CONSOLE_COLOR_NORMAL, CONSOLE_COLOR_RED, CONSOLE_CO
 // structs
 
 // functions
+/********************************************************************
+ ConsoleInitialize - initialize console for UTF-8
+
+*********************************************************************/
 HRESULT DAPI ConsoleInitialize();
 void DAPI ConsoleUninitialize();
 
