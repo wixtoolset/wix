@@ -24,9 +24,6 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     HRESULT hr = S_OK;
     DWORD dwMajorVersion = 0;
     VERUTIL_VERSION* pVersion = NULL;
-    LPSTR pszVersion = NULL;
-
-    ::SetConsoleCP(CP_UTF8);
 
     ConsoleInitialize();
 
@@ -43,14 +40,10 @@ int __cdecl wmain(int argc, LPWSTR argv[])
 
     if (pVersion)
     {
-        hr = StrAnsiAllocString(&pszVersion, pVersion->sczVersion, 0, CP_UTF8);
-        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to convert version to UTF-8.");
-
-        ConsoleWrite(CONSOLE_COLOR_NORMAL, "%hs", pszVersion);
+        ConsoleWriteW(CONSOLE_COLOR_NORMAL, pVersion->sczVersion);
     }
 
 LExit:
-    ReleaseStr(pszVersion);
     ReleaseVerutilVersion(pVersion);
     ConsoleUninitialize();
     return hr;
