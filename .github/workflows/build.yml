@@ -26,7 +26,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -59,7 +59,7 @@ jobs:
         run: 7z a build\testresults.zip @src\testresultfilelist.txt
 
       - name: Save build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: artifacts
           path: build/artifacts/
@@ -82,7 +82,7 @@ jobs:
       # Do NOT publish logs on `master` branch as they may contain secrets in them.
       - name: Save logs
         if: github.ref != 'refs/heads/master' && (success() || failure())
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: logs_${{ github.run_id }}
           path: build/logs/
