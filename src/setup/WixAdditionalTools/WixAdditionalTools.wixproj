@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <OutputPath>$(PackageOutputPath)</OutputPath>
+    <SignOutput>true</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>

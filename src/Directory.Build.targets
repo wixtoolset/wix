@@ -143,6 +143,20 @@
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
+  <Target Name="SignBundleEngine" DependsOnTargets="_GetSignClient" Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' ">
+    <Message Importance="high" Text="Signing bundle engine: @(SignBundleEngine->&apos;%(Identity)&apos;) using configuration from: $(SigningConfiguration)" />
+
+    <Exec Command='"$(SigningToolExe)" sign -i "@(SignBundleEngine->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Target Name="SignBundle" DependsOnTargets="_GetSignClient" Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' ">
+    <Message Importance="high" Text="Signing bundle: @(SignBundle->&apos;%(Identity)&apos;) using configuration from: $(SigningConfiguration)" />
+
+    <Exec Command='"$(SigningToolExe)" sign -i "@(SignBundle->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
   <Import Project="Directory$(MSBuildProjectExtension).targets" Condition=" Exists('Directory$(MSBuildProjectExtension).targets') " />
   <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
 </Project>
