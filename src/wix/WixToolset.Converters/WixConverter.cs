@@ -42,12 +42,6 @@ namespace WixToolset.Converters
     /// </summary>
     public sealed class WixConverter
     {
-        private enum ConvertOperation
-        {
-            Convert,
-            Format,
-        }
-
         private static readonly Regex AddPrefix = new Regex(@"^[^a-zA-Z_]", RegexOptions.Compiled);
         private static readonly Regex IllegalIdentifierCharacters = new Regex(@"[^A-Za-z0-9_\.]|\.{2,}", RegexOptions.Compiled); // non 'words' and assorted valid characters
 
@@ -339,8 +333,6 @@ namespace WixToolset.Converters
                 { WixConverter.WixLocalizationUIElementName, this.ConvertWixLocalizationUIElement},
             };
 
-            this.ConversionMessages = new List<Message>();
-
             this.Messaging = messaging;
 
             this.IndentationAmount = indentationAmount;
@@ -354,7 +346,12 @@ namespace WixToolset.Converters
 
         private CustomTableTarget CustomTableSetting { get; }
 
-        private List<Message> ConversionMessages { get; }
+        private List<Message> ConversionMessages
+        {
+            get { return this.State.ConversionMessages; }
+        }
+
+        private ConversionState State { get; set; }
 
         private HashSet<ConverterTestType> ErrorsAsWarnings { get; set; }
 
@@ -364,13 +361,26 @@ namespace WixToolset.Converters
 
         private int IndentationAmount { get; set; }
 
-        private ConvertOperation Operation { get; set; }
+        private ConvertOperation Operation
+        {
+            get { return this.State.Operation; }
+        }
 
-        private string SourceFile { get; set; }
+        private string SourceFile
+        {
+            get { return this.State.SourceFile; }
+        }
 
-        private int SourceVersion { get; set; }
+        private int SourceVersion
+        {
+            get { return this.State.SourceVersion; }
+            set { this.State.SourceVersion = value; }
+        }
 
-        private XElement XRoot { get; set; }
+        private XElement XRoot
+        {
+            get { return this.State.XDocument.Root; }
+        }
 
         /// <summary>
         /// Convert a file.
@@ -382,27 +392,30 @@ namespace WixToolset.Converters
         {
             var savedDocument = false;
 
-            if (this.TryOpenSourceFile(sourceFile, out var document))
+            if (this.TryOpenSourceFile(ConvertOperation.Convert, sourceFile))
             {
-                this.Convert(document);
+                this.Convert(this.State.XDocument);
 
                 // Fix Messages if requested and necessary.
                 if (saveConvertedFile && 0 < this.ConversionMessages.Count)
                 {
-                    savedDocument = this.SaveDocument(document);
+                    savedDocument = this.SaveDocument(this.State.XDocument);
                 }
             }
 
-            return this.ReportMessages(document, savedDocument);
+            return this.ReportMessages(this.State.XDocument, savedDocument);
         }
 
         /// <summary>
         /// Convert a document.
         /// </summary>
         /// <param name="document">The document to convert.</param>
+        /// <param name="sourceFile">The file that the document was loaded from.</param>
         /// <returns>The number of conversions found.</returns>
-        public int ConvertDocument(XDocument document)
+        public int ConvertDocument(XDocument document, string sourceFile = "InMemoryXml")
         {
+            this.State = new ConversionState(ConvertOperation.Convert, sourceFile);
+            this.State.Initialize(document);
             this.Convert(document);
 
             return this.ReportMessages(document, false);
@@ -418,27 +431,30 @@ namespace WixToolset.Converters
         {
             var savedDocument = false;
 
-            if (this.TryOpenSourceFile(sourceFile, out var document))
+            if (this.TryOpenSourceFile(ConvertOperation.Format, sourceFile))
             {
-                this.FormatDocument(document);
+                this.FormatDocument(this.State.XDocument);
 
                 // Fix Messages if requested and necessary.
                 if (saveConvertedFile && 0 < this.ConversionMessages.Count)
                 {
-                    savedDocument = this.SaveDocument(document);
+                    savedDocument = this.SaveDocument(this.State.XDocument);
                 }
             }
 
-            return this.ReportMessages(document, savedDocument);
+            return this.ReportMessages(this.State.XDocument, savedDocument);
         }
 
         /// <summary>
         /// Format a document.
         /// </summary>
         /// <param name="document">The document to format.</param>
+        /// <param name="sourceFile">The file that the document was loaded from.</param>
         /// <returns>The number of Messages found.</returns>
-        public int FormatDocument(XDocument document)
+        public int FormatDocument(XDocument document, string sourceFile = "InMemoryXml")
         {
+            this.State = new ConversionState(ConvertOperation.Format, sourceFile);
+            this.State.Initialize(document);
             this.Format(document);
 
             return this.ReportMessages(document, false);
@@ -446,11 +462,6 @@ namespace WixToolset.Converters
 
         private void Convert(XDocument document)
         {
-            // Reset the instance info.
-            this.ConversionMessages.Clear();
-            this.SourceVersion = 0;
-            this.Operation = ConvertOperation.Convert;
-
             // Remove the declaration.
             if (null != document.Declaration
                 && this.OnInformation(ConverterTestType.DeclarationPresent, document, "This file contains an XML declaration on the first line."))
@@ -458,8 +469,6 @@ namespace WixToolset.Converters
                 document.Declaration = null;
                 TrimLeadingText(document);
             }
-
-            this.XRoot = document.Root;
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
@@ -469,11 +478,6 @@ namespace WixToolset.Converters
 
         private void Format(XDocument document)
         {
-            // Reset the instance info.
-            this.ConversionMessages.Clear();
-            this.SourceVersion = 0;
-            this.Operation = ConvertOperation.Format;
-
             // Remove the declaration.
             if (null != document.Declaration
                 && this.OnInformation(ConverterTestType.DeclarationPresent, document, "This file contains an XML declaration on the first line."))
@@ -482,29 +486,26 @@ namespace WixToolset.Converters
                 TrimLeadingText(document);
             }
 
-            this.XRoot = document.Root;
-
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
             this.RemoveUnusedNamespaces(document.Root);
             this.MoveNamespacesToRoot(document.Root);
         }
 
-        private bool TryOpenSourceFile(string sourceFile, out XDocument document)
+        private bool TryOpenSourceFile(ConvertOperation operation, string sourceFile)
         {
-            this.SourceFile = sourceFile;
+            this.State = new ConversionState(operation, sourceFile);
 
             try
             {
-                document = XDocument.Load(this.SourceFile, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+                this.State.Initialize();
+                return true;
             }
             catch (XmlException e)
             {
                 this.OnError(ConverterTestType.XmlException, null, "The xml is invalid. Detail: '{0}'", e.Message);
-                document = null;
+                return false;
             }
-
-            return document != null;
         }
 
         private bool SaveDocument(XDocument document)
