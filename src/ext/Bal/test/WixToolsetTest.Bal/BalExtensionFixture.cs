@@ -177,7 +177,7 @@ namespace WixToolsetTest.Bal
                     "-o", bundleFile,
                 });
                 Assert.Equal(6802, compileResult.ExitCode);
-                WixAssert.StringEqual("There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.", compileResult.Messages[0].ToString());
+                WixAssert.StringEqual("There must be at least one package with bal:PrereqPackage=\"yes\" when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.", compileResult.Messages[0].ToString());
 
                 Assert.False(File.Exists(bundleFile));
                 Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
