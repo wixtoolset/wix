@@ -21,12 +21,21 @@ namespace WixToolset.Converters
         public ConversionState(ConvertOperation operation, string sourceFile)
         {
             this.ConversionMessages = new List<Message>();
+            this.ChainPackageElementsById = new Dictionary<string, List<XElement>>();
+            this.WixMbaPrereqPackageIdElements = new List<XElement>();
+            this.WixMbaPrereqLicenseUrlElements = new List<XElement>();
             this.Operation = operation;
             this.SourceFile = sourceFile;
             this.SourceVersion = 0;
         }
 
         public List<Message> ConversionMessages { get; }
+
+        public Dictionary<string, List<XElement>> ChainPackageElementsById { get; }
+
+        public List<XElement> WixMbaPrereqPackageIdElements { get; }
+
+        public List<XElement> WixMbaPrereqLicenseUrlElements { get; }
 
         public ConvertOperation Operation { get; }
 

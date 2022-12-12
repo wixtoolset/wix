@@ -45,7 +45,7 @@ namespace WixToolset.Bal
 
         public static Message MissingDNCPrereq()
         {
-            return Message(null, Ids.MissingDNCPrereq, "There must be at least one PrereqPackage when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
+            return Message(null, Ids.MissingDNCPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
         }
 
         public static Message MissingIUIPrimaryPackage()
@@ -55,7 +55,7 @@ namespace WixToolset.Bal
 
         public static Message MissingMBAPrereq()
         {
-            return Message(null, Ids.MissingMBAPrereq, "There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
+            return Message(null, Ids.MissingMBAPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
         }
 
         public static Message MultipleBAFunctions(SourceLineNumber sourceLineNumbers)

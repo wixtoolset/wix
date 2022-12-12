@@ -131,6 +131,8 @@ namespace WixToolset.Converters
         private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName VariableElementName = WixNamespace + "Variable";
         private static readonly XName VerbElementName = WixNamespace + "Verb";
+        private static readonly XName BalPrereqLicenseUrlAttributeName = WixBalNamespace + "PrereqLicenseUrl";
+        private static readonly XName BalPrereqPackageAttributeName = WixBalNamespace + "PrereqPackage";
         private static readonly XName BalUseUILanguagesName = WixBalNamespace + "UseUILanguages";
         private static readonly XName BalStandardBootstrapperApplicationName = WixBalNamespace + "WixStandardBootstrapperApplication";
         private static readonly XName BalManagedBootstrapperApplicationHostName = WixBalNamespace + "WixManagedBootstrapperApplicationHost";
@@ -147,6 +149,7 @@ namespace WixToolset.Converters
         private static readonly XName Wix4ElementName = WixNamespace + "Wix";
         private static readonly XName Wix3ElementName = Wix3Namespace + "Wix";
         private static readonly XName WixElementWithoutNamespaceName = XNamespace.None + "Wix";
+        private static readonly XName WixVariableElementName = WixNamespace + "WixVariable";
         private static readonly XName Include4ElementName = WixNamespace + "Include";
         private static readonly XName Include3ElementName = Wix3Namespace + "Include";
         private static readonly XName IncludeElementWithoutNamespaceName = XNamespace.None + "Include";
@@ -164,11 +167,11 @@ namespace WixToolset.Converters
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
         {
-            { "http://schemas.microsoft.com/wix/BalExtension", "http://wixtoolset.org/schemas/v4/wxs/bal" },
+            { "http://schemas.microsoft.com/wix/BalExtension", WixBalNamespace },
             { "http://schemas.microsoft.com/wix/ComPlusExtension", "http://wixtoolset.org/schemas/v4/wxs/complus" },
             { "http://schemas.microsoft.com/wix/DependencyExtension", WixDependencyNamespace },
             { "http://schemas.microsoft.com/wix/DifxAppExtension", "http://wixtoolset.org/schemas/v4/wxs/difxapp" },
-            { "http://schemas.microsoft.com/wix/FirewallExtension", "http://wixtoolset.org/schemas/v4/wxs/firewall" },
+            { "http://schemas.microsoft.com/wix/FirewallExtension", WixFirewallNamespace },
             { "http://schemas.microsoft.com/wix/HttpExtension", "http://wixtoolset.org/schemas/v4/wxs/http" },
             { "http://schemas.microsoft.com/wix/IIsExtension", "http://wixtoolset.org/schemas/v4/wxs/iis" },
             { "http://schemas.microsoft.com/wix/MsmqExtension", "http://wixtoolset.org/schemas/v4/wxs/msmq" },
@@ -177,7 +180,7 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/SqlExtension", "http://wixtoolset.org/schemas/v4/wxs/sql" },
             { "http://schemas.microsoft.com/wix/TagExtension", XNamespace.None },
             { "http://schemas.microsoft.com/wix/UtilExtension", WixUtilNamespace },
-            { "http://schemas.microsoft.com/wix/VSExtension", "http://wixtoolset.org/schemas/v4/wxs/vs" },
+            { "http://schemas.microsoft.com/wix/VSExtension", WixVSNamespace },
             { "http://wixtoolset.org/schemas/thmutil/2010", "http://wixtoolset.org/schemas/v4/thmutil" },
             { "http://schemas.microsoft.com/wix/2009/Lux", "http://wixtoolset.org/schemas/v4/lux" },
             { "http://schemas.microsoft.com/wix/2006/wi", "http://wixtoolset.org/schemas/v4/wxs" },
@@ -394,7 +397,7 @@ namespace WixToolset.Converters
 
             if (this.TryOpenSourceFile(ConvertOperation.Convert, sourceFile))
             {
-                this.Convert(this.State.XDocument);
+                this.DoIt(this.State.XDocument);
 
                 // Fix Messages if requested and necessary.
                 if (saveConvertedFile && 0 < this.ConversionMessages.Count)
@@ -416,7 +419,7 @@ namespace WixToolset.Converters
         {
             this.State = new ConversionState(ConvertOperation.Convert, sourceFile);
             this.State.Initialize(document);
-            this.Convert(document);
+            this.DoIt(document);
 
             return this.ReportMessages(document, false);
         }
@@ -455,12 +458,12 @@ namespace WixToolset.Converters
         {
             this.State = new ConversionState(ConvertOperation.Format, sourceFile);
             this.State.Initialize(document);
-            this.Format(document);
+            this.DoIt(document);
 
             return this.ReportMessages(document, false);
         }
 
-        private void Convert(XDocument document)
+        private void DoIt(XDocument document)
         {
             // Remove the declaration.
             if (null != document.Declaration
@@ -472,22 +475,7 @@ namespace WixToolset.Converters
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
-            this.RemoveUnusedNamespaces(document.Root);
-            this.MoveNamespacesToRoot(document.Root);
-        }
-
-        private void Format(XDocument document)
-        {
-            // Remove the declaration.
-            if (null != document.Declaration
-                && this.OnInformation(ConverterTestType.DeclarationPresent, document, "This file contains an XML declaration on the first line."))
-            {
-                document.Declaration = null;
-                TrimLeadingText(document);
-            }
-
-            // Start converting the nodes at the top.
-            this.ConvertNodes(document.Nodes(), 0);
+            this.ConvertMbaPrereqVariables();
             this.RemoveUnusedNamespaces(document.Root);
             this.MoveNamespacesToRoot(document.Root);
         }
@@ -2309,6 +2297,89 @@ namespace WixToolset.Converters
             whitespace.Value = value.Append(' ', level * indentationAmount).ToString();
         }
 
+        private void ConvertMbaPrereqVariables()
+        {
+            XElement root = this.XRoot;
+            VisitElement(root, x =>
+            {
+                if (x is XElement e && e.Attribute("Id") is XAttribute a)
+                {
+                    if (e.Name == ExePackageElementName || e.Name == MsiPackageElementName ||
+                             e.Name == MspPackageElementName || e.Name == MsuPackageElementName)
+                    {
+                        if (!this.State.ChainPackageElementsById.TryGetValue(a.Value, out var elements))
+                        {
+                            elements = new List<XElement>();
+                            this.State.ChainPackageElementsById.Add(a.Value, elements);
+                        }
+
+                        elements.Add(e);
+                    }
+                    else if (e.Name == WixVariableElementName && e.Attribute("Value") != null)
+                    {
+                        switch (a.Value)
+                        {
+                            case "WixMbaPrereqPackageId":
+                                this.State.WixMbaPrereqPackageIdElements.Add(e);
+                                break;
+                            case "WixMbaPrereqLicenseUrl":
+                                this.State.WixMbaPrereqLicenseUrlElements.Add(e);
+                                break;
+                        }
+                    }
+                }
+                return true;
+            });
+
+            if (this.State.WixMbaPrereqPackageIdElements.Count == 1 && this.State.WixMbaPrereqLicenseUrlElements.Count < 2)
+            {
+                var wixMbaPrereqPackageIdElement = this.State.WixMbaPrereqPackageIdElements[0];
+                var packageId = wixMbaPrereqPackageIdElement.Attribute("Value")?.Value;
+                if (this.State.ChainPackageElementsById.TryGetValue(packageId, out var packageElements) && packageElements.Count == 1)
+                {
+                    var packageElement = packageElements[0];
+
+                    if (this.OnInformation(ConverterTestType.WixMbaPrereqPackageIdDeprecated, wixMbaPrereqPackageIdElement, "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead."))
+                    {
+                        packageElement.Add(new XAttribute(BalPrereqPackageAttributeName, "yes"));
+
+                        using (var lab = new ConversionLab(wixMbaPrereqPackageIdElement))
+                        {
+                            lab.RemoveTargetElement();
+                        }
+
+                        this.State.WixMbaPrereqPackageIdElements.Clear();
+                    }
+
+                    if (this.State.WixMbaPrereqLicenseUrlElements.Count == 1)
+                    {
+                        var wixMbaPrereqLicenseUrlElement = this.State.WixMbaPrereqLicenseUrlElements[0];
+                        if (this.OnInformation(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, wixMbaPrereqLicenseUrlElement, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"yes\" to a prereq package instead."))
+                        {
+                            var licenseUrl = wixMbaPrereqLicenseUrlElement.Attribute("Value")?.Value;
+                            packageElement.Add(new XAttribute(BalPrereqLicenseUrlAttributeName, licenseUrl));
+                            using (var lab = new ConversionLab(wixMbaPrereqLicenseUrlElement))
+                            {
+                                lab.RemoveTargetElement();
+                            }
+
+                            this.State.WixMbaPrereqLicenseUrlElements.Clear();
+                        }
+                    }
+                }
+            }
+
+            foreach (var element in this.State.WixMbaPrereqPackageIdElements)
+            {
+                this.OnError(ConverterTestType.WixMbaPrereqPackageIdDeprecated, element, "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead.");
+            }
+
+            foreach (var element in this.State.WixMbaPrereqLicenseUrlElements)
+            {
+                this.OnError(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, element, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"yes\" to a prereq package instead.");
+            }
+        }
+
         /// <summary>
         /// Removes unused namespaces from the element and its children.
         /// </summary>
@@ -3203,6 +3274,16 @@ namespace WixToolset.Converters
             /// Referencing '{0}' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory.
             /// </summary>
             EmptyStandardDirectoryRefNotConvertable,
+
+            /// <summary>
+            /// The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl="yes" to a prereq package instead.
+            /// </summary>
+            WixMbaPrereqLicenseUrlDeprecated,
+
+            /// <summary>
+            /// The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage="yes" to the target package instead.
+            /// </summary>
+            WixMbaPrereqPackageIdDeprecated,
         }
     }
 }
