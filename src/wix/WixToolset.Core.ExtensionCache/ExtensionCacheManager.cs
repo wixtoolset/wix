@@ -88,7 +88,7 @@ namespace WixToolset.Core.ExtensionCache
             }
             else if (!String.IsNullOrEmpty(extensionVersion)) // looking for an explicit version of an extension.
             {
-                var present = ExtensionFileExists(cacheFolder, extensionId, extensionVersion);
+                var present = this.ExtensionFileExists(cacheFolder, extensionId, extensionVersion);
                 found.Add(new CachedExtension(extensionId, extensionVersion, !present));
             }
             else // looking for all versions of an extension or all versions of all extensions.
@@ -122,7 +122,7 @@ namespace WixToolset.Core.ExtensionCache
                             continue;
                         }
 
-                        var present = ExtensionFileExists(cacheFolder, foundExtensionId, foundExtensionVersion);
+                        var present = this.ExtensionFileExists(cacheFolder, foundExtensionId, foundExtensionVersion);
                         found.Add(new CachedExtension(foundExtensionId, foundExtensionVersion, !present));
                     }
                 }
@@ -259,20 +259,22 @@ namespace WixToolset.Core.ExtensionCache
             return (extensionId, extensionVersion);
         }
 
-        private static bool ExtensionFileExists(string baseFolder, string extensionId, string extensionVersion)
+        private bool ExtensionFileExists(string baseFolder, string extensionId, string extensionVersion)
         {
-            var toolsFolder = Path.Combine(baseFolder, extensionId, extensionVersion, "tools");
-            if (!Directory.Exists(toolsFolder))
+            var packageRootFolderName = this.ExtensionManager.GetExtensionPackageRootFolderName();
+
+            var extensionFolder = Path.Combine(baseFolder, extensionId, extensionVersion, packageRootFolderName);
+            if (!Directory.Exists(extensionFolder))
             {
                 return false;
             }
 
-            var extensionAssembly = Path.Combine(toolsFolder, extensionId + ".dll");
+            var extensionAssembly = Path.Combine(extensionFolder, extensionId + ".dll");
 
             var present = File.Exists(extensionAssembly);
             if (!present)
             {
-                extensionAssembly = Path.Combine(toolsFolder, extensionId + ".exe");
+                extensionAssembly = Path.Combine(extensionFolder, extensionId + ".exe");
                 present = File.Exists(extensionAssembly);
             }
 

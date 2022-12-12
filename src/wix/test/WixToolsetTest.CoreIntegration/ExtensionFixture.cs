@@ -201,6 +201,7 @@ namespace WixToolsetTest.CoreIntegration
                     result.AssertSuccess();
                     var output = result.Messages.Select(m => m.ToString()).Single();
                     Assert.StartsWith("WixToolset.UI.wixext 4.", output);
+                    Assert.DoesNotContain("damaged", output);
 
                     result = WixRunner.Execute(new[]
                     {
