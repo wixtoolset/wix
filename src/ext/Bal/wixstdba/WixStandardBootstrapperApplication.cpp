@@ -271,8 +271,9 @@ public: // IBootstrapperApplication
                 }
             }
         }
-        else // maybe modify the action state if the bundle is or is not already installed.
+        else if (BOOTSTRAPPER_DISPLAY_FULL <= m_command.display) // only modify the action state if showing full UI.
         {
+            // Maybe modify the action state if the bundle is or is not already installed.
             if (fInstalled && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
             {
                 m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
@@ -329,7 +330,7 @@ public: // IBootstrapperApplication
             // Best effort
         }
 
-        if (BOOTSTRAPPER_ACTION_INSTALL == m_command.action && BOOTSTRAPPER_RELATION_UPGRADE == relationType)
+        if (BOOTSTRAPPER_ACTION_INSTALL == m_command.action && BOOTSTRAPPER_RELATION_UPGRADE != m_command.relationType && BOOTSTRAPPER_RELATION_UPGRADE == relationType)
         {
             int nResult = 0;
             HRESULT hr = VerCompareStringVersions(m_sczBundleVersion, wzVersion, TRUE/*fStrict*/, &nResult);
