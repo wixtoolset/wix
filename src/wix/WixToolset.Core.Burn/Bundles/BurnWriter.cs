@@ -135,13 +135,13 @@ namespace WixToolset.Core.Burn.Bundles
             var nextAddress = this.EngineSize;
             for (var i = 1; i < reader.AttachedContainers.Count; i++)
             {
-                var cntnr = reader.AttachedContainers[i];
+                var slot = reader.AttachedContainers[i];
 
                 reader.Stream.Seek(nextAddress, SeekOrigin.Begin);
                 // TODO: verify that the size in the section data is 0 or the same size.
-                this.AppendContainer(reader.Stream, cntnr.Size, BurnCommon.Container.Attached);
+                this.AppendContainer(reader.Stream, slot.Size, BurnCommon.Container.Attached);
 
-                nextAddress += cntnr.Size;
+                nextAddress += slot.Size;
             }
 
             return true;

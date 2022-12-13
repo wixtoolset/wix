@@ -451,7 +451,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal struct ContainerSlot
     {
-        public ContainerSlot(uint size) : this()
+        public ContainerSlot(uint size)
         {
             this.Size = size;
         }

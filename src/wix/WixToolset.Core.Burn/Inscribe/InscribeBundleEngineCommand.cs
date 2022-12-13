@@ -37,7 +37,7 @@ namespace WixToolset.Core.Burn.Inscribe
             {
                 reader.Stream.Seek(0, SeekOrigin.Begin);
 
-                var buffer = new byte[4 * 1024];
+                var buffer = new byte[8 * 1024];
                 var total = 0;
                 var read = 0;
                 do
