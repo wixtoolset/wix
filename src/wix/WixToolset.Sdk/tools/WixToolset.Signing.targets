@@ -246,7 +246,7 @@
 
     <DetachBundleEngineForSigning
         BundleFile="@(SignTargetPath)"
-        OutputFile="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)"
+        OutputFile="$(IntermediateOutputPath)%(SignTargetPath.Filename)-engine%(SignTargetPath.Extension)"
         IntermediateDirectory="%(SignTargetPath.RootDir)%(SignTargetPath.Directory)"
 
         NoLogo="$(InscribeNoLogo)"
@@ -264,7 +264,7 @@
 
     <!-- Explicitly add output to FileWrites to ensure it is included even when the target is up to date. -->
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)" />
+      <FileWrites Include="$(IntermediateOutputPath)%(SignTargetPath.Filename)-engine%(SignTargetPath.Extension)" />
     </ItemGroup>
   </Target>
 
@@ -275,7 +275,7 @@
     To be called after signing the bundle engine to reattach the attached container.
 
     [IN]
-    @(Inscribe) - The bundle to inscribe.
+    @(SignBundleEngine) - The bundle to inscribe.
 
     [OUT]
     @(SignBundle) - The bundle engine file to be signed.
@@ -288,7 +288,7 @@
   <Target
       Name="InscribeBundle"
       DependsOnTargets="$(InscribeBundleDependsOn)"
-      Inputs="@(SignTargetPath)"
+      Inputs="@(SignTargetPath);@(SignBundleEngine)"
       Outputs="$(SignedFilePath)">
 
     <ReattachSignedBundleEngine
