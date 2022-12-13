@@ -1676,6 +1676,16 @@ namespace WixToolset.Converters
                     lab.AddCommentsAsSiblings(comments);
                 }
             }
+
+            var evnt = element.Attribute("Event")?.Value;
+            var value = element.Attribute("Value")?.Value;
+
+            if (evnt?.Equals("DoAction", StringComparison.OrdinalIgnoreCase) == true
+                && value?.StartsWith("WixUI", StringComparison.OrdinalIgnoreCase) == true
+                && this.OnInformation(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element, "Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. For more information, see https://wixtoolset.org/docs/fourthree/#converting-custom-wixui-dialog-sets."))
+            {
+                // Just warn.
+            }
         }
 
         private void ConvertMultiStringValueElement(XElement element)
