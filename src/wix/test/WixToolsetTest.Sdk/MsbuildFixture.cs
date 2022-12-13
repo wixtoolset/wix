@@ -41,7 +41,7 @@ namespace WixToolsetTest.Sdk
                 var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(line => line.Trim()).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"TEST: SignBundleEngine: obj\x86\Release\SimpleBundle.exe",
+                    @"TEST: SignBundleEngine: obj\x86\Release\SimpleBundle-engine.exe",
                     @"TEST: SignBundle: obj\x86\Release\SimpleBundle.exe",
                 }, testMessages);
 
@@ -84,7 +84,7 @@ namespace WixToolsetTest.Sdk
                 var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(line => line.Trim()).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"TEST: SignBundleEngine: obj\x86\Release\UncompressedBundle.exe",
+                    @"TEST: SignBundleEngine: obj\x86\Release\UncompressedBundle-engine.exe",
                 }, testMessages);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
