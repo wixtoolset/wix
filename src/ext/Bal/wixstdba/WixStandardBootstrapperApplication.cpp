@@ -384,6 +384,10 @@ public: // IBootstrapperApplication
         __inout BOOL* pfStopProcessingUpdates
     )
     {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnDetectUpdate() - update location: %ls, version: %ls", wzUpdateLocation, wzUpdateVersion);
+#endif
+
         HRESULT hr = S_OK;
         int nResult = 0;
 
@@ -412,6 +416,17 @@ public: // IBootstrapperApplication
         return __super::OnDetectUpdate(wzUpdateLocation, dw64Size, wzHash, hashAlgorithm, wzUpdateVersion, wzTitle, wzSummary, wzContentType, wzContent, pfCancel, pfStopProcessingUpdates);
     }
 
+
+    virtual STDMETHODIMP OnDetectUpdateComplete(
+        __in HRESULT /*hrStatus*/,
+        __inout BOOL* pfIgnoreError
+    )
+    {
+        // A failed update is very sad indeed, but shouldn't be fatal.
+        *pfIgnoreError = TRUE;
+
+        return S_OK;
+    }
 
     virtual STDMETHODIMP OnDetectComplete(
         __in HRESULT hrStatus,
