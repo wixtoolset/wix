@@ -50,5 +50,26 @@ namespace WixToolsetTest.BurnE2E
 
             packageA.VerifyInstalled(true);
         }
+
+        [RuntimeFact]
+        public void SucceedsWhenFeedUrlIsBad()
+        {
+            // This test never fails because update checks are skipped in -quiet.
+            // See https://github.com/wixtoolset/issues/issues/7090.
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundle = this.CreateBundleInstaller("WixStdBaTest_BadUpdateFeed");
+
+            packageA.VerifyInstalled(false);
+
+            bundle.Install();
+            bundle.VerifyRegisteredAndInPackageCache();
+
+            packageA.VerifyInstalled(true);
+
+            bundle.Uninstall();
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageA.VerifyInstalled(false);
+        }
     }
 }
