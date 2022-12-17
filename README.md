@@ -1,8 +1,8 @@
 <img src="https://github.com/wixtoolset/Home/raw/master/imgs/wix-white-bg.png" alt="WiX Toolset" height="128" />
 
-![latest version](https://img.shields.io/nuget/vpre/wix)
-![download count](https://img.shields.io/nuget/dt/wix)
-![build status](https://img.shields.io/github/workflow/status/wixtoolset/wix4/Build%20WiX%20Toolset%20v4/develop)
+[![latest version](https://img.shields.io/nuget/vpre/wix)](https://www.nuget.org/packages/wix)
+[![download count](https://img.shields.io/nuget/dt/wix)](https://www.nuget.org/stats/packages/WiX?groupby=Version)
+[![build status](https://img.shields.io/github/workflow/status/wixtoolset/wix4/Build%20WiX%20Toolset%20v4/develop)](https://github.com/wixtoolset/wix4/actions/workflows/build.yml?query=branch%3Adevelop)
 
 # WiX Toolset v4
 
