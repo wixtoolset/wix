@@ -4,7 +4,7 @@
 
 LPCWSTR vcsFirewallExceptionQuery =
     L"SELECT `Name`, `RemoteAddresses`, `Port`, `Protocol`, `Program`, `Attributes`, `Profile`, `Component_`, `Description`, `Direction` FROM `Wix4FirewallException`";
-enum eFirewallExceptionQuery { feqName = 1, feqRemoteAddresses, feqPort, feqProtocol, feqProgram, feqAttributes, feqProfile, feqComponent, feqDescription };
+enum eFirewallExceptionQuery { feqName = 1, feqRemoteAddresses, feqPort, feqProtocol, feqProgram, feqAttributes, feqProfile, feqComponent, feqDescription, feqDirection };
 enum eFirewallExceptionTarget { fetPort = 1, fetApplication, fetUnknown };
 enum eFirewallExceptionAttributes { feaIgnoreFailures = 1 };
 
@@ -36,11 +36,11 @@ static UINT SchedFirewallExceptions(
     LPWSTR pwzComponent = NULL;
     LPWSTR pwzFormattedFile = NULL;
     LPWSTR pwzDescription = NULL;
-    int iDirection = 0;
+    int iDirection = MSI_NULL_INTEGER;
 
     // initialize
     hr = WcaInitialize(hInstall, "SchedFirewallExceptions");
-    ExitOnFailure(hr, "failed to initialize");
+    ExitOnFailure(hr, "Failed to initialize");
 
     // anything to do?
     if (S_OK != WcaTableExists(L"Wix4FirewallException"))
@@ -51,36 +51,39 @@ static UINT SchedFirewallExceptions(
 
     // query and loop through all the firewall exceptions
     hr = WcaOpenExecuteView(vcsFirewallExceptionQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on Wix4FirewallException table");
+    ExitOnFailure(hr, "Failed to open view on Wix4FirewallException table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordFormattedString(hRec, feqName, &pwzName);
-        ExitOnFailure(hr, "failed to get firewall exception name");
+        ExitOnFailure(hr, "Failed to get firewall exception name.");
 
         hr = WcaGetRecordFormattedString(hRec, feqRemoteAddresses, &pwzRemoteAddresses);
-        ExitOnFailure(hr, "failed to get firewall exception remote addresses");
+        ExitOnFailure(hr, "Failed to get firewall exception remote addresses.");
 
         hr = WcaGetRecordFormattedString(hRec, feqPort, &pwzPort);
-        ExitOnFailure(hr, "failed to get firewall exception port");
+        ExitOnFailure(hr, "Failed to get firewall exception port.");
 
         hr = WcaGetRecordInteger(hRec, feqProtocol, &iProtocol);
-        ExitOnFailure(hr, "failed to get firewall exception protocol");
+        ExitOnFailure(hr, "Failed to get firewall exception protocol.");
 
         hr = WcaGetRecordFormattedString(hRec, feqProgram, &pwzProgram);
-        ExitOnFailure(hr, "failed to get firewall exception program");
+        ExitOnFailure(hr, "Failed to get firewall exception program.");
 
         hr = WcaGetRecordInteger(hRec, feqAttributes, &iAttributes);
-        ExitOnFailure(hr, "failed to get firewall exception attributes");
+        ExitOnFailure(hr, "Failed to get firewall exception attributes.");
         
         hr = WcaGetRecordInteger(hRec, feqProfile, &iProfile);
-        ExitOnFailure(hr, "failed to get firewall exception profile");
+        ExitOnFailure(hr, "Failed to get firewall exception profile.");
 
         hr = WcaGetRecordString(hRec, feqComponent, &pwzComponent);
-        ExitOnFailure(hr, "failed to get firewall exception component");
+        ExitOnFailure(hr, "Failed to get firewall exception component.");
 
         hr = WcaGetRecordString(hRec, feqDescription, &pwzDescription);
-        ExitOnFailure(hr, "failed to get firewall description");
+        ExitOnFailure(hr, "Failed to get firewall exception description.");
+
+        hr = WcaGetRecordInteger(hRec, feqDirection, &iDirection);
+        ExitOnFailure(hr, "Failed to get firewall exception direction.");
 
         // figure out what we're doing for this exception, treating reinstall the same as install
         WCA_TODO todoComponent = WcaGetComponentToDo(pwzComponent);

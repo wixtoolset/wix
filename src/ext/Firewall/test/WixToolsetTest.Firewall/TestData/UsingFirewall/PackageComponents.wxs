@@ -6,10 +6,12 @@
             <Component>
                 <File Name="fw.exe" Source="example.txt">
                     <Shortcut Id="FwShortcut" Directory="INSTALLFOLDER" Name="Firewall" />
-                    <fw:FirewallException Id="ExampleFirewall" Description="An example firewall" Name="example" Port="42" Outbound="true">
+                    <fw:FirewallException Id="ExampleFirewall" Description="An app-based firewall exception" Name="ExampleApp" Port="42">
                         <fw:RemoteAddress Value="*" />
                     </fw:FirewallException>
                 </File>
+
+                <fw:FirewallException Description="A port-based firewall exception" Name="ExamplePort" Port="42" Outbound="yes" Scope="localSubnet" />
             </Component>
         </ComponentGroup>
     </Fragment>
