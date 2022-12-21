@@ -461,7 +461,7 @@ public static partial class Installer
     /// <param name="commandLine">command line property settings</param>
     /// <exception cref="InstallerException">There was an error installing the product</exception>
     /// <remarks><p>
-    /// To completely remove a product, set REMOVE=ALL in <paramRef name="commandLine"/>.
+    /// To completely remove a product, set REMOVE=ALL in <paramref name="commandLine"/>.
     /// </p><p>
     /// This method displays the user interface with the current settings and
     /// log mode. You can change user interface settings with the <see cref="SetInternalUI(InstallUIOptions)"/>
