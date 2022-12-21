@@ -243,7 +243,7 @@ namespace WixToolsetTest.UI
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
-                    "-ext", Path.GetFullPath(new Uri(typeof(UIExtensionFactory).Assembly.CodeBase).LocalPath),
+                    "-ext", Path.GetFullPath(typeof(UIExtensionFactory).Assembly.Location),
                     "-bindpath", bindFolder,
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
