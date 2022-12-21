@@ -43,7 +43,7 @@ namespace WixToolset.Http
             new[]
             {
                 new ColumnDefinition("WixHttpUrlAce", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("WixHttpUrlReservation_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "WixHttpUrlReservation", keyColumn: 1, description: "Foreign key into the WixHttpUrlReservation table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("WixHttpUrlReservation_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4HttpUrlReservation", keyColumn: 1, description: "Foreign key into the Wix4HttpUrlReservation table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("SecurityPrincipal", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The security principal for this ACE.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Rights", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 1073741824, description: "The rights for this ACE."),
             },

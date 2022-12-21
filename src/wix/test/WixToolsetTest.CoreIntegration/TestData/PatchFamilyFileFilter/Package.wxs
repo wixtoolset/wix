@@ -1,5 +1,5 @@
-<!-- TODO: DELETE ???
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<!-- TODO: DELETE ???
   <Package Name="~Test Package" Version="$(var.V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="e703bf17-4765-444c-91fd-88550fa681d4" Scope="perMachine" ProductCode="e703bf17-4765-444c-91fd-88550fa681d4">
     
 
@@ -26,5 +26,5 @@
       </Component>
     </ComponentGroup>
   </Fragment>
-</Wix>
 -->
+</Wix>
