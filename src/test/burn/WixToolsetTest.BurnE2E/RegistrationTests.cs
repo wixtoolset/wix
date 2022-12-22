@@ -25,7 +25,12 @@ namespace WixToolsetTest.BurnE2E
             bundleA.Install();
             var initialRegistration = bundleA.VerifyRegisteredAndInPackageCache();
 
+            var now = DateTime.Now;
+            var today = now.ToString("yyyyMMdd");
+            var yesterday = now.AddDays(-1).ToString("yyyyMMdd"); // check yesterday in case the bundle install crossed the midnight hour.
+
             Assert.NotNull(initialRegistration.EstimatedSize);
+            Assert.True(initialRegistration.InstallDate == today || initialRegistration.InstallDate == yesterday, $"Installed date should have been {today} or {yesterday}");
 
             testBAController.SetForceKeepRegistration(null);
             testBAController.ResetPackageStates("PackageA");
@@ -36,6 +41,8 @@ namespace WixToolsetTest.BurnE2E
             // Verifies https://github.com/wixtoolset/issues/issues/4039
             Assert.NotNull(finalRegistration.EstimatedSize);
             Assert.InRange(finalRegistration.EstimatedSize.Value, initialRegistration.EstimatedSize.Value + 1, Int32.MaxValue);
+
+            Assert.Equal(initialRegistration.InstallDate, finalRegistration.InstallDate);
         }
 
         [RuntimeFact]

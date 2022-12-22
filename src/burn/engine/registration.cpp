@@ -10,6 +10,7 @@ const LPCWSTR REGISTRY_RUN_ONCE_KEY = L"SOFTWARE\\Microsoft\\Windows\\CurrentVer
 const LPCWSTR REGISTRY_BUNDLE_DISPLAY_ICON = L"DisplayIcon";
 const LPCWSTR REGISTRY_BUNDLE_DISPLAY_VERSION = L"DisplayVersion";
 const LPCWSTR REGISTRY_BUNDLE_ESTIMATED_SIZE = L"EstimatedSize";
+const LPCWSTR REGISTRY_BUNDLE_INSTALL_DATE = L"InstallDate";
 const LPCWSTR REGISTRY_BUNDLE_PUBLISHER = L"Publisher";
 const LPCWSTR REGISTRY_BUNDLE_HELP_LINK = L"HelpLink";
 const LPCWSTR REGISTRY_BUNDLE_HELP_TELEPHONE = L"HelpTelephone";
@@ -610,6 +611,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     HKEY hkRegistration = NULL;
     BOOL fCreated = FALSE;
     LPWSTR sczPublisher = NULL;
+    SYSTEMTIME systime = { };
     DWORD er = ERROR_SUCCESS;
 
     AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
@@ -814,10 +816,17 @@ extern "C" HRESULT RegistrationSessionBegin(
         ExitOnFailure(hr, "Failed to write update registration.");
     }
 
-    // Only set estimated size here for the first time.
-    // It will always get updated at the end of the session.
+    // Only set install date and initial estimated size here for the first time.
+    // Estimated size will always get updated at the end of the session.
     if (fCreated)
     {
+        // Write the install date.
+        ::GetLocalTime(&systime);
+
+        hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_INSTALL_DATE, L"%04u%02u%02u", systime.wYear, systime.wMonth, systime.wDay);
+        ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_INSTALL_DATE);
+
+        // Write the initial estimated size.
         hr = UpdateEstimatedSize(hkRegistration, qwEstimatedSize);
         ExitOnFailure(hr, "Failed to update estimated size.");
     }
