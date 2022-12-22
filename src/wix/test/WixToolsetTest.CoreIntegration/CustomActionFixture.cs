@@ -65,6 +65,78 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanScheduleCustomActionInModule()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msmPath = Path.Combine(baseFolder, "bin", "test.msm");
+
+                var result = WixRunner.Execute(new[]
+                    {
+                    "build",
+                    Path.Combine(folder, "CustomAction", "MsmCustomAction.wxs"),
+                    Path.Combine(folder, "CustomAction", "SimpleCustomAction.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msmPath
+                });
+
+                result.AssertSuccess();
+
+                var rows = Query.QueryDatabase(msmPath, new[] { "CustomAction", "ModuleInstallExecuteSequence" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "CustomAction:Action1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\t1\tBinary1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tEntryPoint1\t",
+                    "ModuleInstallExecuteSequence:Action1.243FB739_4D05_472F_9CFB_EF6B1017B6DE\t\tInstallFiles\t1\t",
+                    "ModuleInstallExecuteSequence:CreateFolders\t3700\t\t\t",
+                    "ModuleInstallExecuteSequence:InstallFiles\t4000\t\t\t",
+                    "ModuleInstallExecuteSequence:RemoveFiles\t3500\t\t\t",
+                    "ModuleInstallExecuteSequence:RemoveFolders\t3600\t\t\t"
+                }, rows);
+            }
+        }
+
+        [Fact]
+        public void CanScheduleSetPropertyInModule()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msmPath = Path.Combine(baseFolder, "bin", "test.msm");
+
+                var result = WixRunner.Execute(new[]
+                    {
+                    "build",
+                    Path.Combine(folder, "SetProperty", "MsmSetProperty.wxs"),
+                    "-bindpath", Path.Combine(folder, "SetProperty", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msmPath
+                });
+
+                result.AssertSuccess();
+
+                var rows = Query.QueryDatabase(msmPath, new[] { "CustomAction", "ModuleInstallExecuteSequence" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "CustomAction:SetINSTALLLOCATION.243FB739_4D05_472F_9CFB_EF6B1017B6DE\t51\tINSTALLLOCATION.243FB739_4D05_472F_9CFB_EF6B1017B6DE\t[INSTALLFOLDER.243FB739_4D05_472F_9CFB_EF6B1017B6DE]\t",
+                    "ModuleInstallExecuteSequence:CostFinalize\t1000\t\t\t",
+                    "ModuleInstallExecuteSequence:CreateFolders\t3700\t\t\t",
+                    "ModuleInstallExecuteSequence:InstallFiles\t4000\t\t\t",
+                    "ModuleInstallExecuteSequence:RemoveFiles\t3500\t\t\t",
+                    "ModuleInstallExecuteSequence:RemoveFolders\t3600\t\t\t","" +
+                    "ModuleInstallExecuteSequence:SetINSTALLLOCATION.243FB739_4D05_472F_9CFB_EF6B1017B6DE\t\tCostFinalize\t1\t"
+                }, rows);
+            }
+        }
+
+        [Fact]
         public void PopulatesCustomActionTable()
         {
             var folder = TestData.Get(@"TestData");
