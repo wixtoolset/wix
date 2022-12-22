@@ -7,6 +7,6 @@
     <String Id="Regid" Overridable="yes" Value="wixtoolset.org" />
     <String Id="AboutUrl" Overridable="yes" Value="https://wixtoolset.org/" />
     <String Id="LicenseUrl" Overridable="yes" Value="https://wixtoolset.org/about/license/" />
-    <String Id="SupportUrl" Overridable="yes" Value="https://wixtoolset.org/documentation/" />
+    <String Id="SupportUrl" Overridable="yes" Value="https://wixtoolset.org/docs/gethelp/" />
     <String Id="UpdateUrl" Overridable="yes" Value="https://wixtoolset.org/releases/feeds/wix-additional-tools-$(SetupDashedMajorMinorVersion)$(SetupDashedPrerelease).feed" />
 </WixLocalization>

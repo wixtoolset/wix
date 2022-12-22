@@ -59,11 +59,13 @@ namespace WixToolset.Tasks
 
             var metadata = new Metadata
             {
+                Id = "WixToolset.AdditionalTools",
                 Type = MetadataType.Burn,
                 Name = bundleSymbol.Name,
                 Version = bundleSymbol.Version,
                 Publisher = bundleSymbol.Manufacturer,
                 Description = "Installation for " + bundleSymbol.Name,
+                License = "MS-RL",
                 SupportUrl = bundleSymbol.HelpUrl,
                 BundleCode = bundleSymbol.BundleId,
                 UpgradeCode = bundleSymbol.UpgradeCode,
