@@ -162,6 +162,7 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <rup>$(GitBaseVersionPatch)</rup>
       <rpr>$(GitCommits)</rpr>
       <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
+      <szInformationalVersion>$(InformationalVersion)</szInformationalVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -176,6 +177,8 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
 #define rmm	$(rmm)
 #define rup	$(rup)
 #define rpr	$(rpr)
+#define szInformationalVersion &quot;$(szInformationalVersion)&quot;
+#define wzInformationalVersion L&quot;$(szInformationalVersion)&quot;
 
 #endif
 "/>

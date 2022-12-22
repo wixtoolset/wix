@@ -204,7 +204,7 @@ extern "C" HRESULT EngineRun(
     }
 
     PathForCurrentProcess(&sczExePath, NULL); // Ignore failure.
-    LogId(REPORT_STANDARD, MSG_BURN_INFO, szVerMajorMinorBuild, ovix.dwMajorVersion, ovix.dwMinorVersion, ovix.dwBuildNumber, ovix.wServicePackMajor, sczExePath, szBurnPlatform, szMachinePlatform);
+    LogId(REPORT_STANDARD, MSG_BURN_INFO, szInformationalVersion, ovix.dwMajorVersion, ovix.dwMinorVersion, ovix.dwBuildNumber, ovix.wServicePackMajor, sczExePath, szBurnPlatform, szMachinePlatform);
     ReleaseNullStr(sczExePath);
 
     // initialize core
