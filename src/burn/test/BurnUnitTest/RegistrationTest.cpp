@@ -111,6 +111,7 @@ namespace Bootstrapper
                 Assert::True(Directory::Exists(cacheDirectory), "Cache directory didn't exist.");
                 Assert::True(File::Exists(Path::Combine(cacheDirectory, gcnew String(L"setup.exe"))), "Bundle exe wasn't cached.");
 
+                this->ValidateUninstallKeyString(L"InstallDate", DateTime::Now.ToString("yyyyMMdd"));
                 this->ValidateUninstallKeyResume(Int32(BURN_RESUME_MODE_ACTIVE));
                 this->ValidateRunOnceKeyEntry(cacheExePath);
 
@@ -121,6 +122,7 @@ namespace Bootstrapper
                 // verify that registration was removed
                 Assert::False(Directory::Exists(cacheDirectory), "Cache directory wasn't removed.");
 
+                this->ValidateUninstallKeyNull(L"InstallDate");
                 this->ValidateUninstallKeyNull(L"Resume");
                 this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, nullptr);
             }

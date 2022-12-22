@@ -15,6 +15,7 @@ namespace WixTestTools
         public const string REGISTRY_ARP_DISPLAY_NAME = "DisplayName";
         public const string REGISTRY_ARP_DISPLAY_VERSION = "DisplayVersion";
         public const string REGISTRY_ARP_ESTIMATED_SIZE = "EstimatedSize";
+        public const string REGISTRY_ARP_INSTALL_DATE = "InstallDate";
         public const string REGISTRY_ARP_PUBLISHER = "Publisher";
         public const string REGISTRY_ARP_HELP_LINK = "HelpLink";
         public const string REGISTRY_ARP_HELP_TELEPHONE = "HelpTelephone";
@@ -41,6 +42,8 @@ namespace WixTestTools
         public string DisplayVersion { get; set; }
 
         public int? EstimatedSize { get; set; }
+
+        public string InstallDate { get; set; }
 
         public int? Installed { get; set; }
 
@@ -103,6 +106,7 @@ namespace WixTestTools
             registration.DisplayName = idKey.GetValue(REGISTRY_ARP_DISPLAY_NAME) as string;
             registration.DisplayVersion = idKey.GetValue(REGISTRY_ARP_DISPLAY_VERSION) as string;
             registration.EstimatedSize = idKey.GetValue(REGISTRY_ARP_ESTIMATED_SIZE) as int?;
+            registration.InstallDate = idKey.GetValue(REGISTRY_ARP_INSTALL_DATE) as string;
             registration.Installed = idKey.GetValue(REGISTRY_ARP_INSTALLED) as int?;
             registration.ModifyPath = idKey.GetValue(REGISTRY_ARP_MODIFY_PATH) as string;
             registration.Publisher = idKey.GetValue(REGISTRY_ARP_PUBLISHER) as string;
