@@ -1136,7 +1136,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (SectionType.Module == this.Section.Type)
             {
                 row[0] = symbol.Action;
-                if (0 != symbol.Sequence)
+                if (symbol.Sequence.HasValue && symbol.Sequence.Value != 0)
                 {
                     row[1] = symbol.Sequence;
                 }
