@@ -673,7 +673,7 @@ namespace WixToolset.Util
             var categoryCount = CompilerConstants.IntegerNotSet;
             string eventMessageFile = null;
             string parameterMessageFile = null;
-            int typesSupported = 0;
+            var typesSupported = 0;
             var isKeyPath = false;
 
             foreach (var attrib in element.Attributes())
@@ -776,26 +776,26 @@ namespace WixToolset.Util
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             string eventSourceKey = $@"SYSTEM\CurrentControlSet\Services\EventLog\{logName}\{sourceName}";
-            var id = this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
+            var id = this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", eventMessageFile, componentId, RegistryValueType.Expandable);
 
             if (null != categoryMessageFile)
             {
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", categoryMessageFile, componentId, RegistryValueType.Expandable);
             }
 
             if (CompilerConstants.IntegerNotSet != categoryCount)
             {
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", categoryCount, componentId);
             }
 
             if (null != parameterMessageFile)
             {
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", parameterMessageFile, componentId, RegistryValueType.Expandable);
             }
 
             if (0 != typesSupported)
             {
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", typesSupported, componentId);
             }
 
             var componentKeyPath = this.CreateComponentKeyPath();
@@ -1746,15 +1746,15 @@ namespace WixToolset.Util
                 var linkageKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Linkage", escapedName);
                 var performanceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Performance", escapedName);
 
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
-                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? 1 : 0, componentId);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, RegistryValueType.MultiString);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, RegistryValueType.MultiString);
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4InstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
