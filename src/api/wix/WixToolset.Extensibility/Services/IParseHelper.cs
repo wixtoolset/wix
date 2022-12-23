@@ -104,8 +104,21 @@ namespace WixToolset.Extensibility.Services
         /// <param name="name">The registry entry name.</param>
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
-        /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
-        Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
+        /// <param name="valueType">The registry value type. Default is string.</param>
+        /// <param name="valueAction">The way to apply the registry value. Default is write.</param>
+        Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, RegistryValueType valueType = RegistryValueType.String, RegistryValueActionType valueAction = RegistryValueActionType.Write);
+
+        /// <summary>
+        /// Creates a numeric Registry symbol in the active section.
+        /// </summary>
+        /// <param name="section">Active section.</param>
+        /// <param name="sourceLineNumbers">Source and line number of the current symbol.</param>
+        /// <param name="root">The registry entry root.</param>
+        /// <param name="key">The registry entry key.</param>
+        /// <param name="name">The registry entry name.</param>
+        /// <param name="value">The numeric registry entry value.</param>
+        /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
+        Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, int value, string componentId);
 
         /// <summary>
         /// Create a WixSimpleReference symbol in the active section.

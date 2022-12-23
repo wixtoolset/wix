@@ -1317,24 +1317,24 @@ namespace WixToolset.Core
             }
             else if (YesNoType.No == advertise)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, progId, String.Empty, description, componentId);
+                this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, progId, String.Empty, description, componentId);
                 if (null != classId)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(progId, "\\CLSID"), String.Empty, classId, componentId);
+                    this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(progId, "\\CLSID"), String.Empty, classId, componentId);
                     if (null != parent)   // if this is a version independent ProgId
                     {
                         if (YesNoType.Yes == firstProgIdForClass)
                         {
-                            this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\VersionIndependentProgID"), String.Empty, progId, componentId);
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\VersionIndependentProgID"), String.Empty, progId, componentId);
                         }
 
-                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(progId, "\\CurVer"), String.Empty, parent, componentId);
+                        this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(progId, "\\CurVer"), String.Empty, parent, componentId);
                     }
                     else
                     {
                         if (YesNoType.Yes == firstProgIdForClass)
                         {
-                            this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\ProgID"), String.Empty, progId, componentId);
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\ProgID"), String.Empty, progId, componentId);
                         }
                     }
                 }
@@ -1350,13 +1350,13 @@ namespace WixToolset.Core
                         icon = String.Concat(icon, ",", iconIndex);
                     }
 
-                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(progId, "\\DefaultIcon"), String.Empty, icon, componentId);
+                    this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(progId, "\\DefaultIcon"), String.Empty, icon, componentId);
                 }
             }
 
             if (null != noOpen)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, progId, "NoOpen", noOpen, componentId); // ProgId NoOpen name
+                this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, progId, "NoOpen", noOpen, componentId); // ProgId NoOpen name
             }
 
             // raise an error for an orphaned ProgId
@@ -4572,7 +4572,7 @@ namespace WixToolset.Core
                 }
 
                 // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion], (Default) = [Description]
-                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}", id, registryVersion), null, description, componentId);
+                this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}", id, registryVersion), null, description, componentId);
 
                 // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\[Language]\[win16|win32|win64], (Default) = [TypeLibPath]\[ResourceId]
                 var path = String.Concat("[#", fileServer, "]");
@@ -4580,15 +4580,15 @@ namespace WixToolset.Core
                 {
                     path = String.Concat(path, Path.DirectorySeparatorChar, resourceId.ToString(CultureInfo.InvariantCulture.NumberFormat));
                 }
-                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\{2}\{3}", id, registryVersion, language, (win64Component ? "win64" : "win32")), null, path, componentId);
+                this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\{2}\{3}", id, registryVersion, language, (win64Component ? "win64" : "win32")), null, path, componentId);
 
                 // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\FLAGS, (Default) = [TypeLibFlags]
-                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\FLAGS", id, registryVersion), null, flags.ToString(CultureInfo.InvariantCulture.NumberFormat), componentId);
+                this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\FLAGS", id, registryVersion), null, flags.ToString(CultureInfo.InvariantCulture.NumberFormat), componentId);
 
                 if (null != helpDirectoryId)
                 {
                     // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\HELPDIR, (Default) = [HelpDirectory]
-                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\HELPDIR", id, registryVersion), null, String.Concat("[", helpDirectoryId, "]"), componentId);
+                    this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\HELPDIR", id, registryVersion), null, String.Concat("[", helpDirectoryId, "]"), componentId);
                 }
             }
         }
@@ -4896,10 +4896,10 @@ namespace WixToolset.Core
 
                 if (null != command)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(prefix, "\\shell\\", id), String.Empty, command, componentId);
+                    this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(prefix, "\\shell\\", id), String.Empty, command, componentId);
                 }
 
-                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(prefix, "\\shell\\", id, "\\command"), String.Empty, target, componentId);
+                this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(prefix, "\\shell\\", id, "\\command"), String.Empty, target, componentId);
             }
         }
 

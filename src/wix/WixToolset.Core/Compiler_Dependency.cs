@@ -208,13 +208,13 @@ namespace WixToolset.Core
                     var root = RegistryRootType.MachineUser;
 
                     var value = "[ProductCode]";
-                    this.Core.CreateRegistryRow(sourceLineNumbers, root, keyProvides, null, value, parentId);
+                    this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, null, value, parentId);
 
                     value = !String.IsNullOrEmpty(version) ? version : "[ProductVersion]";
-                    var versionRegistrySymbol = this.Core.CreateRegistryRow(sourceLineNumbers, root, keyProvides, "Version", value, parentId);
+                    var versionRegistrySymbol = this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, "Version", value, parentId);
 
                     value = !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]";
-                    this.Core.CreateRegistryRow(sourceLineNumbers, root, keyProvides, "DisplayName", value, parentId);
+                    this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, "DisplayName", value, parentId);
 
                     // Use the Version registry value and use that as a potential key path.
                     possibleKeyPath = versionRegistrySymbol.Id;

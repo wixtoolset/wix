@@ -301,9 +301,9 @@ namespace WixToolset.Core
         /// <param name="name">The registry entry name.</param>
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
-        public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId)
+        public Identifier CreateRegistryStringSymbol(SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId)
         {
-            return this.parseHelper.CreateRegistrySymbol(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
+            return this.parseHelper.CreateRegistrySymbol(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId);
         }
 
         /// <summary>

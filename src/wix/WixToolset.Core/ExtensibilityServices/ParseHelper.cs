@@ -155,7 +155,7 @@ namespace WixToolset.Core.ExtensibilityServices
             return suffix == null ? null : name + suffix;
         }
 
-        public Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
+        public Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, RegistryValueType valueType = RegistryValueType.String, RegistryValueActionType valueAction = RegistryValueActionType.Write)
         {
             if (RegistryRootType.Unknown == root)
             {
@@ -172,12 +172,6 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentNullException(nameof(componentId));
             }
 
-            // Escape the leading '#' character for string registry values.
-            if (escapeLeadingHash && null != value && value.StartsWith("#", StringComparison.Ordinal))
-            {
-                value = String.Concat("#", value);
-            }
-
             var id = this.CreateIdentifier("reg", componentId, ((int)root).ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
 
             var symbol = section.AddSymbol(new RegistrySymbol(sourceLineNumbers, id)
@@ -186,10 +180,17 @@ namespace WixToolset.Core.ExtensibilityServices
                 Key = key,
                 Name = name,
                 Value = value,
+                ValueType = valueType,
+                ValueAction = valueAction,
                 ComponentRef = componentId,
             });
 
             return symbol.Id;
+        }
+
+        public Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, int value, string componentId)
+        {
+            return this.CreateRegistrySymbol(section, sourceLineNumbers, root, key, name, value.ToString(), componentId, RegistryValueType.Integer);
         }
 
         public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, string primaryKey)
