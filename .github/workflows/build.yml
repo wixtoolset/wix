@@ -25,10 +25,11 @@ jobs:
     name: Build
     runs-on: windows-2022
     steps:
-      - name: Checkout code
+      - name: Clone repo (shallow)
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
+      - name: Fetch code
+        run: git fetch --shallow-exclude=v4.0.0-rc.1
 
       # - name: Configure Visual Studio
       #   shell: cmd
