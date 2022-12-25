@@ -136,6 +136,11 @@ static HRESULT GetTempPathFromSystemEnvironmentVariable(
         hr = EnvExpandEnvironmentStringsForUser(NULL, sczValue, psczPath, NULL);
         PathExitOnFailure(hr, "Failed to expand environment variables for system in string: %ls", sczValue);
     }
+    else
+    {
+        hr = StrAllocString(psczPath, sczValue, 0);
+        PathExitOnFailure(hr, "Failed to copy environment variable: %ls", wzName);
+    }
 
     hr = PathBackslashTerminate(psczPath);
     PathExitOnFailure(hr, "Failed to backslash terminate system '%ls' value.", wzName);
