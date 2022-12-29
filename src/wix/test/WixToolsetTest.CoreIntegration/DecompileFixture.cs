@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class DecompileFixture
     {
-        private static void DecompileAndCompare(string sourceFolder, string msiName, string expectedWxsName)
+        private static void DecompileAndCompare(string msiName, string expectedWxsName, params string[] sourceFolder)
         {
             var folder = TestData.Get(sourceFolder);
 
@@ -35,19 +35,19 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanDecompileSingleFileCompressed()
         {
-            DecompileAndCompare(@"TestData\DecompileSingleFileCompressed", "example.msi", "Expected.wxs");
+            DecompileAndCompare("example.msi", "Expected.wxs", "TestData", "DecompileSingleFileCompressed");
         }
 
         [Fact]
         public void CanDecompile64BitSingleFileCompressed()
         {
-            DecompileAndCompare(@"TestData\DecompileSingleFileCompressed64", "example.msi", "Expected.wxs");
+            DecompileAndCompare("example.msi", "Expected.wxs", "TestData", "DecompileSingleFileCompressed64");
         }
 
         [Fact]
         public void CanDecompileNestedDirSearchUnderRegSearch()
         {
-            DecompileAndCompare(@"TestData\AppSearch", "NestedDirSearchUnderRegSearch.msi", "DecompiledNestedDirSearchUnderRegSearch.wxs");
+            DecompileAndCompare("NestedDirSearchUnderRegSearch.msi", "DecompiledNestedDirSearchUnderRegSearch.wxs", "TestData", "AppSearch");
         }
 
         [Fact]
@@ -56,31 +56,37 @@ namespace WixToolsetTest.CoreIntegration
             // The input MSI was not created using standard methods, it is an example of a real world database that needs to be decompiled.
             // The Class/@Feature_ column has length of 32, the File/@Attributes has length of 2,
             // and numerous foreign key relationships are missing.
-            DecompileAndCompare(@"TestData\Class", "OldClassTableDef.msi", "DecompiledOldClassTableDef.wxs");
+            DecompileAndCompare("OldClassTableDef.msi", "DecompiledOldClassTableDef.wxs", "TestData", "Class");
         }
 
         [Fact]
         public void CanDecompileSequenceTables()
         {
-            DecompileAndCompare(@"TestData\SequenceTables", "SequenceTables.msi", "DecompiledSequenceTables.wxs");
+            DecompileAndCompare("SequenceTables.msi", "DecompiledSequenceTables.wxs", "TestData", "SequenceTables");
         }
 
         [Fact]
         public void CanDecompileShortcuts()
         {
-            DecompileAndCompare(@"TestData\Shortcut", "shortcuts.msi", "DecompiledShortcuts.wxs");
+            DecompileAndCompare("shortcuts.msi", "DecompiledShortcuts.wxs", "TestData", "Shortcut");
         }
 
         [Fact]
         public void CanDecompileNullComponent()
         {
-            DecompileAndCompare(@"TestData\DecompileNullComponent", "example.msi", "Expected.wxs");
+            DecompileAndCompare("example.msi", "Expected.wxs", "TestData", "DecompileNullComponent");
         }
 
         [Fact]
         public void CanDecompileMergeModuleWithTargetDirComponent()
         {
-            DecompileAndCompare(@"TestData\DecompileTargetDirMergeModule", "MergeModule1.msm", "Expected.wxs");
+            DecompileAndCompare("MergeModule1.msm", "Expected.wxs", "TestData", "DecompileTargetDirMergeModule");
+        }
+
+        [Fact]
+        public void CanDecompileUI()
+        {
+            DecompileAndCompare("ui.msi", "ExpectedUI.wxs", "TestData", "Decompile");
         }
     }
 }

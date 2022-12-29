@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Codepage="1252" UpgradeCode="{4C0904C8-C924-43D8-ACB7-6F3938768BB8}" Manufacturer="Test" ProductCode="{81780708-3CDC-4735-95FF-FAD79E98CA22}" Language="1033" Name="ui" Version="1.0.0.0" InstallerVersion="200">
+    <Binary Id="WixUIWixca" SourceFile="FILE NOT EXPORTED" />
+    <Binary Id="WixUI_Bmp_Banner" SourceFile="FILE NOT EXPORTED" />
+    <Binary Id="WixUI_Bmp_Dialog" SourceFile="FILE NOT EXPORTED" />
+    <Binary Id="WixUI_Ico_Exclam" SourceFile="FILE NOT EXPORTED" />
+    <Binary Id="WixUI_Ico_Info" SourceFile="FILE NOT EXPORTED" />
+    <Binary Id="WixUI_Bmp_New" SourceFile="FILE NOT EXPORTED" />
+    <Binary Id="WixUI_Bmp_Up" SourceFile="FILE NOT EXPORTED" />
+    <Property Id="WixUIRMOption" Value="UseRM" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+    <Property Id="WixUI_Mode" Value="InstallDir" />
+    <Property Id="ErrorDialog" Value="ErrorDlg" />
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="ui">
+        <Component Id="ProductComponent" Guid="{03A6CA75-3469-5323-B60B-5F50CD2C9C04}" Bitness="always32">
+          <File Id="Product.wxs" Name="Product.wxs" KeyPath="yes" Source="SourceDir\File\Product.wxs" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <UI>
+      <Dialog Id="FatalError" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Finish" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" Disabled="yes" TabSkip="no" />
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="70" Width="220" Height="80" Text="[ProductName] Setup Wizard ended prematurely because of an error. Your system has not been modified. To install this program at a later time, run Setup Wizard again. Click the Finish button to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}[ProductName] Setup Wizard ended prematurely" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="UserExit" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Finish" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" Disabled="yes" TabSkip="no" />
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="80" Text="[ProductName] setup was interrupted. Your system has not been modified. To install this program at a later time, please run the installation again. Click the Finish button to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}[ProductName] Setup Wizard was interrupted" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="ExitDialog" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Finish" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" Disabled="yes" TabSkip="no" />
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="OptionalCheckBox" Type="CheckBox" X="135" Y="190" Width="220" Height="40" Text="[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]" Hidden="yes" ShowCondition="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" CheckBoxValue="1" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="70" Width="220" Height="40" Text="Click the Finish button to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}Completed the [ProductName] Setup Wizard" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="OptionalText" Type="Text" X="135" Y="110" Width="220" Height="80" Text="[WIXUI_EXITDIALOGOPTIONALTEXT]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WIXUI_EXITDIALOGOPTIONALTEXT AND NOT Installed" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="BrowseDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="PathEdit" Type="PathEdit" X="25" Y="202" Width="320" Height="18" Indirect="yes" Property="_BrowseProperty" TabSkip="no" />
+        <Control Id="OK" Type="PushButton" X="240" Y="243" Width="56" Height="17" Text="OK" TabSkip="no" Default="yes">
+          <Publish Event="SetTargetPath" Value="[_BrowseProperty]" />
+          <Publish Event="EndDialog" Value="Return" />
+          <Publish Event="DoAction" Value="WixUIValidatePath" />
+          <Publish Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" Event="SpawnDialog" Value="InvalidDirDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="Reset" Value="0" />
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="ComboLabel" Type="Text" X="25" Y="58" Width="44" Height="10" Text="&amp;Look in:" TabSkip="no" />
+        <Control Id="DirectoryCombo" Type="DirectoryCombo" X="70" Y="55" Width="220" Height="80" Indirect="yes" Fixed="yes" Remote="yes" Property="_BrowseProperty" TabSkip="no">
+          <Subscribe Event="IgnoreChange" Attribute="IgnoreChange" />
+        </Control>
+        <Control Id="WixUI_Bmp_Up" Type="PushButton" X="298" Y="55" Width="19" Height="19" Text="WixUI_Bmp_Up" Icon="yes" FixedSize="yes" IconSize="16" ToolTip="Up one level" TabSkip="no">
+          <Publish Event="DirectoryListUp" Value="0" />
+        </Control>
+        <Control Id="NewFolder" Type="PushButton" X="325" Y="55" Width="19" Height="19" Text="WixUI_Bmp_New" Icon="yes" FixedSize="yes" IconSize="16" ToolTip="Create a new folder" TabSkip="no">
+          <Publish Event="DirectoryListNew" Value="0" />
+        </Control>
+        <Control Id="DirectoryList" Type="DirectoryList" X="25" Y="83" Width="320" Height="98" Indirect="yes" Sunken="yes" Property="_BrowseProperty" TabSkip="no" />
+        <Control Id="PathLabel" Type="Text" X="25" Y="190" Width="320" Height="10" Text="&amp;Folder name:" TabSkip="no" />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Text="Browse to the destination folder" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Change destination folder" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="DiskCostDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="OK" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="OK" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="20" Y="20" Width="280" Height="20" Text="The disk space required for the installation of the selected features." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Text" Type="Text" X="20" Y="53" Width="330" Height="50" Text="Highlighted volumes do not have enough disk space available for selected features. You can either remove some files from the highlighted volumes, install fewer features, or select different destination drives." TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Disk Space Requirements" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="VolumeList" Type="VolumeCostList" X="20" Y="100" Width="330" Height="120" Text="{120}{70}{70}{70}{70}" Sunken="yes" Fixed="yes" Remote="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="ErrorDlg" X="50" Y="50" Width="270" Height="105" ErrorDialog="yes" Title="[ProductName] Setup">
+        <Control Id="ErrorText" Type="Text" X="48" Y="15" Width="205" Height="60" Text="Information text" NoPrefix="yes" TabSkip="no" />
+        <Control Id="N" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="&amp;No" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorNo" />
+        </Control>
+        <Control Id="Y" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="&amp;Yes" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorYes" />
+        </Control>
+        <Control Id="A" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="Cancel" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorAbort" />
+        </Control>
+        <Control Id="C" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="Cancel" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorCancel" />
+        </Control>
+        <Control Id="ErrorIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" Text="WixUI_Ico_Info" Disabled="yes" FixedSize="yes" IconSize="32" ToolTip="Information icon" TabSkip="yes" />
+        <Control Id="I" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="&amp;Ignore" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorIgnore" />
+        </Control>
+        <Control Id="O" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="OK" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorOk" />
+        </Control>
+        <Control Id="R" Type="PushButton" X="100" Y="80" Width="56" Height="17" Text="&amp;Retry" TabSkip="yes">
+          <Publish Event="EndDialog" Value="ErrorRetry" />
+        </Control>
+      </Dialog>
+      <Dialog Id="FilesInUse" X="50" Y="50" Width="370" Height="270" KeepModeless="yes" Title="[ProductName] Setup">
+        <Control Id="Retry" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="&amp;Retry" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Retry" />
+        </Control>
+        <Control Id="Ignore" Type="PushButton" X="235" Y="243" Width="56" Height="17" Text="&amp;Ignore" TabSkip="no">
+          <Publish Event="EndDialog" Value="Ignore" />
+        </Control>
+        <Control Id="Exit" Type="PushButton" X="166" Y="243" Width="56" Height="17" Text="E&amp;xit" TabSkip="no">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="20" Y="23" Width="280" Height="20" Text="Some files that need to be updated are currently in use." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Text" Type="Text" X="20" Y="55" Width="330" Height="30" Text="The following applications are using files that need to be updated by this setup. Close these applications and then click &amp;Retry to continue setup or Exit to exit it." TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Files in Use" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="List" Type="ListBox" X="20" Y="87" Width="330" Height="130" Sunken="yes" Property="FileInUseProcess" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="MsiRMFilesInUse" X="50" Y="50" Width="370" Height="270" KeepModeless="yes" Title="[ProductName] Setup">
+        <Control Id="OK" Type="PushButton" X="240" Y="243" Width="56" Height="17" Text="OK" TabSkip="no" Default="yes">
+          <Publish Event="EndDialog" Value="Return" />
+          <Publish Condition="WixUIRMOption~=&quot;UseRM&quot;" Event="RMShutdownAndRestart" Value="0" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+        <Control Id="ShutdownOption" Type="RadioButtonGroup" X="26" Y="190" Width="305" Height="45" Property="WixUIRMOption" TabSkip="no" />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="20" Y="23" Width="280" Height="20" Text="Some files that need to be updated are currently in use." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Text" Type="Text" X="20" Y="55" Width="330" Height="45" Text="The following applications are using files that need to be updated by this setup. You can let Setup Wizard close them and attempt to restart them or reboot the machine later." TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Files in Use" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="List" Type="ListBox" X="20" Y="100" Width="330" Height="80" Sunken="yes" Property="FileInUseProcess" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="PrepareDlg" X="50" Y="50" Width="370" Height="270" Modeless="yes" Title="[ProductName] Setup">
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="70" Width="220" Height="20" Text="Please wait while the Setup Wizard prepares to guide you through the installation." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}Welcome to the [ProductName] Setup Wizard" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="yes" />
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" Disabled="yes" TabSkip="yes" />
+        <Control Id="ActionData" Type="Text" X="135" Y="125" Width="220" Height="30" Transparent="yes" NoPrefix="yes" TabSkip="yes">
+          <Subscribe Event="ActionData" Attribute="Text" />
+        </Control>
+        <Control Id="ActionText" Type="Text" X="135" Y="100" Width="220" Height="20" Transparent="yes" NoPrefix="yes" TabSkip="yes">
+          <Subscribe Event="ActionText" Attribute="Text" />
+        </Control>
+      </Dialog>
+      <Dialog Id="CancelDlg" X="50" Y="50" Width="260" Height="85" Title="[ProductName] Setup">
+        <Control Id="No" Type="PushButton" X="132" Y="57" Width="56" Height="17" Text="&amp;No" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="Yes" Type="PushButton" X="72" Y="57" Width="56" Height="17" Text="&amp;Yes" TabSkip="no">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+        <Control Id="Text" Type="Text" X="48" Y="15" Width="194" Height="30" Text="Are you sure you want to cancel [ProductName] installation?" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24" Text="WixUI_Ico_Info" Disabled="yes" FixedSize="yes" IconSize="32" ToolTip="Information icon" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="ProgressDlg" X="50" Y="50" Width="370" Height="270" Modeless="yes" Title="[ProductName] Setup">
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" Disabled="yes" TabSkip="no" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="ActionText" Type="Text" X="70" Y="100" Width="285" Height="10" TabSkip="yes">
+          <Subscribe Event="ActionText" Attribute="Text" />
+        </Control>
+        <Control Id="TextInstalling" Type="Text" X="20" Y="65" Width="330" Height="35" Text="Please wait while the Setup Wizard installs [ProductName]." Hidden="yes" NoPrefix="yes" ShowCondition="NOT Installed OR (Installed AND (RESUME OR Preselected) AND NOT PATCH)" TabSkip="yes" />
+        <Control Id="TitleInstalling" Type="Text" X="20" Y="15" Width="330" Height="15" Text="{\WixUI_Font_Title}Installing [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="NOT Installed OR (Installed AND (RESUME OR Preselected) AND NOT PATCH)" TabSkip="yes" />
+        <Control Id="TextChanging" Type="Text" X="20" Y="65" Width="330" Height="35" Text="Please wait while the Setup Wizard changes [ProductName]." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Change&quot;" TabSkip="yes" />
+        <Control Id="TitleChanging" Type="Text" X="20" Y="15" Width="330" Height="15" Text="{\WixUI_Font_Title}Changing [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Change&quot;" TabSkip="yes" />
+        <Control Id="TextRepairing" Type="Text" X="20" Y="65" Width="330" Height="35" Text="Please wait while the Setup Wizard repairs [ProductName]." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Repair&quot;" TabSkip="yes" />
+        <Control Id="TitleRepairing" Type="Text" X="20" Y="15" Width="330" Height="15" Text="{\WixUI_Font_Title}Repairing [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Repair&quot;" TabSkip="yes" />
+        <Control Id="TextRemoving" Type="Text" X="20" Y="65" Width="330" Height="35" Text="Please wait while the Setup Wizard removes [ProductName]." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="yes" />
+        <Control Id="TitleRemoving" Type="Text" X="20" Y="15" Width="330" Height="15" Text="{\WixUI_Font_Title}Removing [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="yes" />
+        <Control Id="TextUpdating" Type="Text" X="20" Y="65" Width="330" Height="35" Text="Please wait while the Setup Wizard updates [ProductName]." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Update&quot;" TabSkip="yes" />
+        <Control Id="TitleUpdating" Type="Text" X="20" Y="15" Width="330" Height="15" Text="{\WixUI_Font_Title}Updating [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Update&quot;" TabSkip="yes" />
+        <Control Id="ProgressBar" Type="ProgressBar" X="20" Y="115" Width="330" Height="10" Text="Progress done" Disabled="yes" ProgressBlocks="yes" TabSkip="yes">
+          <Subscribe Event="SetProgress" Attribute="Progress" />
+        </Control>
+        <Control Id="StatusLabel" Type="Text" X="20" Y="100" Width="50" Height="10" Text="Status:" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="ResumeDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Install" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Install" Hidden="yes" ElevationShield="yes" ShowCondition="ALLUSERS" TabSkip="no">
+          <Publish Condition="1 OR CostingComplete = 1" Event="SpawnWaitDialog" Value="WaitForCostingDlg" />
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="InstallNoShield" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Install" Hidden="yes" ShowCondition="NOT ALLUSERS" TabSkip="no" Default="yes">
+          <Publish Condition="1 OR CostingComplete = 1" Event="SpawnWaitDialog" Value="WaitForCostingDlg" />
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="60" Text="The Setup Wizard will complete the installation of [ProductName] on your computer. Click Install to continue or Cancel to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}Resuming the [ProductName] Setup Wizard" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="WaitForCostingDlg" X="50" Y="50" Width="260" Height="85" Title="[ProductName] Setup">
+        <Control Id="Return" Type="PushButton" X="102" Y="57" Width="56" Height="17" Text="&amp;Return" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+        <Control Id="Text" Type="Text" X="48" Y="15" Width="194" Height="30" Text="Please wait while the installer finishes determining your disk space requirements." TabSkip="yes" />
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24" Text="WixUI_Ico_Exclam" Disabled="yes" FixedSize="yes" IconSize="32" ToolTip="Exclamation icon" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="OutOfRbDiskDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="No" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="&amp;No" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="Yes" Type="PushButton" X="240" Y="243" Width="56" Height="17" Text="&amp;Yes" TabSkip="no">
+          <Publish Event="EnableRollback" Value="False" />
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="20" Y="20" Width="280" Height="20" Text="Disk space required for the installation exceeds available disk space." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Text" Type="Text" X="20" Y="53" Width="330" Height="90" Text="The highlighted volumes do not have enough disk space available for the currently selected features. You can remove some files from the highlighted volumes, install fewer features, or select a different destination drive. Alternatively, you may choose to disable the installer's rollback functionality. Disabling rollback prevents the installer from restoring your computer's original state should the installation be interrupted in any way. Click Yes if you wish to take the risk of disabling rollback." TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Out of Disk Space" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="VolumeList" Type="VolumeCostList" X="20" Y="150" Width="330" Height="70" Text="{120}{70}{70}{70}{70}" Sunken="yes" Fixed="yes" Remote="yes" ShowRollbackCost="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="OutOfDiskDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="OK" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="OK" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="20" Y="20" Width="280" Height="20" Text="Disk space required for the installation exceeds available disk space." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Text" Type="Text" X="20" Y="53" Width="330" Height="60" Text="The highlighted volumes do not have enough disk space available for the currently selected features. You can remove some files from the highlighted volumes, install fewer features, or select a different destination drive." TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Out of Disk Space" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="VolumeList" Type="VolumeCostList" X="20" Y="120" Width="330" Height="100" Text="{120}{70}{70}{70}{70}" Sunken="yes" Fixed="yes" Remote="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="InvalidDirDlg" X="50" Y="50" Width="260" Height="85" Title="[ProductName] Setup">
+        <Control Id="OK" Type="PushButton" X="102" Y="57" Width="56" Height="17" Text="OK" TabSkip="no" Default="yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+        <Control Id="Text" Type="Text" X="48" Y="22" Width="194" Height="30" Text="Installation directory must be on a local hard drive." TabSkip="yes" />
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24" Text="WixUI_Ico_Info" Disabled="yes" FixedSize="yes" IconSize="32" ToolTip="Information icon" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="WelcomeDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" TabSkip="no" Default="yes">
+          <Publish Condition="Installed AND PATCH" Property="WixUI_InstallMode" Value="Update" />
+          <Publish Condition="NOT Installed" Event="NewDialog" Value="LicenseAgreementDlg" />
+          <Publish Condition="Installed AND PATCH" Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="60" Text="The Setup Wizard will install [ProductName] on your computer. Click Next to continue or Cancel to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" ShowCondition="NOT Installed OR NOT PATCH" HideCondition="Installed AND PATCH" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}Welcome to the [ProductName] Setup Wizard" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="PatchDescription" Type="Text" X="135" Y="80" Width="220" Height="60" Text="The Setup Wizard will update [ProductName] on your computer. Click Next to continue or Cancel to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" ShowCondition="Installed AND PATCH" HideCondition="NOT Installed OR NOT PATCH" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="LicenseAgreementDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="207" Width="330" Height="18" Text="I &amp;accept the terms in the License Agreement" Property="LicenseAccepted" CheckBoxValue="1" TabSkip="no" />
+        <Control Id="Print" Type="PushButton" X="112" Y="243" Width="56" Height="17" Text="&amp;Print" TabSkip="no">
+          <Publish Event="DoAction" Value="WixUIPrintEula" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" TabSkip="no">
+          <Publish Event="NewDialog" Value="WelcomeDlg" />
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;" TabSkip="no" Default="yes">
+          <Publish Condition="LicenseAccepted = &quot;1&quot;" Event="NewDialog" Value="InstallDirDlg" />
+          <Publish Condition="1 OR CostingComplete = 1" Event="SpawnWaitDialog" Value="WaitForCostingDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="LicenseText" Type="ScrollableText" X="20" Y="60" Width="330" Height="140" Text="{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033\deflangfe1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Tahoma;}}&#xD;&#xA;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#xD;&#xA;\pard\sa200\sl276\slmult1\f0\fs20 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\par&#xD;&#xA;}&#xD;&#xA;&#xA;" Sunken="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="340" Height="15" Text="Please read the following license agreement carefully" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}End-User License Agreement" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="VerifyReadyDlg" X="50" Y="50" Width="370" Height="270" TrackDiskSpace="yes" Title="[ProductName] Setup">
+        <Control Id="Install" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Install" Disabled="yes" Hidden="yes" ElevationShield="yes" ShowCondition="NOT Installed AND ALLUSERS" EnableCondition="NOT Installed" DefaultCondition="NOT Installed" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="InstallNoShield" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Install" Disabled="yes" Hidden="yes" ShowCondition="NOT Installed AND NOT ALLUSERS" EnableCondition="NOT Installed" DefaultCondition="NOT Installed" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="Change" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Change" Disabled="yes" Hidden="yes" ElevationShield="yes" ShowCondition="WixUI_InstallMode = &quot;Change&quot; AND ALLUSERS AND (ADDLOCAL OR REMOVE)" EnableCondition="WixUI_InstallMode = &quot;Change&quot;" DefaultCondition="WixUI_InstallMode = &quot;Change&quot;" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="ChangeNoShield" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Change" Disabled="yes" Hidden="yes" ShowCondition="WixUI_InstallMode = &quot;Change&quot; AND (NOT ALLUSERS OR (NOT ADDLOCAL AND NOT REMOVE))" EnableCondition="WixUI_InstallMode = &quot;Change&quot;" DefaultCondition="WixUI_InstallMode = &quot;Change&quot;" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="Repair" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="Re&amp;pair" Disabled="yes" Hidden="yes" ShowCondition="WixUI_InstallMode = &quot;Repair&quot;" EnableCondition="WixUI_InstallMode = &quot;Repair&quot;" DefaultCondition="WixUI_InstallMode = &quot;Repair&quot;" TabSkip="no" Default="yes">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="ReinstallMode" Value="ecmus" />
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="Reinstall" Value="All" />
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="Remove" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Remove" Disabled="yes" Hidden="yes" ElevationShield="yes" ShowCondition="WixUI_InstallMode = &quot;Remove&quot; AND ALLUSERS" EnableCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="Remove" Value="All" />
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="RemoveNoShield" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Remove" Disabled="yes" Hidden="yes" ShowCondition="WixUI_InstallMode = &quot;Remove&quot; AND NOT ALLUSERS" EnableCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="Remove" Value="All" />
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="Update" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Update" Disabled="yes" Hidden="yes" ElevationShield="yes" ShowCondition="WixUI_InstallMode = &quot;Update&quot; AND ALLUSERS" EnableCondition="WixUI_InstallMode = &quot;Update&quot;" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="UpdateNoShield" Type="PushButton" X="212" Y="243" Width="80" Height="17" Text="&amp;Update" Disabled="yes" Hidden="yes" ShowCondition="WixUI_InstallMode = &quot;Update&quot; AND NOT ALLUSERS" EnableCondition="WixUI_InstallMode = &quot;Update&quot;" TabSkip="no">
+          <Publish Condition="OutOfDiskSpace &lt;&gt; 1" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" Event="SpawnDialog" Value="OutOfRbDiskDlg" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EndDialog" Value="Return" />
+          <Publish Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" Event="EnableRollback" Value="False" />
+          <Publish Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" Event="SpawnDialog" Value="OutOfDiskDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17" Text="&amp;Back" DefaultCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="no">
+          <Publish Condition="NOT Installed" Event="NewDialog" Value="InstallDirDlg" />
+          <Publish Condition="Installed AND NOT PATCH" Event="NewDialog" Value="MaintenanceTypeDlg" />
+          <Publish Condition="Installed AND PATCH" Event="NewDialog" Value="WelcomeDlg" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="InstallTitle" Type="Text" X="15" Y="15" Width="300" Height="15" Text="{\WixUI_Font_Title}Ready to install [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="NOT Installed" TabSkip="yes" />
+        <Control Id="InstallText" Type="Text" X="25" Y="70" Width="320" Height="80" Text="Click Install to begin the installation. Click Back to review or change any of your installation settings. Click Cancel to exit the wizard." Hidden="yes" ShowCondition="NOT Installed" TabSkip="yes" />
+        <Control Id="ChangeTitle" Type="Text" X="15" Y="15" Width="300" Height="15" Text="{\WixUI_Font_Title}Ready to change [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Change&quot;" TabSkip="yes" />
+        <Control Id="ChangeText" Type="Text" X="25" Y="70" Width="320" Height="80" Text="Click Change to begin the installation. Click Back to review or change any of your installation settings. Click Cancel to exit the wizard." Hidden="yes" ShowCondition="WixUI_InstallMode = &quot;Change&quot;" TabSkip="yes" />
+        <Control Id="RepairTitle" Type="Text" X="15" Y="15" Width="300" Height="15" Text="{\WixUI_Font_Title}Ready to repair [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Repair&quot;" TabSkip="yes" />
+        <Control Id="RepairText" Type="Text" X="25" Y="70" Width="320" Height="80" Text="Click Repair to repair the installation of [ProductName]. Click Back to review or change any of your installation settings. Click Cancel to exit the wizard." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Repair&quot;" TabSkip="yes" />
+        <Control Id="RemoveTitle" Type="Text" X="15" Y="15" Width="300" Height="15" Text="{\WixUI_Font_Title}Ready to remove [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="yes" />
+        <Control Id="RemoveText" Type="Text" X="25" Y="70" Width="320" Height="80" Text="Click Remove to remove [ProductName] from your computer. Click Back to review or change any of your installation settings. Click Cancel to exit the wizard." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Remove&quot;" TabSkip="yes" />
+        <Control Id="UpdateTitle" Type="Text" X="15" Y="15" Width="300" Height="15" Text="{\WixUI_Font_Title}Ready to update [ProductName]" Hidden="yes" Transparent="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Update&quot;" TabSkip="yes" />
+        <Control Id="UpdateText" Type="Text" X="25" Y="70" Width="320" Height="80" Text="Click Update to update [ProductName] from your computer. Click Back to review or change any of your installation settings. Click Cancel to exit the wizard." Hidden="yes" NoPrefix="yes" ShowCondition="WixUI_InstallMode = &quot;Update&quot;" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="InstallDirDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" TabSkip="no" Default="yes">
+          <Publish Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" />
+          <Publish Condition="NOT WIXUI_DONTVALIDATEPATH" Event="DoAction" Value="WixUIValidatePath" />
+          <Publish Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" Event="SpawnDialog" Value="InvalidDirDlg" />
+          <Publish Condition="WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;" Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" TabSkip="no">
+          <Publish Event="NewDialog" Value="LicenseAgreementDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Folder" Type="PathEdit" X="20" Y="100" Width="320" Height="18" Indirect="yes" Property="WIXUI_INSTALLDIR" TabSkip="no" />
+        <Control Id="ChangeFolder" Type="PushButton" X="20" Y="120" Width="56" Height="17" Text="&amp;Change..." TabSkip="no">
+          <Publish Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" />
+          <Publish Event="SpawnDialog" Value="BrowseDlg" />
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Text="Click Next to install to the default folder or click Change to choose another." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Text="{\WixUI_Font_Title}Destination Folder" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="FolderLabel" Type="Text" X="20" Y="60" Width="290" Height="30" Text="Install [ProductName] to:" NoPrefix="yes" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="MaintenanceTypeDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="ChangeButton" Type="PushButton" X="40" Y="65" Width="80" Height="17" Text="&amp;Change" ToolTip="Change Installation" DisableCondition="ARPNOMODIFY" TabSkip="no" Default="yes">
+          <Publish Property="WixUI_InstallMode" Value="Change" />
+        </Control>
+        <Control Id="RepairButton" Type="PushButton" X="40" Y="118" Width="80" Height="17" Text="Re&amp;pair" ToolTip="Repair Installation" DisableCondition="ARPNOREPAIR" TabSkip="no">
+          <Publish Property="WixUI_InstallMode" Value="Repair" />
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="RemoveButton" Type="PushButton" X="40" Y="171" Width="80" Height="17" Text="&amp;Remove" ToolTip="Remove Installation" DisableCondition="ARPNOREMOVE" TabSkip="no">
+          <Publish Property="WixUI_InstallMode" Value="Remove" />
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" TabSkip="no">
+          <Publish Event="NewDialog" Value="MaintenanceWelcomeDlg" />
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" Disabled="yes" TabSkip="no" />
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="340" Height="20" Text="Select the operation you wish to perform." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="340" Height="15" Text="{\WixUI_Font_Title}Change, repair, or remove installation" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+        <Control Id="ChangeText" Type="Text" X="60" Y="85" Width="280" Height="20" Text="Lets you change the way features are installed." HideCondition="ARPNOMODIFY" TabSkip="yes" />
+        <Control Id="RepairText" Type="Text" X="60" Y="138" Width="280" Height="30" Text="Repairs errors in the most recent installation by fixing missing and corrupt files, shortcuts, and registry entries." HideCondition="ARPNOREPAIR" TabSkip="yes" />
+        <Control Id="RemoveText" Type="Text" X="60" Y="191" Width="280" Height="20" Text="Removes [ProductName] from your computer." NoPrefix="yes" HideCondition="ARPNOREMOVE" TabSkip="yes" />
+        <Control Id="ChangeDisabledText" Type="Text" X="60" Y="85" Width="280" Height="20" Text="[ProductName] has no independently selectable features." Hidden="yes" NoPrefix="yes" ShowCondition="ARPNOMODIFY" TabSkip="yes" />
+        <Control Id="RepairDisabledText" Type="Text" X="60" Y="138" Width="280" Height="30" Text="[ProductName] cannot be repaired." Hidden="yes" NoPrefix="yes" ShowCondition="ARPNOREPAIR" TabSkip="yes" />
+        <Control Id="RemoveDisabledText" Type="Text" X="60" Y="191" Width="280" Height="20" Text="[ProductName] cannot be removed." Hidden="yes" NoPrefix="yes" ShowCondition="ARPNOREMOVE" TabSkip="yes" />
+      </Dialog>
+      <Dialog Id="MaintenanceWelcomeDlg" X="50" Y="50" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" TabSkip="no" Default="yes">
+          <Publish Event="NewDialog" Value="MaintenanceTypeDlg" />
+          <Publish Condition="1 OR CostingComplete = 1" Event="SpawnWaitDialog" Value="WaitForCostingDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="Cancel" TabSkip="no" Cancel="yes">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Text="WixUI_Bmp_Dialog" Disabled="yes" TabSkip="no" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back" Disabled="yes" TabSkip="no" />
+        <Control Id="Description" Type="Text" X="135" Y="70" Width="220" Height="60" Text="The Setup Wizard allows you to change the way [ProductName] features are installed on your computer or to remove it from your computer. Click Next to continue or Cancel to exit the Setup Wizard." Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}Welcome to the [ProductName] Setup Wizard" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
+      </Dialog>
+      <RadioButtonGroup Property="WixUIRMOption">
+        <RadioButton Value="UseRM" X="0" Y="0" Width="295" Height="16" Text="&amp;Close the applications and attempt to restart them." />
+        <RadioButton Value="DontUseRM" X="0" Y="20" Width="295" Height="16" Text="&amp;Do not close applications. A reboot will be required." />
+      </RadioButtonGroup>
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+      <UIText Id="NewFolder" Value="Folder|New Folder" />
+      <UIText Id="AbsentPath" />
+      <UIText Id="bytes" Value="bytes" />
+      <UIText Id="GB" Value="GB" />
+      <UIText Id="KB" Value="KB" />
+      <UIText Id="MB" Value="MB" />
+      <UIText Id="MenuAbsent" Value="Entire feature will be unavailable" />
+      <UIText Id="MenuAdvertise" Value="Feature will be installed when required" />
+      <UIText Id="MenuAllCD" Value="Entire feature will be installed to run from CD" />
+      <UIText Id="MenuAllLocal" Value="Entire feature will be installed on local hard drive" />
+      <UIText Id="MenuAllNetwork" Value="Entire feature will be installed to run from network" />
+      <UIText Id="MenuCD" Value="Will be installed to run from CD" />
+      <UIText Id="MenuLocal" Value="Will be installed on local hard drive" />
+      <UIText Id="MenuNetwork" Value="Will be installed to run from network" />
+      <UIText Id="ScriptInProgress" Value="Gathering required information..." />
+      <UIText Id="SelAbsentAbsent" Value="This feature will remain uninstalled" />
+      <UIText Id="SelAbsentAdvertise" Value="This feature will be set to be installed when required" />
+      <UIText Id="SelAbsentCD" Value="This feature will be installed to run from CD" />
+      <UIText Id="SelAbsentLocal" Value="This feature will be installed on the local hard drive" />
+      <UIText Id="SelAbsentNetwork" Value="This feature will be installed to run from the network" />
+      <UIText Id="SelAdvertiseAbsent" Value="This feature will become unavailable" />
+      <UIText Id="SelAdvertiseAdvertise" Value="Will be installed when required" />
+      <UIText Id="SelAdvertiseCD" Value="This feature will be available to run from CD" />
+      <UIText Id="SelAdvertiseLocal" Value="This feature will be installed on your local hard drive" />
+      <UIText Id="SelAdvertiseNetwork" Value="This feature will be available to run from the network" />
+      <UIText Id="SelCDAbsent" Value="This feature will be uninstalled completely, you won't be able to run it from CD" />
+      <UIText Id="SelCDAdvertise" Value="This feature will change from run from CD state to set to be installed when required" />
+      <UIText Id="SelCDCD" Value="This feature will remain to be run from CD" />
+      <UIText Id="SelCDLocal" Value="This feature will change from run from CD state to be installed on the local hard drive" />
+      <UIText Id="SelChildCostNeg" Value="This feature frees up [1] on your hard drive." />
+      <UIText Id="SelChildCostPos" Value="This feature requires [1] on your hard drive." />
+      <UIText Id="SelCostPending" Value="Compiling cost for this feature..." />
+      <UIText Id="SelLocalAbsent" Value="This feature will be completely removed" />
+      <UIText Id="SelLocalAdvertise" Value="This feature will be removed from your local hard drive, but will be set to be installed when required" />
+      <UIText Id="SelLocalCD" Value="This feature will be removed from your local hard drive, but will be still available to run from CD" />
+      <UIText Id="SelLocalLocal" Value="This feature will remain on your local hard drive" />
+      <UIText Id="SelLocalNetwork" Value="This feature will be removed from your local hard drive, but will be still available to run from the network" />
+      <UIText Id="SelNetworkAbsent" Value="This feature will be uninstalled completely, you won't be able to run it from the network" />
+      <UIText Id="SelNetworkAdvertise" Value="This feature will change from run from network state to set to be installed when required" />
+      <UIText Id="SelNetworkLocal" Value="This feature will change from run from network state to be installed on the local hard drive" />
+      <UIText Id="SelNetworkNetwork" Value="This feature will remain to be run from the network" />
+      <UIText Id="SelParentCostNegNeg" Value="This feature frees up [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures free up [4] on your hard drive." />
+      <UIText Id="SelParentCostNegPos" Value="This feature frees up [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures require [4] on your hard drive." />
+      <UIText Id="SelParentCostPosNeg" Value="This feature requires [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures free up [4] on your hard drive." />
+      <UIText Id="SelParentCostPosPos" Value="This feature requires [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures require [4] on your hard drive." />
+      <UIText Id="TimeRemaining" Value="Time remaining: {[1] minutes }{[2] seconds}" />
+      <UIText Id="VolumeCostAvailable" Value="Available" />
+      <UIText Id="VolumeCostDifference" Value="Difference" />
+      <UIText Id="VolumeCostRequired" Value="Required" />
+      <UIText Id="VolumeCostSize" Value="Disk Size" />
+      <UIText Id="VolumeCostVolume" Value="Volume" />
+    </UI>
+    <CustomAction Id="WixUIValidatePath" Return="ignore" BinaryRef="WixUIWixca" DllEntry="ValidatePath" />
+    <CustomAction Id="WixUIPrintEula" Return="ignore" BinaryRef="WixUIWixca" DllEntry="PrintEula" />
+    <Feature Id="ProductFeature" Title="ui" Level="1">
+      <ComponentRef Id="ProductComponent" />
+    </Feature>
+    <Media Id="1" Cabinet="cab1.cab" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <AdminUISequence>
+      <Show Dialog="FatalError" OnExit="error" />
+      <Show Dialog="UserExit" OnExit="cancel" />
+      <Show Dialog="ExitDialog" OnExit="success" />
+    </AdminUISequence>
+    <InstallUISequence>
+      <Show Dialog="FatalError" OnExit="error" />
+      <Show Dialog="UserExit" OnExit="cancel" />
+      <Show Dialog="ExitDialog" OnExit="success" />
+      <Show Dialog="PrepareDlg" Before="AppSearch" />
+      <Show Dialog="MaintenanceWelcomeDlg" Condition="Installed AND NOT RESUME AND NOT Preselected AND NOT PATCH" Before="ResumeDlg" />
+      <Show Dialog="ResumeDlg" Condition="Installed AND (RESUME OR Preselected)" Before="WelcomeDlg" />
+      <Show Dialog="WelcomeDlg" Condition="NOT Installed OR PATCH" Before="ProgressDlg" />
+      <Show Dialog="ProgressDlg" Before="ExecuteAction" />
+    </InstallUISequence>
+  </Package>
+</Wix>
