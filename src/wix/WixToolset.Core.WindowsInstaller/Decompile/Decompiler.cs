@@ -256,6 +256,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             }
         }
 
+        private static XAttribute XAttributeIfNotNull(string attributeName, string value)
+        {
+            return value is null ? null : new XAttribute(attributeName, value);
+        }
+
         private static XAttribute XAttributeIfNotNull(string attributeName, Row row, int column)
         {
             return row.IsColumnNull(column) ? null : new XAttribute(attributeName, row.FieldAsString(column));
@@ -352,62 +357,15 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Action", actionSymbol.Action),
                     String.IsNullOrEmpty(actionSymbol.Condition) ? null : new XAttribute("Condition", actionSymbol.Condition));
 
-                switch (actionSymbol.Sequence)
-                {
-                    case (-4):
-                        xAction.SetAttributeValue("OnExit", "suspend");
-                        break;
-                    case (-3):
-                        xAction.SetAttributeValue("OnExit", "error");
-                        break;
-                    case (-2):
-                        xAction.SetAttributeValue("OnExit", "cancel");
-                        break;
-                    case (-1):
-                        xAction.SetAttributeValue("OnExit", "success");
-                        break;
-                    default:
-                        if (null != actionSymbol.Before)
-                        {
-                            xAction.SetAttributeValue("Before", actionSymbol.Before);
-                        }
-                        else if (null != actionSymbol.After)
-                        {
-                            xAction.SetAttributeValue("After", actionSymbol.After);
-                        }
-                        else if (actionSymbol.Sequence.HasValue)
-                        {
-                            xAction.SetAttributeValue("Sequence", actionSymbol.Sequence.Value);
-                        }
-                        break;
-                }
+                AssignActionSequence(actionSymbol, xAction);
             }
             else if (this.DecompilerHelper.TryGetIndexedElement("Dialog", actionSymbol.Action, out var _)) // dialog
             {
-                xAction = new XElement(Names.CustomElement,
+                xAction = new XElement(Names.ShowElement,
                     new XAttribute("Dialog", actionSymbol.Action),
-                    new XAttribute("Condition", actionSymbol.Condition));
+                    XAttributeIfNotNull("Condition", actionSymbol.Condition));
 
-                switch (actionSymbol.Sequence)
-                {
-                    case (-4):
-                        xAction.SetAttributeValue("OnExit", "suspend");
-                        break;
-                    case (-3):
-                        xAction.SetAttributeValue("OnExit", "error");
-                        break;
-                    case (-2):
-                        xAction.SetAttributeValue("OnExit", "cancel");
-                        break;
-                    case (-1):
-                        xAction.SetAttributeValue("OnExit", "success");
-                        break;
-                    default:
-                        SetAttributeIfNotNull(xAction, "Before", actionSymbol.Before);
-                        SetAttributeIfNotNull(xAction, "After", actionSymbol.After);
-                        SetAttributeIfNotNull(xAction, "Sequence", actionSymbol.Sequence);
-                        break;
-                }
+                AssignActionSequence(actionSymbol, xAction);
             }
             else // possibly a standard action without suggested sequence information
             {
@@ -868,7 +826,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     // add tabbable controls
                     while (null != xControl)
                     {
-                        var controlId = xControl.Attribute("Id");
+                        var controlId = xControl.Attribute("Id").Value;
                         var controlRow = controlRows[String.Concat(dialogId, DecompilerConstants.PrimaryKeyDelimiter, controlId)];
 
                         xControl.SetAttributeValue("TabSkip", "no");
@@ -913,7 +871,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
 
                     // set cancel control
-                    var controlCancel = dialogRow.FieldAsString(8);
+                    var controlCancel = dialogRow.FieldAsString(9);
                     if (!String.IsNullOrEmpty(controlCancel))
                     {
                         if (this.DecompilerHelper.TryGetIndexedElement("Control", dialogId, controlCancel, out var xCancelControl))
@@ -3428,7 +3386,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("Y", controlRow.Y),
                     new XAttribute("Width", controlRow.Width),
                     new XAttribute("Height", controlRow.Height),
-                    new XAttribute("Text", controlRow.Text));
+                    XAttributeIfNotNull("Text", controlRow.Text));
 
                 if (!controlRow.IsColumnNull(7))
                 {
@@ -3699,8 +3657,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
             foreach (var row in table.Rows)
             {
-                var xPublish = new XElement(Names.PublishElement,
-                    new XAttribute("Condition", row.FieldAsString(4)));
+                var xPublish = new XElement(Names.PublishElement);
+                var condition = row.FieldAsString(4);
+
+                if (!String.IsNullOrEmpty(condition) && condition != "1")
+                {
+                    xPublish.Add(new XAttribute("Condition", condition));
+                }
 
                 var publishEvent = row.FieldAsString(2);
                 if (publishEvent.StartsWith("[", StringComparison.Ordinal) && publishEvent.EndsWith("]", StringComparison.Ordinal))
@@ -7455,7 +7418,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 var xUiText = new XElement(Names.UITextElement,
                     new XAttribute("Id", row.FieldAsString(0)),
-                    new XAttribute("Value", row.FieldAsString(1)));
+                    XAttributeIfNotNull("Value", row, 1));
 
                 this.UIElement.Add(xUiText);
             }
@@ -7535,6 +7498,39 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 {
                     this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, row.TableDefinition.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), featureField.Column.Name, Convert.ToString(featureField.Data), componentField.Column.Name, Convert.ToString(componentField.Data), "FeatureComponents"));
                 }
+            }
+        }
+
+        private static void AssignActionSequence(WixActionSymbol actionSymbol, XElement xAction)
+        {
+            switch (actionSymbol.Sequence)
+            {
+                case (-4):
+                    xAction.SetAttributeValue("OnExit", "suspend");
+                    break;
+                case (-3):
+                    xAction.SetAttributeValue("OnExit", "error");
+                    break;
+                case (-2):
+                    xAction.SetAttributeValue("OnExit", "cancel");
+                    break;
+                case (-1):
+                    xAction.SetAttributeValue("OnExit", "success");
+                    break;
+                default:
+                    if (null != actionSymbol.Before)
+                    {
+                        xAction.SetAttributeValue("Before", actionSymbol.Before);
+                    }
+                    else if (null != actionSymbol.After)
+                    {
+                        xAction.SetAttributeValue("After", actionSymbol.After);
+                    }
+                    else if (actionSymbol.Sequence.HasValue)
+                    {
+                        xAction.SetAttributeValue("Sequence", actionSymbol.Sequence.Value);
+                    }
+                    break;
             }
         }
 

@@ -15,6 +15,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         public static readonly XName SummaryInformationElement = WxsNamespace + "SummaryInformation";
 
         public static readonly XName CustomElement = WxsNamespace + "Custom";
+        public static readonly XName ShowElement = WxsNamespace + "Show";
 
         public static readonly XName AdminExecuteSequenceElement = WxsNamespace + "AdminExecuteSequence";
         public static readonly XName AdminUISequenceElement = WxsNamespace + "AdminUISequence";
