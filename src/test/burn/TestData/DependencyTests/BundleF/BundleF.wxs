@@ -3,7 +3,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fortestinguseonly="http://wixtoolset.org/schemas/v4/wxs/fortestinguseonly">
   <Fragment>
     <fortestinguseonly:ForTestingUseOnlyBundle Id="{5E9D5B04-41EA-4196-954C-1F7357C31FB0}" />
-    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="Detect" />
+    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="detect" />
 
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />

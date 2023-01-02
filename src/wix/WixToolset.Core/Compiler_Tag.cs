@@ -263,7 +263,7 @@ namespace WixToolset.Core
         /// Parses a TagRef element for Software Id Tag registration under a PatchFamily element.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        private void ParseTagRefElement(XElement node)
+        private void ParseSoftwareTagRefElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string regid = null;
@@ -311,6 +311,9 @@ namespace WixToolset.Core
             }
         }
 
-        private Identifier CreateTagId(string regid) => this.Core.CreateIdentifier("tag", regid, ".product.tag");
+        private Identifier CreateTagId(string regid)
+        {
+            return this.Core.CreateIdentifier("tag", regid, ".product.tag");
+        }
     }
 }

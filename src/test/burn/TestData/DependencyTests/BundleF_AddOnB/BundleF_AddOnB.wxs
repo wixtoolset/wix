@@ -5,7 +5,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util" xmlns:fortestinguseonly="http://wixtoolset.org/schemas/v4/wxs/fortestinguseonly">
   <Fragment>
     <fortestinguseonly:ForTestingUseOnlyBundle Id="{B774BF3B-3E89-4D42-9D29-AFAB27C5772D}" />
-    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="Addon" />
+    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="addon" />
     <util:RegistrySearch Root="HKLM" Key="$(var.TestExeRegistryKey)" Value="Version" Variable="ExeA_Version" />
 
     <PackageGroup Id="BundlePackages">

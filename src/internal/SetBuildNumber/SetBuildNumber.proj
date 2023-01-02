@@ -131,7 +131,6 @@
           DependsOnTargets="$(SetBuildNumbersDependsOn)"
           BeforeTargets="AfterBuild" />
 
-
   <ItemGroup>
     <PackageReference Include="GitInfo" Version="2.2.0" />
   </ItemGroup>

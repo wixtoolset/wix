@@ -4,7 +4,7 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-    <RelatedBundle Id="{B1617DA6-F824-4B9F-B9B2-A6AFD07A652D}" Action="Patch" />
+    <RelatedBundle Id="{B1617DA6-F824-4B9F-B9B2-A6AFD07A652D}" Action="patch" />
 
     <PackageGroup Id="BundlePackages">
       <MspPackage Id="PatchA" SourceFile="$(var.PatchA.TargetPath)">

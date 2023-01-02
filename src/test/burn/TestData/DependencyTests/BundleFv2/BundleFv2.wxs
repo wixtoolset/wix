@@ -2,7 +2,7 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="Detect" />
+    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="detect" />
 
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />

@@ -1,6 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="$safeprojectname$" Manufacturer="$company$" Version="$version$" UpgradeCode="PUT-GUID-HERE">
-    <MajorUpgrade DowngradeError="A newer version of [ProductName] is already installed" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed" />
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />
