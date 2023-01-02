@@ -168,7 +168,7 @@ static HRESULT ConfigureCertificates(
     DWORD_PTR cbPFXPassword = 0;
 
     // Bail quickly if the Certificate table isn't around.
-    if (S_OK != WcaTableExists(L"Certificate"))
+    if (S_OK != WcaTableExists(L"Wix4Certificate"))
     {
         WcaLog(LOGMSG_VERBOSE, "Skipping ConfigureCertificates() - required table not present.");
         ExitFunction1(hr = S_FALSE);

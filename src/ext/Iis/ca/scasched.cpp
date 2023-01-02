@@ -53,7 +53,7 @@ LPCWSTR vcsWebDirQuery = L"SELECT `Web_`, `WebDir`, `Component_`, `Path`, `DirPr
     L"FROM `Wix4IIsWebDir`";
 
 LPCWSTR vcsVDirQuery = L"SELECT `Web_`, `VirtualDir`, `Component_`, `Alias`, `Directory_`, `DirProperties_`, `Application_` "
-    L"FROM `IIsWebVirtualDir`";
+    L"FROM `Wix4IIsWebVirtualDir`";
 
 LPCWSTR vcsFilterQuery = L"SELECT `Web_`, `Name`, `Component_`, `Path`, `Description`, `Flags`, `LoadOrder` FROM `Wix4IIsFilter` ORDER BY `Web_`";
 
@@ -83,8 +83,8 @@ extern "C" UINT __stdcall ConfigureIIs(
     ExitOnFailure(hr, "Failed to initialize");
 
     // check for the prerequsite tables
-    if (S_OK != WcaTableExists(L"IIsWebSite") && S_OK != WcaTableExists(L"IIsFilter") && S_OK != WcaTableExists(L"IIsProperty") && 
-        S_OK != WcaTableExists(L"IIsWebServiceExtension") && S_OK != WcaTableExists(L"IIsAppPool"))
+    if (S_OK != WcaTableExists(L"Wix4IIsWebSite") && S_OK != WcaTableExists(L"Wix4IIsFilter") && S_OK != WcaTableExists(L"Wix4IIsProperty") && 
+        S_OK != WcaTableExists(L"Wix4IIsWebServiceExtension") && S_OK != WcaTableExists(L"Wix4IIsAppPool"))
     {
         WcaLog(LOGMSG_VERBOSE, "skipping IIs CustomAction, no IIsWebSite table, no IIsFilter table, no IIsProperty table, no IIsWebServiceExtension, and no IIsAppPool table");
         ExitFunction1(hr = S_FALSE);
@@ -120,7 +120,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     ExitOnFailure(hr, "Failed to add encoding key to CustomActionData.");
 
     // Wrap vcsUserDeferredQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"User"))
+    if (S_OK == WcaTableExists(L"Wix4User"))
     {
         hr = WcaWrapQuery(vcsUserDeferredQuery, &pwzCustomActionData, efmcColumn3 | efmcColumn4 | efmcColumn5, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap User query");
@@ -132,7 +132,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebSvcExtQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebServiceExtension"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebServiceExtension"))
     {
         hr = WcaWrapQuery(vcsWebSvcExtQuery, &pwzCustomActionData, efmcColumn2 | efmcColumn3 | efmcColumn4, 1, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebServiceExtension query");
@@ -144,7 +144,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsAppPoolQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsAppPool"))
+    if (S_OK == WcaTableExists(L"Wix4IIsAppPool"))
     {
         hr = WcaWrapQuery(vcsAppPoolQuery, &pwzCustomActionData, efmcColumn2 | efmcColumn15 | efmcColumn16, 3, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsAppPool query");
@@ -159,7 +159,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsMimeMapQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsMimeMap"))
+    if (S_OK == WcaTableExists(L"Wix4IIsMimeMap"))
     {
         hr = WcaWrapQuery(vcsMimeMapQuery, &pwzCustomActionData, efmcColumn4 | efmcColumn5, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsMimeMap query");
@@ -171,7 +171,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsHttpHeaderQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsHttpHeader"))
+    if (S_OK == WcaTableExists(L"Wix4IIsHttpHeader"))
     {
         hr = WcaWrapQuery(vcsHttpHeaderQuery, &pwzCustomActionData, efmcColumn1 | efmcColumn4, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsHttpHeader query");
@@ -183,7 +183,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebErrorQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebError"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebError"))
     {
         hr = WcaWrapQuery(vcsWebErrorQuery, &pwzCustomActionData, efmcColumn5 | efmcColumn6, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebError query");
@@ -195,7 +195,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebDirPropertiesQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebDirProperties"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebDirProperties"))
     {
         hr = WcaWrapQuery(vcsWebDirPropertiesQuery, &pwzCustomActionData, efmcColumn8 | efmcColumn10 | efmcColumn12 | efmcColumn15, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebDirProperties query");
@@ -207,7 +207,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsSslCertificateQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"Certificate") && S_OK == WcaTableExists(L"CertificateHash") && S_OK == WcaTableExists(L"IIsWebSiteCertificates"))
+    if (S_OK == WcaTableExists(L"Wix4Certificate") && S_OK == WcaTableExists(L"Wix4CertificateHash") && S_OK == WcaTableExists(L"Wix4IIsWebSiteCertificates"))
     {
         hr = WcaWrapQuery(vcsSslCertificateQuery, &pwzCustomActionData, 0, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap SslCertificate query");
@@ -219,7 +219,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebLogQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebLog"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebLog"))
     {
         hr = WcaWrapQuery(vcsWebLogQuery, &pwzCustomActionData, efmcColumn2, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebLog query");
@@ -231,7 +231,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebApplicationQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebApplication"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebApplication"))
     {
         hr = WcaWrapQuery(vcsWebApplicationQuery, &pwzCustomActionData, efmcColumn1, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebApplication query");
@@ -243,7 +243,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebAppExtensionQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebApplicationExtension"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebApplicationExtension"))
     {
         hr = WcaWrapQuery(vcsWebAppExtensionQuery, &pwzCustomActionData, efmcColumn2 | efmcColumn3, 0xFFFFFFFF, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebApplicationExtension query");
@@ -255,7 +255,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebQuery, vcsWebAddressQuery, and vcsWebBaseQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebAddress") && S_OK == WcaTableExists(L"IIsWebSite"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebAddress") && S_OK == WcaTableExists(L"Wix4IIsWebSite"))
     {
         hr = WcaWrapQuery(vcsWebQuery, &pwzCustomActionData, efmcColumn3 | efmcColumn4 | efmcColumn12 | efmcColumn13 | efmcColumn14, 2, 6);
         ExitOnFailure(hr, "Failed to wrap IIsWebSite query");
@@ -279,7 +279,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsWebDirQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebDir"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebDir"))
     {
         hr = WcaWrapQuery(vcsWebDirQuery, &pwzCustomActionData, efmcColumn4, 3, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsWebDir query");
@@ -291,7 +291,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsVDirQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsWebVirtualDir"))
+    if (S_OK == WcaTableExists(L"Wix4IIsWebVirtualDir"))
     {
         hr = WcaWrapQuery(vcsVDirQuery, &pwzCustomActionData, efmcColumn4, 3, 5);
         ExitOnFailure(hr, "Failed to wrap IIsWebVirtualDir query");
@@ -303,7 +303,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsFilterQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsFilter"))
+    if (S_OK == WcaTableExists(L"Wix4IIsFilter"))
     {
         hr = WcaWrapQuery(vcsFilterQuery, &pwzCustomActionData, efmcColumn4 | efmcColumn5, 3, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsFilter query");
@@ -315,7 +315,7 @@ extern "C" UINT __stdcall ConfigureIIs(
     }
 
     // Wrap vcsPropertyQuery to send to deferred CA
-    if (S_OK == WcaTableExists(L"IIsProperty"))
+    if (S_OK == WcaTableExists(L"Wix4IIsProperty"))
     {
         hr = WcaWrapQuery(vcsPropertyQuery, &pwzCustomActionData, efmcColumn4, 2, 0xFFFFFFFF);
         ExitOnFailure(hr, "Failed to wrap IIsProperty query");
