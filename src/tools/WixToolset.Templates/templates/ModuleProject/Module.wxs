@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Module Id="$safeprojectname$" Guid="PUT-GUID-HERE" Manufacturer="$company$" Language="0" Version="$version$">
+  <Module Id="$safeprojectname$" Guid="PUT-GUID-HERE" Language="0" Version="$version$">
     <Component Guid='PUT-GUID-HERE' Directory='TARGETDIR'>
         <!-- TODO: Install something more useful than this source code file itself -->
         <File Source="Module.wxs" />
