@@ -3,7 +3,7 @@
 #include "precomp.h"
 // sql queries
 LPCWSTR vcsWebLogQuery7 = L"SELECT `Log`, `Format` "
-                         L"FROM `Wix4IIsWebLog`  WHERE `Log`=?";
+                          L"FROM `Wix4IIsWebLog` WHERE `Log`=?";
 
 enum eWebLogQuery { wlqLog = 1, wlqFormat };
 
