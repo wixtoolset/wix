@@ -1013,6 +1013,7 @@ namespace WixToolset.Converters
             {
                 var xConditions = element.Elements(ConditionElementName).ToList();
                 var comments = new List<XNode>();
+                var conditions = new List<KeyValuePair<string, string>>();
 
                 foreach (var xCondition in xConditions)
                 {
@@ -1021,8 +1022,17 @@ namespace WixToolset.Converters
                         TryGetInnerText(xCondition, out var text, out comments, comments) &&
                         this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
                     {
-                        element.Add(new XAttribute(action + "Condition", text));
+                        conditions.Add(new KeyValuePair<string, string>(action, text));
                     }
+                }
+
+                foreach (var actionCondition in conditions.GroupBy(c => c.Key))
+                {
+                    var conditionValues = actionCondition.Select(c => c.Value).ToList();
+
+                    var finalCondition = (conditionValues.Count == 1) ? conditionValues.Single() : String.Join(" OR ", conditionValues.Select(c => $"({c})"));
+
+                    element.Add(new XAttribute(actionCondition.Key + "Condition", finalCondition));
                 }
 
                 foreach (var xCondition in xConditions)
