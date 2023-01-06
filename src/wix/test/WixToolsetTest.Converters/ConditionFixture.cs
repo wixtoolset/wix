@@ -55,6 +55,49 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void FixDoubleControlCondition()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <UI>",
+                "      <Dialog Id='Dlg1'>",
+                "        <Control Id='Control1'>",
+                "          <Condition Action='hide'>x=y</Condition>",
+                "          <Condition Action='hide'>a&lt;>b</Condition>",
+                "        </Control>",
+                "      </Dialog>",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <UI>",
+                "      <Dialog Id=\"Dlg1\">",
+                "        <Control Id=\"Control1\" HideCondition=\"(x=y) OR (a&lt;&gt;b)\" />",
+                "      </Dialog>",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
         public void FixControlConditionWithComment()
         {
             var parse = String.Join(Environment.NewLine,
