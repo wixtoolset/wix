@@ -47,25 +47,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);NU1702</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <AssetTargetFallback>$(AssetTargetFallback);net7.0-windows7.0;net7.0-windows;net7.0;net6.0-windows7.0;net6.0-windows;net6.0;net5.0-windows7.0;net5.0-windows;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.0;net462;net47;net471;net472;net48;native</AssetTargetFallback>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
-
-  <ItemDefinitionGroup>
-    <ProjectReference>
-      <Private>false</Private>
-    </ProjectReference>
-    <None>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemDefinitionGroup>
 
   <ImportGroup>
     <Import Project="$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportAfter\*" Condition="'$(ImportUserLocationsByWildcardAfterWixToolsetProps)' != 'false' and Exists('$(MSBuildUserExtensionsPath)\WixToolset\$(WixToolsetMajorMinorVersion)\Imports\WixToolset.props\ImportAfter')" />
