@@ -109,6 +109,21 @@
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
   </PropertyGroup>
 
+  <ItemDefinitionGroup>
+    <!-- Customize project references to not attempt assembly reference resolution. -->
+    <ProjectReference>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+      <OutputItemType>_WixResolvedProjectReference</OutputItemType>
+    </ProjectReference>
+
+    <!-- By default do not copy none items to output. -->
+    <None>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemDefinitionGroup>
+
   <PropertyGroup>
     <!--
     Only Package, Module and Bundle output types create .wixpdbs, so reset the flag indicating symbols will be produced outside of those output types.
@@ -268,7 +283,7 @@
     @(_MSBuildProjectReferenceExistent) - References to projects that exist.
 
     [OUT]
-    @(_ResolvedProjectReferencePaths) - Target paths from .vcxproj outputs added.
+    @(_WixResolvedProjectReference) - Target paths from .vcxproj outputs added.
     ================================================================================================
     -->
   <Target
@@ -281,7 +296,7 @@
       Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration);%(_MSBuildProjectReferenceExistent.SetPlatform)"
       Condition=" '@(ProjectReferenceWithConfiguration)' != '' and '%(_MSBuildProjectReferenceExistent.Extension)' == '.vcxproj' ">
 
-      <Output TaskParameter="TargetOutputs" ItemName="_ResolvedProjectReferencePaths" />
+      <Output TaskParameter="TargetOutputs" ItemName="_WixResolvedProjectReference" />
     </MSBuild>
   </Target>
 
@@ -289,23 +304,23 @@
     ================================================================================================
                                         _ConvertResolvedProjectReferencesIntoWixConstructs
 
-    Converts _ResolvedProjectReferencePaths (which are the outputs of the ProjectReferences that
+    Converts _WixResolvedProjectReference (which are the outputs of the ProjectReferences that
     normally would be passed through ResolveAssemblyReferences then be passed to the C# compiler
     as references) into the appropriate WiX constructs. For example, references to .wixlibs are
-    converted into WixLibrary items. In the end, _ResolvedProjectReferencePaths is emptied to
+    converted into WixLibrary items. In the end, _WixResolvedProjectReference is emptied to
     prevent ResolveAssemblyReferences and other non-sensical targets (from a WiX point of view)
     from doing work.
 
     [IN]
-    @(_ResolvedProjectReferencePaths) - Resolved project references.
+    @(_WixResolvedProjectReference) - Resolved project references.
     $(VSProjectConfigurations) - map of project names to configurations, provided by VS when building in the IDE.
 
     [OUT]
     $(ProjectReferenceDefineConstants) - Define constants from project references.
     @(BindPath) - Bind paths from project references.
     @(WixLibrary) - Target paths from .vcxproj outputs added.
-    @(_WixReferencedProjectOutputs) - Copy of _ResolvedProjectReferencePaths for use in up-to-date checks.
-    @(_ResolvedProjectReferencePaths) - All resolved reference paths emptied.
+    @(_WixReferencedProjectOutputs) - Copy of _WixResolvedProjectReference for use in up-to-date checks.
+    @(_WixResolvedProjectReference) - All resolved reference paths emptied.
     ================================================================================================
     -->
   <PropertyGroup>
@@ -314,21 +329,21 @@
   <Target
       Name="_ConvertResolvedProjectReferencesIntoWixConstructs"
       DependsOnTargets="$(_CreateProjectDefineConstantsDependsOn)"
-      Condition=" '@(_ResolvedProjectReferencePaths)' != '' ">
+      Condition=" '@(_WixResolvedProjectReference)' != '' ">
 
     <!-- Save all the project reference outputs before we start removing -->
     <ItemGroup>
-      <_WixReferencedProjectOutputs Include="@(_ResolvedProjectReferencePaths)" />
+      <_WixReferencedProjectOutputs Include="@(_WixResolvedProjectReference)" />
     </ItemGroup>
 
     <ItemGroup>
-      <WixLibrary Include="@(_ResolvedProjectReferencePaths)" Condition=" '%(Extension)' == '.wixlib' " />
-      <_ResolvedProjectReferencePaths Remove="@(WixLibrary)" />
+      <WixLibrary Include="@(_WixResolvedProjectReference)" Condition=" '%(Extension)' == '.wixlib' " />
+      <_WixResolvedProjectReference Remove="@(WixLibrary)" />
     </ItemGroup>
 
     <!-- Convert resolved project references into compiler defines and named and unamed bind paths -->
     <CreateProjectReferenceDefineConstantsAndBindPaths
-        ResolvedProjectReferences="@(_ResolvedProjectReferencePaths)"
+        ResolvedProjectReferences="@(_WixResolvedProjectReference)"
         ProjectConfigurations="$(VSProjectConfigurations)">
       <Output TaskParameter="BindPaths" ItemName="BindPath" />
       <Output TaskParameter="DefineConstants" PropertyName="ProjectReferenceDefineConstants" />
@@ -339,7 +354,7 @@
       behavior from kicking in
     -->
     <ItemGroup>
-      <_ResolvedProjectReferencePaths Remove="@(_ResolvedProjectReferencePaths)" />
+      <_WixResolvedProjectReference Remove="@(_WixResolvedProjectReference)" />
     </ItemGroup>
   </Target>
 
@@ -358,7 +373,7 @@
 
     [IN]
     @(WixLibrary) - the list of .wixlib files.
-    @(_ResolvedProjectReferencePaths) - resolved project references.
+    @(_WixResolvedProjectReference) - resolved project references.
     $(WixLibrarySearchPaths) - optional search paths used to find .wixlibs.
 
     [OUT]
