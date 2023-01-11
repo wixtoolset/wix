@@ -6229,7 +6229,7 @@ static HRESULT LoadControls(
             }
 
             wzWindowClass = vhModuleMsftEdit ? MSFTEDIT_CLASS : RICHEDIT_CLASSW;
-            dwWindowBits |= ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL | ES_READONLY;
+            dwWindowBits |= ES_SAVESEL | ES_MULTILINE | WS_VSCROLL | ES_READONLY;
             break;
 
         case THEME_CONTROL_TYPE_STATIC:
