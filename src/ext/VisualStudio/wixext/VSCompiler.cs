@@ -76,7 +76,7 @@ namespace WixToolset.VisualStudio
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4VSFindInstances", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4VSFindInstances", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
         }
 
         private void ParseVsixPackageElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
