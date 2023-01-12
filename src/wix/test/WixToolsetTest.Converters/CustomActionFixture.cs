@@ -18,19 +18,21 @@ namespace WixToolsetTest.Converters
             var parse = String.Join(Environment.NewLine,
                 "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <CustomAction Id='Foo' BinaryKey='WixCA' DllEntry='CAQuietExec' />",
-                "  <CustomAction Id='Foo' BinaryKey='WixCA_x64' DllEntry='CAQuietExec64' />",
-                "  <CustomAction Id='Foo' BinaryKey='UtilCA' DllEntry='WixQuietExec' />",
-                "  <CustomAction Id='Foo' BinaryKey='UtilCA_x64' DllEntry='WixQuietExec64' />",
+                "  <CustomAction Id='Foo1' BinaryKey='WixCA' DllEntry='CAQuietExec' />",
+                "  <CustomAction Id='Foo2' BinaryKey='WixCA_x64' DllEntry='CAQuietExec64' />",
+                "  <CustomAction Id='Foo3' BinaryKey='UtilCA' DllEntry='WixQuietExec' />",
+                "  <CustomAction Id='Foo4' BinaryKey='UtilCA_x64' DllEntry='WixQuietExec64' />",
+                "  <CustomAction Id='Foo5' BinaryKey='WixCA' DllEntry='CAQuietExec64' Execute='deferred' Return='check' Impersonate='no' />",
                 "</Wix>");
 
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
-                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
-                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
-                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
+                "  <CustomAction Id=\"Foo1\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
+                "  <CustomAction Id=\"Foo2\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
+                "  <CustomAction Id=\"Foo3\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
+                "  <CustomAction Id=\"Foo4\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
+                "  <CustomAction Id=\"Foo5\" DllEntry=\"WixQuietExec64\" Execute=\"deferred\" Return=\"check\" Impersonate=\"no\" BinaryRef=\"Wix4UtilCA_X86\" />",
                 "</Wix>",
             };
 
@@ -43,8 +45,8 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentLines(document);
 
-            Assert.Equal(11, errors);
             WixAssert.CompareLineByLine(expected, actual);
+            Assert.Equal(14, errors);
         }
 
         [Fact]
