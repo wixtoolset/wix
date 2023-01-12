@@ -1,12 +1,11 @@
 <Project>
   <Import Project="$(WixMSBuildProps)" />
+
   <PropertyGroup>
     <WixVariables>DataFolderVar=data</WixVariables>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Package.wxs" />
-
     <BindVariable Include="VersionVar=1.2.3" />
   </ItemGroup>
 

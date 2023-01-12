@@ -6,17 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Package.wxs" />
-    <Compile Include="PackageComponents.wxs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Package.en-us.wxl" />
-    <EmbeddedResource Include="Package.en.wxl" />
-    <EmbeddedResource Include="Package.de-de.wxl" />
-  </ItemGroup>
-
-  <ItemGroup>
     <BindInputPaths Include="data" />
   </ItemGroup>
 

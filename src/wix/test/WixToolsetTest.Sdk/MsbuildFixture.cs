@@ -12,7 +12,7 @@ namespace WixToolsetTest.Sdk
     public class MsbuildFixture
     {
         public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).LocalPath), "..", "..", "..", "publish", "WixToolset.Sdk");
-        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
+        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "Sdk", "Sdk.props");
 
         [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk)]
@@ -63,7 +63,7 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildUncompressedBundle(BuildSystem buildSystem)
         {
-            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage");
+            var sourceFolder = TestData.Get("TestData", "SimpleMsiPackage");
 
             using (var fs = new TestDataFolderFileSystem())
             {
@@ -106,7 +106,7 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMergeModule(BuildSystem buildSystem)
         {
-            var sourceFolder = TestData.Get(@"TestData\MergeModule\SimpleMergeModule");
+            var sourceFolder = TestData.Get("TestData", "MergeModule", "SimpleMergeModule");
 
             using (var fs = new TestDataFolderFileSystem())
             {
@@ -199,7 +199,7 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithMergeModule(BuildSystem buildSystem)
         {
-            var sourceFolder = TestData.Get(@"TestData\MergeModule");
+            var sourceFolder = TestData.Get(@"TestData", "MergeModule");
 
             using (var fs = new TestDataFolderFileSystem())
             {
@@ -390,7 +390,7 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildMsiPackageWithIceSuppressions(BuildSystem buildSystem)
         {
-            var sourceFolder = TestData.Get(@"TestData\MsiPackageWithIceError\MsiPackage");
+            var sourceFolder = TestData.Get("TestData", "MsiPackageWithIceError", "MsiPackage");
 
             using (var fs = new TestDataFolderFileSystem())
             {
@@ -414,7 +414,7 @@ namespace WixToolsetTest.Sdk
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithWarningSuppressions(BuildSystem buildSystem)
         {
-            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+            var sourceFolder = TestData.Get("TestData", "SimpleMsiPackage", "MsiPackage");
 
             using (var fs = new TestDataFolderFileSystem())
             {
@@ -738,7 +738,7 @@ namespace WixToolsetTest.Sdk
 
         private void AssertWixpdb(BuildSystem buildSystem, string debugType, string[] expectedOutputFiles)
         {
-            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+            var sourceFolder = TestData.Get("TestData", "SimpleMsiPackage", "MsiPackage");
 
             using (var fs = new TestDataFolderFileSystem())
             {

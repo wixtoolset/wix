@@ -6,10 +6,6 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <ProjectGuid>7fb77005-c6e0-454f-8c2d-0a4a79c918ba</ProjectGuid>
-  </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformName>$(Platform)</PlatformName>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
@@ -30,16 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Package.wxs" />
-    <Compile Include="PackageComponents.wxs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Package.en-us.wxl" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <BindInputPaths Include="data" />
+    <BindPath Include="data" />
   </ItemGroup>
 
   <Import Project="$(WixTargetsPath)" />
