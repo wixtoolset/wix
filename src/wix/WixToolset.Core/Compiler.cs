@@ -3502,9 +3502,14 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.IllegalPropertyCustomActionAttributes(sourceLineNumbers));
             }
 
-            if (!targetType.HasValue /*0 == targetBits*/)
+            if (!targetType.HasValue)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+            }
+
+            if (!sourceType.HasValue)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "BinaryRef", "Directory", "Error", "FileRef", "Property", "Script"));
             }
 
             this.Core.ParseForExtensionElements(node);
