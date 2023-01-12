@@ -1532,13 +1532,6 @@ namespace WixToolset.Converters
                     newElementName = "QueryNativeMachine";
                     break;
                 case "VS2017_ROOT_FOLDER":
-                case "VS2017DEVENV":
-                case "VS2017_EXTENSIONS_DIR":
-                case "VS2017_ITEMTEMPLATES_DIR":
-                case "VS2017_PROJECTTEMPLATES_DIR":
-                case "VS2017_SCHEMAS_DIR":
-                case "VS2017_IDE_DIR":
-                case "VS2017_BOOTSTRAPPER_PACKAGE_FOLDER":
                 case "VS2017_IDE_FSHARP_PROJECTSYSTEM_INSTALLED":
                 case "VS2017_IDE_VB_PROJECTSYSTEM_INSTALLED":
                 case "VS2017_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED":
@@ -1547,13 +1540,6 @@ namespace WixToolset.Converters
                 case "VS2017_IDE_VWD_PROJECTSYSTEM_INSTALLED":
                 case "VS2017_IDE_MODELING_PROJECTSYSTEM_INSTALLED":
                 case "VS2019_ROOT_FOLDER":
-                case "VS2019DEVENV":
-                case "VS2019_EXTENSIONS_DIR":
-                case "VS2019_ITEMTEMPLATES_DIR":
-                case "VS2019_PROJECTTEMPLATES_DIR":
-                case "VS2019_SCHEMAS_DIR":
-                case "VS2019_IDE_DIR":
-                case "VS2019_BOOTSTRAPPER_PACKAGE_FOLDER":
                 case "VS2019_IDE_FSHARP_PROJECTSYSTEM_INSTALLED":
                 case "VS2019_IDE_VB_PROJECTSYSTEM_INSTALLED":
                 case "VS2019_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED":
@@ -1562,13 +1548,6 @@ namespace WixToolset.Converters
                 case "VS2019_IDE_VWD_PROJECTSYSTEM_INSTALLED":
                 case "VS2019_IDE_MODELING_PROJECTSYSTEM_INSTALLED":
                 case "VS2022_ROOT_FOLDER":
-                case "VS2022DEVENV":
-                case "VS2022_EXTENSIONS_DIR":
-                case "VS2022_ITEMTEMPLATES_DIR":
-                case "VS2022_PROJECTTEMPLATES_DIR":
-                case "VS2022_SCHEMAS_DIR":
-                case "VS2022_IDE_DIR":
-                case "VS2022_BOOTSTRAPPER_PACKAGE_FOLDER":
                 case "VS2022_IDE_FSHARP_PROJECTSYSTEM_INSTALLED":
                 case "VS2022_IDE_VB_PROJECTSYSTEM_INSTALLED":
                 case "VS2022_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED":
@@ -1576,6 +1555,33 @@ namespace WixToolset.Converters
                 case "VS2022_IDE_VC_PROJECTSYSTEM_INSTALLED":
                 case "VS2022_IDE_VWD_PROJECTSYSTEM_INSTALLED":
                 case "VS2022_IDE_MODELING_PROJECTSYSTEM_INSTALLED":
+                    newElementName = "FindVisualStudio";
+                    newNamespace = WixVSNamespace;
+                    newNamespaceName = "vs";
+                    break;
+                case "VS2017DEVENV":
+                case "VS2017_EXTENSIONS_DIR":
+                case "VS2017_ITEMTEMPLATES_DIR":
+                case "VS2017_PROJECTTEMPLATES_DIR":
+                case "VS2017_SCHEMAS_DIR":
+                case "VS2017_IDE_DIR":
+                case "VS2017_BOOTSTRAPPER_PACKAGE_FOLDER":
+                case "VS2019DEVENV":
+                case "VS2019_EXTENSIONS_DIR":
+                case "VS2019_ITEMTEMPLATES_DIR":
+                case "VS2019_PROJECTTEMPLATES_DIR":
+                case "VS2019_SCHEMAS_DIR":
+                case "VS2019_IDE_DIR":
+                case "VS2019_BOOTSTRAPPER_PACKAGE_FOLDER":
+                case "VS2022DEVENV":
+                case "VS2022_EXTENSIONS_DIR":
+                case "VS2022_ITEMTEMPLATES_DIR":
+                case "VS2022_PROJECTTEMPLATES_DIR":
+                case "VS2022_SCHEMAS_DIR":
+                case "VS2022_IDE_DIR":
+                case "VS2022_BOOTSTRAPPER_PACKAGE_FOLDER":
+                    // These PropertyRefs need to stay (in addition to the `FindVisualStudio`
+                    // addition) because they're constructed from deeper AppSearches.
                     newElementName = "FindVisualStudio";
                     newNamespace = WixVSNamespace;
                     newNamespaceName = "vs";

@@ -27,7 +27,7 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:vs=\"http://wixtoolset.org/schemas/v4/wxs/vs\">",
                 "  <Fragment>",
-                "    <vs:FindVisualStudio /><PropertyRef Id=\"VS2019_ROOT_FOLDER\" />",
+                "    <vs:FindVisualStudio />",
                 "    <vs:FindVisualStudio /><PropertyRef Id=\"VS2022_BOOTSTRAPPER_PACKAGE_FOLDER\" />",
                 "    <CustomActionRef Id=\"VS2017Setup\" />",
                 "  </Fragment>",

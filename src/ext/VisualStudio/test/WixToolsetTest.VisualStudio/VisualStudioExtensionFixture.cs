@@ -6,6 +6,7 @@ namespace WixToolsetTest.VisualStudio
     using WixInternal.Core.TestPackage;
     using WixToolset.VisualStudio;
     using Xunit;
+    using System.Linq;
 
     public class VisualStudioExtensionFixture
     {
@@ -35,10 +36,46 @@ namespace WixToolsetTest.VisualStudio
             }, results);
         }
 
+        [Fact]
+        public void CanBuildUsingVsixPackageOnArm64()
+        {
+            var folder = TestData.Get(@"TestData\UsingVsixPackage");
+            var build = new Builder(folder, typeof(VSExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildARM64, "CustomAction");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:SetVS2010Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2010_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2012Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2012_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2013Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2013_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2015Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2015_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:vimLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3122\tVS_VSIX_INSTALLER_PATH\t/q  \"[#filzi8nwT8Ta133xcfp7qSIdGdRiC0]\" /admin\t",
+                "CustomAction:viuMpl8IvFSDAzTulrmpAzBwAmCRTQ\t1074\tVS_VSIX_INSTALLER_PATH\t/q  \"[#filzi8nwT8Ta133xcfp7qSIdGdRiC0]\"\t",
+                "CustomAction:vrmLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3442\tVS_VSIX_INSTALLER_PATH\t/q  /u:\"ExampleVsix\" /admin\t",
+                "CustomAction:vruMpl8IvFSDAzTulrmpAzBwAmCRTQ\t1394\tVS_VSIX_INSTALLER_PATH\t/q  /u:\"ExampleVsix\"\t",
+                "CustomAction:vumLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3186\tVS_VSIX_INSTALLER_PATH\t/q  /u:\"ExampleVsix\" /admin\t",
+                "CustomAction:vuuMpl8IvFSDAzTulrmpAzBwAmCRTQ\t1138\tVS_VSIX_INSTALLER_PATH\t/q  /u:\"ExampleVsix\"\t",
+                "CustomAction:Vwd2012VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2012_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
+                "CustomAction:Vwd2013VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2013_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
+                "CustomAction:Vwd2015VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2015_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
+                "CustomAction:Wix4VSFindInstances_A64\t257\tVSCA_A64\tFindInstances\t",
+            }, results);
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args)
                                   .AssertSuccess();
+        }
+
+        private static void BuildARM64(string[] args)
+        {
+            var newArgs = args.ToList();
+            newArgs.Add("-platform");
+            newArgs.Add("arm64");
+
+            var result = WixRunner.Execute(newArgs.ToArray());
+            result.AssertSuccess();
         }
     }
 }
