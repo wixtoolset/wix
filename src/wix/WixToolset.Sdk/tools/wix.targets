@@ -40,6 +40,15 @@
     <AvailableItemName Include="BindPath;BindVariable;WixLibrary;WixExtension" />
   </ItemGroup>
 
+  <UsingTask TaskName="CreateItemAvoidingInference" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="UpdateProjectReferenceMetadata" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixAssignCulture" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ReadTracking" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixBuild" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WindowsInstallerValidation" AssemblyFile="$(WixTasksPath)" />
+
   <!--
   ***********************************************************************************************
   ***********************************************************************************************
@@ -151,15 +160,6 @@
   ***********************************************************************************************
   ***********************************************************************************************
   -->
-
-  <UsingTask TaskName="CreateItemAvoidingInference" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="UpdateProjectReferenceMetadata" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="WixAssignCulture" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="ReadTracking" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="WixBuild" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="WindowsInstallerValidation" AssemblyFile="$(WixTasksPath)" />
 
   <!--
   ***********************************************************************************************
