@@ -3072,8 +3072,8 @@ namespace WixToolset.Util
             var newService = false;
             string programCommandLine = null;
             string rebootMessage = null;
-            var resetPeriod = CompilerConstants.IntegerNotSet;
-            var restartServiceDelay = CompilerConstants.IntegerNotSet;
+            int? resetPeriod = null;
+            int? restartServiceDelay = null;
             string secondFailureActionType = null;
             string serviceName = null;
             string thirdFailureActionType = null;
