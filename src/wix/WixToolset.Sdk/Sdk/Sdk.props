@@ -3,6 +3,7 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <WixSdkPropsImported>true</WixSdkPropsImported>
     <WixPropsPath Condition=" '$(WixPropsPath)' == '' ">$([MSBuild]::NormalizePath($(MSBuildThisFileDirectory), '..\tools\wix.props'))</WixPropsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$([MSBuild]::NormalizePath($(MSBuildThisFileDirectory), '..\tools\wix.targets'))</WixTargetsPath>
   </PropertyGroup>

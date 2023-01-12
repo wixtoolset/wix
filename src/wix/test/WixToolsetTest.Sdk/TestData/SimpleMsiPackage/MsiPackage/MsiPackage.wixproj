@@ -30,15 +30,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Package.wxs" />
-    <Compile Include="PackageComponents.wxs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Package.en-us.wxl" />
-  </ItemGroup>
-
-  <ItemGroup>
     <BindInputPaths Include="data" />
   </ItemGroup>
 

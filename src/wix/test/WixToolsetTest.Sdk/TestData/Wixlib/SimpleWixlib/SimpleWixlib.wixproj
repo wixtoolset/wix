@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Library.wxs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <BindPath Include="data" />
   </ItemGroup>
 
