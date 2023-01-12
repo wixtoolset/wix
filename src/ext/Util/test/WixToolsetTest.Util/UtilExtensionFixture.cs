@@ -171,6 +171,23 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanBuildServiceConfig()
+        {
+            var folder = TestData.Get(@"TestData", "ServiceConfig");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder }, "test.msi");
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "ServiceConfig", "Wix4ServiceConfig");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:Wix4UtilCA_X64\t[Binary data]",
+                "CustomAction:Wix4ExecServiceConfig_X64\t3073\tWix4UtilCA_X64\tExecServiceConfig\t",
+                "CustomAction:Wix4RollbackServiceConfig_X64\t3329\tWix4UtilCA_X64\tRollbackServiceConfig\t",
+                "CustomAction:Wix4SchedServiceConfig_X64\t1\tWix4UtilCA_X64\tSchedServiceConfig\t",
+                "Wix4ServiceConfig:svc\tfilPeUUVRrj2.Q_YcmN55mro4H1aQY\t1\trestart\trestart\trestart\t\t\t\t",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildWithEventManifest()
         {
             var folder = TestData.Get(@"TestData\EventManifest");

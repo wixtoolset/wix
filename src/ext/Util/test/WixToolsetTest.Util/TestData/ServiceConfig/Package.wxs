@@ -1,0 +1,27 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="A downgrade error message." />
+
+        <Feature Id="ProductFeature" Title="A feature title">
+            <ComponentGroupRef Id="ProductComponents" />
+        </Feature>
+    </Package>
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Name="notanexe.exe" Source="Package.wxs" />
+                <ServiceInstall Name="svc" Start="demand" Type="ownProcess" ErrorControl="normal">
+                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+                </ServiceInstall>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
