@@ -31,6 +31,7 @@ namespace WixToolset.Core
             var productCode = "*";
             string productLanguage = null;
             var isPerMachine = true;
+            var isPerUserOrMachine = false;
             string upgradeCode = null;
             string manufacturer = null;
             string version = null;
@@ -90,6 +91,10 @@ namespace WixToolset.Core
                             case "perUser":
                                 isPerMachine = false;
                                 sourceBits |= 8;
+                                break;
+                            case "perUserOrMachine":
+                                isPerMachine = false;
+                                isPerUserOrMachine = true;
                                 break;
                             default:
                                 this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
@@ -169,7 +174,12 @@ namespace WixToolset.Core
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "UpgradeCode"), upgradeCode, false, false, false, true);
                 }
 
-                if (isPerMachine)
+                if (isPerUserOrMachine)
+                {
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "2", false, false, false, false);
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "MSIINSTALLPERUSER"), "1", false, false, false, false);
+                }
+                else if (isPerMachine)
                 {
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "1", false, false, false, false);
                 }
