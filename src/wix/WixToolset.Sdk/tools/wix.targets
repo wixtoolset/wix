@@ -245,7 +245,7 @@
     @(_MSBuildProjectReferenceExistent) - References to projects that exist.
 
     [OUT]
-    @(_MSBuildProjectReferenceExistent) - Updated project references.
+    @(_MSBuildProjectReferenceExistent) - Project references updated as necessary.
     ================================================================================================
     -->
   <Target
@@ -256,19 +256,12 @@
     <UpdateProjectReferenceMetadata
         ProjectReferences="@(_MSBuildProjectReferenceExistent)"
         IntermediateFolder="$(IntermediateOutputPath)">
-      <Output TaskParameter="UpdatedProjectReferences" ItemName="_WixPublishProjectReferences" />
+      <Output TaskParameter="UpdatedProjectReferences" ItemName="_WixUpdatedProjectReferences" />
     </UpdateProjectReferenceMetadata>
 
     <ItemGroup>
-      <_MSBuildProjectReferenceExistent Remove='@(_WixPublishProjectReferences)' />
-      <_MSBuildProjectReferenceExistent Include='@(_WixPublishProjectReferences)' />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_MSBuildProjectReferenceExistent Condition="'%(_MSBuildProjectReferenceExistent.SetTargetFramework)' == ''">
-        <SkipGetTargetFrameworkProperties Condition="'$(EnableDynamicPlatformResolution)' != 'true'">true</SkipGetTargetFrameworkProperties>
-        <UndefineProperties>%(_MSBuildProjectReferenceExistent.UndefineProperties);TargetFramework</UndefineProperties>
-      </_MSBuildProjectReferenceExistent>
+      <_MSBuildProjectReferenceExistent Remove='@(_WixUpdatedProjectReferences)' />
+      <_MSBuildProjectReferenceExistent Include='@(_WixUpdatedProjectReferences)' />
     </ItemGroup>
   </Target>
 
