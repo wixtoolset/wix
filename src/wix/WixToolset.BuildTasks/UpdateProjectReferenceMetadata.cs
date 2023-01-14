@@ -5,6 +5,7 @@ namespace WixToolset.BuildTasks
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
@@ -13,6 +14,8 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public class UpdateProjectReferenceMetadata : Task
     {
+        private static readonly char[] TargetFrameworksSplitter = new char[] { ',', ';' };
+
         /// <summary>
         /// The list of project references that exist.
         /// </summary>
@@ -26,40 +29,101 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] UpdatedProjectReferences { get; private set; }
 
         /// <summary>
-        /// Finds all project references requesting publishing and updates them to publish instead of build.
+        /// Finds all project references requesting publishing and updates them to publish instead of build and
+        /// sets target framework if requested.
         /// </summary>
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            var publishProjectReferences = new List<ITaskItem>();
+            var updatedProjectReferences = new List<ITaskItem>();
             var intermediateFolder = Path.GetFullPath(this.IntermediateFolder);
 
             foreach (var projectReference in this.ProjectReferences)
             {
-                var publish = projectReference.GetMetadata("Publish");
-                var publishDir = projectReference.GetMetadata("PublishDir");
+                var additionalProjectReferences = new List<ITaskItem>();
 
-                if (publish.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                    (String.IsNullOrWhiteSpace(publish) && !String.IsNullOrWhiteSpace(publishDir)))
+                var updatedProjectReference = this.TrySetTargetFrameworksOnProjectReference(projectReference, additionalProjectReferences);
+
+                if (this.TryAddPublishPropertiesToProjectReference(projectReference, intermediateFolder))
                 {
-                    publishDir = String.IsNullOrWhiteSpace(publishDir) ? this.CalculatePublishDirFromProjectReference(projectReference, intermediateFolder) : Path.GetFullPath(publishDir);
+                    foreach (var additionalProjectReference in additionalProjectReferences)
+                    {
+                        this.TryAddPublishPropertiesToProjectReference(additionalProjectReference, intermediateFolder);
+                    }
 
-                    this.AddPublishPropertiesToProjectReference(projectReference, publishDir);
-
-                    publishProjectReferences.Add(projectReference);
+                    updatedProjectReference = true;
                 }
+
+                if (updatedProjectReference)
+                {
+                    updatedProjectReferences.Add(projectReference);
+                }
+
+                updatedProjectReferences.AddRange(additionalProjectReferences);
             }
 
-            this.UpdatedProjectReferences = publishProjectReferences.ToArray();
+            this.UpdatedProjectReferences = updatedProjectReferences.ToArray();
 
             return true;
         }
 
-        private string CalculatePublishDirFromProjectReference(ITaskItem projectReference, string intermediateFolder)
+        private bool TryAddPublishPropertiesToProjectReference(ITaskItem projectReference, string intermediateFolder)
         {
-            var publishDir = Path.Combine("publish", Path.GetFileNameWithoutExtension(projectReference.ItemSpec));
+            var publish = projectReference.GetMetadata("Publish");
+            var publishDir = projectReference.GetMetadata("PublishDir");
 
-            return Path.Combine(intermediateFolder, publishDir);
+            if (publish.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                (String.IsNullOrWhiteSpace(publish) && !String.IsNullOrWhiteSpace(publishDir)))
+            {
+                if (String.IsNullOrWhiteSpace(publishDir))
+                {
+                    publishDir = CalculatePublishDirFromProjectReference(projectReference, intermediateFolder);
+                }
+
+                publishDir = AppendTargetFrameworkFromProjectReference(projectReference, publishDir);
+
+                publishDir = Path.GetFullPath(publishDir);
+
+                this.AddPublishPropertiesToProjectReference(projectReference, publishDir);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TrySetTargetFrameworksOnProjectReference(ITaskItem projectReference, List<ITaskItem> additionalProjectReferences)
+        {
+            var setTargetFramework = projectReference.GetMetadata("SetTargetFramework");
+            var targetFrameworks = projectReference.GetMetadata("TargetFrameworks");
+            var targetFrameworksToSet = targetFrameworks.Split(TargetFrameworksSplitter).Where(s => !String.IsNullOrWhiteSpace(s)).ToList();
+
+            if (String.IsNullOrWhiteSpace(setTargetFramework) && targetFrameworksToSet.Count > 0)
+            {
+                // First, clone the project reference so there are enough duplicates for all of the
+                // requested target frameworks.
+                for (var i = 1; i < targetFrameworksToSet.Count; ++i)
+                {
+                    additionalProjectReferences.Add(new TaskItem(projectReference));
+                }
+
+                // Then set the target framework on each project reference.
+                for (var i = 0; i < targetFrameworksToSet.Count; ++i)
+                {
+                    var reference = (i == 0) ? projectReference : additionalProjectReferences[i - 1];
+
+                    this.SetTargetFrameworkOnProjectReference(reference, targetFrameworksToSet[i]);
+                }
+
+                return true;
+            }
+
+            if (!String.IsNullOrWhiteSpace(setTargetFramework) && !String.IsNullOrWhiteSpace(targetFrameworks))
+            {
+                this.Log.LogWarning("ProjectReference {0} contains metadata for both SetTargetFramework and TargetFrameworks. SetTargetFramework takes precedent so the TargetFrameworks value '{1}' is ignored", projectReference.ItemSpec, targetFrameworks);
+            }
+
+            return false;
         }
 
         private void AddPublishPropertiesToProjectReference(ITaskItem projectReference, string publishDir)
@@ -90,6 +154,43 @@ namespace WixToolset.BuildTasks
 
             this.Log.LogMessage(MessageImportance.Low, "Adding publish metadata to project reference {0} Targets {1}, BindPath {2}, AdditionalProperties: {3}",
                 projectReference.ItemSpec, projectReference.GetMetadata("Targets"), projectReference.GetMetadata("BindPath"), projectReference.GetMetadata("AdditionalProperties"));
+        }
+
+        private void SetTargetFrameworkOnProjectReference(ITaskItem projectReference, string targetFramework)
+        {
+            projectReference.SetMetadata("SetTargetFramework", $"TargetFramework={targetFramework}");
+
+            var bindName = projectReference.GetMetadata("BindName");
+            if (String.IsNullOrWhiteSpace(bindName))
+            {
+                bindName = Path.GetFileNameWithoutExtension(projectReference.ItemSpec);
+
+                projectReference.SetMetadata("BindName", $"{bindName}.{targetFramework}");
+            }
+
+            this.Log.LogMessage(MessageImportance.Low, "Adding target framework metadata to project reference {0} SetTargetFramework: {1}, BindName: {2}",
+                                projectReference.ItemSpec, projectReference.GetMetadata("SetTargetFramework"), projectReference.GetMetadata("BindName"));
+        }
+
+        private static string CalculatePublishDirFromProjectReference(ITaskItem projectReference, string intermediateFolder)
+        {
+            var publishDir = Path.Combine("publish", Path.GetFileNameWithoutExtension(projectReference.ItemSpec));
+
+            return Path.Combine(intermediateFolder, publishDir);
+        }
+
+        private static string AppendTargetFrameworkFromProjectReference(ITaskItem projectReference, string publishDir)
+        {
+            var setTargetFramework = projectReference.GetMetadata("SetTargetFramework");
+
+            if (setTargetFramework.StartsWith("TargetFramework=") && setTargetFramework.Length > "TargetFramework=".Length)
+            {
+                var targetFramework = setTargetFramework.Substring("TargetFramework=".Length);
+
+                publishDir = Path.Combine(publishDir, targetFramework);
+            }
+
+            return publishDir;
         }
     }
 }

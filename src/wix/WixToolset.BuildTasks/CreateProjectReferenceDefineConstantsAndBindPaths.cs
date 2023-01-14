@@ -152,7 +152,7 @@ namespace WixToolset.BuildTasks
             {
                 if (!targetPath.Equals(oldTargetPath, StringComparison.OrdinalIgnoreCase))
                 {
-                    defineConstants[targetPathDefine] += ";" + targetPath;
+                    defineConstants[targetPathDefine] += "%3B" + targetPath;
                 }
 
                 // If there was only one targetpath we need to create its culture specific define

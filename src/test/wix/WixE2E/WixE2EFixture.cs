@@ -7,12 +7,22 @@ namespace WixE2E
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
-    using System.Threading;
     using WixInternal.TestSupport;
     using Xunit;
 
     public class WixE2EFixture
     {
+        [Fact]
+        public void CanBuildWixlibMultiFramework()
+        {
+            var projectPath = TestData.Get("TestData", "WixprojLibraryMultiFramework", "WixprojLibraryMultiFramework.wixproj");
+
+            CleanEverything();
+
+            var result = RestoreAndBuild(projectPath);
+            result.AssertSuccess();
+        }
+
         [Fact]
         public void CanBuildWixlibWithNativeDll()
         {
