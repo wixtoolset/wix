@@ -210,6 +210,7 @@ namespace WixToolset.Util
                         case "CheckRebootRequired":
                         case "ExitEarlyWithSuccess":
                         case "FailWhenDeferred":
+                        case "QueryNativeMachine":
                         case "QueryWindowsDirectories":
                         case "QueryWindowsDriverInfo":
                         case "QueryWindowsSuiteInfo":
