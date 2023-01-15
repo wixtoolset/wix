@@ -2384,12 +2384,12 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 this.DecompilerHelper.RootElement.SetAttributeValue("Guid", this.ModularizationGuid);
             }
 
-            this.RemoveExtensionDataFromTables(tables);
-
             foreach (var extension in this.Extensions)
             {
                 extension.PreDecompileTables(tables);
             }
+
+            this.RemoveExtensionDataFromTables(tables);
         }
 
         private void RemoveExtensionDataFromTables(TableIndexedCollection tables)

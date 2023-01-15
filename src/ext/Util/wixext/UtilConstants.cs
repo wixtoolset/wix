@@ -11,6 +11,9 @@ namespace WixToolset.Util
     {
         internal static readonly XNamespace Namespace = "http://wixtoolset.org/schemas/v4/wxs/util";
 
+        internal static readonly XName BroadcastEnvironmentChange = Namespace + "BroadcastEnvironmentChange";
+        internal static readonly XName BroadcastSettingChange = Namespace + "BroadcastSettingChange";
+        internal static readonly XName CheckRebootRequired = Namespace + "CheckRebootRequired";
         internal static readonly XName CloseApplicationName = Namespace + "CloseApplication";
         internal static readonly XName EventManifestName = Namespace + "EventManifest";
         internal static readonly XName FileShareName = Namespace + "FileShare";
@@ -21,6 +24,9 @@ namespace WixToolset.Util
         internal static readonly XName PerfCounterName = Namespace + "PerfCounter";
         internal static readonly XName PerfCounterManifestName = Namespace + "PerfCounterManifest";
         internal static readonly XName PermissionExName = Namespace + "PermissionEx";
+        internal static readonly XName QueryNativeMachine = Namespace + "QueryNativeMachine";
+        internal static readonly XName QueryWindowsDriverInfo = Namespace + "QueryWindowsDriverInfo";
+        internal static readonly XName QueryWindowsSuiteInfo = Namespace + "QueryWindowsSuiteInfo";
         internal static readonly XName RemoveFolderExName = Namespace + "RemoveFolderEx";
         internal static readonly XName RestartResourceName = Namespace + "RestartResource";
         internal static readonly XName ServiceConfigName = Namespace + "ServiceConfig";
