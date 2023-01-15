@@ -9,6 +9,7 @@ namespace WixToolsetTest.Util
     using WixInternal.Core.TestPackage;
     using WixToolset.Util;
     using Xunit;
+    using System.Xml.Linq;
 
     public class UtilExtensionFixture
     {
@@ -62,9 +63,20 @@ namespace WixToolsetTest.Util
             var output = Path.Combine(folder, "decompile.xml");
 
             build.BuildAndDecompileAndBuild(Build, Decompile, output);
-            File.Exists(output);
-        }
 
+            var doc = XDocument.Load(output);
+            var utilElementNames = doc.Descendants()
+                .Where(e => e.Name.Namespace == "http://wixtoolset.org/schemas/v4/wxs/util")
+                .Select(e => e.Name.LocalName)
+                .OrderBy(s => s)
+                .ToArray();
+            WixAssert.CompareLineByLine(new[]
+            {
+                "FileShare",
+                "FileSharePermission",
+                "User",
+            }, utilElementNames);
+        }
 
         [Fact]
         public void CanBuildCloseApplication()
@@ -225,9 +237,36 @@ namespace WixToolsetTest.Util
                 "CustomAction:Wix4BroadcastEnvironmentChange_A64\t65\tWix4UtilCA_A64\tWixBroadcastEnvironmentChange\t",
                 "CustomAction:Wix4BroadcastSettingChange_A64\t65\tWix4UtilCA_A64\tWixBroadcastSettingChange\t",
                 "CustomAction:Wix4CheckRebootRequired_A64\t65\tWix4UtilCA_A64\tWixCheckRebootRequired\t",
+                "CustomAction:Wix4QueryNativeMachine_A64\t257\tWix4UtilCA_A64\tWixQueryNativeMachine\t",
                 "CustomAction:Wix4QueryOsDriverInfo_A64\t257\tWix4UtilCA_A64\tWixQueryOsDriverInfo\t",
                 "CustomAction:Wix4QueryOsInfo_A64\t257\tWix4UtilCA_A64\tWixQueryOsInfo\t",
             }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildAndDecompiileQueries()
+        {
+            var folder = TestData.Get(@"TestData\Queries");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+            var output = Path.Combine(folder, "decompile.xml");
+
+            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+
+            var doc = XDocument.Load(output);
+            var utilElementNames = doc.Descendants()
+                .Where(e => e.Name.Namespace == "http://wixtoolset.org/schemas/v4/wxs/util")
+                .Select(e => e.Name.LocalName)
+                .OrderBy(s => s)
+                .ToArray();
+            WixAssert.CompareLineByLine(new[]
+            {
+                "BroadcastEnvironmentChange",
+                "BroadcastSettingChange",
+                "CheckRebootRequired",
+                "QueryNativeMachine",
+                "QueryWindowsDriverInfo",
+                "QueryWindowsSuiteInfo",
+            }, utilElementNames);
         }
 
         [Fact]

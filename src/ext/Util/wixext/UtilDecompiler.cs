@@ -3,16 +3,15 @@
 namespace WixToolset.Util
 {
     using System;
-    using System.IO;
-    using System.Text;
     using System.Collections;
-    using System.Diagnostics;
-
-    using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Data.WindowsInstaller;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
     using System.Xml.Linq;
+    using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility;
     using WixToolset.Util.Symbols;
 
     /// <summary>
@@ -22,14 +21,45 @@ namespace WixToolset.Util
     {
         public override IReadOnlyCollection<TableDefinition> TableDefinitions => UtilTableDefinitions.All;
 
+        private static readonly Dictionary<string, XName> CustomActionMapping = new Dictionary<string, XName>()
+        {
+            {  "Wix4BroadcastEnvironmentChange_X86", UtilConstants.BroadcastEnvironmentChange },
+            {  "Wix4BroadcastEnvironmentChange_X64", UtilConstants.BroadcastEnvironmentChange },
+            {  "Wix4BroadcastEnvironmentChange_ARM64", UtilConstants.BroadcastEnvironmentChange },
+            {  "Wix4BroadcastSettingChange_X86", UtilConstants.BroadcastSettingChange },
+            {  "Wix4BroadcastSettingChange_X64", UtilConstants.BroadcastSettingChange },
+            {  "Wix4BroadcastSettingChange_ARM64", UtilConstants.BroadcastSettingChange },
+            {  "Wix4CheckRebootRequired_X86", UtilConstants.CheckRebootRequired },
+            {  "Wix4CheckRebootRequired_X64", UtilConstants.CheckRebootRequired },
+            {  "Wix4CheckRebootRequired_ARM64", UtilConstants.CheckRebootRequired },
+            {  "Wix4QueryNativeMachine_X86", UtilConstants.QueryNativeMachine },
+            {  "Wix4QueryNativeMachine_X64", UtilConstants.QueryNativeMachine },
+            {  "Wix4QueryNativeMachine_ARM64", UtilConstants.QueryNativeMachine },
+            {  "Wix4QueryOsDriverInfo_X86", UtilConstants.QueryWindowsDriverInfo },
+            {  "Wix4QueryOsDriverInfo_X64", UtilConstants.QueryWindowsDriverInfo },
+            {  "Wix4QueryOsDriverInfo_ARM64", UtilConstants.QueryWindowsDriverInfo },
+            {  "Wix4QueryOsInfo_X86", UtilConstants.QueryWindowsSuiteInfo },
+            {  "Wix4QueryOsInfo_X64", UtilConstants.QueryWindowsSuiteInfo },
+            {  "Wix4QueryOsInfo_ARM64", UtilConstants.QueryWindowsSuiteInfo },
+        };
+
+        private IReadOnlyCollection<string> customActionNames;
+
         /// <summary>
         /// Called at the beginning of the decompilation of a database.
         /// </summary>
         /// <param name="tables">The collection of all tables.</param>
         public override void PreDecompileTables(TableIndexedCollection tables)
         {
+            this.RememberCustomActionNames(tables);
             this.CleanupSecureCustomProperties(tables);
             this.CleanupInternetShortcutRemoveFileTables(tables);
+        }
+
+        private void RememberCustomActionNames(TableIndexedCollection tables)
+        {
+            var customActionTable = tables["CustomAction"];
+            this.customActionNames = customActionTable?.Rows.Select(r => r.GetPrimaryKey()).Distinct().ToList() ?? (IReadOnlyCollection<string>)Array.Empty<string>();
         }
 
         /// <summary>
@@ -195,6 +225,7 @@ namespace WixToolset.Util
         /// <param name="tables">The collection of all tables.</param>
         public override void PostDecompileTables(TableIndexedCollection tables)
         {
+            this.FinalizeCustomActions();
             this.FinalizePerfmonTable(tables);
             this.FinalizePerfmonManifestTable(tables);
             this.FinalizeSecureObjectsTable(tables);
@@ -223,7 +254,7 @@ namespace WixToolset.Util
                     AttributeIfNotNull("RebootPrompt", 0x2 == (attribute & 0x2)),
                     AttributeIfNotNull("ElevatedCloseMessage", 0x4 == (attribute & 0x4)),
                     NumericAttributeIfNotNull("Sequence", row, 5),
-                    NumericAttributeIfNotNull("Property", row, 6)
+                    AttributeIfNotNull("Property", row, 6)
                     );
             }
         }
@@ -379,7 +410,7 @@ namespace WixToolset.Util
                 if (this.DecompilerHelper.TryGetIndexedElement("Wix4FileShare", row.FieldAsString(0), out var fileShare) ||
                     this.DecompilerHelper.TryGetIndexedElement("FileShare", row.FieldAsString(0), out fileShare))
                 {
-                        fileShare.Add(fileSharePermission);
+                    fileShare.Add(fileSharePermission);
                 }
                 else
                 {
@@ -692,6 +723,17 @@ namespace WixToolset.Util
                     );
 
                 this.DecompilerHelper.IndexElement(row, xmlConfig);
+            }
+        }
+
+        private void FinalizeCustomActions()
+        {
+            foreach (var customActionName in this.customActionNames)
+            {
+                if (CustomActionMapping.TryGetValue(customActionName, out var elementName))
+                {
+                    this.DecompilerHelper.AddElementToRoot(elementName);
+                }
             }
         }
 
