@@ -15,6 +15,7 @@ namespace WixToolsetTest.BurnE2E
         [RuntimeFact]
         public void AllowsBAToKeepRegistration()
         {
+            const string fakeInstallDay = "20230101";
             this.CreatePackageInstaller("PackageA");
             var bundleA = this.CreateBundleInstaller("BundleA");
             var testBAController = this.CreateTestBAController();
@@ -35,6 +36,12 @@ namespace WixToolsetTest.BurnE2E
             testBAController.SetForceKeepRegistration(null);
             testBAController.ResetPackageStates("PackageA");
 
+            // Pretend the bundle was installed on this day to be able to verify that it is only written on the initial install.
+            using (var registrationKey = initialRegistration.BaseKey.OpenSubKey(initialRegistration.KeyPath, writable: true))
+            {
+                registrationKey.SetValue(GenericArpRegistration.REGISTRY_ARP_INSTALL_DATE, fakeInstallDay);
+            }
+
             bundleA.Install();
             var finalRegistration = bundleA.VerifyRegisteredAndInPackageCache();
 
@@ -42,7 +49,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.NotNull(finalRegistration.EstimatedSize);
             Assert.InRange(finalRegistration.EstimatedSize.Value, initialRegistration.EstimatedSize.Value + 1, Int32.MaxValue);
 
-            Assert.Equal(initialRegistration.InstallDate, finalRegistration.InstallDate);
+            Assert.Equal(fakeInstallDay, finalRegistration.InstallDate);
         }
 
         [RuntimeFact]

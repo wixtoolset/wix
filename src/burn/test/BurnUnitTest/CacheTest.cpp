@@ -83,7 +83,7 @@ namespace Bootstrapper
                 CacheUninitialize(&cache);
 
                 // Second fallback is system-level %TMP%.
-                hr = RegWriteExpandString(hkSystemEnvironment, L"TMP", L"B:\\TEST\\TMP\\");
+                hr = RegWriteString(hkSystemEnvironment, L"TMP", L"B:\\TEST\\TMP\\");
                 NativeAssert::Succeeded(hr, "Failed to write TEMP system environment value.");
 
                 hr = CacheInitialize(&cache, &internalCommand);
