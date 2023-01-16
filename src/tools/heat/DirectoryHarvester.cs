@@ -177,7 +177,7 @@ namespace WixToolset.Harvesters
             {
                 try
                 {
-                    int fileCount = this.HarvestDirectory(path, "SourceDir\\", harvestParent, generateType);
+                    int fileCount = this.HarvestDirectory(path, "", harvestParent, generateType);
 
                     if (generateType != GenerateType.PayloadGroup)
                     {
@@ -256,7 +256,7 @@ namespace WixToolset.Harvesters
                 foreach (string filePath in Directory.GetFiles(path))
                 {
                     string fileName = Path.GetFileName(filePath);
-                    string source = String.Concat(relativePath, fileName);
+                    string source = String.Concat("SourceDir\\", relativePath, fileName);
 
                     Wix.ISchemaElement newChild;
                     if (generateType == GenerateType.PayloadGroup)
@@ -265,6 +265,11 @@ namespace WixToolset.Harvesters
                         newChild = payload;
 
                         payload.SourceFile = source;
+
+                        if (!String.IsNullOrEmpty(relativePath))
+                        {
+                            payload.Name = String.Concat(relativePath, fileName);
+                        }
                     }
                     else
                     {
