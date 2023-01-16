@@ -904,7 +904,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         else if ((BOOTSTRAPPER_REQUEST_STATE_ABSENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested) &&
                  !pPackage->fPermanent) // removing a package that should be removed.
         {
-            execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+            execute = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == pPackage->currentState ? BOOTSTRAPPER_ACTION_STATE_NONE : BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
         }
         else if (BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT == pPackage->requested)
         {
@@ -968,9 +968,10 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
+            case BOOTSTRAPPER_REQUEST_STATE_CACHE: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_ABSENT:
-                rollback = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+                rollback = BOOTSTRAPPER_ACTION_STATE_UNINSTALL == execute ? BOOTSTRAPPER_ACTION_STATE_INSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
             default:
                 rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
