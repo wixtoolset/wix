@@ -121,7 +121,7 @@ namespace WixToolset.Bal
 
             if (isDNC)
             {
-                this.FinalizeBAFactorySymbol(section);
+                this.FinalizeBAFactorySymbol(section, baSymbol);
             }
 
             if (isIuiBA || isStdBA || isMBA || isDNC)
@@ -135,11 +135,12 @@ namespace WixToolset.Bal
             }
         }
 
-        private void FinalizeBAFactorySymbol(IntermediateSection section)
+        private void FinalizeBAFactorySymbol(IntermediateSection section, WixBootstrapperApplicationDllSymbol baSymbol)
         {
             var factorySymbol = section.Symbols.OfType<WixBalBAFactoryAssemblySymbol>().SingleOrDefault();
             if (null == factorySymbol)
             {
+                this.Messaging.Write(BalErrors.MissingDNCBAFactoryAssembly(baSymbol.SourceLineNumbers));
                 return;
             }
 
@@ -148,6 +149,7 @@ namespace WixToolset.Bal
                                                       .SingleOrDefault();
             if (null == factoryPayloadSymbol)
             {
+                this.Messaging.Write(BalErrors.MissingDNCBAFactoryAssembly(factorySymbol.SourceLineNumbers));
                 return;
             }
 

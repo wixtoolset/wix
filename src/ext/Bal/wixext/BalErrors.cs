@@ -43,6 +43,11 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.IuibaPrimaryPackageEnableFeatureSelection, "When using WixInternalUIBootstrapperApplication, primary packages must not have feature selection enabled because it interferes with the user selecting feature through the MSI UI.");
         }
 
+        public static Message MissingDNCBAFactoryAssembly(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MissingDNCBAFactoryAssembly, "The BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\" when using the DotNetCoreBootstrapperApplicationHost.");
+        }
+
         public static Message MissingDNCPrereq()
         {
             return Message(null, Ids.MissingDNCPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
@@ -116,6 +121,7 @@ namespace WixToolset.Bal
             IuibaPrimaryPackageEnableFeatureSelection = 6815,
             OverridableVariableCollision = 6816,
             OverridableVariableCollision2 = 6817,
+            MissingDNCBAFactoryAssembly = 6818,
         }
     }
 }
