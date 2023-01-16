@@ -76,5 +76,39 @@ namespace WixToolsetTest.Heat
                 }, wxs);
             }
         }
+
+        [Fact]
+        public void CanHarvestNestedFiles()
+        {
+            var folder = TestData.Get("TestData", "NestedFiles");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var outputPath = Path.Combine(fs.GetFolder(), "out.wxs");
+
+                var args = new[]
+                {
+                    "dir", folder,
+                    "-generate", "payloadgroup",
+                    "-o", outputPath
+                };
+
+                var result = HeatRunner.Execute(args);
+                result.AssertSuccess();
+
+                var wxs = File.ReadAllLines(outputPath).Select(s => s.Replace("\"", "'")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                    "    <Fragment>",
+                    "        <PayloadGroup Id='TARGETDIR'>",
+                    "            <Payload SourceFile='SourceDir\\Nested\\c.txt' Name='Nested\\c.txt' />",
+                    "            <Payload SourceFile='SourceDir\\b.txt' />",
+                    "        </PayloadGroup>",
+                    "    </Fragment>",
+                    "</Wix>",
+                }, wxs);
+            }
+        }
     }
 }
