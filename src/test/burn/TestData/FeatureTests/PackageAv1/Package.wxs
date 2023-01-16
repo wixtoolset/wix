@@ -48,7 +48,6 @@
   <Fragment>
     <Component Id="RegistryComponent" Directory="INSTALLFOLDER">
       <RegistryValue Root="HKLM" Key="Software\WiX\Tests\$(var.TestGroupName)" Name="$(var.PackageName)" Value="!(bind.Property.TestVersion)" Type="string" />
-      <Provides Key="WiX.$(var.TestGroupName).A,v1.0" />
     </Component>
   </Fragment>
 
