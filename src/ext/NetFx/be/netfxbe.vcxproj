@@ -48,20 +48,24 @@
   <ItemGroup>
     <ClCompile Include="detectnetcore.cpp" />
     <ClCompile Include="detectnetcoresdk.cpp" />
+    <ClCompile Include="detectnetcoresdkfeatureband.cpp" />
     <ClCompile Include="netfxbe.cpp" />
     <ClCompile Include="NetfxBundleExtension.cpp" />
     <ClCompile Include="netfxsearch.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="runnetcoresearch.cpp" />
   </ItemGroup>
 
   <ItemGroup>
     <ClInclude Include="detectnetcore.h" />
     <ClInclude Include="detectnetcoresdk.h" />
+    <ClInclude Include="detectnetcoresdkfeatureband.h" />
     <ClInclude Include="NetfxBundleExtension.h" />
     <ClInclude Include="netfxsearch.h" />
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="runnetcoresearch.h" />
   </ItemGroup>
 
   <ItemGroup>

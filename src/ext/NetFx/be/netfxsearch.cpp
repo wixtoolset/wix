@@ -15,7 +15,7 @@ STDMETHODIMP NetfxSearchParseFromXml(
     BSTR bstrNodeName = NULL;
 
     // Select Netfx search nodes.
-    hr = XmlSelectNodes(pixnBundleExtension, L"NetFxNetCoreSearch|NetFxNetCoreSdkSearch", &pixnNodes);
+    hr = XmlSelectNodes(pixnBundleExtension, L"NetFxNetCoreSearch|NetFxNetCoreSdkSearch|NetFxNetCoreSdkFeatureBandSearch", &pixnNodes);
     BextExitOnFailure(hr, "Failed to select Netfx search nodes.");
 
     // Get Netfx search node count.
@@ -72,9 +72,30 @@ STDMETHODIMP NetfxSearchParseFromXml(
             hr = XmlGetAttributeUInt32(pixnNode, L"Platform", reinterpret_cast<DWORD*>(&netCoreSdkSearch.platform));
             BextExitOnFailure(hr, "Failed to get @Platform.");
 
-            // @Version
-            hr = XmlGetAttributeEx(pixnNode, L"Version", &netCoreSdkSearch.sczVersion);
-            BextExitOnFailure(hr, "Failed to get @Version.");
+            // @MajorVersion
+            hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &netCoreSdkSearch.sczMajorVersion);
+            BextExitOnFailure(hr, "Failed to get @MajorVersion.");
+        }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"NetFxNetCoreSdkFeatureBandSearch", -1))
+        {
+            pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SDK_FEATURE_BAND_SEARCH;
+
+            auto& netCoreSdkSearch = pSearch->NetCoreSdkFeatureBandSearch;
+            // @Platform
+            hr = XmlGetAttributeUInt32(pixnNode, L"Platform", reinterpret_cast<DWORD*>(&netCoreSdkSearch.platform));
+            BextExitOnFailure(hr, "Failed to get @Platform.");
+
+            // @MajorVersion
+            hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &netCoreSdkSearch.sczMajorVersion);
+            BextExitOnFailure(hr, "Failed to get @MajorVersion.");
+
+            // @MinorVersion
+            hr = XmlGetAttributeEx(pixnNode, L"MinorVersion", &netCoreSdkSearch.sczMinorVersion);
+            BextExitOnFailure(hr, "Failed to get @MinorVersion.");
+
+            // @PatchVersion
+            hr = XmlGetAttributeEx(pixnNode, L"PatchVersion", &netCoreSdkSearch.sczPatchVersion);
+            BextExitOnFailure(hr, "Failed to get @PatchVersion.");
         }
         else
         {
@@ -131,6 +152,9 @@ STDMETHODIMP NetfxSearchExecute(
         break;
     case NETFX_SEARCH_TYPE_NET_CORE_SDK_SEARCH:
         hr = NetfxPerformDetectNetCoreSdk(wzVariable, pSearch, pEngine, wzBaseDirectory);
+        break;
+    case NETFX_SEARCH_TYPE_NET_CORE_SDK_FEATURE_BAND_SEARCH:
+        hr = NetfxPerformDetectNetCoreSdkFeatureBand(wzVariable, pSearch, pEngine, wzBaseDirectory);
         break;
     default:
         hr = E_UNEXPECTED;

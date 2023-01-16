@@ -10,8 +10,9 @@ namespace WixToolset.Netfx
     {
         NetFxNativeImage,
         NetFxNetCoreSearch,
-        NetFxNetCoreSdkSearch,
         NetFxDotNetCompatibilityCheck,
+        NetFxNetCoreSdkSearch,
+        NetFxNetCoreSdkFeatureBandSearch,
     }
 
     public static partial class NetfxSymbolDefinitions
@@ -41,6 +42,9 @@ namespace WixToolset.Netfx
                 case NetfxSymbolDefinitionType.NetFxNetCoreSdkSearch:
                     return NetfxSymbolDefinitions.NetFxNetCoreSdkSearch;
 
+                case NetfxSymbolDefinitionType.NetFxNetCoreSdkFeatureBandSearch:
+                    return NetfxSymbolDefinitions.NetFxNetCoreSdkFeatureBandSearch;
+
                 case NetfxSymbolDefinitionType.NetFxDotNetCompatibilityCheck:
                     return NetfxSymbolDefinitions.NetFxDotNetCompatibilityCheck;
 
@@ -53,6 +57,7 @@ namespace WixToolset.Netfx
         {
             NetFxNetCoreSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
             NetFxNetCoreSdkSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
+            NetFxNetCoreSdkFeatureBandSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
         }
     }
 }
