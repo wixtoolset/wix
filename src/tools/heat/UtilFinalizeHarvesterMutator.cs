@@ -25,6 +25,7 @@ namespace WixToolset.Harvesters
         private Hashtable filePaths;
         private ArrayList files;
         private ArrayList registryValues;
+        private List<Wix.Payload> payloads;
         private bool suppressCOMElements;
         private bool suppressVB6COMElements;
         private string preprocessorVariable;
@@ -40,6 +41,7 @@ namespace WixToolset.Harvesters
             this.filePaths = new Hashtable();
             this.files = new ArrayList();
             this.registryValues = new ArrayList();
+            this.payloads = new List<Wix.Payload>();
         }
 
         /// <summary>
@@ -93,6 +95,7 @@ namespace WixToolset.Harvesters
             this.filePaths.Clear();
             this.files.Clear();
             this.registryValues.Clear();
+            this.payloads.Clear();
 
             // index elements in this wix document
             this.IndexElement(wix);
@@ -100,6 +103,7 @@ namespace WixToolset.Harvesters
             this.MutateDirectories();
             this.MutateFiles();
             this.MutateRegistryValues();
+            this.MutatePayloads();
 
             // must occur after all the registry values have been formatted
             this.MutateComponents();
@@ -130,6 +134,10 @@ namespace WixToolset.Harvesters
             else if (element is Wix.RegistryValue)
             {
                 this.registryValues.Add(element);
+            }
+            else if (element is Wix.Payload payloadElement)
+            {
+                this.payloads.Add(payloadElement);
             }
 
             // index the child elements
@@ -1001,6 +1009,33 @@ namespace WixToolset.Harvesters
                     {
                         file.Source = file.Source.Substring(9).Insert(0, sourceDirSubstitution);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Mutate the payloads.
+        /// </summary>
+        private void MutatePayloads()
+        {
+            string sourceDirSubstitution = this.preprocessorVariable;
+            if (sourceDirSubstitution == null)
+            {
+                return;
+            }
+
+            string prefix = "$(";
+            if (sourceDirSubstitution.StartsWith("wix.", StringComparison.Ordinal))
+            {
+                prefix = "!(";
+            }
+            sourceDirSubstitution = String.Concat(prefix, sourceDirSubstitution, ")");
+
+            foreach (var payload in this.payloads)
+            {
+                if (payload.SourceFile != null && payload.SourceFile.StartsWith("SourceDir\\", StringComparison.Ordinal))
+                {
+                    payload.SourceFile = payload.SourceFile.Substring(9).Insert(0, sourceDirSubstitution);
                 }
             }
         }
