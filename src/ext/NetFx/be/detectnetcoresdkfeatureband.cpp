@@ -2,9 +2,11 @@
 
 #include "precomp.h"
 
-HRESULT DetectNetCoreSdk(
+HRESULT DetectNetCoreSdkFeatureBand(
     __in NETFX_NET_CORE_PLATFORM platform,
     __in LPCWSTR wzMajorVersion,
+    __in LPCWSTR wzMinorVersion,
+    __in LPCWSTR wzPatchVersion,
     __in LPCWSTR wzBaseDirectory,
     __inout LPWSTR* psczLatestVersion
     )
@@ -12,11 +14,11 @@ HRESULT DetectNetCoreSdk(
     HRESULT hr = S_OK;
     LPWSTR sczArguments = NULL;
 
-    hr = StrAllocFormatted(&sczArguments, L"sdk %ls", wzMajorVersion);
-    BextExitOnFailure(hr, "Failed to build sdk netcoresearch.exe arguments.");
+    hr = StrAllocFormatted(&sczArguments, L"sdkfeatureband %ls %ls %ls", wzMajorVersion, wzMinorVersion, wzPatchVersion);
+    BextExitOnFailure(hr, "Failed to build sdkfeatureband netcoresearch.exe arguments.");
 
     hr = RunNetCoreSearch(platform, wzBaseDirectory, sczArguments, psczLatestVersion);
-    BextExitOnFailure(hr, "Failed to run netcoresearch.exe for sdk.");
+    BextExitOnFailure(hr, "Failed to run netcoresearch.exe for sdkfeatureband.");
 
 LExit:
     ReleaseStr(sczArguments);
@@ -24,7 +26,7 @@ LExit:
     return hr;
 }
 
-HRESULT NetfxPerformDetectNetCoreSdk(
+HRESULT NetfxPerformDetectNetCoreSdkFeatureBand(
     __in LPCWSTR wzVariable,
     __in NETFX_SEARCH* pSearch,
     __in IBundleExtensionEngine* pEngine,
@@ -34,8 +36,14 @@ HRESULT NetfxPerformDetectNetCoreSdk(
     HRESULT hr = S_OK;
     LPWSTR sczLatestVersion = NULL;
 
-    hr = DetectNetCoreSdk(pSearch->NetCoreSdkSearch.platform, pSearch->NetCoreSdkSearch.sczMajorVersion, wzBaseDirectory, &sczLatestVersion);
-    BextExitOnFailure(hr, "DetectNetCoreSdk failed.");
+    hr = DetectNetCoreSdkFeatureBand(
+        pSearch->NetCoreSdkFeatureBandSearch.platform,
+        pSearch->NetCoreSdkFeatureBandSearch.sczMajorVersion,
+        pSearch->NetCoreSdkFeatureBandSearch.sczMinorVersion,
+        pSearch->NetCoreSdkFeatureBandSearch.sczPatchVersion,
+        wzBaseDirectory,
+        &sczLatestVersion);
+    BextExitOnFailure(hr, "DetectNetCoreSdkFeatureBand failed.");
 
     hr = pEngine->SetVariableVersion(wzVariable, sczLatestVersion);
     BextExitOnFailure(hr, "Failed to set variable '%ls' to '%ls'", wzVariable, sczLatestVersion);

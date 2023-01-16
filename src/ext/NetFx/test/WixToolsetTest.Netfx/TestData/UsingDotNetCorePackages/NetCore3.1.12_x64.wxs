@@ -5,7 +5,7 @@
     <?define NetCorePlatform = x64?>
     <?define NetCoreIdVersion = 3112?>
     <?define NetCoreVersion = 3.1.12?>
-    <?define NetCoreSdkPlatform = x64?>
+    <?define NetCoreSdkFeatureBandVersion = 31400?>
     <?define NetCoreSdkIdVersion = 31425?>
     <?define NetCoreSdkVersion = 3.1.425?>
     <?include NetCore3_Platform.wxi?>
@@ -61,16 +61,17 @@
     </Fragment>
 
     <Fragment>
-        <netfx:DotNetCoreSdkSearch Id="$(var.DotNetCoreSdkId)" Platform="$(var.NetCoreSdkPlatform)" Version="3.0.100" Variable="$(var.DotNetCoreSdkId)" />
+        <netfx:DotNetCoreSdkSearch Id="$(var.DotNetCoreSdkId)" Platform="$(var.NetCorePlatform)" MajorVersion="3" Variable="$(var.DotNetCoreSdkId)" />
+        <netfx:DotNetCoreSdkFeatureBandSearch Id="$(var.DotNetCoreSdkFeatureBandId)" Platform="$(var.NetCorePlatform)" Version="3.1.400" Variable="$(var.DotNetCoreSdkFeatureBandId)" />
 
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)DetectCondition" Value="$(var.DotNetCoreSdkId) &gt;= v$(var.NetCoreSdkVersion)" Overridable="yes" />
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)InstallCondition" Value="" Overridable="yes" />
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)PackageDirectory" Value="redist\" Overridable="yes" />
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)RepairArguments" Value="" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DotNetCoreSdkFeatureBandId) &gt;= v$(var.NetCoreSdkVersion)" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)RepairArguments" Value="" Overridable="yes" />
 
         <PackageGroup Id="$(var.DotNetCoreSdkRedistId)">
-            <ExePackage CacheId="$(var.DotNetCoreSdkRedistId)_2485A7AFA98E178CB8F30C9838346B514AEA4769" InstallArguments="$(var.DotNetCoreSdkRedistInstallArguments)" PerMachine="yes" DetectCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)DetectCondition)" InstallCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)InstallCondition)" Id="$(var.DotNetCoreSdkRedistId)" Vital="yes" Permanent="yes" Protocol="burn" LogPathVariable="$(var.DotNetCoreSdkRedistLog)" Cache="remove">
-                <ExePackagePayload Name="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)PackageDirectory)dotnet-sdk-$(var.NetCoreSdkVersion)-win-$(var.NetCoreSdkPlatform).exe" DownloadUrl="$(var.DotNetCoreSdkRedistLink)" ProductName="Microsoft .NET Core Runtime - 3.1.425 (x64)" Description="Microsoft .NET Core Runtime - 3.1.425 (x64)" CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18" CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769" Size="135024384" Version="3.1.425" />
+            <ExePackage CacheId="$(var.DotNetCoreSdkRedistId)_2485A7AFA98E178CB8F30C9838346B514AEA4769" InstallArguments="$(var.DotNetCoreSdkRedistInstallArguments)" PerMachine="yes" DetectCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)DetectCondition)" InstallCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)InstallCondition)" Id="$(var.DotNetCoreSdkRedistId)" Vital="yes" Permanent="yes" Protocol="burn" LogPathVariable="$(var.DotNetCoreSdkRedistLog)" Cache="remove">
+                <ExePackagePayload Name="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-sdk-$(var.NetCoreSdkVersion)-win-$(var.NetCorePlatform).exe" DownloadUrl="$(var.DotNetCoreSdkRedistLink)" ProductName="Microsoft .NET Core Runtime - 3.1.425 (x64)" Description="Microsoft .NET Core Runtime - 3.1.425 (x64)" CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18" CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769" Size="135024384" Version="3.1.425" />
             </ExePackage>
         </PackageGroup>
     </Fragment>

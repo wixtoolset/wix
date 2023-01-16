@@ -2,137 +2,155 @@
 
 #include "precomp.h"
 
-enum class NETCORESEARCHKIND
+enum class NETCORESEARCHTYPE
 {
     None,
     Runtime,
     Sdk,
+    SdkFeatureBand,
 };
 
 struct NETCORESEARCH_STATE
 {
-    NETCORESEARCHKIND Kind = NETCORESEARCHKIND::None;
-    union
-    {
-        struct
-        {
-            LPCWSTR wzTargetName;
-            DWORD dwMajorVersion;
-        } Runtime;
-        struct
-        {
-            DWORD dwMajorVersion;
-            DWORD dwMinorVersion;
-            DWORD dwFeatureBand;
-        }
-         Sdk;
-    } Data;
+    NETCORESEARCHTYPE type;
+    HRESULT hrSearch;
     VERUTIL_VERSION* pVersion;
+
+    struct
+    {
+        LPCWSTR wzTargetName;
+        DWORD dwMajorVersion;
+    } Runtime;
+    struct
+    {
+        DWORD dwMajorVersion;
+    } Sdk;
+    struct
+    {
+        DWORD dwMajorVersion;
+        DWORD dwMinorVersion;
+        DWORD dwPatchVersion;
+    } SdkFeatureBand;
 };
 
+static HRESULT GetSearchStateFromArguments(
+    __in int argc,
+    __in LPWSTR argv[],
+    __in NETCORESEARCH_STATE* pSearchState
+    );
 static HRESULT GetDotnetEnvironmentInfo(
-    __in NETCORESEARCH_STATE& pSearchState,
-    __inout VERUTIL_VERSION** ppVersion
+    __in NETCORESEARCH_STATE* pSearchState
     );
 static void HOSTFXR_CALLTYPE GetDotnetEnvironmentInfoResult(
     __in const hostfxr_dotnet_environment_info* pInfo,
     __in LPVOID pvContext
     );
 
-bool string_equal_invariant(__in PCWSTR const x,__in  PCWSTR const y) { return CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, x, -1, y, -1); }
-
-HRESULT get_search_state_from_arguments(__in int argc, __in LPWSTR argv[], __out NETCORESEARCH_STATE& searchState);
-
 int __cdecl wmain(int argc, LPWSTR argv[])
 {
     HRESULT hr = S_OK;
-    VERUTIL_VERSION* pVersion = NULL;
-    NETCORESEARCH_STATE searchState = {};
-
-    ::SetConsoleCP(CP_UTF8);
+    NETCORESEARCH_STATE searchState = { };
 
     ConsoleInitialize();
 
-    hr = get_search_state_from_arguments(argc, argv, OUT searchState);
-    if (FAILED(hr))
+    hr = GetSearchStateFromArguments(argc, argv, &searchState);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse arguments.");
+
+    hr = GetDotnetEnvironmentInfo(&searchState);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to search.");
+
+    if (searchState.pVersion)
     {
-        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse arguments.");
-    }
-
-    hr = GetDotnetEnvironmentInfo(searchState, &pVersion);
-
-
-    if (pVersion)
-    {
-        ConsoleWriteW(CONSOLE_COLOR_NORMAL, pVersion->sczVersion);
+        ConsoleWriteW(CONSOLE_COLOR_NORMAL, searchState.pVersion->sczVersion);
     }
 
 LExit:
-    ReleaseVerutilVersion(pVersion);
+    ReleaseVerutilVersion(searchState.pVersion);
     ConsoleUninitialize();
     return hr;
 }
 
-HRESULT get_search_state_from_arguments(int argc, LPWSTR argv[], __out NETCORESEARCH_STATE& searchState)
+HRESULT GetSearchStateFromArguments(
+    __in int argc,
+    __in LPWSTR argv[],
+    __in NETCORESEARCH_STATE* pSearchState
+    )
 {
     HRESULT hr = S_OK;
-    searchState = {};
-    const auto searchKind = argv[1];
+    LPCWSTR wzSearchKind = NULL;
 
-    if (argc < 3)
+    if (argc < 2)
     {
         ExitFunction1(hr = E_INVALIDARG);
     }
 
+    wzSearchKind = argv[1];
 
-    if (string_equal_invariant(searchKind, L"runtime"))
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzSearchKind, -1, L"runtime", -1))
     {
         if (argc != 4)
         {
             ExitFunction1(hr = E_INVALIDARG);
         }
-        searchState.Kind = NETCORESEARCHKIND::Runtime;
 
-        const PCWSTR majorVersion = argv[2];
-        const PCWSTR targetName = argv[3];
+        LPCWSTR wzMajorVersion = argv[2];
+        LPCWSTR wzTargetName = argv[3];
 
-        auto& data = searchState.Data.Runtime;
+        pSearchState->type = NETCORESEARCHTYPE::Runtime;
 
-        data.wzTargetName = targetName;
-        hr = StrStringToUInt32(majorVersion, 0, reinterpret_cast<UINT*>(&data.dwMajorVersion));
-        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get target version from: %ls", majorVersion);
+        hr = StrStringToUInt32(wzMajorVersion, 0, reinterpret_cast<UINT*>(&pSearchState->Runtime.dwMajorVersion));
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get target version from: %ls", wzMajorVersion);
+
+        pSearchState->Runtime.wzTargetName = wzTargetName;
     }
-    else if(string_equal_invariant(searchKind, L"sdk"))
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzSearchKind, -1, L"sdk", -1))
     {
-        searchState.Kind = NETCORESEARCHKIND::Sdk;
-
-        const PCWSTR version = argv[2];
-
-        VERUTIL_VERSION* sdkVersion = nullptr;
-        hr = VerParseVersion(version, 0, FALSE, &sdkVersion);
-        if (FAILED(hr))
+        if (argc != 3)
         {
-            ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse version from: %ls", version);
+            ExitFunction1(hr = E_INVALIDARG);
         }
 
-        auto& data = searchState.Data.Sdk;
+        LPCWSTR wzMajorVersion = argv[2];
 
-        data.dwMajorVersion = sdkVersion->dwMajor;
-        data.dwMinorVersion = sdkVersion->dwMinor;
-        data.dwFeatureBand = sdkVersion->dwPatch;
+        pSearchState->type = NETCORESEARCHTYPE::Sdk;
 
-        VerFreeVersion(sdkVersion);
+        hr = StrStringToUInt32(wzMajorVersion, 0, reinterpret_cast<UINT*>(&pSearchState->Sdk.dwMajorVersion));
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get sdk major version from: %ls", wzMajorVersion);
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzSearchKind, -1, L"sdkfeatureband", -1))
+    {
+        if (argc != 5)
+        {
+            ExitFunction1(hr = E_INVALIDARG);
+        }
+
+        LPCWSTR wzMajorVersion = argv[2];
+        LPCWSTR wzMinorVersion = argv[3];
+        LPCWSTR wzPatchVersion = argv[4];
+
+        pSearchState->type = NETCORESEARCHTYPE::SdkFeatureBand;
+
+        hr = StrStringToUInt32(wzMajorVersion, 0, reinterpret_cast<UINT*>(&pSearchState->SdkFeatureBand.dwMajorVersion));
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get major version from: %ls", wzMajorVersion);
+
+        hr = StrStringToUInt32(wzMinorVersion, 0, reinterpret_cast<UINT*>(&pSearchState->SdkFeatureBand.dwMinorVersion));
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get minor version from: %ls", wzMinorVersion);
+
+        hr = StrStringToUInt32(wzPatchVersion, 0, reinterpret_cast<UINT*>(&pSearchState->SdkFeatureBand.dwPatchVersion));
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get patch version from: %ls", wzPatchVersion);
+    }
+    else
+    {
+        pSearchState->type = NETCORESEARCHTYPE::None;
+        ExitFunction1(hr = E_INVALIDARG);
     }
 
 LExit:
     return hr;
 }
 
-
-
 static HRESULT GetDotnetEnvironmentInfo(
-    __in NETCORESEARCH_STATE& state,
-    __inout VERUTIL_VERSION** ppVersion
+    __in NETCORESEARCH_STATE* pState
     )
 {
     HRESULT hr = S_OK;
@@ -156,17 +174,13 @@ static HRESULT GetDotnetEnvironmentInfo(
     pfnGetDotnetEnvironmentInfo = (hostfxr_get_dotnet_environment_info_fn)::GetProcAddress(hModule, "hostfxr_get_dotnet_environment_info");
     ConsoleExitOnNullWithLastError(pfnGetDotnetEnvironmentInfo, hr, CONSOLE_COLOR_RED, "Failed to get address for hostfxr_get_dotnet_environment_info.");
 
-    hr = pfnGetDotnetEnvironmentInfo(NULL, NULL, GetDotnetEnvironmentInfoResult, &state);
+    hr = pfnGetDotnetEnvironmentInfo(NULL, NULL, GetDotnetEnvironmentInfoResult, pState);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get .NET Core environment info.");
 
-    if (state.pVersion)
-    {
-        *ppVersion = state.pVersion;
-        state.pVersion = NULL;
-    }
+    hr = pState->hrSearch;
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to process .NET Core environment info.");
 
 LExit:
-    ReleaseVerutilVersion(state.pVersion);
     ReleaseStr(sczHostfxrPath);
     ReleaseStr(sczProcessPath);
 
@@ -178,17 +192,117 @@ LExit:
     return hr;
 }
 
-bool matches_feature_band(const int requested, const int actual)
+static HRESULT PerformRuntimeSearch(
+    __in const hostfxr_dotnet_environment_info* pInfo,
+    __in DWORD dwMajorVersion,
+    __in LPCWSTR wzTargetName,
+    __inout VERUTIL_VERSION** ppVersion
+    )
 {
-    // we have not requested a match on feature band, so skip the check
-    if (requested == 0) return true;
+    HRESULT hr = S_OK;
+    VERUTIL_VERSION* pFrameworkVersion = NULL;
+    int nCompare = 0;
 
-    const int requestedBand = requested / 100;
-    const int actualBand = actual  / 100;
+    for (size_t i = 0; i < pInfo->framework_count; ++i)
+    {
+        const hostfxr_dotnet_environment_framework_info* pFrameworkInfo = pInfo->frameworks + i;
+        ReleaseVerutilVersion(pFrameworkVersion);
 
-    if (actualBand != requestedBand) return false;
+        if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzTargetName, -1, pFrameworkInfo->name, -1))
+        {
+            continue;
+        }
 
-    return actual >= requested;
+        hr = VerParseVersion(pFrameworkInfo->version, 0, FALSE, &pFrameworkVersion);
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse framework version: %ls", pFrameworkInfo->version);
+
+        if (pFrameworkVersion->dwMajor != dwMajorVersion)
+        {
+            continue;
+        }
+
+        if (*ppVersion)
+        {
+            hr = VerCompareParsedVersions(*ppVersion, pFrameworkVersion, &nCompare);
+            ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to compare versions.");
+
+            if (nCompare > -1)
+            {
+                continue;
+            }
+        }
+
+        ReleaseVerutilVersion(*ppVersion);
+        *ppVersion = pFrameworkVersion;
+        pFrameworkVersion = NULL;
+    }
+
+LExit:
+    ReleaseVerutilVersion(pFrameworkVersion);
+
+    return hr;
+}
+
+static HRESULT PerformSdkSearch(
+    __in const hostfxr_dotnet_environment_info* pInfo,
+    __in BOOL fFeatureBand,
+    __in DWORD dwMajorVersion,
+    __in DWORD dwMinorVersion,
+    __in DWORD dwPatchVersion,
+    __inout VERUTIL_VERSION** ppVersion
+    )
+{
+    HRESULT hr = S_OK;
+    VERUTIL_VERSION* pSdkVersion = NULL;
+    int nCompare = 0;
+    DWORD dwRequestedBand = dwPatchVersion / 100;
+
+    for (size_t i = 0; i < pInfo->sdk_count; ++i)
+    {
+        const hostfxr_dotnet_environment_sdk_info* pSdkInfo = pInfo->sdks + i;
+        ReleaseVerutilVersion(pSdkVersion);
+
+        hr = VerParseVersion(pSdkInfo->version, 0, FALSE, &pSdkVersion);
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse sdk version: %ls", pSdkInfo->version);
+
+        if (pSdkVersion->dwMajor != dwMajorVersion)
+        {
+            continue;
+        }
+
+        if (fFeatureBand)
+        {
+            if (pSdkVersion->dwMinor != dwMinorVersion)
+            {
+                continue;
+            }
+
+            if ((pSdkVersion->dwPatch / 100) != dwRequestedBand)
+            {
+                continue;
+            }
+        }
+
+        if (*ppVersion)
+        {
+            hr = VerCompareParsedVersions(*ppVersion, pSdkVersion, &nCompare);
+            ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to compare versions.");
+
+            if (nCompare > -1)
+            {
+                continue;
+            }
+        }
+
+        ReleaseVerutilVersion(*ppVersion);
+        *ppVersion = pSdkVersion;
+        pSdkVersion = NULL;
+    }
+
+LExit:
+    ReleaseVerutilVersion(pSdkVersion);
+
+    return hr;
 }
 
 static void HOSTFXR_CALLTYPE GetDotnetEnvironmentInfoResult(
@@ -198,88 +312,25 @@ static void HOSTFXR_CALLTYPE GetDotnetEnvironmentInfoResult(
 {
     NETCORESEARCH_STATE* pState = static_cast<NETCORESEARCH_STATE*>(pvContext);
     HRESULT hr = S_OK;
-    VERUTIL_VERSION* pDotnetVersion = nullptr;
-    int nCompare = 0;
 
-
-    if (pState->Kind == NETCORESEARCHKIND::Sdk)
+    if (pState->type == NETCORESEARCHTYPE::Sdk)
     {
-        auto& sdkData = pState->Data.Sdk;
-        for (size_t i = 0; i < pInfo->sdk_count; ++i)
-        {
-            const hostfxr_dotnet_environment_sdk_info* pSdkInfo = pInfo->sdks + i;
-            ReleaseVerutilVersion(pDotnetVersion);
-
-            hr = VerParseVersion(pSdkInfo->version, 0, FALSE, &pDotnetVersion);
-            ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse sdk version: %ls", pSdkInfo->version);
-
-            if (pDotnetVersion->dwMajor != sdkData.dwMajorVersion)
-            {
-                continue;
-            }
-            if (!matches_feature_band(sdkData.dwFeatureBand, pDotnetVersion->dwPatch))
-            {
-                continue;
-            }
-
-            if (pState->pVersion)
-            {
-                hr = VerCompareParsedVersions(pState->pVersion, pDotnetVersion, &nCompare);
-                ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to compare versions.");
-
-                if (nCompare > -1)
-                {
-                    continue;
-                }
-            }
-
-            ReleaseVerutilVersion(pState->pVersion);
-            pState->pVersion = pDotnetVersion;
-            pDotnetVersion = nullptr;
-        }
+        hr = PerformSdkSearch(pInfo, FALSE, pState->Sdk.dwMajorVersion, 0, 0, &pState->pVersion);
     }
-    else if(pState->Kind == NETCORESEARCHKIND::Runtime)
+    else if (pState->type == NETCORESEARCHTYPE::SdkFeatureBand)
     {
-        auto& runtimeData = pState->Data.Runtime;
-        for (size_t i = 0; i < pInfo->framework_count; ++i)
-        {
-            const hostfxr_dotnet_environment_framework_info* pFrameworkInfo = pInfo->frameworks + i;
-            ReleaseVerutilVersion(pDotnetVersion);
-
-            if (string_equal_invariant(runtimeData.wzTargetName, pFrameworkInfo->name))
-            {
-                continue;
-            }
-
-            hr = VerParseVersion(pFrameworkInfo->version, 0, FALSE, &pDotnetVersion);
-            ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to parse framework version: %ls", pFrameworkInfo->version);
-
-            if (pDotnetVersion->dwMajor != runtimeData.dwMajorVersion)
-            {
-                continue;
-            }
-
-            if (pState->pVersion)
-            {
-                hr = VerCompareParsedVersions(pState->pVersion, pDotnetVersion, &nCompare);
-                ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to compare versions.");
-
-                if (nCompare > -1)
-                {
-                    continue;
-                }
-            }
-
-            ReleaseVerutilVersion(pState->pVersion);
-            pState->pVersion = pDotnetVersion;
-            pDotnetVersion = nullptr;
-        }
+        hr = PerformSdkSearch(pInfo, TRUE, pState->SdkFeatureBand.dwMajorVersion, pState->SdkFeatureBand.dwMinorVersion, pState->SdkFeatureBand.dwPatchVersion, &pState->pVersion);
+    }
+    else if (pState->type == NETCORESEARCHTYPE::Runtime)
+    {
+        hr = PerformRuntimeSearch(pInfo, pState->Runtime.dwMajorVersion, pState->Runtime.wzTargetName, &pState->pVersion);
     }
     else
     {
-        ConsoleWriteError(E_INVALIDARG, CONSOLE_COLOR_RED, "Invalid NETCORESEARCHKIND.");
+        hr = E_INVALIDARG;
+        ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Invalid NETCORESEARCHTYPE.");
     }
 
 LExit:
-    ReleaseVerutilVersion(pDotnetVersion);
+    pState->hrSearch = hr;
 }

@@ -21,8 +21,9 @@
   <?define DotNetCoreRedistInstallArguments = /install /quiet /log "[$(var.DotNetCoreRedistLog)]"?>
   <?define DotNetCoreRedistUninstallArguments = /uninstall /quiet /log "[$(var.DotNetCoreRedistLog)]"?>
 
-  <?define DotNetCoreSdkId = DOTNETCORESDK3_$(var.NetCoreSdkPlatform)?>
-  <?define DotNetCoreSdkRedistId = DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist_$(var.NetCoreSdkPlatform)?>
+  <?define DotNetCoreSdkId = DOTNETCORESDK3_$(var.NetCorePlatform)?>
+  <?define DotNetCoreSdkFeatureBandId = DOTNETCORESDK$(var.NetCoreSdkFeatureBandVersion)_$(var.NetCorePlatform)?>
+  <?define DotNetCoreSdkRedistId = DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist_$(var.NetCorePlatform)?>
   <?define DotNetCoreSdkRedistLog = DotNetCoreSdk$(var.NetCoreSdkIdVersion)RedistLog?>
   <?define DotNetCoreSdkRedistInstallArguments = /install /quiet /log "[$(var.DotNetCoreSdkRedistLog)]"?>
   <?define DotNetCoreSdkRedistUninstallArguments = /uninstall /quiet /log "[$(var.DotNetCoreSdkRedistLog)]"?>

@@ -7,6 +7,7 @@
             <PackageGroupRef Id="AspNetCoreRuntime3112Redist_x64" />
             <PackageGroupRef Id="DesktopNetCoreRuntime3112Redist_x64" />
             <PackageGroupRef Id="DotNetCoreRuntime3112Redist_x64" />
+            <PackageGroupRef Id="DotNetCoreSdk31425Redist_x64" />
         </Chain>
     </Bundle>
 </Wix>

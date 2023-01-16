@@ -5,7 +5,7 @@
     <?define NetCorePlatform = x86?>
     <?define NetCoreIdVersion = 609?>
     <?define NetCoreVersion = 6.0.9?>
-    <?define NetCoreSdkPlatform = x86?>
+    <?define NetCoreSdkFeatureBandVersion = 60400?>
     <?define NetCoreSdkIdVersion = 60403?>
     <?define NetCoreSdkVersion = 6.0.403?>
     <?include NetCore6_Platform.wxi?>
@@ -61,16 +61,21 @@
     </Fragment>
 
     <Fragment>
-        <netfx:DotNetCoreSdkSearch Id="$(var.DotNetCoreSdkId)" Platform="$(var.NetCoreSdkPlatform)" Version="6.0.200" Variable="$(var.DotNetCoreSdkId)" />
+        <netfx:DotNetCoreSdkSearch Id="$(var.DotNetCoreSdkId)" Platform="$(var.NetCorePlatform)" MajorVersion="6" Variable="$(var.DotNetCoreSdkId)" />
+        <netfx:DotNetCoreSdkFeatureBandSearch Id="$(var.DotNetCoreSdkFeatureBandId)" Platform="$(var.NetCorePlatform)" Version="6.0.400" Variable="$(var.DotNetCoreSdkFeatureBandId)" />
+    </Fragment>
 
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)DetectCondition" Value="$(var.DotNetCoreSdkId) &gt;= v$(var.NetCoreSdkVersion)" Overridable="yes" />
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)InstallCondition" Value="" Overridable="yes" />
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)PackageDirectory" Value="redist\" Overridable="yes" />
-        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)RepairArguments" Value="" Overridable="yes" />
+    <Fragment>
+        <netfx:DotNetCoreSdkFeatureBandSearchRef Id="$(var.DotNetCoreSdkFeatureBandId)" />
+
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DotNetCoreSdkFeatureBandId) &gt;= v$(var.NetCoreSdkVersion)" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)RepairArguments" Value="" Overridable="yes" />
 
         <PackageGroup Id="$(var.DotNetCoreSdkRedistId)">
-            <ExePackage CacheId="$(var.DotNetCoreSdkRedistId)_2485A7AFA98E178CB8F30C9838346B514AEA4769" InstallArguments="$(var.DotNetCoreSdkRedistInstallArguments)" PerMachine="yes" DetectCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)DetectCondition)" InstallCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)InstallCondition)" Id="$(var.DotNetCoreSdkRedistId)" Vital="yes" Permanent="yes" Protocol="burn" LogPathVariable="$(var.DotNetCoreSdkRedistLog)" Cache="remove">
-                <ExePackagePayload Name="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCoreSdkPlatform)PackageDirectory)dotnet-sdk-$(var.NetCoreSdkVersion)-win-$(var.NetCoreSdkPlatform).exe" DownloadUrl="$(var.DotNetCoreSdkRedistLink)" ProductName="Microsoft .NET 6.0 SDK - 6.0.403 (x86)" Description="Microsoft .NET SDK - 6.0.403 (x86)" CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18" CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769" Size="194236520" Version="6.0.403" />
+            <ExePackage CacheId="$(var.DotNetCoreSdkRedistId)_2485A7AFA98E178CB8F30C9838346B514AEA4769" InstallArguments="$(var.DotNetCoreSdkRedistInstallArguments)" PerMachine="yes" DetectCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)DetectCondition)" InstallCondition="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)InstallCondition)" Id="$(var.DotNetCoreSdkRedistId)" Vital="yes" Permanent="yes" Protocol="burn" LogPathVariable="$(var.DotNetCoreSdkRedistLog)" Cache="remove">
+                <ExePackagePayload Name="!(wix.DotNetCoreSdk$(var.NetCoreSdkIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-sdk-$(var.NetCoreSdkVersion)-win-$(var.NetCorePlatform).exe" DownloadUrl="$(var.DotNetCoreSdkRedistLink)" ProductName="Microsoft .NET 6.0 SDK - 6.0.403 (x86)" Description="Microsoft .NET SDK - 6.0.403 (x86)" CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18" CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769" Size="194236520" Version="6.0.403" />
             </ExePackage>
         </PackageGroup>
     </Fragment>

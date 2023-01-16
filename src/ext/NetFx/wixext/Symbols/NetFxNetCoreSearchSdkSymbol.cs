@@ -12,9 +12,9 @@ namespace WixToolset.Netfx
             new[]
             {
                 new IntermediateFieldDefinition(nameof(NetFxNetCoreSdkSearchSymbolFields.Platform), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(NetFxNetCoreSdkSearchSymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNetCoreSdkSearchSymbolFields.MajorVersion), IntermediateFieldType.Number),
             },
-            typeof(NetFxNetCoreSearchSymbol));
+            typeof(NetFxNetCoreSdkSearchSymbol));
     }
 }
 
@@ -22,20 +22,11 @@ namespace WixToolset.Netfx.Symbols
 {
     using WixToolset.Data;
 
-
-    public enum NetCoreSdkSearchPlatform
-    {
-        X86,
-        X64,
-        Arm64,
-    }
-
     public enum NetFxNetCoreSdkSearchSymbolFields
     {
         Platform,
-        Version,
+        MajorVersion,
     }
-
 
     public class NetFxNetCoreSdkSearchSymbol : IntermediateSymbol
     {
@@ -49,16 +40,16 @@ namespace WixToolset.Netfx.Symbols
 
         public IntermediateField this[NetFxNetCoreSdkSearchSymbolFields index] => this.Fields[(int)index];
 
-        public NetCoreSdkSearchPlatform Platform
+        public NetCoreSearchPlatform Platform
         {
-            get => (NetCoreSdkSearchPlatform)this.Fields[(int)NetFxNetCoreSdkSearchSymbolFields.Platform].AsNumber();
+            get => (NetCoreSearchPlatform)this.Fields[(int)NetFxNetCoreSdkSearchSymbolFields.Platform].AsNumber();
             set => this.Set((int)NetFxNetCoreSdkSearchSymbolFields.Platform, (int)value);
         }
 
-        public string Version
+        public int MajorVersion
         {
-            get => this.Fields[(int)NetFxNetCoreSdkSearchSymbolFields.Version].AsString();
-            set => this.Set((int)NetFxNetCoreSdkSearchSymbolFields.Version, value);
+            get => this.Fields[(int)NetFxNetCoreSdkSearchSymbolFields.MajorVersion].AsNumber();
+            set => this.Set((int)NetFxNetCoreSdkSearchSymbolFields.MajorVersion, value);
         }
     }
 }

@@ -31,4 +31,6 @@
 #include "netfxsearch.h"
 #include "detectnetcore.h"
 #include "detectnetcoresdk.h"
+#include "detectnetcoresdkfeatureband.h"
 #include "NetfxBundleExtension.h"
+#include "runnetcoresearch.h"

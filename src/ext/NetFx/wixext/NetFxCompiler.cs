@@ -55,6 +55,12 @@ namespace WixToolset.Netfx
                         case "DotNetCoreSdkSearchRef":
                             this.ParseDotNetCoreSdkSearchRefElement(intermediate, section, element);
                             break;
+                        case "DotNetCoreSdkFeatureBandSearch":
+                            this.ParseDotNetCoreSdkFeatureBandSearchElement(intermediate, section, element);
+                            break;
+                        case "DotNetCoreSdkFeatureBandSearchRef":
+                            this.ParseDotNetCoreSdkFeatureBandSearchRefElement(intermediate, section, element);
+                            break;
                         case "DotNetCompatibilityCheck":
                             this.ParseDotNetCompatibilityCheckElement(intermediate, section, element);
                             break;
@@ -80,6 +86,12 @@ namespace WixToolset.Netfx
                             break;
                         case "DotNetCoreSdkSearchRef":
                             this.ParseDotNetCoreSdkSearchRefElement(intermediate, section, element);
+                            break;
+                        case "DotNetCoreSdkFeatureBandSearch":
+                            this.ParseDotNetCoreSdkFeatureBandSearchElement(intermediate, section, element);
+                            break;
+                        case "DotNetCoreSdkFeatureBandSearchRef":
+                            this.ParseDotNetCoreSdkFeatureBandSearchRefElement(intermediate, section, element);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -267,8 +279,8 @@ namespace WixToolset.Netfx
             string variable = null;
             string condition = null;
             string after = null;
-            NetCoreSdkSearchPlatform? platform = null;
-            string version = null;
+            NetCoreSearchPlatform? platform = null;
+            var majorVersion = CompilerConstants.IntegerNotSet;
 
             foreach (var attrib in element.Attributes())
             {
@@ -293,22 +305,22 @@ namespace WixToolset.Netfx
                             switch (platformValue)
                             {
                                 case "arm64":
-                                    platform = NetCoreSdkSearchPlatform.Arm64;
+                                    platform = NetCoreSearchPlatform.Arm64;
                                     break;
                                 case "x64":
-                                    platform = NetCoreSdkSearchPlatform.X64;
+                                    platform = NetCoreSearchPlatform.X64;
                                     break;
                                 case "x86":
-                                    platform = NetCoreSdkSearchPlatform.X86;
+                                    platform = NetCoreSearchPlatform.X86;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Platform", platformValue, "arm64", "x64", "x86"));
                                     break;
                             }
                             break;
-                        case "Version":
+                        case "MajorVersion":
                             // .NET Core had a different deployment strategy before .NET Core 3.0 which would require different detection logic.
-                            version = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            majorVersion = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 3, Int32.MaxValue);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -331,16 +343,13 @@ namespace WixToolset.Netfx
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Platform"));
             }
 
-            
-            if (String.IsNullOrEmpty(version))
+            if (majorVersion == CompilerConstants.IntegerNotSet)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Version"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "MajorVersion"));
             }
-
-            var ver = Version.Parse(version);
-            if (ver.Major == 4)
+            else if (majorVersion == 4)
             {
-                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Version", version, "3.*", "5+.*"));
+                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "MajorVersion", "4", "3", "5+"));
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -358,7 +367,7 @@ namespace WixToolset.Netfx
                 section.AddSymbol(new NetFxNetCoreSdkSearchSymbol(sourceLineNumbers, id)
                 {
                     Platform = platform.Value,
-                    Version = version,
+                    MajorVersion = majorVersion,
                 });
             }
         }
@@ -376,6 +385,157 @@ namespace WixToolset.Netfx
                         case "Id":
                             var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, NetfxSymbolDefinitions.NetFxNetCoreSdkSearch, refId);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+        }
+
+        private void ParseDotNetCoreSdkFeatureBandSearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
+            string variable = null;
+            string condition = null;
+            string after = null;
+            NetCoreSearchPlatform? platform = null;
+            string version = null;
+            var majorVersion = 0;
+            var minorVersion = 0;
+            var patchVersion = 0;
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Variable":
+                            variable = this.ParseHelper.GetAttributeBundleVariableNameValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "After":
+                            after = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Platform":
+                            var platformValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (platformValue)
+                            {
+                                case "arm64":
+                                    platform = NetCoreSearchPlatform.Arm64;
+                                    break;
+                                case "x64":
+                                    platform = NetCoreSearchPlatform.X64;
+                                    break;
+                                case "x86":
+                                    platform = NetCoreSearchPlatform.X86;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Platform", platformValue, "arm64", "x64", "x86"));
+                                    break;
+                            }
+                            break;
+                        case "Version":
+                            version = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            if (id == null)
+            {
+                id = this.ParseHelper.CreateIdentifier("dncsfbs", variable, condition, after);
+            }
+
+            if (!platform.HasValue)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Platform"));
+            }
+
+            if (String.IsNullOrEmpty(version))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Version"));
+            }
+            else
+            {
+                if (!Version.TryParse(version, out var featureBandVersion))
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Version", version, "x.x.x00"));
+                }
+                else
+                {
+                    majorVersion = featureBandVersion.Major;
+                    minorVersion = featureBandVersion.Minor;
+                    patchVersion = featureBandVersion.Build;
+
+                    if ((patchVersion % 100) != 0 || featureBandVersion.Revision != -1)
+                    {
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Version", version, "x.x.x00"));
+                    }
+
+                    if (majorVersion == 4)
+                    {
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Version", version, "3.*", "5+.*"));
+                    }
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bundleExtensionId == null)
+            {
+                this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+
+                section.AddSymbol(new NetFxNetCoreSdkFeatureBandSearchSymbol(sourceLineNumbers, id)
+                {
+                    Platform = platform.Value,
+                    MajorVersion = majorVersion,
+                    MinorVersion = minorVersion,
+                    PatchVersion = patchVersion,
+                });
+            }
+        }
+
+        private void ParseDotNetCoreSdkFeatureBandSearchRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, NetfxSymbolDefinitions.NetFxNetCoreSdkFeatureBandSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
