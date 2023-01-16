@@ -185,6 +185,35 @@ namespace WixToolsetTest.Bal
         }
 
         [Fact]
+        public void CannotBuildUsingDncbaMissingBAFactoryPayload()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\Dncba");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundleFile,
+                });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\" when using the DotNetCoreBootstrapperApplicationHost.",
+                }, compileResult.Messages.Select(x => x.ToString()).ToArray());
+                Assert.Equal(6818, compileResult.ExitCode);
+
+                Assert.False(File.Exists(bundleFile));
+                Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
+            }
+        }
+
+        [Fact]
         public void CannotBuildUsingOverridableWrongCase()
         {
             using (var fs = new DisposableFileSystem())
