@@ -2238,7 +2238,7 @@ namespace WixToolset.Data
 
         public static Message BindVariableUnknown(SourceLineNumber sourceLineNumbers, string variableId)
         {
-            return Message(sourceLineNumbers, Ids.BindVariableUnknown, "The bind variable !(wix.{0}) is unknown. Please ensure the variable is declared on the command line for wix.exe, via a BindVariable element, or inline using the syntax !(wix.{0}=some value which doesn't contain parenthesis).", variableId);
+            return Message(sourceLineNumbers, Ids.BindVariableUnknown, "The bind variable !(wix.{0}) is unknown. Please ensure the variable is declared on the command line for wix.exe, via a WixVariable element, or inline using the syntax !(wix.{0}=some value which doesn't contain parentheses).", variableId);
         }
 
         public static Message NoSourceFiles()
