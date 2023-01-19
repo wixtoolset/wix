@@ -12,12 +12,12 @@ namespace WixToolset.Mba.Core
     public class BootstrapperApplicationData : IBootstrapperApplicationData
     {
         /// <summary>
-        /// 
+        /// The default file name for BootstrapperApplicationData.
         /// </summary>
         public const string DefaultFileName = "BootstrapperApplicationData.xml";
 
         /// <summary>
-        /// 
+        /// The XML namespace for BootstrapperApplicationData.
         /// </summary>
         public const string XMLNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
 

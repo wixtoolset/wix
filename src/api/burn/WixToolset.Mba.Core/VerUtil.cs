@@ -110,10 +110,10 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Clone the version.
         /// </summary>
-        /// <param name="version"></param>
-        /// <returns></returns>
+        /// <param name="version">Source version</param>
+        /// <returns>Cloned version</returns>
         public static VerUtilVersion CopyVersion(VerUtilVersion version)
         {
             var handle = VerCopyVersion(version.GetHandle());
@@ -121,11 +121,11 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Parse a version.
         /// </summary>
-        /// <param name="version"></param>
+        /// <param name="version">Source version</param>
         /// <param name="strict">Whether to throw exception on invalid version.</param>
-        /// <returns></returns>
+        /// <returns>Parsed version</returns>
         public static VerUtilVersion ParseVersion(string version, bool strict)
         {
             var handle = VerParseVersion(version, 0, strict);
@@ -133,10 +133,10 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Parse version from qword.
         /// </summary>
-        /// <param name="version"></param>
-        /// <returns></returns>
+        /// <param name="version">Source version</param>
+        /// <returns>Parsed version</returns>
         public static VerUtilVersion VersionFromQword(long version)
         {
             var handle = VerVersionFromQword(version);

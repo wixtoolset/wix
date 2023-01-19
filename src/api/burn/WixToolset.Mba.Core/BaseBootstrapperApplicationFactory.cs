@@ -13,8 +13,8 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Default implementation of <see cref="IBootstrapperApplicationFactory.Create(IntPtr, IntPtr)"/>
         /// </summary>
-        /// <param name="pArgs"></param>
-        /// <param name="pResults"></param>
+        /// <param name="pArgs">The args struct given by the engine when initially creating the BA.</param>
+        /// <param name="pResults">The results struct given by the engine when initially creating the BA</param>
         public void Create(IntPtr pArgs, IntPtr pResults)
         {
             InitializeFromCreateArgs(pArgs, out var engine, out var bootstrapperCommand);

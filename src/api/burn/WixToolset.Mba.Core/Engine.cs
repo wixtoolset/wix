@@ -6,21 +6,14 @@ namespace WixToolset.Mba.Core
     using System.ComponentModel;
     using System.Runtime.InteropServices;
     using System.Security;
-    using System.Text;
 
     /// <summary>
     /// Default implementation of <see cref="IEngine"/>.
     /// </summary>
     public sealed class Engine : IEngine
     {
-        private static readonly string normalizeVersionFormatString = "{0} must be less than or equal to " + UInt16.MaxValue;
-
         private IBootstrapperEngine engine;
 
-        /// <summary>
-        /// Creates a new instance of the <see cref="Engine"/> container class.
-        /// </summary>
-        /// <param name="engine">The <see cref="IBootstrapperEngine"/> to contain.</param>
         internal Engine(IBootstrapperEngine engine)
         {
             this.engine = engine;
@@ -351,82 +344,6 @@ namespace WixToolset.Mba.Core
         public void Quit(int exitCode)
         {
             this.engine.Quit(exitCode);
-        }
-
-        /// <summary>
-        /// Utility method for converting a <see cref="Version"/> into a <see cref="long"/>.
-        /// </summary>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        public static long VersionToLong(Version version)
-        {
-            // In Windows, each version component has a max value of 65535,
-            // so we truncate the version before shifting it, which will overflow if invalid.
-            long major = (long)(ushort)version.Major << 48;
-            long minor = (long)(ushort)version.Minor << 32;
-            long build = (long)(ushort)version.Build << 16;
-            long revision = (long)(ushort)version.Revision;
-
-            return major | minor | build | revision;
-        }
-
-        /// <summary>
-        /// Utility method for converting a <see cref="long"/> into a <see cref="Version"/>.
-        /// </summary>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        public static Version LongToVersion(long version)
-        {
-            int major = (int)((version & ((long)0xffff << 48)) >> 48);
-            int minor = (int)((version & ((long)0xffff << 32)) >> 32);
-            int build = (int)((version & ((long)0xffff << 16)) >> 16);
-            int revision = (int)(version & 0xffff);
-
-            return new Version(major, minor, build, revision);
-        }
-
-        /// <summary>
-        /// Verifies that Version can be represented in a <see cref="long"/>.
-        /// If the Build or Revision fields are undefined, they are set to zero.
-        /// </summary>
-        public static Version NormalizeVersion(Version version)
-        {
-            if (version == null)
-            {
-                throw new ArgumentNullException("version");
-            }
-
-            int major = version.Major;
-            int minor = version.Minor;
-            int build = version.Build;
-            int revision = version.Revision;
-
-            if (major > UInt16.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException("version", String.Format(normalizeVersionFormatString, "Major"));
-            }
-            if (minor > UInt16.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException("version", String.Format(normalizeVersionFormatString, "Minor"));
-            }
-            if (build > UInt16.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException("version", String.Format(normalizeVersionFormatString, "Build"));
-            }
-            if (build == -1)
-            {
-                build = 0;
-            }
-            if (revision > UInt16.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException("version", String.Format(normalizeVersionFormatString, "Revision"));
-            }
-            if (revision == -1)
-            {
-                revision = 0;
-            }
-
-            return new Version(major, minor, build, revision);
         }
     }
 }

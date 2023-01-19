@@ -45,7 +45,7 @@ namespace WixToolsetTest.Mba.Core
         public void CanCreateFromQword()
         {
             var version = new Version(100, 200, 300, 400);
-            var qwVersion = Engine.VersionToLong(version);
+            var qwVersion = VersionToLong(version);
 
             using var parsedVersion = VerUtil.VersionFromQword(qwVersion);
             Assert.Equal("100.200.300.400", parsedVersion.Version);
@@ -98,6 +98,18 @@ namespace WixToolsetTest.Mba.Core
             Assert.Equal("5", parsedVersion.ReleaseLabels[4].Label);
             Assert.True(parsedVersion.ReleaseLabels[4].IsNumeric);
             Assert.Equal(5u, parsedVersion.ReleaseLabels[4].Value);
+        }
+
+        private static long VersionToLong(Version version)
+        {
+            // In Windows, each version component has a max value of 65535,
+            // so we truncate the version before shifting it, which will overflow if invalid.
+            long major = (long)(ushort)version.Major << 48;
+            long minor = (long)(ushort)version.Minor << 32;
+            long build = (long)(ushort)version.Build << 16;
+            long revision = (long)(ushort)version.Revision;
+
+            return major | minor | build | revision;
         }
     }
 }

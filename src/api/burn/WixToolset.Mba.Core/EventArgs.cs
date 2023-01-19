@@ -14,7 +14,8 @@ namespace WixToolset.Mba.Core
     public abstract class HResultEventArgs : EventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="HResultEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
         public HResultEventArgs()
         {
@@ -33,7 +34,8 @@ namespace WixToolset.Mba.Core
     public abstract class CancellableHResultEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="CancellableHResultEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
         public CancellableHResultEventArgs(bool cancelRecommendation)
         {
@@ -52,7 +54,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public abstract class ResultEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ResultEventArgs(Result recommendation, Result result)
         {
             this.Recommendation = recommendation;
@@ -77,9 +82,9 @@ namespace WixToolset.Mba.Core
     public abstract class StatusEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="StatusEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
         public StatusEventArgs(int hrStatus)
         {
             this.Status = hrStatus;
@@ -96,7 +101,10 @@ namespace WixToolset.Mba.Core
     /// </summary>
     public abstract class ActionEventArgs<T> : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ActionEventArgs(int hrStatus, T recommendation, T action)
             : base(hrStatus)
         {
@@ -121,7 +129,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public abstract class CancellableActionEventArgs<T> : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CancellableActionEventArgs(bool cancelRecommendation, T recommendation, T action)
             : base(cancelRecommendation)
         {
@@ -146,7 +157,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public abstract class CacheProgressBaseEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheProgressBaseEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -184,13 +198,14 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when startup has begun.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.Startup"/>.
     /// </summary>
     [Serializable]
     public class StartupEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="StartupEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
         public StartupEventArgs()
         {
@@ -198,13 +213,14 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when shutdown has begun.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.Shutdown"/>.
     /// </summary>
     [Serializable]
     public class ShutdownEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="ShutdownEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
         public ShutdownEventArgs(BOOTSTRAPPER_SHUTDOWN_ACTION action)
         {
@@ -223,7 +239,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectBeginEventArgs(bool cached, RegistrationType registrationType, int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -254,7 +273,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectForwardCompatibleBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool missingFromCache, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -303,7 +325,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectUpdateBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectUpdateBeginEventArgs(string updateLocation, bool cancelRecommendation, bool skipRecommendation)
             : base(cancelRecommendation)
         {
@@ -328,7 +353,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectUpdateEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectUpdateEventArgs(string updateLocation, long size, string hash, UpdateHashType hashAlgorithm, string version, string title, string summary, string contentType, string content, bool cancelRecommendation, bool stopRecommendation)
             : base(cancelRecommendation)
         {
@@ -401,7 +429,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectUpdateCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectUpdateCompleteEventArgs(int hrStatus, bool ignoreRecommendation)
             : base(hrStatus)
         {
@@ -420,7 +451,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectRelatedBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, string version, bool missingFromCache, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -469,7 +503,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectPackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectPackageBeginEventArgs(string packageId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -488,7 +525,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectCompatibleMsiPackageEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectCompatibleMsiPackageEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -519,7 +559,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectRelatedMsiPackageEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectRelatedMsiPackageEventArgs(string packageId, string upgradeCode, string productCode, bool perMachine, string version, RelatedOperation operation, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -568,12 +611,9 @@ namespace WixToolset.Mba.Core
     public class DetectPatchTargetEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="productCode"></param>
-        /// <param name="state"></param>
-        /// <param name="cancelRecommendation"></param>
         public DetectPatchTargetEventArgs(string packageId, string productCode, PackageState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -603,7 +643,10 @@ namespace WixToolset.Mba.Core
     /// </summary>
     public class DetectMsiFeatureEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectMsiFeatureEventArgs(string packageId, string featureId, FeatureState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -629,12 +672,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments for <see cref="IDefaultBootstrapperApplication.DetectPackageComplete"/>.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectPackageComplete"/>.
     /// </summary>
     [Serializable]
     public class DetectPackageCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectPackageCompleteEventArgs(string packageId, int hrStatus, PackageState state, bool cached)
             : base(hrStatus)
         {
@@ -660,16 +706,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the detection phase has completed.
+    /// Event arguments used when the detection phase has completed.
     /// </summary>
     [Serializable]
     public class DetectCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="DetectCompleteEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="eligibleForCleanup"></param>
         public DetectCompleteEventArgs(int hrStatus, bool eligibleForCleanup)
             : base(hrStatus)
         {
@@ -688,7 +733,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanBeginEventArgs(int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -707,7 +755,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanRelatedBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanRelatedBundleEventArgs(string bundleId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -738,7 +789,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanRelatedBundleTypeEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanRelatedBundleTypeEventArgs(string bundleId, RelatedBundlePlanType recommendedType, RelatedBundlePlanType type, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -769,7 +823,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanPackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanPackageBeginEventArgs(string packageId, PackageState currentState, bool cached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT repairCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, RequestState state, BOOTSTRAPPER_CACHE_TYPE cacheType, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -836,7 +893,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanCompatibleMsiPackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanCompatibleMsiPackageBeginEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, bool recommendedRemove, bool requestRemove, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -879,7 +939,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanCompatibleMsiPackageCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanCompatibleMsiPackageCompleteEventArgs(string packageId, string compatiblePackageId, int hrStatus, bool requestedRemove)
             : base(hrStatus)
         {
@@ -910,7 +973,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanRollbackBoundaryEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanRollbackBoundaryEventArgs(string rollbackBoundaryId, bool recommendedTransaction, bool transaction, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -944,13 +1010,9 @@ namespace WixToolset.Mba.Core
     public class PlanPatchTargetEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="productCode"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="state"></param>
-        /// <param name="cancelRecommendation"></param>
         public PlanPatchTargetEventArgs(string packageId, string productCode, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -987,7 +1049,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanMsiFeatureEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanMsiFeatureEventArgs(string packageId, string featureId, FeatureState recommendedState, FeatureState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1024,7 +1089,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanMsiPackageEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanMsiPackageEventArgs(string packageId, bool shouldExecute, ActionState action, BOOTSTRAPPER_MSI_FILE_VERSIONING recommendedFileVersioning, bool cancelRecommendation, BURN_MSI_PROPERTY actionMsiProperty, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler, BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning)
             : base(cancelRecommendation)
         {
@@ -1086,11 +1154,9 @@ namespace WixToolset.Mba.Core
     public class PlanPackageCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="requested"></param>
         public PlanPackageCompleteEventArgs(string packageId, int hrStatus, RequestState requested)
             : base(hrStatus)
         {
@@ -1115,7 +1181,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlannedCompatiblePackageEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlannedCompatiblePackageEventArgs(string packageId, string compatiblePackageId, bool remove)
         {
             this.PackageId = packageId;
@@ -1145,7 +1214,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlannedPackageEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlannedPackageEventArgs(string packageId, ActionState execute, ActionState rollback, bool cache, bool uncache)
         {
             this.PackageId = packageId;
@@ -1182,15 +1254,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has completed planning the installation.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanComplete"/>.
     /// </summary>
     [Serializable]
     public class PlanCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="PlanCompleteEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
         public PlanCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1203,7 +1275,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanForwardCompatibleBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool recommendedIgnoreBundle, bool cancelRecommendation, bool ignoreBundle)
             : base(cancelRecommendation)
         {
@@ -1258,7 +1333,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ApplyBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ApplyBeginEventArgs(int phaseCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1278,7 +1356,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ElevateBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ElevateBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1286,15 +1367,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has completed starting the elevated process.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ElevateComplete"/>.
     /// </summary>
     [Serializable]
     public class ElevateCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="ElevateCompleteEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
         public ElevateCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1307,7 +1388,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ProgressEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ProgressEventArgs(int progressPercentage, int overallPercentage, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1332,7 +1416,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ErrorEventArgs : ResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ErrorEventArgs(ErrorType errorType, string packageId, int errorCode, string errorMessage, int dwUIHint, string[] data, Result recommendation, Result result)
             : base(recommendation, result)
         {
@@ -1381,7 +1468,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class RegisterBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public RegisterBeginEventArgs(RegistrationType recommendedRegistrationType, bool cancelRecommendation, RegistrationType registrationType)
             : base(cancelRecommendation)
         {
@@ -1406,7 +1496,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class RegisterCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public RegisterCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1419,7 +1512,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class UnregisterBeginEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public UnregisterBeginEventArgs(RegistrationType recommendedRegistrationType, RegistrationType registrationType)
         {
             this.RecommendedRegistrationType = recommendedRegistrationType;
@@ -1443,7 +1539,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class UnregisterCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public UnregisterCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1456,7 +1555,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1469,7 +1571,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheAcquireBeginEventArgs : CancellableActionEventArgs<CacheOperation>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheAcquireBeginEventArgs(string packageOrContainerId, string payloadId, string source, string downloadUrl, string payloadContainerId, CacheOperation recommendation, CacheOperation action, bool cancelRecommendation)
             : base(cancelRecommendation, recommendation, action)
         {
@@ -1512,7 +1617,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheAcquireProgressEventArgs : CacheProgressBaseEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheAcquireProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
             : base(packageOrContainerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
         {
@@ -1525,7 +1633,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheAcquireCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheAcquireCompleteEventArgs(string packageOrContainerId, string payloadId, int hrStatus, BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1550,7 +1661,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheVerifyBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheVerifyBeginEventArgs(string packageOrContainerId, string payloadId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1575,7 +1689,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheVerifyProgressEventArgs : CacheProgressBaseEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheVerifyProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, CacheVerifyStep verifyStep, bool cancelRecommendation)
             : base(packageOrContainerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
         {
@@ -1594,7 +1711,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheVerifyCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheVerifyCompleteEventArgs(string packageOrContainerId, string payloadId, int hrStatus, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1614,15 +1734,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used after the engine has cached the installation sources.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CacheComplete"/>.
     /// </summary>
     [Serializable]
     public class CacheCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="CacheCompleteEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
         public CacheCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1635,7 +1755,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecuteBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecuteBeginEventArgs(int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1654,7 +1777,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecutePackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecutePackageBeginEventArgs(string packageId, bool shouldExecute, ActionState action, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1697,7 +1823,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecutePatchTargetEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecutePatchTargetEventArgs(string packageId, string targetProductCode, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1722,7 +1851,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecuteMsiMessageEventArgs : ResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecuteMsiMessageEventArgs(string packageId, InstallMessage messageType, int dwUIHint, string message, string[] data, Result recommendation, Result result)
             : base(recommendation, result)
         {
@@ -1765,7 +1897,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecuteFilesInUseEventArgs : ResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecuteFilesInUseEventArgs(string packageId, string[] files, Result recommendation, FilesInUseType source, Result result)
             : base(recommendation, result)
         {
@@ -1792,12 +1927,14 @@ namespace WixToolset.Mba.Core
 
     /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecutePackageComplete"/>
-    /// Additional arguments used when the engine has completed installing a specific package.
     /// </summary>
     [Serializable]
     public class ExecutePackageCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecutePackageCompleteEventArgs(string packageId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION recommendation, BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1817,15 +1954,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has completed installing packages.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecuteComplete"/>.
     /// </summary>
     [Serializable]
     public class ExecuteCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="ExecuteCompleteEventArgs"/> class.
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
         public ExecuteCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1838,7 +1975,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ApplyCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_APPLYCOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ApplyCompleteEventArgs(int hrStatus, ApplyRestart restart, BOOTSTRAPPER_APPLYCOMPLETE_ACTION recommendation, BOOTSTRAPPER_APPLYCOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1857,7 +1997,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ApplyDowngradeEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ApplyDowngradeEventArgs(int hrRecommendation, int hrStatus)
         {
             this.Recommendation = hrRecommendation;
@@ -1881,7 +2024,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheAcquireResolvingEventArgs : CancellableActionEventArgs<CacheResolveOperation>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheAcquireResolvingEventArgs(string packageOrContainerId, string payloadId, string[] searchPaths, bool foundLocal, int recommendedSearchPath, string downloadUrl, string payloadContainerId, CacheResolveOperation recommendation, int chosenSearchPath, CacheResolveOperation action, bool cancel)
             : base(cancel, recommendation, action)
         {
@@ -1942,7 +2088,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CachePackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CachePackageBeginEventArgs(string packageId, int cachePayloads, long packageCacheSize, bool vital, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1979,7 +2128,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CachePackageCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CachePackageCompleteEventArgs(string packageId, int hrStatus, BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1998,7 +2150,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecuteProgressEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecuteProgressEventArgs(string packageId, int progressPercentage, int overallPercentage, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2024,12 +2179,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine before it tries to launch the preapproved executable.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.LaunchApprovedExeBegin"/>.
     /// </summary>
     [Serializable]
     public class LaunchApprovedExeBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public LaunchApprovedExeBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2037,12 +2195,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine after it finished trying to launch the preapproved executable.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.LaunchApprovedExeComplete"/>.
     /// </summary>
     [Serializable]
     public class LaunchApprovedExeCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public LaunchApprovedExeCompleteEventArgs(int hrStatus, int processId)
             : base(hrStatus)
         {
@@ -2057,12 +2218,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine before beginning an MSI transaction.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.BeginMsiTransactionBegin"/>.
     /// </summary>
     [Serializable]
     public class BeginMsiTransactionBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public BeginMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2076,12 +2240,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine after beginning an MSI transaction.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.BeginMsiTransactionComplete"/>.
     /// </summary>
     [Serializable]
     public class BeginMsiTransactionCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public BeginMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
@@ -2095,12 +2262,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine before committing an MSI transaction.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CommitMsiTransactionBegin"/>.
     /// </summary>
     [Serializable]
     public class CommitMsiTransactionBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CommitMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2114,12 +2284,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine after committing an MSI transaction.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CommitMsiTransactionComplete"/>.
     /// </summary>
     [Serializable]
     public class CommitMsiTransactionCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CommitMsiTransactionCompleteEventArgs(string transactionId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -2139,12 +2312,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine before rolling back an MSI transaction.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.RollbackMsiTransactionBegin"/>.
     /// </summary>
     [Serializable]
     public class RollbackMsiTransactionBeginEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public RollbackMsiTransactionBeginEventArgs(string transactionId)
         {
             this.TransactionId = transactionId;
@@ -2157,12 +2333,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine after rolling back an MSI transaction.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.RollbackMsiTransactionComplete"/>.
     /// </summary>
     [Serializable]
     public class RollbackMsiTransactionCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public RollbackMsiTransactionCompleteEventArgs(string transactionId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION recommendation, BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -2182,13 +2361,14 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine before pausing Windows automatic updates.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PauseAutomaticUpdatesBegin"/>.
     /// </summary>
     [Serializable]
     public class PauseAutomaticUpdatesBeginEventArgs : HResultEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
         public PauseAutomaticUpdatesBeginEventArgs()
         {
@@ -2196,15 +2376,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine after pausing Windows automatic updates.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PauseAutomaticUpdatesComplete"/>.
     /// </summary>
     [Serializable]
     public class PauseAutomaticUpdatesCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus"></param>
         public PauseAutomaticUpdatesCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -2212,13 +2392,14 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine before taking a system restore point.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.SystemRestorePointBegin"/>.
     /// </summary>
     [Serializable]
     public class SystemRestorePointBeginEventArgs : HResultEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
         public SystemRestorePointBeginEventArgs()
         {
@@ -2226,15 +2407,15 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine after taking a system restore point.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.SystemRestorePointComplete"/>.
     /// </summary>
     [Serializable]
     public class SystemRestorePointCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        ///
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
         /// </summary>
-        /// <param name="hrStatus"></param>
         public SystemRestorePointCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -2247,7 +2428,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheContainerOrPayloadVerifyBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheContainerOrPayloadVerifyBeginEventArgs(string packageOrContainerId, string payloadId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2272,7 +2456,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheContainerOrPayloadVerifyProgressEventArgs : CacheProgressBaseEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheContainerOrPayloadVerifyProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
             : base(packageOrContainerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
         {
@@ -2285,7 +2472,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CacheContainerOrPayloadVerifyCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CacheContainerOrPayloadVerifyCompleteEventArgs(string packageOrContainerId, string payloadId, int hrStatus)
             : base(hrStatus)
         {
@@ -2310,7 +2500,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CachePayloadExtractBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CachePayloadExtractBeginEventArgs(string containerId, string payloadId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2335,7 +2528,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CachePayloadExtractProgressEventArgs : CacheProgressBaseEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CachePayloadExtractProgressEventArgs(string containerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
             : base(containerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
         {
@@ -2348,7 +2544,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CachePayloadExtractCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CachePayloadExtractCompleteEventArgs(string containerId, string payloadId, int hrStatus)
             : base(hrStatus)
         {
@@ -2373,7 +2572,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class SetUpdateBeginEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public SetUpdateBeginEventArgs()
         {
         }
@@ -2385,7 +2587,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class SetUpdateCompleteEventArgs : StatusEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public SetUpdateCompleteEventArgs(int hrStatus, string previousPackageId, string newPackageId)
             : base(hrStatus)
         {
@@ -2410,7 +2615,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanRestoreRelatedBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public PlanRestoreRelatedBundleEventArgs(string bundleId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2441,7 +2649,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class ExecuteProcessCancelEventArgs : HResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public ExecuteProcessCancelEventArgs(string packageId, int processId, BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION recommendation, BOOTSTRAPPER_EXECUTEPROCESSCANCEL_ACTION action)
         {
             this.PackageId = packageId;
@@ -2477,7 +2688,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class DetectRelatedBundlePackageEventArgs : CancellableHResultEventArgs
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public DetectRelatedBundlePackageEventArgs(string packageId, string productCode, RelationType relationType, bool perMachine, string version, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2520,7 +2734,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class CachePackageNonVitalValidationFailureEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION>
     {
-        /// <summary />
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
         public CachePackageNonVitalValidationFailureEventArgs(string packageId, int hrStatus, BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION recommendation, BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION action)
             : base(hrStatus, recommendation, action)
         {

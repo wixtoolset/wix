@@ -19,7 +19,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.PackageCount"/>.
         /// </summary>
-        /// <param name="pcPackages"></param>
         void GetPackageCount(
             [MarshalAs(UnmanagedType.U4)] out int pcPackages
             );
@@ -27,9 +26,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.GetVariableNumeric(string)"/>.
         /// </summary>
-        /// <param name="wzVariable"></param>
-        /// <param name="pllValue"></param>
-        /// <returns></returns>
         [PreserveSig]
         int GetVariableNumeric(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
@@ -79,8 +75,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.EvaluateCondition(string)"/>.
         /// </summary>
-        /// <param name="wzCondition"></param>
-        /// <param name="pf"></param>
         void EvaluateCondition(
             [MarshalAs(UnmanagedType.LPWStr)] string wzCondition,
             [MarshalAs(UnmanagedType.Bool)] out bool pf
@@ -89,8 +83,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.Log(LogLevel, string)"/>.
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="wzMessage"></param>
         void Log(
             [MarshalAs(UnmanagedType.U4)] LogLevel level,
             [MarshalAs(UnmanagedType.LPWStr)] string wzMessage
@@ -99,10 +91,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SendEmbeddedError(int, string, int)"/>.
         /// </summary>
-        /// <param name="dwErrorCode"></param>
-        /// <param name="wzMessage"></param>
-        /// <param name="dwUIHint"></param>
-        /// <param name="pnResult"></param>
         void SendEmbeddedError(
             [MarshalAs(UnmanagedType.U4)] int dwErrorCode,
             [MarshalAs(UnmanagedType.LPWStr)] string wzMessage,
@@ -113,9 +101,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SendEmbeddedProgress(int, int)"/>.
         /// </summary>
-        /// <param name="dwProgressPercentage"></param>
-        /// <param name="dwOverallProgressPercentage"></param>
-        /// <param name="pnResult"></param>
         void SendEmbeddedProgress(
             [MarshalAs(UnmanagedType.U4)] int dwProgressPercentage,
             [MarshalAs(UnmanagedType.U4)] int dwOverallProgressPercentage,
@@ -125,11 +110,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/>.
         /// </summary>
-        /// <param name="wzLocalSource"></param>
-        /// <param name="wzDownloadSource"></param>
-        /// <param name="qwValue"></param>
-        /// <param name="hashType"></param>
-        /// <param name="wzHash"></param>
         void SetUpdate(
             [MarshalAs(UnmanagedType.LPWStr)] string wzLocalSource,
             [MarshalAs(UnmanagedType.LPWStr)] string wzDownloadSource,
@@ -141,9 +121,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SetLocalSource(string, string, string)"/>.
         /// </summary>
-        /// <param name="wzPackageOrContainerId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="wzPath"></param>
         void SetLocalSource(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
@@ -153,11 +130,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
         /// </summary>
-        /// <param name="wzPackageOrContainerId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="wzUrl"></param>
-        /// <param name="wzUser"></param>
-        /// <param name="wzPassword"></param>
         void SetDownloadSource(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
@@ -169,8 +141,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SetVariableNumeric(string, long)"/>.
         /// </summary>
-        /// <param name="wzVariable"></param>
-        /// <param name="llValue"></param>
         void SetVariableNumeric(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
             long llValue
@@ -179,9 +149,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SetVariableString(string, string, bool)"/>.
         /// </summary>
-        /// <param name="wzVariable"></param>
-        /// <param name="wzValue"></param>
-        /// <param name="fFormatted"></param>
         void SetVariableString(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
                                               IntPtr wzValue,
@@ -191,8 +158,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.SetVariableVersion(string, string)"/>.
         /// </summary>
-        /// <param name="wzVariable"></param>
-        /// <param name="wzValue"></param>
         void SetVariableVersion(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
                                               IntPtr wzValue
@@ -206,7 +171,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.Detect(IntPtr)"/>.
         /// </summary>
-        /// <param name="hwndParent"></param>
         void Detect(
             IntPtr hwndParent
             );
@@ -214,7 +178,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.Plan(LaunchAction)"/>.
         /// </summary>
-        /// <param name="action"></param>
         void Plan(
             [MarshalAs(UnmanagedType.U4)] LaunchAction action
             );
@@ -222,8 +185,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.Elevate(IntPtr)"/>.
         /// </summary>
-        /// <param name="hwndParent"></param>
-        /// <returns></returns>
         [PreserveSig]
         int Elevate(
             IntPtr hwndParent
@@ -232,7 +193,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.Apply(IntPtr)"/>.
         /// </summary>
-        /// <param name="hwndParent"></param>
         void Apply(
             IntPtr hwndParent
             );
@@ -240,7 +200,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.Quit(int)"/>.
         /// </summary>
-        /// <param name="dwExitCode"></param>
         void Quit(
             [MarshalAs(UnmanagedType.U4)] int dwExitCode
             );
@@ -248,10 +207,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.LaunchApprovedExe(IntPtr, string, string, int)"/>.
         /// </summary>
-        /// <param name="hwndParent"></param>
-        /// <param name="wzApprovedExeForElevationId"></param>
-        /// <param name="wzArguments"></param>
-        /// <param name="dwWaitForInputIdleTimeout"></param>
         void LaunchApprovedExe(
             IntPtr hwndParent,
             [MarshalAs(UnmanagedType.LPWStr)] string wzApprovedExeForElevationId,
@@ -262,7 +217,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Sets the URL to the update feed.
         /// </summary>
-        /// <param name="url">URL of the update feed.</param>
         void SetUpdateSource(
             [MarshalAs(UnmanagedType.LPWStr)] string url
             );
@@ -270,9 +224,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.CompareVersions(string, string)"/>.
         /// </summary>
-        /// <param name="wzVersion1"></param>
-        /// <param name="wzVersion2"></param>
-        /// <param name="pnResult"></param>
         void CompareVersions(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion1,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion2,
@@ -297,93 +248,94 @@ namespace WixToolset.Mba.Core
     public enum ActionState
     {
         /// <summary>
-        /// 
+        /// No action.
         /// </summary>
         None,
 
         /// <summary>
-        /// 
+        /// Uninstall action.
         /// </summary>
         Uninstall,
 
         /// <summary>
-        /// 
+        /// Install action.
         /// </summary>
         Install,
 
         /// <summary>
-        /// 
+        /// Modify action.
         /// </summary>
         Modify,
 
         /// <summary>
-        /// 
+        /// Repair action.
         /// </summary>
         Repair,
 
         /// <summary>
-        /// 
+        /// Minor upgrade action.
         /// </summary>
         MinorUpgrade,
     }
 
     /// <summary>
-    /// The action for the BA to perform.
+    /// The action for the bundle to perform.
     /// </summary>
     public enum LaunchAction
     {
         /// <summary>
-        /// 
+        /// Invalid action.
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// 
+        /// Provide help information.
         /// </summary>
         Help,
 
         /// <summary>
-        /// 
+        /// Layout the bundle on disk, normally to prepare for offline installation.
         /// </summary>
         Layout,
 
         /// <summary>
-        /// 
+        /// Same as Uninstall, except it will always remove itself from the package cache and Add/Remove Programs.
+        /// This should only be used to remove corrupt bundles since it might not properly clean up its packages.
         /// </summary>
         UnsafeUninstall,
 
         /// <summary>
-        /// 
+        /// Uninstall the bundle.
         /// </summary>
         Uninstall,
 
         /// <summary>
-        /// 
+        /// Cache the bundle and its packages.
         /// </summary>
         Cache,
 
         /// <summary>
-        /// 
+        /// Install the bundle.
         /// </summary>
         Install,
 
         /// <summary>
-        /// 
+        /// Modify the bundle.
         /// </summary>
         Modify,
 
         /// <summary>
-        /// 
+        /// Repair the bundle
         /// </summary>
         Repair,
 
         /// <summary>
-        /// 
+        /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/> and then exit without waiting for it to complete.
         /// </summary>
         UpdateReplace,
 
         /// <summary>
-        /// 
+        /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/> as an embedded bundle.
         /// </summary>
         UpdateReplaceEmbedded,
     }
@@ -441,32 +393,32 @@ namespace WixToolset.Mba.Core
     public enum PackageState
     {
         /// <summary>
-        /// 
+        /// Invalid state.
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// 
+        /// The package is not on the machine (except possibly MspPackage) and should not be installed.
         /// </summary>
         Obsolete,
 
         /// <summary>
-        /// 
+        /// The package is not installed.
         /// </summary>
         Absent,
 
         /// <summary>
-        /// 
+        /// The package is not installed but is in the package cache.
         /// </summary>
         Cached,
 
         /// <summary>
-        /// 
+        /// The package is installed.
         /// </summary>
         Present,
 
         /// <summary>
-        /// 
+        /// The package is on the machine but not active, so only uninstall operations are allowed.
         /// </summary>
         Superseded,
     }
@@ -477,68 +429,70 @@ namespace WixToolset.Mba.Core
     public enum RequestState
     {
         /// <summary>
-        /// 
+        /// No change requested.
         /// </summary>
         None,
 
         /// <summary>
-        /// /
+        /// As long as there are no dependents, the package will be uninstalled.
+        /// There are some packages that can't be uninstalled, such as an ExePackage without an UninstallCommand.
         /// </summary>
         ForceAbsent,
 
         /// <summary>
-        /// 
+        /// Request the package to not be installed on the machine.
         /// </summary>
         Absent,
 
         /// <summary>
-        /// 
+        /// Request the package to be cached and not be installed on the machine.
         /// </summary>
         Cache,
 
         /// <summary>
-        /// 
+        /// Request the package to be installed on the machine.
         /// </summary>
         Present,
 
         /// <summary>
-        /// 
+        /// Force the bundle to install the package.
         /// </summary>
         ForcePresent,
 
         /// <summary>
-        /// 
+        /// Request the package to be repaired.
         /// </summary>
         Repair,
     }
 
     /// <summary>
     /// Indicates the state of a feature.
+    /// See https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiqueryfeaturestatew.
     /// </summary>
     public enum FeatureState
     {
         /// <summary>
-        /// 
+        /// Invalid state.
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// 
+        /// INSTALLSTATE_ABSENT
         /// </summary>
         Absent,
 
         /// <summary>
-        /// 
+        /// INSTALLSTATE_ADVERTISED
         /// </summary>
         Advertised,
 
         /// <summary>
-        /// 
+        /// INSTALLSTATE_LOCAL
         /// </summary>
         Local,
 
         /// <summary>
-        /// 
+        /// INSTALLSTATE_SOURCE
         /// </summary>
         Source,
     }

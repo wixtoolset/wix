@@ -7,7 +7,7 @@ namespace WixToolset.Mba.Core
     using System.Runtime.InteropServices;
 
     /// <summary>
-    /// Interface used by WixToolset.Mba.Host to dynamically load the BA.
+    /// Interface used by the native host to dynamically load the BA.
     /// </summary>
     [ComVisible(true)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

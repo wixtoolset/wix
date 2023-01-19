@@ -13,19 +13,8 @@ namespace WixToolset.Mba.Core
     public sealed class BootstrapperCommand : IBootstrapperCommand
     {
         /// <summary>
-        /// 
+        /// See <see cref="IBootstrapperCommand"/>.
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="display"></param>
-        /// <param name="commandLine"></param>
-        /// <param name="cmdShow"></param>
-        /// <param name="resume"></param>
-        /// <param name="splashScreen"></param>
-        /// <param name="relation"></param>
-        /// <param name="passthrough"></param>
-        /// <param name="layoutDirectory"></param>
-        /// <param name="bootstrapperWorkingFolder"></param>
-        /// <param name="bootstrapperApplicationDataPath"></param>
         public BootstrapperCommand(
             LaunchAction action,
             Display display,
