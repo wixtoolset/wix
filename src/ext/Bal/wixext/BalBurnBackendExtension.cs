@@ -86,6 +86,11 @@ namespace WixToolset.Bal
 
                 return true;
             }
+            else if (symbol is WixBalBootstrapperApplicationSymbol)
+            {
+                // This symbol is only for the processing in SymbolsFinalized.
+                return true;
+            }
             else
             {
                 return base.TryProcessSymbol(section, symbol);
@@ -100,28 +105,33 @@ namespace WixToolset.Bal
             this.VerifyDisplayInternalUICondition(section);
             this.VerifyOverridableVariables(section);
 
-            var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationDllSymbol>().SingleOrDefault();
-            var baId = baSymbol?.Id?.Id;
-            if (null == baId)
+            var balBaSymbol = section.Symbols.OfType<WixBalBootstrapperApplicationSymbol>().SingleOrDefault();
+            if (balBaSymbol == null)
             {
                 return;
             }
 
-            var isIuiBA = baId.StartsWith("WixInternalUIBootstrapperApplication");
-            var isStdBA = baId.StartsWith("WixStandardBootstrapperApplication");
-            var isMBA = baId.StartsWith("WixManagedBootstrapperApplicationHost");
-            var isDNC = baId.StartsWith("WixDotNetCoreBootstrapperApplicationHost");
+            var isIuiBA = balBaSymbol.Type == WixBalBootstrapperApplicationType.InternalUi;
+            var isStdBA = balBaSymbol.Type == WixBalBootstrapperApplicationType.Standard;
+            var isMBA = balBaSymbol.Type == WixBalBootstrapperApplicationType.ManagedHost;
+            var isDNC = balBaSymbol.Type == WixBalBootstrapperApplicationType.DotNetCoreHost;
             var isSCD = isDNC && this.VerifySCD(section);
+
+
+            if (!isIuiBA && !isStdBA && !isMBA && !isDNC)
+            {
+                throw new WixException($"Invalid WixBalBootstrapperApplicationType: '{balBaSymbol.Type}'");
+            }
 
             if (isIuiBA)
             {
                 // This needs to happen before VerifyPrereqPackages because it can add prereq packages.
-                this.VerifyPrimaryPackages(section);
+                this.VerifyPrimaryPackages(section, balBaSymbol.SourceLineNumbers);
             }
 
             if (isDNC)
             {
-                this.FinalizeBAFactorySymbol(section, baSymbol);
+                this.FinalizeBAFactorySymbol(section, balBaSymbol.SourceLineNumbers);
             }
 
             if (isIuiBA || isStdBA || isMBA || isDNC)
@@ -131,16 +141,16 @@ namespace WixToolset.Bal
 
             if (isIuiBA || isMBA || (isDNC && !isSCD))
             {
-                this.VerifyPrereqPackages(section, isDNC, isIuiBA);
+                this.VerifyPrereqPackages(section, balBaSymbol.SourceLineNumbers, isDNC, isIuiBA);
             }
         }
 
-        private void FinalizeBAFactorySymbol(IntermediateSection section, WixBootstrapperApplicationDllSymbol baSymbol)
+        private void FinalizeBAFactorySymbol(IntermediateSection section, SourceLineNumber baSourceLineNumbers)
         {
             var factorySymbol = section.Symbols.OfType<WixBalBAFactoryAssemblySymbol>().SingleOrDefault();
             if (null == factorySymbol)
             {
-                this.Messaging.Write(BalErrors.MissingDNCBAFactoryAssembly(baSymbol.SourceLineNumbers));
+                this.Messaging.Write(BalErrors.MissingDNCBAFactoryAssembly(baSourceLineNumbers));
                 return;
             }
 
@@ -149,8 +159,7 @@ namespace WixToolset.Bal
                                                       .SingleOrDefault();
             if (null == factoryPayloadSymbol)
             {
-                this.Messaging.Write(BalErrors.MissingDNCBAFactoryAssembly(factorySymbol.SourceLineNumbers));
-                return;
+                throw new WixException($"Missing payload symbol with id: 'factorySymbol.PayloadId'");
             }
 
             factorySymbol.FilePath = factoryPayloadSymbol.Name;
@@ -216,7 +225,7 @@ namespace WixToolset.Bal
             }
         }
 
-        private void VerifyPrimaryPackages(IntermediateSection section)
+        private void VerifyPrimaryPackages(IntermediateSection section, SourceLineNumber baSourceLineNumbers)
         {
             WixBalPackageInfoSymbol defaultPrimaryPackage = null;
             WixBalPackageInfoSymbol x86PrimaryPackage = null;
@@ -398,7 +407,7 @@ namespace WixToolset.Bal
             }
             else if (defaultPrimaryPackage == null)
             {
-                this.Messaging.Write(BalErrors.MissingIUIPrimaryPackage());
+                this.Messaging.Write(BalErrors.MissingIUIPrimaryPackage(baSourceLineNumbers));
             }
             else
             {
@@ -467,12 +476,12 @@ namespace WixToolset.Bal
             }
         }
 
-        private void VerifyPrereqPackages(IntermediateSection section, bool isDNC, bool isIuiBA)
+        private void VerifyPrereqPackages(IntermediateSection section, SourceLineNumber baSourceLineNumbers, bool isDNC, bool isIuiBA)
         {
             var prereqInfoSymbols = section.Symbols.OfType<WixMbaPrereqInformationSymbol>().ToList();
             if (!isIuiBA && prereqInfoSymbols.Count == 0)
             {
-                var message = isDNC ? BalErrors.MissingDNCPrereq() : BalErrors.MissingMBAPrereq();
+                var message = isDNC ? BalErrors.MissingDNCPrereq(baSourceLineNumbers) : BalErrors.MissingMBAPrereq(baSourceLineNumbers);
                 this.Messaging.Write(message);
                 return;
             }

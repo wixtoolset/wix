@@ -581,7 +581,7 @@ namespace WixToolset.Bal
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId);
+                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.InternalUi);
             }
         }
 
@@ -860,7 +860,7 @@ namespace WixToolset.Bal
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId);
+                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.Standard);
             }
         }
 
@@ -963,7 +963,7 @@ namespace WixToolset.Bal
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId);
+                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.ManagedHost);
 
                 if (alwaysInstallPrereqs)
                 {
@@ -1086,7 +1086,7 @@ namespace WixToolset.Bal
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId);
+                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.DotNetCoreHost);
 
                 if (alwaysInstallPrereqs)
                 {
@@ -1098,7 +1098,7 @@ namespace WixToolset.Bal
             }
         }
 
-        private void CreateBARef(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement node, string name)
+        private void CreateBARef(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement node, string name, WixBalBootstrapperApplicationType baType)
         {
             var id = this.ParseHelper.CreateIdentifierValueFromPlatform(name, this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
             if (id == null)
@@ -1109,6 +1109,11 @@ namespace WixToolset.Bal
             if (!this.Messaging.EncounteredError)
             {
                 this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBootstrapperApplication, id);
+
+                section.AddSymbol(new WixBalBootstrapperApplicationSymbol(sourceLineNumbers)
+                {
+                    Type = baType,
+                });
             }
         }
     }

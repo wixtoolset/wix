@@ -18,12 +18,11 @@ namespace WixToolset.Bal
         WixStdbaOptions,
         WixStdbaOverridableVariable,
         WixMbaPrereqOptions,
+        WixBalBootstrapperApplication,
     }
 
     public static partial class BalSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out BalSymbolDefinitionType type))
@@ -67,6 +66,9 @@ namespace WixToolset.Bal
 
                 case BalSymbolDefinitionType.WixMbaPrereqOptions:
                     return BalSymbolDefinitions.WixMbaPrereqOptions;
+
+                case BalSymbolDefinitionType.WixBalBootstrapperApplication:
+                    return BalSymbolDefinitions.WixBalBootstrapperApplication;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

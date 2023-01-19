@@ -204,7 +204,7 @@ namespace WixToolsetTest.Bal
                 });
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "The BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\" when using the DotNetCoreBootstrapperApplicationHost.",
+                    "When using DotNetCoreBootstrapperApplicationHost, the Payload element for the BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\".",
                 }, compileResult.Messages.Select(x => x.ToString()).ToArray());
                 Assert.Equal(6818, compileResult.ExitCode);
 
