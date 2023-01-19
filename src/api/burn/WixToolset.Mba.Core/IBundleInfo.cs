@@ -10,27 +10,27 @@ namespace WixToolset.Mba.Core
     public interface IBundleInfo
     {
         /// <summary>
-        /// 
+        /// The name of the variable that contains the path to the bundle's log.
         /// </summary>
         string LogVariable { get; }
 
         /// <summary>
-        /// 
+        /// Bundle/@Name
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// 
+        /// Variables that were marked with bal:Overridable="yes".
         /// </summary>
         IOverridableVariables OverridableVariables { get; }
 
         /// <summary>
-        /// 
+        /// The packages in the bundle's chain.
         /// </summary>
         IDictionary<string, IPackageInfo> Packages { get; }
 
         /// <summary>
-        /// 
+        /// Whether the bundle is per-machine or per-user.
         /// </summary>
         bool PerMachine { get; }
 

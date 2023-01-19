@@ -8,57 +8,57 @@ namespace WixToolset.Mba.Core
     using System.Xml.XPath;
 
     /// <summary>
-    /// 
+    /// The type of package.
     /// </summary>
     public enum PackageType
     {
         /// <summary>
-        /// 
+        /// Invalid type.
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// 
+        /// ExePackage
         /// </summary>
         Exe,
 
         /// <summary>
-        /// 
+        /// MsiPackage
         /// </summary>
         Msi,
 
         /// <summary>
-        /// 
+        /// MspPackage
         /// </summary>
         Msp,
 
         /// <summary>
-        /// 
+        /// MsuPackage
         /// </summary>
         Msu,
 
         /// <summary>
-        /// 
+        /// Related bundle of type Upgrade
         /// </summary>
         UpgradeBundle,
 
         /// <summary>
-        /// 
+        /// Related bundle of type Addon
         /// </summary>
         AddonBundle,
 
         /// <summary>
-        /// 
+        /// Related bundle of type Patch
         /// </summary>
         PatchBundle,
 
         /// <summary>
-        /// 
+        /// Related bundle of type Update
         /// </summary>
         UpdateBundle,
 
         /// <summary>
-        /// 
+        /// BundlePackage
         /// </summary>
         ChainBundle,
     }
@@ -156,10 +156,10 @@ namespace WixToolset.Mba.Core
         internal PackageInfo() { }
 
         /// <summary>
-        /// 
+        /// Parse packages from BootstrapperApplicationData.xml.
         /// </summary>
-        /// <param name="root"></param>
-        /// <returns></returns>
+        /// <param name="root">The root node.</param>
+        /// <returns>A dictionary of the packages by Id.</returns>
         public static IDictionary<string, IPackageInfo> ParsePackagesFromXml(XPathNavigator root)
         {
             var packagesById = new Dictionary<string, IPackageInfo>();
@@ -213,6 +213,13 @@ namespace WixToolset.Mba.Core
 
                 package.RepairCondition = BootstrapperApplicationData.GetAttribute(node, "RepairCondition");
 
+                BOOTSTRAPPER_CACHE_TYPE? cacheType = GetCacheTypeAttribute(node, "Cache");
+                if (!cacheType.HasValue)
+                {
+                    throw new Exception("Failed to get cache type for package.");
+                }
+                package.CacheType = cacheType.Value;
+
                 packagesById.Add(package.Id, package);
             }
 
@@ -221,11 +228,11 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Parse the cache type attribute.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="attributeName"></param>
-        /// <returns></returns>
+        /// <param name="node">Package node</param>
+        /// <param name="attributeName">Attribute name</param>
+        /// <returns>The cache type</returns>
         public static BOOTSTRAPPER_CACHE_TYPE? GetCacheTypeAttribute(XPathNavigator node, string attributeName)
         {
             string attributeValue = BootstrapperApplicationData.GetAttribute(node, attributeName);
@@ -250,11 +257,11 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Parse the package type attribute
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="attributeName"></param>
-        /// <returns></returns>
+        /// <param name="node">Package node</param>
+        /// <param name="attributeName">Attribute name</param>
+        /// <returns>The package type</returns>
         public static PackageType? GetPackageTypeAttribute(XPathNavigator node, string attributeName)
         {
             string attributeValue = BootstrapperApplicationData.GetAttribute(node, attributeName);
@@ -291,13 +298,13 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Create <see cref="IPackageInfo"/> from a related bundle.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="relationType"></param>
-        /// <param name="perMachine"></param>
-        /// <param name="version"></param>
-        /// <returns></returns>
+        /// <param name="id">Package id</param>
+        /// <param name="relationType">Relation type</param>
+        /// <param name="perMachine">Whether the related bundle is per-machine</param>
+        /// <param name="version">The related bundle's version</param>
+        /// <returns>The package info</returns>
         public static IPackageInfo GetRelatedBundleAsPackage(string id, RelationType relationType, bool perMachine, string version)
         {
             PackageInfo package = new PackageInfo();
@@ -323,10 +330,10 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// 
+        /// Create <see cref="IPackageInfo"/> from an update bundle.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Package id</param>
+        /// <returns>The package info</returns>
         public static IPackageInfo GetUpdateBundleAsPackage(string id)
         {
             PackageInfo package = new PackageInfo();

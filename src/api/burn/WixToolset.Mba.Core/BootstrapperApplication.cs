@@ -798,7 +798,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheBegin(CacheBeginEventArgs args)
         {
             EventHandler<CacheBeginEventArgs> handler = this.CacheBegin;
@@ -811,7 +811,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CachePackageBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCachePackageBegin(CachePackageBeginEventArgs args)
         {
             EventHandler<CachePackageBeginEventArgs> handler = this.CachePackageBegin;
@@ -824,7 +824,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheAcquireBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheAcquireBegin(CacheAcquireBeginEventArgs args)
         {
             EventHandler<CacheAcquireBeginEventArgs> handler = this.CacheAcquireBegin;
@@ -837,7 +837,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheAcquireProgress"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheAcquireProgress(CacheAcquireProgressEventArgs args)
         {
             EventHandler<CacheAcquireProgressEventArgs> handler = this.CacheAcquireProgress;
@@ -863,7 +863,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheAcquireComplete"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheAcquireComplete(CacheAcquireCompleteEventArgs args)
         {
             EventHandler<CacheAcquireCompleteEventArgs> handler = this.CacheAcquireComplete;
@@ -876,7 +876,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheVerifyBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheVerifyBegin(CacheVerifyBeginEventArgs args)
         {
             EventHandler<CacheVerifyBeginEventArgs> handler = this.CacheVerifyBegin;
@@ -889,7 +889,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheVerifyProgress"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheVerifyProgress(CacheVerifyProgressEventArgs args)
         {
             EventHandler<CacheVerifyProgressEventArgs> handler = this.CacheVerifyProgress;
@@ -902,7 +902,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheVerifyComplete"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheVerifyComplete(CacheVerifyCompleteEventArgs args)
         {
             EventHandler<CacheVerifyCompleteEventArgs> handler = this.CacheVerifyComplete;
@@ -915,7 +915,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CachePackageComplete"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCachePackageComplete(CachePackageCompleteEventArgs args)
         {
             EventHandler<CachePackageCompleteEventArgs> handler = this.CachePackageComplete;
@@ -1227,6 +1227,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="PlanForwardCompatibleBundle"/> event.
         /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanForwardCompatibleBundle(PlanForwardCompatibleBundleEventArgs args)
         {
             EventHandler<PlanForwardCompatibleBundleEventArgs> handler = this.PlanForwardCompatibleBundle;
@@ -1239,7 +1240,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheContainerOrPayloadVerifyBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheContainerOrPayloadVerifyBegin(CacheContainerOrPayloadVerifyBeginEventArgs args)
         {
             EventHandler<CacheContainerOrPayloadVerifyBeginEventArgs> handler = this.CacheContainerOrPayloadVerifyBegin;
@@ -1252,7 +1253,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheContainerOrPayloadVerifyProgress"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheContainerOrPayloadVerifyProgress(CacheContainerOrPayloadVerifyProgressEventArgs args)
         {
             EventHandler<CacheContainerOrPayloadVerifyProgressEventArgs> handler = this.CacheContainerOrPayloadVerifyProgress;
@@ -1265,7 +1266,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CacheContainerOrPayloadVerifyComplete"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheContainerOrPayloadVerifyComplete(CacheContainerOrPayloadVerifyCompleteEventArgs args)
         {
             EventHandler<CacheContainerOrPayloadVerifyCompleteEventArgs> handler = this.CacheContainerOrPayloadVerifyComplete;
@@ -1278,7 +1279,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CachePayloadExtractBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCachePayloadExtractBegin(CachePayloadExtractBeginEventArgs args)
         {
             EventHandler<CachePayloadExtractBeginEventArgs> handler = this.CachePayloadExtractBegin;
@@ -1291,7 +1292,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CachePayloadExtractProgress"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCachePayloadExtractProgress(CachePayloadExtractProgressEventArgs args)
         {
             EventHandler<CachePayloadExtractProgressEventArgs> handler = this.CachePayloadExtractProgress;
@@ -1304,7 +1305,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CachePayloadExtractComplete"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCachePayloadExtractComplete(CachePayloadExtractCompleteEventArgs args)
         {
             EventHandler<CachePayloadExtractCompleteEventArgs> handler = this.CachePayloadExtractComplete;
@@ -1317,7 +1318,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="SetUpdateBegin"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnSetUpdateBegin(SetUpdateBeginEventArgs args)
         {
             EventHandler<SetUpdateBeginEventArgs> handler = this.SetUpdateBegin;
@@ -1330,7 +1331,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="SetUpdateComplete"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnSetUpdateComplete(SetUpdateCompleteEventArgs args)
         {
             EventHandler<SetUpdateCompleteEventArgs> handler = this.SetUpdateComplete;
@@ -1382,6 +1383,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Called by the engine, raises the <see cref="CachePackageNonVitalValidationFailure"/> event.
         /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCachePackageNonVitalValidationFailure(CachePackageNonVitalValidationFailureEventArgs args)
         {
             EventHandler<CachePackageNonVitalValidationFailureEventArgs> handler = this.CachePackageNonVitalValidationFailure;

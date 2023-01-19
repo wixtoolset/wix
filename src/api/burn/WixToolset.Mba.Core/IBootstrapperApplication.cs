@@ -65,14 +65,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectForwardCompatibleBundle"/>.
         /// </summary>
-        /// <param name="wzBundleId"></param>
-        /// <param name="relationType"></param>
-        /// <param name="wzBundleTag"></param>
-        /// <param name="fPerMachine"></param>
-        /// <param name="wzVersion"></param>
-        /// <param name="fMissingFromCache"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectForwardCompatibleBundle(
@@ -88,10 +80,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectUpdateBegin"/>.
         /// </summary>
-        /// <param name="wzUpdateLocation"></param>
-        /// <param name="fCancel"></param>
-        /// <param name="fSkip"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectUpdateBegin(
@@ -103,18 +91,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectUpdate"/>.
         /// </summary>
-        /// <param name="wzUpdateLocation"></param>
-        /// <param name="dw64Size"></param>
-        /// <param name="wzVersion"></param>
-        /// <param name="wzHash"></param>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="wzTitle"></param>
-        /// <param name="wzSummary"></param>
-        /// <param name="wzContentType"></param>
-        /// <param name="wzContent"></param>
-        /// <param name="fCancel"></param>
-        /// <param name="fStopProcessingUpdates"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectUpdate(
@@ -134,9 +110,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectUpdateComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <param name="fIgnoreError"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectUpdateComplete(
@@ -162,9 +135,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectPackageBegin"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectPackageBegin(
@@ -202,11 +172,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectPatchTarget"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzProductCode"></param>
-        /// <param name="patchState"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectPatchTarget(
@@ -219,11 +184,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectMsiFeature"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzFeatureId"></param>
-        /// <param name="state"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectMsiFeature(
@@ -248,9 +208,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <param name="fEligibleForCleanup"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectComplete(
@@ -261,9 +218,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanBegin"/>.
         /// </summary>
-        /// <param name="cPackages"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanBegin(
@@ -342,12 +296,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanPatchTarget"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzProductCode"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="pRequestedState"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanPatchTarget(
@@ -361,12 +309,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanMsiFeature"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzFeatureId"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="pRequestedState"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanMsiFeature(
@@ -397,10 +339,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanPackageComplete"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="requested"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanPackageComplete(
@@ -436,8 +374,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanComplete(
@@ -447,9 +383,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ApplyBegin"/>.
         /// </summary>
-        /// <param name="dwPhaseCount"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnApplyBegin(
@@ -460,8 +393,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ElevateBegin"/>.
         /// </summary>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnElevateBegin(
@@ -471,8 +402,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ElevateComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnElevateComplete(
@@ -482,10 +411,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.Progress"/>.
         /// </summary>
-        /// <param name="dwProgressPercentage"></param>
-        /// <param name="dwOverallPercentage"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnProgress(
@@ -497,16 +422,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.Error"/>.
         /// </summary>
-        /// <param name="errorType"></param>
-        /// <param name="wzPackageId"></param>
-        /// <param name="dwCode"></param>
-        /// <param name="wzError"></param>
-        /// <param name="dwUIHint"></param>
-        /// <param name="cData"></param>
-        /// <param name="rgwzData"></param>
-        /// <param name="nRecommendation"></param>
-        /// <param name="pResult"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnError(
@@ -535,8 +450,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.RegisterComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnRegisterComplete(
@@ -546,8 +459,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CacheBegin"/>.
         /// </summary>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCacheBegin(
@@ -695,9 +606,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecuteBegin"/>.
         /// </summary>
-        /// <param name="cExecutingPackages"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecuteBegin(
@@ -708,13 +616,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecutePackageBegin"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="fExecute"></param>
-        /// <param name="action"></param>
-        /// <param name="uiLevel"></param>
-        /// <param name="fDisableExternalUiHandler"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecutePackageBegin(
@@ -729,10 +630,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecutePatchTarget"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzTargetProductCode"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecutePatchTarget(
@@ -744,11 +641,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecuteProgress"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="dwProgressPercentage"></param>
-        /// <param name="dwOverallPercentage"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecuteProgress(
@@ -761,15 +653,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecuteMsiMessage"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="messageType"></param>
-        /// <param name="dwUIHint"></param>
-        /// <param name="wzMessage"></param>
-        /// <param name="cData"></param>
-        /// <param name="rgwzData"></param>
-        /// <param name="nRecommendation"></param>
-        /// <param name="pResult"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecuteMsiMessage(
@@ -800,12 +683,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecutePackageComplete"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="restart"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="pAction"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecutePackageComplete(
@@ -819,8 +696,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ExecuteComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnExecuteComplete(
@@ -840,8 +715,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.UnregisterComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnUnregisterComplete(
@@ -851,11 +724,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.ApplyComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <param name="restart"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="pAction"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnApplyComplete(
@@ -868,8 +736,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.LaunchApprovedExeBegin"/>.
         /// </summary>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnLaunchApprovedExeBegin(
@@ -879,9 +745,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.LaunchApprovedExeComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <param name="processId"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnLaunchApprovedExeComplete(
@@ -892,9 +755,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.BeginMsiTransactionBegin"/>.
         /// </summary>
-        /// <param name="wzTransactionId"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnBeginMsiTransactionBegin(
@@ -905,9 +765,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.BeginMsiTransactionComplete"/>.
         /// </summary>
-        /// <param name="wzTransactionId"></param>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnBeginMsiTransactionComplete(
@@ -918,9 +775,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CommitMsiTransactionBegin"/>.
         /// </summary>
-        /// <param name="wzTransactionId"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCommitMsiTransactionBegin(
@@ -931,12 +785,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CommitMsiTransactionComplete"/>.
         /// </summary>
-        /// <param name="wzTransactionId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="restart"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="pAction"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCommitMsiTransactionComplete(
@@ -950,8 +798,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.RollbackMsiTransactionBegin"/>.
         /// </summary>
-        /// <param name="wzTransactionId"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnRollbackMsiTransactionBegin(
@@ -961,12 +807,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.RollbackMsiTransactionComplete"/>.
         /// </summary>
-        /// <param name="wzTransactionId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="restart"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="pAction"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnRollbackMsiTransactionComplete(
@@ -980,7 +820,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PauseAutomaticUpdatesBegin"/>.
         /// </summary>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPauseAutomaticUpdatesBegin(
@@ -989,8 +828,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PauseAutomaticUpdatesComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPauseAutomaticUpdatesComplete(
@@ -1000,7 +837,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.SystemRestorePointBegin"/>.
         /// </summary>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnSystemRestorePointBegin(
@@ -1009,8 +845,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.SystemRestorePointComplete"/>.
         /// </summary>
-        /// <param name="hrStatus"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnSystemRestorePointComplete(
@@ -1020,15 +854,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanForwardCompatibleBundle"/>.
         /// </summary>
-        /// <param name="wzBundleId"></param>
-        /// <param name="relationType"></param>
-        /// <param name="wzBundleTag"></param>
-        /// <param name="fPerMachine"></param>
-        /// <param name="wzVersion"></param>
-        /// <param name="fRecommendedIgnoreBundle"></param>
-        /// <param name="fCancel"></param>
-        /// <param name="fIgnoreBundle"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanForwardCompatibleBundle(
@@ -1211,27 +1036,27 @@ namespace WixToolset.Mba.Core
     public enum Display
     {
         /// <summary>
-        ///
+        /// Invalid value.
         /// </summary>
         Unknown,
 
         /// <summary>
-        ///
+        /// The bundle is being run through the Burn protocol by an external application.
         /// </summary>
         Embedded,
 
         /// <summary>
-        ///
+        /// No UI should be shown.
         /// </summary>
         None,
 
         /// <summary>
-        ///
+        /// The UI should not require any interaction from the user.
         /// </summary>
         Passive,
 
         /// <summary>
-        ///
+        /// The UI should be fully interactive.
         /// </summary>
         Full,
     }
@@ -1343,27 +1168,27 @@ namespace WixToolset.Mba.Core
     public enum Restart
     {
         /// <summary>
-        ///
+        /// Invalid value.
         /// </summary>
         Unknown,
 
         /// <summary>
-        ///
+        /// The bundle should never initiate a restart.
         /// </summary>
         Never,
 
         /// <summary>
-        ///
+        /// The bundle should prompt the user whether to restart.
         /// </summary>
         Prompt,
 
         /// <summary>
-        ///
+        /// The bundle should restart if necessary.
         /// </summary>
         Automatic,
 
         /// <summary>
-        ///
+        /// The bundle should always restart when given the option.
         /// </summary>
         Always,
     }
@@ -1396,67 +1221,67 @@ namespace WixToolset.Mba.Core
     public enum Result
     {
         /// <summary>
-        ///
+        /// An error occurred.
         /// </summary>
         Error = -1,
 
         /// <summary>
-        ///
+        /// Invalid value.
         /// </summary>
         None,
 
         /// <summary>
-        ///
+        /// IDOK
         /// </summary>
         Ok,
 
         /// <summary>
-        ///
+        /// IDCANCEL
         /// </summary>
         Cancel,
 
         /// <summary>
-        ///
+        /// IDABORT
         /// </summary>
         Abort,
 
         /// <summary>
-        ///
+        /// IDRETRY
         /// </summary>
         Retry,
 
         /// <summary>
-        ///
+        /// IDIGNORE
         /// </summary>
         Ignore,
 
         /// <summary>
-        ///
+        /// IDYES
         /// </summary>
         Yes,
 
         /// <summary>
-        ///
+        /// IDNO
         /// </summary>
         No,
 
         /// <summary>
-        /// /
+        /// IDCLOSE
         /// </summary>
         Close,
 
         /// <summary>
-        ///
+        /// IDHELP
         /// </summary>
         Help,
 
         /// <summary>
-        ///
+        /// IDTRYAGAIN
         /// </summary>
         TryAgain,
 
         /// <summary>
-        ///
+        /// IDCONTINUE
         /// </summary>
         Continue,
     }
@@ -1467,7 +1292,7 @@ namespace WixToolset.Mba.Core
     public enum ResumeType
     {
         /// <summary>
-        ///
+        /// No resume information.
         /// </summary>
         None,
 
@@ -1553,12 +1378,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// The calculated operation for the related bundle.
+    /// The calculated operation for the related MSI package.
     /// </summary>
     public enum RelatedOperation
     {
         /// <summary>
-        ///
+        /// No relation.
         /// </summary>
         None,
 
@@ -1697,47 +1522,55 @@ namespace WixToolset.Mba.Core
     public enum RelationType
     {
         /// <summary>
-        ///
+        /// No relation.
         /// </summary>
         None,
 
         /// <summary>
-        ///
+        /// The related bundle is detected by the running bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         Detect,
 
         /// <summary>
-        ///
+        /// The related bundle shares an upgrade code with the running bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         Upgrade,
 
         /// <summary>
-        ///
+        /// The related bundle is an add-on for the running bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         Addon,
 
         /// <summary>
-        ///
+        /// The related bundle is a patch for the running bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         Patch,
 
         /// <summary>
-        ///
+        /// The running bundle is an add-on for the related bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         DependentAddon,
 
         /// <summary>
-        ///
+        /// The running bundle is a patch for the related bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         DependentPatch,
 
         /// <summary>
-        ///
+        /// The related bundle is a newer version of the running bundle.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         Update,
 
         /// <summary>
-        ///
+        /// The related bundle is in the running bundle's chain.
+        /// This relationship is reversed for <see cref="IBootstrapperCommand.Relation" />
         /// </summary>
         ChainPackage,
     }
@@ -1748,37 +1581,37 @@ namespace WixToolset.Mba.Core
     public enum RelatedBundlePlanType
     {
         /// <summary>
-        ///
+        /// Don't execute the related bundle.
         /// </summary>
         None,
 
         /// <summary>
-        ///
+        /// The running bundle is a downgrade for the related bundle.
         /// </summary>
         Downgrade,
 
         /// <summary>
-        ///
+        /// The running bundle is an upgrade for the related bundle.
         /// </summary>
         Upgrade,
 
         /// <summary>
-        ///
+        /// The related bundle is an add-on of the running bundle.
         /// </summary>
         Addon,
 
         /// <summary>
-        ///
+        /// The related bundle is a patch for the running bundle.
         /// </summary>
         Patch,
 
         /// <summary>
-        ///
+        /// The running bundle is an add-on for the related bundle.
         /// </summary>
         DependentAddon,
 
         /// <summary>
-        ///
+        /// The running bundle is a patch for the related bundle.
         /// </summary>
         DependentPatch,
     }
@@ -1816,7 +1649,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_APPLYCOMPLETE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -1855,7 +1688,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -1872,7 +1705,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -1895,7 +1728,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEPACKAGENONVITALVALIDATIONFAILURE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -1912,7 +1745,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -1933,7 +1766,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -1967,7 +1800,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_EXECUTEMSITRANSACTIONCOMPLETE_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
@@ -2046,7 +1879,7 @@ namespace WixToolset.Mba.Core
     public enum BOOTSTRAPPER_SHUTDOWN_ACTION
     {
         /// <summary>
-        ///
+        /// Instructs the engine to not take any special action.
         /// </summary>
         None,
 
