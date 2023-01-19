@@ -45,22 +45,22 @@ namespace WixToolset.Bal
 
         public static Message MissingDNCBAFactoryAssembly(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.MissingDNCBAFactoryAssembly, "The BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\" when using the DotNetCoreBootstrapperApplicationHost.");
+            return Message(sourceLineNumbers, Ids.MissingDNCBAFactoryAssembly, "When using DotNetCoreBootstrapperApplicationHost, the Payload element for the BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\".");
         }
 
-        public static Message MissingDNCPrereq()
+        public static Message MissingDNCPrereq(SourceLineNumber sourceLineNumbers)
         {
-            return Message(null, Ids.MissingDNCPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
+            return Message(sourceLineNumbers, Ids.MissingDNCPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
         }
 
-        public static Message MissingIUIPrimaryPackage()
+        public static Message MissingIUIPrimaryPackage(SourceLineNumber sourceLineNumbers)
         {
-            return Message(null, Ids.MissingIUIPrimaryPackage, "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".");
+            return Message(sourceLineNumbers, Ids.MissingIUIPrimaryPackage, "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".");
         }
 
-        public static Message MissingMBAPrereq()
+        public static Message MissingMBAPrereq(SourceLineNumber sourceLineNumbers)
         {
-            return Message(null, Ids.MissingMBAPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
+            return Message(sourceLineNumbers, Ids.MissingMBAPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
         }
 
         public static Message MultipleBAFunctions(SourceLineNumber sourceLineNumbers)
