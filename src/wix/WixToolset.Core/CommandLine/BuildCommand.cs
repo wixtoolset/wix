@@ -682,7 +682,16 @@ namespace WixToolset.Core.CommandLine
                             }
                             else if (!String.IsNullOrEmpty(value))
                             {
-                                parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(PdbType)).Select(s => s.ToLowerInvariant())));
+                                if (value.Equals("embedded", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    this.Messaging.Write(WarningMessages.UnsupportedCommandLineArgumentValue(arg, value, "full"));
+
+                                    this.PdbType = PdbType.Full;
+                                }
+                                else
+                                {
+                                    parser.ReportErrorArgument(arg, ErrorMessages.IllegalCommandLineArgumentValue(arg, value, Enum.GetNames(typeof(PdbType)).Select(s => s.ToLowerInvariant())));
+                                }
                             }
 
                             return true;

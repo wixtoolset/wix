@@ -643,6 +643,11 @@ namespace WixToolset.Data
             return Message(null, Ids.UnsupportedCommandLineArgument, "'{0}' is not a valid command line argument.", arg);
         }
 
+        public static Message UnsupportedCommandLineArgumentValue(string arg, string value, string fallback)
+        {
+            return Message(null, Ids.UnsupportedCommandLineArgument, "The value '{0}' is not a valid value for command line argument '{1}'. Using the value '{2}' instead.", value, arg, fallback);
+        }
+
         public static Message UpdateOfNonKeyPathFile(string nonKeyPathFileId, string componentId, string keyPathFileId)
         {
             return Message(null, Ids.UpdateOfNonKeyPathFile, "File '{0}' in Component '{1}' was changed, but the KeyPath file '{2}' was not. This file will not be patched on the target system if the REINSTALLMODE does not contain 'A'. The KeyPath file should also be changed and included in your patch.", nonKeyPathFileId, componentId, keyPathFileId);
