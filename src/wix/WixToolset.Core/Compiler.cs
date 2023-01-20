@@ -365,7 +365,7 @@ namespace WixToolset.Core
                         break;
                     }
 
-                    var id = value.Substring(start + 1, end - 1);
+                    var id = value.Substring(start + 1, end - start - 1);
                     if (Common.IsIdentifier(id))
                     {
                         this.Core.Write(WarningMessages.PropertyValueContainsPropertyReference(sourceLineNumbers, propertyId.Id, id));

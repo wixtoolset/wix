@@ -495,6 +495,33 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildBadProperty()
+        {
+            var folder = TestData.Get(@"TestData", "Property");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BadProperty.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, "bin", "test.msi")
+                });
+
+                var messages = result.Messages.Select(m => m.ToString()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The 'Break' Property contains '[X]' in its value which is an illegal reference to another property. If this value is a string literal, not a property reference, please ignore this warning. To set a property with the value of another property, use a CustomAction with Property and Value attributes.",
+                    "The 'Break' Property contains '[Y]' in its value which is an illegal reference to another property. If this value is a string literal, not a property reference, please ignore this warning. To set a property with the value of another property, use a CustomAction with Property and Value attributes.",
+                }, messages);
+            }
+        }
+
+        [Fact]
         public void CanBuildSetProperty()
         {
             var folder = TestData.Get(@"TestData\SetProperty");
