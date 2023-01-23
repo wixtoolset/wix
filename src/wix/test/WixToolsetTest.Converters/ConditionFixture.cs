@@ -187,6 +187,7 @@ namespace WixToolsetTest.Converters
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
         }
+
         [Fact]
         public void FixPublishConditionWithComment()
         {

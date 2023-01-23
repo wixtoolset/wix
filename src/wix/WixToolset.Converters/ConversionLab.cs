@@ -40,21 +40,58 @@ namespace WixToolset.Converters
             }
         }
 
+        public void InsertElementBeforeTargetElement(XElement newElement)
+        {
+            var index = this.index - 1;
+
+            if (0 <= index
+         && this.siblingNodes[index] is XText leadingText
+         && String.IsNullOrWhiteSpace(leadingText.Value))
+            {
+                this.siblingNodes.Insert(index, newElement);
+                this.siblingNodes.Insert(index, new XText(leadingText.Value));
+                this.index += 2;
+            }
+        }
+
+        private bool IsUniqueElement(XElement newElement)
+        {
+            foreach (XNode node in this.siblingNodes)
+            {
+                if (node is XElement element)
+                {
+                    if (element.Name == newElement.Name)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public void InsertUniqueElementBeforeTargetElement(XElement newElement)
+        {
+            if (this.IsUniqueElement(newElement))
+            {
+                this.InsertElementBeforeTargetElement(newElement);
+            }
+        }
+
         public void RemoveTargetElement()
         {
-            if (this.index + 1 < this.siblingNodes.Count
-             && this.siblingNodes[this.index + 1] is XText trailingText
-             && String.IsNullOrWhiteSpace(trailingText.Value))
-            {
-                this.siblingNodes.RemoveAt(this.index + 1);
-            }
             this.siblingNodes.RemoveAt(this.index);
-            if (0 < this.index
-             && this.siblingNodes[this.index - 1] is XText leadingText
+
+            var index = this.index - 1;
+
+            if (0 <= index
+             && this.siblingNodes[index] is XText leadingText
              && String.IsNullOrWhiteSpace(leadingText.Value))
             {
-                this.siblingNodes.RemoveAt(this.index - 1);
+                this.siblingNodes.RemoveAt(index);
             }
+
+            this.RemoveOrphanTextNodes();
         }
 
         public void ReplaceTargetElement(XElement replacement)

@@ -563,9 +563,7 @@ namespace WixToolset.Converters
                 else if (node is XElement element)
                 {
                     this.ConvertElement(element);
-
                     var before = element.Nodes().ToList();
-
                     this.ConvertNodes(before, level + 1);
 
                     // If any nodes were added during the processing of the children,
@@ -1066,7 +1064,7 @@ namespace WixToolset.Converters
                     {
                         xCondition.Remove();
                         element.Add(new XAttribute("Condition", text));
-                        lab.RemoveOrphanTextNodes();
+                        lab. RemoveOrphanTextNodes();
                         lab.AddCommentsAsSiblings(comments);
                     }
                 }
@@ -1280,6 +1278,7 @@ namespace WixToolset.Converters
                     using (var lab = new ConversionLab(element))
                     {
                         element.Add(new XAttribute("Condition", text));
+                        lab.RemoveOrphanTextNodes();
                         lab.AddCommentsAsSiblings(comments);
                     }
                 }
@@ -1610,13 +1609,15 @@ namespace WixToolset.Converters
             if (!String.IsNullOrEmpty(newElementName)
                 && this.OnInformation(ConverterTestType.ReferencesReplaced, element, "UI, custom action, and property reference {0} has been replaced with strongly-typed element.", id))
             {
-                this.XRoot.SetAttributeValue(XNamespace.Xmlns + newNamespaceName, newNamespace.NamespaceName);
-
-                element.AddBeforeSelf(new XElement(newNamespace + newElementName));
-
-                if (replace)
+                using (var lab = new ConversionLab(element))
                 {
-                    element.Remove();
+                    this.XRoot.SetAttributeValue(XNamespace.Xmlns + newNamespaceName, newNamespace.NamespaceName);
+                    lab.InsertUniqueElementBeforeTargetElement(new XElement(newNamespace + newElementName));
+
+                    if (replace)
+                    {
+                        lab.RemoveTargetElement();
+                    }
                 }
             }
         }
@@ -2241,7 +2242,7 @@ namespace WixToolset.Converters
                     element.Name = ns.GetName(element.Name.LocalName);
                 }
 
-                // Remove all the attributes and add them back to with their namespace updated (as necessary).
+                // Remove all the attributes and add them back with their namespace updated (as necessary).
                 IEnumerable<XAttribute> attributes = element.Attributes().ToList();
                 element.RemoveAttributes();
 
