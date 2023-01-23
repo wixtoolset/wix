@@ -29,7 +29,8 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:bal=\"http://wixtoolset.org/schemas/v4/wxs/bal\">",
-                "  <Fragment><PackageGroup Id=\"NetFx452Web\">",
+                "  <Fragment>",
+                "    <PackageGroup Id=\"NetFx452Web\">",
                 "      <ExePackage Id=\"NetFx452Web\" bal:PrereqPackage=\"yes\" bal:PrereqLicenseUrl=\"$(var.NetFx452EulaLink)\" />",
                 "    </PackageGroup>",
                 "  </Fragment>",
