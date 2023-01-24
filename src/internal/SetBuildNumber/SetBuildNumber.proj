@@ -20,7 +20,6 @@
     <SetBuildNumbersDependsOn>
       __SetPropertiesFromGit;
       GitThisAssembly;
-      SetAppVeyorBuildNumber;
       SetGlobalJson;
       SetDirectoryPackagesProps;
       SetOverallWixVersions;
@@ -32,20 +31,6 @@
     <OverallWixVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\wixver.props))</OverallWixVersionsPath>
     <GitInfoThisAssemblyFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\ThisAssembly.WixVer.cs))</GitInfoThisAssemblyFile>
   </PropertyGroup>
-
-  <Target Name="SetAppVeyorBuildNumber"
-          Condition=" '$(APPVEYOR)'=='True' ">
-    <PropertyGroup>
-      <AppVeyorBuildNumber>$(InformationalVersion)-$(APPVEYOR_BUILD_ID)</AppVeyorBuildNumber>
-      <AppVeyorBuildNumber Condition=" '$(APPVEYOR_PULL_REQUEST_NUMBER)'!='' ">PR#$(APPVEYOR_PULL_REQUEST_NUMBER)-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
-      <AppVeyorBuildNumber Condition=" '$(RuntimeTestsEnabled)'!='' ">TEST-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
-    </PropertyGroup>
-
-    <Message Importance="high" Text="  $(AppVeyorBuildNumber)" />
-
-    <Exec Command='appveyor UpdateBuild -Version "$(AppVeyorBuildNumber)"' />
-  </Target>
-
 
   <Target Name="SetGlobalJson"
           Inputs="global.json.pp"
