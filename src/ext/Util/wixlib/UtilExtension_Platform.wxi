@@ -125,7 +125,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="$(var.Prefix)RegisterRestartResources$(var.Suffix)" DllEntry="WixRegisterRestartResources$(var.Suffix)" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RegisterRestartResources$(var.Suffix)" DllEntry="WixRegisterRestartResources" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
             <Custom Action="$(var.Prefix)RegisterRestartResources$(var.Suffix)" Before="InstallValidate" Overridable="yes" />
