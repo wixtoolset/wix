@@ -42,7 +42,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\wixstdba\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>shlwapi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>rpcrt4.lib;shlwapi.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>

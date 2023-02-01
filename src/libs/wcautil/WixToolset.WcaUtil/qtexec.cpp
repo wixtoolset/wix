@@ -21,6 +21,10 @@ static HRESULT CreatePipes(
 
     HRESULT hr = S_OK;
     SECURITY_ATTRIBUTES sa;
+    WCHAR wzGuid[GUID_STRING_LENGTH];
+    LPWSTR szStdInPipeName = NULL;
+    LPWSTR szStdOutPipeName = NULL;
+    BOOL fRes = TRUE;
     HANDLE hOutTemp = INVALID_HANDLE_VALUE;
     HANDLE hInTemp = INVALID_HANDLE_VALUE;
 
@@ -30,6 +34,16 @@ static HRESULT CreatePipes(
     HANDLE hInRead = INVALID_HANDLE_VALUE;
     HANDLE hInWrite = INVALID_HANDLE_VALUE;
 
+    // Generate unique pipe names
+    hr = GuidFixedCreate(wzGuid);
+    ExitOnFailure(hr, "Failed to create UUID.");
+
+    hr = StrAllocFormatted(&szStdInPipeName, L"\\\\.\\pipe\\%ls-stdin", wzGuid);
+    ExitOnFailure(hr, "Failed to create stdin pipe name.");
+
+    hr = StrAllocFormatted(&szStdOutPipeName, L"\\\\.\\pipe\\%ls-stdout", wzGuid);
+    ExitOnFailure(hr, "Failed to create stdout pipe name.");
+
     // Fill out security structure so we can inherit handles
     ::ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -37,35 +51,33 @@ static HRESULT CreatePipes(
     sa.lpSecurityDescriptor = NULL;
 
     // Create pipes
-    if (!::CreatePipe(&hOutTemp, &hOutWrite, &sa, 0))
-    {
-        ExitOnLastError(hr, "Failed to create output pipe");
-    }
+    hOutTemp = ::CreateNamedPipeW(szStdOutPipeName, PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, OUTPUT_BUFFER, OUTPUT_BUFFER, NMPWAIT_USE_DEFAULT_WAIT, &sa);
+    ExitOnInvalidHandleWithLastError(hOutTemp, hr, "Failed to create named pipe for stdout reader");
 
-    if (!::CreatePipe(&hInRead, &hInTemp, &sa, 0))
-    {
-        ExitOnLastError(hr, "Failed to create input pipe");
-    }
+    hOutWrite = ::CreateFileW(szStdOutPipeName, FILE_WRITE_DATA | SYNCHRONIZE | FILE_FLAG_OVERLAPPED, 0, &sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    ExitOnInvalidHandleWithLastError(hOutWrite, hr, "Failed to open named pipe for stdout writer");
 
+    fRes = ::DuplicateHandle(::GetCurrentProcess(), hOutWrite, ::GetCurrentProcess(), &hErrWrite, 0, FALSE, DUPLICATE_SAME_ACCESS);
+    ExitOnNullWithLastError(fRes, hr, "Failed to duplicate named pipe from stdout to stderr");
+    ExitOnInvalidHandleWithLastError(hErrWrite, hr, "Failed to duplicate named pipe from stdout to stderr");
 
-    // Duplicate output pipe so standard error and standard output write to
-    // the same pipe
-    if (!::DuplicateHandle(::GetCurrentProcess(), hOutWrite, ::GetCurrentProcess(), &hErrWrite, 0, TRUE, DUPLICATE_SAME_ACCESS))
-    {
-        ExitOnLastError(hr, "Failed to duplicate write handle");
-    }
+    fRes = ::DuplicateHandle(::GetCurrentProcess(), hOutTemp, ::GetCurrentProcess(), &hOutRead, 0, FALSE, DUPLICATE_SAME_ACCESS);
+    ExitOnNullWithLastError(fRes, hr, "Failed to duplicate named pipe for stdout reader");
+    ExitOnInvalidHandleWithLastError(hOutRead, hr, "Failed to duplicate named pipe for stdout reader");
+    ::CloseHandle(hOutTemp);
+    hOutTemp = INVALID_HANDLE_VALUE;
 
-    // We need to create new output read and input write handles that are
-    // non inheritable.  Otherwise it creates handles that can't be closed.
-    if (!::DuplicateHandle(::GetCurrentProcess(), hOutTemp, ::GetCurrentProcess(), &hOutRead, 0, FALSE, DUPLICATE_SAME_ACCESS))
-    {
-        ExitOnLastError(hr, "Failed to duplicate output pipe");
-    }
+    hInTemp = ::CreateNamedPipeW(szStdInPipeName, PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, 1, OUTPUT_BUFFER, OUTPUT_BUFFER, NMPWAIT_USE_DEFAULT_WAIT, &sa);
+    ExitOnInvalidHandleWithLastError(hInTemp, hr, "Failed to create named pipe for stdin writer");
 
-    if (!::DuplicateHandle(::GetCurrentProcess(), hInTemp, ::GetCurrentProcess(), &hInWrite, 0, FALSE, DUPLICATE_SAME_ACCESS))
-    {
-        ExitOnLastError(hr, "Failed to duplicate input pipe");
-    }
+    hInRead = ::CreateFileW(szStdInPipeName, FILE_READ_DATA, 0, &sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    ExitOnInvalidHandleWithLastError(hInRead, hr, "Failed to open named pipe for stdin reader");
+
+    fRes = ::DuplicateHandle(::GetCurrentProcess(), hInTemp, ::GetCurrentProcess(), &hInWrite, 0, FALSE, DUPLICATE_SAME_ACCESS);
+    ExitOnNullWithLastError(fRes, hr, "Failed to duplicate named pipe for stdin writer");
+    ExitOnInvalidHandleWithLastError(hInWrite, hr, "Failed to duplicate named pipe for stdin writer");
+    ::CloseHandle(hInTemp);
+    hInTemp = INVALID_HANDLE_VALUE;
 
     // now that everything has succeeded, assign to the outputs
     *phOutRead = hOutRead;
@@ -84,19 +96,22 @@ static HRESULT CreatePipes(
     hInWrite = INVALID_HANDLE_VALUE;
 
 LExit:
-    ReleaseFile(hOutRead);
-    ReleaseFile(hOutWrite);
-    ReleaseFile(hErrWrite);
-    ReleaseFile(hInRead);
-    ReleaseFile(hInWrite);
-    ReleaseFile(hOutTemp);
-    ReleaseFile(hInTemp);
+    ReleaseFileHandle(hOutRead);
+    ReleaseFileHandle(hOutWrite);
+    ReleaseFileHandle(hErrWrite);
+    ReleaseFileHandle(hInRead);
+    ReleaseFileHandle(hInWrite);
+    ReleaseFileHandle(hOutTemp);
+    ReleaseFileHandle(hInTemp);
+    ReleaseStr(szStdInPipeName);
+    ReleaseStr(szStdOutPipeName);
 
     return hr;
 }
 
 static HRESULT HandleOutput(
     __in BOOL fLogOutput,
+    __in HANDLE hProcess,
     __in HANDLE hRead,
     __out_z_opt LPWSTR* psczOutput
     )
@@ -112,20 +127,89 @@ static HRESULT HandleOutput(
     BOOL bFirst = TRUE;
     BOOL bUnicode = TRUE;
     HRESULT hr = S_OK;
+    OVERLAPPED overlapped = { 0 };
+    HANDLE rghHandles[2] = { 0 };
+    BOOL fRes = TRUE;
+    DWORD dwRes = ERROR_SUCCESS;
+    BOOL fLast = FALSE;
+
+    ::ZeroMemory(&overlapped, sizeof(overlapped));
 
     // Get buffer for output
     pBuffer = static_cast<BYTE *>(MemAlloc(OUTPUT_BUFFER, FALSE));
     ExitOnNull(pBuffer, hr, E_OUTOFMEMORY, "Failed to allocate buffer for output.");
 
-    while (0 != dwBytes)
+    overlapped.hEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    ExitOnNullWithLastError((overlapped.hEvent && (overlapped.hEvent != INVALID_HANDLE_VALUE)), hr, "Failed to create event");
+
+    rghHandles[0] = hProcess;
+    rghHandles[1] = overlapped.hEvent;
+
+    fRes = ::ConnectNamedPipe(hRead, &overlapped);
+    if (!fRes)
+    {
+        dwRes = ::GetLastError();
+        if (dwRes == ERROR_IO_PENDING)
+        {
+            hr = AppWaitForSingleObject(overlapped.hEvent, INFINITE);
+            ExitOnFailure(hr, "Failed to wait for process to connect to stdout");
+            fRes = TRUE;
+        }
+        else if (dwRes == ERROR_PIPE_CONNECTED)
+        {
+            fRes = TRUE;
+        }
+        ExitOnNullWithLastError(fRes, hr, "Failed to connect to stdout");
+    }
+
+    while (!fLast)
     {
         ::ZeroMemory(pBuffer, OUTPUT_BUFFER);
-        if (!::ReadFile(hRead, pBuffer, OUTPUT_BUFFER - 1, &dwBytes, NULL) && GetLastError() != ERROR_BROKEN_PIPE)
+        fRes = ::ResetEvent(overlapped.hEvent);
+        ExitOnNullWithLastError(fRes, hr, "Failed to reset event");
+
+        fRes = ::ReadFile(hRead, pBuffer, OUTPUT_BUFFER - 1, nullptr, &overlapped);
+        if (!fRes)
         {
-            ExitOnLastError(hr, "Failed to read from handle.");
+            dwRes = ::GetLastError();
+            if (dwRes == ERROR_BROKEN_PIPE)
+            {
+                break;
+            }
+            ExitOnNullWithLastError((dwRes == ERROR_IO_PENDING), hr, "Failed to wait for stdout data");
         }
 
-        if (fLogOutput)
+        dwRes = ::WaitForMultipleObjects(ARRAYSIZE(rghHandles), rghHandles, FALSE, INFINITE);
+        // Process terminated, or pipe abandoned- read any remains from the pipe
+        if ((dwRes == WAIT_OBJECT_0) || (dwRes == WAIT_ABANDONED_0) || (dwRes == (WAIT_ABANDONED_0 + 1)))
+        {
+            fLast = TRUE;
+            if (!::PeekNamedPipe(hRead, pBuffer, OUTPUT_BUFFER - 1, &dwBytes, nullptr, nullptr))
+            {
+                break;
+            }
+        }
+        else
+        {
+            ExitOnNullWithLastError((dwRes != WAIT_FAILED), hr, "Failed to wait for process to terminate or write to stdout");
+            if (dwRes != (WAIT_OBJECT_0 + 1))
+            {
+                ExitOnWin32Error(dwRes, hr, "Failed to wait for process to terminate or write to stdout.");
+            }
+
+            fRes = ::GetOverlappedResult(hRead, &overlapped, &dwBytes, FALSE);
+            if (!fRes)
+            {
+                dwRes = ::GetLastError();
+                if (dwRes == ERROR_BROKEN_PIPE)
+                {
+                    break;
+                }
+                ExitOnWin32Error(dwRes, hr, "Failed to read stdout data");
+            }
+        }
+
+        if (fLogOutput && dwBytes)
         {
             // Check for UNICODE or ANSI output
             if (bFirst)
@@ -215,6 +299,12 @@ static HRESULT HandleOutput(
     // Print any text that didn't end with a new line
     if (szLog && *szLog)
     {
+        if (psczOutput)
+        {
+            hr = StrAllocConcat(psczOutput, szLog, 0);
+            ExitOnFailure(hr, "Failed to concatenate output to return string.");
+        }
+
         hr = StrReplaceStringAll(&szLog, L"%", L"%%");
         ExitOnFailure(hr, "Failed to escape percent signs in string");
 
@@ -231,6 +321,7 @@ LExit:
     ReleaseStr(szTemp);
     ReleaseStr(szWrite);
     ReleaseStr(sczEscaped);
+    ReleaseFileHandle(overlapped.hEvent);
 
     return hr;
 }
@@ -293,7 +384,7 @@ static HRESULT QuietExecImpl(
         ReleaseFile(hInRead);
 
         // Log output if we were asked to do so; otherwise just read the output handle
-        HandleOutput(fLogOutput, hOutRead, psczOutput);
+        HandleOutput(fLogOutput, oProcInfo.hProcess, hOutRead, psczOutput);
 
         // Wait for everything to finish
         ::WaitForSingleObject(oProcInfo.hProcess, dwTimeout);

@@ -17,3 +17,5 @@ const WCHAR MAGIC_MULTISZ_DELIM = 128;
 #include "fileutil.h"
 #include "memutil.h"
 #include "strutil.h"
+#include "apputil.h"
+#include "guidutil.h"
