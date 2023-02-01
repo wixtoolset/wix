@@ -174,55 +174,6 @@ LExit:
     return hr;
 }
 
-// These two custom actions are deprecated, and should go away in wix v4.0. WixQuietExec replaces this one,
-// and is not intended to have any difference in behavior apart from CA name and property names.
-extern "C" UINT __stdcall CAQuietExec(
-    __in MSIHANDLE hInstall
-    )
-{
-    Assert(hInstall);
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "CAQuietExec");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    hr = ExecCommon(CAQUIET_ARGUMENTS_PROPERTY, CAQUIET_TIMEOUT_PROPERTY, TRUE, TRUE);
-    ExitOnFailure(hr, "Failed in ExecCommon method");
-
-LExit:
-    if (FAILED(hr))
-    {
-        er = ERROR_INSTALL_FAILURE;
-    }
-
-    return WcaFinalize(er); 
-}
-
-// 2nd deprecated custom action name, superseded by WixQuietExec64
-extern "C" UINT __stdcall CAQuietExec64(
-    __in MSIHANDLE hInstall
-    )
-{
-    Assert(hInstall);
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "CAQuietExec64");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    hr = ExecCommon64(CAQUIET64_ARGUMENTS_PROPERTY, CAQUIET_TIMEOUT_PROPERTY, TRUE, TRUE);
-    ExitOnFailure(hr, "Failed in ExecCommon64 method");
-
-LExit:
-    if (FAILED(hr))
-    {
-        er = ERROR_INSTALL_FAILURE;
-    }
-
-    return WcaFinalize(er);
-}
-
 extern "C" UINT __stdcall WixQuietExec(
     __in MSIHANDLE hInstall
     )
