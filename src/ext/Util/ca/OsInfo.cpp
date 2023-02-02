@@ -330,6 +330,7 @@ LExit:
     {
         ::LocalFree(psid);
     }
+    
     ReleaseStr(pwzPropertyValue);
     return hr;
 }

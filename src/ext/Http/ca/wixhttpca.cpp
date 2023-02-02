@@ -191,16 +191,16 @@ static UINT SchedHttpUrlReservations(
 
         if (WCA_TODO_INSTALL == todoSched)
         {
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixRollbackHttpUrlReservationsInstall"), sczRollbackCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackHttpUrlReservationsInstall"), sczRollbackCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
             ExitOnFailure(hr, "Failed to schedule install URL reservations rollback.");
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixExecHttpUrlReservationsInstall"), sczCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecHttpUrlReservationsInstall"), sczCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
             ExitOnFailure(hr, "Failed to schedule install URL reservations execution.");
         }
         else
         {
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixRollbackHttpUrlReservationsUninstall"), sczRollbackCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackHttpUrlReservationsUninstall"), sczRollbackCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
             ExitOnFailure(hr, "Failed to schedule uninstall URL reservations rollback.");
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixExecHttpUrlReservationsUninstall"), sczCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecHttpUrlReservationsUninstall"), sczCustomActionData, cUrlReservations * COST_HTTP_URL_ACL);
             ExitOnFailure(hr, "Failed to schedule uninstall URL reservations execution.");
         }
     }

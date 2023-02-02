@@ -795,23 +795,22 @@ extern "C" UINT __stdcall SchedNetFx(
     // Schedule the install custom action
     if (pwzInstallCustomActionData && *pwzInstallCustomActionData)
     {
-        hr = WcaSetProperty(L"NetFxExecuteNativeImageInstall", pwzInstallCustomActionData);
+        hr = WcaSetProperty(CUSTOM_ACTION_DECORATION(L"NetFxExecuteNativeImageInstall"), pwzInstallCustomActionData);
         ExitOnFailure(hr, "failed to schedule NetFxExecuteNativeImageInstall action");
 
-        hr = WcaSetProperty(L"NetFxExecuteNativeImageCommitInstall", pwzInstallCustomActionData);
+        hr = WcaSetProperty(CUSTOM_ACTION_DECORATION(L"NetFxExecuteNativeImageCommitInstall"), pwzInstallCustomActionData);
         ExitOnFailure(hr, "failed to schedule NetFxExecuteNativeImageCommitInstall action");
     }
 
     // Schedule the uninstall custom action
     if (pwzUninstallCustomActionData && *pwzUninstallCustomActionData)
     {
-        hr = WcaSetProperty(L"NetFxExecuteNativeImageUninstall", pwzUninstallCustomActionData);
+        hr = WcaSetProperty(CUSTOM_ACTION_DECORATION(L"NetFxExecuteNativeImageUninstall"), pwzUninstallCustomActionData);
         ExitOnFailure(hr, "failed to schedule NetFxExecuteNativeImageUninstall action");
 
-        hr = WcaSetProperty(L"NetFxExecuteNativeImageCommitUninstall", pwzUninstallCustomActionData);
+        hr = WcaSetProperty(CUSTOM_ACTION_DECORATION(L"NetFxExecuteNativeImageCommitUninstall"), pwzUninstallCustomActionData);
         ExitOnFailure(hr, "failed to schedule NetFxExecuteNativeImageCommitUninstall action");
     }
-
 
 LExit:
     ReleaseStr(pwzInstallCustomActionData);
