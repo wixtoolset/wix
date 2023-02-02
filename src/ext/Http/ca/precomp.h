@@ -15,7 +15,7 @@
 
 #include "cost.h"
 
-#include "caDecor.h"
+#include "..\..\caDecor.h"
 
 enum eHandleExisting
 {

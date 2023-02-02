@@ -420,16 +420,16 @@ static UINT SchedHttpSniSslCerts(
 
         if (WCA_TODO_INSTALL == todoSched)
         {
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixRollbackHttpSniSslCertsInstall"), sczRollbackCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackHttpSniSslCertsInstall"), sczRollbackCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
             ExitOnFailure(hr, "Failed to schedule install SNI SSL certificate rollback");
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixExecHttpSniSslCertsInstall"), sczCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecHttpSniSslCertsInstall"), sczCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
             ExitOnFailure(hr, "Failed to schedule install SNI SSL certificate execution");
         }
         else
         {
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixRollbackHttpSniSslCertsUninstall"), sczRollbackCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackHttpSniSslCertsUninstall"), sczRollbackCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
             ExitOnFailure(hr, "Failed to schedule uninstall SNI SSL certificate rollback");
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WixExecHttpSniSslCertsUninstall"), sczCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecHttpSniSslCertsUninstall"), sczCustomActionData, cCertificates * COST_HTTP_SNI_SSL);
             ExitOnFailure(hr, "Failed to schedule uninstall SNI SSL certificate execution");
         }
     }

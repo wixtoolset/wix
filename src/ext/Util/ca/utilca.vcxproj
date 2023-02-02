@@ -79,7 +79,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ClInclude Include="caDecor.h" />
     <ClInclude Include="cost.h" />
     <ClInclude Include="CustomMsiErrors.h" />
     <ClInclude Include="precomp.h" />

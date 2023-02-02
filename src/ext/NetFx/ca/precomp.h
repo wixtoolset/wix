@@ -14,5 +14,5 @@
 #include "dirutil.h"
 #include "guidutil.h"
 
-#include "caDecor.h"
+#include "..\..\caDecor.h"
 #include "cost.h"
