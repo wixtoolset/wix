@@ -86,7 +86,7 @@ namespace WixToolset.Util
             new[]
             {
                 new ColumnDefinition("FileShare_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4FileShare", keyColumn: 1, description: "FileShare that these premissions are to be applied to.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4User", description: "User that these premissions are to apply to.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4User", keyColumn: 1, description: "User that these premissions are to apply to.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Permissions", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Permissions int, as in EXPLICIT_ACCESS.grfAccessPermissions in MSDN"),
             },
             symbolIdIsPrimaryKey: false
