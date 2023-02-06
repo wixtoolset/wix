@@ -2466,7 +2466,7 @@ namespace WixToolset.Core
                         case "Action":
                             if (customAction)
                             {
-                                actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
+                                actionName = this.ConvertActionName( this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib));
                                 this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.CustomAction, actionName);
                             }
                             else
@@ -2477,7 +2477,7 @@ namespace WixToolset.Core
                         case "After":
                             if (customAction || showDialog || specialAction || specialStandardAction)
                             {
-                                afterAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
+                                afterAction = this.ConvertActionName(this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib));
                                 this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.WixAction, sequenceTable.ToString(), afterAction);
                             }
                             else
@@ -2488,7 +2488,7 @@ namespace WixToolset.Core
                         case "Before":
                             if (customAction || showDialog || specialAction || specialStandardAction)
                             {
-                                beforeAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
+                                beforeAction = this.ConvertActionName( this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib));
                                 this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.WixAction, sequenceTable.ToString(), beforeAction);
                             }
                             else
@@ -4995,6 +4995,83 @@ namespace WixToolset.Core
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Adds platform suffix to old fasion names of WIX custom actions
+        /// This allows to specify WIX custom action names wihout specifying an architecture in Sequnces and dialogs.
+        /// Suffix will be added according to build architecture
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        private string ConvertActionName(string actionName)
+        {
+            string tmp = actionName;
+
+            switch(actionName)
+            {
+                //Actions from Util extension
+                case "Wix4SchedXmlFile":
+                case "Wix4SchedXmlConfig":
+                case "Wix4WaitForEvent":
+                case "Wix4WaitForEventDeferred":
+                case "Wix4ExitEarlyWithSuccess":             
+                case "Wix4BroadcastSettingChange":
+                case "Wix4BroadcastEnvironmentChange":
+                case "Wix4ShellExecBinary":
+                case "Wix4ShellExec":
+                case "Wix4UnelevatedShellExec":
+                case "Wix4QuietExec":
+                case "Wix4SilentExec":
+                case "Wix4CheckRebootRequired":
+                case "Wix4CloseApplications":
+                case "Wix4ConfigureUsers":
+                case "Wix4ConfigureSmbInstall":
+                case "Wix4ConfigureSmbUninstall":
+                case "Wix4InstallPerfCounterData":
+                case "Wix4UninstallPerfCounterData":
+                case "Wix4ConfigurePerfmonInstall":
+                case "Wix4ConfigurePerfmonUninstall":
+                case "Wix4ConfigurePerfmonManifestRegister":
+                case "Wix4ConfigurePerfmonManifestUnregister":
+                case "Wix4ConfigureEventManifestRegister":
+                case "Wix4ConfigureEventManifestUnregister":
+                case "Wix4SchedServiceConfig":
+                case "Wix4TouchFileDuringInstall":
+                case "Wix4TouchFileDuringUninstall":
+                case "Wix4SchedInternetShortcuts":
+                case "Wix4SchedSecureObjects":
+                // Actions from IIS extension
+                case "Wix4ConfigureIIs":
+                case "Wix4InstallCertificates":
+                //Actions from ComPlus extension
+                case "Wix4ConfigureComPlusInstall":
+                case "Wix4ConfigureComPlusUninstall":
+                // Actions from dependency extension
+                case "Wix4DependencyRequire":
+                case "Wix4DependencyCheck":
+                // Actions from DirectX extension
+                case "Wix4QueryDirectXCaps":
+                //Actions from  firewall extension
+                case "Wix4SchedFirewallExceptionsInstall":
+                // Actions from HTTP extension
+                case "Wix4SchedHttpUrlReservationsInstall":
+                case "Wix4SchedHttpSniSslCertsInstall":
+                //Actions from MSMQ extension
+                case "Wix4MessageQueuingInstall":
+                //Actions from UI extension
+                case "WixUIValidatePath":
+                case "WixUIPrintEula":
+                // Actions from SQL extension
+                case "Wix4InstallSqlData":
+                    tmp = tmp + "_" + this.CurrentPlatform;
+                    break;
+                default:
+                    break;
+            }
+
+            return tmp;
+
         }
     }
 }

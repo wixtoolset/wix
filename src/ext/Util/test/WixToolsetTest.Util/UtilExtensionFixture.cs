@@ -10,6 +10,7 @@ namespace WixToolsetTest.Util
     using WixToolset.Util;
     using Xunit;
     using System.Xml.Linq;
+    using System;
 
     public class UtilExtensionFixture
     {
@@ -511,6 +512,43 @@ namespace WixToolsetTest.Util
                     "The WindowsFeatureSearch/@Variable attribute's value, 'NTProductType', is one of the illegal options: 'AdminToolsFolder', 'AppDataFolder', 'CommonAppDataFolder', 'CommonFiles64Folder', 'CommonFiles6432Folder', 'CommonFilesFolder', 'CompatibilityMode', 'ComputerName', 'Date', 'DesktopFolder', 'FavoritesFolder', 'FontsFolder', 'InstallerName', 'InstallerVersion', 'LocalAppDataFolder', 'LogonUser', 'MyPicturesFolder', 'NativeMachine', 'NTProductType', 'NTSuiteBackOffice', 'NTSuiteDataCenter', 'NTSuiteEnterprise', 'NTSuitePersonal', 'NTSuiteSmallBusiness', 'NTSuiteSmallBusinessRestricted', 'NTSuiteWebServer', 'PersonalFolder', 'Privileged', 'ProcessorArchitecture', 'ProgramFiles64Folder', 'ProgramFiles6432Folder', 'ProgramFilesFolder', 'ProgramMenuFolder', 'RebootPending', 'SendToFolder', 'ServicePackLevel', 'StartMenuFolder', 'StartupFolder', 'System64Folder', 'SystemFolder', 'SystemLanguageID', 'TempFolder', 'TemplateFolder', 'TerminalServer', 'UserLanguageID', 'UserUILanguageID', 'VersionMsi', 'VersionNT', 'VersionNT64', 'WindowsBuildNumber', 'WindowsFolder', 'WindowsVolume', 'WixBundleAction', 'WixBundleActiveParent', 'WixBundleCommandLineAction', 'WixBundleElevated', 'WixBundleExecutePackageAction', 'WixBundleExecutePackageCacheFolder', 'WixBundleForcedRestartPackage', 'WixBundleInstalled', 'WixBundleProviderKey', 'WixBundleSourceProcessFolder', 'WixBundleSourceProcessPath', 'WixBundleTag', 'WixBundleUILevel', or 'WixBundleVersion'.",
                 }, messages.ToArray());
             }
+        }
+
+        [Fact]
+        public void CanBuildWithFlatActionName()
+        {
+            var folder = TestData.Get(@"TestData\FlatActionsNames");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(Build, true, "InstallExecuteSequence");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "InstallExecuteSequence:FindRelatedProducts\t\t25",
+                "InstallExecuteSequence:LaunchConditions\t\t100",
+                "InstallExecuteSequence:ValidateProductID\t\t700",
+                "InstallExecuteSequence:CostInitialize\t\t800",
+                "InstallExecuteSequence:FileCost\t\t900",
+                "InstallExecuteSequence:CostFinalize\t\t1000",
+                "InstallExecuteSequence:MigrateFeatureStates\t\t1200",
+                "InstallExecuteSequence:InstallValidate\t\t1400",
+                "InstallExecuteSequence:RemoveExistingProducts\t\t1401",
+                "InstallExecuteSequence:InstallInitialize\t\t1500",
+                "InstallExecuteSequence:ProcessComponents\t\t1600",
+                "InstallExecuteSequence:UnpublishFeatures\t\t1800",
+                "InstallExecuteSequence:RemoveFiles\t\t3500",
+                "InstallExecuteSequence:Wix4ConfigureSmbUninstall_X86\tVersionNT > 400\t3501",
+                "InstallExecuteSequence:RemoveFolders\t\t3600",
+                "InstallExecuteSequence:CreateFolders\t\t3700",
+                "InstallExecuteSequence:InstallFiles\t\t4000",
+                "InstallExecuteSequence:Wix4SchedXmlConfig_X86\tSOME_CONDITION\t4001",
+                "InstallExecuteSequence:Wix4ConfigureSmbInstall_X86\tAnother_Condition\t4002",
+                "InstallExecuteSequence:RegisterUser\t\t6000",
+                "InstallExecuteSequence:RegisterProduct\t\t6100",
+                "InstallExecuteSequence:PublishFeatures\t\t6300",
+                "InstallExecuteSequence:PublishProduct\t\t6400",
+                "InstallExecuteSequence:InstallFinalize\t\t6600"
+            }, results.OrderBy(s => Int32.Parse(s.Substring(s.LastIndexOf('\t')))).ToArray());
+
         }
 
         private static void Build(string[] args)
