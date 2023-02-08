@@ -166,7 +166,7 @@ public: // IBootstrapperApplication
         else if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display && !m_fAutomaticRemoval)
         {
             // Make sure the MSI UI is shown regardless of the current state of the package.
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
         }
 
         return __super::OnPlanPackageBegin(wzPackageId, state, fCached, installCondition, repairCondition, recommendedState, recommendedCacheType, pRequestState, pRequestedCacheType, pfCancel);
