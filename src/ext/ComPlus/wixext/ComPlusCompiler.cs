@@ -28,6 +28,8 @@ namespace WixToolset.ComPlus
 
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/complus";
 
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4ConfigureComPlusInstall", "Wix4ConfigureComPlusUninstall" };
+
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>

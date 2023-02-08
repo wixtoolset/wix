@@ -16,6 +16,8 @@ namespace WixToolset.UI
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/ui";
 
+        public override List<string> ActionNames { get; } = new List<string> { "WixUIValidatePath", "WixUIPrintEula" };
+
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>

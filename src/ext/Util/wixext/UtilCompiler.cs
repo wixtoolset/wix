@@ -35,10 +35,43 @@ namespace WixToolset.Util
         internal const int UserDontCreateUser = 0x00000200;
         internal const int UserNonVital = 0x00000400;
         internal const int UserRemoveComment = 0x00000800;
-
+        
         private static readonly Regex FindPropertyBrackets = new Regex(@"\[(?!\\|\])|(?<!\[\\\]|\[\\|\\\[)\]", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         public override XNamespace Namespace => UtilConstants.Namespace;
+
+
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4SchedXmlFile",
+                 "Wix4SchedXmlConfig",
+                 "Wix4WaitForEvent",
+                 "Wix4WaitForEventDeferred",
+                 "Wix4ExitEarlyWithSuccess",             
+                 "Wix4BroadcastSettingChange",
+                 "Wix4BroadcastEnvironmentChange",
+                 "Wix4ShellExecBinary",
+                 "Wix4ShellExec",
+                 "Wix4UnelevatedShellExec",
+                 "Wix4QuietExec",
+                 "Wix4SilentExec",
+                 "Wix4CheckRebootRequired",
+                 "Wix4CloseApplications",
+                 "Wix4ConfigureUsers",
+                 "Wix4ConfigureSmbInstall",
+                 "Wix4ConfigureSmbUninstall",
+                 "Wix4InstallPerfCounterData",
+                 "Wix4UninstallPerfCounterData",
+                 "Wix4ConfigurePerfmonInstall",
+                 "Wix4ConfigurePerfmonUninstall",
+                 "Wix4ConfigurePerfmonManifestRegister",
+                 "Wix4ConfigurePerfmonManifestUnregister",
+                 "Wix4ConfigureEventManifestRegister",
+                 "Wix4ConfigureEventManifestUnregister",
+                 "Wix4SchedServiceConfig",
+                 "Wix4TouchFileDuringInstall",
+                 "Wix4TouchFileDuringUninstall",
+                 "Wix4SchedInternetShortcuts",
+                 "Wix4SchedSecureObjects"}; 
+              
 
         /// <summary>
         /// Types of Internet shortcuts.

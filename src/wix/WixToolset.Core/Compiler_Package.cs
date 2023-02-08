@@ -2466,8 +2466,8 @@ namespace WixToolset.Core
                         case "Action":
                             if (customAction)
                             {
-                                actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.CustomAction, actionName);
+                                    actionName = this.ConvertActionName(this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib));
+                                    this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.CustomAction, actionName);
                             }
                             else
                             {
@@ -2477,8 +2477,8 @@ namespace WixToolset.Core
                         case "After":
                             if (customAction || showDialog || specialAction || specialStandardAction)
                             {
-                                afterAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.WixAction, sequenceTable.ToString(), afterAction);
+                                    afterAction = this.ConvertActionName(this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib));
+                                    this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.WixAction, sequenceTable.ToString(), afterAction);
                             }
                             else
                             {
@@ -2488,8 +2488,8 @@ namespace WixToolset.Core
                         case "Before":
                             if (customAction || showDialog || specialAction || specialStandardAction)
                             {
-                                beforeAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.WixAction, sequenceTable.ToString(), beforeAction);
+                                    beforeAction = this.ConvertActionName(this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib));
+                                    this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.WixAction, sequenceTable.ToString(), beforeAction);
                             }
                             else
                             {

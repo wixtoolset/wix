@@ -41,6 +41,11 @@ namespace WixToolset.Extensibility
         protected IComponentKeyPath CreateComponentKeyPath() => this.Context.ServiceProvider.GetService<IComponentKeyPath>();
 
         /// <summary>
+        /// Returns list of old fasion WIX custom action names (prefixed with WiX and without platform suffix)
+        /// </summary>
+        public virtual List<string> ActionNames { get { return new List<string>(); } }  
+
+        /// <summary>
         /// Called at the beginning of the compilation of a source file.
         /// </summary>
         public virtual void PreCompile(ICompileContext context)

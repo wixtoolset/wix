@@ -16,6 +16,8 @@ namespace WixToolset.DirectX
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/directx";
 
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4QueryDirectXCaps" };
+
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>

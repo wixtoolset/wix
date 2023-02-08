@@ -15,6 +15,9 @@ namespace WixToolset.Dependency
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/dependency";
 
+
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4DependencyRequire", "Wix4DependencyCheck" };
+
         /// <summary>
         /// Processes an attribute for the Compiler.
         /// </summary>

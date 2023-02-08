@@ -1729,6 +1729,18 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
+
+                if ("DoAction" == controlEvent && null != argument)
+                {
+                    // if we're not looking at a standard action or a formatted string then create a reference
+                    // to the custom action.
+                    if (!WindowsInstallerStandard.IsStandardAction(argument) && !this.Core.ContainsProperty(argument))
+                    {
+                        // Convert old style custom action names to Wix4 standard
+                        argument = this.ConvertActionName(argument);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.CustomAction, argument);
+                    }
+                }
                 this.Core.AddSymbol(new ControlEventSymbol(sourceLineNumbers)
                 {
                     DialogRef = dialog,
@@ -1740,15 +1752,7 @@ namespace WixToolset.Core
                 });
             }
 
-            if ("DoAction" == controlEvent && null != argument)
-            {
-                // if we're not looking at a standard action or a formatted string then create a reference
-                // to the custom action.
-                if (!WindowsInstallerStandard.IsStandardAction(argument) && !this.Core.ContainsProperty(argument))
-                {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.CustomAction, argument);
-                }
-            }
+            
 
             // if we're referring to a dialog but not through a property, add it to the references
             if (("NewDialog" == controlEvent || "SpawnDialog" == controlEvent || "SpawnWaitDialog" == controlEvent || "SelectionBrowse" == controlEvent) && Common.IsIdentifier(argument))

@@ -19,6 +19,11 @@ namespace WixToolset.Extensibility
         XNamespace Namespace { get; }
 
         /// <summary>
+        /// Keeps list os actions that can be converted from old style names to WiX 4 format
+        /// </summary>
+        List<string> ActionNames { get; }
+
+        /// <summary>
         /// Called at the beginning of the compilation of a source file.
         /// </summary>
         void PreCompile(ICompileContext context);

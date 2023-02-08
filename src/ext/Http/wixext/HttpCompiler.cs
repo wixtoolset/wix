@@ -17,6 +17,8 @@ namespace WixToolset.Http
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/http";
 
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4SchedHttpUrlReservationsInstall", "Wix4SchedHttpSniSslCertsInstall" };
+
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>

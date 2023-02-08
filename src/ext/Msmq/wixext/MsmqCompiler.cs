@@ -17,6 +17,8 @@ namespace WixToolset.Msmq
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/msmq";
 
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4MessageQueuingInstall" };
+
         /// <summary>
         /// </summary>
         /// <remarks></remarks>

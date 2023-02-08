@@ -18,6 +18,8 @@ namespace WixToolset.Iis
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/iis";
 
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4ConfigureIIs", "Wix4InstallCertificates" };
+
         /// <summary>
         /// Types of objects that custom HTTP Headers can be applied to.
         /// </summary>

@@ -17,6 +17,9 @@ namespace WixToolset.Firewall
     {
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/firewall";
 
+
+        public override List<string> ActionNames { get; } = new List<string> { "Wix4SchedFirewallExceptionsInstall" };
+
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>

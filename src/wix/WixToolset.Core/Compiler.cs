@@ -37,6 +37,8 @@ namespace WixToolset.Core
 
         private string activeName;
         private string activeLanguage;
+        protected List<string> ActionsToConvert;
+
 
         /// <summary>
         /// Type of RadioButton element in a group.
@@ -59,6 +61,7 @@ namespace WixToolset.Core
         internal Compiler(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.ActionsToConvert = new List<string>();
         }
 
         public IMessaging Messaging { get; }
@@ -78,6 +81,8 @@ namespace WixToolset.Core
         /// </summary>
         /// <value>The option to show pedantic messages.</value>
         public bool ShowPedanticMessages { get; set; }
+
+       
 
         /// <summary>
         /// Compiles the provided Xml document into an intermediate object
@@ -109,6 +114,7 @@ namespace WixToolset.Core
                 }
 
                 extension.PreCompile(this.Context);
+                this.ActionsToConvert.AddRange(extension.ActionNames);
             }
 
             // Try to compile it.
@@ -7991,6 +7997,19 @@ namespace WixToolset.Core
             }
 
             return directoryId;
+        }
+
+        private string ConvertActionName(string actionName)
+        {
+            string tmp = actionName;
+
+            if (this.ActionsToConvert.Contains(actionName))
+            {
+                tmp = tmp + "_" + this.CurrentPlatform;
+            }      
+
+            return tmp;
+
         }
     }
 }

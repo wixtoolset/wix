@@ -303,6 +303,24 @@ namespace WixToolsetTest.UI
             }, results.Where(s => s.StartsWith("Control:ErrorDlg\tY")).Select(s => s.Split('\t')[9]).ToArray());
         }
 
+        [Fact]
+        public void CanBuildUsingOldStileActions()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_OldStileAction");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(Build, "CustomAction", "ControlEvent");
+            WixAssert.CompareLineByLine(new[]
+            {
+               "ControlEvent:WelcomeDlg\tNext\tDoAction\tWixUIValidatePath_X86\t1\t4",
+               "ControlEvent:WelcomeEulaDlg\tPrint\tDoAction\tWixUIPrintEula_X86\t1\t1"
+            }, results.Where(s => s.Contains("DoAction")).OrderBy(s => s).ToArray());
+
+
+
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args)
