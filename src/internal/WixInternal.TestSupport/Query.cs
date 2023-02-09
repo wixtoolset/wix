@@ -26,6 +26,20 @@ namespace WixInternal.TestSupport
             return results.ToArray();
         }
 
+        public static string[] QueryDatabase(Database db, string[] tables)
+        {
+            var results = new List<string>();
+            var resultsByTable = QueryDatabaseByTable(db, tables);
+            var sortedTables = tables.ToList();
+            sortedTables.Sort();
+            foreach (var tableName in sortedTables)
+            {
+                var rows = resultsByTable[tableName];
+                rows?.ForEach(r => results.Add($"{tableName}:{r}"));
+            }
+            return results.ToArray();
+        }
+
         /// <summary>
         /// Returns rows from requested tables formatted to facilitate testing.
         /// If the table did not exist in the database, its list will be null.
@@ -39,68 +53,89 @@ namespace WixInternal.TestSupport
 
             if (tables?.Length > 0)
             {
-                var sb = new StringBuilder();
                 using (var db = new Database(path))
                 {
-                    foreach (var table in tables)
-                    {
-                        if (table == "_SummaryInformation")
-                        {
-                            var entries = new List<string>();
-                            results.Add(table, entries);
-
-                            entries.Add($"Title\t{db.SummaryInfo.Title}");
-                            entries.Add($"Subject\t{db.SummaryInfo.Subject}");
-                            entries.Add($"Author\t{db.SummaryInfo.Author}");
-                            entries.Add($"Keywords\t{db.SummaryInfo.Keywords}");
-                            entries.Add($"Comments\t{db.SummaryInfo.Comments}");
-                            entries.Add($"Template\t{db.SummaryInfo.Template}");
-                            entries.Add($"CodePage\t{db.SummaryInfo.CodePage}");
-                            entries.Add($"PageCount\t{db.SummaryInfo.PageCount}");
-                            entries.Add($"WordCount\t{db.SummaryInfo.WordCount}");
-                            entries.Add($"CharacterCount\t{db.SummaryInfo.CharacterCount}");
-                            entries.Add($"Security\t{db.SummaryInfo.Security}");
-
-                            continue;
-                        }
-
-                        if (!db.IsTablePersistent(table))
-                        {
-                            results.Add(table, null);
-                            continue;
-                        }
-
-                        var rows = new List<string>();
-                        results.Add(table, rows);
-
-                        using (var view = db.OpenView("SELECT * FROM `{0}`", table))
-                        {
-                            view.Execute();
-
-                            Record record;
-                            while ((record = view.Fetch()) != null)
-                            {
-                                sb.Clear();
-
-                                using (record)
-                                {
-                                    for (var i = 0; i < record.FieldCount; ++i)
-                                    {
-                                        if (i > 0)
-                                        {
-                                            sb.Append("\t");
-                                        }
-
-                                        sb.Append(record[i + 1]?.ToString());
-                                    }
-                                }
-
-                                rows.Add(sb.ToString());
-                            }
-                        }
-                        rows.Sort();
-                    }
+                    results = QueryDatabaseByTable(db, tables);
                 }
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Returns rows from requested tables formatted to facilitate testing.
+        /// If the table did not exist in the database, its list will be null.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="tables"></param>
+        /// <returns></returns>
+        public static Dictionary<string, List<string>> QueryDatabaseByTable(Database db, string[] tables)
+        {
+            var results = new Dictionary<string, List<string>>();
+
+            if (tables?.Length > 0)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var table in tables)
+                {
+                    if (table == "_SummaryInformation")
+                    {
+                        var entries = new List<string>();
+                        results.Add(table, entries);
+
+                        entries.Add($"Title\t{db.SummaryInfo.Title}");
+                        entries.Add($"Subject\t{db.SummaryInfo.Subject}");
+                        entries.Add($"Author\t{db.SummaryInfo.Author}");
+                        entries.Add($"Keywords\t{db.SummaryInfo.Keywords}");
+                        entries.Add($"Comments\t{db.SummaryInfo.Comments}");
+                        entries.Add($"Template\t{db.SummaryInfo.Template}");
+                        entries.Add($"CodePage\t{db.SummaryInfo.CodePage}");
+                        entries.Add($"PageCount\t{db.SummaryInfo.PageCount}");
+                        entries.Add($"WordCount\t{db.SummaryInfo.WordCount}");
+                        entries.Add($"CharacterCount\t{db.SummaryInfo.CharacterCount}");
+                        entries.Add($"Security\t{db.SummaryInfo.Security}");
+
+                        continue;
+                    }
+
+                    if (!db.IsTablePersistent(table))
+                    {
+                        results.Add(table, null);
+                        continue;
+                    }
+
+                    var rows = new List<string>();
+                    results.Add(table, rows);
+
+                    using (var view = db.OpenView("SELECT * FROM `{0}`", table))
+                    {
+                        view.Execute();
+
+                        Record record;
+                        while ((record = view.Fetch()) != null)
+                        {
+                            sb.Clear();
+
+                            using (record)
+                            {
+                                for (var i = 0; i < record.FieldCount; ++i)
+                                {
+                                    if (i > 0)
+                                    {
+                                        sb.Append("\t");
+                                    }
+
+                                    sb.Append(record[i + 1]?.ToString());
+                                }
+                            }
+
+                            rows.Add(sb.ToString());
+                        }
+                    }
+
+                    rows.Sort();
+               }
             }
 
             return results;

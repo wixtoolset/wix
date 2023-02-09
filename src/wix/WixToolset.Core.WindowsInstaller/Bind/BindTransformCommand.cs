@@ -76,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else if ("UpgradeCode" == id)
                     {
-                        updatedUpgradeCode = id;
+                        updatedUpgradeCode = row.FieldAsString(1);
                         propertyTable.Rows.RemoveAt(i);
                     }
                 }

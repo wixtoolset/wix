@@ -41,43 +41,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (wixInstanceTransformsSymbols.Any())
             {
-                string targetProductCode = null;
-                string targetUpgradeCode = null;
-                string targetProductVersion = null;
-
                 var targetSummaryInformationTable = this.Output.Tables["_SummaryInformation"];
-                var targetPropertyTable = this.Output.Tables["Property"];
+                var targetPropertyRows = new RowDictionary<PropertyRow>(this.Output.Tables["Property"]);
+                PropertyRow propertyRow = null;
 
                 // Get the data from target database
-                foreach (var propertyRow in targetPropertyTable.Rows)
-                {
-                    if ("ProductCode" == (string)propertyRow[0])
-                    {
-                        targetProductCode = (string)propertyRow[1];
-                    }
-                    else if ("ProductVersion" == (string)propertyRow[0])
-                    {
-                        targetProductVersion = (string)propertyRow[1];
-                    }
-                    else if ("UpgradeCode" == (string)propertyRow[0])
-                    {
-                        targetUpgradeCode = (string)propertyRow[1];
-                    }
-                }
+                var targetProductCode = targetPropertyRows.TryGetValue("ProductCode", out propertyRow) ? propertyRow.Value : null;
+                var targetProductVersion = targetPropertyRows.TryGetValue("ProductVersion", out propertyRow) ? propertyRow.Value : null;
+                var targetUpgradeCode = targetPropertyRows.TryGetValue("UpgradeCode", out propertyRow) ? propertyRow.Value : null;
 
                 // Index the Instance Component Rows, we'll get the Components rows from the real Component table.
-                var targetInstanceComponentTable = this.Section.Symbols.OfType<WixInstanceComponentSymbol>();
-                var instanceComponentGuids = targetInstanceComponentTable.ToDictionary(t => t.Id.Id, t => (ComponentRow)null);
+                var instanceComponentSymbols = this.Section.Symbols.OfType<WixInstanceComponentSymbol>().ToDictionary(t => t.Id.Id, t => (ComponentRow)null);
 
-                if (instanceComponentGuids.Any())
+                if (instanceComponentSymbols.Any())
                 {
                     var targetComponentTable = this.Output.Tables["Component"];
                     foreach (ComponentRow componentRow in targetComponentTable.Rows)
                     {
                         var component = (string)componentRow[0];
-                        if (instanceComponentGuids.ContainsKey(component))
+                        if (instanceComponentSymbols.ContainsKey(component))
                         {
-                            instanceComponentGuids[component] = componentRow;
+                            instanceComponentSymbols[component] = componentRow;
                         }
                     }
                 }
@@ -123,9 +107,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     productCodeRow[0] = "ProductCode";
                     productCodeRow[1] = productCode;
 
-                    // Change the instance property
+                    // Set the instance property. If the property exists in the MSI already, mark the row as modified in the transform.
+                    // Otherwise, we need to mark the row as an add.
                     var instanceIdRow = propertyTable.CreateRow(instanceSymbol.SourceLineNumbers);
-                    instanceIdRow.Operation = RowOperation.Modify;
+                    instanceIdRow.Operation = targetPropertyRows.ContainsKey(instanceSymbol.PropertyId) ? RowOperation.Modify : RowOperation.Add;
                     instanceIdRow.Fields[1].Modified = true;
                     instanceIdRow[0] = instanceSymbol.PropertyId;
                     instanceIdRow[1] = instanceId;
@@ -192,10 +177,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
 
                     // If there are instance Components generate new GUIDs for them.
-                    if (0 < instanceComponentGuids.Count)
+                    if (0 < instanceComponentSymbols.Count)
                     {
                         var componentTable = instanceTransform.EnsureTable(this.TableDefinitions["Component"]);
-                        foreach (var targetComponentRow in instanceComponentGuids.Values)
+                        foreach (var targetComponentRow in instanceComponentSymbols.Values)
                         {
                             var guid = targetComponentRow.Guid;
                             if (!String.IsNullOrEmpty(guid))
