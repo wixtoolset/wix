@@ -298,7 +298,7 @@ namespace WixToolsetTest.Converters
 
             WixAssert.CompareLineByLine(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
         }
 
         [Fact]
