@@ -62,7 +62,7 @@ extern "C" HRESULT DAPI LocProbeForFile(
     __in_z LPCWSTR wzBasePath,
     __in_z LPCWSTR wzLocFileName,
     __in_z_opt LPCWSTR wzLanguage,
-    __inout LPWSTR* psczPath
+    __deref_out_z LPWSTR* psczPath
     )
 {
     HRESULT hr = S_OK;
@@ -286,7 +286,7 @@ extern "C" void DAPI LocFree(
 
 extern "C" HRESULT DAPI LocLocalizeString(
     __in const WIX_LOCALIZATION* pWixLoc,
-    __inout LPWSTR* ppsczInput
+    __deref_out_z LPWSTR* ppsczInput
     )
 {
     Assert(ppsczInput && pWixLoc);

@@ -46,7 +46,7 @@ HRESULT DAPI LocProbeForFile(
     __in_z LPCWSTR wzBasePath,
     __in_z LPCWSTR wzLocFileName,
     __in_z_opt LPCWSTR wzLanguage,
-    __inout LPWSTR* psczPath
+    __deref_out_z LPWSTR* psczPath
     );
 
 /********************************************************************
@@ -84,7 +84,7 @@ void DAPI LocFree(
 *******************************************************************/
 HRESULT DAPI LocLocalizeString(
     __in const WIX_LOCALIZATION* pWixLoc,
-    __inout LPWSTR* psczInput
+    __deref_out_z LPWSTR* psczInput
     );
 
 /********************************************************************

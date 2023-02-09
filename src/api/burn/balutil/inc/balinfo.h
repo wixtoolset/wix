@@ -115,7 +115,7 @@ typedef struct _BAL_INFO_COMMAND
  BalInfoParseCommandLine - parses wzCommandLine from BOOTSTRAPPER_COMMAND.
 
 ********************************************************************/
-HRESULT DAPI BalInfoParseCommandLine(
+DAPI_(HRESULT) BalInfoParseCommandLine(
     __in BAL_INFO_COMMAND* pCommand,
     __in const BOOTSTRAPPER_COMMAND* pBootstrapperCommand
     );
@@ -181,7 +181,7 @@ DAPI_(void) BalInfoUninitialize(
  BalInfoUninitializeCommandLine - uninitializes BAL_INFO_COMMAND.
 
 ********************************************************************/
-void DAPI BalInfoUninitializeCommandLine(
+DAPI_(void) BalInfoUninitializeCommandLine(
     __in BAL_INFO_COMMAND* pCommand
 );
 
@@ -190,7 +190,7 @@ void DAPI BalInfoUninitializeCommandLine(
  BalInfoSetOverridableVariablesFromEngine - sets overridable variables from command line.
 
  ********************************************************************/
-HRESULT DAPI BalSetOverridableVariablesFromEngine(
+DAPI_(HRESULT) BalSetOverridableVariablesFromEngine(
     __in BAL_INFO_OVERRIDABLE_VARIABLES* pOverridableVariables,
     __in BAL_INFO_COMMAND* pCommand,
     __in IBootstrapperEngine* pEngine
