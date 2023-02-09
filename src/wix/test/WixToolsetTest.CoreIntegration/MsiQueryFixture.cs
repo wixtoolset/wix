@@ -727,7 +727,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
                 {
                     "build",
                     Path.Combine(folder, "ServiceInstall", "OwnProcess.wxs"),
@@ -741,9 +741,12 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "ServiceInstall", "ServiceControl" });
+                var results = Query.QueryDatabase(msiPath, new[] { "ServiceInstall", "ServiceControl", "MsiServiceConfig", "MsiServiceConfigFailureActions" });
                 WixAssert.CompareLineByLine(new[]
                 {
+                    "MsiServiceConfig:SampleService.DS\tSampleService\t1\t3\t1\ttest.txt",
+                    "MsiServiceConfig:SampleService.SS\tSampleService\t1\t5\t1\ttest.txt",
+                    "MsiServiceConfigFailureActions:SampleService\tSampleService\t1\t120\tRestart required because service failed.\t[~]\t\t\ttest.txt",
                     "ServiceControl:SampleService\tSampleService\t161\t\t1\ttest.txt",
                     "ServiceInstall:SampleService\tSampleService\t\t16\t4\t0\t\t\t\t\t\ttest.txt\t",
                 }, results);
