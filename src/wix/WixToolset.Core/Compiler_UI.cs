@@ -1480,7 +1480,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.CheckBox, checkBoxPropertyRef);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, checkBoxPropertyRef);
                     }
                 }
 
