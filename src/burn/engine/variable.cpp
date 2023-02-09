@@ -193,6 +193,10 @@ static HRESULT InitializeVariableInstallerVersion(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     );
+static HRESULT InitializeVariableInstallerInformationalVersion(
+    __in DWORD_PTR dwpData,
+    __inout BURN_VARIANT* pValue
+);
 static HRESULT InitializeVariableVersion(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
@@ -244,6 +248,7 @@ extern "C" HRESULT VariableInitialize(
         {L"FontsFolder", InitializeVariableCsidlFolder, CSIDL_FONTS},
         {VARIABLE_INSTALLERNAME, InitializeVariableInstallerName, 0},
         {VARIABLE_INSTALLERVERSION, InitializeVariableInstallerVersion, 0},
+        {VARIABLE_INSTALLERINFORMATIONALVERSION, InitializeVariableInstallerInformationalVersion, 0},
         {L"LocalAppDataFolder", InitializeVariableCsidlFolder, CSIDL_LOCAL_APPDATA},
         {VARIABLE_LOGONUSER, InitializeVariableLogonUser, 0},
         {L"MyPicturesFolder", InitializeVariableCsidlFolder, CSIDL_MYPICTURES},
@@ -2309,7 +2314,7 @@ LExit:
 #endif
 
 static HRESULT InitializeVariable6432Folder(
-        __in DWORD_PTR dwpData,
+    __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     )
 {
@@ -2405,7 +2410,28 @@ static HRESULT InitializeVariableInstallerVersion(
     LPWSTR sczVersion = NULL;
 
     hr = StrAllocStringAnsi(&sczVersion, szVerMajorMinorBuild, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed to copy the engine version.");
+    ExitOnFailure(hr, "Failed to copy the engine version: %hs", szVerMajorMinorBuild);
+
+    // set value
+    hr = BVariantSetString(pValue, sczVersion, 0, FALSE);
+    ExitOnFailure(hr, "Failed to set variant value.");
+
+LExit:
+    ReleaseStr(sczVersion);
+
+    return hr;
+}
+
+static HRESULT InitializeVariableInstallerInformationalVersion(
+    __in DWORD_PTR /*dwpData*/,
+    __inout BURN_VARIANT* pValue
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczVersion = NULL;
+
+    hr = StrAllocStringAnsi(&sczVersion, szInformationalVersion, 0, CP_ACP);
+    ExitOnFailure(hr, "Failed to copy the engine informational version: %hs", szInformationalVersion);
 
     // set value
     hr = BVariantSetString(pValue, sczVersion, 0, FALSE);
