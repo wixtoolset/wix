@@ -46,6 +46,7 @@ if exist "%_NUGET_CACHE%\wixtoolset.dutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.du
 if exist "%_NUGET_CACHE%\wixtoolset.extensibility" rd /s/q "%_NUGET_CACHE%\wixtoolset.extensibility"
 if exist "%_NUGET_CACHE%\wixtoolset.firewall.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.firewall.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.heat" rd /s/q "%_NUGET_CACHE%\wixtoolset.heat"
+if exist "%_NUGET_CACHE%\wixtoolset.iis.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.iis.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.mba.core" rd /s/q "%_NUGET_CACHE%\wixtoolset.mba.core"
 if exist "%_NUGET_CACHE%\wixtoolset.netfx.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.netfx.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.sdk" rd /s/q "%_NUGET_CACHE%\wixtoolset.sdk"
