@@ -2,6 +2,7 @@
   <Package Name="Bad Property" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
     <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
 
+    <Property Id="AB" Value="ab[1]" />
     <Property Id="Break" Value="[X] [Y]" />
 
     <Feature Id="ProductFeature">
