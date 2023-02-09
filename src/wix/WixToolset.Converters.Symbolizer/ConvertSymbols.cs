@@ -593,6 +593,8 @@ namespace WixToolset.Converters.Symbolizer
                 return DefaultSymbolFromRow(typeof(WixBundleVariableSymbol), row, columnZeroIsId: true);
             case "WixChainItem":
                 return DefaultSymbolFromRow(typeof(WixChainItemSymbol), row, columnZeroIsId: true);
+            case "WixComponentGroup":
+                return DefaultSymbolFromRow(typeof(WixComponentGroupSymbol), row, columnZeroIsId: true);
             case "WixCustomTable":
                 return DefaultSymbolFromRow(typeof(WixCustomTableSymbol), row, columnZeroIsId: true);
             case "WixDirectory":

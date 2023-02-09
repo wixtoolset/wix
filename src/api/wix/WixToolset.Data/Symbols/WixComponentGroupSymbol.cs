@@ -10,7 +10,8 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixComponentGroup,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixComponentGroupSymbolFields.WixComponentGroup), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComponentGroupSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComponentGroupSymbolFields.Source), IntermediateFieldType.String),
             },
             typeof(WixComponentGroupSymbol));
     }
@@ -20,7 +21,8 @@ namespace WixToolset.Data.Symbols
 {
     public enum WixComponentGroupSymbolFields
     {
-        WixComponentGroup,
+        DirectoryRef,
+        Source,
     }
 
     public class WixComponentGroupSymbol : IntermediateSymbol
@@ -35,10 +37,16 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixComponentGroupSymbolFields index] => this.Fields[(int)index];
 
-        public string WixComponentGroup
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)WixComponentGroupSymbolFields.WixComponentGroup];
-            set => this.Set((int)WixComponentGroupSymbolFields.WixComponentGroup, value);
+            get => (string)this.Fields[(int)WixComponentGroupSymbolFields.DirectoryRef];
+            set => this.Set((int)WixComponentGroupSymbolFields.DirectoryRef, value);
+        }
+
+        public string Source
+        {
+            get => (string)this.Fields[(int)WixComponentGroupSymbolFields.Source];
+            set => this.Set((int)WixComponentGroupSymbolFields.Source, value);
         }
     }
 }

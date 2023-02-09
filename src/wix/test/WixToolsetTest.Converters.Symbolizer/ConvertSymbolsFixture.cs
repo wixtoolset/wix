@@ -531,6 +531,10 @@ namespace WixToolsetTest.Converters.Symbolizer
                 break;
             }
 
+            case "WixComponentGroup":
+                fields = String.Empty;
+                break;
+
             case "WixProperty":
             {
                 var wixPropertySymbol = (WixPropertySymbol)symbol;
