@@ -780,7 +780,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             events |= symbol.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
             events |= symbol.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
 
-            var row = this.CreateRow(symbol, "MsiServiceConfigFailureActions");
+            var row = this.CreateRow(symbol, "MsiServiceConfig");
             row[0] = symbol.Id.Id;
             row[1] = symbol.Name;
             row[2] = events;
@@ -795,7 +795,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             events |= symbol.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
             events |= symbol.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
 
-            var row = this.CreateRow(symbol, "MsiServiceConfig");
+            var row = this.CreateRow(symbol, "MsiServiceConfigFailureActions");
             row[0] = symbol.Id.Id;
             row[1] = symbol.Name;
             row[2] = events;

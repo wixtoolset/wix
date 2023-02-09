@@ -4,7 +4,10 @@
         <ComponentGroup Id="ProductComponents">
             <Component Directory="INSTALLFOLDER">
                 <File Id="test.txt" Source="test.txt" />
-                <ServiceInstall Name="SampleService" ErrorControl="ignore" Start="disabled" Type="ownProcess" />
+                <ServiceInstall Name="SampleService" ErrorControl="ignore" Start="disabled" Type="ownProcess">
+                    <ServiceConfig DelayedAutoStart="yes" ServiceSid="unrestricted" OnInstall="yes" />
+                    <ServiceConfigFailureActions RebootMessage="Restart required because service failed." ResetPeriod="120" OnInstall="yes" />
+                </ServiceInstall>
                 <ServiceControl Name="SampleService" Start="install" Stop="uninstall" Remove="uninstall" Wait="yes" />
             </Component>
         </ComponentGroup>
