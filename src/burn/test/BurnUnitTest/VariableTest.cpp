@@ -605,6 +605,9 @@ namespace Bootstrapper
                     VariableGetStringHelper(&variables, L"CommonFiles64Folder");
                     VariableGetStringHelper(&variables, L"System64Folder");
                 }
+
+                Assert::Equal<String^>(wzVerMajorMinorBuild, VariableGetVersionHelper(&variables, L"InstallerVersion"));
+                Assert::Equal<String^>(wzInformationalVersion, VariableGetVersionHelper(&variables, L"InstallerInformationalVersion"));
             }
             finally
             {
