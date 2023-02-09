@@ -89,7 +89,14 @@ namespace WixToolsetTest.Converters
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
-            Assert.Equal(3, errors);
+            WixAssert.CompareLineByLine(new[]
+            {
+                "[Converted] This file contains an XML declaration on the first line. (DeclarationPresent)",
+                "[Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)",
+                "[Converted] The TARGETDIR directory should no longer be explicitly referenced. Remove the DirectoryRef element with Id attribute 'TARGETDIR'. (StandardDirectoryRefDeprecated)",
+                "A reference to the TARGETDIR Directory was removed. This may cause the Fragment that defined TARGETDIR to not be included in the final output. If this happens, reference a different element in the Fragment to replace the old reference to TARGEDIR. (TargetDirRefRemoved)",
+            }, messaging.Messages.Select(m => m.ToString()).ToArray());
+            Assert.Equal(4, errors);
         }
 
         [Fact]
@@ -201,7 +208,7 @@ namespace WixToolsetTest.Converters
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
-            Assert.Equal(4, errors);
+            Assert.Equal(5, errors);
         }
 
         [Fact]

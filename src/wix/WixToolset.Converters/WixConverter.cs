@@ -1123,6 +1123,8 @@ namespace WixToolset.Converters
                     if (this.OnInformation(ConverterTestType.StandardDirectoryRefDeprecated, element, "The {0} directory should no longer be explicitly referenced. Remove the DirectoryRef element with Id attribute '{0}'.", id))
                     {
                         RemoveElementKeepChildren(element);
+
+                        this.OnError(ConverterTestType.TargetDirRefRemoved, element, "A reference to the TARGETDIR Directory was removed. This may cause the Fragment that defined TARGETDIR to not be included in the final output. If this happens, reference a different element in the Fragment to replace the old reference to TARGEDIR.");
                     }
                 }
                 else if (this.OnInformation(ConverterTestType.StandardDirectoryRefDeprecated, element, "The standard directory '{0}' should no longer be directly referenced. Use the StandardDirectory element instead.", id))
@@ -3300,6 +3302,11 @@ namespace WixToolset.Converters
             /// The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage="yes" to the target package instead.
             /// </summary>
             WixMbaPrereqPackageIdDeprecated,
+
+            /// <summary>
+            /// A reference to the TARGETDIR Directory was removed. This may cause the Fragment that defined TARGETDIR to not be included in the final output. If this happens, reference a different element in the Fragment to replace the old reference to TARGEDIR.
+            /// </summary>
+            TargetDirRefRemoved,
         }
     }
 }
