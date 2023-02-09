@@ -3748,7 +3748,7 @@ namespace WixToolset.Core
 
                 foreach (var sequence in sequences)
                 {
-                    this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Global, sequence, actionName, condition, afterAction: "CostInitialize");
+                    this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Global, sequence, actionName, condition, afterAction: "CostFinalize");
                 }
             }
         }
