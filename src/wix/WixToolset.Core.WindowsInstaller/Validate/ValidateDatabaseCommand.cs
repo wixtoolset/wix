@@ -26,10 +26,16 @@ namespace WixToolset.Core.WindowsInstaller.Validate
             this.DatabasePath = databasePath;
             this.CubeFiles = cubeFiles;
             this.Ices = ices;
-            this.SuppressedIces = suppressedIces == null ? WellKnownSuppressedIces : suppressedIces.Union(WellKnownSuppressedIces);
-
             this.IntermediateFolder = intermediateFolder;
             this.OutputSourceLineNumber = new SourceLineNumber(databasePath);
+            this.SuppressedIces = suppressedIces == null ? WellKnownSuppressedIces : suppressedIces.Union(WellKnownSuppressedIces);
+
+            // Suppress ICE103 for merge modules because the custom action DLL in mergemod.cub is borked.
+            // See https://github.com/wixtoolset/issues/issues/6567.
+            if (Path.GetExtension(this.DatabasePath) == ".msm")
+            {
+                this.SuppressedIces = this.SuppressedIces.Union(new[] { "ICE103" });
+            }
         }
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }

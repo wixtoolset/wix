@@ -20,7 +20,6 @@ namespace WixToolsetTest.CoreIntegration
     // These tests are still interesting (and complex) enough to keep
     // around for manual testing. Uncomment or define the following
     // line to do so.
-#if DISABLE_VALIDATION_TESTS_DUE_TO_WINDOWS_INSTALLER_INCONSISTENCIES
     public class ValidationFixture
     {
         [Fact]
@@ -213,7 +212,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 File.WriteAllLines(Path.Combine(testLogsFolder, "validate.txt"), validationResult.Messages.Select(m => m.ToString()));
 
-                Assert.Equal(1, validationResult.ExitCode);
+                Assert.Equal(1076, validationResult.ExitCode);
 
                 var messages = validationResult.Messages.Select(m => m.ToString()).ToArray();
                 WixAssert.CompareLineByLine(new[]
@@ -302,7 +301,7 @@ namespace WixToolsetTest.CoreIntegration
                     msiPath
                 });
 
-                Assert.Equal(1, validationResult.ExitCode);
+                Assert.Equal(1076, validationResult.ExitCode);
 
                 var messages = validationResult.Messages.Select(m => m.ToString()).ToArray();
                 WixAssert.CompareLineByLine(new[]
@@ -342,7 +341,7 @@ namespace WixToolsetTest.CoreIntegration
                     msiPath
                 });
 
-                Assert.Equal(1, validationResult.ExitCode);
+                Assert.Equal(1076, validationResult.ExitCode);
 
                 var messages = validationResult.Messages.Select(m => m.ToString()).ToArray();
                 WixAssert.CompareLineByLine(new[]
@@ -423,5 +422,4 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
     }
-#endif
 }
