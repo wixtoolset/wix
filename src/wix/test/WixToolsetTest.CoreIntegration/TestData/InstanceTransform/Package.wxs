@@ -1,13 +1,11 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
-    
-
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="11111111-1111-1111-1111-111111111111" Compressed="no" InstallerVersion="200" Scope="perMachine">
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <Property Id="INSTANCEPROPERTY" Secure="yes" />
 
     <InstanceTransforms Property="INSTANCEPROPERTY">
-      <Instance Id="I1" ProductCode="*" ProductName="MsiPackage (Instance 1)" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" />
+      <Instance Id="I1" ProductCode="*" ProductName="MsiPackage (Instance 1)" UpgradeCode="22222222-2222-2222-2222-222222222222" />
     </InstanceTransforms>
 
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">

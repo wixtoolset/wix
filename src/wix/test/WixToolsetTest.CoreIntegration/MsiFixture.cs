@@ -2,12 +2,10 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
-    using System;
     using System.IO;
     using System.Linq;
-    using Example.Extension;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -599,56 +597,6 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildInstanceTransform()
-        {
-            var folder = TestData.Get(@"TestData\InstanceTransform");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "Package.wxs"),
-                    Path.Combine(folder, "PackageComponents.wxs"),
-                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
-
-                result.AssertSuccess();
-
-                var output = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
-                var substorage = output.SubStorages.Single();
-                Assert.Equal("I1", substorage.Name);
-
-                var data = substorage.Data;
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "_SummaryInformation",
-                    "Property",
-                    "Upgrade"
-                }, data.Tables.Select(t => t.Name).ToArray());
-
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "INSTANCEPROPERTY\tI1",
-                    "ProductName\tMsiPackage (Instance 1)",
-                }, JoinRows(data.Tables["Property"]));
-
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
-                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t\t1.0.0.0\t1033\t1\t0\t0",
-                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
-                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t1.0.0.0\t\t1033\t2\t0\t0"
-                }, JoinRows(data.Tables["Upgrade"]));
-            }
-        }
-
-        [Fact]
         public void FailsBuildAtBindTimeForMissingEnsureTable()
         {
             var folder = TestData.Get(@"TestData");
@@ -678,16 +626,6 @@ namespace WixToolsetTest.CoreIntegration
                     });
 
                 Assert.False(File.Exists(msiPath));
-            }
-        }
-
-        private static string[] JoinRows(Table table)
-        {
-            return table.Rows.Select(r => JoinFields(r.Fields)).ToArray();
-
-            static string JoinFields(Field[] fields)
-            {
-                return String.Join('\t', fields.Select(f => f.ToString()));
             }
         }
     }
