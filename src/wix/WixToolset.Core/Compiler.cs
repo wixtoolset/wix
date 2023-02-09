@@ -2644,9 +2644,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixComponentGroupSymbol(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixComponentGroupSymbol(sourceLineNumbers, id)
+                {
+                    DirectoryRef = directoryId,
+                    Source = source
+                });
 
-                // Add this componentGroup and its parent in WixGroup.
                 this.Core.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.ComponentGroup, id.Id);
             }
         }
