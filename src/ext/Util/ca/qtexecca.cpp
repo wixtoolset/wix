@@ -4,12 +4,6 @@
 
 #define OUTPUT_BUFFER 1024
 
-// These old "CA" prefix names are deprecated, and intended to go away in wix 4.0, only staying now for compatibility reasons
-const LPCWSTR CAQUIET_TIMEOUT_PROPERTY = L"QtExecCmdTimeout";
-const LPCWSTR CAQUIET_ARGUMENTS_PROPERTY = L"QtExecCmdLine";
-const LPCWSTR CAQUIET64_ARGUMENTS_PROPERTY = L"QtExec64CmdLine";
-// end deprecated section
-
 // WixCA name quiet commandline argument properties
 const LPCWSTR WIX_QUIET_ARGUMENTS_PROPERTY = L"WixQuietExecCmdLine";
 const LPCWSTR WIX_QUIET64_ARGUMENTS_PROPERTY = L"WixQuietExec64CmdLine";
