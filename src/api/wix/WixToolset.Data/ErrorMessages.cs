@@ -180,12 +180,12 @@ namespace WixToolset.Data
 
         public static Message CreateCabAddFileFailed()
         {
-            return Message(null, Ids.CreateCabAddFileFailed, "An error (E_FAIL) was returned while adding files to a CAB file. This most commonly happens when creating a CAB file 2 GB or larger. Either reduce the size of your installation package, raise Media/@CompressionLevel to a higher compression level, or split your installation package's files into more than one CAB file.");
+            return Message(null, Ids.CreateCabAddFileFailed, "An error (E_FAIL) was returned while creating a CAB file. The most common cause of this error is attempting to create a CAB file larger than 2GB. You can reduce the size of your installation package, use a higher compression level, or split your files into more than one CAB file.");
         }
 
         public static Message CreateCabInsufficientDiskSpace()
         {
-            return Message(null, Ids.CreateCabInsufficientDiskSpace, "An error (ERROR_DISK_FULL) was returned while creating a CAB file. This means you have insufficient disk space - please clear more disk space and try this operation again.");
+            return Message(null, Ids.CreateCabInsufficientDiskSpace, "An error (ERROR_DISK_FULL) was returned while creating a CAB file. This means you have insufficient disk space. Clear disk space and try again.");
         }
 
         public static Message CubeFileNotFound(string cubeFile)
