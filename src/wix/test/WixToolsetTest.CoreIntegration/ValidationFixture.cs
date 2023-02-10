@@ -20,6 +20,7 @@ namespace WixToolsetTest.CoreIntegration
     // These tests are still interesting (and complex) enough to keep
     // around for manual testing. Uncomment or define the following
     // line to do so.
+#if DISABLE_VALIDATION_TESTS_DUE_TO_WINDOWS_INSTALLER_INCONSISTENCIES
     public class ValidationFixture
     {
         [Fact]
@@ -422,4 +423,5 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
     }
+#endif
 }
