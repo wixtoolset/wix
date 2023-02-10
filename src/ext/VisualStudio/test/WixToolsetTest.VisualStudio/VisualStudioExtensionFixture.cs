@@ -42,7 +42,9 @@ namespace WixToolsetTest.VisualStudio
             var folder = TestData.Get(@"TestData\UsingVsixPackage");
             var build = new Builder(folder, typeof(VSExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(BuildARM64, "CustomAction");
+            var results = build.BuildAndQuery(BuildARM64, "CustomAction", "Property");
+
+            var customActionResults = results.Where(r => r.StartsWith("CustomAction:")).ToArray();
             WixAssert.CompareLineByLine(new[]
             {
                 "CustomAction:SetVS2010Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2010_VSIX_INSTALLER_PATH]\t",
@@ -59,7 +61,24 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:Vwd2013VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2013_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2015VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2015_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Wix4VSFindInstances_A64\t257\tVSCA_A64\tFindInstances\t",
-            }, results);
+            }, customActionResults);
+
+            var propertyResults = results.Single(r => r.StartsWith("Property:SecureCustomProperties")).Split('\t')[1].Split(';');
+            WixAssert.CompareLineByLine(new[]
+            {
+                "VS_VSIX_INSTALLER_PATH",
+                "VS2010_VSIX_INSTALLER_PATH",
+                "VS2012_VSIX_INSTALLER_PATH",
+                "VS2013_VSIX_INSTALLER_PATH",
+                "VS2015_VSIX_INSTALLER_PATH",
+                "VS2017_IDE_DIR",
+                "VS2017_ROOT_FOLDER",
+                "VS2017DEVENV",
+                "VS2019_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED",
+                "VS2022_ROOT_FOLDER",
+                "WIX_DOWNGRADE_DETECTED",
+                "WIX_UPGRADE_DETECTED",
+            }, propertyResults);
         }
 
         private static void Build(string[] args)
