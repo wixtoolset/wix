@@ -4,6 +4,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -122,9 +123,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var created = this.CreateCabinet(cabinetWorkItem);
 
                     // Update the cabinet work item to report back what cabinets were created.
-                    lock (this.completedCabinets)
+                    if (created?.Any() == true)
                     {
-                        this.completedCabinets.Add(new CompletedCabinetWorkItem(cabinetWorkItem.DiskId, created));
+                        lock (this.completedCabinets)
+                        {
+                            this.completedCabinets.Add(new CompletedCabinetWorkItem(cabinetWorkItem.DiskId, created));
+                        }
                     }
                 }
             }
@@ -186,22 +190,40 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // create the cabinet file
             var cabinetPath = Path.GetFullPath(cabinetWorkItem.CabinetFile);
             var cab = new Cabinet(cabinetPath);
-            var created = cab.Compress(compressFiles, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
 
-            // Best effort check to see if the cabinet is too large for the Windows Installer.
             try
             {
-                var fi = new FileInfo(cabinetPath);
-                if (fi.Length > Int32.MaxValue)
+                var created = cab.Compress(compressFiles, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
+
+                // Best effort check to see if the cabinet is too large for the Windows Installer.
+                try
                 {
-                    this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(cabinetWorkItem.SourceLineNumber, cabinetPath, "cabinet"));
+                    var fi = new FileInfo(cabinetPath);
+                    if (fi.Length > Int32.MaxValue)
+                    {
+                        this.Messaging.Write(WarningMessages.WindowsInstallerFileTooLarge(cabinetWorkItem.SourceLineNumber, cabinetPath, "cabinet"));
+                    }
+                }
+                catch
+                {
+                }
+
+                return created;
+            }
+            catch (Exception e) when (e.InnerException is Win32Exception win32Exception)
+            {
+                switch (win32Exception.NativeErrorCode)
+                {
+                    case 0x4005:
+                        this.Messaging.Write(ErrorMessages.CreateCabAddFileFailed());
+                        return null;
+                    case 0x0070:
+                        this.Messaging.Write(ErrorMessages.CreateCabInsufficientDiskSpace());
+                        return null;
+                    default:
+                        throw;
                 }
             }
-            catch
-            {
-            }
-
-            return created;
         }
     }
 }
