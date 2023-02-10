@@ -7,6 +7,7 @@ namespace Example.Extension
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     internal class ExampleCompilerExtension : BaseCompilerExtension
     {
@@ -57,6 +58,24 @@ namespace Example.Extension
             }
         }
 
+        public override IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
+        {
+            switch (parentElement.Name.LocalName)
+            {
+                case "Component":
+                    var componentId = context["ComponentId"];
+
+                    switch (element.Name.LocalName)
+                    {
+                        case "ExampleSetKeyPath":
+                            return this.ParseExampleSetKeyPathElement(intermediate, section, element, componentId);
+                    }
+                    break;
+            }
+
+            return base.ParsePossibleKeyPathElement(intermediate, section, parentElement, element, context);
+        }
+
         private void ParseExampleElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
@@ -99,6 +118,59 @@ namespace Example.Extension
                 symbol.Set(0, componentId);
                 symbol.Set(1, value);
             }
+        }
+
+        private IComponentKeyPath ParseExampleSetKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            string file = null;
+            string reg = null;
+            var explicitly = false;
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "File":
+                            file = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+
+                        case "Registry":
+                            reg = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+
+                        case "Explicitly":
+                            explicitly = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes;
+                            break;
+
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseAttribute(intermediate, section, element, attrib, null);
+                }
+            }
+
+            if (file == null && reg == null)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "File", "Registry", true));
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                var componentKeyPath = this.CreateComponentKeyPath();
+                componentKeyPath.Id = file ?? reg;
+                componentKeyPath.Explicit = explicitly;
+                componentKeyPath.Type = String.IsNullOrEmpty(file) ? PossibleKeyPathType.Registry : PossibleKeyPathType.File;
+                return componentKeyPath;
+            }
+
+            return null;
         }
 
         private void ParseExampleEnsureTableElement(Intermediate intermediate, IntermediateSection section, XElement element)

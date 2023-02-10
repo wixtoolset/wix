@@ -97,6 +97,66 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWithExampleExtensionWithFilePossibleKeyPath()
+        {
+            var folder = TestData.Get("TestData", "ExampleExtensionUsingPossibleKeyPath");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageWithFile.wxs"),
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "extest.msi")
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, "bin", "extest.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var componentSymbol = section.Symbols.OfType<ComponentSymbol>().Single();
+                Assert.Equal("ExampleFile", componentSymbol.KeyPath);
+                Assert.Equal(ComponentKeyPathType.File, componentSymbol.KeyPathType);
+            }
+        }
+
+        [Fact]
+        public void CanBuildWithExampleExtensionWithRegistryPossibleKeyPath()
+        {
+            var folder = TestData.Get("TestData", "ExampleExtensionUsingPossibleKeyPath");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageWithRegistry.wxs"),
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "extest.msi")
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, "bin", "extest.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var componentSymbol = section.Symbols.OfType<ComponentSymbol>().Single();
+                Assert.Equal("RegMadeKeyPath", componentSymbol.KeyPath);
+                Assert.Equal(ComponentKeyPathType.Registry, componentSymbol.KeyPathType);
+            }
+        }
+
+        [Fact]
         public void CanParseCommandLineWithExtension()
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");

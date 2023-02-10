@@ -2422,14 +2422,33 @@ namespace WixToolset.Core
                         {
                             keyPathSet = possibleKeyPath.Explicit ? YesNoType.Yes : YesNoType.NotSet;
 
-                            if (!String.IsNullOrEmpty(possibleKeyPath.Id))
+                            switch (possibleKeyPath.Type)
                             {
-                                keyPossible = possibleKeyPath.Id;
-                            }
+                                case PossibleKeyPathType.File:
+                                    keyBit = ComponentKeyPathType.File;
+                                    keyPossible = possibleKeyPath.Id;
+                                    break;
+                                case PossibleKeyPathType.Directory:
+                                    keyBit = ComponentKeyPathType.Directory;
+                                    keyPossible = String.Empty;
+                                    break;
 
-                            if (PossibleKeyPathType.Registry == possibleKeyPath.Type || PossibleKeyPathType.RegistryFormatted == possibleKeyPath.Type)
-                            {
-                                keyBit = ComponentKeyPathType.Registry; //MsiInterop.MsidbComponentAttributesRegistryKeyPath;
+                                case PossibleKeyPathType.OdbcDataSource:
+                                    keyBit = ComponentKeyPathType.OdbcDataSource;
+                                    keyPossible = possibleKeyPath.Id;
+                                    break;
+
+                                case PossibleKeyPathType.Registry:
+                                case PossibleKeyPathType.RegistryFormatted:
+                                    keyBit = ComponentKeyPathType.Registry;
+                                    keyPossible = possibleKeyPath.Id;
+                                    break;
+
+                                case PossibleKeyPathType.None:
+                                default:
+                                    keyBit = null;
+                                    keyPossible = null;
+                                    break;
                             }
                         }
                     }
