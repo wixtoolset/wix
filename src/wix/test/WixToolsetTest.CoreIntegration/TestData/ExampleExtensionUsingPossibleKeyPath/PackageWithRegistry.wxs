@@ -1,0 +1,25 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ex="http://www.example.com/scheams/v1/wxs">
+    <Package Name="MsiPackage With Registry" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no">
+        <MajorUpgrade DowngradeErrorMessage="Don't upgrade" />
+
+        <Feature Id="ProductFeature">
+            <ComponentGroupRef Id="ProductComponents" />
+        </Feature>
+    </Package>
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <ex:ExampleSetKeyPath Registry="RegMadeKeyPath" />
+                <RegistryValue Id="RegMadeKeyPath" Root="HKLM" Key="SOFTWARE\Example Corporation" Name="Test" Value="Thing" KeyPath="no" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
