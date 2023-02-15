@@ -31,7 +31,7 @@ namespace WixToolset.BuildTasks
         public override bool Execute()
         {
             var bindPaths = new Dictionary<string, List<ITaskItem>>(StringComparer.OrdinalIgnoreCase);
-            var defineConstants = new Dictionary<string, string>();
+            var defineConstants = new SortedDictionary<string, string>();
 
             foreach (var resolvedReference in this.ResolvedProjectReferences)
             {
@@ -46,7 +46,7 @@ namespace WixToolset.BuildTasks
             return true;
         }
 
-        private void AddBindPathsForResolvedReference(Dictionary<string, List<ITaskItem>> bindPathByPaths, ITaskItem resolvedReference)
+        private void AddBindPathsForResolvedReference(IDictionary<string, List<ITaskItem>> bindPathByPaths, ITaskItem resolvedReference)
         {
             // If the BindName was not explicitly provided, try to use the source project's filename
             // as the bind name.
@@ -84,7 +84,7 @@ namespace WixToolset.BuildTasks
             }
         }
 
-        private void AddDefineConstantsForResolvedReference(Dictionary<string, string> defineConstants, ITaskItem resolvedReference)
+        private void AddDefineConstantsForResolvedReference(IDictionary<string, string> defineConstants, ITaskItem resolvedReference)
         {
             var configuration = resolvedReference.GetMetadata("Configuration");
             var fullConfiguration = resolvedReference.GetMetadata("FullConfiguration");
@@ -96,7 +96,7 @@ namespace WixToolset.BuildTasks
             var projectFileName = Path.GetFileName(projectPath);
             var projectName = Path.GetFileNameWithoutExtension(projectPath);
 
-            var referenceName = ToolsCommon.GetIdentifierFromName(ToolsCommon.GetMetadataOrDefault(resolvedReference, "Name", projectName));
+            var referenceName = ToolsCommon.CreateIdentifierFromValue(ToolsCommon.GetMetadataOrDefault(resolvedReference, "Name", projectName));
 
             var targetPath = resolvedReference.GetMetadata("FullPath");
             var targetDir = Path.GetDirectoryName(targetPath) + Path.DirectorySeparatorChar;
@@ -156,12 +156,12 @@ namespace WixToolset.BuildTasks
                 }
 
                 // If there was only one targetpath we need to create its culture specific define
-                if (!oldTargetPath.Contains(";"))
+                if (!oldTargetPath.Contains("%3B"))
                 {
                     var oldSubFolder = FindSubfolder(oldTargetPath, targetDir, targetFileName);
                     if (!String.IsNullOrEmpty(oldSubFolder))
                     {
-                        defineConstants[referenceName + "." + oldSubFolder.Replace('\\', '_') + ".TargetPath"] = oldTargetPath;
+                        defineConstants[referenceName + "." + ToolsCommon.CreateIdentifierFromValue(oldSubFolder) + ".TargetPath"] = oldTargetPath;
                     }
                 }
 
@@ -169,7 +169,7 @@ namespace WixToolset.BuildTasks
                 var subFolder = FindSubfolder(targetPath, targetDir, targetFileName);
                 if (!String.IsNullOrEmpty(subFolder))
                 {
-                    defineConstants[referenceName + "." + subFolder.Replace('\\', '_') + ".TargetPath"] = targetPath;
+                    defineConstants[referenceName + "." + ToolsCommon.CreateIdentifierFromValue(subFolder) + ".TargetPath"] = targetPath;
                 }
             }
             else

@@ -670,6 +670,114 @@ namespace WixToolsetTest.Sdk
             }
         }
 
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildMultiTargetingWixlibUsingRids(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "PackageUsingRids");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
+                var projectPath = Path.Combine(baseFolder, "PackageUsingRids.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    "-Restore",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                    });
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
+
+                var releaseFiles = Directory.EnumerateFiles(filesFolder, "*", SearchOption.AllDirectories);
+                var releaseFileSizes = releaseFiles.Select(p => PathAndSize(p, filesFolder)).OrderBy(s => s).ToArray();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"net472_x64\e_sqlite3.dll - 1601536",
+                    @"net472_x86\e_sqlite3.dll - 1207296",
+                    @"net6_x64\e_sqlite3.dll - 1601536",
+                    @"net6_x86\e_sqlite3.dll - 1207296",
+                }, releaseFileSizes);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildMultiTargetingWixlibUsingRidsWithReleaseAndDebug(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "PackageReleaseAndDebug");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
+                var projectPath = Path.Combine(baseFolder, "PackageReleaseAndDebug.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    "-Restore",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                    });
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
+                WixAssert.StringCollectionEmpty(warnings);
+
+                var releaseFiles = Directory.EnumerateFiles(filesFolder, "*", SearchOption.AllDirectories);
+                var releaseFileSizes = releaseFiles.Select(p => PathAndSize(p, filesFolder)).OrderBy(s => s).ToArray();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"debug_net472_x64\e_sqlite3.dll - 1601536",
+                    @"debug_net472_x86\e_sqlite3.dll - 1207296",
+                    @"debug_net6_x64\e_sqlite3.dll - 1601536",
+                    @"debug_net6_x86\e_sqlite3.dll - 1207296",
+                    @"release_net472_x64\e_sqlite3.dll - 1601536",
+                    @"release_net472_x86\e_sqlite3.dll - 1207296",
+                    @"release_net6_x64\e_sqlite3.dll - 1601536",
+                    @"release_net6_x86\e_sqlite3.dll - 1207296",
+                }, releaseFileSizes);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CannotBuildMultiTargetingWixlibUsingExplicitSubsetOfTfmAndRid(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "PackageUsingExplicitTfmAndRids");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
+                var projectPath = Path.Combine(baseFolder, "PackageUsingExplicitTfmAndRids.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[] {
+                    "-Restore",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                    });
+
+                var errors = GetDistinctErrorMessages(result.Output, baseFolder);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"<basefolder>\Package.wxs(22): error WIX0103: Cannot find the File file '!(bindpath.TestExe.net472.win_x86)\e_sqlite3.dll'. The following paths were checked: !(bindpath.TestExe.net472.win_x86)\e_sqlite3.dll [<basefolder>\PackageUsingExplicitTfmAndRids.wixproj]",
+                }, errors);
+            }
+        }
 
         [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk)]
@@ -773,9 +881,31 @@ namespace WixToolsetTest.Sdk
             return ReplacePathsInMessage(message.Substring(start, end - start), baseFolder);
         }
 
+        private static string[] GetDistinctErrorMessages(string[] output, string baseFolder)
+        {
+            return output.Where(l => l.Contains(": error ")).Select(line =>
+            {
+                var trimmed = ReplacePathsInMessage(line, baseFolder);
+
+                // If the message starts with a multi-proc build marker (like: "1>" or "2>") trim it.
+                if (trimmed[1] == '>')
+                {
+                    trimmed = trimmed.Substring(2);
+                }
+
+                return trimmed;
+            }).Distinct().ToArray();
+        }
+
         private static string ReplacePathsInMessage(string message, string baseFolder)
         {
-            return message.Replace(baseFolder, "<basefolder>").Trim();
+            return message.Trim().Replace(baseFolder, "<basefolder>");
+        }
+
+        private static string PathAndSize(string path, string replace)
+        {
+            var fi = new FileInfo(path);
+            return $"{fi.FullName.Replace(replace, String.Empty)} - {fi.Length}";
         }
     }
 }

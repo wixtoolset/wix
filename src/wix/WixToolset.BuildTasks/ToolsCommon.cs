@@ -18,18 +18,17 @@ namespace WixToolset.BuildTasks
         private static readonly Regex IllegalIdentifierCharacters = new Regex(@"[^A-Za-z0-9_\.]|\.{2,}"); // non 'words' and assorted valid characters
 
         /// <summary>
-        /// Return an identifier based on passed file/directory name
+        /// Return an identifier based on passed value.
         /// </summary>
-        /// <param name="name">File/directory name to generate identifer from</param>
-        /// <returns>A version of the name that is a legal identifier.</returns>
-        /// <remarks>This is duplicated from WiX's Common class.</remarks>
-        public static string GetIdentifierFromName(string name)
+        /// <param name="value">Value to create identifer from.</param>
+        /// <returns>A version of the value that is a legal identifier.</returns>
+        public static string CreateIdentifierFromValue(string value)
         {
-            var result = IllegalIdentifierCharacters.Replace(name, "_"); // replace illegal characters with "_".
+            var result = IllegalIdentifierCharacters.Replace(value, "_"); // replace illegal characters with "_".
 
             // MSI identifiers must begin with an alphabetic character or an
             // underscore. Prefix all other values with an underscore.
-            if (AddPrefix.IsMatch(name))
+            if (AddPrefix.IsMatch(value))
             {
                 result = String.Concat("_", result);
             }
