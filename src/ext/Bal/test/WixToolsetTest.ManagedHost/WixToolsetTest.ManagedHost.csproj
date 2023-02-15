@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

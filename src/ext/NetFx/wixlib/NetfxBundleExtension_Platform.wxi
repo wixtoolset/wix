@@ -5,10 +5,10 @@
     <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
-        <BundleExtension Id="$(var.Prefix)NetfxBundleExtension$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))netfxbe.dll" Name="$(var.Prefix)NetfxBundleExtension$(var.Suffix)\netfxbe.dll">
+        <BundleExtension Id="$(var.Prefix)NetfxBundleExtension$(var.Suffix)" SourceFile="!(bindpath.netfxbe.$(var.platform))netfxbe.dll" Name="$(var.Prefix)NetfxBundleExtension$(var.Suffix)\netfxbe.dll">
             <?foreach PLATFORM in x86;x64;arm64?>
-            <Payload SourceFile="!(bindpath.$(var.PLATFORM))netcoresearch.exe" Name="$(var.Prefix)NetfxBundleExtension$(var.Suffix)\$(var.PLATFORM)\netcoresearch.exe" />
-            <Payload SourceFile="!(bindpath.$(var.PLATFORM))hostfxr.dll" Name="$(var.Prefix)NetfxBundleExtension$(var.Suffix)\$(var.PLATFORM)\hostfxr.dll" />
+            <Payload SourceFile="!(bindpath.netcoresearch.$(var.PLATFORM))netcoresearch.exe" Name="$(var.Prefix)NetfxBundleExtension$(var.Suffix)\$(var.PLATFORM)\netcoresearch.exe" />
+            <Payload SourceFile="!(bindpath.netcoresearch.$(var.PLATFORM))hostfxr.dll" Name="$(var.Prefix)NetfxBundleExtension$(var.Suffix)\$(var.PLATFORM)\hostfxr.dll" />
             <?endforeach?>
         </BundleExtension>
     </Fragment>

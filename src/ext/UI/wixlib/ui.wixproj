@@ -5,6 +5,7 @@
     <BindFiles>true</BindFiles>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
+
   <PropertyGroup>
     <DefineConstants>
       $(DefineConstants);
@@ -17,19 +18,15 @@
       upIco=$(MSBuildProjectDirectory)\Bitmaps\up.ico;
     </DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)x86" BindName="x86" />
-    <BindInputPaths Include="$(OutputPath)x64" BindName="x64" />
-    <BindInputPaths Include="$(OutputPath)arm64" BindName="arm64" />
-  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Common_Platform.wxi" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=x64" />
-    <ProjectReference Include="..\ca\uica.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\uica.vcxproj" Platforms="arm64,x86,x64" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>

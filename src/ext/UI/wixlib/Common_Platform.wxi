@@ -13,6 +13,6 @@
     </Fragment>
 
     <Fragment>
-        <Binary Id="WixUiCa$(Suffix)" SourceFile="!(bindpath.$(platform))uica.dll" />
+        <Binary Id="WixUiCa$(Suffix)" SourceFile="!(bindpath.uica.$(platform))uica.dll" />
     </Fragment>
 </Include>
