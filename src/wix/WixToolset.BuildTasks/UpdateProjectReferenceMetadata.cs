@@ -6,15 +6,16 @@ namespace WixToolset.BuildTasks
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
     /// <summary>
-    /// This task adds publish metadata to the appropriate project references.
+    /// This task adds mutli-targeting and publish metadata to the appropriate project references.
     /// </summary>
     public class UpdateProjectReferenceMetadata : Task
     {
-        private static readonly char[] TargetFrameworksSplitter = new char[] { ',', ';' };
+        private static readonly char[] MetadataPairSplitter = new char[] { '|' };
 
         /// <summary>
         /// The list of project references that exist.
@@ -29,168 +30,449 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] UpdatedProjectReferences { get; private set; }
 
         /// <summary>
-        /// Finds all project references requesting publishing and updates them to publish instead of build and
+        /// Finds all project references requesting multi-targeting and publishing and updates them to publish instead of build and
         /// sets target framework if requested.
         /// </summary>
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            var updatedProjectReferences = new List<ITaskItem>();
             var intermediateFolder = Path.GetFullPath(this.IntermediateFolder);
 
-            foreach (var projectReference in this.ProjectReferences)
-            {
-                var additionalProjectReferences = new List<ITaskItem>();
+            // Create the project reference facades.
+            var projectReferenceFacades = this.ProjectReferences.Select(p => ProjectReferenceFacade.CreateFacade(p, this.Log, intermediateFolder));
 
-                var updatedProjectReference = this.TrySetTargetFrameworksOnProjectReference(projectReference, additionalProjectReferences);
+            // Expand the facade count by applying Configurations/Platforms.
+            projectReferenceFacades = this.ExpandProjectReferencesForConfigurationsAndPlatforms(projectReferenceFacades);
 
-                if (this.TryAddPublishPropertiesToProjectReference(projectReference, intermediateFolder))
-                {
-                    foreach (var additionalProjectReference in additionalProjectReferences)
-                    {
-                        this.TryAddPublishPropertiesToProjectReference(additionalProjectReference, intermediateFolder);
-                    }
+            // Expand the facade count by applying TargetFrameworks/RuntimeIdentifiers.
+            projectReferenceFacades = this.ExpandProjectReferencesForTargetFrameworksAndRuntimeIdentifiers(projectReferenceFacades);
 
-                    updatedProjectReference = true;
-                }
-
-                if (updatedProjectReference)
-                {
-                    updatedProjectReferences.Add(projectReference);
-                }
-
-                updatedProjectReferences.AddRange(additionalProjectReferences);
-            }
-
-            this.UpdatedProjectReferences = updatedProjectReferences.ToArray();
+            // Assign any metadata added during expansion above to the project references.
+            this.UpdatedProjectReferences = this.AssignMetadataToProjectReferences(projectReferenceFacades).ToArray();
 
             return true;
         }
 
-        private bool TryAddPublishPropertiesToProjectReference(ITaskItem projectReference, string intermediateFolder)
+        private IEnumerable<ProjectReferenceFacade> ExpandProjectReferencesForConfigurationsAndPlatforms(IEnumerable<ProjectReferenceFacade> projectReferenceFacades)
         {
-            var publish = projectReference.GetMetadata("Publish");
-            var publishDir = projectReference.GetMetadata("PublishDir");
-
-            if (publish.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                (String.IsNullOrWhiteSpace(publish) && !String.IsNullOrWhiteSpace(publishDir)))
+            foreach (var projectReferenceFacade in projectReferenceFacades)
             {
-                if (String.IsNullOrWhiteSpace(publishDir))
+                var configurationsWithPlatforms = ExpandTerms(projectReferenceFacade.AvailableConfigurations, projectReferenceFacade.AvailablePlatforms).ToList();
+
+                if (configurationsWithPlatforms.Count == 0)
                 {
-                    publishDir = CalculatePublishDirFromProjectReference(projectReference, intermediateFolder);
+                    yield return projectReferenceFacade;
+                }
+                else
+                {
+                    var expand = new List<ProjectReferenceFacade>(configurationsWithPlatforms.Count)
+                    {
+                        projectReferenceFacade
+                    };
+
+                    // First, clone the project reference so there are enough facades for all of the
+                    // requested configurations/platforms.
+                    for (var i = 1; i < configurationsWithPlatforms.Count; ++i)
+                    {
+                        expand.Add(projectReferenceFacade.Clone());
+                    }
+
+                    // Then set the configuration/platform on each project reference.
+                    for (var i = 0; i < configurationsWithPlatforms.Count; ++i)
+                    {
+                        expand[i].Configuration = configurationsWithPlatforms[i].FirstTerm;
+                        expand[i].Platform = configurationsWithPlatforms[i].SecondTerm;
+
+                        yield return expand[i];
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<ProjectReferenceFacade> ExpandProjectReferencesForTargetFrameworksAndRuntimeIdentifiers(IEnumerable<ProjectReferenceFacade> projectReferenceFacades)
+        {
+            foreach (var projectReferenceFacade in projectReferenceFacades)
+            {
+                var tfmsWithRids = ExpandTerms(projectReferenceFacade.AvailableTargetFrameworks, projectReferenceFacade.AvailableRuntimeIdentifiers).ToList();
+
+                if (tfmsWithRids.Count == 0)
+                {
+                    yield return projectReferenceFacade;
+                }
+                else
+                {
+                    var expand = new List<ProjectReferenceFacade>(tfmsWithRids.Count)
+                    {
+                        projectReferenceFacade
+                    };
+
+                    // First, clone the project reference so there are enough facades for all of the
+                    // requested target frameworks/runtime identifiers.
+                    for (var i = 1; i < tfmsWithRids.Count; ++i)
+                    {
+                        expand.Add(projectReferenceFacade.Clone());
+                    }
+
+                    // Then set the target framework/runtime identifier on each project reference.
+                    for (var i = 0; i < tfmsWithRids.Count; ++i)
+                    {
+                        expand[i].TargetFramework = tfmsWithRids[i].FirstTerm;
+                        expand[i].RuntimeIdentifier = tfmsWithRids[i].SecondTerm;
+
+                        yield return expand[i];
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<ITaskItem> AssignMetadataToProjectReferences(IEnumerable<ProjectReferenceFacade> facades)
+        {
+            foreach (var facade in facades)
+            {
+                var projectReference = facade.ProjectReference;
+                var targetsValue = new MetadataValueList(projectReference, "Targets");
+
+                if (facade.Modified)
+                {
+                    var configurationValue = new MetadataValue(projectReference, "Configuration");
+                    var platformValue = new MetadataValue(projectReference, "Platform");
+                    var fullConfigurationValue = new MetadataValue(projectReference, "FullConfiguration");
+                    var additionalProperties = new MetadataValueList(projectReference, "AdditionalProperties");
+                    var bindName = new MetadataValue(projectReference, "BindName");
+                    var bindPath = new MetadataValue(projectReference, "BindPath");
+
+                    var publishDir = facade.CalculatePublishDir();
+
+                    additionalProperties.SetValue("PublishDir=", publishDir);
+                    additionalProperties.SetValue("RuntimeIdentifier=", facade.RuntimeIdentifier);
+
+                    additionalProperties.Apply();
+
+                    if (!String.IsNullOrWhiteSpace(facade.Configuration))
+                    {
+                        projectReference.SetMetadata("SetConfiguration", $"Configuration={facade.Configuration}");
+
+                        if (configurationValue.HadValue)
+                        {
+                            configurationValue.SetValue(facade.Configuration);
+                            configurationValue.Apply();
+                        }
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(facade.Platform))
+                    {
+                        projectReference.SetMetadata("SetPlatform", $"Platform={facade.Platform}");
+
+                        if (platformValue.HadValue)
+                        {
+                            platformValue.SetValue(facade.Platform);
+                            platformValue.Apply();
+                        }
+                    }
+
+                    if (fullConfigurationValue.HadValue && (configurationValue.Modified || platformValue.Modified))
+                    {
+                        fullConfigurationValue.SetValue($"{configurationValue.Value}|{platformValue.Value}");
+                        fullConfigurationValue.Apply();
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(facade.TargetFramework))
+                    {
+                        projectReference.SetMetadata("SetTargetFramework", $"TargetFramework={facade.TargetFramework}");
+                    }
+
+                    var bindNameSuffix = facade.CalculateBindNameSuffix();
+                    if (!String.IsNullOrWhiteSpace(bindNameSuffix))
+                    {
+                        var bindNamePrefix = bindName.HadValue ? bindName.Value : Path.GetFileNameWithoutExtension(projectReference.ItemSpec);
+
+                        bindName.SetValue(ToolsCommon.CreateIdentifierFromValue(bindNamePrefix + bindNameSuffix));
+                        bindName.Apply();
+                    }
+
+                    if (!bindPath.HadValue)
+                    {
+                        bindPath.SetValue(publishDir);
+                        bindPath.Apply();
+                    }
                 }
 
-                publishDir = AppendTargetFrameworkFromProjectReference(projectReference, publishDir);
-
-                publishDir = Path.GetFullPath(publishDir);
-
-                this.AddPublishPropertiesToProjectReference(projectReference, publishDir);
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool TrySetTargetFrameworksOnProjectReference(ITaskItem projectReference, List<ITaskItem> additionalProjectReferences)
-        {
-            var setTargetFramework = projectReference.GetMetadata("SetTargetFramework");
-            var targetFrameworks = projectReference.GetMetadata("TargetFrameworks");
-            var targetFrameworksToSet = targetFrameworks.Split(TargetFrameworksSplitter).Where(s => !String.IsNullOrWhiteSpace(s)).ToList();
-
-            if (String.IsNullOrWhiteSpace(setTargetFramework) && targetFrameworksToSet.Count > 0)
-            {
-                // First, clone the project reference so there are enough duplicates for all of the
-                // requested target frameworks.
-                for (var i = 1; i < targetFrameworksToSet.Count; ++i)
+                if (facade.Publish)
                 {
-                    additionalProjectReferences.Add(new TaskItem(projectReference));
+                    var publishTargets = new MetadataValueList(projectReference, "PublishTargets");
+
+                    if (publishTargets.HadValue)
+                    {
+                        targetsValue.AddRange(publishTargets.Values);
+                    }
+                    else
+                    {
+                        targetsValue.SetValue(null, "Publish");
+                    }
+
+                    // GetTargetPath target always needs to be last so we can set bind paths to the output location of the project reference.
+                    if (targetsValue.Values.Count == 0 || !"GetTargetPath".Equals(targetsValue.Values[targetsValue.Values.Count - 1], StringComparison.OrdinalIgnoreCase))
+                    {
+                        targetsValue.Values.Remove("GetTargetPath");
+                        targetsValue.SetValue(null, "GetTargetPath");
+                    }
                 }
 
-                // Then set the target framework on each project reference.
-                for (var i = 0; i < targetFrameworksToSet.Count; ++i)
+                if (targetsValue.Modified)
                 {
-                    var reference = (i == 0) ? projectReference : additionalProjectReferences[i - 1];
-
-                    this.SetTargetFrameworkOnProjectReference(reference, targetFrameworksToSet[i]);
+                    targetsValue.Apply();
                 }
 
-                return true;
-            }
+                this.Log.LogMessage(MessageImportance.Low, "Adding metadata to project reference {0} Targets {1}, BindPath {2}={3}, AdditionalProperties: {4}",
+                    projectReference.ItemSpec, projectReference.GetMetadata("Targets"), projectReference.GetMetadata("BindName"), projectReference.GetMetadata("BindPath"), projectReference.GetMetadata("AdditionalProperties"));
 
-            if (!String.IsNullOrWhiteSpace(setTargetFramework) && !String.IsNullOrWhiteSpace(targetFrameworks))
-            {
-                this.Log.LogWarning("ProjectReference {0} contains metadata for both SetTargetFramework and TargetFrameworks. SetTargetFramework takes precedent so the TargetFrameworks value '{1}' is ignored", projectReference.ItemSpec, targetFrameworks);
+                yield return projectReference;
             }
-
-            return false;
         }
 
-        private void AddPublishPropertiesToProjectReference(ITaskItem projectReference, string publishDir)
+        private static IEnumerable<ExpansionTerms> ExpandTerms(IReadOnlyCollection<string> firstTerms, IReadOnlyCollection<string> secondTerms)
         {
-            var additionalProperties = projectReference.GetMetadata("AdditionalProperties");
-            if (!String.IsNullOrWhiteSpace(additionalProperties))
+            if (firstTerms.Count == 0)
             {
-                additionalProperties += ";";
+                firstTerms = new[] { String.Empty };
             }
 
-            additionalProperties += "PublishDir=" + publishDir;
-
-            var bindPath = ToolsCommon.GetMetadataOrDefault(projectReference, "BindPath", publishDir);
-
-            var publishTargets = projectReference.GetMetadata("PublishTargets");
-            if (String.IsNullOrWhiteSpace(publishTargets))
+            foreach (var firstTerm in firstTerms)
             {
-                publishTargets = "Publish;GetTargetPath";
-            }
-            else if (!publishTargets.EndsWith(";GetTargetsPath", StringComparison.OrdinalIgnoreCase))
-            {
-                publishTargets += ";GetTargetsPath";
-            }
+                var pairSplit = firstTerm.Split(MetadataPairSplitter, 2);
 
-            projectReference.SetMetadata("AdditionalProperties", additionalProperties);
-            projectReference.SetMetadata("BindPath", bindPath);
-            projectReference.SetMetadata("Targets", publishTargets);
-
-            this.Log.LogMessage(MessageImportance.Low, "Adding publish metadata to project reference {0} Targets {1}, BindPath {2}, AdditionalProperties: {3}",
-                projectReference.ItemSpec, projectReference.GetMetadata("Targets"), projectReference.GetMetadata("BindPath"), projectReference.GetMetadata("AdditionalProperties"));
+                // No pair indicator so expand the first term by the second term.
+                if (pairSplit.Length == 1)
+                {
+                    if (secondTerms.Count == 0)
+                    {
+                        yield return new ExpansionTerms(firstTerm, null);
+                    }
+                    else
+                    {
+                        foreach (var secondTerm in secondTerms)
+                        {
+                            yield return new ExpansionTerms(firstTerm, secondTerm);
+                        }
+                    }
+                }
+                else // there was a pair like "first|second" or "first|" or "|second" in the first term, so return that value as the pair.
+                {
+                    yield return new ExpansionTerms(pairSplit[0], pairSplit[1]);
+                }
+            }
         }
 
-        private void SetTargetFrameworkOnProjectReference(ITaskItem projectReference, string targetFramework)
+        private class ProjectReferenceFacade
         {
-            projectReference.SetMetadata("SetTargetFramework", $"TargetFramework={targetFramework}");
+            private string configuration;
+            private string platform;
+            private string targetFramework;
+            private string runtimeIdentifier;
 
-            var bindName = projectReference.GetMetadata("BindName");
-            if (String.IsNullOrWhiteSpace(bindName))
+            public ProjectReferenceFacade(ITaskItem projectReference, IReadOnlyCollection<string> availableConfigurations, string configuration, IReadOnlyCollection<string> availablePlatforms, string platform, IReadOnlyCollection<string> availableTargetFrameworks, string targetFramework, IReadOnlyCollection<string> availableRuntimeIdentifiers, string runtimeIdentifier, string publishBaseDir)
             {
-                bindName = Path.GetFileNameWithoutExtension(projectReference.ItemSpec);
-
-                projectReference.SetMetadata("BindName", $"{bindName}.{targetFramework}");
+                this.ProjectReference = projectReference;
+                this.AvailableConfigurations = availableConfigurations;
+                this.configuration = configuration;
+                this.AvailablePlatforms = availablePlatforms;
+                this.platform = platform;
+                this.AvailableTargetFrameworks = availableTargetFrameworks;
+                this.targetFramework = targetFramework;
+                this.AvailableRuntimeIdentifiers = availableRuntimeIdentifiers;
+                this.runtimeIdentifier = runtimeIdentifier;
+                this.PublishBaseDir = publishBaseDir;
+                this.Modified = !String.IsNullOrWhiteSpace(configuration) || !String.IsNullOrWhiteSpace(platform) ||
+                                !String.IsNullOrWhiteSpace(targetFramework) || !String.IsNullOrWhiteSpace(runtimeIdentifier) ||
+                                !String.IsNullOrWhiteSpace(publishBaseDir);
             }
 
-            this.Log.LogMessage(MessageImportance.Low, "Adding target framework metadata to project reference {0} SetTargetFramework: {1}, BindName: {2}",
-                                projectReference.ItemSpec, projectReference.GetMetadata("SetTargetFramework"), projectReference.GetMetadata("BindName"));
-        }
+            public ITaskItem ProjectReference { get; }
 
-        private static string CalculatePublishDirFromProjectReference(ITaskItem projectReference, string intermediateFolder)
-        {
-            var publishDir = Path.Combine("publish", Path.GetFileNameWithoutExtension(projectReference.ItemSpec));
+            public bool Modified { get; private set; }
 
-            return Path.Combine(intermediateFolder, publishDir);
-        }
+            public IReadOnlyCollection<string> AvailableConfigurations { get; }
 
-        private static string AppendTargetFrameworkFromProjectReference(ITaskItem projectReference, string publishDir)
-        {
-            var setTargetFramework = projectReference.GetMetadata("SetTargetFramework");
+            public IReadOnlyCollection<string> AvailablePlatforms { get; }
 
-            if (setTargetFramework.StartsWith("TargetFramework=") && setTargetFramework.Length > "TargetFramework=".Length)
+            public IReadOnlyCollection<string> AvailableRuntimeIdentifiers { get; }
+
+            public IReadOnlyCollection<string> AvailableTargetFrameworks { get; }
+
+            public bool Publish => !String.IsNullOrEmpty(this.PublishBaseDir);
+
+            public string PublishBaseDir { get; }
+
+            public string Configuration
             {
-                var targetFramework = setTargetFramework.Substring("TargetFramework=".Length);
-
-                publishDir = Path.Combine(publishDir, targetFramework);
+                get => this.configuration;
+                set => this.configuration = this.SetWithModified(value, this.configuration);
             }
 
-            return publishDir;
+            public string Platform
+            {
+                get => this.platform;
+                set => this.platform = this.SetWithModified(value, this.platform);
+            }
+
+            public string TargetFramework
+            {
+                get => this.targetFramework;
+                set => this.targetFramework = this.SetWithModified(value, this.targetFramework);
+            }
+
+            public string RuntimeIdentifier
+            {
+                get => this.runtimeIdentifier;
+                set => this.runtimeIdentifier = this.SetWithModified(value, this.runtimeIdentifier);
+            }
+
+            public ProjectReferenceFacade Clone()
+            {
+                return new ProjectReferenceFacade(new TaskItem(this.ProjectReference), this.AvailableConfigurations, this.configuration, this.AvailablePlatforms, this.platform, this.AvailableTargetFrameworks, this.targetFramework, this.AvailableRuntimeIdentifiers, this.runtimeIdentifier, this.PublishBaseDir);
+            }
+
+            public static ProjectReferenceFacade CreateFacade(ITaskItem projectReference, TaskLoggingHelper logger, string intermediateFolder)
+            {
+                var configurationsValue = new MetadataValueList(projectReference, "Configurations");
+                var setConfigurationValue = new MetadataValue(projectReference, "SetConfiguration", "Configuration=");
+                var platformsValue = new MetadataValueList(projectReference, "Platforms");
+                var setPlatformValue = new MetadataValue(projectReference, "SetPlatform", "Platform=");
+                var targetFrameworksValue = new MetadataValueList(projectReference, "TargetFrameworks");
+                var setTargetFrameworkValue = new MetadataValue(projectReference, "SetTargetFramework", "TargetFramework=");
+                var runtimeIdentifiersValue = new MetadataValueList(projectReference, "RuntimeIdentifiers");
+                var publishValue = new MetadataValue(projectReference, "Publish", null);
+                var publishDirValue = new MetadataValue(projectReference, "PublishDir", null);
+
+                var configurations = GetFromListAndValidateSetValue(configurationsValue, setConfigurationValue, logger, projectReference, "Configuration=Release");
+
+                var platforms = GetFromListAndValidateSetValue(platformsValue, setPlatformValue, logger, projectReference, "Platform=x64");
+
+                var targetFrameworks = GetFromListAndValidateSetValue(targetFrameworksValue, setTargetFrameworkValue, logger, projectReference, "TargetFramework=tfm");
+
+                string publishBaseDir = null;
+
+                if (publishValue.Value.Equals("true", StringComparison.OrdinalIgnoreCase) || (!publishValue.HadValue && publishDirValue.HadValue))
+                {
+                    if (publishDirValue.HadValue)
+                    {
+                        publishBaseDir = publishDirValue.Value;
+                    }
+                    else
+                    {
+                        publishBaseDir = Path.Combine(intermediateFolder, "publish", Path.GetFileNameWithoutExtension(projectReference.ItemSpec));
+                    }
+                }
+
+                return new ProjectReferenceFacade(projectReference, configurations, null, platforms, null, targetFrameworks, null, runtimeIdentifiersValue.Values, null, publishBaseDir);
+            }
+
+            public string CalculatePublishDir()
+            {
+                if (!this.Publish)
+                {
+                    return null;
+                }
+
+                var publishDir = this.PublishBaseDir;
+
+                if (!String.IsNullOrWhiteSpace(this.Configuration))
+                {
+                    publishDir = Path.Combine(publishDir, this.Configuration);
+                }
+
+                if (!String.IsNullOrWhiteSpace(this.Platform))
+                {
+                    publishDir = Path.Combine(publishDir, this.Platform);
+                }
+
+                if (!String.IsNullOrWhiteSpace(this.TargetFramework))
+                {
+                    publishDir = Path.Combine(publishDir, this.TargetFramework);
+                }
+
+                if (!String.IsNullOrWhiteSpace(this.RuntimeIdentifier))
+                {
+                    publishDir = Path.Combine(publishDir, this.RuntimeIdentifier);
+                }
+
+
+                return Path.GetFullPath(publishDir);
+            }
+
+            public string CalculateBindNameSuffix()
+            {
+                var sb = new StringBuilder();
+
+                if (!String.IsNullOrWhiteSpace(this.Configuration))
+                {
+                    sb.AppendFormat(".{0}", this.Configuration);
+                }
+
+                if (!String.IsNullOrWhiteSpace(this.Platform))
+                {
+                    sb.AppendFormat(".{0}", this.Platform);
+                }
+
+                if (!String.IsNullOrWhiteSpace(this.TargetFramework))
+                {
+                    sb.AppendFormat(".{0}", this.TargetFramework);
+                }
+
+                if (!String.IsNullOrWhiteSpace(this.RuntimeIdentifier))
+                {
+                    sb.AppendFormat(".{0}", this.RuntimeIdentifier);
+                }
+
+                return sb.ToString();
+            }
+
+            private string SetWithModified(string newValue, string oldValue)
+            {
+                if (String.IsNullOrWhiteSpace(newValue) && String.IsNullOrWhiteSpace(oldValue))
+                {
+                    return String.Empty;
+                }
+                else if (oldValue != newValue)
+                {
+                    this.Modified = true;
+                    return newValue;
+                }
+
+                return oldValue;
+            }
+
+            private static List<string> GetFromListAndValidateSetValue(MetadataValueList listValue, MetadataValue setValue, TaskLoggingHelper logger, ITaskItem projectReference, string setExample)
+            {
+                var targetFrameworks = listValue.Values;
+
+                if (setValue.HadValue)
+                {
+                    if (listValue.HadValue)
+                    {
+                        logger.LogMessage("ProjectReference {0} contains metadata for both {1} and {2}. {2} takes precedent so the {1} value '{3}' will be ignored", projectReference.ItemSpec, setValue.Name, listValue.Name, setValue.OriginalValue);
+                    }
+                    else if (!setValue.ValidValue)
+                    {
+                        logger.LogError("ProjectReference {0} contains invalid {1} value '{2}'. The {1} value should look something like '{3}'.", projectReference.ItemSpec, setValue.Name, setValue.OriginalValue, setExample);
+                    }
+                }
+
+                return targetFrameworks;
+            }
+        }
+
+        private class ExpansionTerms
+        {
+            public ExpansionTerms(string firstTerm, string secondTerm)
+            {
+                this.FirstTerm = firstTerm;
+                this.SecondTerm = secondTerm;
+            }
+
+            public string FirstTerm { get; }
+
+            public string SecondTerm { get; }
         }
     }
 }

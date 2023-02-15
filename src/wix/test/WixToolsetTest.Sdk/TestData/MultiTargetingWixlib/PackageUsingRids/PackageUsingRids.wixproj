@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Import Project="$(WixMSBuildProps)" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\TestExe\TestExe.csproj" Publish="true" TargetFrameworks="net6.0,net472" RuntimeIdentifiers="win-x86,win-x64" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+</Project>
