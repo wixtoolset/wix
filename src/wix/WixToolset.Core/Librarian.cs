@@ -65,6 +65,11 @@ namespace WixToolset.Core
 
                 trackedFiles = this.ResolveFilePathsToEmbed(context, sections);
 
+                if (this.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+
                 foreach (var section in sections)
                 {
                     section.AssignToLibrary(context.LibraryId);
@@ -116,18 +121,18 @@ namespace WixToolset.Core
                         {
                             var resolution = variableResolver.ResolveVariables(symbol.SourceLineNumbers, pathField.Path);
 
-                            var file = this.FileResolver.ResolveFile(resolution.Value, context.Extensions, bindPaths, symbol.SourceLineNumbers, symbol.Definition);
-
-                            if (!String.IsNullOrEmpty(file))
+                            try
                             {
+                                var file = this.FileResolver.ResolveFile(resolution.Value, context.Extensions, bindPaths, symbol.SourceLineNumbers, symbol.Definition);
+
                                 // File was successfully resolved so track the embedded index as the embedded file index.
                                 field.Set(new IntermediateFieldPathValue { Embed = true, Path = file });
 
                                 trackedFiles.Add(this.LayoutServices.TrackFile(file, TrackedFileType.Input, symbol.SourceLineNumbers));
                             }
-                            else
+                            catch (WixException e)
                             {
-                                this.Messaging.Write(ErrorMessages.FileNotFound(symbol.SourceLineNumbers, pathField.Path, symbol.Definition.Name));
+                                this.Messaging.Write(e.Error);
                             }
                         }
                     }
