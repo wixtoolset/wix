@@ -28,7 +28,7 @@
 
   <!-- NetFx Custom Action DLL Definitions -->
   <Fragment>
-    <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))netfxca.dll" />
+    <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.netfxca.$(var.platform))netfxca.dll" />
     <Binary Id="$(var.Prefix)NetCheck_x86" SourceFile="!(bindpath.x86)NetCoreCheck.exe" />
     <Binary Id="$(var.Prefix)NetCheck_x64" SourceFile="!(bindpath.x64)NetCoreCheck.exe" />
     <Binary Id="$(var.Prefix)NetCheck_arm64" SourceFile="!(bindpath.arm64)NetCoreCheck.exe" />

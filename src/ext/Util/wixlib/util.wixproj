@@ -6,18 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)x86" BindName='x86' />
-    <BindInputPaths Include="$(OutputPath)x64" BindName='x64' />
-    <BindInputPaths Include="$(OutputPath)arm64" BindName='arm64' />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=x64" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\be\utilbe.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Platforms="arm64,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>

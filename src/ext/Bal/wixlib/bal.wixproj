@@ -8,26 +8,14 @@
 
   <ItemGroup>
     <BindPath Include="..\wixstdba\Resources\" />
-    <BindPath Include="$(OutputPath)net6.0" />
     <BindPath Include="$(OutputPath)net20" />
-    <BindPath Include="$(OutputPath)x86" BindName="x86" />
-    <BindPath Include="$(OutputPath)x64" BindName="x64" />
-    <BindPath Include="$(OutputPath)arm64" BindName="arm64" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\dnchost\dnchost.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\dnchost\dnchost.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\dnchost\dnchost.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\mbahost\mbahost.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\mbahost\mbahost.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\mbahost\mbahost.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\dnchost\dnchost.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\mbahost\mbahost.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Platforms="arm64,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>

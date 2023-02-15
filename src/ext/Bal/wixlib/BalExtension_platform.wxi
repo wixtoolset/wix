@@ -6,8 +6,8 @@
 
     <Fragment>
         <BootstrapperApplication Id="WixDotNetCoreBootstrapperApplicationHost$(var.Suffix)">
-            <BootstrapperApplicationDll Id="WixDotNetCoreBootstrapperApplicationHost" SourceFile="!(bindpath.$(var.platform))\dnchost.dll" />
-            <Payload SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" Name="dncpreq.dll" />
+            <BootstrapperApplicationDll Id="WixDotNetCoreBootstrapperApplicationHost" SourceFile="!(bindpath.dnchost.$(var.platform))\dnchost.dll" />
+            <Payload SourceFile="!(bindpath.wixstdba.$(var.platform))\wixstdba.dll" Name="dncpreq.dll" />
         </BootstrapperApplication>
     </Fragment>
 
@@ -20,8 +20,8 @@
 
     <Fragment>
         <BootstrapperApplication Id="WixInternalUIBootstrapperApplication$(var.Suffix)">
-            <BootstrapperApplicationDll Id="WixInternalUIBootstrapperApplication" SourceFile="!(bindpath.$(var.platform))\wixiuiba.dll" />
-            <Payload SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" Name="prereqba.dll" />
+            <BootstrapperApplicationDll Id="WixInternalUIBootstrapperApplication" SourceFile="!(bindpath.wixiuiba.$(var.platform))\wixiuiba.dll" />
+            <Payload SourceFile="!(bindpath.wixstdba.$(var.platform))\wixstdba.dll" Name="prereqba.dll" />
         </BootstrapperApplication>
     </Fragment>
 
@@ -34,7 +34,7 @@
 
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication$(var.Suffix)">
-            <BootstrapperApplicationDll Id="WixStandardBootstrapperApplication" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
+            <BootstrapperApplicationDll Id="WixStandardBootstrapperApplication" SourceFile="!(bindpath.wixstdba.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
 

@@ -6,8 +6,8 @@
 
     <Fragment>
         <BootstrapperApplication Id="WixManagedBootstrapperApplicationHost$(var.Suffix)">
-            <BootstrapperApplicationDll Id="WixManagedBootstrapperApplicationHost" SourceFile="!(bindpath.$(var.platform))\mbahost.dll" />
-            <Payload SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" Name="mbapreq.dll" />
+            <BootstrapperApplicationDll Id="WixManagedBootstrapperApplicationHost" SourceFile="!(bindpath.mbahost.$(var.platform))\mbahost.dll" />
+            <Payload SourceFile="!(bindpath.wixstdba.$(var.platform))\wixstdba.dll" Name="mbapreq.dll" />
             <PayloadGroupRef Id="WixManagedBootstrapperApplicationHostManagedPayloads" />
         </BootstrapperApplication>
     </Fragment>

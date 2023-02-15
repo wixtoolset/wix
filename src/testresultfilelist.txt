@@ -3,10 +3,8 @@ build/logs/TestResults/burn.trx
 build/logs/TestResults/libs.trx
 build/logs/TestResults/tools.trx
 build/logs/TestResults/wix.trx
-build/logs/TestResults/WixToolsetTest.Bal.trx
 build/logs/TestResults/WixToolsetTest.BurnE2E.trx
-build/logs/TestResults/WixToolsetTest.Dnc.HostGenerator.trx
-build/logs/TestResults/WixToolsetTest.ManagedHost.trx
 build/logs/TestResults/util.wixext.trx
+build/logs/TestResults/bal.wixext.trx
 build/logs/TestResults/WixToolsetTest.MsiE2E.trx
 build/logs/TestResults/WixToolsetTest.WixE2ETests.trx

@@ -20,7 +20,7 @@
 @echo Building ext\Util %_C% using %_N%
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% || exit /b
+msbuild -Restore -p:Configuration=%_C% -warnaserror -bl:%_L%\ext_util_build.binlog || exit /b
 
 :: Test
 dotnet test ^
@@ -35,6 +35,7 @@ msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Util.wix
 :clean
 @rd /s/q "..\..\build\Util.wixext" 2> nul
 @del "..\..\build\artifacts\WixToolset.Util.wixext.*.nupkg" 2> nul
+@del "%_L%\ext_util_build.binlog" 2> nul
 @del "%_L%\TestResults\util.wixext.trx" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.util.wixext" 2> nul
 @exit /b
