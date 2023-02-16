@@ -35,8 +35,9 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             return new CommandLineHelp("Reattaches a signed burn engine to a bundle.", "burn reattach [options] original.exe -engine signed.exe -o final.exe", new[]
             {
+                new CommandLineHelpSwitch("-engine", "Burn engine extracted using `wix burn detach` and then signed."),
                 new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
-                new CommandLineHelpSwitch("-out", "-o", "Output bundle with signed engine attached."),
+                new CommandLineHelpSwitch("-out", "-o", "Required path to output bundle with reattached signed engine that can then be signed as a whole."),
             });
         }
 

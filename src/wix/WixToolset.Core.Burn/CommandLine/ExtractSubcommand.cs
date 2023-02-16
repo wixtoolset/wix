@@ -33,7 +33,7 @@ namespace WixToolset.Core.Burn.CommandLine
 
         public override CommandLineHelp GetCommandLineHelp()
         {
-            return new CommandLineHelp("Extracts the internals of a bundle to a folder.", "burn extract [options] bundle.exe -o outputfolder ", new[]
+            return new CommandLineHelp("Extracts the contents of a bundle.", "burn extract [options] bundle.exe -o outputfolder", new[]
             {
                 new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
                 new CommandLineHelpSwitch("-outba", "-oba", "Folder to extract the bundle bootstrapper application to."),
@@ -68,7 +68,7 @@ namespace WixToolset.Core.Burn.CommandLine
                     try
                     {
                         if (!String.IsNullOrEmpty(this.ExtractContainersPath))
-                                {
+                        {
                             reader.ExtractAttachedContainers(this.ExtractContainersPath, this.IntermediateFolder);
                         }
                     }
@@ -92,7 +92,7 @@ namespace WixToolset.Core.Burn.CommandLine
                     case "intermediatefolder":
                         this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(argument);
                         return true;
-                        
+
                     case "oba":
                     case "outba":
                         this.ExtractBootstrapperApplicationPath = parser.GetNextArgumentAsDirectoryOrError(argument);

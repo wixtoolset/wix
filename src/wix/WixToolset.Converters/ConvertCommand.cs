@@ -21,6 +21,7 @@ namespace WixToolset.Converters
             {
                 Switches = new[]
                 {
+                    new CommandLineHelpSwitch("--custom-table", "Convert custom table authoring for use in MSI packages (msi) or bundles (bundle)."),
                     new CommandLineHelpSwitch("--dry-run", "-n", "Only display errors, do not update files."),
                     new CommandLineHelpSwitch("--recurse", "-r", "Search for matching files in current dir and subdirs."),
                     new CommandLineHelpSwitch("-set1<file>", "Primary settings file."),

@@ -34,7 +34,7 @@ namespace WixToolset.Core.Burn.CommandLine
             return new CommandLineHelp("Detaches the Burn engine from a bundle so it can be signed.", "burn detach [options] original.exe -engine engine.exe", new[]
             {
                 new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
-                new CommandLineHelpSwitch("-engine", "Path to extract bundle's engine file to."),
+                new CommandLineHelpSwitch("-engine", "Path for extracted bundle engine."),
             });
         }
 

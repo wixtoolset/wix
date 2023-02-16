@@ -62,13 +62,12 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             {
                 Switches = new[]
                 {
-                    new CommandLineHelpSwitch("-a", "Admin image, generates source file information in the transform."),
                     new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
                     new CommandLineHelpSwitch("-p", "Preserve unchanged rows."),
                     new CommandLineHelpSwitch("-pedantic", "Show pedantic messages."),
-                    new CommandLineHelpSwitch("-serr <flags>", "Suppress error when applying transform; see Error flags below"),
-                    new CommandLineHelpSwitch("-t <type>", "Use default validation flags for the transform type; see Transform types below"),
-                    new CommandLineHelpSwitch("-val <flags>", "Validation flags for the transform; see Validation flags below"),
+                    new CommandLineHelpSwitch("-serr <flags>", "Suppress error when applying transform; see Error flags below."),
+                    new CommandLineHelpSwitch("-t <type>", "Use default validation flags for the transform type; see Transform types below."),
+                    new CommandLineHelpSwitch("-val <flags>", "Validation flags for the transform; see Validation flags below."),
                     new CommandLineHelpSwitch("-x", "Folder to extract binaries."),
                     new CommandLineHelpSwitch("-xo", "Output transfrom as a WiX output instead of an MST file."),
                     new CommandLineHelpSwitch("-out", "-o", "Path to output the transform file."),
