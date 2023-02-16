@@ -39,7 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
         public override CommandLineHelp GetCommandLineHelp()
         {
-            return new CommandLineHelp("Validates MSI database using standard or custom ICEs.", "msi validate [options] inputfile", new[]
+            return new CommandLineHelp("Validates MSI database using standard or custom ICEs.", "msi validate [options] {inputfile.msi|inputfile.msm}", new[]
             {
                 new CommandLineHelpSwitch("-cub", "Optional path to a custom validation .CUBe file."),
                 new CommandLineHelpSwitch("-ice", "Validates only with the specified ICE. May be provided multiple times."),

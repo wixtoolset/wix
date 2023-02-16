@@ -48,7 +48,7 @@ namespace WixToolsetTest.Converters
             WixAssert.CompareLineByLine(new[]
             {
                 "[Converted] The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead. (WixMbaPrereqPackageIdDeprecated)",
-                "[Converted] The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"yes\" to a prereq package instead. (WixMbaPrereqLicenseUrlDeprecated)",
+                "[Converted] The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead. (WixMbaPrereqLicenseUrlDeprecated)",
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
             WixAssert.CompareLineByLine(expected, actualLines);
         }
@@ -86,7 +86,7 @@ namespace WixToolsetTest.Converters
             WixAssert.CompareLineByLine(new[]
             {
                 "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead. (WixMbaPrereqPackageIdDeprecated)",
-                "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"yes\" to a prereq package instead. (WixMbaPrereqLicenseUrlDeprecated)",
+                "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead. (WixMbaPrereqLicenseUrlDeprecated)",
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
             WixAssert.CompareLineByLine(expected, actualLines);
         }

@@ -2372,7 +2372,7 @@ namespace WixToolset.Converters
                     if (this.State.WixMbaPrereqLicenseUrlElements.Count == 1)
                     {
                         var wixMbaPrereqLicenseUrlElement = this.State.WixMbaPrereqLicenseUrlElements[0];
-                        if (this.OnInformation(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, wixMbaPrereqLicenseUrlElement, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"yes\" to a prereq package instead."))
+                        if (this.OnInformation(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, wixMbaPrereqLicenseUrlElement, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead."))
                         {
                             var licenseUrl = wixMbaPrereqLicenseUrlElement.Attribute("Value")?.Value;
                             packageElement.Add(new XAttribute(BalPrereqLicenseUrlAttributeName, licenseUrl));
@@ -2394,7 +2394,7 @@ namespace WixToolset.Converters
 
             foreach (var element in this.State.WixMbaPrereqLicenseUrlElements)
             {
-                this.OnError(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, element, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"yes\" to a prereq package instead.");
+                this.OnError(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, element, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead.");
             }
         }
 
@@ -3129,7 +3129,7 @@ namespace WixToolset.Converters
             DisplayInternalUiNotConvertable,
 
             /// <summary>
-            /// InstallerVersion has breaking change when missing.
+            /// InstallerVersion has breaking change when omitted.
             /// </summary>
             InstallerVersionBehaviorChange,
 
