@@ -54,9 +54,18 @@ namespace WixToolset.Tools
             }
             catch (WixException e)
             {
-                listener.Write(e.Error);
+                if (e.Error != null)
+                {
+                    listener.Write(e.Error);
 
-                return e.Error.Id;
+                    return e.Error.Id;
+                }
+                else
+                {
+                    listener.Write(e.Message);
+
+                    return e.HResult;
+                }
             }
             catch (Exception e)
             {
