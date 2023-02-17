@@ -245,6 +245,22 @@ namespace WixToolset.Core.ExtensibilityServices
                                     throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", context.Platform.ToString());
                             }
 
+                        case "BUILDARCHSHORT":
+                            switch (context.Platform)
+                            {
+                                case Platform.X86:
+                                    return "X86";
+
+                                case Platform.X64:
+                                    return "X64";
+
+                                case Platform.ARM64:
+                                    return "A64";
+
+                                default:
+                                    throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", context.Platform.ToString());
+                            }
+
                         case "WIXMAJORVERSION":
                             return ThisAssembly.Git.BaseVersion.Major;
 
