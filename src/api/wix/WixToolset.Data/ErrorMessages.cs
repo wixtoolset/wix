@@ -1683,7 +1683,7 @@ namespace WixToolset.Data
 
         public static Message PerUserButAllUsersEquals1(SourceLineNumber sourceLineNumbers, string path)
         {
-            return Message(sourceLineNumbers, Ids.PerUserButAllUsersEquals1, "The MSI '{0}' is explicitly marked to not elevate so it must be a per-user package but the ALLUSERS Property is set to '1' creating a per-machine package. Remove the Property with Id='ALLUSERS' and use Package/@InstallScope attribute to be explicit instead.", path);
+            return Message(sourceLineNumbers, Ids.PerUserButAllUsersEquals1, "The MSI '{0}' is explicitly marked to not elevate so it must be a per-user package but the ALLUSERS Property is set to '1' creating a per-machine package. Remove the Property with Id='ALLUSERS' and use Package/@Scope attribute to be explicit instead.", path);
         }
 
         public static Message PreprocessorError(SourceLineNumber sourceLineNumbers, string message)
@@ -1723,7 +1723,7 @@ namespace WixToolset.Data
 
         public static Message ProductCodeInvalidForTransform(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.ProductCodeInvalidForTransform, "The value '*' is not valid for the ProductCode when used in a transform or in a patch. Copy the ProductCode from your target product MSI into the Package/@Id attribute value for your product authoring.");
+            return Message(sourceLineNumbers, Ids.ProductCodeInvalidForTransform, "The value '*' is not valid for the ProductCode when used in a transform or in a patch. Copy the ProductCode from your target product MSI into the Package/@ProductCode attribute value for your product authoring.");
         }
 
         public static Message ProgIdNestedTooDeep(SourceLineNumber sourceLineNumbers)
@@ -2148,7 +2148,7 @@ namespace WixToolset.Data
 
         public static Message UnsupportedAllUsersValue(SourceLineNumber sourceLineNumbers, string path, string value)
         {
-            return Message(sourceLineNumbers, Ids.UnsupportedAllUsersValue, "The MSI '{0}' set the ALLUSERS Property to '{0}' which is not supported. Remove the Property with Id='ALLUSERS' and use Package/@InstallScope attribute instead.", path, value);
+            return Message(sourceLineNumbers, Ids.UnsupportedAllUsersValue, "The MSI '{0}' set the ALLUSERS Property to '{0}' which is not supported. Remove the Property with Id='ALLUSERS' and use Package/@Scope attribute instead.", path, value);
         }
 
         public static Message UnsupportedExtensionAttribute(SourceLineNumber sourceLineNumbers, string elementName, string extensionElementName)
