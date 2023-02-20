@@ -3752,7 +3752,7 @@ static HRESULT ParseActions(
 
             ++i;
             ReleaseNullBSTR(bstrType);
-            ReleaseObject(pixnChild);
+            ReleaseNullObject(pixnChild);
         }
     }
 
@@ -3984,8 +3984,8 @@ static HRESULT ParseRadioButtons(
             pControl->fLastRadioButton = TRUE;
         }
 
-        ReleaseObject(pixnl);
-        ReleaseObject(pixnRadioButtons);
+        ReleaseNullObject(pixnl);
+        ReleaseNullObject(pixnRadioButtons);
     }
 
 LExit:

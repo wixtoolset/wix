@@ -160,6 +160,33 @@ There are currently four states for a button: default, focus, hover, and selecte
                 <Text>Back</Text>
                 <ChangePageAction Page="Progressbar" />
             </Button>
+            <Button Name="RadioButtonsButton" X="-183" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Next</Text>
+                <ChangePageAction Page="RadioButtons" />
+            </Button>
+        </Page>
+        <Page Name="RadioButtons">
+            <Label X="6" Y="6" Width="-6" Height="43" FontId="Default">
+                This page has two groups of radio buttons. Only one value should be able to be selected for each group. A value should be able to be selected for both groups.
+            </Label>
+            <Label X="6" Y="50" Width="-6" Height="13" FontId="Default">
+                Choice #1:
+            </Label>
+            <RadioButtons Name="CHOICE">
+                <RadioButton Height="30" Width="30" X="33" Y="68" Value="1" />
+                <RadioButton Height="30" Width="30" X="33" Y="103" Value="2" />
+            </RadioButtons>
+            <Label X="6" Y="138" Width="-6" Height="13" FontId="Default">
+                Choice #2:
+            </Label>
+            <RadioButtons Name="CHOICE2">
+                <RadioButton Height="30" Width="130" X="33" Y="156" Value="1">One</RadioButton>
+                <RadioButton Height="30" Width="130" X="33" Y="191" Value="2">Two</RadioButton>
+            </RadioButtons>
+            <Button Name="RadioButtonsBackButton" X="-269" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Back</Text>
+                <ChangePageAction Page="Billboard" />
+            </Button>
         </Page>
         <Button Name="StartButton" X="-97" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default" Visible="yes">
             <Text>Start</Text>
