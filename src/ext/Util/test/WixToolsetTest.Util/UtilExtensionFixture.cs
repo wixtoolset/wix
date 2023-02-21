@@ -183,6 +183,21 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanBuildRemoveFolderExInPackage()
+        {
+            var folder = TestData.Get(@"TestData\RemoveFolderExPackage");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "RemoveFile", "Wix4RemoveFolderEx");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:Wix4UtilCA_X64\t[Binary data]",
+                "CustomAction:Wix4RemoveFoldersEx_X64\t65\tWix4UtilCA_X64\tWixRemoveFoldersEx\t",
+                "Wix4RemoveFolderEx:wrfRwBJnGq1p9zdOKI6qUQ.p.wHFtE\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tREMOVEPROP\t3\t",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildServiceConfig()
         {
             var folder = TestData.Get(@"TestData", "ServiceConfig");

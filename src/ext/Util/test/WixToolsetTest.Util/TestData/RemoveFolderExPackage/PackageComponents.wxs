@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="example.txt" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\[Manufacturer]\[ProductName]" Name="InstallFolder" Value="[INSTALLFOLDER]" />
+                <util:RemoveFolderEx On="both" Property="REMOVEPROP" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
