@@ -51,16 +51,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(chainBundlePath));
 
-                string chainBundleId;
-                using (var wixOutput = WixOutput.Read(chainPdbPath))
-                {
-
-                    var intermediate = Intermediate.Load(wixOutput);
-                    var section = intermediate.Sections.Single();
-
-                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                    chainBundleId = bundleSymbol.BundleId;
-                }
+                var chainBundleId = GetBundleIdFromWixpdb(chainPdbPath);
 
                 // parent.exe
                 result = WixRunner.Execute(new[]
@@ -78,16 +69,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(parentBundlePath));
 
-                string parentBundleId;
-                using (var wixOutput = WixOutput.Read(parentPdbPath))
-                {
-
-                    var intermediate = Intermediate.Load(wixOutput);
-                    var section = intermediate.Sections.Single();
-
-                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                    parentBundleId = bundleSymbol.BundleId;
-                }
+                var parentBundleId = GetBundleIdFromWixpdb(parentPdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, parentBaFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -140,16 +122,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(grandparentBundlePath));
 
-                string grandparentBundleId;
-                using (var wixOutput = WixOutput.Read(grandparentPdbPath))
-                {
-
-                    var intermediate = Intermediate.Load(wixOutput);
-                    var section = intermediate.Sections.Single();
-
-                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                    grandparentBundleId = bundleSymbol.BundleId;
-                }
+                var grandparentBundleId = GetBundleIdFromWixpdb(grandparentPdbPath);
 
                 var grandparentExtractResult = BundleExtractor.ExtractBAContainer(null, grandparentBundlePath, grandparentBaFolderPath, extractFolderPath);
                 grandparentExtractResult.AssertSuccess();
@@ -229,16 +202,8 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(parentBundlePath));
 
                 var chainBundleId = "{216BDA7F-74BD-45E8-957B-500552F05629}";
-                string parentBundleId;
-                using (var wixOutput = WixOutput.Read(parentPdbPath))
-                {
 
-                    var intermediate = Intermediate.Load(wixOutput);
-                    var section = intermediate.Sections.Single();
-
-                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                    parentBundleId = bundleSymbol.BundleId;
-                }
+                var parentBundleId = GetBundleIdFromWixpdb(parentPdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, parentBaFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -316,16 +281,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(parentBundlePath));
 
-                string parentBundleId;
-                using (var wixOutput = WixOutput.Read(parentPdbPath))
-                {
-
-                    var intermediate = Intermediate.Load(wixOutput);
-                    var section = intermediate.Sections.Single();
-
-                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                    parentBundleId = bundleSymbol.BundleId;
-                }
+                var parentBundleId = GetBundleIdFromWixpdb(parentPdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -361,6 +317,90 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "<WixPackageProperties Package='v3bundle.exe' Vital='yes' DisplayName='CustomV3Theme' Description='CustomV3Theme' DownloadSize='*' PackageSize='*' InstalledSize='1135' PackageType='Bundle' Permanent='no' LogPathVariable='WixBundleLog_v3bundle.exe' RollbackLogPathVariable='WixBundleRollbackLog_v3bundle.exe' Compressed='yes' Version='1.0.0.0' RepairCondition='0' Cache='keep' />",
                 }, packageElements);
+            }
+        }
+
+        [Fact]
+        public void CanBuildBundleWithAllUsersPackage()
+        {
+            var folder = TestData.Get("TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var dataPath = Path.Combine(folder, ".Data");
+
+                var msiIntermediateFolder = Path.Combine(baseFolder, "obj", "msi");
+                var msiBinFolder = Path.Combine(baseFolder, "bin", "msi");
+                var msiPath = Path.Combine(msiBinFolder, "test.msi");
+
+                var bundleIntermediateFolder = Path.Combine(baseFolder, "obj", "bundle");
+                var bundleBinFolder = Path.Combine(baseFolder, "bin", "bundle");
+                var bundlePath = Path.Combine(bundleBinFolder, "bundle.exe");
+                var bundlePdbPath = Path.Combine(bundleBinFolder, "bundle.wixpdb");
+
+                var baFolderPath = Path.Combine(baseFolder, "extract", "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract", "files");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleAllUsers", "AllUsersPackage.wxs"),
+                    "-bindpath", dataPath,
+                    "-intermediateFolder", msiIntermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleAllUsers", "BundleWithAllUsersPackage.wxs"),
+                    "-bindpath", dataPath,
+                    "-bindpath", msiBinFolder,
+                    "-intermediateFolder", bundleIntermediateFolder,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                var parentBundleId = GetBundleIdFromWixpdb(bundlePdbPath);
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    $"<Registration Id='{parentBundleId}' ExecutableName='bundle.exe' PerMachine='yes' Tag='' Version='9.9' ProviderKey='{parentBundleId}'>" +
+                    "<Arp DisplayName='All Users Bundle' DisplayVersion='9.9' Publisher='Example Corporation' />" +
+                    "</Registration>"
+                }, registrations);
+
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixPackageProperties", new List<string> { "DownloadSize", "PackageSize" } },
+                };
+
+                var packageElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPackageProperties", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixPackageProperties Package='test.msi' Vital='yes' DisplayName='All Users Package' DownloadSize='*' PackageSize='*' InstalledSize='28' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_test.msi' RollbackLogPathVariable='WixBundleRollbackLog_test.msi' Compressed='no' ProductCode='{33333333-3333-3333-3333-333333333333}' UpgradeCode='{4BE34BEE-CA23-488E-96A0-B15878E3654B}' Version='1.0' Cache='keep' />",
+                }, packageElements);
+            }
+        }
+
+        private static string GetBundleIdFromWixpdb(string bundlePdbPath)
+        {
+            using (var wixOutput = WixOutput.Read(bundlePdbPath))
+            {
+
+                var intermediate = Intermediate.Load(wixOutput);
+                var section = intermediate.Sections.Single();
+
+                var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+                return bundleSymbol.BundleId;
             }
         }
     }
