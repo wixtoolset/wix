@@ -6,10 +6,70 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class CustomActionFixture
     {
+        [Fact]
+        public void CanBuildSetProperty()
+        {
+            var folder = TestData.Get("TestData", "SetProperty");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var output = WindowsInstallerData.Load(Path.Combine(baseFolder, "bin", "test.wixpdb"), false);
+                var caRows = output.Tables["CustomAction"].Rows.Single();
+                WixAssert.StringEqual("SetINSTALLLOCATION", caRows.FieldAsString(0));
+                WixAssert.StringEqual("51", caRows.FieldAsString(1));
+                WixAssert.StringEqual("INSTALLLOCATION", caRows.FieldAsString(2));
+                WixAssert.StringEqual("[INSTALLFOLDER]", caRows.FieldAsString(3));
+            }
+        }
+
+        [Fact]
+        public void CannotBuildWhenSetPropertyReferencesMissingAction()
+        {
+            var folder = TestData.Get("TestData", "SetProperty");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "CannotBuildWhenSetPropertyReferencesMissingAction.wxs"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                var messages = result.Messages.Select(m => m.ToString()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The identifier 'WixAction:InstallUISequence/OnlyScheduledInExecuteSequence' could not be found. Ensure you have typed the reference correctly and that all the necessary inputs are provided to the linker."
+                }, messages);
+            }
+        }
+
         [Fact]
         public void CanDetectCustomActionCycle()
         {

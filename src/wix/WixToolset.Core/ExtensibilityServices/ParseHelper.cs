@@ -780,28 +780,9 @@ namespace WixToolset.Core.ExtensibilityServices
                 Overridable = overridable,
             });
 
-            if (null != beforeAction)
+            if (beforeAction != null || afterAction != null)
             {
-                if (WindowsInstallerStandard.IsStandardAction(beforeAction))
-                {
-                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), beforeAction);
-                }
-                else
-                {
-                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, beforeAction);
-                }
-            }
-
-            if (null != afterAction)
-            {
-                if (WindowsInstallerStandard.IsStandardAction(afterAction))
-                {
-                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), afterAction);
-                }
-                else
-                {
-                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, afterAction);
-                }
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), beforeAction ?? afterAction);
             }
 
             return actionSymbol;
