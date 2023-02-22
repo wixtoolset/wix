@@ -7,7 +7,7 @@
         .NET Framework installation state properties
     -->
 
-  <!-- Location of .NET Framework redistributable install root directory -->
+  <!-- Location of .NET Framework install root directory -->
   <Fragment>
     <Property Id="NETFRAMEWORKINSTALLROOTDIR" Secure="yes">
       <RegistrySearch Id="NetFxInstallRootSearch" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" />
