@@ -1,0 +1,39 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no">
+    <MajorUpgrade DowngradeErrorMessage="Cannot Downgrade" />
+
+    <Feature Id="ProductFeature">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <SetProperty Id="OnlyScheduledInExecuteSequence" Value="Some=Data" Before="OnlyScheduledInExecuteSequence" />
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+       <Component>
+         <File Source="test.txt" />
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <InstallExecuteSequence>
+      <Custom Action="OnlyScheduledInExecuteSequence" After="InstallFiles" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+    <CustomAction Id="OnlyScheduledInExecuteSequence" BinaryRef="PretendDll" DllEntry="IgnoredByTesting" Execute="immediate" Return="check" />
+  </Fragment>
+
+  <Fragment>
+    <Binary Id="PretendDll" SourceFile="test.txt" />
+  </Fragment>
+</Wix>
