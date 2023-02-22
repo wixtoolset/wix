@@ -396,7 +396,6 @@ namespace WixToolset.Data.WindowsInstaller
                 new DirectorySymbol(null, new Identifier(AccessModifier.Global, "TempFolder")) { Name = "Temp" },
                 new DirectorySymbol(null, new Identifier(AccessModifier.Global, "TemplateFolder")) { Name = "Template" },
                 new DirectorySymbol(null, new Identifier(AccessModifier.Global, "WindowsFolder")) { Name = "Windows" },
-                new DirectorySymbol(null, new Identifier(AccessModifier.Global, "WindowsVolume")) { Name = "WinVol" },
             };
 
             standardActionNames = new HashSet<string>(standardActions.Select(a => a.Action));
