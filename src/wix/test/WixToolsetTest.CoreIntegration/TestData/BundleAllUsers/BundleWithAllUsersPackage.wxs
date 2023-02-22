@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Bundle Name="All Users Bundle" Version="9.9" Manufacturer="Example Corporation" UpgradeCode="{4BE34BEE-CA23-488E-96A0-B15878E3654B}" Compressed="no">
+    <BootstrapperApplication>
+      <BootstrapperApplicationDll SourceFile="fakeba.dll" />
+    </BootstrapperApplication>
+
+    <Chain>
+      <MsiPackage SourceFile="test.msi" ForcePerMachine="yes" />
+    </Chain>
+  </Bundle>
+</Wix>

@@ -130,7 +130,14 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void ValidateMsiProperty(WixBundleMsiPropertySymbol symbol)
         {
-            this.BackendHelper.ValidateBundleMsiPropertyName(symbol.SourceLineNumbers, "MsiProperty", "Name", symbol.Name);
+            // Validate the MSI properties *except* for the ALLUSERS property when set during binding (most likely
+            // by the MsiPackage/@ForcePerMachine attribute).
+            var nameField = symbol.Fields[(int)WixBundleMsiPropertySymbolFields.Name];
+            var name = nameField.AsString();
+            if (name != "ALLUSERS" || nameField.Context != "wix.bind")
+            {
+                this.BackendHelper.ValidateBundleMsiPropertyName(symbol.SourceLineNumbers, "MsiProperty", "Name", name);
+            }
 
             if (symbol.Condition != null)
             {
