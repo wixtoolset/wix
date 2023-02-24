@@ -321,7 +321,7 @@
   </PropertyGroup>
   <Target
       Name="_ConvertResolvedProjectReferencesIntoWixConstructs"
-      DependsOnTargets="$(_CreateProjectDefineConstantsDependsOn)"
+      DependsOnTargets="$(_ConvertResolvedProjectReferencesIntoWixConstructs)"
       Condition=" '@(_WixResolvedProjectReference)' != '' ">
 
     <!-- Save all the project reference outputs before we start removing -->
