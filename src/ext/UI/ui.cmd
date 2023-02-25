@@ -2,6 +2,8 @@
 @pushd %~dp0
 
 @set _C=Debug
+@set _L=%~dp0..\..\..\build\logs
+
 :parse_args
 @if /i "%1"=="release" set _C=Release
 @if /i "%1"=="inc" set _INC=1
