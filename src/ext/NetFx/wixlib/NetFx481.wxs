@@ -1,0 +1,111 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+    .NET Framework installation state properties
+
+    Official documentation can be found at the following locations:
+      https://learn.microsoft.com/en-us/dotnet/framework/install/guide-for-developers
+      https://learn.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed
+  -->
+
+  <?define NetFx481MinRelease = 533320 ?>
+  <?define NetFx481WebLink = https://go.microsoft.com/fwlink/?LinkId=2203304 ?>
+  <?define NetFx481RedistLink = https://go.microsoft.com/fwlink/?linkid=2203305 ?>
+  <?define NetFx481EulaLink = https://referencesource.microsoft.com/license.html ?>
+  <?define NetFx481WebId = NetFx481Web ?>
+  <?define NetFx481RedistId = NetFx481Redist ?>
+
+  <Fragment>
+    <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
+    <Property Id="WIX_IS_NETFRAMEWORK_481_OR_LATER_INSTALLED" Secure="yes" />
+    <SetProperty Id="WIX_IS_NETFRAMEWORK_481_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx481MinRelease)&quot;" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
+
+    <WixVariable Id="NetFx481WebDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx481MinRelease)" Overridable="yes" />
+    <WixVariable Id="NetFx481WebInstallCondition" Value="" Overridable="yes" />
+    <WixVariable Id="NetFx481WebPackageDirectory" Value="redist\" Overridable="yes" />
+
+    <PackageGroup Id="$(var.NetFx481WebId)">
+      <ExePackage
+        CacheId="$(var.NetFx481WebId)_AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
+        InstallArguments="/q /norestart /log &quot;[NetFx481WebLog].html&quot;"
+        PerMachine="yes"
+        DetectCondition="!(wix.NetFx481WebDetectCondition)"
+        InstallCondition="!(wix.NetFx481WebInstallCondition)"
+        Id="$(var.NetFx481WebId)"
+        Vital="yes"
+        Permanent="yes"
+        Protocol="netfx4"
+        LogPathVariable="NetFx481WebLog"
+        Cache="remove">
+
+        <ExePackagePayload
+          Name="!(wix.NetFx481WebPackageDirectory)ndp481-web.exe"
+          DownloadUrl="$(var.NetFx481WebLink)"
+          ProductName="Microsoft .NET Framework 4.8.1"
+          Description="Microsoft .NET Framework 4.8.1 Setup"
+          CertificatePublicKey="0A7D1EFF01D4EBAD21E85C51499576EBAA40E676"
+          CertificateThumbprint="AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
+          Size="1460448"
+          Version="4.8.09037.06"
+        />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx481WebId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx481WebId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx481WebId)" LicenseUrl="$(var.NetFx481EulaLink)" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
+
+    <WixVariable Id="NetFx481RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx481MinRelease)" Overridable="yes" />
+    <WixVariable Id="NetFx481RedistInstallCondition" Value="" Overridable="yes" />
+    <WixVariable Id="NetFx481RedistPackageDirectory" Value="redist\" Overridable="yes" />
+
+    <PackageGroup Id="$(var.NetFx481RedistId)">
+      <ExePackage 
+        CacheId="$(var.NetFx481RedistId)_AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173" 
+        InstallArguments="/q /norestart /log &quot;[NetFx481RedistLog].html&quot;" 
+        PerMachine="yes" 
+        DetectCondition="!(wix.NetFx481RedistDetectCondition)" 
+        InstallCondition="!(wix.NetFx481RedistInstallCondition)" 
+        Id="$(var.NetFx481RedistId)" 
+        Vital="yes" 
+        Permanent="yes" 
+        Protocol="netfx4" 
+        LogPathVariable="NetFx481RedistLog" 
+        Cache="remove">
+
+        <ExePackagePayload 
+          Name="!(wix.NetFx481RedistPackageDirectory)ndp481-x86-x64-allos-enu.exe" 
+          DownloadUrl="$(var.NetFx481RedistLink)" 
+          ProductName="Microsoft .NET Framework 4.8.1" 
+          Description="Microsoft .NET Framework 4.8.1 Setup" 
+          CertificatePublicKey="0A7D1EFF01D4EBAD21E85C51499576EBAA40E676" 
+          CertificateThumbprint="AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173" 
+          Size="63610344" 
+          Version="4.8.09037.06" 
+          />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx481RedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx481RedistId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx481RedistId)" LicenseUrl="$(var.NetFx481EulaLink)" />
+  </Fragment>
+</Wix>
