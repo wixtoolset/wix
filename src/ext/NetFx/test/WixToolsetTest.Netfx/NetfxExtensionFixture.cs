@@ -77,6 +77,38 @@ namespace WixToolsetTest.Netfx
         }
 
         [Fact]
+        public void CanBuildUsingNetFx481Packages()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\UsingNetFxPackages");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var extensionResult = WixRunner.Execute(new[]
+                {
+                    "extension", "add",
+                    "WixToolset.Bal.wixext"
+                });
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
+                    "-ext", "WixToolset.Bal.wixext",
+                    "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundleFile,
+                    "-arch", "x64",
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+            }
+        }
+
+        [Fact]
         public void CanBuildUsingNativeImage()
         {
             var folder = TestData.Get(@"TestData\UsingNativeImage");
