@@ -29,6 +29,11 @@ namespace WixToolset.Core.WindowsInstaller
             return Message(originalLineNumber, Ids.InvalidModuleVersion, "The Module/@Version was not be able to be used as a four-part version. A valid four-part version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", version);
         }
 
+        public static Message InvalidWindowsInstallerWixpdbForValidation(string wixpdbPath)
+        {
+            return Message(null, Ids.InvalidWindowsInstallerWixpdbForValidation, "The validation .wixpdb file: {0} was not from a Windows Installer database build (.msi or .msm). Verify that the output type was actually an MSI Package or Merge Module.", wixpdbPath);
+        }
+
         public static Message UnknownDecompileType(string decompileType, string filePath)
         {
             return Message(null, Ids.UnknownDecompileType, "Unknown decompile type '{0}' from input: {1}", decompileType, filePath);
@@ -52,6 +57,7 @@ namespace WixToolset.Core.WindowsInstaller
             ExceededMaximumAllowedFeatureDepthInMsi = 7503,
             UnknownDecompileType = 7504,
             UnknownValidationTargetFileExtension = 7505,
+            InvalidWindowsInstallerWixpdbForValidation = 7506,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }

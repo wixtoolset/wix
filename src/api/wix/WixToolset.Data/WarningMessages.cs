@@ -613,9 +613,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.UnclearShortcut, "Because it is an advertised shortcut, the target of shortcut '{0}' will be the keypath of component '{2}' rather than parent file '{1}'. To eliminate this warning, you can (1) make the Shortcut element a child of the File element that is the keypath of component '{2}', (2) make file '{1}' the keypath of component '{2}', or (3) remove the @Advertise attribute so the shortcut is a non-advertised shortcut.", shortcutId, fileId, componentId);
         }
 
-        public static Message UnexpectedEntrySection(SourceLineNumber sourceLineNumbers, string sectionType, string expectedType, string outputExtension)
+        public static Message UnexpectedEntrySection(SourceLineNumber sourceLineNumbers, string sectionType, string expectedType)
         {
-            return Message(sourceLineNumbers, Ids.UnexpectedEntrySection, "Found mismatched entry point <{0}>. Expected <{1}> for specified output package type {2}.", sectionType, expectedType, outputExtension);
+            return Message(sourceLineNumbers, Ids.UnexpectedEntrySection, "Found entry point <{0}> that does not match expected <{1}> output type. Verify that your source code is correct and matches the expected output type.", sectionType, expectedType);
         }
 
         public static Message UnexpectedTableInProduct(SourceLineNumber sourceLineNumbers, string tableName)

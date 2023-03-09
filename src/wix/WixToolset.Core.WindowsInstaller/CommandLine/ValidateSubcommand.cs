@@ -90,7 +90,14 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
                 if (File.Exists(this.WixpdbPath))
                 {
-                    data = WindowsInstallerData.Load(this.WixpdbPath);
+                    try
+                    {
+                        data = WindowsInstallerData.Load(this.WixpdbPath);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        this.Messaging.Write(WindowsInstallerBackendErrors.InvalidWindowsInstallerWixpdbForValidation(this.WixpdbPath));
+                    }
                 }
 
                 var command = new ValidateDatabaseCommand(this.Messaging, this.FileSystem, this.IntermediateFolder, this.DatabasePath, data, this.CubeFiles, this.Ices, this.SuppressIces);
