@@ -2,11 +2,10 @@
 
 namespace WixToolsetTest.UI
 {
-    using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.UI;
     using Xunit;
@@ -16,8 +15,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIAdvanced()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Advanced");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Advanced");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "ControlEvent");
@@ -52,8 +51,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIAdvancedX64()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Advanced");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Advanced");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent");
@@ -88,8 +87,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIAdvancedARM64()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Advanced");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Advanced");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildARM64, "Binary", "Dialog", "CustomAction", "ControlEvent");
@@ -124,8 +123,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIFeatureTree()
         {
-            var folder = TestData.Get(@"TestData\WixUI_FeatureTree");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_FeatureTree");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent");
@@ -155,8 +154,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIInstallDir()
         {
-            var folder = TestData.Get(@"TestData\WixUI_InstallDir");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_InstallDir");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "Property", "ControlEvent");
@@ -191,8 +190,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIMinimal()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Minimal");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Minimal");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "ControlEvent");
@@ -220,8 +219,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIMinimalInKazakh()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Minimal");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Minimal");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildInKazakh, "Dialog");
@@ -232,8 +231,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIMinimalAndReadPdb()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Minimal");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Minimal");
+            var bindFolder = TestData.Get(@"TestData", "data");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -258,8 +257,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIMondo()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Mondo");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Mondo");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "ControlEvent");
@@ -292,8 +291,8 @@ namespace WixToolsetTest.UI
         [Fact]
         public void CanBuildUsingWixUIMondoLocalized()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Mondo");
-            var bindFolder = TestData.Get(@"TestData\data");
+            var folder = TestData.Get(@"TestData", "WixUI_Mondo");
+            var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildInGerman, "Control");
@@ -301,6 +300,31 @@ namespace WixToolsetTest.UI
             {
                 "&Ja",
             }, results.Where(s => s.StartsWith("Control:ErrorDlg\tY")).Select(s => s.Split('\t')[9]).ToArray());
+        }
+
+        [Fact]
+        public void CannotBuildWithV3LikeUIRef()
+        {
+            var folder = TestData.Get(@"TestData", "InvalidUIRef");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var outputPath = Path.Combine(intermediateFolder, "bin", "test.msi");
+
+                var args = new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-ext", typeof(UIExtensionFactory).Assembly.Location,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", outputPath,
+                };
+
+                var results = WixRunner.Execute(args);
+                var message = results.Messages.Single();
+                Assert.Equal("The identifier 'WixUI:WixUI_Mondo' is inaccessible due to its protection level.", message.ToString());
+            }
         }
 
         private static void Build(string[] args)

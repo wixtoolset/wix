@@ -542,42 +542,5 @@ namespace WixToolsetTest.Converters
             Assert.Equal(2, errors);
             WixAssert.CompareLineByLine(expected, actual);
         }
-
-        [Fact]
-        public void WarnsOnWixUIDoActionControlEvents()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
-                "  <Fragment>",
-                "    <UI Id='WixUI_Test'>",
-                "      <Publish Dialog='BrowseDlg' Control='OK' Event='DoAction' Value='WixUIValidatePath' Order='3' />",
-                "    </UI>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var expected = new[]
-            {
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Fragment>",
-                "    <UI Id=\"WixUI_Test\">",
-                "      <Publish Dialog=\"BrowseDlg\" Control=\"OK\" Event=\"DoAction\" Value=\"WixUIValidatePath\" Order=\"3\" />",
-                "    </UI>",
-                "  </Fragment>",
-                "</Wix>",
-            };
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new WixConverter(messaging, 2, null, null);
-
-            var errors = converter.ConvertDocument(document);
-
-            var actual = UnformattedDocumentLines(document);
-
-            Assert.Equal(2, errors);
-            Assert.Single(messaging.Messages.Where(m => m.Id == 65));
-            WixAssert.CompareLineByLine(expected, actual);
-        }
     }
 }
