@@ -301,7 +301,7 @@ namespace WixToolsetTest.Util
         public void CanBuildModuleWithXmlConfig()
         {
             var folder = TestData.Get(@"TestData", "XmlConfigModule");
-            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder }, "test.msm");
 
             var results = build.BuildAndQuery(BuildX64, "Wix4XmlConfig");
             WixAssert.CompareLineByLine(new[]
