@@ -1355,25 +1355,6 @@ namespace WixToolset.Converters
                 }
             }
 
-            var xConditions = element.Elements(ConditionElementName).ToList();
-            foreach (var xCondition in xConditions)
-            {
-                var message = xCondition.Attribute("Message")?.Value;
-
-                if (!String.IsNullOrEmpty(message) &&
-                    TryGetInnerText(xCondition, out var text, out var comments) &&
-                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
-                {
-                    using (var lab = new ConversionLab(xCondition))
-                    {
-                        lab.ReplaceTargetElement(new XElement(LaunchElementName,
-                                                              new XAttribute("Condition", text),
-                                                              new XAttribute("Message", message)));
-                        lab.AddCommentsAsSiblings(comments);
-                    }
-                }
-            }
-
             var xMediaTemplate = element.Element(MediaTemplateElementName);
             if (xMediaTemplate?.HasAttributes == false
                 && this.OnInformation(ConverterTestType.DefaultMediaTemplate, element, "A MediaTemplate with no attributes set is now provided by default. Remove the element."))
