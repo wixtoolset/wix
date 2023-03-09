@@ -289,7 +289,7 @@ namespace WixToolset.Converters
                 { WixConverter.DirectoryRefElementName, this.ConvertDirectoryRefElement },
                 { WixConverter.FeatureElementName, this.ConvertFeatureElement },
                 { WixConverter.FileElementName, this.ConvertFileElement },
-                { WixConverter.FragmentElementName, this.ConvertFragmentElement },
+                { WixConverter.ConditionElementName, this.ConvertLaunchConditionElement },
                 { WixConverter.FirewallRemoteAddressElementName, this.ConvertFirewallRemoteAddressElement },
                 { WixConverter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
                 { WixConverter.ErrorElementName, this.ConvertErrorElement },
@@ -1064,7 +1064,7 @@ namespace WixToolset.Converters
                     {
                         xCondition.Remove();
                         element.Add(new XAttribute("Condition", text));
-                        lab. RemoveOrphanTextNodes();
+                        lab.RemoveOrphanTextNodes();
                         lab.AddCommentsAsSiblings(comments);
                     }
                 }
@@ -1205,25 +1205,20 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertFragmentElement(XElement element)
+        private void ConvertLaunchConditionElement(XElement element)
         {
-            var xConditions = element.Elements(ConditionElementName).ToList();
+            var message = element.Attribute("Message")?.Value;
 
-            foreach (var xCondition in xConditions)
+            if (!String.IsNullOrEmpty(message) &&
+                TryGetInnerText(element, out var text, out var comments) &&
+                this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", element.Name.LocalName))
             {
-                var message = xCondition.Attribute("Message")?.Value;
-
-                if (!String.IsNullOrEmpty(message) &&
-                    TryGetInnerText(xCondition, out var text, out var comments) &&
-                    this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
+                using (var lab = new ConversionLab(element))
                 {
-                    using (var lab = new ConversionLab(xCondition))
-                    {
-                        lab.ReplaceTargetElement(new XElement(LaunchElementName,
-                                                              new XAttribute("Condition", text),
-                                                              new XAttribute("Message", message)));
-                        lab.AddCommentsAsSiblings(comments);
-                    }
+                    lab.ReplaceTargetElement(new XElement(LaunchElementName,
+                                                          new XAttribute("Condition", text),
+                                                          new XAttribute("Message", message)));
+                    lab.AddCommentsAsSiblings(comments);
                 }
             }
         }
