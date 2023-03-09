@@ -382,19 +382,15 @@ namespace WixToolsetTest.Converters
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Include xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
-                "  <Fragment>",
-                "    <Condition Message='from wxi'>",
-                "        wxicondition",
-                "    </Condition>",
-                "  </Fragment>",
+                "  <Condition Message='from wxi'>",
+                "      wxicondition",
+                "  </Condition>",
                 "</Include>");
 
             var expected = new[]
             {
                 "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Fragment>",
-                "    <Launch Condition=\"wxicondition\" Message=\"from wxi\" />",
-                "  </Fragment>",
+                "  <Launch Condition=\"wxicondition\" Message=\"from wxi\" />",
                 "</Include>"
             };
 
@@ -485,7 +481,7 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void FixLaunchCondition()
+        public void FixLaunchConditionInFragment()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -569,7 +565,7 @@ namespace WixToolsetTest.Converters
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Product>",
-                "  <Package />",
+                "    <Package />",
                 "    <Condition Message='Stop the install'>",
                 "      1&lt;2",
                 "    </Condition>",
@@ -583,7 +579,7 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Package Compressed=\"no\">",
-                "  ",
+                "    ",
                 "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
                 "  </Package>",
