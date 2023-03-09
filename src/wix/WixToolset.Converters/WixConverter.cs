@@ -1687,7 +1687,7 @@ namespace WixToolset.Converters
                 && value?.StartsWith("WixUI", StringComparison.OrdinalIgnoreCase) == true
                 && this.OnInformation(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element, "Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. For more information, see https://wixtoolset.org/docs/fourthree/#converting-custom-wixui-dialog-sets."))
             {
-                // Just warn.
+                element.Attribute("Value").Value = value + "_$(sys.BUILDARCHSHORT)";
             }
         }
 

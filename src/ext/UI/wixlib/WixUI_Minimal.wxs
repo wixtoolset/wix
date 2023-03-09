@@ -1,7 +1,5 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
-
 <!--
 First-time install dialog sequence:
  - WixUI_WelcomeEulaDlg
@@ -17,8 +15,18 @@ Patch dialog sequence:
 -->
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?foreach WIXUIARCH in X86;X64;A64 ?>
     <Fragment>
-        <UI Id="WixUI_Minimal">
+        <UI Id="WixUI_Minimal_$(WIXUIARCH)">
+            <Publish Dialog="WelcomeEulaDlg" Control="Print" Event="DoAction" Value="WixUIPrintEula_$(WIXUIARCH)" />
+        </UI>
+
+        <UIRef Id="WixUI_Minimal" />
+    </Fragment>
+    <?endforeach?>
+
+    <Fragment>
+        <UI Id="file WixUI_Minimal">
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
             <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
@@ -59,12 +67,4 @@ Patch dialog sequence:
 
         <UIRef Id="WixUI_Common" />
     </Fragment>
-
-    <?foreach WIXUIARCH in X86;X64;A64 ?>
-    <Fragment>
-        <UI Id="WixUI_Minimal_$(WIXUIARCH)">
-            <Publish Dialog="WelcomeEulaDlg" Control="Print" Event="DoAction" Value="WixUIPrintEula_$(WIXUIARCH)" />
-        </UI>
-    </Fragment>
-    <?endforeach?>
 </Wix>

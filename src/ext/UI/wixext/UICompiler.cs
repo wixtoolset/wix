@@ -87,7 +87,6 @@ namespace WixToolset.UI
             else
             {
                 var platform = this.Context.Platform == Platform.ARM64 ? "A64" : this.Context.Platform.ToString();
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixUI, id);
                 this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixUI, $"{id}_{platform}");
 
                 if (installDirectory != null)
