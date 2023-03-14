@@ -1,4 +1,4 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
     <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" InstallerVersion="200">
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 
@@ -13,6 +13,15 @@
         </ComponentGroup>
 
         <ui:WixUI Id="WixUI_FeatureTree" />
+        <WixVariable Id="WixUIDialogBmp" Value="WixUIDialogBmp.png" />
+        <WixVariable Id="WixUIBannerBmp" Value="WixUIBannerBmp.png" />
+
+        <SetProperty
+          Id="WIXUI_EXITDIALOGOPTIONALTEXT"
+          Value="Thank you for installing [ProductName]."
+          After="FindRelatedProducts"
+          Sequence="ui"
+          />
     </Package>
 
     <Fragment>
