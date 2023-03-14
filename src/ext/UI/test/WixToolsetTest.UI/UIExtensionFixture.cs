@@ -143,6 +143,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
+                "CustomAction:SetWIXUI_EXITDIALOGOPTIONALTEXT\t51\tWIXUI_EXITDIALOGOPTIONALTEXT\tThank you for installing [ProductName].\t",
                 "CustomAction:WixUIPrintEula_X64\t65\tWixUiCa_X64\tPrintEula\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
             WixAssert.CompareLineByLine(new[]
@@ -152,13 +153,13 @@ namespace WixToolsetTest.UI
         }
 
         [Fact]
-        public void CanBuildUsingWixUIInstallDir()
+        public void CanBuildUsingWixUIInstallDirWithCustomizedEula()
         {
             var folder = TestData.Get(@"TestData", "WixUI_InstallDir");
             var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "Property", "ControlEvent");
+            var results = build.BuildAndQuery(BuildEula, "Binary", "Dialog", "CustomAction", "Property", "ControlEvent");
             Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
@@ -303,6 +304,82 @@ namespace WixToolsetTest.UI
         }
 
         [Fact]
+        public void CanBuildUsingWithInstallDirAndRemovedDialog()
+        {
+            var folder = TestData.Get(@"TestData", "InstallDir_NoLicense");
+            var bindFolder = TestData.Get(@"TestData", "data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "Property", "ControlEvent");
+            Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X86\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixUIValidatePath_X86\t65\tWixUiCa_X86\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Property:WIXUI_INSTALLDIR\tINSTALLFOLDER",
+            }, results.Where(r => r.StartsWith("Property:WIXUI")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "ControlEvent:BrowseDlg\tOK\tDoAction\tWixUIValidatePath_X86\tNOT WIXUI_DONTVALIDATEPATH\t3",
+                "ControlEvent:InstallDirDlg\tNext\tDoAction\tWixUIValidatePath_X86\tNOT WIXUI_DONTVALIDATEPATH\t2",
+            }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
+
+            Assert.Empty(results.Where(result => result.Contains("LicenseAgreementDlg")).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingWithInstallDirAndAddedDialog()
+        {
+            var folder = TestData.Get(@"TestData", "InstallDir_SpecialDlg");
+            var bindFolder = TestData.Get(@"TestData", "data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "Control", "Dialog", "CustomAction", "Property", "ControlEvent");
+            Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:WixUI_Bmp_Banner\t[Binary data]",
+                "Binary:WixUI_Bmp_Dialog\t[Binary data]",
+                "Binary:WixUI_Bmp_New\t[Binary data]",
+                "Binary:WixUI_Bmp_Up\t[Binary data]",
+                "Binary:WixUI_Ico_Exclam\t[Binary data]",
+                "Binary:WixUI_Ico_Info\t[Binary data]",
+                "Binary:WixUiCa_X64\t[Binary data]",
+            }, results.Where(r => r.StartsWith("Binary:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:WixUIPrintEula_X64\t65\tWixUiCa_X64\tPrintEula\t",
+                "CustomAction:WixUIValidatePath_X64\t65\tWixUiCa_X64\tValidatePath\t",
+            }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Property:WIXUI_INSTALLDIR\tINSTALLFOLDER",
+            }, results.Where(r => r.StartsWith("Property:WIXUI")).ToArray());
+            WixAssert.CompareLineByLine(new[]
+            {
+                "ControlEvent:BrowseDlg\tOK\tDoAction\tWixUIValidatePath_X64\tNOT WIXUI_DONTVALIDATEPATH\t3",
+                "ControlEvent:InstallDirDlg\tNext\tDoAction\tWixUIValidatePath_X64\tNOT WIXUI_DONTVALIDATEPATH\t2",
+                "ControlEvent:LicenseAgreementDlg\tPrint\tDoAction\tWixUIPrintEula_X64\t1\t1",
+            }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
+
+            Assert.Equal(8, results.Where(result => result.StartsWith("Control:") && result.Contains("SpecialDlg")).Count());
+            Assert.Equal(5, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("SpecialDlg")).Count());
+            Assert.Single(results.Where(result => result.StartsWith("Dialog:") && result.Contains("SpecialDlg")));
+        }
+
+        [Fact]
         public void CannotBuildWithV3LikeUIRef()
         {
             var folder = TestData.Get(@"TestData", "InvalidUIRef");
@@ -342,6 +419,12 @@ namespace WixToolsetTest.UI
         private static void BuildARM64(string[] args)
         {
             var result = WixRunner.Execute(args.Concat(new[] { "-arch", "arm64" }).ToArray())
+                                  .AssertSuccess();
+        }
+
+        private static void BuildEula(string[] args)
+        {
+            var result = WixRunner.Execute(args.Concat(new[] { "-bv", "WixUILicenseRtf=bpl.rtf" }).ToArray())
                                   .AssertSuccess();
         }
 
