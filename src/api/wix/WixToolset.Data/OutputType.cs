@@ -30,10 +30,6 @@ namespace WixToolset.Data
         /// <summary>Package output type.</summary>
         Package,
 
-        /// <summary>Package output type.</summary>
-        [Obsolete]
-        Product = Package,
-
         /// <summary>Transform output type.</summary>
         Transform,
 

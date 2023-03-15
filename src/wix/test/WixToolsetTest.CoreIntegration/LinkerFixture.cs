@@ -86,7 +86,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void MissingEntrySectionDetectedPackage()
         {
-            var folder = TestData.Get(@"TestData\OverridableActions");
+            var folder = TestData.Get("TestData", "OverridableActions");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -100,12 +100,12 @@ namespace WixToolsetTest.CoreIntegration
                         "build",
                         Path.Combine(folder, "PackageComponents.wxs"),
                         "-intermediateFolder", intermediateFolder,
-                        "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                        "-o", Path.Combine(baseFolder, "bin", "test.msi")
                     });
                 }
                 catch (WixException we)
                 {
-                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Expected section of type 'Product'.", we.Message);
+                    WixAssert.StringEqual("Could not find entry section in provided list of intermediates. Expected section of type 'Package'.", we.Message);
                     return;
                 }
 
