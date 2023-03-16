@@ -48,19 +48,31 @@ namespace WixToolset.BuildTasks
 
         private void AddBindPathsForResolvedReference(IDictionary<string, List<ITaskItem>> bindPathByPaths, ITaskItem resolvedReference)
         {
+            var projectPath = resolvedReference.GetMetadata("MSBuildSourceProjectFile");
+
             // If the BindName was not explicitly provided, try to use the source project's filename
             // as the bind name.
             var name = resolvedReference.GetMetadata("BindName");
             if (String.IsNullOrWhiteSpace(name))
             {
-                var projectPath = resolvedReference.GetMetadata("MSBuildSourceProjectFile");
                 name = String.IsNullOrWhiteSpace(projectPath) ? String.Empty : Path.GetFileNameWithoutExtension(projectPath);
             }
 
             var path = resolvedReference.GetMetadata("BindPath");
             if (String.IsNullOrWhiteSpace(path))
             {
-                path = Path.GetDirectoryName(resolvedReference.GetMetadata("FullPath"));
+                var fullpath = resolvedReference.GetMetadata("FullPath");
+                path = Path.GetDirectoryName(fullpath);
+
+                // If the resolved project reference (incorrectly) points at a file then use the file's
+                // file's directory instead. When this happens, it is a problem in the referenced project
+                // 
+                while (File.Exists(path))
+                {
+                    this.Log.LogWarning("The project '{0}' target path '{1}' resolved to an invalid path where a filename was a child of a file. Using the parent directory '{2}' instead.", projectPath, fullpath, path);
+
+                    path = Path.GetDirectoryName(path);
+                }
             }
 
             if (!bindPathByPaths.TryGetValue(path, out var bindPathsForPath) ||
