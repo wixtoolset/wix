@@ -51,6 +51,51 @@ namespace WixToolsetTest.Bal
         }
 
         [Fact]
+        public void CanBuildUsingWixIuiBaWithUrlPrereqPackage()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\WixIuiBa");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "UrlPrereqPackage.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", TestData.Get(@"TestData\WixStdBa\Data"),
+                    "-o", bundleFile,
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var balPackageInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixBalPackageInfo PackageId='test.msi' PrimaryPackageType='default' />",
+                }, balPackageInfos);
+
+                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqInformation");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixMbaPrereqInformation PackageId='wixnative.exe' LicenseUrl='https://www.mysite.com/prereqterms' />",
+                }, mbaPrereqInfos);
+
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.thm")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.wxl")));
+            }
+        }
+
+        [Fact]
         public void CanBuildUsingWixIuiBaWithImplicitPrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
