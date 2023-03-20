@@ -358,7 +358,7 @@ namespace WixToolset.Bal
 
             if (prereqAttribute != null && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqAttribute))
             {
-                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out _))
+                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
                 {
                     prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
                     {
