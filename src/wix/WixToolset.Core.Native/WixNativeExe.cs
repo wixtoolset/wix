@@ -113,6 +113,12 @@ namespace WixToolset.Core.Native
                     }
                     else if (str.Contains(" ") && !str.StartsWith("\""))
                     {
+                        // Escape a trailing backslash with another backslash if quoting the path.
+                        if (str.EndsWith("\\", StringComparison.Ordinal))
+                        {
+                            str += "\\";
+                        }
+
                         yield return $"\"{str}\"";
                     }
                     else

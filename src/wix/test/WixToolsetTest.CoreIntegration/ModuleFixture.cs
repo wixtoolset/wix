@@ -50,14 +50,14 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanMergeModuleAndValidate()
         {
-            var msmFolder = TestData.Get(@"TestData\SimpleModule");
-            var folder = TestData.Get(@"TestData\SimpleMerge");
+            var msmFolder = TestData.Get("TestData", "SimpleModule");
+            var folder = TestData.Get("TestData", "SimpleMerge");
 
             using (var fs = new DisposableFileSystem())
             {
-                var intermediateFolder = fs.GetFolder();
-                var msiPath = Path.Combine(intermediateFolder, @"bin\test.msi");
-                var cabPath = Path.Combine(intermediateFolder, @"bin\cab1.cab");
+                var intermediateFolder = Path.Combine(fs.GetFolder(), "path with spaces");
+                var msiPath = Path.Combine(intermediateFolder, "bin", "test.msi");
+                var cabPath = Path.Combine(intermediateFolder, "bin", "cab1.cab");
 
                 var msmResult = WixRunner.Execute(new[]
                 {
@@ -83,11 +83,11 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, "bin", "test.wixpdb"));
                 var section = intermediate.Sections.Single();
                 Assert.Empty(section.Symbols.OfType<FileSymbol>());
 
-                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, "bin", "test.wixpdb"));
                 Assert.Empty(data.Tables["File"].Rows);
 
                 var results = Query.QueryDatabase(msiPath, new[] { "File" });
