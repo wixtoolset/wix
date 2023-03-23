@@ -27,7 +27,7 @@ namespace WixToolsetTest.Sdk
                 // Node reuse means that child msbuild processes can stay around after the build completes.
                 // Under that scenario, the root msbuild does not reliably close its streams which causes us to hang.
                 "-nr:false",
-                $"-bl:{Path.ChangeExtension(projectPath, ".binlog")}"
+                MsbuildUtilities.GetQuotedSwitch(buildSystem, "bl", Path.ChangeExtension(projectPath, ".binlog"))
             };
 
             if (arguments != null)
@@ -59,36 +59,35 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        public static string GetQuotedPropertySwitch(BuildSystem buildSystem, string propertyName, string valueToQuote)
+        public static string GetQuotedSwitch(BuildSystem _, string switchName, string switchValue)
         {
-            switch (buildSystem)
+            // If the value ends with a backslash, escape it.
+            if (switchValue?.EndsWith("\\") == true)
             {
-                case BuildSystem.DotNetCoreSdk:
-                    {
-                        // If the value ends with a backslash, double-escape it (it should end up with four backslashes).
-                        if (valueToQuote?.EndsWith("\\") == true)
-                        {
-                            valueToQuote += @"\\\";
-                        }
-
-                        return $"-p:{propertyName}=\\\"{valueToQuote}\\\"";
-                    }
-                case BuildSystem.MSBuild:
-                case BuildSystem.MSBuild64:
-                    {
-                        // If the value ends with a backslash, escape it.
-                        if (valueToQuote?.EndsWith("\\") == true)
-                        {
-                            valueToQuote += @"\";
-                        }
-
-                        return $"-p:{propertyName}=\"{valueToQuote}\"";
-                    }
-                default:
-                    {
-                        throw new NotImplementedException();
-                    }
+                switchValue += @"\";
             }
+
+            return $"-{switchName}:\"{switchValue}\"";
+        }
+
+        public static string GetQuotedPropertySwitch(BuildSystem buildSystem, string propertyName, string propertyValue)
+        {
+            // If the value ends with a backslash, escape it.
+            if (propertyValue?.EndsWith("\\") == true)
+            {
+                propertyValue += @"\";
+            }
+
+            var quotedValue = "\"" + propertyValue + "\"";
+
+            // If the value contains a semicolon then escape-quote it (wrap with the characters: \") to wrap the value
+            // instead of just quoting the value, otherwise dotnet.exe will not pass the value to MSBuild correctly.
+            if (buildSystem == BuildSystem.DotNetCoreSdk && propertyValue?.IndexOf(';') > -1)
+            {
+                quotedValue = "\\\"" + propertyValue + "\\\"";
+            }
+
+            return $"-p:{propertyName}={quotedValue}";
         }
 
         public static IEnumerable<string> GetToolCommandLines(MsbuildRunnerResult result, string toolName, string operation, BuildSystem buildSystem)

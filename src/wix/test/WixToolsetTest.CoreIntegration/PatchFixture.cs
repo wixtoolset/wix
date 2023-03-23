@@ -572,7 +572,7 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void CreateAdminImage(string msiPath, string targetDir)
         {
-            var args = $"/a {Path.ChangeExtension(msiPath, "msi")} TARGETDIR={targetDir} /qn";
+            var args = $"/a \"{Path.ChangeExtension(msiPath, "msi")}\" TARGETDIR=\"{targetDir}\" /qn";
 
             var proc = Process.Start("msiexec.exe", args);
             proc.WaitForExit(5000);

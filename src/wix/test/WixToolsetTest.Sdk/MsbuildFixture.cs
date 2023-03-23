@@ -332,7 +332,7 @@ namespace WixToolsetTest.Sdk
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
-                    $"-p:PdbOutputDir={pdbFolder}",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "PdbOutputDir", pdbFolder),
                     "-p:SuppressValidation=true"
                 });
                 result.AssertSuccess();

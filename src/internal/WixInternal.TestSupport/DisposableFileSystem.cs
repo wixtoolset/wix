@@ -35,7 +35,8 @@ namespace WixInternal.TestSupport
 
         public string GetFolder(bool create = false)
         {
-            var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            // Always return a path with a space in it.
+            var path = Path.Combine(Path.GetTempPath(), ".WIXTEST " + Path.GetRandomFileName());
 
             if (create)
             {
