@@ -195,7 +195,7 @@ namespace WixInternal.TestSupport
                     sb.Append(' ');
                 }
 
-                if (arg.IndexOf(' ') > -1)
+                if (arg.IndexOf(' ') > -1 && !arg.EndsWith("\""))
                 {
                     sb.Append("\"");
                     sb.Append(arg);
