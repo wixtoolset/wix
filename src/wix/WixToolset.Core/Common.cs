@@ -249,7 +249,7 @@ namespace WixToolset.Core
                 {
                     return filename.Length < 9;
                 }
-                else if (expectedDot > 8 || filename[expectedDot] != '.' || expectedDot + 4 < filename.Length)
+                else if (expectedDot == 0 || expectedDot > 8 || filename[expectedDot] != '.' || expectedDot + 4 < filename.Length)
                 {
                     return false;
                 }
