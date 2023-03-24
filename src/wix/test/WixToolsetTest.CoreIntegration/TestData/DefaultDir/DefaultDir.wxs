@@ -21,6 +21,7 @@
             <Directory Id="Folder12" Name="Folder.12"></Directory>
             <Directory Id="Folder123" Name="Folder.123"></Directory>
             <Directory Id="Folder1234" Name="Folder.1234"></Directory>
+            <Directory Id="GitFolder" Name=".git"></Directory>
         </DirectoryRef>
     </Fragment>
 </Wix>
