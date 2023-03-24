@@ -1872,9 +1872,14 @@ NOTE: returns 0 if the multisz in not properly terminated with two nulls
 extern "C" HRESULT DAPI MultiSzLen(
     __in_ecount(*pcch) __nullnullterminated LPCWSTR pwzMultiSz,
     __out SIZE_T* pcch
-)
+    )
 {
     Assert(pcch);
+    if (!pwzMultiSz)
+    {
+        *pcch = 0;
+        return S_OK;
+    }
 
     HRESULT hr = S_OK;
     LPCWSTR wz = pwzMultiSz;
@@ -1941,12 +1946,12 @@ extern "C" HRESULT DAPI MultiSzPrepend(
     hr = ::StringCchLengthW(pwzInsert, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchInsert));
     StrExitOnRootFailure(hr, "failed to get length of insert string");
 
-    cchResult = cchInsert + cchMultiSz + 1;
+    cchResult = cchInsert + (cchMultiSz ? cchMultiSz : 1) + 1;
 
     // Allocate the result buffer
-    hr = StrAlloc(&pwzResult, cchResult + 1);
+    hr = StrAlloc(&pwzResult, cchResult);
     StrExitOnFailure(hr, "failed to allocate result string");
- 
+
     // Prepend
     hr = ::StringCchCopyW(pwzResult, cchResult, pwzInsert);
     StrExitOnRootFailure(hr, "failed to copy prepend string: %ls", pwzInsert);
@@ -1954,8 +1959,7 @@ extern "C" HRESULT DAPI MultiSzPrepend(
     // If there was no MULTISZ, double null terminate our result, otherwise, copy the MULTISZ in
     if (0 == cchMultiSz)
     {
-        pwzResult[cchResult] = L'\0';
-        ++cchResult;
+        pwzResult[cchResult - 2] = L'\0';
     }
     else
     {
@@ -1967,6 +1971,7 @@ extern "C" HRESULT DAPI MultiSzPrepend(
     }
 
     // Set the result
+    pwzResult[cchResult - 1] = L'\0';
     *ppwzMultiSz = pwzResult;
 
     if (pcchMultiSz)
@@ -2257,19 +2262,29 @@ extern "C" HRESULT DAPI MultiSzInsertString(
     //
     // Insert the string
     //
-    cchResult = cchMultiSz + cchString + 1;
+    cchResult = (cchMultiSz ? cchMultiSz : 1) + cchString + 1;
 
     hr = StrAlloc(&pwzResult, cchResult);
     StrExitOnFailure(hr, "failed to allocate result string for MULTISZ insert");
 
     // Copy the part before the insert
-    ::CopyMemory(pwzResult, *ppwzMultiSz, cchProgress * sizeof(WCHAR));
+    if (cchProgress)
+    {
+        ::CopyMemory(pwzResult, *ppwzMultiSz, cchProgress * sizeof(WCHAR));
+    }
 
     // Copy the insert part
     ::CopyMemory(pwzResult + cchProgress, pwzInsert, (cchString + 1) * sizeof(WCHAR));
 
     // Copy the part after the insert
-    ::CopyMemory(pwzResult + cchProgress + cchString + 1, wz, (cchMultiSz - cchProgress) * sizeof(WCHAR));
+    if (cchMultiSz > cchProgress)
+    {
+        ::CopyMemory(pwzResult + cchProgress + cchString + 1, wz, (cchMultiSz - cchProgress) * sizeof(WCHAR));
+    }
+
+    // Ensure double-null termination
+    pwzResult[cchResult-1] = NULL;
+    pwzResult[cchResult-2] = NULL;
 
     // Free the old buffer
     ReleaseNullStr(*ppwzMultiSz);
