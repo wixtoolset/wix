@@ -131,17 +131,17 @@ namespace WixToolset.Dtf.WindowsInstaller.Linq.Entities
         public string Value      { get { return this[4]; } set { this[4] = value; } }
         public string Component_ { get { return this[5]; } set { this[5] = value; } }
         public RegistryRoot Root
-        { get { return (RegistryRoot) this.I(1); } set { this[0] = ((int) value).ToString(); } }
+        { get { return (RegistryRoot) this.I(1); } set { this[1] = ((int) value).ToString(); } }
     }
 
     public class RemoveFile_ : QRecord
     {
         public string FileKey     { get { return this[0]; } set { this[0] = value; } }
-        public string Component_  { get { return this[2]; } set { this[2] = value; } }
-        public string FileName    { get { return this[3]; } set { this[3] = value; } }
-        public string DirProperty { get { return this[4]; } set { this[4] = value; } }
+        public string Component_  { get { return this[1]; } set { this[1] = value; } }
+        public string FileName    { get { return this[2]; } set { this[2] = value; } }
+        public string DirProperty { get { return this[3]; } set { this[3] = value; } }
         public RemoveFileModes InstallMode
-        { get { return (RemoveFileModes) this.I(5); } set { this[5] = ((int) value).ToString(); } }
+        { get { return (RemoveFileModes) this.I(4); } set { this[4] = ((int) value).ToString(); } }
     }
 
     #endregion // Generated code
