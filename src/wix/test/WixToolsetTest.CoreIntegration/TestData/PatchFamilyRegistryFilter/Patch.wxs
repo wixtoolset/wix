@@ -10,7 +10,7 @@
 
   <Fragment>
     <PatchFamily Id="SamplePatchFamily" Version="$(var.V)" Supersede="yes">
-        <ComponentRef Id="regUty0zLJ5uYhRlGzmOzENKmnAtno" />
+        <ComponentRef Id="CReg" />
     </PatchFamily>
   </Fragment>
 </Wix>

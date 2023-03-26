@@ -12,11 +12,11 @@
 
   <Fragment>
     <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
-      <Component>
+      <Component Id="CA">
         <File Id="a.txt" Name="a.txt" Source="A.txt" />
       </Component>
 
-      <Component>
+      <Component Id="CReg">
         <RegistryValue Root="HKLM" Key="SOFTWARE\!(bind.property.ProductName)\Patch" Name="Version" Value="$(V)" />
       </Component>
     </ComponentGroup>
