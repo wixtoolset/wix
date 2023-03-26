@@ -419,7 +419,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var componentId = row.Component;
 
                 // If this file is the keypath of a component
-                if (componentKeyPath.ContainsValue(componentId))
+                if (componentKeyPath.ContainsValue(fileId))
                 {
                     if (!componentWithChangedKeyPath.ContainsKey(componentId))
                     {

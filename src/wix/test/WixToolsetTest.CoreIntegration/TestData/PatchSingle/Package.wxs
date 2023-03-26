@@ -16,10 +16,10 @@
 
   <Fragment>
     <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
-      <Component>
+      <Component Id="CA">
         <File Id="a.txt" Name="a.txt" Source="Av$(var.A).txt" />
       </Component>
-      <Component>
+      <Component Id="CB">
         <File Id="b.txt" Name="b.txt" Source="Bv$(var.B).txt" />
       </Component>
     </ComponentGroup>

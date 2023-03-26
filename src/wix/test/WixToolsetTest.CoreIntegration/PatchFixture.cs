@@ -441,7 +441,7 @@ namespace WixToolsetTest.CoreIntegration
                 var mainTransform = ExtractBaselinePatch(patchPath, "RTM.1", baseFolder);
                 Assert.Null(mainTransform.Tables["File"]);
                 var row = mainTransform.Tables["Registry"].Rows.Single();
-                Assert.Equal("regUty0zLJ5uYhRlGzmOzENKmnAtno", row.FieldAsString(0));
+                Assert.Equal("regWOrcuJr1c2LRNY5vB1ZXx6nPyLo", row.FieldAsString(0));
                 Assert.Equal("1.0.1", row.FieldAsString(4));
 
                 var pairedTransform = ExtractBaselinePatch(patchPath, "#RTM.1", baseFolder);
