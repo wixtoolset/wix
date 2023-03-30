@@ -12,6 +12,9 @@
     <copyright>$copyright$</copyright>
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <packageTypes>
+      <packageType name="MSBuildSdk" />
+    </packageTypes>
   </metadata>
 
   <files>
