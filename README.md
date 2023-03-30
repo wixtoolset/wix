@@ -12,7 +12,7 @@ This repository contains the WiX Toolset v4 codebase.
 
 ## Prerequisites
 
-Visual Studio 2022 (17.0.4 or higher) with the following installed:
+- Visual Studio 2022 (17.0.4 or higher) with the following installed:
 
 | Workloads |
 | :-------- |
@@ -29,6 +29,8 @@ Visual Studio 2022 (17.0.4 or higher) with the following installed:
 | MSVC v143 - VS 2022 C++ ARM64 build tools (Latest) |
 | MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
 
+- [Download the latest nuget.exe command-line tool](https://www.nuget.org/downloads) and put it in a directory on the path.
+
 ##### Getting started:
 
 * Fork the WiX4 repository (https://github.com/wixtoolset/wix4.git)
@@ -43,11 +45,11 @@ Visual Studio 2022 (17.0.4 or higher) with the following installed:
  * Issue the command `devbuild` (or `devbuild release` if you want to create a release version)
 
  ##### Executing your newly built WiX toolset
- 
+
  * `build\wix\Debug\publish\wix\wix --help` (Of course changing Debug to Release if you built in Release mode)
 
  ##### Pull request expectations
- 
+
  * Pick an outstanding WiX4 issue (or create one). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
  * To create a PR fork a new branch from the develop branch
  * Make changes to effect whatever changed behaviour is required for the PR
@@ -56,4 +58,4 @@ Visual Studio 2022 (17.0.4 or higher) with the following installed:
  * If the develop branch has changed since you created your new branch rebase to the current development branch.
  * If needed (ie, you squashed or rebased), do a force push of your branch
  * Create a PR with your branch against the WiX4 repository.
- 
+
