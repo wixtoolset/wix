@@ -193,6 +193,9 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Root: %ls", scz);
             }
 
+            hr = StrAllocStringSecure(&pSearch->RegistrySearch.sczRoot, scz, 0);
+            ExitOnFailure(hr, "Failed to copy string value.");
+
             // @Key
             hr = XmlGetAttributeEx(pixnNode, L"Key", &pSearch->RegistrySearch.sczKey);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get Key attribute.");
@@ -539,6 +542,7 @@ extern "C" void SearchesUninitialize(
                 ReleaseStr(pSearch->FileSearch.sczPath);
                 break;
             case BURN_SEARCH_TYPE_REGISTRY:
+                ReleaseStr(pSearch->RegistrySearch.sczRoot);
                 ReleaseStr(pSearch->RegistrySearch.sczKey);
                 ReleaseStr(pSearch->RegistrySearch.sczValue);
                 break;
@@ -896,11 +900,11 @@ static HRESULT RegistrySearchExists(
 
     // open key
     hr = RegOpenEx(pSearch->RegistrySearch.hRoot, sczKey, KEY_QUERY_VALUE, pSearch->RegistrySearch.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
-    ExitOnPathFailure(hr, fExists, "Failed to open registry key. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+    ExitOnPathFailure(hr, fExists, "Failed to open registry key. Root = '%ls', Key = '%ls'", pSearch->RegistrySearch.sczRoot, pSearch->RegistrySearch.sczKey);
 
     if (!fExists)
     {
-        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+        LogStringLine(REPORT_STANDARD, "Registry key not found. Root = '%ls', Key = '%ls'", pSearch->RegistrySearch.sczRoot, pSearch->RegistrySearch.sczKey);
     }
     else if (pSearch->RegistrySearch.sczValue)
     {
@@ -916,7 +920,7 @@ static HRESULT RegistrySearchExists(
             fExists = TRUE;
             break;
         case ERROR_FILE_NOT_FOUND:
-            LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
+            LogStringLine(REPORT_STANDARD, "Registry value not found. Root = '%ls', Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczRoot, pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
             fExists = FALSE;
             break;
         default:
@@ -975,7 +979,7 @@ static HRESULT RegistrySearchValue(
 
     if (!fExists)
     {
-        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+        LogStringLine(REPORT_STANDARD, "Registry key not found. Root = '%ls', Key = '%ls'", pSearch->RegistrySearch.sczRoot, pSearch->RegistrySearch.sczKey);
 
         ExitFunction();
     }
@@ -984,7 +988,7 @@ static HRESULT RegistrySearchValue(
     hr = RegReadValue(hKey, sczValue, pSearch->RegistrySearch.fExpandEnvironment, &pData, &cbData, &dwType);
     if (E_FILENOTFOUND == hr)
     {
-        LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
+        LogStringLine(REPORT_STANDARD, "Registry value not found. Root = '%ls', Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczRoot, pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
 
         ExitFunction1(hr = S_OK);
     }

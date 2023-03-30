@@ -95,6 +95,7 @@ typedef struct _BURN_SEARCH
             BURN_REGISTRY_SEARCH_TYPE Type;
             BURN_VARIANT_TYPE VariableType;
             HKEY hRoot;
+            LPWSTR sczRoot;
             LPWSTR sczKey;
             LPWSTR sczValue;
             BOOL fWin64;
