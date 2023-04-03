@@ -207,6 +207,11 @@ namespace WixToolset.Core
                 this.DownloadUrl = null;
             }
 
+            if (String.IsNullOrEmpty(this.Name) && String.IsNullOrEmpty(this.SourceFile))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "SourceFile"));
+            }
+
             if (!this.Core.EncounteredError)
             {
                 symbol = this.Core.AddSymbol(new WixBundlePayloadSymbol(this.SourceLineNumbers, this.Id)
