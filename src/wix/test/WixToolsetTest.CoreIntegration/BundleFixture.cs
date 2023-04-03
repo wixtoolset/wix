@@ -406,6 +406,60 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildBundleMissingMsiSource()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleWithMissingSource", "BundleMissingMsiSource.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                var message = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString().Replace(folder, "<testdata>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"The MsiPackage element's Name or SourceFile attribute was not found; one of these is required."
+                }, message);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildBundleMissingMsuSource()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleWithMissingSource", "BundleMissingMsuSource.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                var message = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString().Replace(folder, "<testdata>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"The MsuPackage element's Name or SourceFile attribute was not found; one of these is required."
+                }, message);
+            }
+        }
+
+        [Fact]
         public void CannotBuildBundleWithInvalidIcon()
         {
             var folder = TestData.Get(@"TestData");
