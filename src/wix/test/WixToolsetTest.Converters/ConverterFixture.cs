@@ -388,11 +388,11 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void CanConvertSuppressSignatureValidationNo()
+        public void CanConvertSuppressSignatureVerificationNo()
         {
             var parse = String.Join(Environment.NewLine,
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <MsiPackage SuppressSignatureValidation='no' />",
+                "  <MsiPackage SuppressSignatureVerification='no' />",
                 "</Wix>");
 
             var expected = new[]
@@ -416,11 +416,11 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void CanConvertSuppressSignatureValidationYes()
+        public void CanConvertSuppressSignatureVerificationYes()
         {
             var parse = String.Join(Environment.NewLine,
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <Payload SuppressSignatureValidation='yes' />",
+                "  <Payload SuppressSignatureVerification='yes' />",
                 "</Wix>");
 
             var expected = new[]

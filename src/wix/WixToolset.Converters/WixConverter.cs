@@ -307,7 +307,7 @@ namespace WixToolset.Converters
                 { WixConverter.OldProvidesElementName, this.ConvertProvidesElement },
                 { WixConverter.OldRequiresElementName, this.ConvertRequiresElement },
                 { WixConverter.OldRequiresRefElementName, this.ConvertRequiresRefElement },
-                { WixConverter.PayloadElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.PayloadElementName, this.ConvertSuppressSignatureVerification },
                 { WixConverter.PermissionExElementName, this.ConvertPermissionExElement },
                 { WixConverter.ProductElementName, this.ConvertProductElement },
                 { WixConverter.ProgressTextElementName, this.ConvertProgressTextElement },
@@ -870,7 +870,7 @@ namespace WixToolset.Converters
 
         private void ConvertCatalogElement(XElement element)
         {
-            if (this.OnInformation(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The element will be removed."))
+            if (this.OnInformation(ConverterTestType.SuppressSignatureVerificationObsolete, element, "The Catalog element is obsolete. The element will be removed."))
             {
                 element.Remove();
             }
@@ -1267,7 +1267,7 @@ namespace WixToolset.Converters
 
         private void ConvertExePackageElement(XElement element)
         {
-            this.ConvertSuppressSignatureValidation(element);
+            this.ConvertSuppressSignatureVerification(element);
 
             this.UpdatePackageCacheAttribute(element);
 
@@ -1350,7 +1350,7 @@ namespace WixToolset.Converters
 
         private void ConvertMsuPackageElement(XElement element)
         {
-            this.ConvertSuppressSignatureValidation(element);
+            this.ConvertSuppressSignatureVerification(element);
 
             this.UpdatePackageCacheAttribute(element);
 
@@ -1778,9 +1778,6 @@ namespace WixToolset.Converters
             }
 
             this.OnInformation(ConverterTestType.BurnHashAlgorithmChanged, element, "The hash algorithm for bundles changed from SHA1 to SHA512.");
-
-            this.RemoveAttributeIfPresent(element, "CertificatePublicKey", ConverterTestType.BundleSignatureValidationObsolete, "The {0} element contains obsolete '{1}' attribute. Signature validation is no longer supported. The attribute will be removed.");
-            this.RemoveAttributeIfPresent(element, "CertificateThumbprint", ConverterTestType.BundleSignatureValidationObsolete, "The {0} element contains obsolete '{1}' attribute. Signature validation is no longer supported. The attribute will be removed.");
         }
 
         private void ConvertRegistrySearchElement(XElement element)
@@ -1870,14 +1867,14 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertSuppressSignatureValidation(XElement element)
+        private void ConvertSuppressSignatureVerification(XElement element)
         {
-            var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
+            var suppressSignatureVerification = element.Attribute("SuppressSignatureVerification");
 
-            if (null != suppressSignatureValidation
-                && this.OnInformation(ConverterTestType.BundleSignatureValidationObsolete, element, "The chain package element contains obsolete '{0}' attribute. Signature validation is no longer supported. The attribute will be removed.", suppressSignatureValidation.Name))
+            if (null != suppressSignatureVerification
+                && this.OnInformation(ConverterTestType.SuppressSignatureVerificationObsolete, element, "The chain package element contains obsolete '{0}' attribute. The attribute will be removed.", suppressSignatureVerification.Name))
             {
-                suppressSignatureValidation.Remove();
+                suppressSignatureVerification.Remove();
             }
         }
 
@@ -1913,7 +1910,7 @@ namespace WixToolset.Converters
 
         private void ConvertWindowsInstallerPackageElement(XElement element)
         {
-            this.ConvertSuppressSignatureValidation(element);
+            this.ConvertSuppressSignatureVerification(element);
 
             this.UpdatePackageCacheAttribute(element);
 
@@ -3045,9 +3042,9 @@ namespace WixToolset.Converters
             AssignAnonymousFileId,
 
             /// <summary>
-            /// SuppressSignatureValidation attribute is obsolete and corresponding functionality removed.
+            /// SuppressSignatureVerification attribute is obsolete and corresponding functionality removed.
             /// </summary>
-            BundleSignatureValidationObsolete,
+            SuppressSignatureVerificationObsolete,
 
             /// <summary>
             /// WixCA Binary/@Id has been renamed to UtilCA.
