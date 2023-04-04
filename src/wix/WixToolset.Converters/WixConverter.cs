@@ -115,6 +115,7 @@ namespace WixToolset.Converters
         private static readonly XName RequiresElementName = WixNamespace + "Requires";
         private static readonly XName RequiresRefElementName = WixNamespace + "RequiresRef";
         private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
+        private static readonly XName RelatedBundleElementName = WixNamespace + "RelatedBundle";
         private static readonly XName RemotePayloadElementName = WixNamespace + "RemotePayload";
         private static readonly XName RegistryKeyElementName = WixNamespace + "RegistryKey";
         private static readonly XName RegistrySearchElementName = WixNamespace + "RegistrySearch";
@@ -313,6 +314,7 @@ namespace WixToolset.Converters
                 { WixConverter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
                 { WixConverter.RegistryKeyElementName, this.ConvertRegistryKeyElement },
                 { WixConverter.RegistrySearchElementName, this.ConvertRegistrySearchElement },
+                { WixConverter.RelatedBundleElementName, this.ConvertRelatedBundleElement },
                 { WixConverter.RemotePayloadElementName, this.ConvertRemotePayloadElement },
                 { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
                 { WixConverter.CustomActionRefElementName, this.ConvertCustomActionRefElement },
@@ -1710,6 +1712,19 @@ namespace WixToolset.Converters
                 }
 
                 xAction.Remove();
+            }
+        }
+
+        private void ConvertRelatedBundleElement(XElement element)
+        {
+            var xAction = element.Attribute("Action");
+            var value = xAction?.Value;
+            var lowercaseValue = value?.ToLowerInvariant();
+
+            if (value != lowercaseValue
+                && this.OnInformation(ConverterTestType.RelatedBundleActionLowercase, element, "The RelatedBundle element's Action attribute value must now be all lowercase. The Action='{0}' will be converted to '{1}'", value, lowercaseValue))
+            {
+                xAction.Value = lowercaseValue;
             }
         }
 
@@ -3303,6 +3318,11 @@ namespace WixToolset.Converters
             ///  The Certificate BinaryKey element has been renamed to BinaryRef.
             /// </summary>
             CertificateBinaryKeyIsNowBinaryRef,
+
+            /// <summary>
+            /// The RelatedBundle element's Action attribute value must now be all lowercase. The Action='{0}' will be converted to '{1}'
+            /// </summary>
+            RelatedBundleActionLowercase,
         }
     }
 }
