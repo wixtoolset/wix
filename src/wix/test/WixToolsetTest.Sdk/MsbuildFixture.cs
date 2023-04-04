@@ -818,6 +818,40 @@ namespace WixToolsetTest.Sdk
             }
         }
 
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildPackageWithComma(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PackageWith,Comma");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "PackageWith,Comma.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"bin\Release\cab1.cab",
+                    @"bin\Release\PackageWith,Comma.msi",
+                    @"bin\Release\PackageWith,Comma.wixpdb",
+                }, paths);
+            }
+        }
+
         [Theory(Skip = "Depends on creating broken publish which is not supported at this time")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]

@@ -904,7 +904,7 @@
     </ReadTracking>
 
     <ItemGroup>
-      <_RelativePath Include="$([MSBuild]::MakeRelative($(FullIntermediateOutputPath), %(_FullPathToCopy.FullPath)))" />
+      <_RelativePath Include="$([MSBuild]::MakeRelative(&quot;$(FullIntermediateOutputPath)&quot;, &quot;%(_FullPathToCopy.FullPath)&quot;))" />
     </ItemGroup>
 
     <Copy
