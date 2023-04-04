@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+       <Component>
+         <File Name="fake.dll" Source="example.txt" />
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

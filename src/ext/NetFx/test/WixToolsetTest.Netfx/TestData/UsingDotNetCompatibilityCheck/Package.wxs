@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <netfx:DotNetCompatibilityCheck Id="DotNetCoreCheckManualId" Property="DOTNETCORECHECKRESULT" Platform="x64" RuntimeType="core" RollForward="latestMajor" Version="7.0.1" />
+
+    <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+      <StandardDirectory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+      </StandardDirectory>
+    </Fragment>
+</Wix>
