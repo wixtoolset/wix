@@ -177,6 +177,29 @@ namespace WixToolsetTest.Netfx
             }, results.OrderBy(s => s).ToArray());
         }
 
+        [Fact]
+        public void CanBuildUsingDotNetCompatibilityCheck()
+        {
+            var folder = TestData.Get(@"TestData\UsingDotNetCompatibilityCheck");
+            var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4NetFxDotNetCheck");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:Wix4NetCheck_arm64\t[Binary data]",
+                "Binary:Wix4NetCheck_x64\t[Binary data]",
+                "Binary:Wix4NetCheck_x86\t[Binary data]",
+                "Binary:Wix4NetFxCA_X64\t[Binary data]",
+                "CustomAction:Wix4NetFxDotNetCompatibilityCheck_X64\t1\tWix4NetFxCA_X64\tDotNetCompatibilityCheck\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageInstall_X64\t3137\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageUninstall_X64\t3137\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_X64\t1\tWix4NetFxCA_X64\tSchedNetFx\t",
+                "Wix4NetFxDotNetCheck:DotNetCoreCheckManualId\tMicrosoft.NETCore.App\tx64\t7.0.1\tLatestMajor\tDOTNETCORECHECKRESULT",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args);

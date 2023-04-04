@@ -697,9 +697,6 @@ namespace WixToolset.Netfx
                         case "Platform":
                             platform = this.ParsePlatform(element, sourceLineNumbers, attrib);
                             break;
-                        case "FeatureBand":
-                            platform = this.ParseFeatureBand(element, sourceLineNumbers, attrib);
-                            break;
                         case "Version":
                             version = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
                             break;
@@ -810,20 +807,6 @@ namespace WixToolset.Netfx
             }
 
             return platform;
-        }
-
-        private string ParseFeatureBand(XElement element, SourceLineNumber sourceLineNumbers, XAttribute attrib)
-        {
-            string featureBand = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-
-            if (!Int32.TryParse(featureBand, out var intFeatureBand) || (100 > intFeatureBand) || (intFeatureBand > 999))
-            {
-                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName,
-                    attrib.Name.LocalName, featureBand, "An integer in the range [100 - 999]"));
-
-            }
-
-            return featureBand;
         }
 
         private string ParseRuntimeType(XElement element, SourceLineNumber sourceLineNumbers, XAttribute attrib)

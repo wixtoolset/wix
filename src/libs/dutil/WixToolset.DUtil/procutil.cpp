@@ -352,6 +352,7 @@ extern "C" HRESULT DAPI ProcExec(
     ProcExitOnFailure(hr, "Failed to allocate full command-line.");
 
     si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW;
     si.wShowWindow = static_cast<WORD>(nCmdShow);
     if (!::CreateProcessW(wzExecutablePath, sczFullCommandLine, NULL, NULL, FALSE, 0, 0, NULL, &si, &pi))
     {
