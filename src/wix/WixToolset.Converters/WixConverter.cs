@@ -134,6 +134,7 @@ namespace WixToolset.Converters
         private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName VariableElementName = WixNamespace + "Variable";
         private static readonly XName VerbElementName = WixNamespace + "Verb";
+        private static readonly XName BalConditionElementName = WixBalNamespace + "Condition";
         private static readonly XName BalPrereqLicenseUrlAttributeName = WixBalNamespace + "PrereqLicenseUrl";
         private static readonly XName BalPrereqPackageAttributeName = WixBalNamespace + "PrereqPackage";
         private static readonly XName BalUseUILanguagesName = WixBalNamespace + "UseUILanguages";
@@ -277,6 +278,7 @@ namespace WixToolset.Converters
                 { WixConverter.AdvertiseExecuteSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.InstallUISequenceSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.BalConditionElementName, this.ConvertBalConditionElement },
                 { WixConverter.BootstrapperApplicationElementName, this.ConvertBootstrapperApplicationElement },
                 { WixConverter.BootstrapperApplicationRefElementName, this.ConvertBootstrapperApplicationRefElement },
                 { WixConverter.ApprovedExeForElevationElementName, this.ConvertApprovedExeForElevationElement },
@@ -673,6 +675,11 @@ namespace WixToolset.Converters
             {
                 convert(element);
             }
+        }
+
+        private void ConvertBalConditionElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Condition");
         }
 
         private void ConvertBootstrapperApplicationElement(XElement element)
