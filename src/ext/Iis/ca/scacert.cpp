@@ -492,9 +492,9 @@ static HRESULT ResolveCertificate(
         hr = StrHexEncode(rgbCertificateHash, countof(rgbCertificateHash), wzEncodedCertificateHash, countof(wzEncodedCertificateHash));
         ExitOnFailure(hr, "Failed to hex encode SHA1 hash of certificate.");
 
-        // Update the CertificateHash table.
-        hr = WcaAddTempRecord(&hCertificateHashView, &hCertificateHashColumns, L"CertificateHash", NULL, 0, 2, wzId, wzEncodedCertificateHash);
-        ExitOnFailure(hr, "Failed to add encoded has for certificate: %ls", wzId);
+        // Update the Wix4CertificateHash table.
+        hr = WcaAddTempRecord(&hCertificateHashView, &hCertificateHashColumns, L"Wix4CertificateHash", NULL, 0, 2, wzId, wzEncodedCertificateHash);
+        ExitOnFailure(hr, "Failed to add encoded hash for certificate: %ls", wzId);
     }
 
     *ppbCertificate = pbData;
