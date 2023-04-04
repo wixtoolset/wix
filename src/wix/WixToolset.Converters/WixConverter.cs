@@ -1118,6 +1118,8 @@ namespace WixToolset.Converters
             {
                 if (this.OnInformation(ConverterTestType.TargetDirDeprecated, element, "The TARGETDIR directory should no longer be explicitly defined. Remove the Directory element with Id attribute 'TARGETDIR'."))
                 {
+                    AddTargetDirDirectoryAttributeToComponents(element);
+
                     RemoveElementKeepChildren(element);
                 }
             }
@@ -1143,9 +1145,11 @@ namespace WixToolset.Converters
                 {
                     if (this.OnInformation(ConverterTestType.StandardDirectoryRefDeprecated, element, "The {0} directory should no longer be explicitly referenced. Remove the DirectoryRef element with Id attribute '{0}'.", id))
                     {
+                        AddTargetDirDirectoryAttributeToComponents(element);
+
                         RemoveElementKeepChildren(element);
 
-                        this.OnError(ConverterTestType.TargetDirRefRemoved, element, "A reference to the TARGETDIR Directory was removed. This may cause the Fragment that defined TARGETDIR to not be included in the final output. If this happens, reference a different element in the Fragment to replace the old reference to TARGEDIR.");
+                        this.OnError(ConverterTestType.TargetDirRefRemoved, element, "A reference to the TARGETDIR Directory was removed. This can cause unintended side effects. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages");
                     }
                 }
                 else if (this.OnInformation(ConverterTestType.StandardDirectoryRefDeprecated, element, "The standard directory '{0}' should no longer be directly referenced. Use the StandardDirectory element instead.", id))
@@ -2810,6 +2814,15 @@ namespace WixToolset.Converters
             return value;
         }
 
+        private static void AddTargetDirDirectoryAttributeToComponents(XElement element)
+        {
+            // Move the TARGETDIR reference to the Component Directory attribute
+            foreach (var xComponent in element.Elements(ComponentElementName).Where(x => x.Attribute("Directory") is null))
+            {
+                xComponent.Add(new XAttribute("Directory", "TARGETDIR"));
+            }
+        }
+
         private static void RemoveElementKeepChildren(XElement element)
         {
             var parentElement = element.Parent;
@@ -3317,7 +3330,7 @@ namespace WixToolset.Converters
             WixMbaPrereqPackageIdDeprecated,
 
             /// <summary>
-            /// A reference to the TARGETDIR Directory was removed. This may cause the Fragment that defined TARGETDIR to not be included in the final output. If this happens, reference a different element in the Fragment to replace the old reference to TARGEDIR.
+            /// A reference to the TARGETDIR Directory was removed. This can cause unintended side effects. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages
             /// </summary>
             TargetDirRefRemoved,
 
