@@ -52,6 +52,7 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixDependencyNamespace = "http://wixtoolset.org/schemas/v4/wxs/dependency";
         private static readonly XNamespace WixDirectXNamespace = "http://wixtoolset.org/schemas/v4/wxs/directx";
         private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
+        private static readonly XNamespace WixIisNamespace = "http://wixtoolset.org/schemas/v4/wxs/iis";
         private static readonly XNamespace WixUiNamespace = "http://wixtoolset.org/schemas/v4/wxs/ui";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
         private static readonly XNamespace WixVSNamespace = "http://wixtoolset.org/schemas/v4/wxs/vs";
@@ -76,6 +77,7 @@ namespace WixToolset.Converters
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName CustomTableRefElementName = WixNamespace + "CustomTableRef";
         private static readonly XName CatalogElementName = WixNamespace + "Catalog";
+        private static readonly XName CertificateElementName = WixIisNamespace + "Certificate";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName ComponentElementName = WixNamespace + "Component";
         private static readonly XName ControlElementName = WixNamespace + "Control";
@@ -173,7 +175,7 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/DifxAppExtension", "http://wixtoolset.org/schemas/v4/wxs/difxapp" },
             { "http://schemas.microsoft.com/wix/FirewallExtension", WixFirewallNamespace },
             { "http://schemas.microsoft.com/wix/HttpExtension", "http://wixtoolset.org/schemas/v4/wxs/http" },
-            { "http://schemas.microsoft.com/wix/IIsExtension", "http://wixtoolset.org/schemas/v4/wxs/iis" },
+            { "http://schemas.microsoft.com/wix/IIsExtension", WixIisNamespace },
             { "http://schemas.microsoft.com/wix/MsmqExtension", "http://wixtoolset.org/schemas/v4/wxs/msmq" },
             { "http://schemas.microsoft.com/wix/NetFxExtension", "http://wixtoolset.org/schemas/v4/wxs/netfx" },
             { "http://schemas.microsoft.com/wix/PSExtension", "http://wixtoolset.org/schemas/v4/wxs/powershell" },
@@ -278,6 +280,7 @@ namespace WixToolset.Converters
                 { WixConverter.BootstrapperApplicationRefElementName, this.ConvertBootstrapperApplicationRefElement },
                 { WixConverter.ApprovedExeForElevationElementName, this.ConvertApprovedExeForElevationElement },
                 { WixConverter.CatalogElementName, this.ConvertCatalogElement },
+                { WixConverter.CertificateElementName, this.ConvertCertificateElement },
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
                 { WixConverter.ComponentElementName, this.ConvertComponentElement },
                 { WixConverter.ControlElementName, this.ConvertControlElement },
@@ -861,6 +864,17 @@ namespace WixToolset.Converters
             if (this.OnInformation(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The element will be removed."))
             {
                 element.Remove();
+            }
+        }
+
+
+        private void ConvertCertificateElement(XElement xCertificate)
+        {
+            var xBinaryKey = xCertificate.Attribute("BinaryKey");
+            if (xBinaryKey != null && this.OnInformation(ConverterTestType.CertificateBinaryKeyIsNowBinaryRef, xCertificate, "The Certificate BinaryKey element has been renamed to BinaryRef."))
+            {
+                xCertificate.SetAttributeValue("BinaryRef", xBinaryKey.Value);
+                xBinaryKey.Remove();
             }
         }
 
@@ -3284,6 +3298,11 @@ namespace WixToolset.Converters
             /// A reference to the TARGETDIR Directory was removed. This may cause the Fragment that defined TARGETDIR to not be included in the final output. If this happens, reference a different element in the Fragment to replace the old reference to TARGEDIR.
             /// </summary>
             TargetDirRefRemoved,
+
+            /// <summary>
+            ///  The Certificate BinaryKey element has been renamed to BinaryRef.
+            /// </summary>
+            CertificateBinaryKeyIsNowBinaryRef,
         }
     }
 }
