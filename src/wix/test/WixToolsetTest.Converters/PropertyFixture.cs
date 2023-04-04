@@ -211,7 +211,7 @@ namespace WixToolsetTest.Converters
             WixAssert.CompareLineByLine(expected, actual);
             WixAssert.CompareLineByLine(new[]
             {
-                "Using Property element text is deprecated. Remove the element's text and use only the 'Value' attribute. (InnerTextDeprecated)"
+                "Using Property element text is deprecated. Remove the element's text and use only the 'Value' attribute. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages (InnerTextDeprecated)"
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
             Assert.Equal(1, errors);
         }

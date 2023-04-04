@@ -737,7 +737,7 @@ namespace WixToolset.Converters
                 }
                 else
                 {
-                    this.OnError(ConverterTestType.BootstrapperApplicationDllRequired, element, "The new BootstrapperApplicationDll element is required but could not be added automatically since the bootstrapper application dll was not directly specified.");
+                    this.OnError(ConverterTestType.BootstrapperApplicationDllRequired, element, "The new BootstrapperApplicationDll element is required but could not be added automatically since the bootstrapper application dll was not directly specified. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles");
                 }
             }
 
@@ -920,7 +920,7 @@ namespace WixToolset.Converters
                 && CustomActionIdsWithPlatformSuffix.TryGetValue(actionId, out var replacementId))
             {
                 this.OnError(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element,
-                    $"Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. The platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom action '{actionId}', you must use the new custom action id '{replacementId}'.");
+                    $"Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. The platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom action '{actionId}', you must use the new custom action id '{replacementId}'. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages");
             }
         }
 
@@ -959,7 +959,7 @@ namespace WixToolset.Converters
                                 }
                                 break;
                             default:
-                                this.OnError(ConverterTestType.CustomTableNotAlwaysConvertable, element, "The CustomTable element contains deprecated '{0}' attribute so can't be converted. Use the 'Unreal' attribute for MSI. Use the 'BundleCustomData' element for Bundles. Use the --custom-table argument to force conversion to 'msi' or 'bundle'", bootstrapperApplicationData.Name);
+                                this.OnError(ConverterTestType.CustomTableNotAlwaysConvertable, element, "The CustomTable element contains deprecated '{0}' attribute so can't be converted. Use the 'Unreal' attribute for MSI. Use the 'BundleCustomData' element for Bundles. Use the --custom-table argument to force conversion to 'msi' or 'bundle'. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles", bootstrapperApplicationData.Name);
                                 break;
                         }
                     }
@@ -983,7 +983,7 @@ namespace WixToolset.Converters
                             }
                             break;
                         default:
-                            this.OnError(ConverterTestType.CustomTableNotAlwaysConvertable, element, "The CustomTable element contains no 'Column' elements so can't be converted. Use the 'CustomTableRef' element for MSI. Use the 'BundleCustomDataRef' element for Bundles. Use the --custom-table argument to force conversion to 'msi' or 'bundle'");
+                            this.OnError(ConverterTestType.CustomTableNotAlwaysConvertable, element, "The CustomTable element contains no 'Column' elements so can't be converted. Use the 'CustomTableRef' element for MSI. Use the 'BundleCustomDataRef' element for Bundles. Use the --custom-table argument to force conversion to 'msi' or 'bundle'. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles");
                             break;
                     }
                 }
@@ -1139,7 +1139,7 @@ namespace WixToolset.Converters
             {
                 if (!element.HasElements)
                 {
-                    this.OnError(ConverterTestType.EmptyStandardDirectoryRefNotConvertable, element, "Referencing '{0}' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory.", id);
+                    this.OnError(ConverterTestType.EmptyStandardDirectoryRefNotConvertable, element, "Referencing '{0}' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages", id);
                 }
                 else if (id == "TARGETDIR")
                 {
@@ -1919,7 +1919,7 @@ namespace WixToolset.Converters
 
             if (null != element.Attribute("DisplayInternalUI"))
             {
-                this.OnError(ConverterTestType.DisplayInternalUiNotConvertable, element, "The DisplayInternalUI functionality has fundamentally changed and requires BootstrapperApplication support.");
+                this.OnError(ConverterTestType.DisplayInternalUiNotConvertable, element, "The DisplayInternalUI functionality has fundamentally changed and requires BootstrapperApplication support. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles");
             }
         }
 
@@ -1927,7 +1927,7 @@ namespace WixToolset.Converters
         {
             if (null != element.Attribute("Target"))
             {
-                this.OnError(ConverterTestType.VerbTargetNotConvertable, element, "The Verb/@Target attribute has been replaced with typed @TargetFile and @TargetProperty attributes.");
+                this.OnError(ConverterTestType.VerbTargetNotConvertable, element, "The Verb/@Target attribute has been replaced with typed @TargetFile and @TargetProperty attributes. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages");
             }
         }
 
@@ -2085,7 +2085,7 @@ namespace WixToolset.Converters
                 var result = element.Attribute("Result")?.Value;
                 if (result == null || result == "value")
                 {
-                    this.OnError(ConverterTestType.UtilRegistryValueSearchBehaviorChange, element, "Breaking change: util:RegistrySearch for a value no longer clears the variable when the key or value is missing.");
+                    this.OnError(ConverterTestType.UtilRegistryValueSearchBehaviorChange, element, "Breaking change: util:RegistrySearch for a value no longer clears the variable when the key or value is missing. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles");
                 }
             }
         }
@@ -2155,7 +2155,7 @@ namespace WixToolset.Converters
                 {
                     if (!String.IsNullOrWhiteSpace(text))
                     {
-                        this.OnError(ConverterTestType.InnerTextDeprecated, attribute, "Using {0} element text is deprecated. Remove the element's text and use only the '{1}' attribute.", element.Name.LocalName, attributeName);
+                        this.OnError(ConverterTestType.InnerTextDeprecated, attribute, "Using {0} element text is deprecated. Remove the element's text and use only the '{1}' attribute. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages", element.Name.LocalName, attributeName);
                     }
                 }
                 else if (this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
@@ -2226,7 +2226,7 @@ namespace WixToolset.Converters
                 case "no":
                     return "always32";
                 default:
-                    this.OnError(ConverterTestType.Win64AttributeRenameCannotBeAutomatic, xWin64Attribute, "Breaking change: The Win64 attribute's value '{0}' cannot be converted automatically to the new Bitness attribute.", value);
+                    this.OnError(ConverterTestType.Win64AttributeRenameCannotBeAutomatic, xWin64Attribute, "Breaking change: The Win64 attribute's value '{0}' cannot be converted automatically to the new Bitness attribute. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages", value);
                     return value;
             }
         }
@@ -2406,12 +2406,12 @@ namespace WixToolset.Converters
 
             foreach (var element in this.State.WixMbaPrereqPackageIdElements)
             {
-                this.OnError(ConverterTestType.WixMbaPrereqPackageIdDeprecated, element, "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead.");
+                this.OnError(ConverterTestType.WixMbaPrereqPackageIdDeprecated, element, "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles");
             }
 
             foreach (var element in this.State.WixMbaPrereqLicenseUrlElements)
             {
-                this.OnError(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, element, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead.");
+                this.OnError(ConverterTestType.WixMbaPrereqLicenseUrlDeprecated, element, "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles");
             }
         }
 

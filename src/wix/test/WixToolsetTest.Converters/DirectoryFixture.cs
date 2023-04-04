@@ -320,9 +320,9 @@ namespace WixToolsetTest.Converters
             WixAssert.CompareLineByLine(new[]
             {
                 "[Converted] The namespace 'http://schemas.microsoft.com/wix/2006/wi' is out of date. It must be 'http://wixtoolset.org/schemas/v4/wxs'. (XmlnsValueWrong)",
-                "Referencing 'TARGETDIR' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. (EmptyStandardDirectoryRefNotConvertable)",
-                "Referencing 'ProgramFilesFolder' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. (EmptyStandardDirectoryRefNotConvertable)",
-                "Referencing 'DesktopFolder' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. (EmptyStandardDirectoryRefNotConvertable)"
+                "Referencing 'TARGETDIR' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages (EmptyStandardDirectoryRefNotConvertable)",
+                "Referencing 'ProgramFilesFolder' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages (EmptyStandardDirectoryRefNotConvertable)",
+                "Referencing 'DesktopFolder' directory directly is no longer supported. The DirectoryRef will not be removed but you will probably need to reference a more specific directory. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages (EmptyStandardDirectoryRefNotConvertable)"
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
 
             var actualLines = UnformattedDocumentLines(document);
