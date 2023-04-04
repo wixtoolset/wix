@@ -86,8 +86,8 @@ namespace WixToolsetTest.Converters
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(new[]
             {
-                "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead. (WixMbaPrereqPackageIdDeprecated)",
-                "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead. (WixMbaPrereqLicenseUrlDeprecated)",
+                "The magic WixVariable 'WixMbaPrereqPackageId' has been removed. Add bal:PrereqPackage=\"yes\" to the target package instead. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles (WixMbaPrereqPackageIdDeprecated)",
+                "The magic WixVariable 'WixMbaPrereqLicenseUrl' has been removed. Add bal:PrereqLicenseUrl=\"<url>\" to a prereq package instead. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-bundles (WixMbaPrereqLicenseUrlDeprecated)",
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
             WixAssert.CompareLineByLine(expected, actualLines);
         }
