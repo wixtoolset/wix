@@ -673,7 +673,7 @@ namespace WixToolset.Util
         {
             foreach (var row in table.Rows)
             {
-                var flags = row.FieldAsNullableInteger(6) ?? 0;
+                var flags = row.FieldAsNullableInteger(7) ?? 0;
                 string node = null;
                 string action = null;
                 string on = null;
@@ -712,14 +712,16 @@ namespace WixToolset.Util
                 var xmlConfig = new XElement(UtilConstants.XmlConfigName,
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("File", row.FieldAsString(1)),
-                    new XAttribute("ElementPath", row.FieldAsString(2)),
-                    AttributeIfNotNull("VerifyPath", row, 3),
-                    AttributeIfNotNull("Name", row, 4),
+                    AttributeIfNotNull("ElementId", row, 2),
+                    AttributeIfNotNull("ElementPath", row, 3),
+                    AttributeIfNotNull("VerifyPath", row, 4),
+                    AttributeIfNotNull("Name", row, 5),
+                    AttributeIfNotNull("Value", row, 6),
                     AttributeIfNotNull("Node", node),
                     AttributeIfNotNull("Action", action),
                     AttributeIfNotNull("On", on),
                     AttributeIfTrue("PreserveModifiedDate", 0x00001000 == (flags & 0x00001000)),
-                    NumericAttributeIfNotNull("Sequence", row, 8)
+                    NumericAttributeIfNotNull("Sequence", row, 9)
                     );
 
                 this.DecompilerHelper.IndexElement(row, xmlConfig);
@@ -967,16 +969,16 @@ namespace WixToolset.Util
         /// <param name="tables">Collection of all tables.</param>
         private void FinalizeXmlConfigTable(TableIndexedCollection tables)
         {
-            if (tables.TryGetTable("XmlConfig", out var xmlConfigTable))
+            if (tables.TryGetTable("Wix4XmlConfig", out var xmlConfigTable))
             {
                 foreach (var row in xmlConfigTable.Rows)
                 {
                     var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
 
-                    if (null == row[6] || 0 == (int)row[6])
+                    if (null != row[2])
                     {
                         var id = row.FieldAsString(2);
-                        if (this.DecompilerHelper.TryGetIndexedElement("XmlConfig", id, out var parentXmlConfig))
+                        if (this.DecompilerHelper.TryGetIndexedElement("Wix4XmlConfig", id, out var parentXmlConfig))
                         {
                             parentXmlConfig.Add(xmlConfig);
                         }
@@ -987,7 +989,7 @@ namespace WixToolset.Util
                     }
                     else
                     {
-                        var componentId = row.FieldAsString(7);
+                        var componentId = row.FieldAsString(8);
                         if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
                         {
                             component.Add(xmlConfig);
