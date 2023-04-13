@@ -302,6 +302,29 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanRoundtripXmlConfig()
+        {
+            var folder = TestData.Get(@"TestData", "XmlConfig");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+            var output = Path.Combine(folder, "XmlConfigdecompile.xml");
+
+            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+
+            var doc = XDocument.Load(output);
+            var utilElementNames = doc.Descendants().Where(e => e.Name.Namespace == "http://wixtoolset.org/schemas/v4/wxs/util")
+                                      .Select(e => e.Name.LocalName)
+                                      .ToArray();
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "XmlConfig",
+                "XmlConfig",
+                "XmlConfig",
+                "XmlConfig"
+            }, utilElementNames);
+        }
+
+        [Fact]
         public void CanBuildModuleWithXmlConfig()
         {
             var folder = TestData.Get(@"TestData", "XmlConfigModule");
