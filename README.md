@@ -2,11 +2,11 @@
 
 [![latest version](https://img.shields.io/nuget/vpre/wix)](https://www.nuget.org/packages/wix)
 [![download count](https://img.shields.io/nuget/dt/wix)](https://www.nuget.org/stats/packages/WiX?groupby=Version)
-[![build status](https://img.shields.io/github/actions/workflow/status/wixtoolset/wix4/build.yml?branch=develop)](https://github.com/wixtoolset/wix4/actions/workflows/build.yml?query=branch%3Adevelop)
+[![build status](https://img.shields.io/github/actions/workflow/status/wixtoolset/wix/build.yml?branch=develop)](https://github.com/wixtoolset/wix/actions/workflows/build.yml?query=branch%3Adevelop)
 
-# WiX Toolset v4
+# WiX Toolset
 
-This repository contains the WiX Toolset v4 codebase.
+This repository contains the WiX Toolset codebase.
 
 # Developing WiX
 
@@ -33,9 +33,9 @@ This repository contains the WiX Toolset v4 codebase.
 
 ##### Getting started:
 
-* Fork the WiX4 repository (https://github.com/wixtoolset/wix4.git)
+* Fork the WiX repository (https://github.com/wixtoolset/wix.git)
  into a GitHub domain that you control
-* Clone the WiX4 repository from your fork (git clone https://github.com/yourdomain/wix4.git)
+* Clone the WiX repository from your fork (git clone https://github.com/yourdomain/wix.git)
  into the directory of your choice
 
 ##### To build the WiX toolset:
@@ -50,12 +50,11 @@ This repository contains the WiX Toolset v4 codebase.
 
  ##### Pull request expectations
 
- * Pick an outstanding WiX4 issue (or create one). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
+ * Pick an outstanding WiX issue (or create one). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
  * To create a PR fork a new branch from the develop branch
  * Make changes to effect whatever changed behaviour is required for the PR
  * Push the changes to your repository origin as needed
  * If there are multiple commits squash them down to one commit.
  * If the develop branch has changed since you created your new branch rebase to the current development branch.
  * If needed (ie, you squashed or rebased), do a force push of your branch
- * Create a PR with your branch against the WiX4 repository.
-
+ * Create a PR with your branch against the WiX repository.
