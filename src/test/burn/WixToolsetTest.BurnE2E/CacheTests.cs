@@ -244,7 +244,7 @@ namespace WixToolsetTest.BurnE2E
             {
                 var baseTempPath = dfs.GetFolder(true);
                 var logPath = bundleA.Install(0, $"-burn.engine.working.directory=\"{baseTempPath}\"");
-                Assert.True(LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe"));
+                Assert.True(LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v5.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe"));
             }
         }
 
@@ -280,7 +280,7 @@ namespace WixToolsetTest.BurnE2E
                     }
 
                     var logPath = bundleA.Install();
-                    Assert.True(LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v4.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe"));
+                    Assert.True(LogVerifier.MessageInLogFileRegex(logPath, $"Burn x86 v5.*, Windows v.* \\(Build .*: Service Pack .*\\), path: {baseTempPath.Replace("\\", "\\\\")}\\\\.*\\\\.cr\\\\BundleA.exe"));
                 }
             }
             finally
