@@ -11,7 +11,7 @@
 
   <Fragment>
     <StandardDirectory Id="ProgramFilesFolder">
-      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" SourceName="." />
     </StandardDirectory>
   </Fragment>
 </Wix>
