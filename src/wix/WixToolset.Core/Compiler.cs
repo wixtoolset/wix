@@ -2254,8 +2254,7 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Directory"));
             }
-
-            if (!String.IsNullOrEmpty(subdirectory))
+            else if (!String.IsNullOrEmpty(subdirectory))
             {
                 directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, directoryId, subdirectory);
             }
