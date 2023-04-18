@@ -6635,7 +6635,7 @@ namespace WixToolset.Core
                     this.Core.AddSymbol(new LaunchConditionSymbol(sourceLineNumbers)
                     {
                         Condition = WixUpgradeConstants.UpgradePreventedCondition,
-                        Description = downgradeErrorMessage
+                        Description = disallowUpgradeErrorMessage
                     });
                 }
 

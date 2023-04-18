@@ -11,9 +11,8 @@ namespace WixToolsetTest.CoreIntegration
 
     public class UpgradeFixture
     {
-
         [Fact]
-        public void PopulatesInstallExecuteSequenceTable()
+        public void FailsOnInvalidVersion()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -43,6 +42,28 @@ namespace WixToolsetTest.CoreIntegration
                 }, errorMessages);
                 Assert.Equal(242, result.ExitCode);
             }
+        }
+
+        [Fact]
+        public void MajorUpgradeDowngradeMessagePopulatesRowsAsExpected()
+        {
+            var folder = TestData.Get("TestData", "Upgrade");
+            var build = new Builder(folder, null, new[] { folder });
+
+            var results = build.BuildAndQuery(Build, "Upgrade", "LaunchCondition");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "LaunchCondition:NOT WIX_DOWNGRADE_DETECTED\tNo downgrades allowed!",
+                "LaunchCondition:NOT WIX_UPGRADE_DETECTED\tNo upgrades allowed!",
+                "Upgrade:{7AB24276-C628-43DB-9E65-A184D052909B}\t\t2.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
+                "Upgrade:{7AB24276-C628-43DB-9E65-A184D052909B}\t2.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
+            }, results);
+        }
+
+        private static void Build(string[] args)
+        {
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
         }
     }
 }
