@@ -1,4 +1,4 @@
-name: Build WiX Toolset v4
+name: Build WiX Toolset v5
 
 on:
   push:
