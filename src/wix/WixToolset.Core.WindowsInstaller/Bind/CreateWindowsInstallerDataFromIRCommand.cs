@@ -507,7 +507,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 shortName = this.CreateShortName(name, false, "Directory", symbol.ParentDirectoryRef);
             }
 
-            if (String.IsNullOrEmpty(sourceShortname) && !String.IsNullOrEmpty(symbol.SourceName) && !this.BackendHelper.IsValidShortFilename(symbol.SourceName, false))
+            if (String.IsNullOrEmpty(sourceShortname) && !String.IsNullOrEmpty(symbol.SourceName) && symbol.SourceName != "." && !this.BackendHelper.IsValidShortFilename(symbol.SourceName, false))
             {
                 sourceShortname = this.CreateShortName(symbol.SourceName, false, "Directory", symbol.ParentDirectoryRef);
             }
