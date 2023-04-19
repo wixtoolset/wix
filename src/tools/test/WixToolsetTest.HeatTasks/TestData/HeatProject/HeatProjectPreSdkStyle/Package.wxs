@@ -5,13 +5,13 @@
     <MediaTemplate />
 
     <Feature Id="ProductFeature" Title="HeatProjectFeature">
-      <ComponentGroupRef Id="ToolsVersion4Cs.Binaries" />
+      <ComponentGroupRef Id="Tools_Version_4Cs.Binaries" />
     </Feature>
   </Package>
 
   <Fragment>
     <StandardDirectory Id="ProgramFilesFolder">
-      <Directory Id="ToolsVersion4Cs.Binaries" Name="MsiPackage" />
+      <Directory Id="Tools_Version_4Cs.Binaries" Name="MsiPackage" />
     </StandardDirectory>
   </Fragment>
 </Wix>
