@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ToolsVersion4Cs\ToolsVersion4Cs.csproj" />
+    <ProjectReference Include="..\Tools Version 4Cs\Tools Version 4Cs.csproj" />
   </ItemGroup>
 
   <Import Project="$(HeatTargetsPath)" />
