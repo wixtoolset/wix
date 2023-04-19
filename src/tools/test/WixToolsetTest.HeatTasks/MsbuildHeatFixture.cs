@@ -200,62 +200,62 @@ namespace WixToolsetTest.Sdk
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
                 WixAssert.StringCollectionEmpty(warnings);
 
-                var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_ToolsVersion4Cs.wxs");
+                var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_Tools Version 4Cs.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
                 WixAssert.StringEqual(@"<Wix>" +
                     "<Fragment>" +
-                        "<DirectoryRef Id='ToolsVersion4Cs.Binaries'>" +
-                            "<Component Id='ToolsVersion4Cs.Binaries.ToolsVersion4Cs.dll' Guid='*'>" +
-                                "<File Id='ToolsVersion4Cs.Binaries.ToolsVersion4Cs.dll' Source='$(var.ToolsVersion4Cs.TargetDir)\\ToolsVersion4Cs.dll' />" +
+                        "<DirectoryRef Id='Tools_Version_4Cs.Binaries'>" +
+                            "<Component Id='Tools_Version_4Cs.Binaries.Tools_Version_4Cs.dll' Guid='*'>" +
+                                "<File Id='Tools_Version_4Cs.Binaries.Tools_Version_4Cs.dll' Source='$(var.Tools_Version_4Cs.TargetDir)\\Tools Version 4Cs.dll' />" +
                             "</Component>" +
                         "</DirectoryRef>" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<ComponentGroup Id='ToolsVersion4Cs.Binaries'>" +
-                            "<ComponentRef Id='ToolsVersion4Cs.Binaries.ToolsVersion4Cs.dll' />" +
+                        "<ComponentGroup Id='Tools_Version_4Cs.Binaries'>" +
+                            "<ComponentRef Id='Tools_Version_4Cs.Binaries.Tools_Version_4Cs.dll' />" +
                         "</ComponentGroup>" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<DirectoryRef Id='ToolsVersion4Cs.Symbols'>" +
-                            "<Component Id='ToolsVersion4Cs.Symbols.ToolsVersion4Cs.pdb' Guid='*'>" +
-                                "<File Id='ToolsVersion4Cs.Symbols.ToolsVersion4Cs.pdb' Source='$(var.ToolsVersion4Cs.TargetDir)\\ToolsVersion4Cs.pdb' />" +
+                        "<DirectoryRef Id='Tools_Version_4Cs.Symbols'>" +
+                            "<Component Id='Tools_Version_4Cs.Symbols.Tools_Version_4Cs.pdb' Guid='*'>" +
+                                "<File Id='Tools_Version_4Cs.Symbols.Tools_Version_4Cs.pdb' Source='$(var.Tools_Version_4Cs.TargetDir)\\Tools Version 4Cs.pdb' />" +
                             "</Component>" +
                         "</DirectoryRef>" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<ComponentGroup Id='ToolsVersion4Cs.Symbols'>" +
-                            "<ComponentRef Id='ToolsVersion4Cs.Symbols.ToolsVersion4Cs.pdb' />" +
+                        "<ComponentGroup Id='Tools_Version_4Cs.Symbols'>" +
+                            "<ComponentRef Id='Tools_Version_4Cs.Symbols.Tools_Version_4Cs.pdb' />" +
                         "</ComponentGroup>" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<DirectoryRef Id='ToolsVersion4Cs.Sources'>" +
-                            "<Component Id='ToolsVersion4Cs.Sources.ToolsVersion4Cs.csproj' Guid='*'>" +
-                                "<File Id='ToolsVersion4Cs.Sources.ToolsVersion4Cs.csproj' Source='$(var.ToolsVersion4Cs.ProjectDir)\\ToolsVersion4Cs.csproj' />" +
+                        "<DirectoryRef Id='Tools_Version_4Cs.Sources'>" +
+                            "<Component Id='Tools_Version_4Cs.Sources.Tools_Version_4Cs.csproj' Guid='*'>" +
+                                "<File Id='Tools_Version_4Cs.Sources.Tools_Version_4Cs.csproj' Source='$(var.Tools_Version_4Cs.ProjectDir)\\Tools Version 4Cs.csproj' />" +
                             "</Component>" +
-                            "<Directory Id='ToolsVersion4Cs.Sources.Properties' Name='Properties'>" +
-                                "<Component Id='ToolsVersion4Cs.Sources.AssemblyInfo.cs' Guid='*'>" +
-                                    "<File Id='ToolsVersion4Cs.Sources.AssemblyInfo.cs' Source='$(var.ToolsVersion4Cs.ProjectDir)\\Properties\\AssemblyInfo.cs' />" +
+                            "<Directory Id='Tools_Version_4Cs.Sources.Properties' Name='Properties'>" +
+                                "<Component Id='Tools_Version_4Cs.Sources.AssemblyInfo.cs' Guid='*'>" +
+                                    "<File Id='Tools_Version_4Cs.Sources.AssemblyInfo.cs' Source='$(var.Tools_Version_4Cs.ProjectDir)\\Properties\\AssemblyInfo.cs' />" +
                                 "</Component>" +
                             "</Directory>" +
                         "</DirectoryRef>" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<ComponentGroup Id='ToolsVersion4Cs.Sources'>" +
-                            "<ComponentRef Id='ToolsVersion4Cs.Sources.ToolsVersion4Cs.csproj' />" +
-                            "<ComponentRef Id='ToolsVersion4Cs.Sources.AssemblyInfo.cs' />" +
+                        "<ComponentGroup Id='Tools_Version_4Cs.Sources'>" +
+                            "<ComponentRef Id='Tools_Version_4Cs.Sources.Tools_Version_4Cs.csproj' />" +
+                            "<ComponentRef Id='Tools_Version_4Cs.Sources.AssemblyInfo.cs' />" +
                         "</ComponentGroup>" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<ComponentGroup Id='ToolsVersion4Cs.Content' />" +
+                        "<ComponentGroup Id='Tools_Version_4Cs.Content' />" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<ComponentGroup Id='ToolsVersion4Cs.Satellites' />" +
+                        "<ComponentGroup Id='Tools_Version_4Cs.Satellites' />" +
                     "</Fragment>" +
                     "<Fragment>" +
-                        "<ComponentGroup Id='ToolsVersion4Cs.Documents' />" +
+                        "<ComponentGroup Id='Tools_Version_4Cs.Documents' />" +
                     "</Fragment>" +
                     "</Wix>", testXml);
 
@@ -266,7 +266,7 @@ namespace WixToolsetTest.Sdk
                 var section = intermediate.Sections.Single();
 
                 var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                WixAssert.StringEqual(Path.Combine(fs.BaseFolder, "ToolsVersion4Cs", "bin", "Release\\\\ToolsVersion4Cs.dll"), fileSymbol[FileSymbolFields.Source].AsPath()?.Path);
+                WixAssert.StringEqual(Path.Combine(fs.BaseFolder, "Tools Version 4Cs", "bin", "Release\\\\Tools Version 4Cs.dll"), fileSymbol[FileSymbolFields.Source].AsPath()?.Path);
             }
         }
 

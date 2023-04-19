@@ -4,8 +4,8 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ToolsVersion4Cs")]
-[assembly: AssemblyDescription("ToolsVersion4Cs")]
+[assembly: AssemblyTitle("Tools Version 4Cs")]
+[assembly: AssemblyDescription("Tools Version 4Cs")]
 [assembly: AssemblyProduct("WiX Toolset")]
 [assembly: AssemblyCompany("WiX Toolset Team")]
 [assembly: AssemblyCopyright("Copyright (c) .NET Foundation and contributors. All rights reserved.")]

@@ -367,7 +367,7 @@ namespace WixToolset.Harvesters
                 projectBaseDir = Path.GetDirectoryName(projectFile) + "\\";
             }
 
-            int harvestCount = this.HarvestProjectOutputGroupFiles(projectBaseDir, projectName, pog.Name, pog.FileSource, pogFiles, harvestParent);
+            int harvestCount = this.HarvestProjectOutputGroupFiles(projectBaseDir, sanitizedProjectName, pog.Name, pog.FileSource, pogFiles, harvestParent);
 
             if (this.GenerateType == GenerateType.Container)
             {
