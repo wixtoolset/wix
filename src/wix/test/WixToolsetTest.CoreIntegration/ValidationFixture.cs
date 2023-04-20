@@ -35,6 +35,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-arch", "arm64",
                     Path.Combine(folder, "Module.wxs"),
                     "-loc", Path.Combine(folder, "Module.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
@@ -91,13 +92,49 @@ namespace WixToolsetTest.CoreIntegration
                     "_SummaryInformation:Author\tExample Company",
                     "_SummaryInformation:Keywords\tMergeModule, MSI, database",
                     "_SummaryInformation:Comments\tThis merge module contains the logic and data required to install MergeModule1.",
-                    "_SummaryInformation:Template\tIntel;1033",
+                    "_SummaryInformation:Template\tArm64;1033",
                     "_SummaryInformation:CodePage\t1252",
                     "_SummaryInformation:PageCount\t500",
                     "_SummaryInformation:WordCount\t0",
                     "_SummaryInformation:CharacterCount\t0",
                     "_SummaryInformation:Security\t2",
                 }, rows);
+
+                var validationResult = WixRunner.Execute(new[]
+                {
+                    "msi", "validate",
+                    "-intermediateFolder", intermediateFolder,
+                    msmPath
+                });
+                validationResult.AssertSuccess();
+            }
+        }
+
+        [Fact]
+        public void CanBuildAndValidateSimpleModuleWithProperty()
+        {
+            var folder = TestData.Get(@"TestData\SimpleModuleWithProperty");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "arm64",
+                    Path.Combine(folder, "Module.wxs"),
+                    "-loc", Path.Combine(folder, "Module.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msm")
+                });
+
+                result.AssertSuccess();
+
+                var msmPath = Path.Combine(intermediateFolder, @"bin\test.msm");
+                Assert.True(File.Exists(msmPath));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
                 var validationResult = WixRunner.Execute(new[]
                 {
@@ -342,14 +379,14 @@ namespace WixToolsetTest.CoreIntegration
                     msiPath
                 });
 
-                Assert.Equal(1076, validationResult.ExitCode);
-
                 var messages = validationResult.Messages.Select(m => m.ToString()).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
                     "ICE12: CustomAction: CausesICE12Error is of type: 35. Therefore it must come after CostFinalize @ 1000 in Seq Table: InstallExecuteSequence. CA Seq#: 49",
                     "ICE46: Property 'Myproperty' referenced in column 'LaunchCondition'.'Condition' of row 'Myproperty' differs from a defined property by case only.",
                 }, messages);
+
+                Assert.Equal(1076, validationResult.ExitCode);
             }
         }
 

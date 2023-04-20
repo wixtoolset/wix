@@ -102,6 +102,16 @@ namespace WixToolset.Core.WindowsInstaller.Validate
                 messageSourceLineNumbers = this.GetSourceLineNumbers(message.Table, message.PrimaryKeys);
             }
 
+            // Sigh. These are bad messages we get from the poorly-built mergemod.cub that supports Arm64.
+            // TODO: Re-evaluate mergemod.cub that's current for the next version of WiX.
+            if (message.IceName == "ICE03"
+                && (message.Table == "File" && message.Description.Contains("_ICEM07CAB Missing specifications"))
+                || (message.Table == "Component" && message.Description.Contains("_IceM05Mark Missing specifications"))
+                )
+            {
+                return;
+            }
+
             switch (message.Type)
             {
                 case ValidationMessageType.InternalFailure:

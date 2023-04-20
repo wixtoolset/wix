@@ -190,14 +190,17 @@ namespace WixToolset.Core.Native
 
                     using (var session = new Session(database))
                     {
-                        // Add the product code back into the database.
-                        if (null != productCode)
+                        // Some CUBs erroneously have a ProductCode property, so delete it if we just picked one up.
+                        if (propertyTableExists)
                         {
-                            // Some CUBs erroneously have a ProductCode property, so delete it if we just picked one up.
                             using (var dropProductCodeView = database.OpenExecuteView("DELETE FROM `Property` WHERE `Property` = 'ProductCode'"))
                             {
                             }
+                        }
 
+                        // Add the product code back into the database.
+                        if (null != productCode)
+                        {
                             using (var view = database.OpenExecuteView($"INSERT INTO `Property` (`Property`, `Value`) VALUES ('ProductCode', '{productCode}')"))
                             {
                             }
