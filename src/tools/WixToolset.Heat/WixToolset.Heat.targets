@@ -236,7 +236,11 @@
 
     %(HarvestProject.ProjectOutputGroups)
     %(HeatProjects.ProjectOutputGroups)
-        - The project output groups to harvest 
+        - The project output groups to harvest
+
+    %(HarvestProject.AdditionalOptions)
+    %(HeatProjects.AdditionalOptions)
+        - Any additional harvesting command line options
 
     [OUT]
     %(HeatOutput)
@@ -248,11 +252,13 @@
       <Transforms>$(HarvestProjectsTransforms)</Transforms>
       <ProjectOutputGroups>$(HarvestProjectsProjectOutputGroups)</ProjectOutputGroups>
       <DirectoryIds>$(HarvestProjectsDirectoryIds)</DirectoryIds>
+      <AdditionalOptions>$(HarvestProjectsAdditionalOptions)</AdditionalOptions>
     </HeatProject>
     <HarvestProject>
       <Transforms>$(HarvestProjectsTransforms)</Transforms>
       <ProjectOutputGroups>$(HarvestProjectsProjectOutputGroups)</ProjectOutputGroups>
       <DirectoryIds>$(HarvestProjectsDirectoryIds)</DirectoryIds>
+      <AdditionalOptions>$(HarvestProjectsAdditionalOptions)</AdditionalOptions>
     </HarvestProject>
   </ItemDefinitionGroup>
 
@@ -288,7 +294,7 @@
       Platform="%(_AllHeatProjects.Platform)"
       GenerateWixVariables="$(HarvestProjectsGenerateWixVariables)"
       UseToolsVersion="$(HarvestProjectsUseToolsVersion)"
-      AdditionalOptions="$(HarvestProjectsAdditionalOptions)"
+      AdditionalOptions="%(_AllHeatProjects.AdditionalOptions)"
       ToolPath="$(HeatToolDir)">
 
       <Output TaskParameter="OutputFile" ItemName="Compile" />
@@ -313,7 +319,8 @@
     %(HarvestDirectory.PreprocessorVariable) - Substitute SourceDir for another variable name (ex: var.Dir).
     %(HarvestDirectory.SuppressCom) - Suppress COM elements.
     %(HarvestDirectory.SuppressRootDirectory) - Suppress a Directory element for the root directory.
-    $(HarvestDirectory.SuppressRegistry) - Suppress registry harvesting.
+    %(HarvestDirectory.SuppressRegistry) - Suppress registry harvesting.
+    %(HarvestDirectory.AdditionalOptions) - Any additional harvesting command line options.
 
     [OUT]
     $(IntermediateOutputPath)_%(HarvestDirectory.ComponentGroupName)_dir.wxs
@@ -331,6 +338,7 @@
       <SuppressCom>$(HarvestDirectorySuppressCom)</SuppressCom>
       <SuppressRootDirectory>$(HarvestDirectorySuppressRootDirectory)</SuppressRootDirectory>
       <SuppressRegistry>$(HarvestDirectorySuppressRegistry)</SuppressRegistry>
+      <AdditionalOptions>$(HarvestDirectoryAdditionalOptions)</AdditionalOptions>
     </HarvestDirectory>
   </ItemDefinitionGroup>
 
@@ -374,7 +382,7 @@
       SuppressCom="%(HarvestDirectory.SuppressCom)"
       SuppressRootDirectory="%(HarvestDirectory.SuppressRootDirectory)"
       SuppressRegistry="%(HarvestDirectory.SuppressRegistry)"
-      AdditionalOptions="$(HarvestDirectoryAdditionalOptions)"
+      AdditionalOptions="%(HarvestDirectory.AdditionalOptions)"
       ToolPath="$(HeatToolDir)">
 
       <Output TaskParameter="OutputFile" ItemName="Compile" />
@@ -400,6 +408,7 @@
     %(HarvestFile.SuppressCom) - Suppress COM elements.
     %(HarvestFile.SuppressRootDirectory) - Suppress a Directory element for the root directory.
     $(HarvestFile.SuppressRegistry) - Suppress registry harvesting.
+    %(HarvestFile.AdditionalOptions) - Any additional harvesting command line options.
 
     [OUT]
     $(IntermediateOutputPath)_%(HarvestFile.Filename)_file.wxs
@@ -416,6 +425,7 @@
       <SuppressCom>$(HarvestFileSuppressCom)</SuppressCom>
       <SuppressRegistry>$(HarvestFileSuppressRegistry)</SuppressRegistry>
       <SuppressRootDirectory>$(HarvestFileSuppressRootDirectory)</SuppressRootDirectory>
+      <AdditionalOptions>$(HarvestFileAdditionalOptions)</AdditionalOptions>
     </HarvestFile>
   </ItemDefinitionGroup>
 
@@ -448,7 +458,7 @@
       SuppressCom="%(HarvestFile.SuppressCom)"
       SuppressRegistry="%(HarvestFile.SuppressRegistry)"
       SuppressRootDirectory="%(HarvestFile.SuppressRootDirectory)"
-      AdditionalOptions="$(HarvestFileAdditionalOptions)"
+      AdditionalOptions="%(HarvestFile.AdditionalOptions)"
       ToolPath="$(HeatToolDir)">
 
       <Output TaskParameter="OutputFile" ItemName="Compile" />
