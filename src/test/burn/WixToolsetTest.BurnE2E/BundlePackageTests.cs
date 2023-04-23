@@ -14,6 +14,16 @@ namespace WixToolsetTest.BurnE2E
         public BundlePackageTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [RuntimeFact]
+        public void CanBuildBundlePackagesWithRemoteBundles()
+        {
+            var multipleBundlePackagesWithRemoteBundle = this.CreateBundleInstaller("MultipleBundlePackagesWithRemoteBundle");
+
+            multipleBundlePackagesWithRemoteBundle.Install();
+            // Bundle only contains permanent packages, so it isn't registered
+            multipleBundlePackagesWithRemoteBundle.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
+
+        [RuntimeFact]
         public void CanInstallAndUninstallBundlePackages()
         {
             var packageA = this.CreatePackageInstaller(@"..\BasicFunctionalityTests\PackageA");
