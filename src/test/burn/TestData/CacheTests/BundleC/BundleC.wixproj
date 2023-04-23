@@ -22,5 +22,6 @@
   <!-- We do this to avoid copying such a large file to the VM to run the tests. -->
   <Target Name="DeleteLargeFile" AfterTargets="AfterBuild">
     <Delete Files="$(OutputPath)fivegb.file" />
+    <Delete Files="$(MSBuildProjectDirectory)\fivegb.file" />
   </Target>
 </Project>
