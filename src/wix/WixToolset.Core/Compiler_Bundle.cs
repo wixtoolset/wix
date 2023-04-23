@@ -2855,7 +2855,7 @@ namespace WixToolset.Core
                     Action = RelatedBundleActionType.Upgrade,
                 });
 
-                var depId = new Identifier(AccessModifier.Section, this.Core.CreateIdentifier("dep", packagePayloadId, providerKey));
+                var depId = this.Core.CreateIdentifier("dep", packagePayloadId, providerKey);
                 this.Core.AddSymbol(new WixBundleHarvestedDependencyProviderSymbol(sourceLineNumbers, depId)
                 {
                     PackagePayloadRef = packagePayloadId,
