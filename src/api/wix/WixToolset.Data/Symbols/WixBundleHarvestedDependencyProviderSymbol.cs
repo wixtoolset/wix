@@ -17,7 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedDependencyProviderSymbolFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedDependencyProviderSymbolFields.ProviderAttributes), IntermediateFieldType.Number),
             },
-            typeof(WixDependencyProviderSymbol));
+            typeof(WixBundleHarvestedDependencyProviderSymbol));
     }
 }
 
