@@ -30,4 +30,8 @@
     <Exec Command='"$(BaseOutputPath)$(Configuration)\net6.0\win-x86\testexe.exe" /gf "BAPayloads|10000' WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Exec Command='"$(BaseOutputPath)$(Configuration)\net6.0\win-x86\testexe.exe" /gf "PackagePayloads|10000' WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
+  <Target Name="DeleteThousandsOfFiles" AfterTargets="AfterBuild">
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\BAPayloads" />
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\PackagePayloads" />
+  </Target>
 </Project>
