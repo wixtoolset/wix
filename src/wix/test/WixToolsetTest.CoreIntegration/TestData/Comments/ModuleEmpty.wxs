@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Module
+        Id="Module"
+        Language="1033"
+        Version="1.0.0.0"
+        Guid="243FB739-4D05-472F-9CFB-EF6B1017B6DE">
+        <SummaryInformation Comments="" />
+
+        <Directory Id="ModuleFolder">
+            <Component Id="ModuleComponent" Guid="A04E61B2-3ED4-4803-B2EB-4B773576FA45">
+                <File Id="File1" Name="file.txt" Source="test.txt" />
+            </Component>
+        </Directory>
+
+    </Module>
+</Wix>

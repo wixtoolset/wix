@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Version="1"
+           Name="MsiPackage"
+           Manufacturer="Example Corporation"
+           UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <MajorUpgrade DowngradeErrorMessage="Downgrade not allowed" />
+    <SummaryInformation Comments="Example comments" />
+  </Package>
+</Wix>

@@ -25,6 +25,7 @@ namespace WixToolset.Core
             string moduleId = null;
             string version = null;
             var setCodepage = false;
+            var setComments = false;
             var setPackageName = false;
             var setKeywords = false;
             var ignoredForMergeModules = false;
@@ -206,7 +207,7 @@ namespace WixToolset.Core
                             this.ParseSubstitutionElement(child);
                             break;
                         case "SummaryInformation":
-                            this.ParseSummaryInformationElement(child, ref setCodepage, ref setPackageName, ref setKeywords, ref ignoredForMergeModules);
+                            this.ParseSummaryInformationElement(child, ref setCodepage, ref setComments, ref setPackageName, ref setKeywords, ref ignoredForMergeModules);
                             break;
                         case "UI":
                             this.ParseUIElement(child);
@@ -274,11 +275,14 @@ namespace WixToolset.Core
                         Value = "0"
                     });
 
-                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    if (!setComments)
                     {
-                        PropertyId = SummaryInformationType.Comments,
-                        Value = String.Format(CultureInfo.InvariantCulture, "This merge module contains the logic and data required to install {0}.", this.activeName)
-                    });
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Comments,
+                            Value = String.Format(CultureInfo.InvariantCulture, "This merge module contains the logic and data required to install {0}.", this.activeName)
+                        });
+                    }
 
                     this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, this.activeLanguage);
                 }

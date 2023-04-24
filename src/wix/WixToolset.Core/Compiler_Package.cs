@@ -37,6 +37,7 @@ namespace WixToolset.Core
             string version = null;
             string symbols = null;
             var isCodepageSet = false;
+            var isCommentsSet = false;
             var isPackageNameSet = false;
             var isKeywordsSet = false;
             var isPackageAuthorSet = false;
@@ -190,12 +191,6 @@ namespace WixToolset.Core
                     Value = "Installation Database"
                 });
 
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.Comments,
-                    Value = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName)
-                });
-
                 this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, productLanguage);
 
                 this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
@@ -334,7 +329,7 @@ namespace WixToolset.Core
                             this.ParseStandardDirectoryElement(child);
                             break;
                         case "SummaryInformation":
-                            this.ParseSummaryInformationElement(child, ref isCodepageSet, ref isPackageNameSet, ref isKeywordsSet, ref isPackageAuthorSet);
+                            this.ParseSummaryInformationElement(child, ref isCodepageSet, ref isCommentsSet, ref isPackageNameSet, ref isKeywordsSet, ref isPackageAuthorSet);
                             break;
                         case "SymbolPath":
                             if (null != symbols)
@@ -382,6 +377,15 @@ namespace WixToolset.Core
                         Attributes = isPerMachine ? WixPackageAttributes.PerMachine : WixPackageAttributes.None,
                         Codepage = codepage,
                     });
+
+                    if (!isCommentsSet)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Comments,
+                            Value = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName)
+                        });
+                    }
 
                     if (!isPackageNameSet)
                     {
@@ -780,13 +784,15 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="isCodepageSet"></param>
+        /// <param name="isCommentsSet"></param>
         /// <param name="isPackageNameSet"></param>
         /// <param name="isKeywordsSet"></param>
         /// <param name="isPackageAuthorSet"></param>
-        private void ParseSummaryInformationElement(XElement node, ref bool isCodepageSet, ref bool isPackageNameSet, ref bool isKeywordsSet, ref bool isPackageAuthorSet)
+        private void ParseSummaryInformationElement(XElement node, ref bool isCodepageSet, ref bool isCommentsSet, ref bool isPackageNameSet, ref bool isKeywordsSet, ref bool isPackageAuthorSet)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string codepage = null;
+            string comments = null;
             string packageName = null;
             string keywords = null;
             string packageAuthor = null;
@@ -799,6 +805,9 @@ namespace WixToolset.Core
                     {
                     case "Codepage":
                         codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib, true);
+                        break;
+                    case "Comments":
+                        comments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Description":
                         packageName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -835,6 +844,16 @@ namespace WixToolset.Core
                     {
                         PropertyId = SummaryInformationType.Codepage,
                         Value = codepage
+                    });
+                }
+
+                if (null != comments)
+                {
+                    isCommentsSet = true;
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Comments,
+                        Value = comments
                     });
                 }
 
