@@ -15,9 +15,9 @@ extern "C" {
 
 #include "dutil.h"
 
-#define MessageExitOnLastErrorSource(d, x, e, s, ...)      { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { ExitTraceSource(d, x, s, __VA_ARGS__); WcaErrorMessage(e, x, MB_OK, -1, __VA_ARGS__);  goto LExit; } }
-#define MessageExitOnFailureSource(d, x, e, s, ...)           if (FAILED(x)) { ExitTraceSource(d, x, s, __VA_ARGS__); WcaErrorMessage(e, x, INSTALLMESSAGE_ERROR | MB_OK, -1, __VA_ARGS__);  goto LExit; }
-#define MessageExitOnNullWithLastErrorSource(d, p, x, e, s, ...) if (NULL == p) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (!FAILED(x)) { x = E_FAIL; } ExitTraceSource(d, x, s, __VA_ARGS__); WcaErrorMessage(e, x, MB_OK, -1, __VA_ARGS__);  goto LExit; }
+#define MessageExitOnLastErrorSource(d, x, e, s, ...)      { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { ExitTraceSource(d, x, s, __VA_ARGS__); WcaErrorMessage(e, x, MB_OK, -1, __VA_ARGS__, NULL);  goto LExit; } }
+#define MessageExitOnFailureSource(d, x, e, s, ...)           if (FAILED(x)) { ExitTraceSource(d, x, s, __VA_ARGS__); WcaErrorMessage(e, x, INSTALLMESSAGE_ERROR | MB_OK, -1, __VA_ARGS__, NULL);  goto LExit; }
+#define MessageExitOnNullWithLastErrorSource(d, p, x, e, s, ...) if (NULL == p) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (!FAILED(x)) { x = E_FAIL; } ExitTraceSource(d, x, s, __VA_ARGS__); WcaErrorMessage(e, x, MB_OK, -1, __VA_ARGS__, NULL);  goto LExit; }
 
 #define MessageExitOnLastError(x, e, s, ...) MessageExitOnLastErrorSource(DUTIL_SOURCE_DEFAULT, x, e, s, __VA_ARGS__)
 #define MessageExitOnFailure(x, e, s, ...) MessageExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, e, s, __VA_ARGS__)

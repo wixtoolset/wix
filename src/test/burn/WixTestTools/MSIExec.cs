@@ -111,7 +111,7 @@ namespace WixTestTools
             this.ForceRestart = false;
             this.PromptRestart = false;
             this.LogFile = String.Empty;
-            this.LoggingOptions = MSIExecLoggingOptions.VOICEWARMUP;
+            this.LoggingOptions = MSIExecLoggingOptions.Log_All_Information | MSIExecLoggingOptions.Verbose_Output | MSIExecLoggingOptions.Extra_Debugging_Information; // `/l*vx`
             this.OtherArguments = String.Empty;
         }
 
