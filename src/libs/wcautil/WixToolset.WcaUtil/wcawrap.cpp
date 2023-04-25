@@ -27,7 +27,9 @@ WcaErrorMessage() - sends an error message from the CustomAction using
 the Error table
 
 NOTE: Any and all var_args (...) must be WCHAR*
-      If you pass -1 to cArgs the count will be determined
+      If you pass -1 to cArgs, the count will be determined by
+      looking for a trailing NULL argment. If you omit a terminating
+      NULL, the results are undefined and probably crashy.
 ********************************************************************/
 extern "C" UINT __cdecl WcaErrorMessage(
     __in int iError,
@@ -40,6 +42,22 @@ extern "C" UINT __cdecl WcaErrorMessage(
     UINT er;
     MSIHANDLE hRec = NULL;
     va_list args = NULL;
+
+    if (-1 == cArgs)
+    {
+        LPCWSTR wzArg = NULL;
+        va_list iter = NULL;
+
+        va_start(iter, cArgs);
+        cArgs = 0;
+
+        while (NULL != (wzArg = va_arg(iter, WCHAR*)) && L'\0' != *wzArg)
+        {
+            ++cArgs;
+        }
+
+        va_end(iter);
+    }
 
     uiType |= INSTALLMESSAGE_ERROR;  // ensure error type is set
     hRec = ::MsiCreateRecord(cArgs + 2);
@@ -56,18 +74,6 @@ extern "C" UINT __cdecl WcaErrorMessage(
     ExitOnFailure(HRESULT_FROM_WIN32(er), "failed to set hresult code into error message");
 
     va_start(args, cArgs);
-    if (-1 == cArgs)
-    {
-        LPCWSTR wzArg = NULL;
-        va_list iter = args;
-        cArgs = 0;
-
-        while (NULL != (wzArg = va_arg(iter, WCHAR*)) && L'\0' != *wzArg)
-        {
-            ++cArgs;
-        }
-    }
-
     for (INT i = 0; i < cArgs; i++)
     {
         er = ::MsiRecordSetStringW(hRec, i + 3, va_arg(args, WCHAR*));
@@ -76,6 +82,7 @@ extern "C" UINT __cdecl WcaErrorMessage(
     va_end(args);
 
     er = WcaProcessMessage(static_cast<INSTALLMESSAGE>(uiType), hRec);
+
 LExit:
     if (args)
     {
