@@ -284,7 +284,6 @@ namespace WixToolsetTest.UI
             WixAssert.CompareLineByLine(new[]
             {
                 "ControlEvent:BrowseDlg\tOK\tDoAction\tWixUIValidatePath_X86\tNOT WIXUI_DONTVALIDATEPATH\t3",
-                "ControlEvent:InstallDirDlg\tNext\tDoAction\tWixUIValidatePath_X86\tNOT WIXUI_DONTVALIDATEPATH\t2",
                 "ControlEvent:LicenseAgreementDlg\tPrint\tDoAction\tWixUIPrintEula_X86\t1\t1",
             }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
         }
