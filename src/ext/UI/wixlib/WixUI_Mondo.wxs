@@ -27,7 +27,6 @@ Patch dialog sequence:
         <UI Id="WixUI_Mondo_$(WIXUIARCH)">
             <Publish Dialog="LicenseAgreementDlg" Control="Print" Event="DoAction" Value="WixUIPrintEula_$(WIXUIARCH)" />
             <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath_$(WIXUIARCH)" Order="3" Condition="NOT WIXUI_DONTVALIDATEPATH" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath_$(WIXUIARCH)" Order="2" Condition="NOT WIXUI_DONTVALIDATEPATH" />
         </UI>
 
         <UIRef Id="WixUI_Mondo" />
