@@ -10,6 +10,7 @@ namespace WixToolsetTest.Util
     using WixToolset.Util;
     using Xunit;
     using System.Xml.Linq;
+    using System;
 
     public class UtilExtensionFixture
     {
@@ -293,7 +294,10 @@ namespace WixToolsetTest.Util
             var results = build.BuildAndQuery(BuildX64, "Wix4XmlConfig");
             WixAssert.CompareLineByLine(new[]
             {
-                "Wix4XmlConfig:DelElement\t[INSTALLFOLDER]my.xml\t\t//root/sub\txxx\t\t\t289\tDel\t1",
+                "Wix4XmlConfig:AddAttribute2\t[INSTALLFOLDER]my.xml\tAddElement\t\t\tTheAttribute2\tAttributeValue2\t0\tAdd\t4",
+                "Wix4XmlConfig:AddElement\t[#MyXmlFile]\t\t//root/child2\t\tgrandchild3\t\t273\tAdd\t2",
+                "Wix4XmlConfig:DelElement\t[#MyXmlFile]\t\t//root/child1\tgrandchild1\t\t\t289\tDel\t",
+                "Wix4XmlConfig:uxcPPF6g4HJEQpBLT9w9GT6SKyHWww\t[#MyXmlFile]\tAddElement\t\t\tTheAttribute1\tAttributeValue1\t0\tAdd\t3",
             }, results.OrderBy(s => s).ToArray());
         }
 
