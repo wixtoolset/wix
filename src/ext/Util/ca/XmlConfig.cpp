@@ -266,11 +266,11 @@ static HRESULT ProcessChanges(
         // Keep track of where our next spot will be since our current node may be moved
         pxfcNext = pxfc->pxfcNext;
 
-        // With each node, check to see if it's element path matches the Id of some other node in the list
+        // With each node, check to see if its element path matches the Id of some other node in the list
         pxfcCheck = *ppxfcHead;
         while (pxfcCheck)
         {
-            if (pxfc->pwzElementId)
+            if (pxfc->pwzElementId && *pxfc->pwzElementId)
             {
                 if (0 == lstrcmpW(pxfc->pwzElementId, pxfcCheck->wzId)
                     && 0 == pxfc->iXmlFlags
@@ -314,11 +314,6 @@ static HRESULT ProcessChanges(
                         pxfc->pxfcPrev = pxfcLast;
                         pxfcCheck->cAdditionalChanges = ++cAdditionalChanges;
                     }
-                }
-                else
-                {
-                    hr = E_NOTFOUND;
-                    ExitOnRootFailure(hr, "failed to find matching ElementId: %ls", pxfc->pwzElementId);
                 }
             }
 
@@ -402,10 +397,10 @@ static HRESULT WriteChangeData(
 
     HRESULT hr = S_OK;
     XML_CONFIG_CHANGE* pxfcAdditionalChanges = NULL;
-    LPCWSTR wzElementPath = pxfc->pwzElementId ? pxfc->pwzElementId : pxfc->pwzElementPath;
+    LPCWSTR wzElementPath = pxfc->pwzElementId && *pxfc->pwzElementId ? pxfc->pwzElementId : pxfc->pwzElementPath;
 
     hr = WcaWriteStringToCaData(wzElementPath, ppwzCustomActionData);
-    ExitOnFailure(hr, "failed to write ElementPath to custom action data: %ls", wzElementPath);
+    ExitOnFailure(hr, "failed to write ElementId/ElementPath to custom action data: %ls", wzElementPath);
 
     hr = WcaWriteStringToCaData(pxfc->pwzVerifyPath, ppwzCustomActionData);
     ExitOnFailure(hr, "failed to write VerifyPath to custom action data: %ls", pxfc->pwzVerifyPath);

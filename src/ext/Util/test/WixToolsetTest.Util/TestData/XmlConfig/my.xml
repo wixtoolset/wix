@@ -1,0 +1,11 @@
+<root>
+    <child1>
+        <grandchild1>
+        </grandchild1>
+    </child1>
+
+    <child2>
+        <grandchild2>
+        </grandchild2>
+    </child2>
+</root>
