@@ -1,8 +1,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
-    <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-        <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+    <Package Name="XmlConfig" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 
-        <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+        <Feature Id="ProductFeature" Title="XmlConfig">
             <Component Directory="INSTALLFOLDER">
                 <File Id="MyXmlFile" Source="my.xml" />
             </Component>
@@ -21,7 +21,7 @@
 
     <Fragment>
         <StandardDirectory Id="ProgramFilesFolder">
-            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+            <Directory Id="INSTALLFOLDER" Name="XmlConfig" />
         </StandardDirectory>
     </Fragment>
 </Wix>
