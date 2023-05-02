@@ -151,7 +151,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczDetectCodes), *pcDetectCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Detect code array");
 
-            *prgsczDetectCodes[*pcDetectCodes] = sczId;
+            (*prgsczDetectCodes)[*pcDetectCodes] = sczId;
             sczId = NULL;
             *pcDetectCodes += 1;
         }
@@ -160,7 +160,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczUpgradeCodes), *pcUpgradeCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Upgrade code array");
 
-            *prgsczUpgradeCodes[*pcUpgradeCodes] = sczId;
+            (*prgsczUpgradeCodes)[*pcUpgradeCodes] = sczId;
             sczId = NULL;
             *pcUpgradeCodes += 1;
         }
@@ -169,7 +169,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczAddonCodes), *pcAddonCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Addon code array");
 
-            *prgsczAddonCodes[*pcAddonCodes] = sczId;
+            (*prgsczAddonCodes)[*pcAddonCodes] = sczId;
             sczId = NULL;
             *pcAddonCodes += 1;
         }
@@ -178,7 +178,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczPatchCodes), *pcPatchCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Patch code array");
 
-            *prgsczPatchCodes[*pcPatchCodes] = sczId;
+            (*prgsczPatchCodes)[*pcPatchCodes] = sczId;
             sczId = NULL;
             *pcPatchCodes += 1;
         }
