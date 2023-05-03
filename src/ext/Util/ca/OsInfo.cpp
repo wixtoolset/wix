@@ -353,11 +353,17 @@ extern "C" UINT __stdcall WixQueryOsWellKnownSID(
     ExitOnFailure(hr, "WixQueryOsWellKnownSID failed to initialize");
 
     SetPropertyWellKnownSID(WinLocalSystemSid, L"WIX_ACCOUNT_LOCALSYSTEM", TRUE);
+    SetPropertyWellKnownSID(WinLocalSystemSid, L"WIX_ACCOUNT_LOCALSYSTEM_NODOMAIN", FALSE);
     SetPropertyWellKnownSID(WinLocalServiceSid, L"WIX_ACCOUNT_LOCALSERVICE", TRUE);
+    SetPropertyWellKnownSID(WinLocalServiceSid, L"WIX_ACCOUNT_LOCALSERVICE_NODOMAIN", FALSE);
     SetPropertyWellKnownSID(WinNetworkServiceSid, L"WIX_ACCOUNT_NETWORKSERVICE", TRUE);
+    SetPropertyWellKnownSID(WinNetworkServiceSid, L"WIX_ACCOUNT_NETWORKSERVICE_NODOMAIN", FALSE);
     SetPropertyWellKnownSID(WinBuiltinAdministratorsSid, L"WIX_ACCOUNT_ADMINISTRATORS", TRUE);
+    SetPropertyWellKnownSID(WinBuiltinAdministratorsSid, L"WIX_ACCOUNT_ADMINISTRATORS_NODOMAIN", FALSE);
     SetPropertyWellKnownSID(WinBuiltinUsersSid, L"WIX_ACCOUNT_USERS", TRUE);
+    SetPropertyWellKnownSID(WinBuiltinUsersSid, L"WIX_ACCOUNT_USERS_NODOMAIN", FALSE);
     SetPropertyWellKnownSID(WinBuiltinGuestsSid, L"WIX_ACCOUNT_GUESTS", TRUE);
+    SetPropertyWellKnownSID(WinBuiltinGuestsSid, L"WIX_ACCOUNT_GUESTS_NODOMAIN", FALSE);
     SetPropertyWellKnownSID(WinBuiltinPerfLoggingUsersSid, L"WIX_ACCOUNT_PERFLOGUSERS", TRUE);
     SetPropertyWellKnownSID(WinBuiltinPerfLoggingUsersSid, L"WIX_ACCOUNT_PERFLOGUSERS_NODOMAIN", FALSE);
 
