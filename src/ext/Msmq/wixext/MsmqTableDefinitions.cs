@@ -47,7 +47,7 @@ namespace WixToolset.Msmq
             {
                 new ColumnDefinition("MessageQueueGroupPermission", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("MessageQueue_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "MessageQueue", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("MessageQueue_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4MessageQueue", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Group_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Permissions", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
