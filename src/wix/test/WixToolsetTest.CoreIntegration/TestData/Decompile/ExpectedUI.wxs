@@ -478,6 +478,9 @@
         <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Text="{\WixUI_Font_Bigger}Welcome to the [ProductName] Setup Wizard" Transparent="yes" NoPrefix="yes" TabSkip="yes" />
         <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" Disabled="yes" TabSkip="yes" />
       </Dialog>
+      <Dialog Id="TrickyDlg" X="50" Y="50" Width="370" Height="270" NoMinimize="yes" RightAligned="yes" RightToLeft="yes" LeftScroll="yes" Title="Dialog with tricky style bits">
+        <Control Id="TrickyText" Type="Text" X="48" Y="15" Width="194" Height="30" Text="This is tricky." TabSkip="no" />
+      </Dialog>
       <RadioButtonGroup Property="WixUIRMOption">
         <RadioButton Value="UseRM" X="0" Y="0" Width="295" Height="16" Text="&amp;Close the applications and attempt to restart them." />
         <RadioButton Value="DontUseRM" X="0" Y="20" Width="295" Height="16" Text="&amp;Do not close applications. A reboot will be required." />
