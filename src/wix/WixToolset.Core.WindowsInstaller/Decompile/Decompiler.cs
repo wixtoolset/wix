@@ -4246,13 +4246,14 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesVisible) ? new XAttribute("Hidden", "yes") : null,
                     0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesModal) ? new XAttribute("Modeless", "yes") : null,
                     0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesMinimize) ? new XAttribute("NoMinimize", "yes") : null,
-                    0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesMinimize) ? new XAttribute("NoMinimize", "yes") : null,
                     WindowsInstallerConstants.MsidbDialogAttributesSysModal == (attributes & WindowsInstallerConstants.MsidbDialogAttributesSysModal) ? new XAttribute("SystemModal", "yes") : null,
                     WindowsInstallerConstants.MsidbDialogAttributesKeepModeless == (attributes & WindowsInstallerConstants.MsidbDialogAttributesKeepModeless) ? new XAttribute("KeepModeless", "yes") : null,
                     WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace == (attributes & WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace) ? new XAttribute("TrackDiskSpace", "yes") : null,
                     WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette == (attributes & WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette) ? new XAttribute("CustomPalette", "yes") : null,
                     WindowsInstallerConstants.MsidbDialogAttributesLeftScroll == (attributes & WindowsInstallerConstants.MsidbDialogAttributesLeftScroll) ? new XAttribute("LeftScroll", "yes") : null,
                     WindowsInstallerConstants.MsidbDialogAttributesError == (attributes & WindowsInstallerConstants.MsidbDialogAttributesError) ? new XAttribute("ErrorDialog", "yes") : null,
+                    WindowsInstallerConstants.MsidbDialogAttributesRightAligned == (attributes & WindowsInstallerConstants.MsidbDialogAttributesRightAligned) ? new XAttribute("RightAligned", "yes") : null,
+                    WindowsInstallerConstants.MsidbDialogAttributesRTLRO == (attributes & WindowsInstallerConstants.MsidbDialogAttributesRTLRO) ? new XAttribute("RightToLeft", "yes") : null,
                     !row.IsColumnNull(6) ? new XAttribute("Title", row.FieldAsString(6)) : null);
 
                 this.UIElement.Add(xDialog);
