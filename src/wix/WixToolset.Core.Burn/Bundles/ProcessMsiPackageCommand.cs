@@ -379,7 +379,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void CreateMsiFeatures(Database db)
         {
-            if (db.TableExists("Feature"))
+            if (db.TableExists("Feature") && db.TableExists("FeatureComponents"))
             {
                 using (var allFeaturesView = db.OpenExecuteView("SELECT * FROM `Feature`"))
                 using (var featureView = db.OpenView("SELECT `Component_` FROM `FeatureComponents` WHERE `Feature_` = ?"))
