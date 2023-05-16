@@ -811,5 +811,33 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.False(true, "Expected exception not accepted.");
             }
         }
+
+        [Fact]
+        public void CanBuildBundleWithMsiPackageWithoutComponents()
+        {
+            var folder = TestData.Get(@"TestData\BundleWithComponentlessPackage");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Bundle.wxs"),
+                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+            }
+        }
+
     }
 }
