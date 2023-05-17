@@ -1319,6 +1319,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var directory = symbol.Name.Trim(PathSeparatorChars);
             var parentDir = symbol.ParentDirectoryRef ?? (symbol.Id.Id == "TARGETDIR" ? null : "TARGETDIR");
+            var directoryRows = this.Data.TryGetTable("Directory", out var table) ? table.Rows.ToDictionary(row => row.FieldAsString(0)) : new Dictionary<string, Row>();
 
             var start = 0;
             var end = directory.IndexOfAny(PathSeparatorChars);
@@ -1335,10 +1336,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var id = this.BackendHelper.GenerateIdentifier("d", symbol.ParentDirectoryRef, path);
                     var shortnameSubdirectory = this.BackendHelper.IsValidShortFilename(subdirectoryName, false) ? null : this.CreateShortName(subdirectoryName, false, "Directory", symbol.ParentDirectoryRef);
 
-                    var subdirectoryRow = this.CreateRow(symbol, "Directory");
-                    subdirectoryRow[0] = id;
-                    subdirectoryRow[1] = parentDir;
-                    subdirectoryRow[2] = CreateMsiFilename(shortnameSubdirectory, subdirectoryName);
+                    if (!directoryRows.ContainsKey(id))
+                    {
+                        var subdirectoryRow = this.CreateRow(symbol, "Directory");
+                        subdirectoryRow[0] = id;
+                        subdirectoryRow[1] = parentDir;
+                        subdirectoryRow[2] = CreateMsiFilename(shortnameSubdirectory, subdirectoryName);
+
+                        directoryRows.Add(id, subdirectoryRow);
+                    }
 
                     parentDir = id;
                 }
