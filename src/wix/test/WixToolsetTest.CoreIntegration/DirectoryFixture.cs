@@ -170,7 +170,8 @@ namespace WixToolsetTest.CoreIntegration
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "dZsSsu81KcG46xXTwc4mTSZO5Zx4:INSTALLFOLDER:dupe",
+                    @"d6axmdFGwwNJUBTBpSSKcI7uWXo8:INSTALLFOLDER:path\to\path1",
+                    @"dQ9mCRk.rZXStHc.ILz66dIhE0FI:INSTALLFOLDER:path\to\path2",
                     "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
                     "ProgramFiles6432Folder:ProgramFiles64Folder:.",
                     "ProgramFiles64Folder:TARGETDIR:PFiles64",
