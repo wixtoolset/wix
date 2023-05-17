@@ -2,23 +2,41 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <ComponentGroup Id="ProductComponents">
-            <ComponentGroupRef Id="GroupA" />
-            <ComponentGroupRef Id="GroupB" />
+            <ComponentGroupRef Id="GroupA1" />
+            <ComponentGroupRef Id="GroupA2" />
+            <ComponentGroupRef Id="GroupB1" />
+            <ComponentGroupRef Id="GroupB2" />
         </ComponentGroup>
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="GroupA" Directory="INSTALLFOLDER" Subdirectory="dupe">
+        <ComponentGroup Id="GroupA1" Directory="INSTALLFOLDER" Subdirectory="path\to\path1">
             <Component>
-                <File Name="a.txt" Source="test.txt" />
+                <File Name="a1.txt" Source="test.txt" />
             </Component>
         </ComponentGroup>
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="GroupB" Directory="INSTALLFOLDER" Subdirectory="dupe">
+        <ComponentGroup Id="GroupB1" Directory="INSTALLFOLDER" Subdirectory="path\to\path1">
             <Component>
-                <File Name="b.txt" Source="test.txt" />
+                <File Name="b1.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="GroupA2" Directory="INSTALLFOLDER" Subdirectory="path\to\path2">
+            <Component>
+                <File Name="a2.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="GroupB2" Directory="INSTALLFOLDER" Subdirectory="path\to\path2">
+            <Component>
+                <File Name="b2.txt" Source="test.txt" />
             </Component>
         </ComponentGroup>
     </Fragment>
