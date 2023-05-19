@@ -25,5 +25,22 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(true);
             packageB.VerifyInstalled(true);
         }
+
+        [RuntimeFact]
+        public void CanSupportMultipleDetachedContainers()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleA = this.CreateBundleInstaller("BundleB");
+
+            packageA.VerifyInstalled(false);
+            packageB.VerifyInstalled(false);
+
+            bundleA.Install();
+            bundleA.VerifyRegisteredAndInPackageCache();
+
+            packageA.VerifyInstalled(true);
+            packageB.VerifyInstalled(true);
+        }
     }
 }

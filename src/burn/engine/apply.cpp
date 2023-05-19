@@ -1798,7 +1798,7 @@ static HRESULT AcquireContainerOrPayload(
 
         break;
     default:
-        LogExitWithRootFailure(hr, E_FILENOTFOUND, MSG_RESOLVE_SOURCE_FAILED, "Failed to resolve source, payload: %ls, package: %ls, container: %ls", wzPayloadId, pPackage ? pPackage->sczId : NULL, pContainer ? pContainer->sczId : NULL);
+        LogExitWithRootFailure(hr, E_FILENOTFOUND, MSG_RESOLVE_SOURCE_FAILED, "Failed to resolve source, payload: %ls, package: %ls, container: %ls", wzPayloadId ? wzPayloadId : L"n/a", pPackage ? pPackage->sczId : L"n/a", pContainer ? pContainer->sczId : L"n/a");
     }
 
     // Send 100% complete here. This is sometimes the only progress sent to the BA.
