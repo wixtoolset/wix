@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "CLA-Bot signature check"
-        uses: cla-assistant/github-action@v2.1.3-beta
+        uses: cla-assistant/github-action@v2.3.0
         if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') || github.event_name == 'pull_request_target'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PERSONAL_ACCESS_TOKEN : ${{ secrets.CLA_BOT_ACCESS_TOKEN }}
         with:
-          remote-repository-name: Home
+          remote-repository-name: .github
           path-to-signatures: '.github/signatures/cla.json'
-          path-to-document: 'https://github.com/wixtoolset/Home/blob/master/DNFCLA.md'
-          allowlist: wixbot
+          path-to-document: 'https://github.com/wixtoolset/.github/blob/master/DNFCLA.md'
+          allowlist: wixbot,dependabot[bot]
