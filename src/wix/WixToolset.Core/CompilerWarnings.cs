@@ -56,6 +56,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.Win64Component, "The Provides element should not be authored in the 64-bit component with identifier {0}. The dependency feature may not work if installing this package on 64-bit Windows operating systems prior to Windows 7 and Windows Server 2008 R2. Set the Component/@Bitness attribute to \"always32\" to ensure the dependency feature works correctly on legacy operating systems.", componentId);
         }
 
+        public static Message DiscouragedCustomBurnStub(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.DiscouragedCustomBurnStub, "Using a custom burn stub is highly risky. We recommend using the builtin stub by removing Bundle/@BurnStubPath attribute");
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -72,6 +77,7 @@ namespace WixToolset.Core
             DefiningStandardDirectoryDeprecated = 5437,
             ReadonlyLogVariableTarget = 5438,
             ReservedBurnNamespaceWarning = 5439,
+            DiscouragedCustomBurnStub = 5440,
         } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

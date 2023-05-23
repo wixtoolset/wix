@@ -20,8 +20,6 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
-        public string BurnStubPath { get; set; }
-
         public int CabbingThreadCount { get; set; }
 
         public string CabCachePath { get; set; }

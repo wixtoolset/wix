@@ -135,6 +135,7 @@ namespace WixToolset.Core
             string logVariablePrefixAndExtension;
             string iconSourceFile = null;
             string splashScreenSourceFile = null;
+            string burnStubPath = null;
 
             // Process only standard attributes until the active section is initialized.
             foreach (var attrib in node.Attributes())
@@ -145,6 +146,9 @@ namespace WixToolset.Core
                     {
                         case "AboutUrl":
                             aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "BurnStubFile":
+                            burnStubPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Compressed":
                             compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
@@ -223,6 +227,11 @@ namespace WixToolset.Core
                             break;
                     }
                 }
+            }
+
+            if (!String.IsNullOrEmpty(burnStubPath))
+            {
+                this.Core.Write(CompilerWarnings.DiscouragedCustomBurnStub(sourceLineNumbers));
             }
 
             if (String.IsNullOrEmpty(version))
@@ -415,6 +424,7 @@ namespace WixToolset.Core
                     Compressed = YesNoDefaultType.Yes == compressed ? true : YesNoDefaultType.No == compressed ? (bool?)false : null,
                     IconSourceFile = new IntermediateFieldPathValue { Path = iconSourceFile },
                     SplashScreenSourceFile = new IntermediateFieldPathValue { Path = splashScreenSourceFile },
+                    BurnStubPath = new IntermediateFieldPathValue { Path = burnStubPath },
                     Condition = condition,
                     Tag = tag,
                     Platform = this.CurrentPlatform,

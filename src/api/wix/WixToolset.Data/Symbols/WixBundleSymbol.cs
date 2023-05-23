@@ -34,6 +34,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.InProgressName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.DisableModify), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BurnStubPath), IntermediateFieldType.Path),
             },
             typeof(WixBundleSymbol));
     }
@@ -69,6 +70,7 @@ namespace WixToolset.Data.Symbols
         ProviderKey,
         InProgressName,
         DisableModify,
+        BurnStubPath,
     }
 
     [Flags]
@@ -248,6 +250,12 @@ namespace WixToolset.Data.Symbols
                 return WixBundleModifyType.Allowed;
             }
             set => this.Set((int)WixBundleSymbolFields.DisableModify, value.ToString().ToLowerInvariant());
+        }
+
+        public IntermediateFieldPathValue BurnStubPath
+        {
+            get => this.Fields[(int)WixBundleSymbolFields.BurnStubPath].AsPath();
+            set => this.Set((int)WixBundleSymbolFields.BurnStubPath, value);
         }
 
         public PackagingType DefaultPackagingType => (this.Compressed.HasValue && !this.Compressed.Value) ? PackagingType.External : PackagingType.Embedded;
