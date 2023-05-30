@@ -299,7 +299,7 @@ namespace WixToolset.Test.BA
                 args.CacheType = cacheType;
             }
 
-            this.Log("OnPlanPackageBegin() - id: {0}, defaultState: {1}, requestedState: {2}, defaultCache: {3}, requestedCache: {4}", args.PackageId, args.RecommendedState, args.State, args.RecommendedCacheType, args.CacheType);
+            this.Log("OnPlanPackageBegin() - id: {0}, currentState: {1}, defaultState: {2}, requestedState: {3}, defaultCache: {4}, requestedCache: {5}", args.PackageId, args.CurrentState, args.RecommendedState, args.State, args.RecommendedCacheType, args.CacheType);
         }
 
         protected override void OnPlanPatchTarget(PlanPatchTargetEventArgs args)

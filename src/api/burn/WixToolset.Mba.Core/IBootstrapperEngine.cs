@@ -408,11 +408,6 @@ namespace WixToolset.Mba.Core
         Absent,
 
         /// <summary>
-        /// The package is not installed but is in the package cache.
-        /// </summary>
-        Cached,
-
-        /// <summary>
         /// The package is installed.
         /// </summary>
         Present,
@@ -421,6 +416,12 @@ namespace WixToolset.Mba.Core
         /// The package is on the machine but not active, so only uninstall operations are allowed.
         /// </summary>
         Superseded,
+
+        /// <summary>
+        /// This value is no longer used. See the DetectPackageCompleteEventArgs.Cached value instead.
+        /// </summary>
+        [Obsolete("Use DetectPackageCompleteEventArgs.Cached instead.")]
+        Cached = Present,
     }
 
     /// <summary>
