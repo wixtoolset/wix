@@ -1626,7 +1626,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                this.Messaging.Write(ErrorMessages.InvalidProductVersion(symbol.SourceLineNumbers, version));
+                this.Messaging.Write(WarningMessages.InvalidMsiProductVersion(symbol.SourceLineNumbers, version));
             }
 
             changedVersion = null;

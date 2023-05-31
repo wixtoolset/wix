@@ -533,7 +533,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else if (validate)
             {
-                this.Messaging.Write(ErrorMessages.InvalidProductVersion(packageSymbol.SourceLineNumbers, packageSymbol.Version));
+                this.Messaging.Write(WarningMessages.InvalidMsiProductVersion(packageSymbol.SourceLineNumbers, packageSymbol.Version));
             }
         }
 
