@@ -374,7 +374,7 @@ namespace WixToolset.Core
             }
             else if (!CompilerCore.IsValidProductVersion(version))
             {
-                this.Core.Write(ErrorMessages.InvalidProductVersion(sourceLineNumbers, version));
+                this.Core.Write(WarningMessages.InvalidMsiProductVersion(sourceLineNumbers, version));
             }
 
             // find unexpected child elements

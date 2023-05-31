@@ -36,11 +36,8 @@ namespace WixToolsetTest.CoreIntegration
                 var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error)
                                                    .Select(m => m.ToString())
                                                    .ToArray();
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "Invalid product version '1.256.0'. MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. The revision value is ignored but version labels and metadata are not allowed.",
-                }, errorMessages);
-                Assert.Equal(242, result.ExitCode);
+                Assert.StartsWith("Invalid MSI package version: '1.256.0'.", errorMessages.Single());
+                Assert.Equal(1148, result.ExitCode);
             }
         }
 

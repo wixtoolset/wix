@@ -1,0 +1,31 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Version="!(wix.Version)"
+           Name="MsiPackage"
+           Manufacturer="Example Corporation"
+           UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a"
+           Scope="perUser">
+    <MajorUpgrade DowngradeErrorMessage="Downgrade not allowed" />
+    <MediaTemplate EmbedCab="true" />
+
+    <Feature Id="ProductFeature" Title="Feature title">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="DesktopFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage !(wix.Version) and !(bind.property.ProductVersion)" />
+    </StandardDirectory>
+  </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+            <Component Id="Shared.dll" Shared="yes">
+                <File Name="Shared.dll" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

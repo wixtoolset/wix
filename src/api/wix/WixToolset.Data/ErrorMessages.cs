@@ -1306,11 +1306,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidPreprocessorVariable, "Ill-formed preprocessor variable '$({0})'. Variables must have a prefix (like 'var.', 'env.', or 'sys.') and a name at least 1 character long. If the literal string '$({0})' is desired, use '$$({0})'.", variable);
         }
 
-        public static Message InvalidProductVersion(SourceLineNumber sourceLineNumbers, string version)
-        {
-            return Message(sourceLineNumbers, Ids.InvalidProductVersion, "Invalid product version '{0}'. MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. The revision value is ignored but version labels and metadata are not allowed.", version);
-        }
-
         public static Message InvalidRemoveComponent(SourceLineNumber sourceLineNumbers, string component, string feature, string transformPath)
         {
             return Message(sourceLineNumbers, Ids.InvalidRemoveComponent, "Removing component '{0}' from feature '{1}' is not supported. Either the component was removed or the guid changed in the transform '{2}'. Add the component back, undo the change to the component guid, or remove the entire feature.", component, feature, transformPath);
@@ -2520,7 +2515,6 @@ namespace WixToolset.Data
             InvalidWixTransform = 239,
             UnexpectedFileExtension = 240,
             UnexpectedTableInPatch = 241,
-            InvalidProductVersion = 242,
             InvalidKeypathChange = 243,
             MissingValidatorExtension = 244,
             InvalidValidatorMessageType = 245,
