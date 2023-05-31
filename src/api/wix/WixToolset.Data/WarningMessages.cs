@@ -678,6 +678,17 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidMsiProductVersion, "Invalid product version '{0}' in MSI package '{1}'. Product version should have a major version less than 256, a minor version less than 256, and a build version less than 65536. The bundle may incorrectly detect upgrades of this package.", version, package);
         }
 
+        public static Message InvalidMsiProductVersion(SourceLineNumber sourceLineNumbers, string version)
+        {
+            return Message(sourceLineNumbers, Ids.InvalidMsiProductVersion,
+                "Invalid MSI package version: '{0}'. " +
+                "The Windows Installer SDK says that MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. " +
+                "The revision value is ignored but version labels and metadata are not allowed. " +
+                "Violating the MSI rules sometimes works as expected but the behavior is unpredictable and undefined. "+
+                "Future versions of WiX might treat invalid package versions as an error.",
+                version);
+        }
+
         public static Message CollidingModularizationTypes(string tableName, string columnName, string foreignTableName, int foreignColumnNumber, string modularizationType, string foreignModularizationType)
         {
             return Message(null, Ids.CollidingModularizationTypes, "The definition for the '{0}' table's '{1}' column is a foreign key relationship to the '{2}' table's column number {3}. The modularization types of the two column definitions differ: table '{0}' uses type {4} and table '{2}' uses type {5}. Change one of the modularization types so that they match.", tableName, columnName, foreignTableName, foreignColumnNumber, modularizationType, foreignModularizationType);

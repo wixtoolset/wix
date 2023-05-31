@@ -99,11 +99,8 @@ namespace WixToolsetTest.CoreIntegration
                 var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error)
                                                    .Select(m => m.ToString())
                                                    .ToArray();
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "Invalid product version 'v4.3.2-preview.1'. MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. The revision value is ignored but version labels and metadata are not allowed.",
-                }, errorMessages);
-                Assert.Equal(242, result.ExitCode);
+                Assert.StartsWith("Invalid MSI package version: 'v4.3.2-preview.1'.", errorMessages.Single());
+                Assert.Equal(1148, result.ExitCode);
             }
         }
 
@@ -118,7 +115,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var msiPath = Path.Combine(baseFolder, @"bin\test1.msi");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
                 {
                     "build",
                     Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
@@ -128,14 +125,42 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath
                 });
 
-                var errorMessages = result.Messages.Where(m => m.Level == MessageLevel.Error)
-                                                   .Select(m => m.ToString())
-                                                   .ToArray();
-                WixAssert.CompareLineByLine(new[]
+                result.AssertSuccess();
+
+                var warningMessages = result.Messages.Where(m => m.Level == MessageLevel.Warning).Select(m => m.ToString()).ToArray();
+                Assert.StartsWith("Invalid MSI package version: '257.0.0'.", warningMessages[0]);
+                Assert.StartsWith("Invalid MSI package version: '257.0.0'.", warningMessages[1]);
+                Assert.StartsWith("Invalid MSI package version: '257.0.0'.", warningMessages[2]);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildMsiWithInvalidBindVariableVersion()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test1.msi");
+
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
                 {
-                    "Invalid product version '257.0.0'. MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. The revision value is ignored but version labels and metadata are not allowed.",
-                }, errorMessages);
-                Assert.Equal(242, result.ExitCode);
+                    "build",
+                    Path.Combine(folder, "Version", "PackageWithUndefinedBindVariableVersion.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindvariable", "Version=257.0.0",
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var warningMessages = result.Messages.Where(m => m.Level == MessageLevel.Warning).Select(m => m.ToString()).ToArray();
+                Assert.StartsWith("Invalid MSI package version: '257.0.0'.", warningMessages[0]);
+                Assert.StartsWith("Invalid MSI package version: '257.0.0'.", warningMessages[1]);
+                Assert.StartsWith("Invalid MSI package version: '257.0.0'.", warningMessages[2]);
             }
         }
 
