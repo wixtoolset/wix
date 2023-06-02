@@ -331,7 +331,6 @@
 
     <ItemGroup>
       <WixLibrary Include="@(_WixResolvedProjectReference)" Condition=" '%(Extension)' == '.wixlib' " />
-      <_WixResolvedProjectReference Remove="@(WixLibrary)" />
     </ItemGroup>
 
     <!-- Convert resolved project references into compiler defines and named and unamed bind paths -->
@@ -366,11 +365,11 @@
 
     [IN]
     @(WixLibrary) - the list of .wixlib files.
-    @(_WixResolvedProjectReference) - resolved project references.
     $(WixLibrarySearchPaths) - optional search paths used to find .wixlibs.
 
     [OUT]
-    @(_ResolvedWixLibraryPaths) - Item group with full paths to libraries
+    @(_ResolvedWixLibraryPaths) - Item group with full paths to libraries that were found.
+    @(_UnresolvedWixLibraryPaths) - Item group with full paths to libraries that were not found.
     ================================================================================================
     -->
   <PropertyGroup>
