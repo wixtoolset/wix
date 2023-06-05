@@ -1000,6 +1000,9 @@ static HRESULT ExecuteBundle(
         ExitOnFailure(hr, "Failed to allocate obfuscated bundle command.");
     }
 
+    // Append logging to command line if it doesn't contain '-log'
+    CoreAppendLogToCommandLine(&sczBaseCommand, &sczCommandObfuscated, fRollback, pVariables, pPackage);
+
     // Log obfuscated command, which won't include raw hidden variable values or protocol specific arguments to avoid exposing secrets.
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(action), sczExecutablePath, sczCommandObfuscated ? sczCommandObfuscated : sczBaseCommand);
 

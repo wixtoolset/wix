@@ -325,6 +325,19 @@ extern "C" HRESULT LoggingSetPackageVariable(
         ExitFunction();
     }
 
+    // For burn packages we'll add logging even it it wasn't explictly specified
+    if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type || (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol))
+    {
+        if (!fRollback && (!pPackage->sczLogPathVariable || !*pPackage->sczLogPathVariable))
+        {
+            StrAllocFormatted(&pPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
+        }
+        else if (fRollback && (!pPackage->sczRollbackLogPathVariable || !*pPackage->sczRollbackLogPathVariable))
+        {
+            StrAllocFormatted(&pPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
+        }
+    }
+
     if ((!fRollback && pPackage->sczLogPathVariable && *pPackage->sczLogPathVariable) ||
         (fRollback && pPackage->sczRollbackLogPathVariable && *pPackage->sczRollbackLogPathVariable))
     {
