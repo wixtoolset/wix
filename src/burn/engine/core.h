@@ -306,6 +306,13 @@ HRESULT CoreAppendFileHandleSelfToCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
     );
+HRESULT CoreAppendLogToCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine,
+    __in BOOL fRollback,
+    __in BURN_VARIABLES* pVariables,
+    __in BURN_PACKAGE *pPackage
+    );
 HRESULT CoreAppendSplashScreenWindowToCommandLine(
     __in_opt HWND hwndSplashScreen,
     __deref_inout_z LPWSTR* psczCommandLine

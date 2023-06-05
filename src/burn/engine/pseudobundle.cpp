@@ -27,7 +27,7 @@ extern "C" HRESULT PseudoBundleInitializeRelated(
     ExitOnNull(pPackage->payloads.rgItems, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload group inside of related bundle struct");
     pPackage->payloads.cItems = 1;
 
-    pPayload = (BURN_PAYLOAD*)MemAlloc(sizeof(BURN_PAYLOAD), TRUE); 
+    pPayload = (BURN_PAYLOAD*)MemAlloc(sizeof(BURN_PAYLOAD), TRUE);
     ExitOnNull(pPayload, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload inside of related bundle struct");
     pPackage->payloads.rgItems[0].pPayload = pPayload;
     pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
@@ -58,6 +58,10 @@ extern "C" HRESULT PseudoBundleInitializeRelated(
 
     hr = StrAllocString(&pPackage->sczCacheId, wzId, 0);
     ExitOnFailure(hr, "Failed to copy cache id for pseudo bundle.");
+
+    // Log variables - best effort
+    StrAllocFormatted(&pPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
+    StrAllocFormatted(&pPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
 
     if (pDependencyProvider)
     {
@@ -121,6 +125,10 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
 
     hr = StrAllocString(&pPassthroughPackage->sczCacheId, pPackage->sczCacheId, 0);
     ExitOnFailure(hr, "Failed to copy cache id for passthrough pseudo bundle.");
+
+    // Log variables - best effort
+    StrAllocFormatted(&pPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
+    StrAllocFormatted(&pPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
 
     hr = CoreCreatePassthroughBundleCommandLine(&sczArguments, pInternalCommand, pCommand);
     ExitOnFailure(hr, "Failed to create command-line arguments.");
@@ -206,6 +214,10 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
 
     hr = StrAllocString(&pPackage->sczCacheId, wzCacheId, 0);
     ExitOnFailure(hr, "Failed to copy cache id for update bundle.");
+
+    // Log variables - best effort
+    StrAllocFormatted(&pPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
+    StrAllocFormatted(&pPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
 
     hr = StrAllocString(&pPackage->Exe.sczInstallArguments, wzInstallArguments, 0);
     ExitOnFailure(hr, "Failed to copy install arguments for update bundle package");
