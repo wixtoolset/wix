@@ -31,6 +31,11 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.FailedToExtractAttachedContainers, "Failed to extract attached container. This most often happens when extracting a stripped bundle from the package cache, which is not supported.");
         }
 
+        public static Message FailedToExtractDetachedContainers(SourceLineNumber sourceLineNumbers, string error)
+        {
+            return Message(sourceLineNumbers, Ids.FailedToExtractDetachedContainers, "Failed to extract detached containers. {0}", error);
+        }
+
         public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string packageId)
         {
             return Message(sourceLineNumbers, Ids.HiddenBundleNotSupported, "The BundlePackage '{0}' does not support hiding its ARP registration.", packageId);
@@ -67,6 +72,7 @@ namespace WixToolset.Core.Burn
             HiddenBundleNotSupported = 8506,
             UnknownMsiPackagePlatform = 8507,
             CannotParseBundleVersionAsFourPartVersion = 8508,
+            FailedToExtractDetachedContainers = 8509,
         } // last available is 8999. 9000 is VerboseMessages.
     }
 }

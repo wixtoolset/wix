@@ -23,7 +23,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePath = Path.Combine(baseFolder, @"bin\test.exe");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
                 var baFolderPath = Path.Combine(extractFolderPath, "BA");
-                var attachedContainerFolderPath = Path.Combine(extractFolderPath, "WixAttachedContainer");
+                var msiPath = Path.Combine(extractFolderPath, "_1", "test.msi");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -53,7 +53,7 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(baFolderPath, "manifest.xml")));
-                Assert.False(Directory.Exists(attachedContainerFolderPath));
+                Assert.True(File.Exists(msiPath));
             }
         }
     }

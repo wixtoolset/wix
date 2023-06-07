@@ -143,6 +143,65 @@ namespace WixToolset.Core.Burn.Bundles
         }
 
         /// <summary>
+        /// Extracts detached containers to the output directory.
+        /// </summary>
+        /// <param name="outputDirectory">Directory to write extracted files to.</param>
+        /// <param name="tempDirectory">Scratch directory.</param>
+        /// <param name="uxOutputDirectory">BA extraction folder. If null or empty, a BA folder will be created within tempDirectory</param>
+        /// <returns>True if successful, false otherwise</returns>
+        public bool ExtractDetachedContainers(string outputDirectory, string tempDirectory, string uxOutputDirectory)
+        {
+            if (String.IsNullOrEmpty(uxOutputDirectory))
+            {
+                uxOutputDirectory = Path.Combine(tempDirectory, "BA", "Final");
+            }
+
+            var manifestPath = Path.Combine(uxOutputDirectory, "manifest.xml");
+            if (!File.Exists(manifestPath))
+            {
+                var uxTempDirectory = Path.Combine(tempDirectory, "BA", "Temp");
+                if (!this.ExtractUXContainer(uxOutputDirectory, uxTempDirectory))
+                {
+                    return false;
+                }
+            }
+
+            var document = new XmlDocument();
+            document.Load(manifestPath);
+            var nsmgr = new XmlNamespaceManager(document.NameTable);
+            nsmgr.AddNamespace("burn", BurnCommon.BurnNamespace);
+            var detachedContainerNodes = document.SelectNodes("/burn:BurnManifest/burn:Container[not(@Attached = 'yes')]", nsmgr);
+
+            var exeDirectory = Path.GetDirectoryName(this.fileExe);
+            foreach (XmlElement containerElement in detachedContainerNodes)
+            {
+                var containerName = containerElement.GetAttribute("FilePath");
+
+                var cabinetPath = Path.Combine(exeDirectory, containerName);
+                var extractDirectory = Path.Combine(tempDirectory, containerName);
+
+                Directory.CreateDirectory(extractDirectory);
+                var cabinet = new Cabinet(cabinetPath);
+                cabinet.Extract(extractDirectory);
+
+                var containerId = containerElement.GetAttribute("Id");
+                var containerPayloadNodes = document.SelectNodes($"/burn:BurnManifest/burn:Payload[@Packaging='embedded' and @Container='{containerId}']", nsmgr);
+                foreach (XmlElement payloadElement in containerPayloadNodes)
+                {
+                    var sourceFileName = payloadElement.GetAttribute("SourcePath");
+                    var destinationFileName = payloadElement.GetAttribute("FilePath");
+
+                    var sourcePath = Path.Combine(extractDirectory, sourceFileName);
+                    var destinationPath = Path.Combine(outputDirectory, containerName, destinationFileName);
+
+                    this.fileSystem.MoveFile(null, sourcePath, destinationPath);
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Gets each non-UX attached container from the exe and extracts its contents to the output directory.
         /// </summary>
         /// <param name="outputDirectory">Directory to write extracted files to.</param>
