@@ -1125,6 +1125,11 @@ extern "C" HRESULT CoreCreateCleanRoomCommandLine(
         hr = AppAppendCommandLineArgument(psczCommandLine, pInternalCommand->sczLogFile);
         ExitOnFailure(hr, "Failed to append custom log path.");
     }
+    if (pInternalCommand->dwLoggingAttributes & BURN_LOGGING_ATTRIBUTE_CONSOLE)
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", BURN_COMMANDLINE_SWITCH_LOG_CONSOLE);
+        ExitOnFailure(hr, "Failed to append console logging switch.");
+    }
 
     hr = AppendLayoutToCommandLine(pCommand->action, pCommand->wzLayoutDirectory, psczCommandLine);
     ExitOnFailure(hr, "Failed to append layout.");
@@ -1437,6 +1442,12 @@ extern "C" HRESULT CoreParseCommandLine(
                 hr = PathExpand(&pInternalCommand->sczLogFile, argv[i], PATH_EXPAND_FULLPATH);
                 ExitOnFailure(hr, "Failed to copy log file path.");
             }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"clog", -1) ||
+                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"conlog", -1))
+            {
+                // We're not activating console log here because only the clean room process will log to console
+                pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_CONSOLE;
+            }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"?", -1) ||
                      CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"h", -1) ||
                      CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"help", -1))
@@ -1566,6 +1577,11 @@ extern "C" HRESULT CoreParseCommandLine(
                 ExitOnFailure(hr, "Failed to copy append log file path.");
 
                 pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_APPEND;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_CONSOLE), BURN_COMMANDLINE_SWITCH_LOG_CONSOLE, -1))
+            {
+                pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_CONSOLE;
+                LogEnableConsole(TRUE);
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_MODE), BURN_COMMANDLINE_SWITCH_LOG_MODE, -1))
             {
