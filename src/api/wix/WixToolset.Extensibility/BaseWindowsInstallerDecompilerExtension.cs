@@ -36,13 +36,13 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// See <see cref="IWindowsInstallerDecompilerExtension.PostDecompile(IWindowsInstallerDecompileResult)"/>
         /// </summary>
-        public virtual void PreDecompile(IWindowsInstallerDecompileContext context)
+        public virtual void PreDecompile(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper helper)
         {
             this.Context = context;
 
-            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+            this.DecompilerHelper = helper;
 
-            this.DecompilerHelper = context.ServiceProvider.GetService<IWindowsInstallerDecompilerHelper>();
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
         /// <summary>

@@ -2,8 +2,6 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
-    using System;
-    using System.Collections.Generic;
     using WixToolset.Core.WindowsInstaller.ExtensibilityServices;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -30,20 +28,11 @@ namespace WixToolset.Core.WindowsInstaller
 
         private static void AddServices(IWixToolsetCoreServiceProvider coreProvider)
         {
-            // Singletons.
-            coreProvider.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper(provider)));
-            coreProvider.AddService((provider, singletons) => AddSingleton<IWindowsInstallerDecompilerHelper>(singletons, new WindowsInstallerDecompilerHelper(provider)));
-
-            // Transients.
             coreProvider.AddService<IWindowsInstallerDecompiler>((provider, singletons) => new WindowsInstallerDecompiler(provider));
+            coreProvider.AddService<IWindowsInstallerDecompilerHelper>((provider, singletons) => new WindowsInstallerDecompilerHelper(provider));
             coreProvider.AddService<IWindowsInstallerDecompileContext>((provider, singletons) => new WindowsInstallerDecompileContext(provider));
             coreProvider.AddService<IWindowsInstallerDecompileResult>((provider, singletons) => new WindowsInstallerDecompileResult());
-        }
-
-        private static T AddSingleton<T>(Dictionary<Type, object> singletons, T service) where T : class
-        {
-            singletons.Add(typeof(T), service);
-            return service;
+            coreProvider.AddService<IWindowsInstallerBackendHelper>((provider, singletons) => new WindowsInstallerBackendHelper(provider));
         }
     }
 }

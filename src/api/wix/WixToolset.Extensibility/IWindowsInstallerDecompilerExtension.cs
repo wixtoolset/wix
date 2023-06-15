@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility
     using System.Collections.Generic;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Interface all windows installer decompiler extensions implement.
@@ -21,7 +22,8 @@ namespace WixToolset.Extensibility
         /// Called before decompiling occurs.
         /// </summary>
         /// <param name="context">Decompile context.</param>
-        void PreDecompile(IWindowsInstallerDecompileContext context);
+        /// <param name="helper">Decompile helper.</param>
+        void PreDecompile(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper helper);
 
         /// <summary>
         /// Called before decompiling occurs.

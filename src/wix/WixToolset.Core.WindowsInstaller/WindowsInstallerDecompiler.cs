@@ -39,16 +39,18 @@ namespace WixToolset.Core.WindowsInstaller
                 context.SymbolDefinitionCreator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
             }
 
+            var decompilerHelper = context.ServiceProvider.GetService<IWindowsInstallerDecompilerHelper>();
+
             // Pre-decompile.
             //
             foreach (var extension in context.Extensions)
             {
-                extension.PreDecompile(context);
+                extension.PreDecompile(context, decompilerHelper);
             }
 
             // Decompile.
             //
-            var result = this.Execute(context);
+            var result = this.Execute(context, decompilerHelper);
 
             if (result != null)
             {
@@ -63,7 +65,7 @@ namespace WixToolset.Core.WindowsInstaller
             return result;
         }
 
-        private IWindowsInstallerDecompileResult Execute(IWindowsInstallerDecompileContext context)
+        private IWindowsInstallerDecompileResult Execute(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper decompilerHelper)
         {
             // Delete the directory and its files to prevent cab extraction failure due to an existing file.
             if (!String.IsNullOrEmpty(context.ExtractFolder) && Directory.Exists(context.ExtractFolder))
@@ -83,11 +85,11 @@ namespace WixToolset.Core.WindowsInstaller
             }
             else
             {
-                return this.DecompileDatabase(context, backendHelper, fileSystem, pathResolver);
+                return this.DecompileDatabase(context, decompilerHelper, backendHelper, fileSystem, pathResolver);
             }
         }
 
-        private IWindowsInstallerDecompileResult DecompileDatabase(IWindowsInstallerDecompileContext context, IWindowsInstallerBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver)
+        private IWindowsInstallerDecompileResult DecompileDatabase(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper decompilerHelper, IWindowsInstallerBackendHelper backendHelper, IFileSystem fileSystem, IPathResolver pathResolver)
         {
             var extractFilesFolder = context.SuppressExtractCabinets || (String.IsNullOrEmpty(context.CabinetExtractFolder) && String.IsNullOrEmpty(context.ExtractFolder)) ? null :
                 String.IsNullOrEmpty(context.CabinetExtractFolder) ? Path.Combine(context.ExtractFolder, "File") : context.CabinetExtractFolder;
@@ -106,7 +108,6 @@ namespace WixToolset.Core.WindowsInstaller
             var output = unbindCommand.Execute();
             var extractedFilePaths = unbindCommand.ExportedFiles;
 
-            var decompilerHelper = context.ServiceProvider.GetService<IWindowsInstallerDecompilerHelper>();
             var decompiler = new Decompiler(this.Messaging, backendHelper, decompilerHelper, context.Extensions, context.ExtensionData, context.SymbolDefinitionCreator, context.BaseSourcePath, context.SuppressCustomTables, context.SuppressDroppingEmptyTables, context.SuppressRelativeActionSequencing, context.SuppressUI, context.TreatProductAsModule);
             var document = decompiler.Decompile(output);
 
