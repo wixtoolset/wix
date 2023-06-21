@@ -29,7 +29,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public Dictionary<string, MediaRow> ExtractedFileIdsWithMediaRow { get; private set; }
 
-        private  IFileSystem FileSystem { get; }
+        private IFileSystem FileSystem { get; }
 
         private WindowsInstallerData Output { get; }
 
@@ -55,13 +55,23 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // index all of the cabinet files
             if (OutputType.Module == this.Output.Type || this.TreatOutputAsModule)
             {
-                embeddedCabinetNamesByDiskId.Add(0, "MergeModule.CABinet");
+                var mediaRow = new MediaRow(null, WindowsInstallerTableDefinitions.Media)
+                {
+                    DiskId = 1,
+                    LastSequence = 1,
+                    Cabinet = "MergeModule.CABinet",
+                };
+
+                embeddedCabinetRowsByDiskId.Add(1, mediaRow);
+                embeddedCabinetNamesByDiskId.Add(1, "MergeModule.CABinet");
             }
-            else if (this.Output.Tables.TryGetTable("Media", out var mediaTable))
+
+            if (this.Output.Tables.TryGetTable("Media", out var mediaTable))
             {
                 foreach (var mediaRow in mediaTable.Rows.Cast<MediaRow>().Where(r => !String.IsNullOrEmpty(r.Cabinet)))
                 {
                     if (OutputType.Package == this.Output.Type ||
+                        OutputType.Module == this.Output.Type ||
                         (OutputType.Transform == this.Output.Type && RowOperation.Add == mediaRow.Operation))
                     {
                         if (mediaRow.Cabinet.StartsWith("#", StringComparison.Ordinal))
