@@ -2,20 +2,22 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class DecompileFixture
     {
-        private static void DecompileAndCompare(string msiName, string expectedWxsName, params string[] sourceFolder)
+        private static void DecompileAndCompare(string msiName, bool extract, string expectedWxsName, params string[] sourceFolder)
         {
             var folder = TestData.Get(sourceFolder);
 
             using (var fs = new DisposableFileSystem())
             {
                 var intermediateFolder = fs.GetFolder();
+                var extractPath = Path.Combine(intermediateFolder, "$extracted");
                 var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
 
                 var result = WixRunner.Execute(new[]
@@ -23,10 +25,18 @@ namespace WixToolsetTest.CoreIntegration
                     "msi", "decompile",
                     Path.Combine(folder, msiName),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", outputPath
+                    "-o", outputPath,
+                    extract ? "-x" : String.Empty,
+                    extract ? extractPath : String.Empty,
                 }, out var messages);
 
                 Assert.Equal(0, result);
+                Assert.Empty(messages);
+
+                if (extract)
+                {
+                    Assert.NotEmpty(Directory.EnumerateFiles(extractPath, "*", SearchOption.AllDirectories));
+                }
 
                 WixAssert.CompareXml(Path.Combine(folder, expectedWxsName), outputPath);
             }
@@ -35,19 +45,19 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanDecompileSingleFileCompressed()
         {
-            DecompileAndCompare("example.msi", "Expected.wxs", "TestData", "DecompileSingleFileCompressed");
+            DecompileAndCompare("example.msi", extract: true, "Expected.wxs", "TestData", "DecompileSingleFileCompressed");
         }
 
         [Fact]
         public void CanDecompile64BitSingleFileCompressed()
         {
-            DecompileAndCompare("example.msi", "Expected.wxs", "TestData", "DecompileSingleFileCompressed64");
+            DecompileAndCompare("example.msi", extract: true, "Expected.wxs", "TestData", "DecompileSingleFileCompressed64");
         }
 
         [Fact]
         public void CanDecompileNestedDirSearchUnderRegSearch()
         {
-            DecompileAndCompare("NestedDirSearchUnderRegSearch.msi", "DecompiledNestedDirSearchUnderRegSearch.wxs", "TestData", "AppSearch");
+            DecompileAndCompare("NestedDirSearchUnderRegSearch.msi", extract: false, "DecompiledNestedDirSearchUnderRegSearch.wxs", "TestData", "AppSearch");
         }
 
         [Fact]
@@ -56,37 +66,37 @@ namespace WixToolsetTest.CoreIntegration
             // The input MSI was not created using standard methods, it is an example of a real world database that needs to be decompiled.
             // The Class/@Feature_ column has length of 32, the File/@Attributes has length of 2,
             // and numerous foreign key relationships are missing.
-            DecompileAndCompare("OldClassTableDef.msi", "DecompiledOldClassTableDef.wxs", "TestData", "Class");
+            DecompileAndCompare("OldClassTableDef.msi", extract: false, "DecompiledOldClassTableDef.wxs", "TestData", "Class");
         }
 
         [Fact]
         public void CanDecompileSequenceTables()
         {
-            DecompileAndCompare("SequenceTables.msi", "DecompiledSequenceTables.wxs", "TestData", "SequenceTables");
+            DecompileAndCompare("SequenceTables.msi", extract: false, "DecompiledSequenceTables.wxs", "TestData", "SequenceTables");
         }
 
         [Fact]
         public void CanDecompileShortcuts()
         {
-            DecompileAndCompare("shortcuts.msi", "DecompiledShortcuts.wxs", "TestData", "Shortcut");
+            DecompileAndCompare("shortcuts.msi", extract: false, "DecompiledShortcuts.wxs", "TestData", "Shortcut");
         }
 
         [Fact]
         public void CanDecompileNullComponent()
         {
-            DecompileAndCompare("example.msi", "Expected.wxs", "TestData", "DecompileNullComponent");
+            DecompileAndCompare("example.msi", extract: true, "Expected.wxs", "TestData", "DecompileNullComponent");
         }
 
         [Fact]
         public void CanDecompileMergeModuleWithTargetDirComponent()
         {
-            DecompileAndCompare("MergeModule1.msm", "Expected.wxs", "TestData", "DecompileTargetDirMergeModule");
+            DecompileAndCompare("MergeModule1.msm", extract: true, "Expected.wxs", "TestData", "DecompileTargetDirMergeModule");
         }
 
         [Fact]
         public void CanDecompileUI()
         {
-            DecompileAndCompare("ui.msi", "ExpectedUI.wxs", "TestData", "Decompile");
+            DecompileAndCompare("ui.msi", extract: false, "ExpectedUI.wxs", "TestData", "Decompile");
         }
     }
 }
