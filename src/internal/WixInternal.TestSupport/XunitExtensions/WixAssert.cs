@@ -4,6 +4,7 @@ namespace WixInternal.TestSupport
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using System.Xml.Linq;
@@ -30,8 +31,8 @@ namespace WixInternal.TestSupport
 
         public static void CompareXml(XContainer xExpected, XContainer xActual)
         {
-            var expecteds = xExpected.Descendants().Select(x => $"{x.Name.LocalName}:{String.Join(",", x.Attributes().OrderBy(a => a.Name.LocalName).Select(a => $"{a.Name.LocalName}={a.Value}"))}");
-            var actuals = xActual.Descendants().Select(x => $"{x.Name.LocalName}:{String.Join(",", x.Attributes().OrderBy(a => a.Name.LocalName).Select(a => $"{a.Name.LocalName}={a.Value}"))}");
+            var expecteds = ComparableElements(xExpected);
+            var actuals = ComparableElements(xActual);
 
             CompareLineByLine(expecteds.OrderBy(s => s).ToArray(), actuals.OrderBy(s => s).ToArray());
         }
@@ -42,6 +43,22 @@ namespace WixInternal.TestSupport
             var actualDoc = XDocument.Load(actualPath, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo);
 
             CompareXml(expectedDoc, actualDoc);
+        }
+
+        private static IEnumerable<string> ComparableElements(XContainer container)
+        {
+            return container.Descendants().Select(x => $"{x.Name.LocalName}:{String.Join(",", x.Attributes().OrderBy(a => a.Name.LocalName).Select(a => $"{a.Name.LocalName}={ComparableAttribute(a)}"))}");
+        }
+
+        private static string ComparableAttribute(XAttribute attribute)
+        {
+            switch (attribute.Name.LocalName)
+            {
+                case "SourceFile":
+                    return "<SourceFile>";
+                default:
+                    return attribute.Value;
+            }
         }
 
         /// <summary>

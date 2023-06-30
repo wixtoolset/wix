@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Module Codepage="65001" Id="MergeModule1" Language="1033" Version="1.0.0.0" InstallerVersion="200" Guid="{F844F0E3-8CB4-4A0F-973E-31C4F9338382}">
+    <Binary Id="Binary1" SourceFile="Expected.wxs" />
     <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="WixTestDir" ShortName="7bhhvaai" Name="WiX Toolset Test Directory">
         <Component Id="ModuleComponent1" Guid="{D86EC5A2-9576-4699-BDC3-00586FF72CBE}" Bitness="always32">
