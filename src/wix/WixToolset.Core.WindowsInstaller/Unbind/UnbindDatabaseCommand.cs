@@ -146,6 +146,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         {
             View validationView = null;
             string modularizationGuid = null;
+            string modularizationSuffix = null;
 
             try
             {
@@ -204,6 +205,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 {
                                                     source = Path.Combine(this.ExportBasePath, tableName, row.GetPrimaryKey('.'));
 
+                                                    if (!String.IsNullOrEmpty(modularizationSuffix))
+                                                    {
+                                                        source += modularizationSuffix;
+                                                    }
+
                                                     Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
 
                                                     using (var fs = this.FileSystem.OpenFile(null, source, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -238,6 +244,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                     if (null == modularizationGuid)
                                                     {
                                                         var match = Modularization.Match(value);
+                                                        modularizationSuffix = match.Value;
+
                                                         if (match.Success)
                                                         {
                                                             modularizationGuid = String.Concat('{', match.Value.Substring(1).Replace('_', '-'), '}');
