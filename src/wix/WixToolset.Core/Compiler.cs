@@ -7261,7 +7261,7 @@ namespace WixToolset.Core
 
             if (!level.HasValue)
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             if (String.IsNullOrEmpty(condition))
@@ -7275,7 +7275,7 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.IntegerNotSet == level)
                 {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
                     level = CompilerConstants.IllegalInteger;
                 }
 
