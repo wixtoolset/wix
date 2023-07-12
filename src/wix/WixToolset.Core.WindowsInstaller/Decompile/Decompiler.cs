@@ -1188,11 +1188,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     var fileName = xFile?.Attribute("Name")?.Value;
 
                     // set the source (done here because it requires information from the Directory table)
-                    if (OutputType.Module == this.OutputType)
+                    if (OutputType.Module == this.OutputType && !this.TreatProductAsModule)
                     {
                         xFile.SetAttributeValue("Source", String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, fileId, '.', this.ModularizationGuid.Substring(1, 36).Replace('-', '_')));
                     }
-                    else if (fileCompressed == "yes" || (fileCompressed != "no" && this.Compressed) || (OutputType.Package == this.OutputType && this.TreatProductAsModule))
+                    else if (fileCompressed == "yes" || (fileCompressed != "no" && this.Compressed) || OutputType.Module == this.OutputType)
                     {
                         xFile.SetAttributeValue("Source", String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, fileId));
                     }
@@ -1898,7 +1898,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         private void FinalizeSequenceTables(TableIndexedCollection tables)
         {
             // finalize the normal sequence tables
-            if (OutputType.Package == this.OutputType && !this.TreatProductAsModule)
+            if (OutputType.Package == this.OutputType)
             {
                 foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
                 {
@@ -2039,7 +2039,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                 }
             }
-            else if (OutputType.Module == this.OutputType || this.TreatProductAsModule) // finalize the Module sequence tables
+            else if (OutputType.Module == this.OutputType) // finalize the Module sequence tables
             {
                 foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
                 {

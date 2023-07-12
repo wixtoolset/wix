@@ -93,7 +93,8 @@ namespace WixToolset.Extensibility.Data
         bool SuppressUI { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the decompiler should use module logic on a product output.
+        /// Gets or sets whether the decompiler should keep modularization
+        /// GUIDs (true) or remove them (default/false).
         /// </summary>
         bool TreatProductAsModule { get; set; }
     }

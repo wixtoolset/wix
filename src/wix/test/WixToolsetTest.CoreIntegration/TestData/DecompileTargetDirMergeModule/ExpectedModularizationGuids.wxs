@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Codepage="65001" Id="MergeModule1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" Language="1033" Version="1.0.0.0" InstallerVersion="200" Guid="{F844F0E3-8CB4-4A0F-973E-31C4F9338382}">
+    <Binary Id="Binary1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" SourceFile="Expected.wxs" />
+    <Directory Id="ProgramFilesFolder.F844F0E3_8CB4_4A0F_973E_31C4F9338382" Name="PFiles">
+      <Directory Id="WixTestDir.F844F0E3_8CB4_4A0F_973E_31C4F9338382" ShortName="7bhhvaai" Name="WiX Toolset Test Directory">
+        <Component Id="ModuleComponent1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" Guid="{D86EC5A2-9576-4699-BDC3-00586FF72CBE}" Bitness="always32">
+          <File Id="File1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" ShortName="gahushls.wxs" Name="MergeModule.wxs" KeyPath="yes" Source="SourceDir\File\File1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" />
+        </Component>
+      </Directory>
+    </Directory>
+    <Directory Id="MergeRedirectFolder.F844F0E3_8CB4_4A0F_973E_31C4F9338382">
+      <Component Id="ModuleComponent2.F844F0E3_8CB4_4A0F_973E_31C4F9338382" Guid="{BB222EE8-229B-4051-9443-49E348F0CC77}" Bitness="always32">
+        <File Id="File2.F844F0E3_8CB4_4A0F_973E_31C4F9338382" ShortName="sfmxqeab.wxs" Name="MergeModule.wxs" KeyPath="yes" Source="SourceDir\File\File2.F844F0E3_8CB4_4A0F_973E_31C4F9338382" />
+      </Component>
+    </Directory>
+    <SummaryInformation Description="MergeModule1" Manufacturer="WiX Toolset contributors" />
+    <StandardDirectory Id="TARGETDIR">
+      <Component Id="ModuleComponent3.F844F0E3_8CB4_4A0F_973E_31C4F9338382" Guid="{63A2B2B1-32BE-46FF-8863-4C85A2745F62}" Bitness="always32">
+        <RegistryValue KeyPath="yes" Id="Reg1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" Root="HKLM" Key="SOFTWARE\WiX Toolset\MergeModuleDecompileTest" Name="DoesntReallyMatter" Value="Hello" Type="string" />
+      </Component>
+    </StandardDirectory>
+  </Module>
+</Wix>

@@ -3,10 +3,18 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using WixInternal.Core.TestPackage;
     using WixInternal.TestSupport;
+    using WixToolset.Core;
+    using WixToolset.Core.WindowsInstaller;
+    using WixToolset.Data;
+    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
     using Xunit;
+    using static NuGet.Packaging.PackagingConstants;
 
     public class DecompileFixture
     {
@@ -97,6 +105,39 @@ namespace WixToolsetTest.CoreIntegration
         public void CanDecompileUI()
         {
             DecompileAndCompare("ui.msi", extract: false, "ExpectedUI.wxs", "TestData", "Decompile");
+        }
+
+        [Fact]
+        public void CanDecompileMergeModuleWithTreatProductAsModule()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var outputFolder = fs.GetFolder();
+                var extractPath = Path.Combine(intermediateFolder, "$extracted");
+                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
+                var sourceFolder = TestData.Get("TestData", "DecompileTargetDirMergeModule");
+
+                var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+                serviceProvider.AddWindowsInstallerBackend();
+                var extensionManager = serviceProvider.GetService<IExtensionManager>();
+                var context = serviceProvider.GetService<IWindowsInstallerDecompileContext>();
+
+                context.Extensions = Array.Empty<BaseWindowsInstallerDecompilerExtension>();
+                context.ExtensionData = extensionManager.GetServices<IExtensionData>();
+                context.DecompilePath = Path.Combine(sourceFolder, "MergeModule1.msm");
+                context.DecompileType = OutputType.Module;
+                context.TreatProductAsModule = true;
+                context.IntermediateFolder = intermediateFolder;
+                context.ExtractFolder = outputFolder;
+                context.CabinetExtractFolder = outputFolder;
+
+                var decompiler = serviceProvider.GetService<IWindowsInstallerDecompiler>();
+                var result = decompiler.Decompile(context);
+
+                result.Document.Save(outputPath);
+                WixAssert.CompareXml(Path.Combine(sourceFolder, "ExpectedModularizationGuids.wxs"), outputPath);
+            }
         }
     }
 }
