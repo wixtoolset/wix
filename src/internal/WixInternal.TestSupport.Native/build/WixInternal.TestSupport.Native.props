@@ -5,8 +5,8 @@
   <PropertyGroup>
     <RepoRootDir Condition=" '$(RepoRootDir)' == '' ">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), .gitignore))</RepoRootDir>
   </PropertyGroup>
-  <Import Project="$(RepoRootDir)\packages\xunit.core.2.4.2\build\xunit.core.props" Condition="Exists('$(RepoRootDir)\packages\xunit.core.2.4.2\build\xunit.core.props')" />
-  <Import Project="$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.5\build\net462\xunit.runner.visualstudio.props" Condition="Exists('$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.5\build\net462\xunit.runner.visualstudio.props')" />
+  <Import Project="$(RepoRootDir)\packages\xunit.core.2.5.0\build\xunit.core.props" Condition="Exists('$(RepoRootDir)\packages\xunit.core.2.5.0\build\xunit.core.props')" />
+  <Import Project="$(RepoRootDir)\packages\xunit.runner.visualstudio.2.5.0\build\net462\xunit.runner.visualstudio.props" Condition="Exists('$(RepoRootDir)\packages\xunit.runner.visualstudio.2.5.0\build\net462\xunit.runner.visualstudio.props')" />
   <PropertyGroup>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>

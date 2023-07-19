@@ -575,7 +575,7 @@ namespace WixToolsetTest.CoreIntegration
             var args = $"/a \"{Path.ChangeExtension(msiPath, "msi")}\" TARGETDIR=\"{targetDir}\" /qn";
 
             var proc = Process.Start("msiexec.exe", args);
-            proc.WaitForExit(10000);
+            proc.WaitForExit(20000);
 
             Assert.Equal(0, proc.ExitCode);
         }

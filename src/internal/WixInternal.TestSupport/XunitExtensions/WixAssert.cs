@@ -91,7 +91,7 @@ namespace WixInternal.TestSupport
         {
             if (collection.Count > 0)
             {
-                Assert.True(false, $"The collection was expected to be empty, but instead was [{Environment.NewLine}\"{String.Join($"\", {Environment.NewLine}\"", collection)}\"{Environment.NewLine}]");
+                Assert.Fail($"The collection was expected to be empty, but instead was [{Environment.NewLine}\"{String.Join($"\", {Environment.NewLine}\"", collection)}\"{Environment.NewLine}]");
             }
         }
 

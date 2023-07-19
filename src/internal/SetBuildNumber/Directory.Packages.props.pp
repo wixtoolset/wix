@@ -86,12 +86,12 @@
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
-    <PackageVersion Include="GitInfo" Version="2.2.0" />
+    <PackageVersion Include="GitInfo" Version="2.3.0" />
 
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
-    <PackageVersion Include="xunit" Version="2.4.2" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageVersion Include="xunit.assert" Version="2.4.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+    <PackageVersion Include="xunit" Version="2.5.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
+    <PackageVersion Include="xunit.assert" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
