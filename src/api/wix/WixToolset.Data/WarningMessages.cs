@@ -57,9 +57,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.CannotUpdateCabCache, "Cannot update the timestamp of cached cabinet: '{0}'. If the timestamp is not updated, the build may rebuild more than is necessary. To fix the issue, ensure that the cabinet file is writable, error: {1}", cabinetPath, detail);
         }
 
-        public static Message ColumnsIncompatibleWithInstallerVersion(SourceLineNumber sourceLineNumbers, string tableName, int productInstallerVersion)
+        public static Message ColumnsIncompatibleWithInstallerVersion(SourceLineNumber sourceLineNumbers, string tableName, int packageInstallerVersion)
         {
-            return Message(sourceLineNumbers, Ids.ColumnsIncompatibleWithInstallerVersion, "Table '{0}' uses columns that require a version of Windows Installer greater than specified in your package ('{1}').", tableName, productInstallerVersion);
+            return Message(sourceLineNumbers, Ids.ColumnsIncompatibleWithInstallerVersion, "Table '{0}' uses columns that require a version of Windows Installer greater than specified in your package ('{1}').", tableName, packageInstallerVersion);
         }
 
         public static Message CopyFileFileIdUseless(SourceLineNumber sourceLineNumbers)
@@ -199,7 +199,7 @@ namespace WixToolset.Data
 
         public static Message DeprecatedUpgradeProperty(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedUpgradeProperty, "Specifying a Property element as a child of an Upgrade element has been deprecated. Please specify this Property element as a child of a different element such as Product or Fragment.");
+            return Message(sourceLineNumbers, Ids.DeprecatedUpgradeProperty, "Specifying a Property element as a child of an Upgrade element has been deprecated. Please specify this Property element as a child of a different element such as Package or Fragment.");
         }
 
         public static Message DirectoryInUse(SourceLineNumber sourceLineNumbers, string filePath)
@@ -367,9 +367,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidAttributeCombination, "It is invalid to combine attributes {0} and {1}. The decompiled output will set attribute {2} to {3}.", attrib1, attrib2, name, value);
         }
 
-        public static Message InvalidHigherInstallerVersionInModule(SourceLineNumber sourceLineNumbers, string moduleId, int moduleInstallerVersion, int productInstallerVersion)
+        public static Message InvalidHigherInstallerVersionInModule(SourceLineNumber sourceLineNumbers, string moduleId, int moduleInstallerVersion, int packageInstallerVersion)
         {
-            return Message(sourceLineNumbers, Ids.InvalidHigherInstallerVersionInModule, "Merge module '{0}' has an installer version of {1} which is greater than the product's installer version of {2}. Merging a module with a higher installer version than the product it is being merged into can result in invalid values in the resulting msi. You must set the Package/@InstallerVersion attribute to {1} or greater to merge this merge module into your product.", moduleId, moduleInstallerVersion, productInstallerVersion);
+            return Message(sourceLineNumbers, Ids.InvalidHigherInstallerVersionInModule, "Merge module '{0}' has an installer version of {1} which is greater than the package's installer version of {2}. Merging a module with a higher installer version than the package it is being merged into can result in invalid values in the resulting msi. You must set the Package/@InstallerVersion attribute to {1} or greater to merge this merge module into your package.", moduleId, moduleInstallerVersion, packageInstallerVersion);
         }
 
         public static Message InvalidFourPartVersion(SourceLineNumber sourceLineNumbers, string elementName, string version)
@@ -384,7 +384,7 @@ namespace WixToolset.Data
 
         public static Message MajorUpgradePatchNotRecommended()
         {
-            return Message(null, Ids.MajorUpgradePatchNotRecommended, "Changing the ProductCode in a patch is not recommended because the patch cannot be uninstalled nor can it be sequenced along with other patches for the target product. See https://learn.microsoft.com/en-us/windows/win32/msi/applying-major-upgrades-by-patching-the-local-installation-of-the-product for more information.");
+            return Message(null, Ids.MajorUpgradePatchNotRecommended, "Changing the ProductCode in a patch is not recommended because the patch cannot be uninstalled nor can it be sequenced along with other patches for the target package. See https://learn.microsoft.com/en-us/windows/win32/msi/applying-major-upgrades-by-patching-the-local-installation-of-the-product for more information.");
         }
 
         public static Message MediaExternalCabinetFilenameIllegal(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
@@ -404,7 +404,7 @@ namespace WixToolset.Data
 
         public static Message MissingUpgradeCode(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.MissingUpgradeCode, "The Product/@UpgradeCode attribute was not found; it is strongly recommended to ensure that this product can be upgraded.");
+            return Message(sourceLineNumbers, Ids.MissingUpgradeCode, "The Package/@UpgradeCode attribute was not found; it is strongly recommended to ensure that this package can be upgraded.");
         }
 
         public static Message MsiTransactionLimitations(SourceLineNumber sourceLineNumbers)
@@ -572,9 +572,9 @@ namespace WixToolset.Data
             return Message(null, Ids.SuppressMergedAction, "The merged action '{0}' in the {1} table is being suppressed.", action, sequenceName);
         }
 
-        public static Message TableIncompatibleWithInstallerVersion(SourceLineNumber sourceLineNumbers, string tableName, int productInstallerVersion)
+        public static Message TableIncompatibleWithInstallerVersion(SourceLineNumber sourceLineNumbers, string tableName, int packageInstallerVersion)
         {
-            return Message(sourceLineNumbers, Ids.TableIncompatibleWithInstallerVersion, "Using table '{0}' requires a version of Windows Installer greater than specified in your package ('{1}').", tableName, productInstallerVersion);
+            return Message(sourceLineNumbers, Ids.TableIncompatibleWithInstallerVersion, "Using table '{0}' requires a version of Windows Installer greater than specified in your package ('{1}').", tableName, packageInstallerVersion);
         }
 
         public static Message TargetDirCorrectedDefaultDir()
@@ -620,7 +620,7 @@ namespace WixToolset.Data
 
         public static Message UnexpectedTableInProduct(SourceLineNumber sourceLineNumbers, string tableName)
         {
-            return Message(sourceLineNumbers, Ids.UnexpectedTableInProduct, "An unexpected row in the '{0}' table was found in this product. Products should not contain the '{0}' table.", tableName);
+            return Message(sourceLineNumbers, Ids.UnexpectedTableInProduct, "An unexpected row in the '{0}' table was found in this package. Packages should not contain the '{0}' table.", tableName);
         }
 
         public static Message UnknownAction(SourceLineNumber sourceLineNumbers, string sequenceTableName, string actionName)
@@ -675,14 +675,14 @@ namespace WixToolset.Data
 
         public static Message InvalidMsiProductVersion(SourceLineNumber sourceLineNumbers, string version, string package)
         {
-            return Message(sourceLineNumbers, Ids.InvalidMsiProductVersion, "Invalid product version '{0}' in MSI package '{1}'. Product version should have a major version less than 256, a minor version less than 256, and a build version less than 65536. The bundle may incorrectly detect upgrades of this package.", version, package);
+            return Message(sourceLineNumbers, Ids.InvalidMsiProductVersion, "Invalid package version '{0}' in MSI package '{1}'. Package version should have a major version less than 256, a minor version less than 256, and a build version less than 65536. The bundle may incorrectly detect upgrades of this package.", version, package);
         }
 
         public static Message InvalidMsiProductVersion(SourceLineNumber sourceLineNumbers, string version)
         {
             return Message(sourceLineNumbers, Ids.InvalidMsiProductVersion,
                 "Invalid MSI package version: '{0}'. " +
-                "The Windows Installer SDK says that MSI product versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. " +
+                "The Windows Installer SDK says that MSI package versions must have a major version less than 256, a minor version less than 256, and a build version less than 65536. " +
                 "The revision value is ignored but version labels and metadata are not allowed. " +
                 "Violating the MSI rules sometimes works as expected but the behavior is unpredictable and undefined. "+
                 "Future versions of WiX might treat invalid package versions as an error.",
