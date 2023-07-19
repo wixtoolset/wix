@@ -109,7 +109,7 @@ namespace WixToolsetTest.CoreIntegration
                     return;
                 }
 
-                Assert.True(false, "Expected WixException for missing entry section but expectations were not met.");
+                Assert.Fail("Expected WixException for missing entry section but expectations were not met.");
             }
         }
 
@@ -139,7 +139,7 @@ namespace WixToolsetTest.CoreIntegration
                     return;
                 }
 
-                Assert.True(false, "Expected WixException for missing entry section but expectations were not met.");
+                Assert.Fail("Expected WixException for missing entry section but expectations were not met.");
             }
         }
 
@@ -169,7 +169,7 @@ namespace WixToolsetTest.CoreIntegration
                     return;
                 }
 
-                Assert.True(false, "Expected WixException for missing entry section but expectations were not met.");
+                Assert.Fail("Expected WixException for missing entry section but expectations were not met.");
             }
         }
     }
