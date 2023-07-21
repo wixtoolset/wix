@@ -611,7 +611,7 @@ namespace WixToolsetTest.CoreIntegration
                                                                .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "The Payload 'Auto2' has a duplicate Name 'burn.exe' in the attached container. When extracting the bundle with dark.exe, the file will get overwritten.",
+                    "The Payload 'Auto2' has a duplicate Name 'burn.exe' in the attached container. When extracting the bundle with `wix burn extract`, the file will get overwritten.",
                 }, attachedContainerWarnings);
 
                 var baContainerErrors = result.Messages.Where(m => m.Id == 8002)
