@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
@@ -19,7 +20,7 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildPackageWithTag()
         {
             var folder = TestData.Get(@"TestData\ProductTag");
-            var build = new Builder(folder, null, new[] { folder });
+            var build = new Builder(folder, new Type[] { }, new[] { folder });
 
             var results = build.BuildAndQuery(Build, "File", "SoftwareIdentificationTag");
 

@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
     using WixInternal.TestSupport;
@@ -45,7 +46,7 @@ namespace WixToolsetTest.CoreIntegration
         public void MajorUpgradeDowngradeMessagePopulatesRowsAsExpected()
         {
             var folder = TestData.Get("TestData", "Upgrade");
-            var build = new Builder(folder, null, new[] { folder });
+            var build = new Builder(folder, new Type[] { }, new[] { folder });
 
             var results = build.BuildAndQuery(Build, "Upgrade", "LaunchCondition");
             WixAssert.CompareLineByLine(new[]
