@@ -11,14 +11,29 @@ namespace WixInternal.TestSupport
         public Builder(string sourceFolder, Type extensionType = null, string[] bindPaths = null, string outputFile = null)
         {
             this.SourceFolder = sourceFolder;
-            this.ExtensionType = extensionType;
+            if (extensionType != null)
+            {
+                this.ExtensionTypes = new Type[] { extensionType };
+            }
+            else
+            {
+                this.ExtensionTypes = new Type[] { };
+            }
+            this.BindPaths = bindPaths;
+            this.OutputFile = outputFile ?? "test.msi";
+        }
+
+        public Builder(string sourceFolder, Type[] extensionTypes, string[] bindPaths = null, string outputFile = null)
+        {
+            this.SourceFolder = sourceFolder;
+            this.ExtensionTypes = extensionTypes;
             this.BindPaths = bindPaths;
             this.OutputFile = outputFile ?? "test.msi";
         }
 
         public string[] BindPaths { get; set; }
 
-        public Type ExtensionType { get; set; }
+        public Type[] ExtensionTypes { get; set; }
 
         public string OutputFile { get; set; }
 
@@ -46,10 +61,10 @@ namespace WixInternal.TestSupport
                     "-intermediateFolder", intermediateFolder,
                 };
 
-                if (this.ExtensionType != null)
+                foreach (var ext in this.ExtensionTypes)
                 {
                     args.Add("-ext");
-                    args.Add(Path.GetFullPath(new Uri(this.ExtensionType.Assembly.CodeBase).LocalPath));
+                    args.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
                 }
 
                 args.AddRange(sourceFiles);
@@ -108,10 +123,10 @@ namespace WixInternal.TestSupport
                     "-intermediateFolder", intermediateFolder,
                 };
 
-                if (this.ExtensionType != null)
+                foreach (var ext in this.ExtensionTypes)
                 {
                     firstBuildArgs.Add("-ext");
-                    firstBuildArgs.Add(Path.GetFullPath(new Uri(this.ExtensionType.Assembly.CodeBase).LocalPath));
+                    firstBuildArgs.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
                 }
 
                 firstBuildArgs.AddRange(sourceFiles);
@@ -140,10 +155,10 @@ namespace WixInternal.TestSupport
                     "-o", decompilePath
                 };
 
-                if (this.ExtensionType != null)
+                foreach (var ext in this.ExtensionTypes)
                 {
                     decompileArgs.Add("-ext");
-                    decompileArgs.Add(Path.GetFullPath(new Uri(this.ExtensionType.Assembly.CodeBase).LocalPath));
+                    decompileArgs.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
                 }
 
                 decompileFunc(decompileArgs.ToArray());
@@ -157,10 +172,10 @@ namespace WixInternal.TestSupport
                     "-intermediateFolder", decompileIntermediateFolder
                 };
 
-                if (this.ExtensionType != null)
+                foreach (var ext in this.ExtensionTypes)
                 {
                     secondBuildArgs.Add("-ext");
-                    secondBuildArgs.Add(Path.GetFullPath(new Uri(this.ExtensionType.Assembly.CodeBase).LocalPath));
+                    secondBuildArgs.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
                 }
 
                 secondBuildArgs.Add("-bindpath");

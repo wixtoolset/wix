@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -152,7 +153,7 @@ namespace WixToolsetTest.CoreIntegration
         public void CanBuildPackageUsingProvides()
         {
             var folder = TestData.Get(@"TestData\UsingProvides");
-            var build = new Builder(folder, null, new[] { folder });
+            var build = new Builder(folder, new Type[] { }, new[] { folder });
 
             var results = build.BuildAndQuery(Build, "Wix4DependencyProvider");
             WixAssert.CompareLineByLine(new[]
