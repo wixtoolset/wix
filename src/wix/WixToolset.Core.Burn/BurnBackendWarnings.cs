@@ -8,7 +8,7 @@ namespace WixToolset.Core.Burn
     {
         public static Message AttachedContainerPayloadCollision(SourceLineNumber sourceLineNumbers, string payloadId, string payloadName)
         {
-            return Message(sourceLineNumbers, Ids.AttachedContainerPayloadCollision, "The Payload '{0}' has a duplicate Name '{1}' in the attached container. When extracting the bundle with dark.exe, the file will get overwritten.", payloadId, payloadName);
+            return Message(sourceLineNumbers, Ids.AttachedContainerPayloadCollision, "The Payload '{0}' has a duplicate Name '{1}' in the attached container. When extracting the bundle with `wix burn extract`, the file will get overwritten.", payloadId, payloadName);
         }
 
         public static Message AttachedContainerPayloadCollision2(SourceLineNumber sourceLineNumbers)
