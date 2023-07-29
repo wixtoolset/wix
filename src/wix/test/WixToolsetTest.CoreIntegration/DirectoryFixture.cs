@@ -14,6 +14,44 @@ namespace WixToolsetTest.CoreIntegration
     public class DirectoryFixture
     {
         [Fact]
+        public void CanGetDefaultInstallFolder()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "INSTALLFOLDER:ProgramFiles6432Folder:Example Corporation MsiPackage",
+                    "ProgramFiles6432Folder:ProgramFilesFolder:.",
+                    "ProgramFilesFolder:TARGETDIR:PFiles",
+                    "TARGETDIR::SourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
+            }
+        }
+
+        [Fact]
         public void CanGet32bitProgramFiles6432Folder()
         {
             var folder = TestData.Get(@"TestData");

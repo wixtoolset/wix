@@ -126,11 +126,17 @@ namespace WixToolset.Core
                     }
                 }
 
-                // If there are no authored features, create a default feature and assign the components to it.
-                if (find.EntrySection.Type == SectionType.Package
-                    && !sections.Where(s => s.Id != WixStandardLibraryIdentifiers.DefaultFeatureName).SelectMany(s => s.Symbols).OfType<FeatureSymbol>().Any())
+                // Add default symbols that need a bit more intelligence than just being
+                // included in the standard library.
                 {
-                    var command = new AssignDefaultFeatureCommand(find.EntrySection, sections);
+                    var command = new AddDefaultSymbolsCommand(find, sections);
+                    command.Execute();
+                }
+
+                // If there are no authored features, create a default feature and assign
+                // the components to it.
+                {
+                    var command = new AssignDefaultFeatureCommand(find, sections);
                     command.Execute();
                 }
 
