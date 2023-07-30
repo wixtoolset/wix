@@ -92,17 +92,14 @@ void ScaExUserPermsSmbFreeList(SCA_SMB_EX_USER_PERMS* pExUserPermsList)
 }
 
 // sql query constants
-LPCWSTR vcsSmbQuery = L"SELECT `FileShare`, `ShareName`, `Description`, `Directory_`, "
-    L"`Component_`, `User_`, `Permissions` FROM `Wix4FileShare`";
+LPCWSTR vcsSmbQuery = L"SELECT `FileShare`, `ShareName`, `Component_`, `Description`, `Directory_` FROM `Wix4FileShare`";
 
 enum eSmbQuery {
     ssqFileShare = 1,
     ssqShareName,
+    ssqComponent,
     ssqDescription,
     ssqDirectory,
-    ssqComponent,
-    ssqUser,
-    ssqPermissions
     };
 
 
@@ -173,30 +170,10 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
         hr = ::StringCchCopyW(pss->wzDescription, countof(pss->wzDescription), pwzData);
         ExitOnFailure(hr, "Failed to copy description string to smb object");
 
-        // get user info from the user table
-        hr = WcaGetRecordFormattedString(hRec, ssqUser, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4User record for Wix4FileShare: '%ls'", pss->wzShareName);
-
         // get component install state
         er = ::MsiGetComponentStateW(WcaGetInstallHandle(), pss->wzComponent, &pss->isInstalled, &pss->isAction);
         hr = HRESULT_FROM_WIN32(er);
         ExitOnFailure(hr, "Failed to get Component state for Wix4FileShare");
-
-        // if a user was specified
-        if (*pwzData)
-        {
-            pss->fUseIntegratedAuth = FALSE;
-            pss->fLegacyUserProvided = TRUE;
-            hr = ScaGetUser(pwzData, &pss->scau);
-            ExitOnFailure(hr, "Failed to get user information for fileshare: '%ls'", pss->wzShareName);
-        }
-        else
-        {
-            pss->fLegacyUserProvided = FALSE;
-            // TODO: figure out whether this is useful still
-            //pss->fUseIntegratedAuth = TRUE;
-            // integrated authorization doesn't have a User record
-        }
 
         // get the share's directory
         hr = WcaGetRecordString(hRec, ssqDirectory, &pwzData);
@@ -234,9 +211,6 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
 
         hr = ::StringCchCopyW(pss->wzDirectory, countof(pss->wzDirectory), wzPath);
         ExitOnFailure(hr, "Failed to copy directory string to smb object");
-
-        hr = WcaGetRecordInteger(hRec, ssqPermissions, &pss->nPermissions);
-        ExitOnFailure(hr, "Failed to get Wix4FileShare.Permissions");
 
         // Check to see if additional user & permissions are specified for this share
         if (bUserPermissionsTableExists)
@@ -378,24 +352,8 @@ HRESULT SchedCreateSmb(SCA_SMB* pss)
     hr = WcaWriteStringToCaData(pss->fUseIntegratedAuth ? L"1" : L"0", &pwzCustomActionData);
     ExitOnFailure(hr, "Failed to add server name to CustomActionData");
 
-    if (pss->fLegacyUserProvided)
-    {
-        hr = WcaWriteIntegerToCaData(pss->nUserPermissionCount + 1, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add additional user permission count to CustomActionData");
-
-        hr = UserBuildDomainUserName(wzDomainUser, countof(wzDomainUser), pss->scau.wzName, pss->scau.wzDomain);
-        ExitOnFailure(hr, "Failed to build user and domain name for CustomActionData");
-        hr = WcaWriteStringToCaData(wzDomainUser, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add server Domain\\UserName to CustomActionData");
-
-        hr = WcaWriteIntegerToCaData(pss->nPermissions, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add permissions to CustomActionData");
-    }
-    else
-    {
-        hr = WcaWriteIntegerToCaData(pss->nUserPermissionCount, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add additional user permission count to CustomActionData");
-    }
+    hr = WcaWriteIntegerToCaData(pss->nUserPermissionCount, &pwzCustomActionData);
+    ExitOnFailure(hr, "Failed to add additional user permission count to CustomActionData");
 
     if (pss->nUserPermissionCount > 0)
     {

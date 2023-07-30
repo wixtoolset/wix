@@ -23,14 +23,11 @@ struct SCA_SMB  // hungarian ss
 	WCHAR wzDirectory[MAX_PATH + 1];
 
 	int nUserPermissionCount;
-	int nPermissions;
 	SCA_SMB_EX_USER_PERMS* pExUserPerms;
 
 	INSTALLSTATE isInstalled, isAction;
 
 	BOOL fUseIntegratedAuth;
-	BOOL fLegacyUserProvided;
-	struct SCA_USER scau;
 
 	struct SCA_SMB* pssNext;
 };
