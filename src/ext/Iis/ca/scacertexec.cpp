@@ -154,7 +154,7 @@ static HRESULT ExecuteCertificateOperation(
     LPWSTR pwzPFXPassword = NULL;
     LPWSTR pwzFilePath = NULL;
     BYTE* pbData = NULL;
-    DWORD cbData = 0;
+    DWORD_PTR cbData = 0;
     DWORD_PTR cbPFXPassword = 0;
 
     BOOL fUserStoreLocation = (CERT_SYSTEM_STORE_CURRENT_USER == dwStoreLocation);
@@ -174,7 +174,7 @@ static HRESULT ExecuteCertificateOperation(
     ExitOnFailure(hr, "Failed to parse certificate attribute");
     if (SCA_ACTION_INSTALL == saAction) // install operations need more data
     {
-        hr = WcaReadStreamFromCaData(&pwz, &pbData, (DWORD_PTR*)&cbData);
+        hr = WcaReadStreamFromCaData(&pwz, &pbData, &cbData);
         ExitOnFailure(hr, "Failed to parse certificate stream.");
 
         hr = WcaReadStringFromCaData(&pwz, &pwzPFXPassword);
@@ -192,7 +192,7 @@ static HRESULT ExecuteCertificateOperation(
         // CertAddCertificateContextToStore(CERT_STORE_ADD_REPLACE_EXISTING) does not remove the private key if the cert is replaced
         UninstallCertificatePackage(hCertStore, fUserStoreLocation, pwzName);
 
-        hr = InstallCertificatePackage(hCertStore, fUserStoreLocation, pwzName, pbData, cbData, iAttributes & SCA_CERT_ATTRIBUTE_VITAL, pwzPFXPassword);
+        hr = InstallCertificatePackage(hCertStore, fUserStoreLocation, pwzName, pbData, (DWORD)cbData, iAttributes & SCA_CERT_ATTRIBUTE_VITAL, pwzPFXPassword);
         ExitOnFailure(hr, "Failed to install certificate.");
     }
     else
