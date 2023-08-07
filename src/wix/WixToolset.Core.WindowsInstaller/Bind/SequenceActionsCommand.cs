@@ -446,7 +446,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         var foundBindPath = false;
                         foreach (var file in this.Section.Symbols.OfType<FileSymbol>())
                         {
-                            if (!foundFont && !String.IsNullOrEmpty(file.FontTitle))
+                            // Note that TrueType fonts are denoted by the empty string in the FontTitle
+                            // field. So, non-null means a font is present.
+                            if (!foundFont && file.FontTitle != null)
                             {
                                 set.Add("InstallExecuteSequence/RegisterFonts");
                                 set.Add("InstallExecuteSequence/UnregisterFonts");
