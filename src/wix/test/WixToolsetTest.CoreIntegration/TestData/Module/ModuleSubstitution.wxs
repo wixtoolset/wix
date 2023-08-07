@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="MergeModule.v4" Guid="dc68e039-e0c8-49fb-b5e6-37f9569188e5" Language="1033" Version="1.0.0.0">
+    <SummaryInformation Manufacturer="Manufacturer" />
+
+    <Configuration Name='CONFIGTEST' Format='Text'/>
+    <Substitution Table='CustomAction' Row='setCONFIGTEST' Column='Target' Value='[=CONFIGTEST]'/>
+
+    <Property Id="msmCONFIGTEST" Value="failure"/>
+    <CustomAction Id='setCONFIGTEST' Property='msmCONFIGTEST' Value='[msmCONFIGTEST]'/>
+  </Module>
+</Wix>

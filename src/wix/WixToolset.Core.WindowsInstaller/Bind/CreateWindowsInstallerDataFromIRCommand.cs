@@ -148,6 +148,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     case SymbolDefinitionType.ModuleSubstitution:
+                        this.AddSymbolDefaultly(symbol);
                         this.EnsureModuleIgnoredTable(symbol, "ModuleSubstitution");
                         break;
 
