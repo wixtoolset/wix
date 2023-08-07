@@ -58,7 +58,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
 
-        private  IFileSystem FileSystem { get; }
+        private IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -477,7 +477,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var command = new MergeModulesCommand(this.Messaging, this.WindowsInstallerBackendHelper, fileFacadesFromModule, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
                 command.Execute();
 
-                trackedFiles.AddRange(command.TrackedFiles);
+                if (command.TrackedFiles != null)
+                {
+                    trackedFiles.AddRange(command.TrackedFiles);
+                }
             }
 
             if (this.Messaging.EncounteredError)
