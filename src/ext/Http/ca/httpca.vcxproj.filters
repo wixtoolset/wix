@@ -24,6 +24,15 @@
     <ClCompile Include="snisslcert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sslbinding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="certificates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="certexec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precomp.h">
@@ -32,11 +41,16 @@
     <ClInclude Include="cost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="certificates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomMsiErrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="wixhttpca.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

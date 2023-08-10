@@ -10,3 +10,15 @@ EXPORTS
 	SchedHttpSniSslCertsInstall
 	SchedHttpSniSslCertsUninstall
 	ExecHttpSniSslCerts
+; sslbindings.cpp
+	SchedHttpSslBindingsInstall
+	SchedHttpSslBindingsUninstall
+	ExecHttpSslBindings
+; certificates.cpp
+    InstallHttpCertificates
+    UninstallHttpCertificates
+; certexec.cpp
+    AddUserHttpCertificate
+    AddMachineHttpCertificate
+    DeleteUserHttpCertificate
+    DeleteMachineHttpCertificate

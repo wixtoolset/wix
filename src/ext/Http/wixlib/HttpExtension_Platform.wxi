@@ -1,4 +1,4 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -55,6 +55,51 @@
         <InstallExecuteSequence>
             <Custom Action="$(var.Prefix)SchedHttpSniSslCertsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT >= 602" />
             <Custom Action="$(var.Prefix)SchedHttpSniSslCertsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT >= 602" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment>
+        <UIRef Id="WixHttpErrors" />
+        <UI>
+            <ProgressText Action="$(var.Prefix)SchedHttpSslBindingsInstall$(var.Suffix)" Message="!(loc.WixSchedHttpSslBindingsInstall)" />
+            <ProgressText Action="$(var.Prefix)SchedHttpSslBindingsUninstall$(var.Suffix)" Message="!(loc.WixSchedHttpSslBindingsUninstall)" />
+            <ProgressText Action="$(var.Prefix)RollbackHttpSslBindingsInstall$(var.Suffix)" Message="!(loc.WixRollbackHttpSslBindingsInstall)" />
+            <ProgressText Action="$(var.Prefix)ExecHttpSslBindingsInstall$(var.Suffix)" Message="!(loc.WixExecHttpSslBindingsInstall)" />
+            <ProgressText Action="$(var.Prefix)RollbackHttpSslBindingsUninstall$(var.Suffix)" Message="!(loc.WixRollbackHttpSslBindingsUninstall)" />
+            <ProgressText Action="$(var.Prefix)ExecHttpSslBindingsUninstall$(var.Suffix)" Message="!(loc.WixExecHttpSslBindingsUninstall)" />
+
+            <!--<ProgressText Action="$(var.Prefix)InstallHttpCertificates$(var.Suffix)" Message="!(loc. TODO )" />
+            <ProgressText Action="$(var.Prefix)UninstallHttpCertificates$(var.Suffix)" Message="!(loc. TODO )" />-->
+        </UI>
+
+        <CustomAction Id="$(var.Prefix)SchedHttpSslBindingsInstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="SchedHttpSslBindingsInstall" Execute="immediate" Return="check" HideTarget="yes" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedHttpSslBindingsUninstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="SchedHttpSslBindingsUninstall" Execute="immediate" Return="check" HideTarget="yes" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackHttpSslBindingsInstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSslBindings" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecHttpSslBindingsInstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSslBindings" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackHttpSslBindingsUninstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSslBindings" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecHttpSslBindingsUninstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSslBindings" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+
+        <CustomAction Id="$(var.Prefix)InstallHttpCertificates$(var.Suffix)" DllEntry="InstallHttpCertificates" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)UninstallHttpCertificates$(var.Suffix)" DllEntry="UninstallHttpCertificates" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+
+        <CustomAction Id="$(var.Prefix)AddUserHttpCertificate$(var.Suffix)" DllEntry="AddUserHttpCertificate" Impersonate="yes" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)AddMachineHttpCertificate$(var.Suffix)" DllEntry="AddMachineHttpCertificate" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)DeleteUserHttpCertificate$(var.Suffix)" DllEntry="DeleteUserHttpCertificate" Impersonate="yes" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)DeleteMachineHttpCertificate$(var.Suffix)" DllEntry="DeleteMachineHttpCertificate" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+
+        <CustomAction Id="$(var.Prefix)RollbackAddUserHttpCertificate$(var.Suffix)" DllEntry="DeleteUserHttpCertificate" Impersonate="yes" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackAddMachineHttpCertificate$(var.Suffix)" DllEntry="DeleteMachineHttpCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackDeleteUserHttpCertificate$(var.Suffix)" DllEntry="AddUserHttpCertificate" Impersonate="yes" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackDeleteMachineHttpCertificate$(var.Suffix)" DllEntry="AddMachineHttpCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" />
+
+        <!--
+            We need the HTTP server on Windows XP SP2 or later.
+        -->
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)UninstallHttpCertificates$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="$(var.Prefix)InstallHttpCertificates$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="$(var.Prefix)SchedHttpSslBindingsUninstall$(var.Suffix)" Before="$(var.Prefix)UninstallHttpCertificates$(var.Suffix)" Overridable="yes" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1)))" />
+            <Custom Action="$(var.Prefix)SchedHttpSslBindingsInstall$(var.Suffix)" After="$(var.Prefix)InstallHttpCertificates$(var.Suffix)" Overridable="yes" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1)))" />
         </InstallExecuteSequence>
     </Fragment>
 
