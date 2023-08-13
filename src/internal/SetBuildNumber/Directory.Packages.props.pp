@@ -37,6 +37,7 @@
     <PackageVersion Include="WixToolset.NetFx.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.UI.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Util.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Firewall.wixext" Version="{packageversion}" />
   </ItemGroup>
 
   <ItemGroup>

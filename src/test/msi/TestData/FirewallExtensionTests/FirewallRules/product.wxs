@@ -1,0 +1,23 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="FirewallComponent1"/>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="FirewallComponent1" Guid="A2E492E7-7350-4F77-8424-1FE94553D776" Directory="INSTALLFOLDER">
+            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" >
+                <fw:FirewallException Id="FirewallException1"
+                    Description="WiX Toolset firewall exception rule integration test - minimal app properties"
+                    Name="WiXToolset401 Test - 0001" Scope="any" />
+            </File>
+            <fw:FirewallException Id="FirewallException2"
+                Description="WiX Toolset firewall exception rule integration test - minimal port properties"
+                Name="WiXToolset401 Test - 0002" Scope="any" Port="23456"/>
+        </Component>
+    </Fragment>
+</Wix>
