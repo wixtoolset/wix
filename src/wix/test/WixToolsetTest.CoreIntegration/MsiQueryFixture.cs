@@ -488,11 +488,13 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "Font" });
+                var results = Query.QueryDatabase(msiPath, new[] { "Font", "InstallExecuteSequence" });
                 WixAssert.CompareLineByLine(new[]
                 {
                     "Font:test.txt\tFakeFont",
-                }, results);
+                    "InstallExecuteSequence:RegisterFonts\t\t5300",
+                    "InstallExecuteSequence:UnregisterFonts\t\t2500",
+                }, results.Where(l => l.Contains("Font")).ToArray());
             }
         }
 
@@ -521,11 +523,13 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "Font" });
+                var results = Query.QueryDatabase(msiPath, new[] { "Font", "InstallExecuteSequence" });
                 WixAssert.CompareLineByLine(new[]
                 {
                     "Font:TrueTypeFontFile\t",
-                }, results);
+                    "InstallExecuteSequence:RegisterFonts\t\t5300",
+                    "InstallExecuteSequence:UnregisterFonts\t\t2500",
+                }, results.Where(l => l.Contains("Font")).ToArray());
             }
         }
 

@@ -14,6 +14,64 @@ namespace WixToolsetTest.CoreIntegration
     public class ModuleFixture
     {
         [Fact]
+        public void CanBuildAndMergeModuleWithSubstitution()
+        {
+            var folder = TestData.Get(@"TestData", "Module");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var msmIntermediatePath = Path.Combine(intermediateFolder, "msm");
+                var msmPath = Path.Combine(msmIntermediatePath, "test.msm");
+
+                var msiIntermediatePath = Path.Combine(intermediateFolder, "msi");
+                var msiPath = Path.Combine(msiIntermediatePath, "test.msi");
+
+                // Build the MSM.
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ModuleSubstitution.wxs"),
+                    "-intermediateFolder", msmIntermediatePath,
+                    "-sw1079",
+                    "-o", msmPath
+                });
+
+                result.AssertSuccess();
+
+                // Verify the MSM.
+                var rows = Query.QueryDatabase(msmPath, new[] { "CustomAction", "ModuleConfiguration", "ModuleSubstitution" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "CustomAction:setCONFIGTEST.DC68E039_E0C8_49FB_B5E6_37F9569188E5\t51\tmsmCONFIGTEST.DC68E039_E0C8_49FB_B5E6_37F9569188E5\t[msmCONFIGTEST.DC68E039_E0C8_49FB_B5E6_37F9569188E5]\t",
+                    "ModuleConfiguration:CONFIGTEST\t0\t\t\t\t0\t\t\t\t",
+                    "ModuleSubstitution:CustomAction\tsetCONFIGTEST.DC68E039_E0C8_49FB_B5E6_37F9569188E5\tTarget\t[=CONFIGTEST]"
+                }, rows);
+
+                // Merge the module into an MSI.
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "MergeModuleSubstitution.wxs"),
+                    "-bindpath", msmIntermediatePath,
+                    "-intermediateFolder", msiIntermediatePath,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                // Verify the MSI.
+                rows = Query.QueryDatabase(msiPath, new[] { "CustomAction", "ModuleConfiguration", "ModuleSubstitution" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "CustomAction:setCONFIGTEST.DC68E039_E0C8_49FB_B5E6_37F9569188E5\t51\tmsmCONFIGTEST.DC68E039_E0C8_49FB_B5E6_37F9569188E5\tTestingTesting123\t"
+                }, rows);
+
+                result.AssertSuccess();
+            }
+        }
+
+        [Fact]
         public void CanSuppressModularization()
         {
             var folder = TestData.Get(@"TestData\SuppressModularization");

@@ -148,6 +148,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     case SymbolDefinitionType.ModuleSubstitution:
+                        this.AddSymbolDefaultly(symbol);
                         this.EnsureModuleIgnoredTable(symbol, "ModuleSubstitution");
                         break;
 
@@ -678,6 +679,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             attributes |= (symbol.Attributes & FileSymbolAttributes.Vital) == FileSymbolAttributes.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
 
+            // Note that TrueType fonts are denoted by the empty string in the FontTitle
+            // field. So, non-null means a font is present.
             if (symbol.FontTitle != null)
             {
                 var fontRow = this.CreateRow(symbol, "Font");

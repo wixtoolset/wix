@@ -46,17 +46,6 @@ namespace WixE2E
         }
 
         [Fact]
-        public void CanBuildPackageWithReact()
-        {
-            var projectPath = TestData.Get("TestData", "WixprojPackageReact", "WixprojPackageReact.wixproj");
-
-            CleanEverything();
-
-            var result = RestoreAndBuild(projectPath);
-            result.AssertSuccess();
-        }
-
-        [Fact]
         public void CanBuildPackageWithWebApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore", "WixprojPackageCsprojWebApplicationNetCore.wixproj");

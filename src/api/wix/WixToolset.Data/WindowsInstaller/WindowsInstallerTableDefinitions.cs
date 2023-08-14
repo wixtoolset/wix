@@ -1455,7 +1455,7 @@ namespace WixToolset.Data.WindowsInstaller
             SymbolDefinitions.ModuleConfiguration,
             new[]
             {
-                new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique identifier for this row."),
+                new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique identifier for this row.", modularizeType: ColumnModularizeType.None),
                 new ColumnDefinition("Format", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 3, description: "Format of this item."),
                 new ColumnDefinition("Type", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Additional type information for this item."),
                 new ColumnDefinition("ContextData", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Additional context information about this item."),

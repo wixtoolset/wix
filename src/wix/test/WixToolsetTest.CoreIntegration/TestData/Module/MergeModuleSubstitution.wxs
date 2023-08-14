@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="MergeModuleSubstitution" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="Downgrade message" />
+
+        <Feature Id="Main">
+            <MergeRef Id="TestMsm" />
+        </Feature>
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage">
+                <Merge Id="TestMsm" Language="1033" SourceFile="test.msm">
+                    <ConfigurationData Name="CONFIGTEST" Value="TestingTesting123" />
+                </Merge>
+            </Directory>
+        </StandardDirectory>
+    </Package>
+</Wix>
