@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:http="http://wixtoolset.org/schemas/v4/wxs/http">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+            <http:Certificate Id="SomeCertificate"
+                              Name="Some Certificate"
+                              StoreLocation="localMachine"
+                              StoreName="my"
+                              CertificatePath="[SOME_PATH]"
+                              PFXPassword="[PFX_PASS]"/>
+            <http:SslBinding Host="0.0.0.0" Port="8081" HandleExisting="fail">
+                <http:CertificateRef Id="SomeCertificate" />
+            </http:SslBinding>
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

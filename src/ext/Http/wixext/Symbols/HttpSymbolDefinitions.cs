@@ -10,6 +10,10 @@ namespace WixToolset.Http
         WixHttpSniSslCert,
         WixHttpUrlAce,
         WixHttpUrlReservation,
+        WixHttpSslBinding,
+        WixHttpCertificate,
+        WixHttpSslBindingCertificates,
+        WixHttpCertificateHash
     }
 
     public static partial class HttpSymbolDefinitions
@@ -33,12 +37,23 @@ namespace WixToolset.Http
                 case HttpSymbolDefinitionType.WixHttpSniSslCert:
                     return HttpSymbolDefinitions.WixHttpSniSslCert;
 
+                case HttpSymbolDefinitionType.WixHttpSslBinding:
+                    return HttpSymbolDefinitions.WixHttpSslBinding;
+
                 case HttpSymbolDefinitionType.WixHttpUrlAce:
                     return HttpSymbolDefinitions.WixHttpUrlAce;
 
                 case HttpSymbolDefinitionType.WixHttpUrlReservation:
                     return HttpSymbolDefinitions.WixHttpUrlReservation;
 
+                case HttpSymbolDefinitionType.WixHttpCertificate:
+                    return HttpSymbolDefinitions.WixHttpCertificate;
+
+                case HttpSymbolDefinitionType.WixHttpSslBindingCertificates:
+                    return HttpSymbolDefinitions.WixHttpSslBindingCertificates;
+
+                case HttpSymbolDefinitionType.WixHttpCertificateHash:
+                    return HttpSymbolDefinitions.WixHttpCertificateHash;    
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }

@@ -23,9 +23,15 @@ namespace WixToolset.Http
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, resourceManager, resourceName, args);
         }
 
+        public static Message IllegalElementWithoutComponent(SourceLineNumber sourceLineNumbers, string elementName)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalElementWithoutComponent, "The {0} element cannot be specified unless the element has a Component as an ancestor. A {0} that does not have a Component ancestor is not installed.", elementName);
+        }
+
         public enum Ids
         {
             NoSecuritySpecified = 6701,
+            IllegalElementWithoutComponent = 6721,
         }
     }
 }

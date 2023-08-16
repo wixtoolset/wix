@@ -1,9 +1,5 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-const UINT COST_HTTP_URL_ACL = 2000;
-const UINT COST_HTTP_SNI_SSL = 2000;
-const UINT COST_HTTP_SSL = 2000;
-
-const UINT COST_CERT_ADD = 5000;
-const UINT COST_CERT_DELETE = 5000;
+#define msierrCERTFailedOpen                   26351
+#define msierrCERTFailedAdd                    26352

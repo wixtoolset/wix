@@ -67,7 +67,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ResourceCompile Include="SfxCA.rc" />
+    <ResourceCompile Include="SfxCA.rc">
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
   </ItemGroup>
 
   <ItemGroup>
