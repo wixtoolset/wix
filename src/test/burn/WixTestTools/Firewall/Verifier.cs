@@ -281,7 +281,9 @@ namespace WixTestTools.Firewall
             Assert.True(expected.ServiceName == actual.ServiceName, FormatErrorMessage(name, "ServiceNames", expected.ServiceName, actual.ServiceName, unique));
             Assert.True(expected.Protocol == actual.Protocol, FormatErrorMessage(name, "Protocols", expected.Protocol, actual.Protocol, unique));
             Assert.True(expected.LocalPorts == actual.LocalPorts, FormatErrorMessage(name, "LocalPorts", expected.LocalPorts, actual.LocalPorts, unique));
+            Assert.True(expected.LocalAddresses == actual.LocalAddresses, FormatErrorMessage(name, "LocalAddresses", expected.LocalAddresses, actual.LocalAddresses, unique));
             Assert.True(expected.RemotePorts == actual.RemotePorts, FormatErrorMessage(name, "RemotePorts", expected.RemotePorts, actual.RemotePorts, unique));
+            Assert.True(expected.RemoteAddresses == actual.RemoteAddresses, FormatErrorMessage(name, "RemoteAddresses", expected.RemoteAddresses, actual.RemoteAddresses, unique));
             Assert.True(expected.IcmpTypesAndCodes == actual.IcmpTypesAndCodes, FormatErrorMessage(name, "IcmpTypesAndCodes", expected.IcmpTypesAndCodes, actual.Description, unique));
             Assert.True(expected.Direction == actual.Direction, FormatErrorMessage(name, "Directions", expected.Direction, actual.Direction, unique));
             Assert.Equal<object>(expected.Interfaces, actual.Interfaces);

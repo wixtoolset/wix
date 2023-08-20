@@ -200,5 +200,82 @@ namespace WixToolsetTest.MsiE2E
 
             Verifier.VerifyFirewallRule("WiXToolset401 Test - 0001", expected);
         }
+
+        [RuntimeFact]
+        public void FirewallRulesUseFormattedStringProperties()
+        {
+            var product = this.CreatePackageInstaller("DynamicFirewallRules");
+            product.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            var expected1 = new RuleDetails("WiXToolset401 Test - 0003")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = this.TestContext.GetTestInstallFolder(false, Path.Combine("DynamicFirewallRules", "product.wxs")),
+                Description = "WiX Toolset firewall exception rule integration test - dynamic app description 9999",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "LocalSubnet",
+                SecureFlags = 0,
+                LocalPorts = "9999",
+                RemotePorts = "*",
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0003", expected1);
+
+            var expected2 = new RuleDetails("WiXToolset401 Test - 0004")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                Description = "WiX Toolset firewall exception rule integration test - dynamic port description 9999",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = false,
+                EdgeTraversalOptions = 0,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                SecureFlags = 0,
+                LocalPorts = "9999",
+                RemotePorts = "*",
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0004", expected2);
+
+
+            var expected3 = new RuleDetails("WiXToolset401 Test - 0005 - 9999")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = Path.Combine(Environment.GetEnvironmentVariable("windir"), "system32", "9999.exe"),
+                Description = "WiX Toolset firewall exception rule integration test - dynamic Name 9999",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                Profiles = 2,
+                Protocol = 17,
+                RemoteAddresses = "127.0.0.1/255.255.255.255,192.168.1.1/255.255.255.255",
+                SecureFlags = 0,
+                LocalPorts = "9999",
+                RemotePorts = "*",
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0005 - 9999", expected3);
+
+            product.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            // verify the firewall exceptions have been removed.
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0003"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0004"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0005 - 9999"));
+        }
     }
 }

@@ -164,7 +164,7 @@ namespace WixTestTools.Firewall
         public bool? Enabled { get; set; }
 
         /// <summary>
-        /// This property is optional. It specifies the group to which an individual rule belongs and groups multiple rules into a single line in the Windows Firewall control panel<br/>
+        /// This property is optional. It specifies the group to which an individual rule belongs and groups multiple rules into a single line in the Windows Firewall control panel.<br/>
         /// This allows the users to enable or disable multiple rules with a single click.<br/>
         /// The Grouping property can also be specified using indirect strings.<br/>
         /// Example: "Simple Group Name"<br/>
@@ -193,7 +193,7 @@ namespace WixTestTools.Firewall
 
         /// <summary>
         /// This property is optional. The NET_FW_ACTION enumerated type specifies the action for this rule.<br/>
-        /// NET_FW_ACTION_ALLOW is the default value. Profiles can be combined from the following values:<br/>
+        /// NET_FW_ACTION_ALLOW is the default value. The Action must be specified from the following list of values:<br/>
         /// <b>o</b> NET_FW_ACTION_BLOCK = 0x0<br/>
         /// <b>o</b> NET_FW_ACTION_ALLOW = 0x1<br/>
         /// </summary>

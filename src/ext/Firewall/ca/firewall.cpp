@@ -79,7 +79,7 @@ static UINT SchedFirewallExceptions(
         hr = WcaGetRecordString(hRec, feqComponent, &pwzComponent);
         ExitOnFailure(hr, "Failed to get firewall exception component.");
 
-        hr = WcaGetRecordString(hRec, feqDescription, &pwzDescription);
+        hr = WcaGetRecordFormattedString(hRec, feqDescription, &pwzDescription);
         ExitOnFailure(hr, "Failed to get firewall exception description.");
 
         hr = WcaGetRecordInteger(hRec, feqDirection, &iDirection);
