@@ -1,0 +1,50 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="FirewallComponent2"/>
+        </ComponentGroup>
+
+		<Property Id="PORTNUMBER" Secure="yes">
+			<RegistrySearch Id="FindPortNumber" Root="HKLM" Key="SOFTWARE\WiX\Tests\$(var.TestGroupName)" Name="PortNumber" Type="raw" />
+		</Property>
+
+		<CustomAction Id="SavePortNumberCmdLineValue" Property="CMDLINE_PORTNUMBER" Value="[PORTNUMBER]" Execute="firstSequence" />
+		<CustomAction Id="SetPortNumberFromCmdLineValue" Property="PORTNUMBER" Value="[CMDLINE_PORTNUMBER]" Execute="firstSequence" />
+		<CustomAction Id="SetPortNumberDefaultValue" Property="PORTNUMBER" Value="9999" Execute="firstSequence" />
+
+		<InstallExecuteSequence>
+		  <Custom Action="SavePortNumberCmdLineValue" Before="AppSearch" />
+		  <Custom Action="SetPortNumberFromCmdLineValue" After="AppSearch" Condition="CMDLINE_PORTNUMBER" />
+		  <Custom Action="SetPortNumberDefaultValue" After="SetPortNumberFromCmdLineValue" Condition="NOT PORTNUMBER" />
+		</InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="FirewallComponent2" Guid="528C212C-09C6-47FC-A466-A3799DD04D25" Directory="INSTALLFOLDER" >
+			<RegistryValue Root="HKLM" Key="SOFTWARE\WiX\Tests\$(var.TestGroupName)" Name="PortNumber" Value="[PORTNUMBER]" Type="string" />
+
+            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" >
+                <fw:FirewallException Id="FirewallException1"
+					Port="[PORTNUMBER]"
+                    Description="WiX Toolset firewall exception rule integration test - dynamic app description [PORTNUMBER]"
+                    Name="WiXToolset401 Test - 0003" Scope="localSubnet" />
+            </File>
+			
+            <fw:FirewallException Id="FirewallException2"
+                Description="WiX Toolset firewall exception rule integration test - dynamic port description [PORTNUMBER]"
+                Name="WiXToolset401 Test - 0004" Scope="any" Port="[PORTNUMBER]" />
+
+            <fw:FirewallException Id="FirewallException3"
+                Description="WiX Toolset firewall exception rule integration test - dynamic Name [PORTNUMBER]"
+				Program="%windir%\system32\[PORTNUMBER].exe"
+				Port="[PORTNUMBER]"
+				Protocol="udp" Profile="private"
+                Name="WiXToolset401 Test - 0005 - [PORTNUMBER]" >
+				<fw:RemoteAddress Value="127.0.0.1" />
+				<fw:RemoteAddress Value="192.168.1.1" />
+			</fw:FirewallException>
+        </Component>
+    </Fragment>
+</Wix>

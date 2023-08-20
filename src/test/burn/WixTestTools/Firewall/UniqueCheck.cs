@@ -6,7 +6,7 @@ namespace WixTestTools.Firewall
 
     /// <summary>
     /// A lot of firewall rules don't follow the Microsoft recommendation of using unique names.<br/>
-    /// This class helps to disambiguate the rules based on Name, Direction, Profile, Protocol, ApplicationName and the LocalUserOwner.
+    /// This class helps to disambiguate the rules based on Name, Direction, Profile, Protocol, ApplicationName, LocalUserOwner and RemoteAddresses.
     /// </summary>
     public class UniqueCheck
     {
@@ -22,6 +22,7 @@ namespace WixTestTools.Firewall
             this.Protocol = details.Protocol;
             this.ApplicationName = details.ApplicationName;
             this.LocalUserOwner = details.LocalUserOwner;
+            this.RemoteAddresses = details.RemoteAddresses;
         }
 
 
@@ -37,6 +38,7 @@ namespace WixTestTools.Firewall
 
         public string LocalUserOwner { get; set; }
 
+        public string RemoteAddresses { get; set; }
 
         public bool FirewallRuleIsUnique(INetFwRule3 rule)
         {
@@ -66,6 +68,11 @@ namespace WixTestTools.Firewall
             }
 
             if (this.LocalUserOwner != null && rule.LocalUserOwner != this.LocalUserOwner)
+            {
+                return false;
+            }
+
+            if (this.RemoteAddresses != null && rule.RemoteAddresses != this.RemoteAddresses)
             {
                 return false;
             }
