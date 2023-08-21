@@ -1,0 +1,35 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="FirewallComponent3"/>
+        </ComponentGroup>
+
+		<Property Id="RULENAME" Secure="yes" />
+		<CustomAction Id="SetRuleNameDefaultValue" Property="RULENAME" Value="WiXToolset401 Test - 0008 removal" Execute="firstSequence" />
+
+		<InstallExecuteSequence>
+		  <Custom Action="SetRuleNameDefaultValue" After="AppSearch" Condition="NOT NORULENAME" />
+		</InstallExecuteSequence>
+
+    </Fragment>
+
+    <Fragment>
+        <Component Id="FirewallComponent3" Guid="AA693149-B39C-4012-9DDE-92AB0CEA2386" Directory="INSTALLFOLDER" Transitive="yes">
+            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" >
+                <fw:FirewallException Id="FirewallException6"
+                    Description="WiX Toolset firewall exception rule integration test | ignore failed app properties"
+                    Name="WiXToolset401 Test - 0006 pipe" Scope="any" IgnoreFailure="yes" />
+            </File>
+            <fw:FirewallException Id="FirewallException7"
+                Description="WiX Toolset firewall exception rule integration test | ignore failed port properties"
+                Name="WiXToolset401 Test - 0007 pipe" Scope="any" Port="65123" IgnoreFailure="yes" />
+
+            <fw:FirewallException Id="FirewallException8"
+                Description="WiX Toolset firewall exception rule integration test - removal test"
+                Name="[RULENAME]" Scope="any" Port="52390" Program="test.exe"
+				IgnoreFailure="yes" />
+        </Component>
+    </Fragment>
+</Wix>

@@ -348,90 +348,6 @@ LExit:
 }
 
 /******************************************************************
- FSupportProfiles - Returns true if we support profiles on this machine.
-  (Only on Vista or later)
-
-********************************************************************/
-static BOOL FSupportProfiles()
-{
-    BOOL fSupportProfiles = FALSE;
-    INetFwRules* pNetFwRules = NULL;
-
-    // We only support profiles if we can co-create an instance of NetFwPolicy2. 
-    // This will not work on pre-vista machines.
-    if (SUCCEEDED(GetFirewallRules(TRUE, &pNetFwRules)) &&  pNetFwRules != NULL)
-    {
-        fSupportProfiles = TRUE;
-        ReleaseObject(pNetFwRules);
-    }
-
-    return fSupportProfiles;
-}
-
-/******************************************************************
- GetCurrentFirewallProfile - get the active firewall profile as an
-   INetFwProfile, which owns the lists of exceptions we're 
-   updating.
-
-********************************************************************/
-static HRESULT GetCurrentFirewallProfile(
-    __in BOOL fIgnoreFailures,
-    __out INetFwProfile** ppfwProfile
-    )
-{
-    HRESULT hr = S_OK;
-    INetFwMgr* pfwMgr = NULL;
-    INetFwPolicy* pfwPolicy = NULL;
-    INetFwProfile* pfwProfile = NULL;
-    *ppfwProfile = NULL;
-    
-    do
-    {
-        ReleaseNullObject(pfwPolicy);
-        ReleaseNullObject(pfwMgr);
-        ReleaseNullObject(pfwProfile);
-
-        if (SUCCEEDED(hr = ::CoCreateInstance(__uuidof(NetFwMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(INetFwMgr), (void**)&pfwMgr)) &&
-            SUCCEEDED(hr = pfwMgr->get_LocalPolicy(&pfwPolicy)) &&
-            SUCCEEDED(hr = pfwPolicy->get_CurrentProfile(&pfwProfile)))
-        {
-            break;
-        }
-        else if (fIgnoreFailures)
-        {
-            ExitFunction1(hr = S_FALSE);
-        }
-        else
-        {
-            WcaLog(LOGMSG_STANDARD, "Failed to connect to Windows Firewall");
-            UINT er = WcaErrorMessage(msierrFirewallCannotConnect, hr, INSTALLMESSAGE_ERROR | MB_ABORTRETRYIGNORE, 0);
-            switch (er)
-            {
-            case IDABORT: // exit with the current HRESULT
-                ExitFunction();
-            case IDRETRY: // clean up and retry the loop
-                hr = S_FALSE;
-                break;
-            case IDIGNORE: // pass S_FALSE back to the caller, who knows how to ignore the failure
-                ExitFunction1(hr = S_FALSE);
-            default: // No UI, so default is to fail.
-                ExitFunction();
-            }
-        }
-    } while (S_FALSE == hr);
-
-    *ppfwProfile = pfwProfile;
-    pfwProfile = NULL;
-    
-LExit:
-    ReleaseObject(pfwPolicy);
-    ReleaseObject(pfwMgr);
-    ReleaseObject(pfwProfile);
-
-    return hr;
-}
-
-/******************************************************************
  AddApplicationException
 
 ********************************************************************/
@@ -509,92 +425,6 @@ LExit:
 }
 
 /******************************************************************
- AddApplicationExceptionOnCurrentProfile
-
-********************************************************************/
-static HRESULT AddApplicationExceptionOnCurrentProfile(
-    __in LPCWSTR wzFile, 
-    __in LPCWSTR wzName, 
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in BOOL fIgnoreFailures
-    )
-{
-    HRESULT hr = S_OK;
-    BSTR bstrFile = NULL;
-    BSTR bstrName = NULL;
-    BSTR bstrRemoteAddresses = NULL;
-    INetFwProfile* pfwProfile = NULL;
-    INetFwAuthorizedApplications* pfwApps = NULL;
-    INetFwAuthorizedApplication* pfwApp = NULL;
-
-    // convert to BSTRs to make COM happy
-    bstrFile = ::SysAllocString(wzFile);
-    ExitOnNull(bstrFile, hr, E_OUTOFMEMORY, "failed SysAllocString for path");
-    bstrName = ::SysAllocString(wzName);
-    ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "failed SysAllocString for name");
-    bstrRemoteAddresses = ::SysAllocString(wzRemoteAddresses);
-    ExitOnNull(bstrRemoteAddresses, hr, E_OUTOFMEMORY, "failed SysAllocString for remote addresses");
-
-    // get the firewall profile, which is our entry point for adding exceptions
-    hr = GetCurrentFirewallProfile(fIgnoreFailures, &pfwProfile);
-    ExitOnFailure(hr, "failed to get firewall profile");
-    if (S_FALSE == hr) // user or package author chose to ignore missing firewall
-    {
-        ExitFunction();
-    }
-
-    // first, let's see if the app is already on the exception list
-    hr = pfwProfile->get_AuthorizedApplications(&pfwApps);
-    ExitOnFailure(hr, "failed to get list of authorized apps");
-
-    // try to find it (i.e., support reinstall)
-    hr = pfwApps->Item(bstrFile, &pfwApp);
-    if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
-    {
-        // not found, so we get to add it
-        hr = ::CoCreateInstance(__uuidof(NetFwAuthorizedApplication), NULL, CLSCTX_INPROC_SERVER, __uuidof(INetFwAuthorizedApplication), reinterpret_cast<void**>(&pfwApp));
-        ExitOnFailure(hr, "failed to create authorized app");
-
-        // set the display name
-        hr = pfwApp->put_Name(bstrName);
-        ExitOnFailure(hr, "failed to set authorized app name");
-
-        // set path
-        hr = pfwApp->put_ProcessImageFileName(bstrFile);
-        ExitOnFailure(hr, "failed to set authorized app path");
-
-        // set the allowed remote addresses
-        if (bstrRemoteAddresses && *bstrRemoteAddresses)
-        {
-            hr = pfwApp->put_RemoteAddresses(bstrRemoteAddresses);
-            ExitOnFailure(hr, "failed to set authorized app remote addresses");
-        }
-
-        // add it to the list of authorized apps
-        hr = pfwApps->Add(pfwApp);
-        ExitOnFailure(hr, "failed to add app to the authorized apps list");
-    }
-    else
-    {
-        // we found an existing app exception (if we succeeded, that is)
-        ExitOnFailure(hr, "failed trying to find existing app");
-
-        // enable it (just in case it was disabled)
-        pfwApp->put_Enabled(VARIANT_TRUE);
-    }
-
-LExit:
-    ReleaseBSTR(bstrRemoteAddresses);
-    ReleaseBSTR(bstrName);
-    ReleaseBSTR(bstrFile);
-    ReleaseObject(pfwApp);
-    ReleaseObject(pfwApps);
-    ReleaseObject(pfwProfile);
-
-    return fIgnoreFailures ? S_OK : hr;
-}
-
-/******************************************************************
  AddPortException
 
 ********************************************************************/
@@ -659,79 +489,11 @@ LExit:
 }
 
 /******************************************************************
- AddPortExceptionOnCurrentProfile
-
-********************************************************************/
-static HRESULT AddPortExceptionOnCurrentProfile(
-    __in LPCWSTR wzName,
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in BOOL fIgnoreFailures,
-    __in int iPort,
-    __in int iProtocol
-    )
-{
-    HRESULT hr = S_OK;
-    BSTR bstrName = NULL;
-    BSTR bstrRemoteAddresses = NULL;
-    INetFwProfile* pfwProfile = NULL;
-    INetFwOpenPorts* pfwPorts = NULL;
-    INetFwOpenPort* pfwPort = NULL;
-
-    // convert to BSTRs to make COM happy
-    bstrName = ::SysAllocString(wzName);
-    ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "failed SysAllocString for name");
-    bstrRemoteAddresses = ::SysAllocString(wzRemoteAddresses);
-    ExitOnNull(bstrRemoteAddresses, hr, E_OUTOFMEMORY, "failed SysAllocString for remote addresses");
-
-    // create and initialize a new open port object
-    hr = ::CoCreateInstance(__uuidof(NetFwOpenPort), NULL, CLSCTX_INPROC_SERVER, __uuidof(INetFwOpenPort), reinterpret_cast<void**>(&pfwPort));
-    ExitOnFailure(hr, "failed to create new open port");
-
-    hr = pfwPort->put_Port(iPort);
-    ExitOnFailure(hr, "failed to set exception port");
-
-    hr = pfwPort->put_Protocol(static_cast<NET_FW_IP_PROTOCOL>(iProtocol));
-    ExitOnFailure(hr, "failed to set exception protocol");
-
-    if (bstrRemoteAddresses && *bstrRemoteAddresses)
-    {
-        hr = pfwPort->put_RemoteAddresses(bstrRemoteAddresses);
-        ExitOnFailure(hr, "failed to set exception remote addresses '%ls'", bstrRemoteAddresses);
-    }
-
-    hr = pfwPort->put_Name(bstrName);
-    ExitOnFailure(hr, "failed to set exception name");
-
-    // get the firewall profile, its current list of open ports, and add ours
-    hr = GetCurrentFirewallProfile(fIgnoreFailures, &pfwProfile);
-    ExitOnFailure(hr, "failed to get firewall profile");
-    if (S_FALSE == hr) // user or package author chose to ignore missing firewall
-    {
-        ExitFunction();
-    }
-
-    hr = pfwProfile->get_GloballyOpenPorts(&pfwPorts);
-    ExitOnFailure(hr, "failed to get open ports");
-
-    hr = pfwPorts->Add(pfwPort);
-    ExitOnFailure(hr, "failed to add exception to global list");
-
-LExit:
-    ReleaseBSTR(bstrRemoteAddresses);
-    ReleaseBSTR(bstrName);
-    ReleaseObject(pfwProfile);
-    ReleaseObject(pfwPorts);
-    ReleaseObject(pfwPort);
-
-    return fIgnoreFailures ? S_OK : hr;
-}
-
-/******************************************************************
- RemoveException - Removes the exception rule with the given name.
+ RemoveException - Removes all exception rules with the given name.
 
 ********************************************************************/
 static HRESULT RemoveException(
-    __in LPCWSTR wzName, 
+    __in LPCWSTR wzName,
     __in BOOL fIgnoreFailures
     )
 {
@@ -751,199 +513,13 @@ static HRESULT RemoveException(
     }
 
     hr = pNetFwRules->Remove(bstrName);
-    ExitOnFailure(hr, "failed to remove authorized app");
+    ExitOnFailure(hr, "failed to remove firewall rule");
 
 LExit:
     ReleaseBSTR(bstrName);
     ReleaseObject(pNetFwRules);
 
     return fIgnoreFailures ? S_OK : hr;
-}
-
-/******************************************************************
- RemoveApplicationExceptionFromCurrentProfile
-
-********************************************************************/
-static HRESULT RemoveApplicationExceptionFromCurrentProfile(
-    __in LPCWSTR wzFile, 
-    __in BOOL fIgnoreFailures
-    )
-{
-    HRESULT hr = S_OK;
-    INetFwProfile* pfwProfile = NULL;
-    INetFwAuthorizedApplications* pfwApps = NULL;
-
-    // convert to BSTRs to make COM happy
-    BSTR bstrFile = ::SysAllocString(wzFile);
-    ExitOnNull(bstrFile, hr, E_OUTOFMEMORY, "failed SysAllocString for path");
-
-    // get the firewall profile, which is our entry point for removing exceptions
-    hr = GetCurrentFirewallProfile(fIgnoreFailures, &pfwProfile);
-    ExitOnFailure(hr, "failed to get firewall profile");
-    if (S_FALSE == hr) // user or package author chose to ignore missing firewall
-    {
-        ExitFunction();
-    }
-
-    // now get the list of app exceptions and remove the one
-    hr = pfwProfile->get_AuthorizedApplications(&pfwApps);
-    ExitOnFailure(hr, "failed to get list of authorized apps");
-
-    hr = pfwApps->Remove(bstrFile);
-    ExitOnFailure(hr, "failed to remove authorized app");
-
-LExit:
-    ReleaseBSTR(bstrFile);
-    ReleaseObject(pfwApps);
-    ReleaseObject(pfwProfile);
-
-    return fIgnoreFailures ? S_OK : hr;
-}
-
-/******************************************************************
- RemovePortExceptionFromCurrentProfile
-
-********************************************************************/
-static HRESULT RemovePortExceptionFromCurrentProfile(
-    __in int iPort,
-    __in int iProtocol,
-    __in BOOL fIgnoreFailures
-    )
-{
-    HRESULT hr = S_OK;
-    INetFwProfile* pfwProfile = NULL;
-    INetFwOpenPorts* pfwPorts = NULL;
-
-    // get the firewall profile, which is our entry point for adding exceptions
-    hr = GetCurrentFirewallProfile(fIgnoreFailures, &pfwProfile);
-    ExitOnFailure(hr, "failed to get firewall profile");
-    if (S_FALSE == hr) // user or package author chose to ignore missing firewall
-    {
-        ExitFunction();
-    }
-
-    hr = pfwProfile->get_GloballyOpenPorts(&pfwPorts);
-    ExitOnFailure(hr, "failed to get open ports");
-
-    hr = pfwPorts->Remove(iPort, static_cast<NET_FW_IP_PROTOCOL>(iProtocol));
-    ExitOnFailure(hr, "failed to remove open port %d, protocol %d", iPort, iProtocol);
-
-LExit:
-    return fIgnoreFailures ? S_OK : hr;
-}
-
-static HRESULT AddApplicationException(
-    __in BOOL fSupportProfiles,
-    __in LPCWSTR wzFile, 
-    __in LPCWSTR wzName,
-    __in int iProfile,
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in BOOL fIgnoreFailures,
-    __in LPCWSTR wzPort,
-    __in int iProtocol,
-    __in LPCWSTR wzDescription,
-    __in int iDirection
-)
-{
-    HRESULT hr = S_OK;
-
-    if (fSupportProfiles)
-    {
-        hr = AddApplicationException(wzFile, wzName, iProfile, wzRemoteAddresses, fIgnoreFailures, wzPort, iProtocol, wzDescription, iDirection);
-    }
-    else
-    {
-        if (0 != *wzPort || MSI_NULL_INTEGER != iProtocol)
-        {
-            // NOTE: This is treated as an error rather than either creating a rule based on just the application (no port), or 
-            // just the port because it is unclear what is the proper fall back. For example, suppose that you have code that 
-            // runs in dllhost.exe. Clearly falling back to opening all of dllhost is wrong. Because the firewall is a security
-            // feature, it seems better to require the MSI author to indicate the behavior that they want.
-            WcaLog(LOGMSG_STANDARD, "FirewallExtension: Cannot add firewall rule '%ls', which defines both an application and a port or protocol. Such a rule requires Microsoft Windows Vista or later.", wzName);
-            return fIgnoreFailures ? S_OK : E_NOTIMPL;
-        }
-
-        hr = AddApplicationExceptionOnCurrentProfile(wzFile, wzName, wzRemoteAddresses, fIgnoreFailures);
-    }
-
-    return hr;
-}
-
-static HRESULT AddPortException(
-    __in BOOL fSupportProfiles,
-    __in LPCWSTR wzName,
-    __in int iProfile,
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in BOOL fIgnoreFailures,
-    __in LPCWSTR wzPort,
-    __in int iProtocol,
-    __in LPCWSTR wzDescription,
-    __in int iDirection
-)
-{
-    HRESULT hr = S_OK;
-
-    if (fSupportProfiles)
-    {
-        hr = AddPortException(wzName, iProfile, wzRemoteAddresses, fIgnoreFailures, wzPort, iProtocol, wzDescription, iDirection);
-    }
-    else
-    {
-        hr = AddPortExceptionOnCurrentProfile(wzName, wzRemoteAddresses, fIgnoreFailures, wcstol(wzPort, NULL, 10), iProtocol);
-    }
-
-    return hr;
-}
-
-static HRESULT RemoveApplicationException(
-    __in BOOL fSupportProfiles,
-    __in LPCWSTR wzName,
-    __in LPCWSTR wzFile, 
-    __in BOOL fIgnoreFailures,
-    __in LPCWSTR wzPort,
-    __in int iProtocol
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (fSupportProfiles)
-    {
-        hr = RemoveException(wzName, fIgnoreFailures);
-    }
-    else
-    {
-        if (0 != *wzPort || MSI_NULL_INTEGER != iProtocol)
-        {
-            WcaLog(LOGMSG_STANDARD, "FirewallExtension: Cannot remove firewall rule '%ls', which defines both an application and a port or protocol. Such a rule requires Microsoft Windows Vista or later.", wzName);
-            return S_OK;
-        }
-
-        hr = RemoveApplicationExceptionFromCurrentProfile(wzFile, fIgnoreFailures);
-    }
-
-    return hr;
-}
-
-static HRESULT RemovePortException(
-    __in BOOL fSupportProfiles,
-    __in LPCWSTR wzName,
-    __in LPCWSTR wzPort,
-    __in int iProtocol,
-    __in BOOL fIgnoreFailures
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (fSupportProfiles)
-    {
-        hr = RemoveException(wzName, fIgnoreFailures);
-    }
-    else
-    {
-        hr = RemovePortExceptionFromCurrentProfile(wcstol(wzPort, NULL, 10), iProtocol, fIgnoreFailures);
-    }
-
-    return hr;
 }
 
 /******************************************************************
@@ -956,7 +532,6 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fSupportProfiles = FALSE;
     LPWSTR pwz = NULL;
     LPWSTR pwzCustomActionData = NULL;
     int iTodo = WCA_TODO_UNKNOWN;
@@ -981,9 +556,6 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
 
     hr = ::CoInitialize(NULL);
     ExitOnFailure(hr, "failed to initialize COM");
-
-    // Find out if we support profiles (only on Vista or later)
-    fSupportProfiles = FSupportProfiles();
 
     // loop through all the passed in data
     pwz = pwzCustomActionData;
@@ -1043,13 +615,13 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             case WCA_TODO_INSTALL:
             case WCA_TODO_REINSTALL:
                 WcaLog(LOGMSG_STANDARD, "Installing firewall exception2 %ls on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
-                hr = AddPortException(fSupportProfiles, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
+                hr = AddPortException(pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
                 ExitOnFailure(hr, "failed to add/update port exception for name '%ls' on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
                 break;
 
             case WCA_TODO_UNINSTALL:
                 WcaLog(LOGMSG_STANDARD, "Uninstalling firewall exception2 %ls on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
-                hr = RemovePortException(fSupportProfiles, pwzName, pwzPort, iProtocol, fIgnoreFailures);
+                hr = RemoveException(pwzName, fIgnoreFailures);
                 ExitOnFailure(hr, "failed to remove port exception for name '%ls' on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
                 break;
             }
@@ -1061,13 +633,13 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             case WCA_TODO_INSTALL:
             case WCA_TODO_REINSTALL:
                 WcaLog(LOGMSG_STANDARD, "Installing firewall exception2 %ls (%ls)", pwzName, pwzFile);
-                hr = AddApplicationException(fSupportProfiles, pwzFile, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
+                hr = AddApplicationException(pwzFile, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
                 ExitOnFailure(hr, "failed to add/update application exception for name '%ls', file '%ls'", pwzName, pwzFile);
                 break;
 
             case WCA_TODO_UNINSTALL:
                 WcaLog(LOGMSG_STANDARD, "Uninstalling firewall exception2 %ls (%ls)", pwzName, pwzFile);
-                hr = RemoveApplicationException(fSupportProfiles, pwzName, pwzFile, fIgnoreFailures, pwzPort, iProtocol);
+                hr = RemoveException(pwzName, fIgnoreFailures);
                 ExitOnFailure(hr, "failed to remove application exception for name '%ls', file '%ls'", pwzName, pwzFile);
                 break;
             }

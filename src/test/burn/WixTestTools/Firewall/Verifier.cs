@@ -254,7 +254,13 @@ namespace WixTestTools.Firewall
             rule.Enabled = false;
         }
 
-        public static void RemoveFirewallRulesByName(string name)
+        /// <summary>
+        /// Removes a firewall rule by name. If multiple rules with the same name exist, only one of them is removed.<br/>
+        /// This behavior is different from <b>netsh advfirewall firewall delete rule</b> where all matching rules are deleted if multiple matches are found.<br/>
+        /// The firewall rule name cannot be null or an empty string.
+        /// </summary>
+        /// <param name="name">Name of the firewall rule to be removed.</param>
+        public static void RemoveFirewallRuleByName(string name)
         {
             var rules = GetINetFwRules();
             rules.Remove(name);
