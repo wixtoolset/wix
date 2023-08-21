@@ -144,7 +144,7 @@ namespace WixToolsetTest.MsiE2E
             var product = this.CreatePackageInstaller("FirewallRules");
             product.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            Verifier.RemoveFirewallRulesByName("WiXToolset401 Test - 0002");
+            Verifier.RemoveFirewallRuleByName("WiXToolset401 Test - 0002");
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0002"));
 
             product.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
@@ -176,7 +176,7 @@ namespace WixToolsetTest.MsiE2E
             var product = this.CreatePackageInstaller("FirewallRules");
             product.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            Verifier.RemoveFirewallRulesByName("WiXToolset401 Test - 0001");
+            Verifier.RemoveFirewallRuleByName("WiXToolset401 Test - 0001");
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0001"));
 
             product.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
@@ -276,6 +276,44 @@ namespace WixToolsetTest.MsiE2E
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0003"));
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0004"));
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0005 - 9999"));
+        }
+
+        [RuntimeFact]
+        public void SucceedWhenIgnoreOnFailureIsSet()
+        {
+            var product = this.CreatePackageInstaller("IgnoreFailedFirewallRules");
+            var log1 = product.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0006 pipe"));
+            Assert.True(LogVerifier.MessageInLogFile(log1, "failed to add app to the authorized apps list"));
+
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0007 pipe"));
+            Assert.True(LogVerifier.MessageInLogFile(log1, "failed to add app to the authorized ports list"));
+
+            var expected = new RuleDetails("WiXToolset401 Test - 0008 removal")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = "test.exe",
+                Description = "WiX Toolset firewall exception rule integration test - removal test",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalPorts = "52390",
+                LocalAddresses = "*",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0008 removal", expected);
+            Verifier.RemoveFirewallRuleByName("WiXToolset401 Test - 0008 removal");
+
+            var log2 = product.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, "NORULENAME=1");
+            Assert.True(LogVerifier.MessageInLogFile(log2, "failed to remove firewall rule"));
         }
     }
 }
