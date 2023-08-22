@@ -10,7 +10,6 @@
     <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
     <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="deferred" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
     <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
-    <CustomAction Id="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" DllEntry="DotNetCompatibilityCheck" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
       <Custom Action="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" Before="InstallFiles" Overridable="yes" />
@@ -18,17 +17,24 @@
       <Custom Action="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled = 1" />
       <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled &lt;&gt; 1" />
       <Custom Action="$(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled = 1" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+    <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.netfxca.$(var.platform))netfxca.dll" />
+  </Fragment>
+
+  <Fragment>
+    <CustomAction Id="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" DllEntry="DotNetCompatibilityCheck" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
+
+    <InstallExecuteSequence>
       <Custom Action="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" Before="LaunchConditions" Overridable="yes" />
     </InstallExecuteSequence>
 
     <InstallUISequence>
       <Custom Action="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" Before="LaunchConditions" Overridable="yes" />
     </InstallUISequence>
-  </Fragment>
 
-  <!-- NetFx Custom Action DLL Definitions -->
-  <Fragment>
-    <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.netfxca.$(var.platform))netfxca.dll" />
     <Binary Id="$(var.Prefix)NetCheck_x86" SourceFile="!(bindpath.x86)NetCoreCheck.exe" />
     <Binary Id="$(var.Prefix)NetCheck_x64" SourceFile="!(bindpath.x64)NetCoreCheck.exe" />
     <Binary Id="$(var.Prefix)NetCheck_arm64" SourceFile="!(bindpath.arm64)NetCoreCheck.exe" />
