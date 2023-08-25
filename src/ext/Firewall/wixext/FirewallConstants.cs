@@ -2,12 +2,14 @@
 
 namespace WixToolset.Firewall
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+    using System.Xml.Linq;
 
     static class FirewallConstants
     {
+        internal static readonly XNamespace Namespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
+        internal static readonly XName FirewallExceptionName = Namespace + "FirewallException";
+        internal static readonly XName RemoteAddressName = Namespace + "RemoteAddress";
+
         // from icftypes.h
         public const int NET_FW_RULE_DIR_IN = 1;
         public const int NET_FW_RULE_DIR_OUT = 2;
