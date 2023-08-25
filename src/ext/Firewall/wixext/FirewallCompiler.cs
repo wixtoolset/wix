@@ -15,7 +15,7 @@ namespace WixToolset.Firewall
     /// </summary>
     public sealed class FirewallCompiler : BaseCompilerExtension
     {
-        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/firewall";
+        public override XNamespace Namespace => FirewallConstants.Namespace;
 
         /// <summary>
         /// Processes an element for the Compiler.

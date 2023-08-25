@@ -2,9 +2,11 @@
 
 namespace WixToolsetTest.Firewall
 {
+    using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
+    using System.Xml.Linq;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using WixToolset.Firewall;
     using Xunit;
 
@@ -50,6 +52,55 @@ namespace WixToolsetTest.Firewall
             }, results);
         }
 
+        [Fact]
+        public void CanRoundtripFirewallExceptions()
+        {
+            var folder = TestData.Get(@"TestData", "UsingFirewall");
+            var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
+            var output = Path.Combine(folder, "FirewallExceptionDecompile.xml");
+
+            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+
+            var doc = XDocument.Load(output);
+            var actual = doc.Descendants()
+                .Where(e => e.Name.Namespace == "http://wixtoolset.org/schemas/v4/wxs/firewall")
+                .Select(fe => new { Name = fe.Name.LocalName, Attributes = fe.Attributes().Select(a => $"{a.Name.LocalName}={a.Value}").ToArray() })
+                .ToArray();
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "FirewallException",
+                "FirewallException",
+            }, actual.Select(a => a.Name).ToArray());
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Id=ExampleFirewall",
+                "Name=ExampleApp",
+                "Scope=any",
+                "Port=42",
+                "Protocol=tcp",
+                "Program=[#filNdJBJmq3UCUIwmXS8x21aAsvqzk]",
+                "Profile=all",
+                "Description=An app-based firewall exception",
+                "Outbound=no",
+                "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
+            }, actual[0].Attributes);
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Id=fex70IVsYNnbwiHQrEepmdTPKH8XYs",
+                "Name=ExamplePort",
+                "Scope=localSubnet",
+                "Port=42",
+                "Protocol=tcp",
+                "Profile=all",
+                "Description=A port-based firewall exception",
+                "Outbound=yes",
+                "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
+            }, actual[1].Attributes);
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args);
@@ -63,6 +114,12 @@ namespace WixToolsetTest.Firewall
             newArgs.Add("arm64");
 
             var result = WixRunner.Execute(newArgs.ToArray());
+            result.AssertSuccess();
+        }
+
+        private static void Decompile(string[] args)
+        {
+            var result = WixRunner.Execute(args);
             result.AssertSuccess();
         }
     }
