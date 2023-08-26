@@ -135,7 +135,12 @@ namespace WixToolset.Firewall
                                     protocol = FirewallConstants.NET_FW_IP_PROTOCOL_UDP;
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Protocol", protocolValue, "tcp", "udp"));
+                                    int parsedProtocol;
+                                    if (!Int32.TryParse(protocolValue, out parsedProtocol) || parsedProtocol > 255 || parsedProtocol < 0)
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Protocol", protocolValue, "tcp", "udp", "0-255"));
+                                    }
+                                    protocol = parsedProtocol;
                                     break;
                             }
                             break;
@@ -149,8 +154,20 @@ namespace WixToolset.Firewall
                                 case "localSubnet":
                                     remoteAddresses = "LocalSubnet";
                                     break;
+                                case "DNS":
+                                    remoteAddresses = "dns";
+                                    break;
+                                case "DHCP":
+                                    remoteAddresses = "dhcp";
+                                    break;
+                                case "WINS":
+                                    remoteAddresses = "wins";
+                                    break;
+                                case "defaultGateway":
+                                    remoteAddresses = "DefaultGateway";
+                                    break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Scope", scope, "any", "localSubnet"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Scope", scope, "any", "localSubnet", "DNS", "DHCP", "WINS", "defaultGateway"));
                                     break;
                             }
                             break;
@@ -251,6 +268,21 @@ namespace WixToolset.Firewall
                 this.Messaging.Write(FirewallErrors.NoExceptionSpecified(sourceLineNumbers));
             }
 
+            // Ports can only be specified if the protocol is TCP or UDP.
+            if (!String.IsNullOrEmpty(port) && protocol.HasValue)
+            {
+                switch(protocol.Value)
+                {
+                    case FirewallConstants.NET_FW_IP_PROTOCOL_TCP:
+                    case FirewallConstants.NET_FW_IP_PROTOCOL_UDP:
+                        break;
+
+                    default:
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Port", "Protocol", protocol.Value.ToString()));
+                        break;
+                }
+            }
+
             if (!this.Messaging.EncounteredError)
             {
                 // at this point, File attribute and File parent element are treated the same
@@ -300,8 +332,8 @@ namespace WixToolset.Firewall
                     symbol.Attributes = attributes;
                 }
 
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4SchedFirewallExceptionsInstall", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4SchedFirewallExceptionsUninstall", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix5SchedFirewallExceptionsInstall", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix5SchedFirewallExceptionsUninstall", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
             }
         }
 
