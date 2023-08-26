@@ -8,6 +8,12 @@
 
     <?define Prefix="Wix4" ?>
 
+    <?ifdef Prefix5 ?>
+        <?undef Prefix5 ?>
+    <?endif?>
+
+    <?define Prefix5="Wix5" ?>
+
     <?ifndef platform ?>
         <?define platform="x86" ?>
     <?endif?>

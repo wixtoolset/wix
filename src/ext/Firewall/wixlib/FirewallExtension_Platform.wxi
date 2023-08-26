@@ -6,32 +6,32 @@
     <Fragment>
         <UIRef Id="WixFirewallErrors" />
         <UI>
-            <ProgressText Action="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixSchedFirewallExceptionsInstall)" />
-            <ProgressText Action="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixSchedFirewallExceptionsUninstall)" />
-            <ProgressText Action="$(var.Prefix)RollbackFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixRollbackFirewallExceptionsInstall)" />
-            <ProgressText Action="$(var.Prefix)ExecFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixExecFirewallExceptionsInstall)" />
-            <ProgressText Action="$(var.Prefix)RollbackFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixRollbackFirewallExceptionsUninstall)" />
-            <ProgressText Action="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixExecFirewallExceptionsUninstall)" />
+            <ProgressText Action="$(var.Prefix5)SchedFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixSchedFirewallExceptionsInstall)" />
+            <ProgressText Action="$(var.Prefix5)SchedFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixSchedFirewallExceptionsUninstall)" />
+            <ProgressText Action="$(var.Prefix5)RollbackFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixRollbackFirewallExceptionsInstall)" />
+            <ProgressText Action="$(var.Prefix5)ExecFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixExecFirewallExceptionsInstall)" />
+            <ProgressText Action="$(var.Prefix5)RollbackFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixRollbackFirewallExceptionsUninstall)" />
+            <ProgressText Action="$(var.Prefix5)ExecFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixExecFirewallExceptionsUninstall)" />
         </UI>
 
-        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" DllEntry="SchedFirewallExceptionsInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" DllEntry="SchedFirewallExceptionsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsInstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsInstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix5)SchedFirewallExceptionsInstall$(var.Suffix)" DllEntry="SchedFirewallExceptionsInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix5)SchedFirewallExceptionsUninstall$(var.Suffix)" DllEntry="SchedFirewallExceptionsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix5)RollbackFirewallExceptionsInstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix5)ExecFirewallExceptionsInstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix5)RollbackFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix5)ExecFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
 
         <!--
-            We need the firewall on Windows XP SP2 or later.
+            We need the firewall on Windows Vista or later.
         -->
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1 AND ServicePackLevel &gt;= 1)))" />
-            <Custom Action="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1 AND ServicePackLevel &gt;= 1)))" />
+            <Custom Action="$(var.Prefix5)SchedFirewallExceptionsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt;= 600" />
+            <Custom Action="$(var.Prefix5)SchedFirewallExceptionsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt;= 600" />
         </InstallExecuteSequence>
     </Fragment>
 
     <!-- Firewall Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="$(var.Prefix)FWCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))fwca.dll" />
+        <Binary Id="$(var.Prefix5)FWCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))fwca.dll" />
     </Fragment>
 </Include>
