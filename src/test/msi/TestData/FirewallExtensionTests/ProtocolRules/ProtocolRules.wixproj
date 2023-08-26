@@ -1,0 +1,13 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <UpgradeCode>{4D188568-1CCF-4EEE-BC27-17C3DCC83E58}</UpgradeCode>
+    <ProductComponentsRef>true</ProductComponentsRef>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Product.wxs" Link="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Firewall.wixext" />
+  </ItemGroup>
+</Project>

@@ -7,15 +7,15 @@ namespace WixToolset.Firewall
     public static class FirewallTableDefinitions
     {
         public static readonly TableDefinition WixFirewallException = new TableDefinition(
-            "Wix4FirewallException",
+            "Wix5FirewallException",
             FirewallSymbolDefinitions.WixFirewallException,
             new[]
             {
-                new ColumnDefinition("Wix4FirewallException", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Wix5FirewallException", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Localizable display name.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("RemoteAddresses", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Remote address to accept incoming connections from.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Port", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, minValue: 1, description: "Port number.", modularizeType: ColumnModularizeType.Property),
-                new ColumnDefinition("Protocol", ColumnType.Number, 1, primaryKey: false, nullable: true, ColumnCategory.Integer, minValue: 6, maxValue: 17, description: "Protocol (6=TCP; 17=UDP)."),
+                new ColumnDefinition("Protocol", ColumnType.Number, 1, primaryKey: false, nullable: true, ColumnCategory.Integer, minValue: 0, maxValue: 255, description: "Protocol (6=TCP; 17=UDP). https://www.iana.org/assignments/protocol-numbers"),
                 new ColumnDefinition("Program", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Exception for a program (formatted path name).", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Vital=1"),
                 new ColumnDefinition("Profile", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Integer, minValue: 1, maxValue: 2147483647, description: "Profile (1=domain; 2=private; 4=public; 2147483647=all)."),
