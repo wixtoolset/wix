@@ -28,7 +28,11 @@ namespace WixToolsetTest.Firewall
                 "CustomAction:Wix4SchedFirewallExceptionsInstall_X86\t1\tWix4FWCA_X86\tSchedFirewallExceptionsInstall\t",
                 "CustomAction:Wix4SchedFirewallExceptionsUninstall_X86\t1\tWix4FWCA_X86\tSchedFirewallExceptionsUninstall\t",
                 "Wix4FirewallException:ExampleFirewall\tExampleApp\t*\t42\t6\t[#filNdJBJmq3UCUIwmXS8x21aAsvqzk]\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tAn app-based firewall exception\t1",
+                "Wix4FirewallException:fex_ZpDsnKyHlYiA24JHzvFxm3uLZ8\tExampleDefaultGatewayScope\tDefaultGateway\t4432\t6\t\t0\t2\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tdefaultGateway scope firewall exception\t1",
+                "Wix4FirewallException:fex6bkfWwpiRGI.wVFx0T7W4LXIHxU\tExampleDHCPScope\tdhcp\t\t211\ttest.exe\t0\t4\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tDHCP scope firewall exception\t1",
                 "Wix4FirewallException:fex70IVsYNnbwiHQrEepmdTPKH8XYs\tExamplePort\tLocalSubnet\t42\t6\t\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tA port-based firewall exception\t2",
+                "Wix4FirewallException:fexXxaXCXXFh.UxO_BjmZxi1B1du_Q\tExampleWINSScope\twins\t6573\t6\t\t0\t1\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tWINS scope firewall exception\t1",
+                "Wix4FirewallException:fexxY71H2ZBkPalv7uid1Yy4qaA_lA\tExampleDNSScope\tdns\t356\t17\t\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tDNS scope firewall exception\t1",
             }, results);
         }
 
@@ -48,7 +52,11 @@ namespace WixToolsetTest.Firewall
                 "CustomAction:Wix4SchedFirewallExceptionsInstall_A64\t1\tWix4FWCA_A64\tSchedFirewallExceptionsInstall\t",
                 "CustomAction:Wix4SchedFirewallExceptionsUninstall_A64\t1\tWix4FWCA_A64\tSchedFirewallExceptionsUninstall\t",
                 "Wix4FirewallException:ExampleFirewall\tExampleApp\t*\t42\t6\t[#filNdJBJmq3UCUIwmXS8x21aAsvqzk]\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tAn app-based firewall exception\t1",
+                "Wix4FirewallException:fex_ZpDsnKyHlYiA24JHzvFxm3uLZ8\tExampleDefaultGatewayScope\tDefaultGateway\t4432\t6\t\t0\t2\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tdefaultGateway scope firewall exception\t1",
+                "Wix4FirewallException:fex6bkfWwpiRGI.wVFx0T7W4LXIHxU\tExampleDHCPScope\tdhcp\t\t211\ttest.exe\t0\t4\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tDHCP scope firewall exception\t1",
                 "Wix4FirewallException:fex70IVsYNnbwiHQrEepmdTPKH8XYs\tExamplePort\tLocalSubnet\t42\t6\t\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tA port-based firewall exception\t2",
+                "Wix4FirewallException:fexXxaXCXXFh.UxO_BjmZxi1B1du_Q\tExampleWINSScope\twins\t6573\t6\t\t0\t1\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tWINS scope firewall exception\t1",
+                "Wix4FirewallException:fexxY71H2ZBkPalv7uid1Yy4qaA_lA\tExampleDNSScope\tdns\t356\t17\t\t0\t2147483647\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tDNS scope firewall exception\t1",
             }, results);
         }
 
@@ -71,8 +79,17 @@ namespace WixToolsetTest.Firewall
             {
                 "FirewallException",
                 "FirewallException",
+                "FirewallException",
+                "FirewallException",
+                "FirewallException",
+                "FirewallException",
             }, actual.Select(a => a.Name).ToArray());
+        }
 
+        [Fact]
+        public void RoundtripAttributesAreCorrectForApp()
+        {
+            var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleApp");
             WixAssert.CompareLineByLine(new[]
             {
                 "Id=ExampleFirewall",
@@ -85,8 +102,13 @@ namespace WixToolsetTest.Firewall
                 "Description=An app-based firewall exception",
                 "Outbound=no",
                 "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
-            }, actual[0].Attributes);
+            }, actual.Attributes);
+        }
 
+        [Fact]
+        public void RoundtripAttributesAreCorrectForPort()
+        {
+            var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExamplePort");
             WixAssert.CompareLineByLine(new[]
             {
                 "Id=fex70IVsYNnbwiHQrEepmdTPKH8XYs",
@@ -98,7 +120,79 @@ namespace WixToolsetTest.Firewall
                 "Description=A port-based firewall exception",
                 "Outbound=yes",
                 "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
-            }, actual[1].Attributes);
+            }, actual.Attributes);
+        }
+
+        [Fact]
+        public void RoundtripAttributesAreCorrectForDNSScope()
+        {
+            var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleDNSScope");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Id=fexxY71H2ZBkPalv7uid1Yy4qaA_lA",
+                "Name=ExampleDNSScope",
+                "Scope=DNS",
+                "Port=356",
+                "Protocol=udp",
+                "Profile=all",
+                "Description=DNS scope firewall exception",
+                "Outbound=no",
+                "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
+            }, actual.Attributes);
+        }
+
+        [Fact]
+        public void RoundtripAttributesAreCorrectForDHCPScope()
+        {
+            var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleDHCPScope");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Id=fex6bkfWwpiRGI.wVFx0T7W4LXIHxU",
+                "Name=ExampleDHCPScope",
+                "Scope=DHCP",
+                "Protocol=211",
+                "Program=test.exe",
+                "Profile=public",
+                "Description=DHCP scope firewall exception",
+                "Outbound=no",
+                "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall"
+            }, actual.Attributes);
+        }
+
+        [Fact]
+        public void RoundtripAttributesAreCorrectForWINSScope()
+        {
+            var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleWINSScope");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Id=fexXxaXCXXFh.UxO_BjmZxi1B1du_Q",
+                "Name=ExampleWINSScope",
+                "Scope=WINS",
+                "Port=6573",
+                "Protocol=tcp",
+                "Profile=domain",
+                "Description=WINS scope firewall exception",
+                "Outbound=no",
+                "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
+            }, actual.Attributes);
+        }
+
+        [Fact]
+        public void RoundtripAttributesAreCorrectForDefaultGatewayScope()
+        {
+            var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleDefaultGatewayScope");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Id=fex_ZpDsnKyHlYiA24JHzvFxm3uLZ8",
+                "Name=ExampleDefaultGatewayScope",
+                "Scope=defaultGateway",
+                "Port=4432",
+                "Protocol=tcp",
+                "Profile=private",
+                "Description=defaultGateway scope firewall exception",
+                "Outbound=no",
+                "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
+            }, actual.Attributes);
         }
 
         private static void Build(string[] args)
@@ -121,6 +215,32 @@ namespace WixToolsetTest.Firewall
         {
             var result = WixRunner.Execute(args);
             result.AssertSuccess();
+        }
+        class AttributeVerifier
+        {
+            public string Name { get; set; }
+            public string[] Attributes { get; set; }
+        }
+
+        private static AttributeVerifier BuildAndDecompileAndBuild(string nameSpace, string ruleName)
+        {
+            var folder = TestData.Get(@"TestData", "UsingFirewall");
+            var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
+            var output = Path.Combine(folder, $"Firewall{ruleName}.xml");
+
+            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+
+            var doc = XDocument.Load(output);
+            var actual = doc.Descendants()
+                .Where(e => e.Name.Namespace == nameSpace)
+                .Select(fe => new AttributeVerifier
+                {
+                    Name = fe.Attributes().Single(a => a.Name.LocalName == "Name").Value,
+                    Attributes = fe.Attributes().Select(a => $"{a.Name.LocalName}={a.Value}").ToArray()
+                })
+                .Single(av => av.Name == ruleName);
+
+            return actual;
         }
     }
 }

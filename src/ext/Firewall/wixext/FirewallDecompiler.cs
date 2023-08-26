@@ -69,18 +69,29 @@ namespace WixToolset.Firewall
                     string[] addresses = ((string)row[2]).Split(',');
                     if (addresses.Length == 1)
                     {
-                        // special-case the Scope attribute values
-                        if (addresses[0] == "*")
+                        switch(addresses[0])
                         {
-                            firewallException.Add(new XAttribute("Scope", "any"));
-                        }
-                        else if (addresses[0] == "LocalSubnet")
-                        {
-                            firewallException.Add(new XAttribute("Scope", "localSubnet"));
-                        }
-                        else
-                        {
-                            FirewallDecompiler.AddRemoteAddress(firewallException, addresses[0]);
+                            case "*":
+                                firewallException.Add(new XAttribute("Scope", "any"));
+                                break;
+                            case "LocalSubnet":
+                                firewallException.Add(new XAttribute("Scope", "localSubnet"));
+                                break;
+                            case "dns":
+                                firewallException.Add(new XAttribute("Scope", "DNS"));
+                                break;
+                            case "dhcp":
+                                firewallException.Add(new XAttribute("Scope", "DHCP"));
+                                break;
+                            case "wins":
+                                firewallException.Add(new XAttribute("Scope", "WINS"));
+                                break;
+                            case "DefaultGateway":
+                                firewallException.Add(new XAttribute("Scope", "defaultGateway"));
+                                break;
+                            default:
+                                FirewallDecompiler.AddRemoteAddress(firewallException, addresses[0]);
+                                break;
                         }
                     }
                     else
@@ -106,6 +117,9 @@ namespace WixToolset.Firewall
                             break;
                         case FirewallConstants.NET_FW_IP_PROTOCOL_UDP:
                             firewallException.Add(new XAttribute("Protocol", "udp"));
+                            break;
+                        default:
+                            firewallException.Add(new XAttribute("Protocol", row[4]));
                             break;
                     }
                 }

@@ -1,0 +1,33 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="FirewallComponent1"/>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="FirewallComponent1" Guid="515AEDF0-A656-4006-8CE5-848ECCC680BD" Directory="INSTALLFOLDER">
+            <fw:FirewallException Id="FirewallException12"
+                Description="WiX Toolset firewall exception rule integration test - scope any"
+                Name="WiXToolset401 Test - 0012" Scope="any" Port="1200" />
+            <fw:FirewallException Id="FirewallException13"
+                Description="WiX Toolset firewall exception rule integration test - scope local subnet"
+                Name="WiXToolset401 Test - 0013" Scope="localSubnet" Port="1300" />
+            <fw:FirewallException Id="FirewallException14"
+                Description="WiX Toolset firewall exception rule integration test - scope DNS"
+                Name="WiXToolset401 Test - 0014" Scope="DNS" Port="1400" />
+            <fw:FirewallException Id="FirewallException15"
+                Description="WiX Toolset firewall exception rule integration test - scope DHCP"
+                Name="WiXToolset401 Test - 0015" Scope="DHCP" Port="1500" />
+            <fw:FirewallException Id="FirewallException16"
+                Description="WiX Toolset firewall exception rule integration test - scope WINS"
+                Name="WiXToolset401 Test - 0016" Scope="WINS" Port="1600"  />
+            <fw:FirewallException Id="FirewallException17"
+                Description="WiX Toolset firewall exception rule integration test - scope default gateway"
+                Name="WiXToolset401 Test - 0017" Scope="defaultGateway" Port="1700"  />
+        </Component>
+    </Fragment>
+</Wix>
