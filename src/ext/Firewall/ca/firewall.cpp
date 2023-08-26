@@ -8,6 +8,20 @@ enum eFirewallExceptionQuery { feqName = 1, feqRemoteAddresses, feqPort, feqProt
 enum eFirewallExceptionTarget { fetPort = 1, fetApplication, fetUnknown };
 enum eFirewallExceptionAttributes { feaIgnoreFailures = 1 };
 
+struct FIREWALL_EXCEPTION_ATTRIBUTES
+{
+    LPWSTR pwzName;
+
+    LPWSTR pwzRemoteAddresses;
+    LPWSTR pwzPort;
+    int iProtocol;
+    LPWSTR pwzProgram;
+    int iAttributes;
+    int iProfile;
+    LPWSTR pwzDescription;
+    int iDirection;
+};
+
 /******************************************************************
  SchedFirewallExceptions - immediate custom action worker to 
    register and remove firewall exceptions.
@@ -26,17 +40,9 @@ static UINT SchedFirewallExceptions(
     PMSIHANDLE hRec = NULL;
 
     LPWSTR pwzCustomActionData = NULL;
-    LPWSTR pwzName = NULL;
-    LPWSTR pwzRemoteAddresses = NULL;
-    LPWSTR pwzPort = NULL;
-    int iProtocol = 0;
-    int iAttributes = 0;
-    int iProfile = 0;
-    LPWSTR pwzProgram = NULL;
     LPWSTR pwzComponent = NULL;
-    LPWSTR pwzFormattedFile = NULL;
-    LPWSTR pwzDescription = NULL;
-    int iDirection = MSI_NULL_INTEGER;
+
+    FIREWALL_EXCEPTION_ATTRIBUTES attrs = { 0 };
 
     // initialize
     hr = WcaInitialize(hInstall, "SchedFirewallExceptions");
@@ -55,34 +61,34 @@ static UINT SchedFirewallExceptions(
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
-        hr = WcaGetRecordFormattedString(hRec, feqName, &pwzName);
+        hr = WcaGetRecordFormattedString(hRec, feqName, &attrs.pwzName);
         ExitOnFailure(hr, "Failed to get firewall exception name.");
 
-        hr = WcaGetRecordFormattedString(hRec, feqRemoteAddresses, &pwzRemoteAddresses);
+        hr = WcaGetRecordFormattedString(hRec, feqRemoteAddresses, &attrs.pwzRemoteAddresses);
         ExitOnFailure(hr, "Failed to get firewall exception remote addresses.");
 
-        hr = WcaGetRecordFormattedString(hRec, feqPort, &pwzPort);
+        hr = WcaGetRecordFormattedString(hRec, feqPort, &attrs.pwzPort);
         ExitOnFailure(hr, "Failed to get firewall exception port.");
 
-        hr = WcaGetRecordInteger(hRec, feqProtocol, &iProtocol);
+        hr = WcaGetRecordInteger(hRec, feqProtocol, &attrs.iProtocol);
         ExitOnFailure(hr, "Failed to get firewall exception protocol.");
 
-        hr = WcaGetRecordFormattedString(hRec, feqProgram, &pwzProgram);
+        hr = WcaGetRecordFormattedString(hRec, feqProgram, &attrs.pwzProgram);
         ExitOnFailure(hr, "Failed to get firewall exception program.");
 
-        hr = WcaGetRecordInteger(hRec, feqAttributes, &iAttributes);
+        hr = WcaGetRecordInteger(hRec, feqAttributes, &attrs.iAttributes);
         ExitOnFailure(hr, "Failed to get firewall exception attributes.");
         
-        hr = WcaGetRecordInteger(hRec, feqProfile, &iProfile);
+        hr = WcaGetRecordInteger(hRec, feqProfile, &attrs.iProfile);
         ExitOnFailure(hr, "Failed to get firewall exception profile.");
 
         hr = WcaGetRecordString(hRec, feqComponent, &pwzComponent);
         ExitOnFailure(hr, "Failed to get firewall exception component.");
 
-        hr = WcaGetRecordFormattedString(hRec, feqDescription, &pwzDescription);
+        hr = WcaGetRecordFormattedString(hRec, feqDescription, &attrs.pwzDescription);
         ExitOnFailure(hr, "Failed to get firewall exception description.");
 
-        hr = WcaGetRecordInteger(hRec, feqDirection, &iDirection);
+        hr = WcaGetRecordInteger(hRec, feqDirection, &attrs.iDirection);
         ExitOnFailure(hr, "Failed to get firewall exception direction.");
 
         // figure out what we're doing for this exception, treating reinstall the same as install
@@ -98,25 +104,25 @@ static UINT SchedFirewallExceptions(
         hr = WcaWriteIntegerToCaData(todoComponent, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write exception action to custom action data");
 
-        hr = WcaWriteStringToCaData(pwzName, &pwzCustomActionData);
+        hr = WcaWriteStringToCaData(attrs.pwzName, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write exception name to custom action data");
 
-        hr = WcaWriteIntegerToCaData(iProfile, &pwzCustomActionData);
+        hr = WcaWriteIntegerToCaData(attrs.iProfile, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write exception profile to custom action data");
 
-        hr = WcaWriteStringToCaData(pwzRemoteAddresses, &pwzCustomActionData);
+        hr = WcaWriteStringToCaData(attrs.pwzRemoteAddresses, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write exception remote addresses to custom action data");
 
-        hr = WcaWriteIntegerToCaData(iAttributes, &pwzCustomActionData);
+        hr = WcaWriteIntegerToCaData(attrs.iAttributes, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write exception attributes to custom action data");
 
-        if (*pwzProgram)
+        if (*attrs.pwzProgram)
         {
             // If program is defined, we have an application exception.
             hr = WcaWriteIntegerToCaData(fetApplication, &pwzCustomActionData);
             ExitOnFailure(hr, "failed to write exception target (application) to custom action data");
 
-            hr = WcaWriteStringToCaData(pwzProgram, &pwzCustomActionData);
+            hr = WcaWriteStringToCaData(attrs.pwzProgram, &pwzCustomActionData);
             ExitOnFailure(hr, "failed to write application path to custom action data");
         }
         else
@@ -126,16 +132,16 @@ static UINT SchedFirewallExceptions(
             ExitOnFailure(hr, "failed to write exception target (port) to custom action data");
         }
 
-        hr = WcaWriteStringToCaData(pwzPort, &pwzCustomActionData);
+        hr = WcaWriteStringToCaData(attrs.pwzPort, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write application path to custom action data");
 
-        hr = WcaWriteIntegerToCaData(iProtocol, &pwzCustomActionData);
+        hr = WcaWriteIntegerToCaData(attrs.iProtocol, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write exception protocol to custom action data");
 
-        hr = WcaWriteStringToCaData(pwzDescription, &pwzCustomActionData);
+        hr = WcaWriteStringToCaData(attrs.pwzDescription, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write firewall rule description to custom action data");
 
-        hr = WcaWriteIntegerToCaData(iDirection, &pwzCustomActionData);
+        hr = WcaWriteIntegerToCaData(attrs.iDirection, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write firewall rule direction to custom action data");
     }
 
@@ -172,14 +178,13 @@ static UINT SchedFirewallExceptions(
     }
 
 LExit:
-    ReleaseStr(pwzCustomActionData);
-    ReleaseStr(pwzName);
-    ReleaseStr(pwzRemoteAddresses);
-    ReleaseStr(pwzPort);
-    ReleaseStr(pwzProgram);
+    ReleaseStr(attrs.pwzName);
+    ReleaseStr(attrs.pwzRemoteAddresses);
+    ReleaseStr(attrs.pwzPort);
+    ReleaseStr(attrs.pwzProgram);
+    ReleaseStr(attrs.pwzDescription);
     ReleaseStr(pwzComponent);
-    ReleaseStr(pwzDescription);
-    ReleaseStr(pwzFormattedFile);
+    ReleaseStr(pwzCustomActionData);
 
     return WcaFinalize(er = FAILED(hr) ? ERROR_INSTALL_FAILURE : er);
 }
@@ -272,12 +277,7 @@ LExit:
 ********************************************************************/
 static HRESULT CreateFwRuleObject(
     __in BSTR bstrName,
-    __in int iProfile,
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in LPCWSTR wzPort,
-    __in int iProtocol,
-    __in LPCWSTR wzDescription,
-    __in int iDirection,
+    __in FIREWALL_EXCEPTION_ATTRIBUTES const& attrs,
     __out INetFwRule** ppNetFwRule
     )
 {
@@ -289,11 +289,11 @@ static HRESULT CreateFwRuleObject(
     *ppNetFwRule = NULL;
 
     // convert to BSTRs to make COM happy
-    bstrRemoteAddresses = ::SysAllocString(wzRemoteAddresses);
+    bstrRemoteAddresses = ::SysAllocString(attrs.pwzRemoteAddresses);
     ExitOnNull(bstrRemoteAddresses, hr, E_OUTOFMEMORY, "failed SysAllocString for remote addresses");
-    bstrPort = ::SysAllocString(wzPort);
+    bstrPort = ::SysAllocString(attrs.pwzPort);
     ExitOnNull(bstrPort, hr, E_OUTOFMEMORY, "failed SysAllocString for port");
-    bstrDescription = ::SysAllocString(wzDescription);
+    bstrDescription = ::SysAllocString(attrs.pwzDescription);
     ExitOnNull(bstrDescription, hr, E_OUTOFMEMORY, "failed SysAllocString for description");
 
     hr = ::CoCreateInstance(__uuidof(NetFwRule), NULL, CLSCTX_ALL, __uuidof(INetFwRule), (void**)&pNetFwRule);
@@ -302,12 +302,12 @@ static HRESULT CreateFwRuleObject(
     hr = pNetFwRule->put_Name(bstrName);
     ExitOnFailure(hr, "failed to set exception name");
 
-    hr = pNetFwRule->put_Profiles(static_cast<NET_FW_PROFILE_TYPE2>(iProfile));
+    hr = pNetFwRule->put_Profiles(static_cast<NET_FW_PROFILE_TYPE2>(attrs.iProfile));
     ExitOnFailure(hr, "failed to set exception profile");
 
-    if (MSI_NULL_INTEGER != iProtocol)
+    if (MSI_NULL_INTEGER != attrs.iProtocol)
     {
-        hr = pNetFwRule->put_Protocol(static_cast<NET_FW_IP_PROTOCOL>(iProtocol));
+        hr = pNetFwRule->put_Protocol(static_cast<NET_FW_IP_PROTOCOL>(attrs.iProtocol));
         ExitOnFailure(hr, "failed to set exception protocol");
     }
 
@@ -329,9 +329,9 @@ static HRESULT CreateFwRuleObject(
         ExitOnFailure(hr, "failed to set exception description '%ls'", bstrDescription);
     }
 
-    if (MSI_NULL_INTEGER != iDirection)
+    if (MSI_NULL_INTEGER != attrs.iDirection)
     {
-        hr = pNetFwRule->put_Direction(static_cast<NET_FW_RULE_DIRECTION> (iDirection));
+        hr = pNetFwRule->put_Direction(static_cast<NET_FW_RULE_DIRECTION> (attrs.iDirection));
         ExitOnFailure(hr, "failed to set exception direction");
     }
 
@@ -352,15 +352,8 @@ LExit:
 
 ********************************************************************/
 static HRESULT AddApplicationException(
-    __in LPCWSTR wzFile, 
-    __in LPCWSTR wzName,
-    __in int iProfile,
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in BOOL fIgnoreFailures,
-    __in LPCWSTR wzPort,
-    __in int iProtocol,
-    __in LPCWSTR wzDescription,
-    __in int iDirection
+    __in FIREWALL_EXCEPTION_ATTRIBUTES const& attrs,
+    __in BOOL fIgnoreFailures
     )
 {
     HRESULT hr = S_OK;
@@ -370,9 +363,9 @@ static HRESULT AddApplicationException(
     INetFwRule* pNetFwRule = NULL;
 
     // convert to BSTRs to make COM happy
-    bstrFile = ::SysAllocString(wzFile);
+    bstrFile = ::SysAllocString(attrs.pwzProgram);
     ExitOnNull(bstrFile, hr, E_OUTOFMEMORY, "failed SysAllocString for path");
-    bstrName = ::SysAllocString(wzName);
+    bstrName = ::SysAllocString(attrs.pwzName);
     ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "failed SysAllocString for name");
 
     // get the collection of firewall rules
@@ -387,7 +380,7 @@ static HRESULT AddApplicationException(
     hr = pNetFwRules->Item(bstrName, &pNetFwRule);
     if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
     {
-        hr = CreateFwRuleObject(bstrName, iProfile, wzRemoteAddresses, wzPort, iProtocol, wzDescription, iDirection, &pNetFwRule);
+        hr = CreateFwRuleObject(bstrName, attrs, &pNetFwRule);
         ExitOnFailure(hr, "failed to create FwRule object");
 
         // set edge traversal to true
@@ -429,15 +422,9 @@ LExit:
 
 ********************************************************************/
 static HRESULT AddPortException(
-    __in LPCWSTR wzName,
-    __in int iProfile,
-    __in_opt LPCWSTR wzRemoteAddresses,
-    __in BOOL fIgnoreFailures,
-    __in LPCWSTR wzPort,
-    __in int iProtocol,
-    __in LPCWSTR wzDescription,
-    __in int iDirection
-)
+    __in FIREWALL_EXCEPTION_ATTRIBUTES const& attrs,
+    __in BOOL fIgnoreFailures
+    )
 {
     HRESULT hr = S_OK;
     BSTR bstrName = NULL;
@@ -445,7 +432,7 @@ static HRESULT AddPortException(
     INetFwRule* pNetFwRule = NULL;
 
     // convert to BSTRs to make COM happy
-    bstrName = ::SysAllocString(wzName);
+    bstrName = ::SysAllocString(attrs.pwzName);
     ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "failed SysAllocString for name");
 
     // get the collection of firewall rules
@@ -460,7 +447,7 @@ static HRESULT AddPortException(
     hr = pNetFwRules->Item(bstrName, &pNetFwRule);
     if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
     {
-        hr = CreateFwRuleObject(bstrName, iProfile, wzRemoteAddresses, wzPort, iProtocol, wzDescription, iDirection, &pNetFwRule);
+        hr = CreateFwRuleObject(bstrName, attrs, &pNetFwRule);
         ExitOnFailure(hr, "failed to create FwRule object");
 
         // enable it
@@ -535,16 +522,9 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
     LPWSTR pwz = NULL;
     LPWSTR pwzCustomActionData = NULL;
     int iTodo = WCA_TODO_UNKNOWN;
-    LPWSTR pwzName = NULL;
-    LPWSTR pwzRemoteAddresses = NULL;
-    int iAttributes = 0;
     int iTarget = fetUnknown;
-    LPWSTR pwzFile = NULL;
-    LPWSTR pwzPort = NULL;
-    LPWSTR pwzDescription = NULL;
-    int iProtocol = 0;
-    int iProfile = 0;
-    int iDirection = 0;
+
+    FIREWALL_EXCEPTION_ATTRIBUTES attrs = { 0 };
 
     // initialize
     hr = WcaInitialize(hInstall, "ExecFirewallExceptions");
@@ -576,35 +556,35 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             }
         }
 
-        hr = WcaReadStringFromCaData(&pwz, &pwzName);
+        hr = WcaReadStringFromCaData(&pwz, &attrs.pwzName);
         ExitOnFailure(hr, "failed to read name from custom action data");
 
-        hr = WcaReadIntegerFromCaData(&pwz, &iProfile);
+        hr = WcaReadIntegerFromCaData(&pwz, &attrs.iProfile);
         ExitOnFailure(hr, "failed to read profile from custom action data");
 
-        hr = WcaReadStringFromCaData(&pwz, &pwzRemoteAddresses);
+        hr = WcaReadStringFromCaData(&pwz, &attrs.pwzRemoteAddresses);
         ExitOnFailure(hr, "failed to read remote addresses from custom action data");
 
-        hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
+        hr = WcaReadIntegerFromCaData(&pwz, &attrs.iAttributes);
         ExitOnFailure(hr, "failed to read attributes from custom action data");
-        BOOL fIgnoreFailures = feaIgnoreFailures == (iAttributes & feaIgnoreFailures);
+        BOOL fIgnoreFailures = feaIgnoreFailures == (attrs.iAttributes & feaIgnoreFailures);
 
         hr = WcaReadIntegerFromCaData(&pwz, &iTarget);
         ExitOnFailure(hr, "failed to read target from custom action data");
 
         if (iTarget == fetApplication)
         {
-            hr = WcaReadStringFromCaData(&pwz, &pwzFile);
+            hr = WcaReadStringFromCaData(&pwz, &attrs.pwzProgram);
             ExitOnFailure(hr, "failed to read file path from custom action data");
         }
 
-        hr = WcaReadStringFromCaData(&pwz, &pwzPort);
+        hr = WcaReadStringFromCaData(&pwz, &attrs.pwzPort);
         ExitOnFailure(hr, "failed to read port from custom action data");
-        hr = WcaReadIntegerFromCaData(&pwz, &iProtocol);
+        hr = WcaReadIntegerFromCaData(&pwz, &attrs.iProtocol);
         ExitOnFailure(hr, "failed to read protocol from custom action data");
-        hr = WcaReadStringFromCaData(&pwz, &pwzDescription);
+        hr = WcaReadStringFromCaData(&pwz, &attrs.pwzDescription);
         ExitOnFailure(hr, "failed to read protocol from custom action data");
-        hr = WcaReadIntegerFromCaData(&pwz, &iDirection);
+        hr = WcaReadIntegerFromCaData(&pwz, &attrs.iDirection);
         ExitOnFailure(hr, "failed to read direction from custom action data");
 
         switch (iTarget)
@@ -614,15 +594,15 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             {
             case WCA_TODO_INSTALL:
             case WCA_TODO_REINSTALL:
-                WcaLog(LOGMSG_STANDARD, "Installing firewall exception2 %ls on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
-                hr = AddPortException(pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
-                ExitOnFailure(hr, "failed to add/update port exception for name '%ls' on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
+                WcaLog(LOGMSG_STANDARD, "Installing firewall exception %ls on port %ls, protocol %d", attrs.pwzName, attrs.pwzPort, attrs.iProtocol);
+                hr = AddPortException(attrs, fIgnoreFailures);
+                ExitOnFailure(hr, "failed to add/update port exception for name '%ls' on port %ls, protocol %d", attrs.pwzName, attrs.pwzPort, attrs.iProtocol);
                 break;
 
             case WCA_TODO_UNINSTALL:
-                WcaLog(LOGMSG_STANDARD, "Uninstalling firewall exception2 %ls on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
-                hr = RemoveException(pwzName, fIgnoreFailures);
-                ExitOnFailure(hr, "failed to remove port exception for name '%ls' on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
+                WcaLog(LOGMSG_STANDARD, "Uninstalling firewall exception %ls on port %ls, protocol %d", attrs.pwzName, attrs.pwzPort, attrs.iProtocol);
+                hr = RemoveException(attrs.pwzName, fIgnoreFailures);
+                ExitOnFailure(hr, "failed to remove port exception for name '%ls' on port %ls, protocol %d", attrs.pwzName, attrs.pwzPort, attrs.iProtocol);
                 break;
             }
             break;
@@ -632,15 +612,15 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             {
             case WCA_TODO_INSTALL:
             case WCA_TODO_REINSTALL:
-                WcaLog(LOGMSG_STANDARD, "Installing firewall exception2 %ls (%ls)", pwzName, pwzFile);
-                hr = AddApplicationException(pwzFile, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
-                ExitOnFailure(hr, "failed to add/update application exception for name '%ls', file '%ls'", pwzName, pwzFile);
+                WcaLog(LOGMSG_STANDARD, "Installing firewall exception %ls (%ls)", attrs.pwzName, attrs.pwzProgram);
+                hr = AddApplicationException(attrs, fIgnoreFailures);
+                ExitOnFailure(hr, "failed to add/update application exception for name '%ls', file '%ls'", attrs.pwzName, attrs.pwzProgram);
                 break;
 
             case WCA_TODO_UNINSTALL:
-                WcaLog(LOGMSG_STANDARD, "Uninstalling firewall exception2 %ls (%ls)", pwzName, pwzFile);
-                hr = RemoveException(pwzName, fIgnoreFailures);
-                ExitOnFailure(hr, "failed to remove application exception for name '%ls', file '%ls'", pwzName, pwzFile);
+                WcaLog(LOGMSG_STANDARD, "Uninstalling firewall exception %ls (%ls)", attrs.pwzName, attrs.pwzProgram);
+                hr = RemoveException(attrs.pwzName, fIgnoreFailures);
+                ExitOnFailure(hr, "failed to remove application exception for name '%ls', file '%ls'", attrs.pwzName, attrs.pwzProgram);
                 break;
             }
             break;
@@ -649,11 +629,11 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
 
 LExit:
     ReleaseStr(pwzCustomActionData);
-    ReleaseStr(pwzName);
-    ReleaseStr(pwzRemoteAddresses);
-    ReleaseStr(pwzFile);
-    ReleaseStr(pwzPort);
-    ReleaseStr(pwzDescription);
+    ReleaseStr(attrs.pwzName);
+    ReleaseStr(attrs.pwzRemoteAddresses);
+    ReleaseStr(attrs.pwzProgram);
+    ReleaseStr(attrs.pwzPort);
+    ReleaseStr(attrs.pwzDescription);
     ::CoUninitialize();
 
     return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILURE : ERROR_SUCCESS);
