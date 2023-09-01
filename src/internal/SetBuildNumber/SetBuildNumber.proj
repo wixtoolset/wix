@@ -22,14 +22,33 @@
       GitThisAssembly;
       SetGlobalJson;
       SetDirectoryPackagesProps;
-      SetOverallWixVersions
+      SetOverallWixVersions;
+      TransformWixAppConfig
     </SetBuildNumbersDependsOn>
 
     <GlobalJsonPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\global.json))</GlobalJsonPath>
     <CentralPackageVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\Directory.Packages.props))</CentralPackageVersionsPath>
     <OverallWixVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\wixver.props))</OverallWixVersionsPath>
     <GitInfoThisAssemblyFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\ThisAssembly.WixVer.cs))</GitInfoThisAssemblyFile>
+    <WixAppConfigTransform>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\wix\wix\app.config))</WixAppConfigTransform>
   </PropertyGroup>
+
+  <Target Name="TransformWixAppConfig"
+          Inputs="transform.wix.app.config"
+          Outputs="$(WixAppConfigTransform)">
+    <PropertyGroup>
+	  <OverallWixAppConfigHeader></OverallWixAppConfigHeader>
+      <OverallWixAppConfigText>$([System.IO.File]::ReadAllText(transform.wix.app.config))</OverallWixAppConfigText>
+      <OverallWixAppConfigText>$(OverallWixAppConfigText.Replace('{GitBaseVersionMajor}', $(GitBaseVersionMajor)))</OverallWixAppConfigText>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(WixAppConfigTransform)"
+                      Lines="$(OverallWixAppConfigHeader);$(OverallWixAppConfigText)"
+					  WriteOnlyWhenDifferent="true"
+                      Overwrite="true" />
+
+    <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(WixAppConfigTransform)" />
+  </Target>
 
   <Target Name="SetGlobalJson"
           Inputs="global.json.pp"
@@ -50,7 +69,7 @@
 
     <WriteLinesToFile File="$(GlobalJsonPath)"
                       Lines="$(GlobaJsonTextHeader);$(GlobalJsonText)"
-                      Overwrite="true" 
+                      Overwrite="true"
                       WriteOnlyWhenDifferent="true" />
 
     <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(GlobalJsonPath)" />
@@ -74,7 +93,7 @@
 
     <WriteLinesToFile File="$(CentralPackageVersionsPath)"
                       Lines="$(CentralPackageVersionsTextHeader);$(CentralPackageVersionsText)"
-                      Overwrite="true" 
+                      Overwrite="true"
                       WriteOnlyWhenDifferent="true" />
 
     <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(CentralPackageVersionsPath)" />
@@ -98,7 +117,7 @@
 
     <WriteLinesToFile File="$(OverallWixVersionsPath)"
                       Lines="$(OverallWixVersionsTextHeader);$(OverallWixVersionsText)"
-                      Overwrite="true" 
+                      Overwrite="true"
                       WriteOnlyWhenDifferent="true" />
 
     <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(OverallWixVersionsPath)" />
