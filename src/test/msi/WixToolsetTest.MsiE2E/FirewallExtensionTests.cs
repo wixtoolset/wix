@@ -532,5 +532,232 @@ namespace WixToolsetTest.MsiE2E
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0016"));
             Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0017"));
         }
+
+        [RuntimeFact]
+        public void CanInstallAndUninstallFirewallRulesPackagedByDifferentModules()
+        {
+            var product = this.CreatePackageInstaller("en-US\\CrossVersionMerge");
+            product.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            // Validate new firewall exception details.
+            var expected1 = new RuleDetails("WiXToolset401 Test - 0018")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "MsiPackage", "file1.txt"),
+                Description = "WiX Toolset firewall exception rule integration test - module 401 MergeRedirectFolder - app",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "40101",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0018", expected1);
+
+            var expected2 = new RuleDetails("WiXToolset401 Test - 0019")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                Description = "WiX Toolset firewall exception rule integration test - module 401 MergeRedirectFolder - port",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = false,
+                EdgeTraversalOptions = 0,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "40102",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0019", expected2);
+
+            var expected3 = new RuleDetails("WiXToolset401 Test - 0020")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "MsiPackage", "file2.txt"),
+                Description = "WiX Toolset firewall exception rule integration test - module 401 NotTheMergeRedirectFolder - app",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "40103",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0020", expected3);
+
+            var expected4 = new RuleDetails("WiXToolset401 Test - 0021")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                Description = "WiX Toolset firewall exception rule integration test - module 401 NotTheMergeRedirectFolder - port",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = false,
+                EdgeTraversalOptions = 0,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "40104",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset401 Test - 0021", expected4);
+
+            var expected5 = new RuleDetails("WiXToolset Test - 0022")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "MsiPackage", "file1.txt"),
+                Description = "WiX Toolset firewall exception rule integration test - module MergeRedirectFolder - app",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "50001",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset Test - 0022", expected5);
+
+            var expected6 = new RuleDetails("WiXToolset Test - 0023")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                Description = "WiX Toolset firewall exception rule integration test - module MergeRedirectFolder - port",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = false,
+                EdgeTraversalOptions = 0,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "50002",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset Test - 0023", expected6);
+
+            var expected7 = new RuleDetails("WiXToolset Test - 0024")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "MsiPackage", "file2.txt"),
+                Description = "WiX Toolset firewall exception rule integration test - module NotTheMergeRedirectFolder - app",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "50003",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset Test - 0024", expected7);
+
+            var expected8 = new RuleDetails("WiXToolset Test - 0025")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                Description = "WiX Toolset firewall exception rule integration test - module NotTheMergeRedirectFolder - port",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = false,
+                EdgeTraversalOptions = 0,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "50004",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset Test - 0025", expected8);
+
+            var expected9 = new RuleDetails("WiXToolset Test - 0026")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                ApplicationName = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "MsiPackage", "package.wxs"),
+                Description = "WiX Toolset firewall exception rule integration test - package app",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = true,
+                EdgeTraversalOptions = 1,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "20001",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset Test - 0026", expected9);
+
+            var expected10 = new RuleDetails("WiXToolset Test - 0027")
+            {
+                Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW,
+                Description = "WiX Toolset firewall exception rule integration test - package port",
+                Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN,
+                EdgeTraversal = false,
+                EdgeTraversalOptions = 0,
+                Enabled = true,
+                InterfaceTypes = "All",
+                LocalAddresses = "*",
+                LocalPorts = "20002",
+                Profiles = Int32.MaxValue,
+                Protocol = 6,
+                RemoteAddresses = "*",
+                RemotePorts = "*",
+                SecureFlags = 0,
+            };
+
+            Verifier.VerifyFirewallRule("WiXToolset Test - 0027", expected10);
+
+            product.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            // verify the firewall exceptions have been removed.
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0018"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0019"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0020"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset401 Test - 0021"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset Test - 0022"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset Test - 0023"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset Test - 0024"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset Test - 0025"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset Test - 0026"));
+            Assert.False(Verifier.FirewallRuleExists("WiXToolset Test - 0027"));
+        }
     }
 }
