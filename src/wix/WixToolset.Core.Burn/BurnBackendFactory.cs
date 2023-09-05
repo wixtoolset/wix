@@ -18,6 +18,7 @@ namespace WixToolset.Core.Burn
             switch (outputType.ToLowerInvariant())
             {
                 case "bundle":
+                case "burn":
                 case ".exe":
                     backend = new BundleBackend();
                     return true;

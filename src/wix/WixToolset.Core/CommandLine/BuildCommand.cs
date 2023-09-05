@@ -312,9 +312,17 @@ namespace WixToolset.Core.CommandLine
                     context.IntermediateFolder = this.IntermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
                     context.OutputPath = this.OutputPath;
+                    context.OutputType = this.commandLine.OutputType;
                     context.PdbType = inputsOutputs.PdbType;
                     context.PdbPath = inputsOutputs.PdbPath;
                     context.CancellationToken = cancellationToken;
+
+                    if (String.IsNullOrEmpty(context.OutputType))
+                    {
+                        var entrySection = context.IntermediateRepresentation.Sections.First();
+
+                        context.OutputType = entrySection.Type.ToString();
+                    }
 
                     var binder = this.ServiceProvider.GetService<IBinder>();
                     bindResult = binder.Bind(context);

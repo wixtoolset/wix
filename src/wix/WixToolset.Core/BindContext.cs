@@ -42,6 +42,8 @@ namespace WixToolset.Core
 
         public string OutputPath { get; set; }
 
+        public string OutputType { get; set; }
+
         public PdbType PdbType { get; set; }
 
         public string PdbPath { get; set; }
