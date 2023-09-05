@@ -26,6 +26,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.UnableToOpenFile, "Unable to open file: {0}. Error detail: {1}", path, detail);
         }
 
+        public static Message BackendNotFound(string outputType, string outputPath)
+        {
+            return Message(null, Ids.BackendNotFound, "Unable to find a backend to process output type: {0} for output file: {1}. Specify a different output type or output file extension.", outputType, outputPath);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -37,6 +42,7 @@ namespace WixToolset.Core
             UnableToDeleteFile = 7011,
             UnableToMoveFile = 7012,
             UnableToOpenFile = 7013,
+            BackendNotFound = 7014,
         } // last available is 7099. 7100 is WindowsInstallerBackendWarnings.
     }
 }

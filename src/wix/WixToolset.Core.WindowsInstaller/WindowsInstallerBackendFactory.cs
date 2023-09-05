@@ -18,6 +18,7 @@ namespace WixToolset.Core.WindowsInstaller
             switch (outputType?.ToLowerInvariant())
             {
                 case "module":
+                case "msm":
                 case ".msm":
                     backend = new MsmBackend();
                     return true;
@@ -25,11 +26,14 @@ namespace WixToolset.Core.WindowsInstaller
                 case "msipackage":
                 case "package":
                 case "product":
+                case "msi":
                 case ".msi":
                     backend = new MsiBackend();
                     return true;
 
+                case "msppackage":
                 case "patch":
+                case "msp":
                 case ".msp":
                     backend = new MspBackend();
                     return true;

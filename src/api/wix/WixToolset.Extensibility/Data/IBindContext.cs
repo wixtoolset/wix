@@ -73,6 +73,11 @@ namespace WixToolset.Extensibility.Data
         string OutputPath { get; set; }
 
         /// <summary>
+        /// Output type to bind to.
+        /// </summary>
+        string OutputType { get; set; }
+
+        /// <summary>
         /// Type of PDB to create.
         /// </summary>
         PdbType PdbType { get; set; }

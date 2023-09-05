@@ -58,18 +58,18 @@ namespace WixToolset.Core
 
             var backendFactories = extensionManager.GetServices<IBackendFactory>();
 
-            var entrySection = context.IntermediateRepresentation.Sections.First();
-
             foreach (var factory in backendFactories)
             {
-                if (factory.TryCreateBackend(entrySection.Type.ToString(), context.OutputPath, out var backend))
+                if (factory.TryCreateBackend(context.OutputType, context.OutputPath, out var backend))
                 {
                     var result = backend.Bind(context);
                     return result;
                 }
             }
 
-            // TODO: messaging that a backend could not be found to bind the output type?
+            var messaging = context.ServiceProvider.GetService<IMessaging>();
+
+            messaging.Write(CoreErrors.BackendNotFound(context.OutputType, context.OutputPath));
 
             return null;
         }
