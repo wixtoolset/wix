@@ -316,6 +316,11 @@ namespace WixToolset.Core.CommandLine
                     context.PdbPath = inputsOutputs.PdbPath;
                     context.CancellationToken = cancellationToken;
 
+                    if (context is BindContext bindContext)
+                    {
+                        bindContext.OutputType = this.commandLine.OutputType;
+                    }
+
                     var binder = this.ServiceProvider.GetService<IBinder>();
                     bindResult = binder.Bind(context);
                 }

@@ -222,6 +222,39 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildWithUnknownOutputType()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var outputPath = Path.Combine(intermediateFolder, @"test.pkg");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SimplePackage", "SimplePackage.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-outputType", "invalid",
+                    "-o", outputPath,
+                });
+
+                var messages = result.Messages.Select(m => m.ToString()).ToList();
+                messages.Sort();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"Unable to find a backend to process output type: invalid for output file: <folder>\test.pkg. Specify a different output type or output file extension.",
+                }, messages.Select(s => s.Replace(intermediateFolder, "<folder>")).ToArray());
+
+                Assert.Equal(7014, result.ExitCode);
+            }
+        }
+
+        [Fact]
         public void GuardsAgainstVariousBundleValuesFromLoc()
         {
             var folder = TestData.Get(@"TestData");
