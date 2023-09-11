@@ -12,8 +12,6 @@ namespace WixToolset.Firewall
 
     public static partial class FirewallSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out FirewallSymbolDefinitionType type))

@@ -36,8 +36,6 @@ namespace WixToolset.ComPlus
 
     public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out ComPlusSymbolDefinitionType type))

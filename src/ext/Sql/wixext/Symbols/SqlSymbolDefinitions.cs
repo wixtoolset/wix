@@ -15,8 +15,6 @@ namespace WixToolset.Sql
 
     public static partial class SqlSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out SqlSymbolDefinitionType type))

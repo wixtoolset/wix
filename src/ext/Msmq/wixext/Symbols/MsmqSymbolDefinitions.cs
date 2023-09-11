@@ -14,8 +14,6 @@ namespace WixToolset.Msmq
 
     public static partial class MsmqSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out MsmqSymbolDefinitionType type))
