@@ -2256,6 +2256,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalInnerText, "The {0} element contains inner text which is obsolete. Use the {1} attribute instead.", elementName, attributeName);
         }
 
+        public static Message IllegalAttributeWhenNested(SourceLineNumber sourceLineNumbers, string attributeName)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalAttributeWhenNested, "The File element contains an attribute '{0}' that cannot be used in a File element that is a child of a Component element.", attributeName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);

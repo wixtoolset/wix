@@ -32,6 +32,7 @@ namespace WixToolset.Core.Link
                 return;
             }
 
+            // If a directory with id INSTALLFOLDER hasn't been authored, provide a default one.
             if (!this.Find.SymbolsByName.ContainsKey(WixStandardInstallFolderReference))
             {
                 var sourceLineNumber = new SourceLineNumber("DefaultInstallFolder");
@@ -51,6 +52,9 @@ namespace WixToolset.Core.Link
                 );
             }
 
+            // If an upgrade hasn't been authored and the upgrade strategy is MajorUpgrade,
+            // conjure a default major upgrade with the stdlib localization string for the
+            // downgrade error message.
             var symbols = this.Sections.SelectMany(section => section.Symbols);
             var upgradeSymbols = symbols.OfType<UpgradeSymbol>();
             if (!upgradeSymbols.Any())

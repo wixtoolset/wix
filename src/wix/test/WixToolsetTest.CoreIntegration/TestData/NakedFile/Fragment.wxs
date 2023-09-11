@@ -1,0 +1,24 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+        <FeatureGroupRef Id="FeatureGroup1" />
+        <PropertyRef Id="Property2" />
+    </Package>
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+
+    <Fragment>
+        <FeatureGroup Id="FeatureGroup1" />
+        <File Id="test.txt" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="test.txt" />
+    </Fragment>
+
+    <Fragment>
+        <Property Id="Property2" Hidden="yes" />
+        <File Id="test2.txt" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="test.txt" Name="test2.txt" />
+    </Fragment>
+</Wix>

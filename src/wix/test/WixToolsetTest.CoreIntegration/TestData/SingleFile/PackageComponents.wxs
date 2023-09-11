@@ -2,9 +2,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-            <Component>
-                <File Source="test.txt" />
-            </Component>
+            <File Source="test.txt" />
+            
             <Component Id="Shared.dll" Shared="yes">
                 <File Name="Shared.dll" Source="test.txt" />
             </Component>

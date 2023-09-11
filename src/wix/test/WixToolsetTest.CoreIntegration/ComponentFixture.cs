@@ -41,34 +41,5 @@ namespace WixToolsetTest.CoreIntegration
                 }, errors.Select(e => e.Id).ToArray());
             }
         }
-
-        [Fact]
-        public void CannotBuildMissingDirectoryAttributeWithSubdirectory()
-        {
-            var folder = TestData.Get(@"TestData");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var msiPath = Path.Combine(baseFolder, "bin", "test.msi");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "Component", "MissingDirectoryWithSubdirectory.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", msiPath
-                });
-
-                var errors = result.Messages.Select(m => m.ToString()).ToArray();
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "The Component/@Directory attribute was not found; it is required."
-                }, errors);
-            }
-        }
     }
 }

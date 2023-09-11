@@ -4,6 +4,7 @@ namespace WixToolset.Core.Link
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -11,6 +12,7 @@ namespace WixToolset.Core.Link
     /// <summary>
     /// Symbol with section representing a single unique symbol.
     /// </summary>
+    [DebuggerDisplay("{Symbol.DebuggerDisplay}")]
     internal class SymbolWithSection
     {
         private List<WixSimpleReferenceSymbol> directReferences;
