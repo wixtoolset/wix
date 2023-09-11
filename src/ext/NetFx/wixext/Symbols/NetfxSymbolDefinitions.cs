@@ -17,8 +17,6 @@ namespace WixToolset.Netfx
 
     public static partial class NetfxSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out NetfxSymbolDefinitionType type))

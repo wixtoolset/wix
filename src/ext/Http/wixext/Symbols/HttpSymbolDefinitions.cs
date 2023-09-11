@@ -14,8 +14,6 @@ namespace WixToolset.Http
 
     public static partial class HttpSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out HttpSymbolDefinitionType type))

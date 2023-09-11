@@ -418,8 +418,6 @@ namespace TablesAndSymbols
                 "",
                 "    public static partial class {3}SymbolDefinitions",
                 "    {",
-                "        public static readonly Version Version = new Version(\"4.0.0\");",
-                "",
                 "        public static IntermediateSymbolDefinition ByName(string name)",
                 "        {",
                 "            if (!Enum.TryParse(name, out {3}SymbolDefinitionType type))",

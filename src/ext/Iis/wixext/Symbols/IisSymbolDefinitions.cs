@@ -29,8 +29,6 @@ namespace WixToolset.Iis
 
     public static partial class IisSymbolDefinitions
     {
-        public static readonly Version Version = new Version("4.0.0");
-
         public static IntermediateSymbolDefinition ByName(string name)
         {
             if (!Enum.TryParse(name, out IisSymbolDefinitionType type))
