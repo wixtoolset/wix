@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+    <Feature Id="ProductFeature">
+      <File Id="FILE1" Condition="FILE1" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="test.txt" />
+      <File Id="FILE2" Condition="FILE2" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="test.txt" Name="test2.txt" />
+    </Feature>
+  </Package>
+</Wix>

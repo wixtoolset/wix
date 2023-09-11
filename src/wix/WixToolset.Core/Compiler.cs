@@ -2427,6 +2427,7 @@ namespace WixToolset.Core
                                     keyBit = ComponentKeyPathType.File;
                                     keyPossible = possibleKeyPath.Id;
                                     break;
+
                                 case PossibleKeyPathType.Directory:
                                     keyBit = ComponentKeyPathType.Directory;
                                     keyPossible = String.Empty;
@@ -2581,8 +2582,8 @@ namespace WixToolset.Core
         /// Parses a component group element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="parentType"></param>
-        /// <param name="parentId"></param>
+        /// <param name="parentType">Type of complex reference parent. Will be Unknown if there is no parent.</param>
+        /// <param name="parentId">Optional identifier for primary parent.</param>
         private void ParseComponentGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -2648,6 +2649,9 @@ namespace WixToolset.Core
                         break;
                     case "Component":
                         this.ParseComponentElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null, CompilerConstants.IntegerNotSet, directoryId, source);
+                        break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -3867,6 +3871,9 @@ namespace WixToolset.Core
                     case "Directory":
                         this.ParseDirectoryElement(child, id.Id, diskId, fileSource);
                         break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
+                        break;
                     case "Merge":
                         this.ParseMergeElement(child, id.Id, diskId);
                         break;
@@ -3978,6 +3985,9 @@ namespace WixToolset.Core
                         break;
                     case "Directory":
                         this.ParseDirectoryElement(child, id, diskId, fileSource);
+                        break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
                         break;
                     case "Merge":
                         this.ParseMergeElement(child, id, diskId);
@@ -4416,6 +4426,9 @@ namespace WixToolset.Core
                     case "FeatureRef":
                         this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id.Id);
                         break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
+                        break;
                     case "Level":
                         this.ParseLevelElement(child, id.Id);
                         break;
@@ -4556,6 +4569,9 @@ namespace WixToolset.Core
                     case "FeatureRef":
                         this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id);
                         break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id, null, null);
+                        break;
                     case "MergeRef":
                         this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id);
                         break;
@@ -4640,6 +4656,9 @@ namespace WixToolset.Core
                         break;
                     case "FeatureRef":
                         this.ParseFeatureRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
+                        break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null, null);
                         break;
                     case "MergeRef":
                         this.ParseMergeRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
@@ -5024,9 +5043,8 @@ namespace WixToolset.Core
             }
         }
 
-
         /// <summary>
-        /// Parses a file element.
+        /// Parses a File element's attributes.
         /// </summary>
         /// <param name="node">File element to parse.</param>
         /// <param name="componentId">Parent's component id.</param>
@@ -5034,10 +5052,12 @@ namespace WixToolset.Core
         /// <param name="diskId">Disk id inherited from parent component.</param>
         /// <param name="sourcePath">Default source path of parent directory.</param>
         /// <param name="possibleKeyPath">This will be set with the possible keyPath for the parent component.</param>
-        /// <param name="win64Component">true if the component is 64-bit.</param>
-        /// <param name="componentGuid"></param>
+        /// <param name="componentGuid">Component GUID (including `*`).</param>
+        /// <param name="isNakedFile">Whether the File element being parsed is outside a Component element.</param>
+        /// <param name="fileSymbol">Outgoing file symbol containing parsed attributes.</param>
+        /// <param name="assemblySymbol">Outgoing assembly symbol containing parsed attributes.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, bool win64Component, string componentGuid)
+        private YesNoType ParseFileElementAttributes(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, string componentGuid, bool isNakedFile, out FileSymbol fileSymbol, out AssemblySymbol assemblySymbol)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -5078,12 +5098,25 @@ namespace WixToolset.Core
             var source = sourcePath;   // assume we'll use the parents as the source for this file
             var sourceSet = false;
 
+            fileSymbol = null;
+            assemblySymbol = null;
+
             foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
+                    case "Bitness":
+                    case "Condition":
+                    case "Directory":
+                    case "Subdirectory":
+                        // Naked files handle their attributes in ParseNakedFileElement.
+                        if (!isNakedFile)
+                        {
+                            this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, attrib.Name.LocalName));
+                        }
+                        break;
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
@@ -5324,6 +5357,113 @@ namespace WixToolset.Core
                 }
             }
 
+            if (!this.Core.EncounteredError)
+            {
+                var patchAttributes = PatchAttributeType.None;
+                if (patchIgnore)
+                {
+                    patchAttributes |= PatchAttributeType.Ignore;
+                }
+                if (patchIncludeWholeFile)
+                {
+                    patchAttributes |= PatchAttributeType.IncludeWholeFile;
+                }
+                if (patchAllowIgnoreOnError)
+                {
+                    patchAttributes |= PatchAttributeType.AllowIgnoreOnError;
+                }
+
+                if (String.IsNullOrEmpty(source))
+                {
+                    source = name;
+                }
+                else if (source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)) // if source relies on parent directories, append the file name
+                {
+                    source = Path.Combine(source, name);
+                }
+
+                var attributes = FileSymbolAttributes.None;
+                attributes |= readOnly ? FileSymbolAttributes.ReadOnly : 0;
+                attributes |= hidden ? FileSymbolAttributes.Hidden : 0;
+                attributes |= system ? FileSymbolAttributes.System : 0;
+                attributes |= vital ? FileSymbolAttributes.Vital : 0;
+                attributes |= checksum ? FileSymbolAttributes.Checksum : 0;
+                attributes |= compressed.HasValue && compressed == true ? FileSymbolAttributes.Compressed : 0;
+                attributes |= compressed.HasValue && compressed == false ? FileSymbolAttributes.Uncompressed : 0;
+
+                fileSymbol = new FileSymbol(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Name = name,
+                    ShortName = shortName,
+                    FileSize = defaultSize,
+                    Version = companionFile ?? defaultVersion,
+                    Language = defaultLanguage,
+                    Attributes = attributes,
+
+                    DirectoryRef = directoryId,
+                    DiskId = (CompilerConstants.IntegerNotSet == diskId) ? null : (int?)diskId,
+                    Source = new IntermediateFieldPathValue { Path = source },
+
+                    FontTitle = fontTitle,
+                    SelfRegCost = selfRegCost,
+                    BindPath = bindPath,
+
+                    PatchGroup = (CompilerConstants.IntegerNotSet == patchGroup) ? null : (int?)patchGroup,
+                    PatchAttributes = patchAttributes,
+
+                    // Delta patching information
+                    RetainLengths = protectLengths,
+                    IgnoreOffsets = ignoreOffsets,
+                    IgnoreLengths = ignoreLengths,
+                    RetainOffsets = protectOffsets,
+                    SymbolPaths = symbols,
+                };
+
+                if (AssemblyType.NotAnAssembly != assemblyType)
+                {
+                    assemblySymbol = new AssemblySymbol(sourceLineNumbers, id)
+                    {
+                        ComponentRef = componentId,
+                        FeatureRef = Guid.Empty.ToString("B"),
+                        ManifestFileRef = assemblyManifest,
+                        ApplicationFileRef = assemblyApplication,
+                        Type = assemblyType,
+                        ProcessorArchitecture = procArch,
+                    };
+                }
+            }
+
+            if (CompilerConstants.IntegerNotSet != diskId)
+            {
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
+            }
+
+            // If this component does not have a companion file this file is a possible keypath.
+            possibleKeyPath = null;
+            if (null == companionFile)
+            {
+                possibleKeyPath = id.Id;
+            }
+
+            return keyPath;
+        }
+
+        /// <param name="node">File element to parse.</param>
+        /// <param name="fileSymbol">The partially-parsed file symbol.</param>
+        /// <param name="keyPath">Whether the file is the keypath of its component.</param>
+        /// <param name="win64Component">true if the component is 64-bit.</param>
+        private void ParseFileElementChildren(XElement node, FileSymbol fileSymbol, YesNoType keyPath, bool win64Component)
+        {
+            var directoryId = fileSymbol.DirectoryRef;
+            var componentId = fileSymbol.ComponentRef;
+            var id = fileSymbol.Id;
+            var ignoreOffsets = fileSymbol.IgnoreOffsets;
+            var ignoreLengths = fileSymbol.IgnoreLengths;
+            var protectOffsets = fileSymbol.RetainOffsets;
+            var protectLengths = fileSymbol.RetainLengths;
+            var symbols = fileSymbol.SymbolPaths;
+
             foreach (var child in node.Elements())
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
@@ -5388,96 +5528,140 @@ namespace WixToolset.Core
                 }
             }
 
+            fileSymbol.IgnoreOffsets = ignoreOffsets;
+            fileSymbol.IgnoreLengths = ignoreLengths;
+            fileSymbol.RetainOffsets = protectOffsets;
+            fileSymbol.RetainLengths = protectLengths;
+            fileSymbol.SymbolPaths = symbols;
+        }
+
+
+        /// <summary>
+        /// Parses a File element.
+        /// </summary>
+        /// <param name="node">File element to parse.</param>
+        /// <param name="componentId">Parent's component id.</param>
+        /// <param name="directoryId">Ancestor's directory id.</param>
+        /// <param name="diskId">Disk id inherited from parent component.</param>
+        /// <param name="sourcePath">Default source path of parent directory.</param>
+        /// <param name="possibleKeyPath">This will be set with the possible keyPath for the parent component.</param>
+        /// <param name="win64Component">true if the component is 64-bit.</param>
+        /// <param name="componentGuid">Component GUID (including `*`).</param>
+        /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
+        private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, bool win64Component, string componentGuid)
+        {
+            var keyPath = this.ParseFileElementAttributes(node, componentId, directoryId, diskId, sourcePath, out possibleKeyPath, componentGuid, isNakedFile: false, out var fileSymbol, out var assemblySymbol);
+
             if (!this.Core.EncounteredError)
             {
-                var patchAttributes = PatchAttributeType.None;
-                if (patchIgnore)
+                this.Core.AddSymbol(fileSymbol);
+
+                if (assemblySymbol != null)
                 {
-                    patchAttributes |= PatchAttributeType.Ignore;
-                }
-                if (patchIncludeWholeFile)
-                {
-                    patchAttributes |= PatchAttributeType.IncludeWholeFile;
-                }
-                if (patchAllowIgnoreOnError)
-                {
-                    patchAttributes |= PatchAttributeType.AllowIgnoreOnError;
+                    this.Core.AddSymbol(assemblySymbol);
                 }
 
-                if (String.IsNullOrEmpty(source))
-                {
-                    source = name;
-                }
-                else if (source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)) // if source relies on parent directories, append the file name
-                {
-                    source = Path.Combine(source, name);
-                }
-
-                var attributes = FileSymbolAttributes.None;
-                attributes |= readOnly ? FileSymbolAttributes.ReadOnly : 0;
-                attributes |= hidden ? FileSymbolAttributes.Hidden : 0;
-                attributes |= system ? FileSymbolAttributes.System : 0;
-                attributes |= vital ? FileSymbolAttributes.Vital : 0;
-                attributes |= checksum ? FileSymbolAttributes.Checksum : 0;
-                attributes |= compressed.HasValue && compressed == true ? FileSymbolAttributes.Compressed : 0;
-                attributes |= compressed.HasValue && compressed == false ? FileSymbolAttributes.Uncompressed : 0;
-
-                this.Core.AddSymbol(new FileSymbol(sourceLineNumbers, id)
-                {
-                    ComponentRef = componentId,
-                    Name = name,
-                    ShortName = shortName,
-                    FileSize = defaultSize,
-                    Version = companionFile ?? defaultVersion,
-                    Language = defaultLanguage,
-                    Attributes = attributes,
-
-                    DirectoryRef = directoryId,
-                    DiskId = (CompilerConstants.IntegerNotSet == diskId) ? null : (int?)diskId,
-                    Source = new IntermediateFieldPathValue { Path = source },
-
-                    FontTitle = fontTitle,
-                    SelfRegCost = selfRegCost,
-                    BindPath = bindPath,
-
-                    PatchGroup = (CompilerConstants.IntegerNotSet == patchGroup) ? null : (int?)patchGroup,
-                    PatchAttributes = patchAttributes,
-
-                    // Delta patching information
-                    RetainLengths = protectLengths,
-                    IgnoreOffsets = ignoreOffsets,
-                    IgnoreLengths = ignoreLengths,
-                    RetainOffsets = protectOffsets,
-                    SymbolPaths = symbols,
-                });
-
-                if (AssemblyType.NotAnAssembly != assemblyType)
-                {
-                    this.Core.AddSymbol(new AssemblySymbol(sourceLineNumbers, id)
-                    {
-                        ComponentRef = componentId,
-                        FeatureRef = Guid.Empty.ToString("B"),
-                        ManifestFileRef = assemblyManifest,
-                        ApplicationFileRef = assemblyApplication,
-                        Type = assemblyType,
-                        ProcessorArchitecture = procArch,
-                    });
-                }
-            }
-
-            if (CompilerConstants.IntegerNotSet != diskId)
-            {
-                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
-            }
-
-            // If this component does not have a companion file this file is a possible keypath.
-            possibleKeyPath = null;
-            if (null == companionFile)
-            {
-                possibleKeyPath = id.Id;
+                this.ParseFileElementChildren(node, fileSymbol, keyPath, win64Component);
             }
 
             return keyPath;
+        }
+
+        /// <summary>
+        /// Parses a file element outside a component.
+        /// </summary>
+        /// <param name="node">File element to parse.</param>
+        /// <param name="parentType">Type of complex reference parent. Will be Unknown if there is no parent.</param>
+        /// <param name="parentId">Optional identifier for primary parent.</param>
+        /// <param name="directoryId">Ancestor's directory id.</param>
+        /// <param name="sourcePath">Default source path of parent directory.</param>
+        /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
+        private void ParseNakedFileElement(XElement node, ComplexReferenceParentType parentType, string parentId, string directoryId, string sourcePath)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var win64 = this.Context.IsCurrentPlatform64Bit;
+            string condition = null;
+            string subdirectory = null;
+
+            var keyPath = this.ParseFileElementAttributes(node, "TemporaryComponentId", directoryId, diskId: CompilerConstants.IntegerNotSet, sourcePath, out var _, componentGuid: "*", isNakedFile: true, out var fileSymbol, out var assemblySymbol);
+
+            if (!this.Core.EncounteredError)
+            {
+                // Naked files have additional attributes to handle common component attributes.
+                foreach (var attrib in node.Attributes())
+                {
+                    if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                    {
+                        switch (attrib.Name.LocalName)
+                        {
+                        case "Bitness":
+                            var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (bitnessValue)
+                            {
+                                case "always32":
+                                    win64 = false;
+                                    break;
+                                case "always64":
+                                    win64 = true;
+                                    break;
+                                case "default":
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                    break;
+                            }
+                            break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Directory":
+                            directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                            break;
+                        case "Subdirectory":
+                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        }
+                    }
+                }
+
+                directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
+
+                this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, fileSymbol.Id)
+                {
+                    ComponentId = "*",
+                    DirectoryRef = directoryId,
+                    Location = ComponentLocation.LocalOnly,
+                    Condition = condition,
+                    KeyPath = fileSymbol.Id.Id,
+                    KeyPathType = ComponentKeyPathType.File,
+                    DisableRegistryReflection = false,
+                    NeverOverwrite = false,
+                    Permanent = false,
+                    SharedDllRefCount = false,
+                    Shared = false,
+                    Transitive = false,
+                    UninstallWhenSuperseded = false,
+                    Win64 = win64,
+                });
+
+                fileSymbol.ComponentRef = fileSymbol.Id.Id;
+                this.Core.AddSymbol(fileSymbol);
+
+                if (assemblySymbol != null)
+                {
+                    this.Core.AddSymbol(assemblySymbol);
+                }
+
+                this.ParseFileElementChildren(node, fileSymbol, keyPath, win64);
+
+                if (ComplexReferenceParentType.Unknown != parentType && null != parentId) // if parent was provided, add a complex reference to that.
+                {
+                    // If the naked file's component is defined directly under a feature, then mark the complex reference primary.
+                    this.Core.CreateComplexReference(sourceLineNumbers, parentType, parentId, null, ComplexReferenceChildType.Component, fileSymbol.Id.Id, ComplexReferenceParentType.Feature == parentType);
+                }
+            }
         }
 
         /// <summary>
@@ -5796,6 +5980,9 @@ namespace WixToolset.Core
                         break;
                     case "FeatureRef":
                         this.ParseFeatureRefElement(child, ComplexReferenceParentType.Unknown, null);
+                        break;
+                    case "File":
+                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, null, null);
                         break;
                     case "Icon":
                         this.ParseIconElement(child);
@@ -7144,6 +7331,9 @@ namespace WixToolset.Core
                         case "Directory":
                             this.ParseDirectoryElement(child, id, diskId: CompilerConstants.IntegerNotSet, fileSource: String.Empty);
                             break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id, null);
+                            break;
                         case "Merge":
                             this.ParseMergeElement(child, id, diskId: CompilerConstants.IntegerNotSet);
                             break;
@@ -7295,7 +7485,7 @@ namespace WixToolset.Core
         /// Parses a merge reference element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="parentType">Parents complex reference type.</param>
+        /// <param name="parentType">Parent's complex reference type.</param>
         /// <param name="parentId">Identifier for parent feature or feature group.</param>
         private void ParseMergeRefElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {

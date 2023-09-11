@@ -162,7 +162,7 @@ namespace WixToolset.Core
                         }
                     }
                 }
-                else
+                else if (find.EntrySection.Type == SectionType.Package)
                 {
                     var command = new AssignDefaultFeatureCommand(this.Messaging, find.EntrySection, sections, referencedComponents, componentsToFeatures);
                     command.Execute();

@@ -8,7 +8,6 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
-    using static System.Collections.Specialized.BitVector32;
 
     internal class AssignDefaultFeatureCommand
     {

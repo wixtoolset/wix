@@ -175,6 +175,9 @@ namespace WixToolset.Core
                         case "Exclusion":
                             this.ParseExclusionElement(child);
                             break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Module, this.activeName, null, null);
+                            break;
                         case "Icon":
                             this.ParseIconElement(child);
                             break;

@@ -287,6 +287,9 @@ namespace WixToolset.Core
                         case "FeatureGroupRef":
                             this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.Product, productCode);
                             break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, null, null);
+                            break;
                         case "Icon":
                             this.ParseIconElement(child);
                             break;

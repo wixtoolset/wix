@@ -1,0 +1,14 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="WixlibFiles">
+            <File Id="test.txt" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="test.txt" />
+            <File Id="test2.txt" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="test.txt" Name="test2.txt" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>

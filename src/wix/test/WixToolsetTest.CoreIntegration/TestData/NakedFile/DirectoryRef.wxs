@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+    <DirectoryRef Id="INSTALLFOLDER">
+      <!-- Relies on default-feature feature to include naked files in package. -->
+      <File Id="test.txt" Source="test.txt" />
+      <File Id="test2.txt" Source="test.txt" Name="test2.txt" />
+    </DirectoryRef>
+  </Package>
+  
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

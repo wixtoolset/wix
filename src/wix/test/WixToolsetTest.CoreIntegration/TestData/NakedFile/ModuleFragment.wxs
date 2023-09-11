@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="MergeModule" Guid="e535b765-1019-4a4f-b3ea-ae28870e6d73" Language="1033" Version="1.0.0.0">
+    <PropertyRef Id="MergeModuleProperty1" />
+    <PropertyRef Id="MergeModuleProperty2" />
+  </Module>
+   
+  <Fragment>
+    <Property Id="MergeModuleProperty1" Hidden="yes" />
+    <File Id="test.txt" Directory="ProgramFilesFolder" Subdirectory="MergeModule" Source="test.txt" />
+  </Fragment>
+  
+  <Fragment>
+    <Property Id="MergeModuleProperty2" Hidden="yes" />
+    <File Id="test2.txt" Directory="ProgramFilesFolder" Subdirectory="MergeModule" Source="test.txt" Name="test2.txt" />
+  </Fragment>
+</Wix>
