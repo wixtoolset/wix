@@ -38,6 +38,11 @@ jobs:
       #   shell: cmd
       #   run: ./src/vs_config.cmd
 
+      - name: Install sign tool
+        if: (github.ref == 'refs/heads/master')
+        shell: cmd
+        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.23356.1
+
       - name: Configure automated logging and crash dumps
         shell: cmd
         run: |
@@ -50,13 +55,22 @@ jobs:
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps" /t REG_DWORD /v DumpCount /d 10 /f
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps" /t REG_DWORD /v DumpType /d 1
 
+      - name: 'Az CLI login'
+        if: (github.ref == 'refs/heads/master')
+        uses: azure/login@v1
+        with:
+          allow-no-subscriptions: true
+          client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
+          tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
+          subscription-id: ${{ secrets.WIX_SIGNING_SUBSCRIPTIONID }}
+
       - name: Build wix4
         shell: cmd
         run: ./src/build_official.cmd
         env:
           RuntimeTestsEnabled: true
-          SigningUser:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_USER || '' }}
-          SigningSecret:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_SECRET || '' }}
+          SigningVaultUri:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_VAULTURI || '' }}
+          SigningCertName:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_CERTNAME || '' }}
 
       - name: Validate test results
         shell: cmd

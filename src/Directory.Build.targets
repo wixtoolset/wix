@@ -4,9 +4,9 @@
 <Project>
   <PropertyGroup>
     <SigningToolFolder>$(ToolsFolder)</SigningToolFolder>
-    <SigningToolExe>$(SigningToolFolder)\SignClient.exe</SigningToolExe>
-    <SigningFilelist>$(SigningToolFolder)\empty-filelist.txt</SigningFilelist>
-    <SigningConfiguration>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), signing.json))\signing.json</SigningConfiguration>
+    <SigningToolExe>$(SigningToolFolder)\sign.exe</SigningToolExe>
+    <SigningFilelist>$(MSBuildThisFileDirectory)signing-empty-file-list.txt</SigningFilelist>
+    <SigningConfiguration>--description "WiX Toolset" --description-url "https://wixtoolset.org/" --timestamp-url "http://timestamp.digicert.com" --file-list "$(SigningFilelist)" --azure-key-vault-managed-identity true --azure-key-vault-url "$(SigningVaultUri)" --azure-key-vault-certificate "$(SigningCertName)"</SigningConfiguration>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsWixTestSupportProject)'=='true' ">
@@ -113,47 +113,39 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="_GetSignClient"
-          Condition=" !Exists('$(SigningToolExe)') ">
-
-    <WriteLinesToFile File='$(SigningFilelist)' Lines='do-not-sign-files-in-nupkg' Overwrite='true' />
-
-    <Exec Command='dotnet.exe tool install --tool-path "$(SigningToolFolder)" SignClient' IgnoreExitCode='true' />
-  </Target>
-
-  <Target Name="SignOutput" DependsOnTargets="_GetSignClient" AfterTargets="AfterBuild"
-          Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' and 
+  <Target Name="SignOutput" AfterTargets="AfterBuild"
+          Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' and 
                       ('$(MSBuildProjectExtension)'=='.csproj' or ('$(MSBuildProjectExtension)'=='.vcxproj' and '$(ConfigurationType)'!='StaticLibrary'))">
 
-    <Message Importance="high" Text="Signing file: $(TargetPath) using configuration from: $(SigningConfiguration)" />
+    <Message Importance="high" Text="Signing file: $(TargetPath)" />
 
-    <Exec Command='"$(SigningToolExe)" sign -i $(TargetPath) -c "$(SigningConfiguration)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+    <Exec Command='"$(SigningToolExe)" code $(TargetPath) $(SigningConfiguration)'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
-  <Target Name="SignNupkg" DependsOnTargets="_GetSignClient" AfterTargets="Pack;PackNative"
-          Condition=" '$(SigningUser)'!='' and '@(NuGetPackOutput)'!='' and '$(SignNupkg)'!='false' ">
+  <Target Name="SignNupkg" AfterTargets="Pack;PackNative"
+          Condition=" '$(SigningCertName)'!='' and '@(NuGetPackOutput)'!='' and '$(SignNupkg)'!='false' ">
     <ItemGroup>
       <SigningNupkgs Include="@(NuGetPackOutput)" Condition=" '%(Extension)'=='.nupkg' " />
     </ItemGroup>
 
-    <Message Importance="high" Text="Signing nupkg: @(SigningNupkgs->&apos;%(Identity)&apos;) using configuration from: $(SigningConfiguration)" />
+    <Message Importance="high" Text="Signing nupkg: @(SigningNupkgs->&apos;%(Identity)&apos;)" />
 
-    <Exec Command='"$(SigningToolExe)" sign -i "@(SigningNupkgs->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+    <Exec Command='"$(SigningToolExe)" code "@(SigningNupkgs->&apos;%(Identity)&apos;)" $(SigningConfiguration)'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
-  <Target Name="SignBundleEngine" DependsOnTargets="_GetSignClient" Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' ">
-    <Message Importance="high" Text="Signing bundle engine: @(SignBundleEngine->&apos;%(Identity)&apos;) using configuration from: $(SigningConfiguration)" />
+  <Target Name="SignBundleEngine" Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' ">
+    <Message Importance="high" Text="Signing bundle engine: @(SignBundleEngine->&apos;%(Identity)&apos;)" />
 
-    <Exec Command='"$(SigningToolExe)" sign -i "@(SignBundleEngine->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+    <Exec Command='"$(SigningToolExe)" code "@(SignBundleEngine->&apos;%(Identity)&apos;)" $(SigningConfiguration)'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
-  <Target Name="SignBundle" DependsOnTargets="_GetSignClient" Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' ">
-    <Message Importance="high" Text="Signing bundle: @(SignBundle->&apos;%(Identity)&apos;) using configuration from: $(SigningConfiguration)" />
+  <Target Name="SignBundle" Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' ">
+    <Message Importance="high" Text="Signing bundle: @(SignBundle->&apos;%(Identity)&apos;)" />
 
-    <Exec Command='"$(SigningToolExe)" sign -i "@(SignBundle->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+    <Exec Command='"$(SigningToolExe)" code "@(SignBundle->&apos;%(Identity)&apos;)" $(SigningConfiguration)'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 

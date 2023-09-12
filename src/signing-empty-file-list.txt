@@ -1,0 +1,1 @@
+this-file-prevents-files-from-being-signed-in-nupkgs
