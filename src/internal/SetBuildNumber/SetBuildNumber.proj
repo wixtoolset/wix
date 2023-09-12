@@ -22,8 +22,7 @@
       GitThisAssembly;
       SetGlobalJson;
       SetDirectoryPackagesProps;
-      SetOverallWixVersions;
-      InstallSigningClient
+      SetOverallWixVersions
     </SetBuildNumbersDependsOn>
 
     <GlobalJsonPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\global.json))</GlobalJsonPath>
@@ -103,12 +102,6 @@
                       WriteOnlyWhenDifferent="true" />
 
     <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(OverallWixVersionsPath)" />
-  </Target>
-
-
-  <Target Name="InstallSigningClient"
-          DependsOnTargets="_GetSignClient"
-          Condition=" '$(SigningUser)'!='' ">
   </Target>
 
 
