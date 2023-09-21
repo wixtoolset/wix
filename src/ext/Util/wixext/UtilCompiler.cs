@@ -3123,8 +3123,14 @@ namespace WixToolset.Util
             // if this element is a child of ServiceInstall then ignore the service name provided.
             if ("ServiceInstall" == parentTableName)
             {
-                // TODO: the ServiceName attribute should not be allowed in this case (the overwriting behavior may confuse users)
-                serviceName = parentTableServiceName;
+                if (null == serviceName || parentTableServiceName == serviceName)
+                {
+                    serviceName = parentTableServiceName;
+                }
+                else
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "ServiceName", parentTableName));
+                }
                 newService = true;
             }
             else
@@ -3136,7 +3142,8 @@ namespace WixToolset.Util
                 }
             }
 
-            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+            var context = new Dictionary<string, string>() { { "ServiceConfigComponentId", componentId }, { "ServiceConfigServiceName", serviceName } };
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element, context);
 
             if (!this.Messaging.EncounteredError)
             {

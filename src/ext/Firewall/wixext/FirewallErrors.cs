@@ -12,11 +12,6 @@ namespace WixToolset.Firewall
             return Message(sourceLineNumbers, Ids.IllegalRemoteAddressWithScopeAttribute, "The RemoteAddress element cannot be specified because its parent FirewallException already specified the Scope attribute. To use RemoteAddress elements, omit the Scope attribute.");
         }
 
-        public static Message NoExceptionSpecified(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.NoExceptionSpecified, "The FirewallException element doesn't identify the target of the firewall exception. To create an application exception, nest the FirewallException element under a File element or provide a value for the File or Program attributes. To create a port exception, provide a value for the Port attribute.");
-        }
-
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -27,10 +22,32 @@ namespace WixToolset.Firewall
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, resourceManager, resourceName, args);
         }
 
+        public static Message IllegalInterfaceWithInterfaceAttribute(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalInterfaceWithInterfaceAttribute, "The Interface element cannot be specified because its parent FirewallException already specified the Interface attribute. To use Interface elements, omit the Interface attribute.");
+        }
+
+        public static Message IllegalInterfaceTypeWithInterfaceTypeAttribute(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalInterfaceTypeWithInterfaceTypeAttribute, "The InterfaceType element cannot be specified because its parent FirewallException already specified the InterfaceType attribute. To use InterfaceType elements, omit the InterfaceType attribute.");
+        }
+
+        public static Message IllegalInterfaceTypeWithInterfaceTypeAll(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalInterfaceTypeWithInterfaceTypeAll, "The InterfaceType element cannot be specified because its parent FirewallException contains another InterfaceType element with value 'All'.");
+        }
+        public static Message IllegalLocalAddressWithLocalScopeAttribute(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalLocalAddressWithLocalScopeAttribute, "The LocalAddress element cannot be specified because its parent FirewallException already specified the LocalScope attribute. To use LocalAddress elements, omit the LocalScope attribute.");
+        }
+
         public enum Ids
         {
             IllegalRemoteAddressWithScopeAttribute = 6401,
-            NoExceptionSpecified = 6403,
+            IllegalInterfaceWithInterfaceAttribute = 6402,
+            IllegalInterfaceTypeWithInterfaceTypeAttribute = 6404,
+            IllegalInterfaceTypeWithInterfaceTypeAll = 6405,
+            IllegalLocalAddressWithLocalScopeAttribute = 6406,
         }
     }
 }

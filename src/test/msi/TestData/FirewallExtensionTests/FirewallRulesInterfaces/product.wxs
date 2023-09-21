@@ -1,0 +1,32 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="FirewallComponent1"/>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="FirewallComponent1" Guid="08044660-CB5D-4891-8BD5-0CB5BB668D78" Directory="INSTALLFOLDER">
+            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" >
+                <fw:FirewallException Id="FirewallException28"
+                    Description="WiX Toolset firewall exception rule integration test - three interfaces"
+                    Name="WiXToolset500 Test - 0028" Scope="any" >
+					<fw:Interface Name="[INTERFACE1]" />
+					<fw:Interface Name="[INTERFACE2]" />
+                    <fw:Interface Name="[INTERFACE3]" />
+                    <fw:InterfaceType Value="RemoteAccess" />
+                    <fw:InterfaceType Value="Lan" />
+                    <fw:InterfaceType Value="Wireless" />
+                </fw:FirewallException>
+            </File>
+
+            <fw:FirewallException Id="FirewallException29"
+                Description="WiX Toolset firewall exception rule integration test - one interface"
+                Name="WiXToolset500 Test - 0029" Scope="any" Port="29292" Interface="[INTERFACE1]" InterfaceType="[INTERFACETYPE]" >
+            </fw:FirewallException>
+        </Component>
+    </Fragment>
+</Wix>

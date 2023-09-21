@@ -8,6 +8,8 @@ namespace WixToolset.Firewall
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// The decompiler for the WiX Toolset Firewall Extension.
@@ -15,6 +17,14 @@ namespace WixToolset.Firewall
     public sealed class FirewallDecompiler : BaseWindowsInstallerDecompilerExtension
     {
         public override IReadOnlyCollection<TableDefinition> TableDefinitions => FirewallTableDefinitions.All;
+
+        private IParseHelper ParseHelper { get; set; }
+
+        public override void PreDecompile(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper helper)
+        {
+            base.PreDecompile(context, helper);
+            this.ParseHelper = context.ServiceProvider.GetService<IParseHelper>();
+        }
 
         /// <summary>
         /// Called at the beginning of the decompilation of a database.
@@ -32,6 +42,8 @@ namespace WixToolset.Firewall
         {
             switch (table.Name)
             {
+                case "WixFirewallException":
+                case "Wix4FirewallException":
                 case "Wix5FirewallException":
                     this.DecompileWixFirewallExceptionTable(table);
                     break;
@@ -57,7 +69,7 @@ namespace WixToolset.Firewall
         /// <param name="table">The table to decompile.</param>
         private void DecompileWixFirewallExceptionTable(Table table)
         {
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 var firewallException = new XElement(FirewallConstants.FirewallExceptionName,
                     new XAttribute("Id", row.FieldAsString(0)),
@@ -90,13 +102,20 @@ namespace WixToolset.Firewall
                                 firewallException.Add(new XAttribute("Scope", "defaultGateway"));
                                 break;
                             default:
-                                FirewallDecompiler.AddRemoteAddress(firewallException, addresses[0]);
+                                if (this.ParseHelper.ContainsProperty(addresses[0]))
+                                {
+                                    firewallException.Add(new XAttribute("Scope", addresses[0]));
+                                }
+                                else
+                                {
+                                    FirewallDecompiler.AddRemoteAddress(firewallException, addresses[0]);
+                                }
                                 break;
                         }
                     }
                     else
                     {
-                        foreach (string address in addresses)
+                        foreach (var address in addresses)
                         {
                             FirewallDecompiler.AddRemoteAddress(firewallException, address);
                         }
@@ -110,16 +129,19 @@ namespace WixToolset.Firewall
 
                 if (!row.IsColumnEmpty(4))
                 {
-                    switch (Convert.ToInt32(row[4]))
+                    switch (row.FieldAsString(4))
                     {
-                        case FirewallConstants.NET_FW_IP_PROTOCOL_TCP:
+                        case FirewallConstants.IntegerNotSetString:
+                            break;
+                        case "6":
                             firewallException.Add(new XAttribute("Protocol", "tcp"));
                             break;
-                        case FirewallConstants.NET_FW_IP_PROTOCOL_UDP:
+                        case "17":
                             firewallException.Add(new XAttribute("Protocol", "udp"));
                             break;
+
                         default:
-                            firewallException.Add(new XAttribute("Protocol", row[4]));
+                            firewallException.Add(new XAttribute("Protocol", row.FieldAsString(4)));
                             break;
                     }
                 }
@@ -131,25 +153,43 @@ namespace WixToolset.Firewall
 
                 if (!row.IsColumnEmpty(6))
                 {
-                    var attr = Convert.ToInt32(row[6]);
-                    AttributeIfNotNull("IgnoreFailure", (attr & 0x1) == 0x1);
+                    var attr = row.FieldAsInteger(6);
+                    if ((attr & 0x1) == 0x1)
+                    {
+                        AttributeIfNotNull("IgnoreFailure", true);
+                    }
+
+                    if ((attr & 0x2) == 0x2)
+                    {
+                        firewallException.Add(new XAttribute("OnUpdate", "DoNothing"));
+                    }
+                    else if ((attr & 0x4) == 0x4)
+                    {
+                        firewallException.Add(new XAttribute("OnUpdate", "EnableOnly"));
+                    }
                 }
 
                 if (!row.IsColumnEmpty(7))
                 {
-                    switch (Convert.ToInt32(row[7]))
+                    switch (row.FieldAsString(7))
                     {
-                        case FirewallConstants.NET_FW_PROFILE2_DOMAIN:
+                        case FirewallConstants.IntegerNotSetString:
+                            break;
+                        case "1":
                             firewallException.Add(new XAttribute("Profile", "domain"));
                             break;
-                        case FirewallConstants.NET_FW_PROFILE2_PRIVATE:
+                        case "2":
                             firewallException.Add(new XAttribute("Profile", "private"));
                             break;
-                        case FirewallConstants.NET_FW_PROFILE2_PUBLIC:
+                        case "4":
                             firewallException.Add(new XAttribute("Profile", "public"));
                             break;
-                        case FirewallConstants.NET_FW_PROFILE2_ALL:
+                        case "2147483647":
                             firewallException.Add(new XAttribute("Profile", "all"));
+                            break;
+
+                        default:
+                            firewallException.Add(new XAttribute("Profile", row.FieldAsString(7)));
                             break;
                     }
                 }
@@ -164,12 +204,228 @@ namespace WixToolset.Firewall
                     switch (Convert.ToInt32(row[10]))
                     {
                         case FirewallConstants.NET_FW_RULE_DIR_IN:
-
-                            firewallException.Add(AttributeIfNotNull("Outbound", false));
                             break;
                         case FirewallConstants.NET_FW_RULE_DIR_OUT:
                             firewallException.Add(AttributeIfNotNull("Outbound", true));
                             break;
+                    }
+                }
+
+                // Introduced in 5.0.0
+                if (row.Fields.Length > 11)
+                {
+                    if (!row.IsColumnEmpty(11))
+                    {
+                        var action = row.FieldAsString(11);
+                        switch (action)
+                        {
+                            case FirewallConstants.IntegerNotSetString:
+                                break;
+                            case "1":
+                                firewallException.Add(new XAttribute("Action", "Allow"));
+                                break;
+                            case "0":
+                                firewallException.Add(new XAttribute("Action", "Block"));
+                                break;
+                            default:
+                                firewallException.Add(new XAttribute("Action", action));
+                                break;
+                        }
+                    }
+
+                    if (!row.IsColumnEmpty(12))
+                    {
+                        var edgeTraversal = row.FieldAsString(12);
+                        switch (edgeTraversal)
+                        {
+                            case FirewallConstants.IntegerNotSetString:
+                                break;
+                            case "0":
+                                firewallException.Add(new XAttribute("EdgeTraversal", "Deny"));
+                                break;
+                            case "1":
+                                firewallException.Add(new XAttribute("EdgeTraversal", "Allow"));
+                                break;
+                            case "2":
+                                firewallException.Add(new XAttribute("EdgeTraversal", "DeferToApp"));
+                                break;
+                            case "3":
+                                firewallException.Add(new XAttribute("EdgeTraversal", "DeferToUser"));
+                                break;
+                            default:
+                                firewallException.Add(new XAttribute("EdgeTraversal", edgeTraversal));
+                                break;
+                        }
+                    }
+
+                    if (!row.IsColumnEmpty(13))
+                    {
+                        var enabled = row.FieldAsString(13);
+                        switch (enabled)
+                        {
+                            case FirewallConstants.IntegerNotSetString:
+                                break;
+                            case "1":
+                                firewallException.Add(new XAttribute("Enabled", "yes"));
+                                break;
+                            case "0":
+                                firewallException.Add(new XAttribute("Enabled", "no"));
+                                break;
+                            default:
+                                firewallException.Add(new XAttribute("Enabled", enabled));
+                                break;
+                        }
+                    }
+
+                    if (!row.IsColumnEmpty(14))
+                    {
+                        firewallException.Add(new XAttribute("Grouping", row.FieldAsString(14)));
+                    }
+
+                    if (!row.IsColumnEmpty(15))
+                    {
+                        firewallException.Add(new XAttribute("IcmpTypesAndCodes", row.FieldAsString(15)));
+                    }
+
+                    if (!row.IsColumnEmpty(16))
+                    {
+                        string[] interfaces = row.FieldAsString(16).Split(new[] { FirewallConstants.FORBIDDEN_FIREWALL_CHAR }, StringSplitOptions.RemoveEmptyEntries);
+                        if (interfaces.Length == 1)
+                        {
+                            firewallException.Add(new XAttribute("Interface", interfaces[0]));
+                        }
+                        else
+                        {
+                            foreach (var interfaceItem in interfaces)
+                            {
+                                FirewallDecompiler.AddInterface(firewallException, interfaceItem);
+                            }
+                        }
+                    }
+
+                    if (!row.IsColumnEmpty(17))
+                    {
+                        string[] interfaceTypes = row.FieldAsString(17).Split(',');
+                        if (interfaceTypes.Length == 1)
+                        {
+                            firewallException.Add(new XAttribute("InterfaceType", interfaceTypes[0]));
+                        }
+                        else
+                        {
+                            foreach (var interfaceType in interfaceTypes)
+                            {
+                                FirewallDecompiler.AddInterfaceType(firewallException, interfaceType);
+                            }
+                        }
+                    }
+
+                    if (!row.IsColumnEmpty(18))
+                    {
+                        string[] addresses = row.FieldAsString(18).Split(',');
+                        if (addresses.Length == 1)
+                        {
+                            switch (addresses[0])
+                            {
+                                case "*":
+                                    firewallException.Add(new XAttribute("LocalScope", "any"));
+                                    break;
+                                case "LocalSubnet":
+                                    firewallException.Add(new XAttribute("LocalScope", "localSubnet"));
+                                    break;
+                                case "dns":
+                                    firewallException.Add(new XAttribute("LocalScope", "DNS"));
+                                    break;
+                                case "dhcp":
+                                    firewallException.Add(new XAttribute("LocalScope", "DHCP"));
+                                    break;
+                                case "wins":
+                                    firewallException.Add(new XAttribute("LocalScope", "WINS"));
+                                    break;
+                                case "DefaultGateway":
+                                    firewallException.Add(new XAttribute("LocalScope", "defaultGateway"));
+                                    break;
+                                default:
+                                    if (this.ParseHelper.ContainsProperty(addresses[0]))
+                                    {
+                                        firewallException.Add(new XAttribute("LocalScope", addresses[0]));
+                                    }
+                                    else
+                                    {
+                                        FirewallDecompiler.AddLocalAddress(firewallException, addresses[0]);
+                                    }
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            foreach (var address in addresses)
+                            {
+                                FirewallDecompiler.AddLocalAddress(firewallException, address);
+                            }
+                        }
+                    }
+
+                    if (!row.IsColumnEmpty(19))
+                    {
+                        firewallException.Add(new XAttribute("RemotePort", row.FieldAsString(19)));
+                    }
+
+                    if (!row.IsColumnEmpty(20))
+                    {
+                        firewallException.Add(new XAttribute("Service", row.FieldAsString(20)));
+                    }
+
+                    if (!row.IsColumnEmpty(21))
+                    {
+                        firewallException.Add(new XAttribute("LocalAppPackageId", row.FieldAsString(21)));
+                    }
+
+                    if (!row.IsColumnEmpty(22))
+                    {
+                        firewallException.Add(new XAttribute("LocalUserAuthorizedList", row.FieldAsString(22)));
+                    }
+
+                    if (!row.IsColumnEmpty(23))
+                    {
+                        firewallException.Add(new XAttribute("LocalUserOwner", row.FieldAsString(23)));
+                    }
+
+                    if (!row.IsColumnEmpty(24))
+                    {
+                        firewallException.Add(new XAttribute("RemoteMachineAuthorizedList", row.FieldAsString(24)));
+                    }
+
+                    if (!row.IsColumnEmpty(25))
+                    {
+                        firewallException.Add(new XAttribute("RemoteUserAuthorizedList", row.FieldAsString(25)));
+                    }
+
+                    if (!row.IsColumnEmpty(26))
+                    {
+                        var secureFlags = row.FieldAsString(26);
+                        switch (secureFlags)
+                        {
+                            case FirewallConstants.IntegerNotSetString:
+                                break;
+                            case "0":
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "None"));
+                                break;
+                            case "1":
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "NoEncapsulation"));
+                                break;
+                            case "2":
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "WithIntegrity"));
+                                break;
+                            case "3":
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "NegotiateEncryption"));
+                                break;
+                            case "4":
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "Encrypt"));
+                                break;
+                            default:
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", secureFlags));
+                                break;
+                        }
                     }
                 }
 
@@ -183,7 +439,34 @@ namespace WixToolset.Firewall
                 new XAttribute("Value", address)
             );
 
-            firewallException.AddAfterSelf(remoteAddress);
+            firewallException.Add(remoteAddress);
+        }
+
+        private static void AddInterfaceType(XElement firewallException, string type)
+        {
+            var interfaceType = new XElement(FirewallConstants.InterfaceTypeName,
+                new XAttribute("Value", type)
+            );
+
+            firewallException.Add(interfaceType);
+        }
+
+        private static void AddLocalAddress(XElement firewallException, string address)
+        {
+            var localAddress = new XElement(FirewallConstants.LocalAddressName,
+                new XAttribute("Value", address)
+            );
+
+            firewallException.Add(localAddress);
+        }
+
+        private static void AddInterface(XElement firewallException, string value)
+        {
+            var interfaceName = new XElement(FirewallConstants.InterfaceName,
+                new XAttribute("Name", value)
+            );
+
+            firewallException.Add(interfaceName);
         }
 
         private static XAttribute AttributeIfNotNull(string name, bool value)

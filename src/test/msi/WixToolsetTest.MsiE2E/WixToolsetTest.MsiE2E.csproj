@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" />
+    <PackageReference Include="System.Net.NetworkInformation" />
     <PackageReference Include="System.Security.Principal.Windows" />
     <PackageReference Include="WixInternal.TestSupport" />
     <PackageReference Include="WixToolset.Data" />

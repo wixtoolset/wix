@@ -1,0 +1,35 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation"
+    UpgradeCode="41B5F815-E7F6-44E0-B92A-AE95DFF683F9" Compressed="yes" Scope="perMachine">
+	<MediaTemplate EmbedCab="yes" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <Feature Id="ProductFeature" Title="Feature with merged modules">
+      <MergeRef Id="TestMsm1" />
+      <MergeRef Id="TestMsm2" />
+      <ComponentRef Id="FirewallComponent1" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage">
+        <Merge Id="TestMsm1" Language="1033" SourceFile="Module401.msm" />
+        <Merge Id="TestMsm2" Language="1033" SourceFile="ModuleCurrent.msm" />
+      </Directory>
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <Property Id="MSIPORT1" Value="20001" />
+    <Property Id="MSIPORT2" Value="20002" />
+
+    <Component Id="FirewallComponent1" Guid="3E9A6190-3E6B-4BC2-8C84-D89D1549FEBD" Directory="INSTALLFOLDER">
+      <File Source="$(sys.SOURCEFILEPATH)">
+        <fw:FirewallException Id="FirewallException1" Description="WiX Toolset firewall exception rule integration test - package app" Name="WiXToolset Test - 0026" Scope="any" Port="[MSIPORT1]" />
+      </File>
+      <fw:FirewallException Id="FirewallException2" Description="WiX Toolset firewall exception rule integration test - package port" Name="WiXToolset Test - 0027" Scope="any" Port="[MSIPORT2]" />
+    </Component>
+  </Fragment>
+</Wix>
