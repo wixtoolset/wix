@@ -5,6 +5,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsWixTestProject>true</IsWixTestProject>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>    
   </PropertyGroup>
 
   <ItemGroup>

@@ -146,7 +146,9 @@ namespace WixTestTools.Firewall
         /// This parameter allows the specification of an array of interface LUIDs (locally unique identifiers) supplied as strings.<br/>
         /// This is commonly used by USB RNDIS (Remote Network Driver Interface Specification) devices to restrict traffic to a specific non-routable interface.<br/>
         /// Use <b>netsh trace show interfaces</b> to show a list of local interfaces and their LUIDs.<br/>
-        /// Example: new object[] { "Wi-Fi", "Local Area Connection* 14" }
+        /// The interfaces are stored in the registry as GUIDs, but need to be passed to the API as text. eg from the registry<br/>
+        /// v2.30|Action=Allow|Active=TRUE|Dir=In|Protocol=6|LPort=23456|IF={423411CD-E627-4A1A-9E1F-C5BE6CD2CC99}|IF={49A98AD0-8379-4079-A445-77066C52E338}|Name=WiXToolset401 Test - 0002|Desc=WiX Toolset firewall exception rule integration test - minimal port properties|<br/>
+        /// Example API value: new object[] { "Wi-Fi", "Local Area Connection* 14" }
         /// </summary>
         public object[] Interfaces { get; set; }
 
@@ -227,13 +229,13 @@ namespace WixTestTools.Firewall
         public string LocalUserOwner { get; set; }
 
         /// <summary>
-        /// This property is optional. It specifies a list of authorized local users for an app container.<br/>
+        /// This property is optional. It specifies a list of authorized local users for an app container (using SDDL).<br/>
         /// Example: "O:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)"
         /// </summary>
         public string LocalUserAuthorizedList { get; set; }
 
         /// <summary>
-        /// This property is optional. It specifies a list of remote users who are authorized to access an app container.<br/>
+        /// This property is optional. It specifies a list of remote users who are authorized to access an app container (using SDDL).<br/>
         /// </summary>
         public string RemoteUserAuthorizedList { get; set; }
 

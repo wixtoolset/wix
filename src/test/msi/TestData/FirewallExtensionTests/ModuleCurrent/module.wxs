@@ -1,0 +1,36 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall" >
+    <Module Id="MergeModule1" Language="1033" Version="1.0.0.0" Guid="44FA5DBE-2413-436E-99B3-A0751D6EB420">
+        <SummaryInformation Manufacturer="Example Company - Module Current" />
+
+		<Property Id="MODULECURRENTPORT1" Value="50001" />
+		<Property Id="MODULECURRENTPORT2" Value="50002" />
+		<Property Id="MODULECURRENTPORT3" Value="50003" />
+		<Property Id="MODULECURRENTPORT4" Value="50004" />
+
+        <Directory Id="MergeRedirectFolder">
+            <Component Id="ModuleComponent1" Guid="EB7B8A63-85C4-4ABB-B9DA-33AECAFE38F7">
+                <File Id="File1" Name="file1.txt" Source="data/test.txt">
+					<fw:FirewallException Id="FirewallException1"
+						Description="WiX Toolset firewall exception rule integration test - module MergeRedirectFolder - app"
+						Name="WiXToolset Test - 0022" Scope="any" Port="[MODULECURRENTPORT1]" />
+				</File>
+				<fw:FirewallException Id="FirewallException2"
+					Description="WiX Toolset firewall exception rule integration test - module MergeRedirectFolder - port"
+					Name="WiXToolset Test - 0023" Scope="any" Port="[MODULECURRENTPORT2]" />
+            </Component>
+        </Directory>
+
+        <Directory Id="NotTheMergeRedirectFolder">
+            <Component Id="ModuleComponent2" Guid="0C9DD4FC-5A54-4E96-830D-DDE27B3017B5">
+                <File Id="File2" Name="file2.txt" Source="data/test.txt">
+					<fw:FirewallException Id="FirewallException3"
+						Description="WiX Toolset firewall exception rule integration test - module NotTheMergeRedirectFolder - app"
+						Name="WiXToolset Test - 0024" Scope="any" Port="[MODULECURRENTPORT3]" />
+				</File>
+				<fw:FirewallException Id="FirewallException4"
+					Description="WiX Toolset firewall exception rule integration test - module NotTheMergeRedirectFolder - port"
+					Name="WiXToolset Test - 0025" Scope="any" Port="[MODULECURRENTPORT4]" />
+            </Component>
+        </Directory>
+    </Module>
+</Wix>

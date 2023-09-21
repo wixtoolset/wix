@@ -35,7 +35,7 @@ namespace WixToolset.Firewall
                     switch (element.Name.LocalName)
                     {
                         case "FirewallException":
-                            this.ParseFirewallExceptionElement(intermediate, section, element, fileComponentId, fileId);
+                            this.ParseFirewallExceptionElement(intermediate, section, parentElement, element, fileComponentId, fileId, null);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -48,7 +48,35 @@ namespace WixToolset.Firewall
                     switch (element.Name.LocalName)
                     {
                         case "FirewallException":
-                            this.ParseFirewallExceptionElement(intermediate, section, element, componentId, null);
+                            this.ParseFirewallExceptionElement(intermediate, section, parentElement, element, componentId, null, null);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
+                            break;
+                    }
+                    break;
+                case "ServiceConfig":
+                    var serviceConfigName = context["ServiceConfigServiceName"];
+                    var serviceConfigComponentId = context["ServiceConfigComponentId"];
+
+                    switch (element.Name.LocalName)
+                    {
+                        case "FirewallException":
+                            this.ParseFirewallExceptionElement(intermediate, section, parentElement, element, serviceConfigComponentId, null, serviceConfigName);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
+                            break;
+                    }
+                    break;
+                case "ServiceInstall":
+                    var serviceInstallName = context["ServiceInstallName"];
+                    var serviceInstallComponentId = context["ServiceInstallComponentId"];
+
+                    switch (element.Name.LocalName)
+                    {
+                        case "FirewallException":
+                            this.ParseFirewallExceptionElement(intermediate, section, parentElement, element, serviceInstallComponentId, null, serviceInstallName);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -64,10 +92,12 @@ namespace WixToolset.Firewall
         /// <summary>
         /// Parses a FirewallException element.
         /// </summary>
+        /// <param name="parentElement">The parent element of the one being parsed.</param>
         /// <param name="element">The element to parse.</param>
         /// <param name="componentId">Identifier of the component that owns this firewall exception.</param>
         /// <param name="fileId">The file identifier of the parent element (null if nested under Component).</param>
-        private void ParseFirewallExceptionElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
+        /// <param name="serviceName">The service name of the parent element (null if not nested under ServiceConfig or ServiceInstall).</param>
+        private void ParseFirewallExceptionElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, string componentId, string fileId, string serviceName)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
@@ -76,12 +106,32 @@ namespace WixToolset.Firewall
             string file = null;
             string program = null;
             string port = null;
-            int? protocol = null;
-            int? profile = null;
+            string protocol = null;
+            string profile = null;
             string scope = null;
             string remoteAddresses = null;
             string description = null;
             int? direction = null;
+            string protocolValue = null;
+            string action = null;
+            string edgeTraversal = null;
+            string enabled = null;
+            string grouping = null;
+            string icmpTypesAndCodes = null;
+            string interfaces = null;
+            string interfaceValue = null;
+            string interfaceTypes = null;
+            string interfaceTypeValue = null;
+            string localScope = null;
+            string localAddresses = null;
+            string remotePort = null;
+            string service = null;
+            string localAppPackageId = null;
+            string localUserAuthorizedList = null;
+            string localUserOwner = null;
+            string remoteMachineAuthorizedList = null;
+            string remoteUserAuthorizedList = null;
+            string secureFlags = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -96,9 +146,9 @@ namespace WixToolset.Firewall
                             name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "File":
-                            if (null != fileId)
+                            if (fileId != null)
                             {
-                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "File", "File"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "File", parentElement.Name.LocalName));
                             }
                             else
                             {
@@ -106,15 +156,31 @@ namespace WixToolset.Firewall
                             }
                             break;
                         case "IgnoreFailure":
-                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes)
                             {
                                 attributes |= 0x1; // feaIgnoreFailures
                             }
                             break;
-                        case "Program":
-                            if (null != fileId)
+                        case "OnUpdate":
+                            var onupdate = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (onupdate)
                             {
-                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "Program", "File"));
+                                case "DoNothing":
+                                    attributes |= 0x2; // feaIgnoreUpdates
+                                    break;
+                                case "EnableOnly":
+                                    attributes |= 0x4; // feaEnableOnUpdate
+                                    break;
+
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "OnUpdate", onupdate, "EnableOnly", "DoNothing"));
+                                    break;
+                            }
+                            break;
+                        case "Program":
+                            if (fileId != null)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "Program", parentElement.Name.LocalName));
                             }
                             else
                             {
@@ -125,22 +191,28 @@ namespace WixToolset.Firewall
                             port = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Protocol":
-                            var protocolValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            protocolValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (protocolValue)
                             {
+                                case FirewallConstants.IntegerNotSetString:
+                                    break;
+
                                 case "tcp":
-                                    protocol = FirewallConstants.NET_FW_IP_PROTOCOL_TCP;
+                                    protocol = FirewallConstants.NET_FW_IP_PROTOCOL_TCP.ToString();
                                     break;
                                 case "udp":
-                                    protocol = FirewallConstants.NET_FW_IP_PROTOCOL_UDP;
+                                    protocol = FirewallConstants.NET_FW_IP_PROTOCOL_UDP.ToString();
                                     break;
+
                                 default:
-                                    int parsedProtocol;
-                                    if (!Int32.TryParse(protocolValue, out parsedProtocol) || parsedProtocol > 255 || parsedProtocol < 0)
+                                    protocol = protocolValue;
+                                    if (!this.ParseHelper.ContainsProperty(protocolValue))
                                     {
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Protocol", protocolValue, "tcp", "udp", "0-255"));
+                                        if (!Int32.TryParse(protocolValue, out var parsedProtocol) || parsedProtocol > 255 || parsedProtocol < 0)
+                                        {
+                                            this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Protocol", protocolValue, "tcp", "udp", "0-255"));
+                                        }
                                     }
-                                    protocol = parsedProtocol;
                                     break;
                             }
                             break;
@@ -167,7 +239,11 @@ namespace WixToolset.Firewall
                                     remoteAddresses = "DefaultGateway";
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Scope", scope, "any", "localSubnet", "DNS", "DHCP", "WINS", "defaultGateway"));
+                                    remoteAddresses = scope;
+                                    if (!this.ParseHelper.ContainsProperty(scope))
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Scope", scope, "any", "localSubnet", "DNS", "DHCP", "WINS", "defaultGateway"));
+                                    }
                                     break;
                             }
                             break;
@@ -176,19 +252,23 @@ namespace WixToolset.Firewall
                             switch (profileValue)
                             {
                                 case "domain":
-                                    profile = FirewallConstants.NET_FW_PROFILE2_DOMAIN;
+                                    profile = FirewallConstants.NET_FW_PROFILE2_DOMAIN.ToString();
                                     break;
                                 case "private":
-                                    profile = FirewallConstants.NET_FW_PROFILE2_PRIVATE;
+                                    profile = FirewallConstants.NET_FW_PROFILE2_PRIVATE.ToString();
                                     break;
                                 case "public":
-                                    profile = FirewallConstants.NET_FW_PROFILE2_PUBLIC;
+                                    profile = FirewallConstants.NET_FW_PROFILE2_PUBLIC.ToString();
                                     break;
                                 case "all":
-                                    profile = FirewallConstants.NET_FW_PROFILE2_ALL;
+                                    profile = FirewallConstants.NET_FW_PROFILE2_ALL.ToString();
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Profile", profileValue, "domain", "private", "public", "all"));
+                                    profile = profileValue;
+                                    if (!this.ParseHelper.ContainsProperty(profileValue))
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Profile", profileValue, "domain", "private", "public", "all"));
+                                    }
                                     break;
                             }
                             break;
@@ -199,6 +279,196 @@ namespace WixToolset.Firewall
                             direction = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes
                                 ? FirewallConstants.NET_FW_RULE_DIR_OUT
                                 : FirewallConstants.NET_FW_RULE_DIR_IN;
+                            break;
+                        case "Action":
+                            action = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (action)
+                            {
+                                case "Block":
+                                    action = "0";
+                                    break;
+                                case "Allow":
+                                    action = "1";
+                                    break;
+
+                                default:
+                                    if (!this.ParseHelper.ContainsProperty(action))
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Action", action, "Allow", "Block"));
+                                    }
+                                    break;
+                            }
+                            break;
+                        case "EdgeTraversal":
+                            edgeTraversal = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (edgeTraversal)
+                            {
+                                case "Deny":
+                                    edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DENY.ToString();
+                                    break;
+                                case "Allow":
+                                    edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_ALLOW.ToString();
+                                    break;
+                                case "DeferToApp":
+                                    attributes |= 0x8; // feaAddINetFwRule2
+                                    edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DEFER_TO_APP.ToString();
+                                    break;
+                                case "DeferToUser":
+                                    attributes |= 0x8; // feaAddINetFwRule2
+                                    edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DEFER_TO_USER.ToString();
+                                    break;
+
+                                default:
+                                    if (!this.ParseHelper.ContainsProperty(edgeTraversal))
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "EdgeTraversal", edgeTraversal, "Allow", "DeferToApp", "DeferToUser", "Deny"));
+                                    }
+                                    break;
+                            }
+                            break;
+                        case "Enabled":
+                            enabled = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            if (!this.ParseHelper.ContainsProperty(enabled))
+                            {
+                                switch (this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                                {
+                                    case YesNoType.Yes:
+                                        enabled = "1";
+                                        break;
+                                    case YesNoType.No:
+                                        enabled = "0";
+                                        break;
+
+                                    default:
+                                        this.Messaging.Write(ErrorMessages.IllegalYesNoValue(sourceLineNumbers, element.Name.LocalName, "Enabled", enabled));
+                                        break;
+                                }
+                            }
+                            break;
+                        case "Grouping":
+                            grouping = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "IcmpTypesAndCodes":
+                            icmpTypesAndCodes = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Interface":
+                            interfaceValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            interfaces = interfaceValue;
+                            break;
+                        case "InterfaceType":
+                            interfaceTypeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (interfaceTypeValue)
+                            {
+                                case "RemoteAccess":
+                                case "Wireless":
+                                case "Lan":
+                                case "All":
+                                    break;
+
+                                default:
+                                    if (!this.ParseHelper.ContainsProperty(interfaceTypeValue))
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "InterfaceType", interfaceTypeValue, "RemoteAccess", "Wireless", "Lan", "All"));
+                                    }
+                                    break;
+                            }
+                            interfaceTypes = interfaceTypeValue;
+                            break;
+                        case "LocalScope":
+                            localScope = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (localScope)
+                            {
+                                case "any":
+                                    localAddresses = "*";
+                                    break;
+                                case "localSubnet":
+                                    localAddresses = "LocalSubnet";
+                                    break;
+                                case "DNS":
+                                    localAddresses = "dns";
+                                    break;
+                                case "DHCP":
+                                    localAddresses = "dhcp";
+                                    break;
+                                case "WINS":
+                                    localAddresses = "wins";
+                                    break;
+                                case "defaultGateway":
+                                    localAddresses = "DefaultGateway";
+                                    break;
+
+                                default:
+                                    if (!this.ParseHelper.ContainsProperty(localScope))
+                                    {
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "LocalScope", localScope, "any", "localSubnet", "DNS", "DHCP", "WINS", "defaultGateway"));
+                                    }
+                                    else
+                                    {
+                                        localAddresses = localScope;
+                                    }
+                                    break;
+                            }
+                            break;
+                        case "RemotePort":
+                            remotePort = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Service":
+                            if (serviceName != null)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "Service", parentElement.Name.LocalName));
+                            }
+                            else
+                            {
+                                service = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            }
+                            break;
+                        case "LocalAppPackageId":
+                            localAppPackageId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            attributes |= 0x10; // feaAddINetFwRule3
+                            break;
+                        case "LocalUserAuthorizedList":
+                            localUserAuthorizedList = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            attributes |= 0x10; // feaAddINetFwRule3
+                            break;
+                        case "LocalUserOwner":
+                            localUserOwner = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            attributes |= 0x10; // feaAddINetFwRule3
+                            break;
+                        case "RemoteMachineAuthorizedList":
+                            remoteMachineAuthorizedList = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            attributes |= 0x10; // feaAddINetFwRule3
+                            break;
+                        case "RemoteUserAuthorizedList":
+                            remoteUserAuthorizedList = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            attributes |= 0x10; // feaAddINetFwRule3
+                            break;
+                        case "IPSecSecureFlags":
+                            secureFlags = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            attributes |= 0x10; // feaAddINetFwRule3
+                            if (!this.ParseHelper.ContainsProperty(secureFlags))
+                            {
+                                switch (secureFlags)
+                                {
+                                    case "None":
+                                        secureFlags = "0";
+                                        break;
+                                    case "NoEncapsulation":
+                                        secureFlags = "1";
+                                        break;
+                                    case "WithIntegrity":
+                                        secureFlags = "2";
+                                        break;
+                                    case "NegotiateEncryption":
+                                        secureFlags = "3";
+                                        break;
+                                    case "Encrypt":
+                                        secureFlags = "4";
+                                        break;
+                                    default:
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "IPSecSecureFlags", secureFlags, "None", "NoEncapsulation", "WithIntegrity", "NegotiateEncryption", "Encrypt"));
+                                        break;
+                                }
+                            }
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -211,7 +481,7 @@ namespace WixToolset.Firewall
                 }
             }
 
-            // parse RemoteAddress children
+            // parse children
             foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
@@ -219,7 +489,7 @@ namespace WixToolset.Firewall
                     switch (child.Name.LocalName)
                     {
                         case "RemoteAddress":
-                            if (null != scope)
+                            if (scope != null)
                             {
                                 this.Messaging.Write(FirewallErrors.IllegalRemoteAddressWithScopeAttribute(sourceLineNumbers));
                             }
@@ -228,6 +498,37 @@ namespace WixToolset.Firewall
                                 this.ParseRemoteAddressElement(intermediate, section, child, ref remoteAddresses);
                             }
                             break;
+                        case "Interface":
+                            if (interfaceValue != null)
+                            {
+                                this.Messaging.Write(FirewallErrors.IllegalInterfaceWithInterfaceAttribute(sourceLineNumbers));
+                            }
+                            else
+                            {
+                                this.ParseInterfaceElement(intermediate, section, child, ref interfaces);
+                            }
+                            break;
+                        case "InterfaceType":
+                            if (interfaceTypeValue != null)
+                            {
+                                this.Messaging.Write(FirewallErrors.IllegalInterfaceTypeWithInterfaceTypeAttribute(sourceLineNumbers));
+                            }
+                            else
+                            {
+                                this.ParseInterfaceTypeElement(intermediate, section, child, ref interfaceTypes);
+                            }
+                            break;
+                        case "LocalAddress":
+                            if (localScope != null)
+                            {
+                                this.Messaging.Write(FirewallErrors.IllegalLocalAddressWithLocalScopeAttribute(sourceLineNumbers));
+                            }
+                            else
+                            {
+                                this.ParseLocalAddressElement(intermediate, section, child, ref localAddresses);
+                            }
+                            break;
+
                         default:
                             this.ParseHelper.UnexpectedElement(element, child);
                             break;
@@ -239,54 +540,84 @@ namespace WixToolset.Firewall
                 }
             }
 
-            if (null == id)
+            if (id == null)
             {
-                id = this.ParseHelper.CreateIdentifier("fex", name, remoteAddresses, componentId);
+                // firewall rule names are meant to be unique
+                id = this.ParseHelper.CreateIdentifier("fex", name, componentId);
             }
 
             // Name is required
-            if (null == name)
+            if (name == null)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
-            // Scope or child RemoteAddress(es) are required
-            if (null == remoteAddresses)
+            if (service == null)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttributeOrElement(sourceLineNumbers, element.Name.LocalName, "Scope", "RemoteAddress"));
+                service = serviceName;
             }
 
             // can't have both Program and File
-            if (null != program && null != file)
+            if (program != null && file != null)
             {
                 this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "File", "Program"));
             }
 
-            // must be nested under File, have File or Program attributes, or have Port attribute
-            if (String.IsNullOrEmpty(fileId) && String.IsNullOrEmpty(file) && String.IsNullOrEmpty(program) && String.IsNullOrEmpty(port))
+            // Defer to user edge traversal setting can only be used in a firewall rule where program path and TCP/UDP protocol are specified with no additional conditions.
+            if (edgeTraversal == FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DEFER_TO_USER.ToString())
             {
-                this.Messaging.Write(FirewallErrors.NoExceptionSpecified(sourceLineNumbers));
-            }
-
-            // Ports can only be specified if the protocol is TCP or UDP.
-            if (!String.IsNullOrEmpty(port) && protocol.HasValue)
-            {
-                switch(protocol.Value)
+                if (protocol != null && !(protocol == FirewallConstants.NET_FW_IP_PROTOCOL_TCP.ToString() || protocol == FirewallConstants.NET_FW_IP_PROTOCOL_UDP.ToString()))
                 {
-                    case FirewallConstants.NET_FW_IP_PROTOCOL_TCP:
-                    case FirewallConstants.NET_FW_IP_PROTOCOL_UDP:
-                        break;
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, element.Name.LocalName, "Protocol", protocolValue, "tcp,udp"));
+                }
 
-                    default:
-                        this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Port", "Protocol", protocol.Value.ToString()));
-                        break;
+                if (String.IsNullOrEmpty(fileId) && String.IsNullOrEmpty(file) && String.IsNullOrEmpty(program))
+                {
+                    this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Program", "EdgeTraversal", "DeferToUser"));
+                }
+
+                if (port != null)
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Port", "EdgeTraversal", "DeferToUser"));
+                }
+
+                if (remotePort != null)
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "RemotePort", "EdgeTraversal", "DeferToUser"));
+                }
+
+                if (localScope != null)
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "LocalScope", "EdgeTraversal", "DeferToUser"));
+                }
+
+                if (scope != null)
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Scope", "EdgeTraversal", "DeferToUser"));
+                }
+
+                if (profile != null)
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Profile", "EdgeTraversal", "DeferToUser"));
+                }
+
+                if (service != null)
+                {
+                    if (serviceName != null)
+                    {
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeValueWhenNested(sourceLineNumbers, element.Name.LocalName, "EdgeTraversal", "DeferToUser", parentElement.Name.LocalName));
+                    }
+                    else
+                    {
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Service", "EdgeTraversal", "DeferToUser"));
+                    }
                 }
             }
 
             if (!this.Messaging.EncounteredError)
             {
                 // at this point, File attribute and File parent element are treated the same
-                if (null != file)
+                if (file != null)
                 {
                     fileId = file;
                 }
@@ -295,26 +626,36 @@ namespace WixToolset.Firewall
                 {
                     Name = name,
                     RemoteAddresses = remoteAddresses,
-                    Profile = profile ?? FirewallConstants.NET_FW_PROFILE2_ALL,
                     ComponentRef = componentId,
                     Description = description,
                     Direction = direction ?? FirewallConstants.NET_FW_RULE_DIR_IN,
+                    Action = action ?? FirewallConstants.IntegerNotSetString,
+                    EdgeTraversal = edgeTraversal ?? FirewallConstants.IntegerNotSetString,
+                    Enabled = enabled ?? FirewallConstants.IntegerNotSetString,
+                    Grouping = grouping,
+                    IcmpTypesAndCodes = icmpTypesAndCodes,
+                    Interfaces = interfaces,
+                    InterfaceTypes = interfaceTypes,
+                    LocalAddresses = localAddresses,
+                    Port = port,
+                    Profile = profile ?? FirewallConstants.IntegerNotSetString,
+                    Protocol = protocol ?? FirewallConstants.IntegerNotSetString,
+                    RemotePort = remotePort,
+                    ServiceName = service,
+                    LocalAppPackageId = localAppPackageId,
+                    LocalUserAuthorizedList = localUserAuthorizedList,
+                    LocalUserOwner = localUserOwner,
+                    RemoteMachineAuthorizedList = remoteMachineAuthorizedList,
+                    RemoteUserAuthorizedList = remoteUserAuthorizedList,
+                    SecureFlags = secureFlags ?? FirewallConstants.IntegerNotSetString,
                 });
 
-                if (!String.IsNullOrEmpty(port))
+                if (String.IsNullOrEmpty(protocol))
                 {
-                    symbol.Port = port;
-
-                    if (!protocol.HasValue)
+                    if (!String.IsNullOrEmpty(port) || !String.IsNullOrEmpty(remotePort))
                     {
-                        // default protocol is "TCP"
-                        protocol = FirewallConstants.NET_FW_IP_PROTOCOL_TCP;
+                        symbol.Protocol = FirewallConstants.NET_FW_IP_PROTOCOL_TCP.ToString();
                     }
-                }
-
-                if (protocol.HasValue)
-                {
-                    symbol.Protocol = protocol.Value;
                 }
 
                 if (!String.IsNullOrEmpty(fileId))
@@ -327,7 +668,7 @@ namespace WixToolset.Firewall
                     symbol.Program = program;
                 }
 
-                if (CompilerConstants.IntegerNotSet != attributes)
+                if (attributes != CompilerConstants.IntegerNotSet)
                 {
                     symbol.Attributes = attributes;
                 }
@@ -379,6 +720,168 @@ namespace WixToolset.Firewall
                 else
                 {
                     remoteAddresses = String.Concat(remoteAddresses, ",", address);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses an Interface element
+        /// </summary>
+        /// <param name="element">The element to parse.</param>
+        private void ParseInterfaceElement(Intermediate intermediate, IntermediateSection section, XElement element, ref string interfaces)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            string name = null;
+
+            // no attributes
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Name":
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            if (String.IsNullOrEmpty(name))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
+            }
+            else
+            {
+                if (String.IsNullOrEmpty(interfaces))
+                {
+                    interfaces = name;
+                }
+                else
+                {
+                    interfaces = String.Concat(interfaces, FirewallConstants.FORBIDDEN_FIREWALL_CHAR, name);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses an InterfaceType element
+        /// </summary>
+        /// <param name="element">The element to parse.</param>
+        private void ParseInterfaceTypeElement(Intermediate intermediate, IntermediateSection section, XElement element, ref string interfaceTypes)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            string value = null;
+
+            // no attributes
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Value":
+                            value = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            if (String.IsNullOrEmpty(value))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Value"));
+            }
+            else
+            {
+                switch (value)
+                {
+                    case "RemoteAccess":
+                    case "Wireless":
+                    case "Lan":
+                    case "All":
+                        break;
+
+                    default:
+                        if (!this.ParseHelper.ContainsProperty(value))
+                        {
+                            this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Value", value, "RemoteAccess", "Wireless", "Lan", "All"));
+                            value = null;
+                        }
+                        break;
+                }
+
+                if (String.IsNullOrEmpty(interfaceTypes))
+                {
+                    interfaceTypes = value;
+                }
+                else if (interfaceTypes.Contains("All"))
+                {
+                    if (value != "All")
+                    {
+                        this.Messaging.Write(FirewallErrors.IllegalInterfaceTypeWithInterfaceTypeAll(sourceLineNumbers));
+                    }
+                }
+                else if(!String.IsNullOrEmpty(value))
+                {
+                    interfaceTypes = String.Concat(interfaceTypes, ",", value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses a RemoteAddress element
+        /// </summary>
+        /// <param name="element">The element to parse.</param>
+        private void ParseLocalAddressElement(Intermediate intermediate, IntermediateSection section, XElement element, ref string localAddresses)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            string address = null;
+
+            // no attributes
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Value":
+                            address = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            if (String.IsNullOrEmpty(address))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Value"));
+            }
+            else
+            {
+                if (String.IsNullOrEmpty(localAddresses))
+                {
+                    localAddresses = address;
+                }
+                else
+                {
+                    localAddresses = String.Concat(localAddresses, ",", address);
                 }
             }
         }

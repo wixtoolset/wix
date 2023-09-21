@@ -6,16 +6,51 @@
             <Component>
                 <File Name="fw.exe" Source="example.txt">
                     <Shortcut Id="FwShortcut" Directory="INSTALLFOLDER" Name="Firewall" />
-                    <fw:FirewallException Id="ExampleFirewall" Description="An app-based firewall exception" Name="ExampleApp" Port="42">
+                    <fw:FirewallException Id="ExampleFirewall" Description="An app-based firewall exception" Name="ExampleApp" Port="42" OnUpdate="DoNothing" >
                         <fw:RemoteAddress Value="*" />
                     </fw:FirewallException>
                 </File>
 
-                <fw:FirewallException Description="A port-based firewall exception" Name="ExamplePort" Port="42" Outbound="yes" Scope="localSubnet" />
+                <fw:FirewallException Description="A port-based firewall exception" Name="ExamplePort" Port="42" Outbound="yes" Scope="localSubnet" OnUpdate="EnableOnly" />
                 <fw:FirewallException Description="DNS scope firewall exception" Name="ExampleDNSScope" Port="356" Protocol="udp" Scope="DNS" />
                 <fw:FirewallException Description="DHCP scope firewall exception" Name="ExampleDHCPScope" Program="test.exe" Protocol="211" Scope="DHCP" Profile="public" />
                 <fw:FirewallException Description="WINS scope firewall exception" Name="ExampleWINSScope" Port="6573" Scope="WINS" Profile="domain"/>
                 <fw:FirewallException Description="defaultGateway scope firewall exception" Name="ExampleDefaultGatewayScope" Port="4432" Scope="defaultGateway" Profile="private" />
+
+                <fw:FirewallException Description="Defer to user edge traversal" Name="defertouser" Program="fw.exe" EdgeTraversal="DeferToUser" />
+                <fw:FirewallException Description="A port-based service exception" Name="ExampleService" Port="12000" Service="ftpsrv" Program="%windir%\system32\svchost.exe" >
+                    <fw:LocalAddress Value="DHCP"/>
+                    <fw:LocalAddress Value="WINS"/>
+                </fw:FirewallException>
+
+                <fw:FirewallException Description="Interfaces with nested elements" Name="interface nested" Port="54671" >
+                    <fw:RemoteAddress Value="127.0.0.1"/>
+                    <fw:Interface Name="Wi-Fi" />
+                    <fw:Interface Name="Local Area Connection" />
+                </fw:FirewallException>
+                <fw:FirewallException Description="Interfaces with property" Name="interface property" Port="54671" Interface="[INTERFACE_PROPERTY]" />
+
+                <ServiceInstall Name="svc1" Type="ownProcess" Start="disabled" ErrorControl="ignore" >
+                    <fw:FirewallException Id="ServiceInstall.nested" IgnoreFailure="true" Description="A port-based firewall exception for a windows service" Name="ExampleNestedService" Port="3546-7890" Scope="localSubnet" >
+                        <fw:InterfaceType Value="Lan" />
+                        <fw:InterfaceType Value="Wireless" />
+                    </fw:FirewallException>
+                </ServiceInstall>
+
+                <fw:FirewallException Description="Simple INetFwRule3 values" Name="INetFwRule3 values" Scope="any" LocalAppPackageId="S-1-15-2-1239072475-3687740317-1842961305-3395936705-4023953123-1525404051-2779347315" LocalUserAuthorizedList="O:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)" LocalUserOwner="S-1-5-21-1898747406-2352535518-1247798438-1914" RemoteMachineAuthorizedList="127.0.0.1" RemoteUserAuthorizedList="O:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)" IPSecSecureFlags="NegotiateEncryption" />
+                <fw:FirewallException Description="INetFwRule3 passed via properties" Name="INetFwRule3 properties" Scope="any" LocalAppPackageId="[PROP1]" LocalUserAuthorizedList="[PROP2]" LocalUserOwner="[PROP3]" RemoteMachineAuthorizedList="[PROP4]" RemoteUserAuthorizedList="[PROP5]" IPSecSecureFlags="[PROP6]" />
+
+                <fw:FirewallException Description="Simple rule with grouping" Name="GroupingExample1" Program="fw.exe" Grouping="@yourresources.dll,-1005" />
+                <fw:FirewallException Description="Rule with grouping property" Name="GroupingExample2" Port="8732" Grouping="[GROUPING_PROP]" />
+
+                <fw:FirewallException Description="Simple ICMP rule" Name="ICMPExample1" Protocol="2" IcmpTypesAndCodes="4:*,9:*,12:*" />
+                <fw:FirewallException Description="Rule with ICMP property" Name="ICMPExample2" Protocol="2" IcmpTypesAndCodes="[ICMP_PROP]" />
+
+                <fw:FirewallException Description="Simple rule with local scope" Name="LocalScopeExample1" Scope="any" LocalScope="localSubnet" />
+                <fw:FirewallException Description="Rule with local scope property" Name="LocalScopeExample2" Scope="any" LocalScope="[LOCALSCOPE_PROP]" />
+
+                <fw:FirewallException Description="Simple rule with remote port" Name="RemotePortExample1" Scope="any" RemotePort="34560" />
+                <fw:FirewallException Description="Rule with remote port property" Name="RemotePortExample2" Program="fw.exe" RemotePort="[REMOTEPORT_PROP]" />
             </Component>
         </ComponentGroup>
     </Fragment>

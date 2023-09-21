@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="FirewallComponent" Guid="28DF3387-F30E-4DBE-90E2-D2C760CB4DD9">
+                <fw:FirewallException
+					Name="[NAME]"
+					Port="[LOCALPORT]"
+					Protocol="[PROTOCOL]"
+					Program="[PROGRAM]"
+					Profile="[PROFILE]"
+					Description="[DESCRIPTION]"
+					Scope="[REMOTESCOPE]"
+					Action="[ACTION]"
+					EdgeTraversal="[EDGETRAVERSAL]"
+					Enabled="[ENABLED]"
+					Grouping="[GROUPING]"
+					IcmpTypesAndCodes="[ICMPTYPES]"
+					Interface="[INTERFACE]"
+					InterfaceType="[INTERFACETYPE]"
+					LocalScope="[LOCALSCOPE]"
+					RemotePort="[REMOTEPORT]"
+					Service="[SERVICE]"
+					LocalAppPackageId="[PACKAGEID]"
+					LocalUserAuthorizedList="[LOCALUSERS]"
+					LocalUserOwner="[LOCALOWNER]"
+					RemoteMachineAuthorizedList="[REMOTEMACHINES]"
+					RemoteUserAuthorizedList="[REMOTEUSERS]"
+					IPSecSecureFlags="[SECUREFLAGS]"
+					/>
+
+                <fw:FirewallException Name="Single Nested properties" >
+					<fw:RemoteAddress Value="[REMOTEADDRESS]" />
+					<fw:LocalAddress Value="[LOCALADDRESS]" />
+                    <fw:InterfaceType Value="[INTERFACETYPE]" />
+                    <fw:Interface Name="[INTERFACE]" />
+                </fw:FirewallException>
+
+                <fw:FirewallException Name="Multiple Nested properties" >
+                    <fw:RemoteAddress Value="[REMOTEADDRESS1]" />
+                    <fw:RemoteAddress Value="[REMOTEADDRESS2]" />
+                    <fw:LocalAddress Value="[LOCALADDRESS1]" />
+                    <fw:LocalAddress Value="[LOCALADDRESS2]" />
+                    <fw:InterfaceType Value="[INTERFACETYPE1]" />
+                    <fw:InterfaceType Value="[INTERFACETYPE2]" />
+                    <fw:Interface Name="[INTERFACE1]" />
+                    <fw:Interface Name="[INTERFACE2]" />
+                </fw:FirewallException>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

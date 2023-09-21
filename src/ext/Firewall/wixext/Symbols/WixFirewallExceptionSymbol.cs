@@ -14,13 +14,29 @@ namespace WixToolset.Firewall
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.RemoteAddresses), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Port), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Protocol), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Protocol), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Program), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Profile), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Profile), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Direction), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Action), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.EdgeTraversal), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Enabled), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Grouping), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.IcmpTypesAndCodes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.Interfaces), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.InterfaceTypes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.LocalAddresses), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.RemotePort), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.ServiceName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.LocalAppPackageId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.LocalUserAuthorizedList), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.LocalUserOwner), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.RemoteMachineAuthorizedList), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.RemoteUserAuthorizedList), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionSymbolFields.SecureFlags), IntermediateFieldType.String),
             },
             typeof(WixFirewallExceptionSymbol));
     }
@@ -42,6 +58,22 @@ namespace WixToolset.Firewall.Symbols
         ComponentRef,
         Description,
         Direction,
+        Action,
+        EdgeTraversal,
+        Enabled,
+        Grouping,
+        IcmpTypesAndCodes,
+        Interfaces,
+        InterfaceTypes,
+        LocalAddresses,
+        RemotePort,
+        ServiceName,
+        LocalAppPackageId,
+        LocalUserAuthorizedList,
+        LocalUserOwner,
+        RemoteMachineAuthorizedList,
+        RemoteUserAuthorizedList,
+        SecureFlags,
     }
 
     public class WixFirewallExceptionSymbol : IntermediateSymbol
@@ -74,9 +106,9 @@ namespace WixToolset.Firewall.Symbols
             set => this.Set((int)WixFirewallExceptionSymbolFields.Port, value);
         }
 
-        public int? Protocol
+        public string Protocol
         {
-            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Protocol].AsNullableNumber();
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Protocol].AsString();
             set => this.Set((int)WixFirewallExceptionSymbolFields.Protocol, value);
         }
 
@@ -92,9 +124,9 @@ namespace WixToolset.Firewall.Symbols
             set => this.Set((int)WixFirewallExceptionSymbolFields.Attributes, value);
         }
 
-        public int Profile
+        public string Profile
         {
-            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Profile].AsNumber();
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Profile].AsString();
             set => this.Set((int)WixFirewallExceptionSymbolFields.Profile, value);
         }
 
@@ -114,6 +146,102 @@ namespace WixToolset.Firewall.Symbols
         {
             get => this.Fields[(int)WixFirewallExceptionSymbolFields.Direction].AsNumber();
             set => this.Set((int)WixFirewallExceptionSymbolFields.Direction, value);
+        }
+
+        public string Action
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Action].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.Action, value);
+        }
+
+        public string EdgeTraversal
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.EdgeTraversal].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.EdgeTraversal, value);
+        }
+
+        public string Enabled
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Enabled].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.Enabled, value);
+        }
+
+        public string Grouping
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Grouping].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.Grouping, value);
+        }
+
+        public string IcmpTypesAndCodes
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.IcmpTypesAndCodes].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.IcmpTypesAndCodes, value);
+        }
+
+        public string Interfaces
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.Interfaces].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.Interfaces, value);
+        }
+
+        public string InterfaceTypes
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.InterfaceTypes].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.InterfaceTypes, value);
+        }
+
+        public string LocalAddresses
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.LocalAddresses].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.LocalAddresses, value);
+        }
+
+        public string RemotePort
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.RemotePort].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.RemotePort, value);
+        }
+
+        public string ServiceName
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.ServiceName].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.ServiceName, value);
+        }
+
+        public string LocalAppPackageId
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.LocalAppPackageId].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.LocalAppPackageId, value);
+        }
+
+        public string LocalUserAuthorizedList
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.LocalUserAuthorizedList].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.LocalUserAuthorizedList, value);
+        }
+
+        public string LocalUserOwner
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.LocalUserOwner].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.LocalUserOwner, value);
+        }
+
+        public string RemoteMachineAuthorizedList
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.RemoteMachineAuthorizedList].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.RemoteMachineAuthorizedList, value);
+        }
+
+        public string RemoteUserAuthorizedList
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.RemoteUserAuthorizedList].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.RemoteUserAuthorizedList, value);
+        }
+
+        public string SecureFlags
+        {
+            get => this.Fields[(int)WixFirewallExceptionSymbolFields.SecureFlags].AsString();
+            set => this.Set((int)WixFirewallExceptionSymbolFields.SecureFlags, value);
         }
     }
 }

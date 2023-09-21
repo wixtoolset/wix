@@ -1,0 +1,57 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="FirewallComponent1"/>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="FirewallComponent1" Guid="A1553D10-BEB7-4E60-A0DC-6F1EEE5A1719" Directory="INSTALLFOLDER">
+                <fw:FirewallException
+					Name="WiXToolset Test - 0028" OnUpdate="EnableOnly"
+					Port="[LOCALPORT]"
+					Protocol="[PROTOCOL]"
+					Program="[PROGRAM]"
+					Profile="[PROFILE]"
+					Description="[DESCRIPTION]"
+					Scope="[REMOTESCOPE]"
+					EdgeTraversal="[EDGETRAVERSAL]"
+					Enabled="[ENABLED]"
+					Grouping="[GROUPING]"
+					IcmpTypesAndCodes="[ICMPTYPES]"
+					Interface="[INTERFACE]"
+					InterfaceType="[INTERFACETYPE]"
+					LocalScope="[LOCALSCOPE]"
+					RemotePort="[REMOTEPORT]"
+					Service="[SERVICE]"
+					LocalAppPackageId="[PACKAGEID]"
+					LocalUserAuthorizedList="[LOCALUSERS]"
+					LocalUserOwner="[LOCALOWNER]"
+					RemoteMachineAuthorizedList="[REMOTEMACHINES]"
+					RemoteUserAuthorizedList="[REMOTEUSERS]"
+					IPSecSecureFlags="[SECUREFLAGS]"
+					/>
+
+                <fw:FirewallException Name="WiXToolset Test - 0029" OnUpdate="DoNothing" >
+					<fw:RemoteAddress Value="[REMOTEADDRESS]" />
+					<fw:LocalAddress Value="[LOCALADDRESS]" />
+                    <fw:InterfaceType Value="[INTERFACETYPE]" />
+                    <fw:Interface Name="[INTERFACE]" />
+                </fw:FirewallException>
+
+                <fw:FirewallException Name="WiXToolset Test - 0030" >
+                    <fw:RemoteAddress Value="[REMOTEADDRESS1]" />
+                    <fw:RemoteAddress Value="[REMOTEADDRESS2]" />
+                    <fw:LocalAddress Value="[LOCALADDRESS1]" />
+                    <fw:LocalAddress Value="[LOCALADDRESS2]" />
+                    <fw:InterfaceType Value="[INTERFACETYPE1]" />
+                    <fw:InterfaceType Value="[INTERFACETYPE2]" />
+                    <fw:Interface Name="[INTERFACE1]" />
+                    <fw:Interface Name="[INTERFACE2]" />
+                </fw:FirewallException>
+        </Component>
+    </Fragment>
+</Wix>
