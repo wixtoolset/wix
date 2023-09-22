@@ -977,12 +977,20 @@ extern "C" UINT __stdcall DotNetCompatibilityCheck(
         WcaLog(LOGMSG_VERBOSE, "Command: %ls %ls", pwzNetCoreCheckFilePath, pwzCommandLine);
 
         hr = ProcExec(pwzNetCoreCheckFilePath, pwzCommandLine, SW_HIDE, &hProcess);
-        ExitOnFailure(hr, "failed to run NetCoreCheck from binary '%ls' with command line: %ls %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath, pwzCommandLine);
+        if (hr == HRESULT_FROM_WIN32(ERROR_EXE_MACHINE_TYPE_MISMATCH) || hr == HRESULT_FROM_WIN32(ERROR_BAD_EXE_FORMAT))
+        {
+            dwExitCode = 13;
+            WcaLog(LOGMSG_VERBOSE, "NetCoreCheck executable for platform %ls is not compatible with current OS", pwzPlatform);
+        }
+        else
+        {
+            ExitOnFailure(hr, "failed to run NetCoreCheck from binary '%ls' with command line: %ls %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath, pwzCommandLine);
 
-        hr = ProcWaitForCompletion(hProcess, INFINITE, &dwExitCode);
-        ExitOnFailure(hr, "failed to finish NetCoreCheck from binary '%ls' with command line: %ls %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath, pwzCommandLine);
-        WcaLog(LOGMSG_VERBOSE, "Exit code: %lu", dwExitCode);
-        ReleaseHandle(hProcess);
+            hr = ProcWaitForCompletion(hProcess, INFINITE, &dwExitCode);
+            ExitOnFailure(hr, "failed to finish NetCoreCheck from binary '%ls' with command line: %ls %ls", pwzNetCoreCheckBinaryId, pwzNetCoreCheckFilePath, pwzCommandLine);
+            WcaLog(LOGMSG_VERBOSE, "Exit code: %lu", dwExitCode);
+            ReleaseHandle(hProcess);
+        }
 
         hr = WcaSetIntProperty(pwzProperty, dwExitCode);
         ExitOnFailure(hr, "failed to set NetCoreCheck result in %ls", pwzProperty);
