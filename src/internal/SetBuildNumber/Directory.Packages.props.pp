@@ -91,9 +91,9 @@
     <PackageVersion Include="GitInfo" Version="2.3.0" />
 
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-    <PackageVersion Include="xunit" Version="2.5.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
-    <PackageVersion Include="xunit.assert" Version="2.5.0" />
+    <PackageVersion Include="xunit" Version="2.5.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.1" />
+    <PackageVersion Include="xunit.assert" Version="2.5.1" />
   </ItemGroup>
 
   <ItemGroup>
