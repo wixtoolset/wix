@@ -143,6 +143,49 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void FixControlConditionWithStringConstants()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <UI>",
+                "      <Dialog Id='Dlg1'>",
+                "        <Control Id='Control1'>",
+                "          <Condition Action='hide'>\"x\"==y</Condition>",
+                "          <Condition Action=\"hide\">\"x's\"==y</Condition>",
+                "        </Control>",
+                "      </Dialog>",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <UI>",
+                "      <Dialog Id=\"Dlg1\">",
+                "        <Control Id=\"Control1\" HideCondition=\"(&quot;x&quot;==y) OR (&quot;x\\'s&quot;==y)\" />",
+                "      </Dialog>",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
         public void FixPublishCondition()
         {
             var parse = String.Join(Environment.NewLine,
@@ -289,6 +332,78 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <!-- Comment -->",
                 "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixMultilineComponentCondition()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Component Id='Comp1' Directory='ApplicationFolder'>",
+                "      <Condition>1&lt;2</Condition>",
+                "    </Component>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixMultilineComponentConditionWithComment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Component Id='Comp1' Directory='ApplicationFolder'>",
+                "      <Condition>",
+                "        <!-- Comment -->",
+                "        1&lt;2 OR ",
+                "        4&lt;3",
+                "      </Condition>",
+                "    </Component>",
+                "  </Fragment>",
+                "</Wix>");
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <!-- Comment -->",
+                "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2 OR 4&lt;3\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -481,6 +596,90 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void FixMultilineFeatureCondition()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Feature Id='ShellExtensionFeature' Level='0' InstallDefault='local' >",
+                "      <Condition Level='1'>",
+                "        (NOT Installed AND NOT PERUSER) OR",
+                "        (Installed AND ZOS_SHELL_EXTENSION_INSTALLLED)",
+                "      </Condition>",
+                "      <ComponentGroupRef Id='ShellExtComponents' />",
+                "    </Feature>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Feature Id=\"ShellExtensionFeature\" Level=\"0\" InstallDefault=\"local\">",
+                "      <Level Value=\"1\" Condition=\"(NOT Installed AND NOT PERUSER) OR (Installed AND ZOS_SHELL_EXTENSION_INSTALLLED)\" />",
+                "      <ComponentGroupRef Id=\"ShellExtComponents\" />",
+                "    </Feature>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixMultilineFeatureConditionWithComment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Feature Id='ShellExtensionFeature' Level='0' InstallDefault='local' >",
+                "      <Condition Level='1'>",
+                "        <!-- Comment -->",
+                "        (NOT Installed AND NOT PERUSER) OR",
+                "        (Installed AND ZOS_SHELL_EXTENSION_INSTALLLED)",
+                "      </Condition>",
+                "      <ComponentGroupRef Id='ShellExtComponents' />",
+                "    </Feature>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Feature Id=\"ShellExtensionFeature\" Level=\"0\" InstallDefault=\"local\">",
+                "      <!-- Comment -->",
+                "      <Level Value=\"1\" Condition=\"(NOT Installed AND NOT PERUSER) OR (Installed AND ZOS_SHELL_EXTENSION_INSTALLLED)\" />",
+                "      <ComponentGroupRef Id=\"ShellExtComponents\" />",
+                "    </Feature>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
         public void FixLaunchConditionInFragment()
         {
             var parse = String.Join(Environment.NewLine,
@@ -519,7 +718,7 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void FixLaunchConditionWithComment()
+        public void FixLaunchConditionInFragmentWithComment()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -540,6 +739,87 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <!-- Comment 1 -->",
                 "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
+                "    <!-- Comment 2 -->",
+                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixMultilineLaunchConditionInFragment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Condition Message='Stop the install'>",
+                "      1&lt;2 OR ",
+                "      4&lt;3",
+                "    </Condition>",
+                "    <Condition Message='Do not stop'>",
+                "      1=2",
+                "    </Condition>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Launch Condition=\"1&lt;2 OR 4&lt;3\" Message=\"Stop the install\" />",
+                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixMultilineLaunchConditionInFragmentWithComment()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Condition Message='Stop the install'>",
+                "      <!-- Comment 1 -->",
+                "      1&lt;2 OR",
+                "      4&lt;3",
+                "    </Condition>",
+                "    <Condition Message='Do not stop'>",
+                "      <!-- Comment 2 -->1=2",
+                "    </Condition>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <!-- Comment 1 -->",
+                "    <Launch Condition=\"1&lt;2 OR 4&lt;3\" Message=\"Stop the install\" />",
                 "    <!-- Comment 2 -->",
                 "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
                 "  </Fragment>",

@@ -1040,7 +1040,7 @@ namespace WixToolset.Converters
                 {
                     var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
                     if (!String.IsNullOrEmpty(action) &&
-                        TryGetInnerText(xCondition, out var text, out comments, comments) &&
+                        TryGetInnerText(xCondition, out var text, out comments, true, false, comments) &&
                         this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
                     {
                         conditions.Add(new KeyValuePair<string, string>(action, text));
@@ -1237,9 +1237,14 @@ namespace WixToolset.Converters
             var message = element.Attribute("Message")?.Value;
 
             if (!String.IsNullOrEmpty(message) &&
-                TryGetInnerText(element, out var text, out var comments) &&
+                TryGetInnerText(element, out var text, out var comments, true, true) &&
                 this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", element.Name.LocalName))
             {
+                if (String.IsNullOrWhiteSpace(text))
+                {
+                    text = String.Empty;
+                }
+
                 using (var lab = new ConversionLab(element))
                 {
                     lab.ReplaceTargetElement(new XElement(LaunchElementName,
@@ -1983,8 +1988,14 @@ namespace WixToolset.Converters
 
             var xScript = xCustomAction.Attribute("Script");
 
-            if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText, out var comments))
+            if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText, out var comments, false, false, new List<XNode>()))
             {
+                if (null != scriptText)
+                {
+                    char[] whitespaceChars = { ' ', '\t', '\r', '\n' };
+                    scriptText = scriptText.Trim(whitespaceChars);
+                }
+
                 if (this.OnInformation(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptSourceFile' attribute to reference it.", xCustomAction.Name.LocalName))
                 {
                     var scriptFolder = Path.GetDirectoryName(this.SourceFile) ?? String.Empty;
@@ -2150,10 +2161,7 @@ namespace WixToolset.Converters
                 var attribute = element.Attribute(attributeName);
                 if (attribute != null)
                 {
-                    if (!String.IsNullOrWhiteSpace(text))
-                    {
-                        this.OnError(ConverterTestType.InnerTextDeprecated, attribute, "Using {0} element text is deprecated. Remove the element's text and use only the '{1}' attribute. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages", element.Name.LocalName, attributeName);
-                    }
+                    this.OnError(ConverterTestType.InnerTextDeprecated, attribute, "Using {0} element text is deprecated. Remove the element's text and use only the '{1}' attribute. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages", element.Name.LocalName, attributeName);
                 }
                 else if (this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
                 {
@@ -2854,20 +2862,45 @@ namespace WixToolset.Converters
             }
         }
 
-        private static bool TryGetInnerText(XElement element, out string value, out List<XNode> comments)
-        {
-            return TryGetInnerText(element, out value, out comments, new List<XNode>());
-        }
-
-        private static bool TryGetInnerText(XElement element, out string value, out List<XNode> comments, List<XNode> initialComments)
+        // This function is used to simultaneously extract the inner text of, and any comments embedded in, an XElement.
+        // The comments are returned in a list, so there can be several of them. In addition, the code is designed so that
+        // it can be called in a loop, processing one element at a time, extracting the comments cumulatively, and returning
+        // the inner text separately with each call. An initial list is passed into the "initialComments" parameter. This
+        // parameter defaults to null, which is replaced by an empty list. The augmented list is returned through the "comments"
+        // out parameter. Thiks list is then passed into the "initialComments" paameter the next time around the loop.
+        //
+        // The inner text is returned through the "value" out parameter. The function returns true if inner text is found.
+        //
+        // There are two other parameters that control the behavior of the function: The "protectQuotes" parameter, with a default
+        // value of "true", causes single and double quotes to be processed into an appropriate set of escape sequences (escaped with
+        // a backslash) ap sppropriate for a "Condition" attribute. Contiguous whitespace is coalesced into a single space character
+        // and leading and trailing whitespace is trimmed. When this paarameter is false, the inner text is returned with all whitespace
+        // intact.
+        //
+        // The other optional parameter, "reportWhitespace", has a default value of "false". When it is true, the value returned by the
+        // function is true, not only when non-whitespace text is returned in the "value" out parameter, but also if only whitespace was
+        // found. In this case, the text returned is a single space. If this parameter is false, the text found is trimmed of leading and
+        // trailing whitespace before being returned and the function only returns true if the returned text is not empty.
+        //
+        // There is one other important case in which the function returns true: If a CDATA node is processed, even if all the whitespace removed
+        // causes the remaining text to be empty, the function returns true. If in fact, the remaining text is empty, the text returned is a single
+        // space.
+        private static bool TryGetInnerText(XElement element,
+                                            out string value,
+                                            out List<XNode> comments,
+                                            bool protectQuotes = true,
+                                            bool reportWhitespace = false,
+                                            List<XNode> initialComments = null)
         {
             value = null;
-            comments = null;
-            var found = false;
-
+            char[] whitespaceChars = { ' ', '\t', '\r', '\n' };
             var nodes = element.Nodes().ToList();
-            comments = initialComments;
-            var nonCommentNodes = new List<XNode>();
+            comments = initialComments ?? new List<XNode>(); ;
+            char? currentQuote = null;
+            var inWhitespace = false;
+            var cDataFound = false;
+            var whitespaceFound = false;
+            var sb = new StringBuilder();
 
             foreach (var node in nodes)
             {
@@ -2875,16 +2908,120 @@ namespace WixToolset.Converters
                 {
                     comments.Add(node);
                 }
-                else
+                else if (XmlNodeType.CDATA == node.NodeType || XmlNodeType.Text == node.NodeType)
                 {
-                    nonCommentNodes.Add(node);
+                    var isCData = XmlNodeType.CDATA == node.NodeType;
+
+                    if (isCData)
+                    {
+                        cDataFound = true;
+                    }
+
+                    var text = (node as XText)?.Value;
+
+                    if (protectQuotes)
+                    {
+                        var nodeSB = new StringBuilder();
+
+                        foreach (var c in text)
+                        {
+                            char? emit = c;
+
+                            // Replace contiguous whitespace with a single space.
+                            if (' ' == c || '\r' == c || '\n' == c || '\t' == c)
+                            {
+                                if (!inWhitespace)
+                                {
+                                    inWhitespace = true;
+                                    whitespaceFound = true;
+                                    emit = ' ';
+                                }
+                                else
+                                {
+                                    emit = null;
+                                }
+                            }
+                            else
+                            {
+                                inWhitespace = false;
+
+                                if ('\\' == c)
+                                {
+                                    // Escape backslash.
+                                    nodeSB.Append('\\');
+                                }
+
+                                else if (!isCData)
+                                {
+                                    // Escape nested quote.
+                                    if ('\'' == c || '"' == c)
+                                    {
+                                        if (currentQuote.HasValue)
+                                        {
+                                            if (currentQuote == c)
+                                            {
+                                                currentQuote = null;
+                                            }
+                                            else
+                                            {
+                                                nodeSB.Append('\\');
+                                            }
+                                        }
+                                        else
+                                        {
+                                            currentQuote = c;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (emit.HasValue)
+                            {
+                                nodeSB.Append(emit);
+                            }
+                        }
+
+                        text = nodeSB.ToString();
+                    }
+
+                    if (0 < text.Length)
+                    {
+                        text = text.Trim(whitespaceChars);
+
+                        if (0 == text.Length && reportWhitespace)
+                        {
+                            text = " ";
+                        }
+                    }
+
+                    sb.Append(text);
                 }
             }
 
-            if (nonCommentNodes.Any() && nonCommentNodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
+            var found = false;
+
+            value = sb.ToString();
+
+            if (0 < value.Length)
             {
-                value = String.Join(String.Empty, nonCommentNodes.Cast<XText>().Select(TrimTextValue));
                 found = true;
+            }
+
+            value = value.Trim(whitespaceChars);
+
+            if (reportWhitespace && whitespaceFound)
+            {
+                found = true;
+            }
+
+            if (cDataFound)
+            {
+                found = true;
+
+                if (0 == value.Length)
+                {
+                    value = " ";
+                }
             }
 
             return found;
@@ -2908,22 +3045,6 @@ namespace WixToolset.Converters
             {
                 text.Remove();
             }
-        }
-
-        private static string TrimTextValue(XText text)
-        {
-            var value = text.Value;
-
-            if (String.IsNullOrEmpty(value))
-            {
-                return String.Empty;
-            }
-            else if (text.NodeType == XmlNodeType.CDATA && String.IsNullOrWhiteSpace(value))
-            {
-                return " ";
-            }
-
-            return value.Trim();
         }
 
         private static void RemoveChildren(XElement element)
