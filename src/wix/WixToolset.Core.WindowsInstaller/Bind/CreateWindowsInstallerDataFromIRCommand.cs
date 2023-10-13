@@ -234,6 +234,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     // Symbols used internally and are not added to the output.
+                    case SymbolDefinitionType.HarvestFiles:
                     case SymbolDefinitionType.WixBuildInfo:
                     case SymbolDefinitionType.WixBindUpdatedFiles:
                     case SymbolDefinitionType.WixComponentGroup:

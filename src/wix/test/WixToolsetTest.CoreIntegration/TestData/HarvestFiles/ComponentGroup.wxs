@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+        <Feature Id="ProductFeature">
+            <ComponentGroupRef Id="Files" />
+        </Feature>
+
+        <ComponentGroup Id="Files" Directory="ProgramFilesFolder" Subdirectory="MsiPackage" Source="$(sys.SOURCEFILEDIR)files2">
+            <Files Include="**">
+                <Exclude Files="notatest.txt" />
+                <Exclude Files="files2_sub2\pleasedontincludeme.dat" />
+            </Files>
+        </ComponentGroup>
+    </Package>
+</Wix>

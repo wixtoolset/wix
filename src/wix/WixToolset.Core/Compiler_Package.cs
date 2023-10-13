@@ -306,6 +306,9 @@ namespace WixToolset.Core
                         case "File":
                             this.ParseNakedFileElement(child, ComplexReferenceParentType.Product, productCode, null, null);
                             break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, null, null);
+                            break;
                         case "Icon":
                             this.ParseIconElement(child);
                             break;

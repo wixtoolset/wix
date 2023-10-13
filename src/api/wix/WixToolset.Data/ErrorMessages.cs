@@ -368,6 +368,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedAttribute, "The {0}/@{1} attribute was not found; it is required unless the attribute {2} has a value of '{3}'.", elementName, attributeName, otherAttributeName, otherAttributeValue, otherAttributeValueUnless);
         }
 
+        public static Message ExpectedAttributeInElementOrParent(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeInElementOrParent, "The {0}/@{1} attribute was not found or empty; it is required unless it is specified in the parent element.", elementName, attributeName);
+        }
+
         public static Message ExpectedAttributeInElementOrParent(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string parentElementName)
         {
             return Message(sourceLineNumbers, Ids.ExpectedAttributeInElementOrParent, "The {0}/@{1} attribute was not found or empty; it is required, or it can be specified in the parent {2} element.", elementName, attributeName, parentElementName);

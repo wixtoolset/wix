@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+        <StandardDirectory Id="ProgramFiles6432Folder">
+            <!-- Relies on default-feature feature to include naked files in package. -->
+            <Files Subdirectory="MsiPackage" Include="files1\**" />
+            <Files Subdirectory="MsiPackage" Include="files2\**" />
+        </StandardDirectory>
+    </Package>
+</Wix>
