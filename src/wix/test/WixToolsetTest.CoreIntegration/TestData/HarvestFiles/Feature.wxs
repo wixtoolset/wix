@@ -1,0 +1,25 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+        <Feature Id="ProductFeature">
+            <Files
+                Directory="ProgramFiles6432Folder"
+                Subdirectory="Example Product"
+                Include="files1\*">
+                <Exclude Files="files1\test1.txt" />
+            </Files>
+
+            <!--
+            `$(sys.SOURCEFILEDIR)` is equivalent to the above (i.e., the default),
+            but this validates that preprocessor variables are happy here.
+            -->
+            <Files
+                Directory="ProgramFiles6432Folder"
+                Subdirectory="Example Product\Assets"
+                Include="$(sys.SOURCEFILEDIR)\files2\*">
+                <Exclude Files="$(sys.SOURCEFILEDIR)\files2\notatest.txt" />
+            </Files>
+        </Feature>
+    </Package>
+</Wix>

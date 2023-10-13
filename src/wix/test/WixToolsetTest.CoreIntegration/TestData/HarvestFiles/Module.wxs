@@ -1,0 +1,6 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Module Id="MergeModule" Guid="e535b765-1019-4a4f-b3ea-ae28870e6d73" Language="1033" Version="1.0.0.0">
+        <Files Directory="ProgramFilesFolder" Subdirectory="MergeModule" Include="files1\*" />
+        <Files Directory="ProgramFilesFolder" Subdirectory="MergeModule" Include="files2\*" />
+    </Module>
+</Wix>

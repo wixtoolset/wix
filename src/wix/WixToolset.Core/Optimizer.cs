@@ -25,7 +25,10 @@ namespace WixToolset.Core
                 extension.PreOptimize(context);
             }
 
-            // TODO: Fill with useful optimization features.
+            {
+                var command = new HarvestFilesCommand(context);
+                command.Execute();
+            }
 
             foreach (var extension in context.Extensions)
             {

@@ -125,12 +125,8 @@ namespace WixToolset.Core.CommandLine
             {
                 using (new IntermediateFieldContext("wix.link"))
                 {
-                    var wixipl = inputsOutputs.Wixipls.SingleOrDefault();
-
-                    if (wixipl == null)
-                    {
-                        wixipl = this.LinkPhase(wixobjs, inputsOutputs, creator, cancellationToken);
-                    }
+                    var wixipl = inputsOutputs.Wixipls.SingleOrDefault()
+                        ?? this.LinkPhase(wixobjs, inputsOutputs, creator, cancellationToken);
 
                     if (!this.Messaging.EncounteredError)
                     {

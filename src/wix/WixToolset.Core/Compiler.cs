@@ -2655,6 +2655,9 @@ namespace WixToolset.Core
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
                         break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
+                        break;
                     default:
                         this.Core.UnexpectedElement(node, child);
                         break;
@@ -3106,7 +3109,7 @@ namespace WixToolset.Core
                     this.Core.AddSymbol(new MoveFileSymbol(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
-                        SourceName  = sourceName,
+                        SourceName = sourceName,
                         DestinationName = destinationName,
                         DestinationShortName = destinationShortName,
                         SourceFolder = sourceDirectory ?? sourceProperty,
@@ -3881,6 +3884,9 @@ namespace WixToolset.Core
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
                         break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
+                        break;
                     case "Merge":
                         this.ParseMergeElement(child, id.Id, diskId);
                         break;
@@ -3995,6 +4001,9 @@ namespace WixToolset.Core
                         break;
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
+                        break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
                         break;
                     case "Merge":
                         this.ParseMergeElement(child, id, diskId);
@@ -4436,6 +4445,9 @@ namespace WixToolset.Core
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
                         break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
+                        break;
                     case "Level":
                         this.ParseLevelElement(child, id.Id);
                         break;
@@ -4579,6 +4591,9 @@ namespace WixToolset.Core
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id, null, null);
                         break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id, null, null);
+                        break;
                     case "MergeRef":
                         this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id);
                         break;
@@ -4666,6 +4681,9 @@ namespace WixToolset.Core
                         break;
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null, null);
+                        break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
                         break;
                     case "MergeRef":
                         this.ParseMergeRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
@@ -5678,6 +5696,129 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Parses a `Files` element.
+        /// </summary>
+        /// <param name="node">Files element to parse.</param>
+        /// <param name="parentType">Type of complex reference parent. Will be Unknown if there is no parent.</param>
+        /// <param name="parentId">Optional identifier for primary parent.</param>
+        /// <param name="directoryId">Ancestor's directory id.</param>
+        /// <param name="sourcePath">Default source path of parent directory.</param>
+        private void ParseFilesElement(XElement node, ComplexReferenceParentType parentType, string parentId, string directoryId, string sourcePath)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var win64 = this.Context.IsCurrentPlatform64Bit;
+            string subdirectory = null;
+            var inclusions = new List<string>();
+            var exclusions = new List<string>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Directory":
+                            directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                            break;
+                        case "Subdirectory":
+                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        case "Include":
+                            inclusions.AddRange(this.Core.GetAttributeValue(sourceLineNumbers, attrib).Split(';'));
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    var context = new Dictionary<string, string>() { { "Win64", win64.ToString() } };
+                    this.Core.ParseExtensionAttribute(node, attrib, context);
+                }
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "Exclude":
+                            this.ParseFilesExcludeElement(child, exclusions);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    var context = new Dictionary<string, string>() { { "Win64", win64.ToString() } };
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
+
+            if (String.IsNullOrEmpty(directoryId))
+            {
+                directoryId = "INSTALLFOLDER";
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+            }
+            else if (!String.IsNullOrEmpty(subdirectory))
+            {
+                directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
+            }
+
+            if (!inclusions.Any())
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Include"));
+            }
+
+            var inclusionsAsString = String.Join(";", inclusions);
+            var exclusionsAsString = String.Join(";", exclusions);
+
+            var id = this.Core.CreateIdentifier("hvf", directoryId, inclusionsAsString, exclusionsAsString);
+
+            this.Core.AddSymbol(new HarvestFilesSymbol(sourceLineNumbers, id)
+            {
+                DirectoryRef = directoryId,
+                Inclusions = inclusionsAsString,
+                Exclusions = exclusionsAsString,
+                ComplexReferenceParentType = parentType.ToString(),
+                ParentId = parentId,
+                SourcePath = sourcePath,
+            });
+        }
+
+        private void ParseFilesExcludeElement(XElement node, IList<string> paths)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Files":
+                            paths.Add(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            this.Core.ParseForExtensionElements(node);
+        }
+
+        /// <summary>
         /// Parses a file search element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
@@ -5996,6 +6137,9 @@ namespace WixToolset.Core
                         break;
                     case "File":
                         this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, null, null);
+                        break;
+                    case "Files":
+                        this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, null, null);
                         break;
                     case "Icon":
                         this.ParseIconElement(child);
@@ -7346,6 +7490,9 @@ namespace WixToolset.Core
                             break;
                         case "File":
                             this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id, null);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id, null);
                             break;
                         case "Merge":
                             this.ParseMergeElement(child, id, diskId: CompilerConstants.IntegerNotSet);

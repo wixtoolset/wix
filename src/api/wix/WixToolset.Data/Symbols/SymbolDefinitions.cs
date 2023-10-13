@@ -40,6 +40,7 @@ namespace WixToolset.Data
         FeatureComponents,
         File,
         FileSFPCatalog,
+        HarvestFiles,
         Icon,
         ImageFamilies,
         IniFile,

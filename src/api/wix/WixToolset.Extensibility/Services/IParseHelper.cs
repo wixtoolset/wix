@@ -11,7 +11,7 @@ namespace WixToolset.Extensibility.Services
     using WixToolset.Extensibility.Data;
 
     /// <summary>
-    /// Interface provided to help compiler extensions parse.
+    /// Interface provided to help compiler and optimizer extensions parse.
     /// </summary>
     public interface IParseHelper
     {
