@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:iis="http://wixtoolset.org/schemas/v4/wxs/iis">
-  <Fragment>
-    <Property Id="PORT" Value="3062" />
-    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-       <Component>
-         <File Source="example.txt" />
-         <iis:WebSite Id="Test" Description="Test web server" Directory="TestWebSiteProductDirectory" AutoStart="yes" DirProperties="ReadAndExecute" ConfigureIfExists="no" >
-            <iis:WebAddress Id="TestAddress" Port="[PORT]" Secure="no" />
-         </iis:WebSite>
-       </Component>
-    </ComponentGroup>
-    <iis:WebDirProperties Id="ReadAndExecute" />
-  </Fragment>
+    <Fragment>
+        <Property Id="PORT" Value="3062" />
+
+        <Binary Id="MyCertBits" SourceFile="example.txt" />
+
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MyCert" Guid="">
+                <iis:Certificate
+                    Id="Certificate.MyCert"
+                    Name="MyCert certificate"
+                    Request="no"
+                    StoreLocation="localMachine"
+                    StoreName="trustedPublisher"
+                    Overwrite="yes"
+                    BinaryRef="MyCertBits" />
+            </Component>
+
+            <Component>
+                <File Source="example.txt" />
+
+                <iis:WebSite Id="Test" Description="Test web server" Directory="TestWebSiteProductDirectory" AutoStart="yes" DirProperties="ReadAndExecute" ConfigureIfExists="no" >
+                    <iis:WebAddress Id="TestAddress" Port="[PORT]" Secure="no" />
+                </iis:WebSite>
+            </Component>
+        </ComponentGroup>
+
+        <iis:WebDirProperties Id="ReadAndExecute" />
+    </Fragment>
 </Wix>
