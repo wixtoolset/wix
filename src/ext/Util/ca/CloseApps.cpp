@@ -136,7 +136,7 @@ LExit:
 }
 
 /******************************************************************
- SendProcessMessage - helper function to enumerate the top-level 
+ SendProcessMessage - helper function to enumerate the top-level
  windows and send to all matching a process ID.
 
 ******************************************************************/
@@ -164,7 +164,7 @@ void SendProcessMessage(
 }
 
 /******************************************************************
- SendApplicationMessage - helper function to iterate through the 
+ SendApplicationMessage - helper function to iterate through the
  processes for the specified application and send all
  applicable process Ids a message and give them time to process
  the message.
@@ -250,7 +250,7 @@ void TerminateProcesses(
 /******************************************************************
  WixCloseApplications - entry point for WixCloseApplications Custom Action
 
- called as Type 1 CustomAction (binary DLL) from Windows Installer 
+ called as Type 1 CustomAction (binary DLL) from Windows Installer
  in InstallExecuteSequence before InstallFiles
 ******************************************************************/
 extern "C" UINT __stdcall WixCloseApplications(
@@ -462,9 +462,9 @@ LExit:
 
 
 /******************************************************************
- WixCloseApplicationsDeferred - entry point for 
+ WixCloseApplicationsDeferred - entry point for
                                 WixCloseApplicationsDeferred Custom Action
-                                called as Type 1025 CustomAction 
+                                called as Type 1025 CustomAction
                                 (deferred binary DLL)
 
  NOTE: deferred CustomAction since it modifies the machine
@@ -533,7 +533,7 @@ extern "C" UINT __stdcall WixCloseApplicationsDeferred(
             SendApplicationMessage(pwzTarget, WM_QUERYENDSESSION, dwTimeout);
         }
 
-        // If we find that an app that we need closed is still runing, require a
+        // If we find that an app that we need closed is still running, require a
         // restart or kill the process as directed.
         ProcFindAllIdsFromExeName(pwzTarget, &prgProcessIds, &cProcessIds);
         if (0 < cProcessIds)
