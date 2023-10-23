@@ -5,7 +5,7 @@
     <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="INSTALLFOLDER" ShortName="oekcr5lq" Name="MsiPackage">
         <Component Id="filF5_pLhBuF5b4N9XEo52g_hUM5Lo" Guid="{GUID}" Bitness="always32">
-          <Example Id="Foo" Value="Bar" xmlns="http://www.example.com/scheams/v1/wxs" />
+          <Example Id="Foo" Value="Bar &lt;optimized&gt;" xmlns="http://www.example.com/scheams/v1/wxs" />
           <File Id="filF5_pLhBuF5b4N9XEo52g_hUM5Lo" Name="example.txt" KeyPath="yes" Source="PFiles\MsiPackage\example.txt" />
         </Component>
       </Directory>

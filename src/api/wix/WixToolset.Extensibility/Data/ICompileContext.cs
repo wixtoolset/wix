@@ -55,7 +55,7 @@ namespace WixToolset.Extensibility.Data
         XDocument Source { get; set; }
 
         /// <summary>
-        /// Cancellation token to abort cancellation.
+        /// Cancellation token.
         /// </summary>
         CancellationToken CancellationToken { get; set; }
     }
