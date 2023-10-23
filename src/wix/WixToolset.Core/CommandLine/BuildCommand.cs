@@ -10,7 +10,6 @@ namespace WixToolset.Core.CommandLine
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -112,6 +111,8 @@ namespace WixToolset.Core.CommandLine
                 return Task.FromResult(this.Messaging.LastErrorNumber);
             }
 
+            this.OptimizePhase(wixobjs, wxls, this.commandLine.BindPaths, this.commandLine.BindVariables, cancellationToken);
+
             if (inputsOutputs.OutputType == OutputType.Library)
             {
                 using (new IntermediateFieldContext("wix.lib"))
@@ -205,6 +206,22 @@ namespace WixToolset.Core.CommandLine
             }
 
             return intermediates;
+        }
+
+        private void OptimizePhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, CancellationToken cancellationToken)
+        {
+            var context = this.ServiceProvider.GetService<IOptimizeContext>();
+            context.Extensions = this.ExtensionManager.GetServices<IOptimizerExtension>();
+            context.IntermediateFolder = this.IntermediateFolder;
+            context.BindPaths = bindPaths;
+            context.BindVariables = bindVariables;
+            context.Platform = this.Platform;
+            context.Intermediates = intermediates;
+            context.Localizations = localizations;
+            context.CancellationToken = cancellationToken;
+
+            var optimizer = this.ServiceProvider.GetService<IOptimizer>();
+            optimizer.Optimize(context);
         }
 
         private void LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, string outputPath, CancellationToken cancellationToken)

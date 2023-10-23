@@ -24,7 +24,7 @@ namespace WixToolsetTest.CoreIntegration
             var results = build.BuildAndQuery(Build, "Wix4Example");
             WixAssert.CompareLineByLine(new[]
             {
-                "Wix4Example:Foo\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tBar"
+                "Wix4Example:Foo\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tBar <optimized>"
             }, results);
         }
 
@@ -92,7 +92,7 @@ namespace WixToolsetTest.CoreIntegration
                 var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
                 WixAssert.StringEqual("Foo", example.Id?.Id);
                 WixAssert.StringEqual("filF5_pLhBuF5b4N9XEo52g_hUM5Lo", example[0].AsString());
-                WixAssert.StringEqual("Bar", example[1].AsString());
+                WixAssert.StringEqual("Bar <optimized>", example[1].AsString());
             }
         }
 

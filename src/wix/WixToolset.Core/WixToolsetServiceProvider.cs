@@ -37,6 +37,7 @@ namespace WixToolset.Core
             this.AddService<ICommandLine>((provider, singletons) => new CommandLine.CommandLine(provider));
             this.AddService<IPreprocessContext>((provider, singletons) => new PreprocessContext(provider));
             this.AddService<ICompileContext>((provider, singletons) => new CompileContext(provider));
+            this.AddService<IOptimizeContext>((provider, singletons) => new OptimizeContext(provider));
             this.AddService<ILibraryContext>((provider, singletons) => new LibraryContext(provider));
             this.AddService<ILibraryResult>((provider, singletons) => new LibraryResult());
             this.AddService<ILinkContext>((provider, singletons) => new LinkContext(provider));
@@ -58,6 +59,7 @@ namespace WixToolset.Core
 
             this.AddService<IBinder>((provider, singletons) => new Binder(provider));
             this.AddService<ICompiler>((provider, singletons) => new Compiler(provider));
+            this.AddService<IOptimizer>((provider, singletons) => new Optimizer(provider));
             this.AddService<ILayoutCreator>((provider, singletons) => new LayoutCreator(provider));
             this.AddService<IPreprocessor>((provider, singletons) => new Preprocessor(provider));
             this.AddService<ILibrarian>((provider, singletons) => new Librarian(provider));

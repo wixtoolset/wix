@@ -35,6 +35,10 @@ namespace Example.Extension
             {
                 extension = new ExampleCompilerExtension();
             }
+            else if (extensionType == typeof(IOptimizerExtension))
+            {
+                extension = new ExampleOptimizerExtension();
+            }
             else if (extensionType == typeof(IExtensionData))
             {
                 extension = new ExampleExtensionData();
