@@ -21,8 +21,8 @@ namespace WixToolsetTest.Converters
                 "    <UI>",
                 "      <Dialog Id='Dlg1'>",
                 "        <Control Id='Control1'>",
-                "          <Condition Action='disable'>x=y</Condition>",
-                "          <Condition Action='hide'>a&lt;>b</Condition>",
+                "          <Condition Action='disable'>$(var.x)=$(var.y)</Condition>",
+                "          <Condition Action='hide'>$(var.a)&lt;>$(var.b)</Condition>",
                 "        </Control>",
                 "      </Dialog>",
                 "    </UI>",
@@ -35,7 +35,7 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <UI>",
                 "      <Dialog Id=\"Dlg1\">",
-                "        <Control Id=\"Control1\" DisableCondition=\"x=y\" HideCondition=\"a&lt;&gt;b\" />",
+                "        <Control Id=\"Control1\" DisableCondition=\"$(var.x)=$(var.y)\" HideCondition=\"$(var.a)&lt;&gt;$(var.b)\" />",
                 "      </Dialog>",
                 "    </UI>",
                 "  </Fragment>",
@@ -64,8 +64,8 @@ namespace WixToolsetTest.Converters
                 "    <UI>",
                 "      <Dialog Id='Dlg1'>",
                 "        <Control Id='Control1'>",
-                "          <Condition Action='hide'>x=y</Condition>",
-                "          <Condition Action='hide'>a&lt;>b</Condition>",
+                "          <Condition Action='hide'>$(var.x)=$(var.y)</Condition>",
+                "          <Condition Action='hide'>$(var.a)&lt;>$(var.b)</Condition>",
                 "        </Control>",
                 "      </Dialog>",
                 "    </UI>",
@@ -78,7 +78,7 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <UI>",
                 "      <Dialog Id=\"Dlg1\">",
-                "        <Control Id=\"Control1\" HideCondition=\"(x=y) OR (a&lt;&gt;b)\" />",
+                "        <Control Id=\"Control1\" HideCondition=\"($(var.x)=$(var.y)) OR ($(var.a)&lt;&gt;$(var.b))\" />",
                 "      </Dialog>",
                 "    </UI>",
                 "  </Fragment>",
@@ -107,8 +107,8 @@ namespace WixToolsetTest.Converters
                 "    <UI>",
                 "      <Dialog Id='Dlg1'>",
                 "        <Control Id='Control1'>",
-                "          <Condition Action='disable'><!-- Comment 1 -->x=y</Condition>",
-                "          <Condition Action='hide'><!-- Comment 2 -->a&lt;>b</Condition>",
+                "          <Condition Action='disable'><!-- Comment 1 -->$(var.x)=$(var.y)</Condition>",
+                "          <Condition Action='hide'><!-- Comment 2 -->$(var.a)&lt;>$(var.b)</Condition>",
                 "        </Control>",
                 "      </Dialog>",
                 "    </UI>",
@@ -123,7 +123,7 @@ namespace WixToolsetTest.Converters
                 "      <Dialog Id=\"Dlg1\">",
                 "        <!-- Comment 1 -->",
                 "        <!-- Comment 2 -->",
-                "        <Control Id=\"Control1\" DisableCondition=\"x=y\" HideCondition=\"a&lt;&gt;b\" />",
+                "        <Control Id=\"Control1\" DisableCondition=\"$(var.x)=$(var.y)\" HideCondition=\"$(var.a)&lt;&gt;$(var.b)\" />",
                 "      </Dialog>",
                 "    </UI>",
                 "  </Fragment>",
@@ -143,7 +143,7 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void FixControlConditionWithStringConstants()
+        public void DemonstrateTheHandlingOfQuotedBackslashesInInnerText()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -152,8 +152,7 @@ namespace WixToolsetTest.Converters
                 "    <UI>",
                 "      <Dialog Id='Dlg1'>",
                 "        <Control Id='Control1'>",
-                "          <Condition Action='hide'>\"x\"==y</Condition>",
-                "          <Condition Action=\"hide\">\"x's\"==y</Condition>",
+                "          <Condition Action='hide'>\"\\\"=$(var.separator)</Condition>",
                 "        </Control>",
                 "      </Dialog>",
                 "    </UI>",
@@ -166,7 +165,49 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <UI>",
                 "      <Dialog Id=\"Dlg1\">",
-                "        <Control Id=\"Control1\" HideCondition=\"(&quot;x&quot;==y) OR (&quot;x\\'s&quot;==y)\" />",
+                "        <Control Id=\"Control1\" HideCondition=\"&quot;\\&quot;=$(var.separator)\" />",
+                "      </Dialog>",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixControlConditionWithStringConstants()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <UI>",
+                "      <Dialog Id='Dlg1'>",
+                "        <Control Id='Control1'>",
+                "          <Condition Action='hide'>\"x\"=$(var.y)</Condition>",
+                "          <Condition Action='hide'>\"x's\"=$(var.y)</Condition>",
+                "        </Control>",
+                "      </Dialog>",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <UI>",
+                "      <Dialog Id=\"Dlg1\">",
+                "        <Control Id=\"Control1\" HideCondition=\"(&quot;x&quot;=$(var.y)) OR (&quot;x's&quot;=$(var.y))\" />",
                 "      </Dialog>",
                 "    </UI>",
                 "  </Fragment>",
