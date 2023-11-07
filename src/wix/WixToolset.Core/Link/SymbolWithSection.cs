@@ -13,7 +13,6 @@ namespace WixToolset.Core.Link
     internal class SymbolWithSection
     {
         private HashSet<SymbolWithSection> possibleConflicts;
-        private HashSet<SymbolWithSection> redundants;
 
         /// <summary>
         /// Creates a symbol for a symbol.
@@ -24,7 +23,6 @@ namespace WixToolset.Core.Link
         {
             this.Symbol = symbol;
             this.Section = section;
-            this.Name = String.Concat(this.Symbol.Definition.Name, ":", this.Symbol.Id.Id);
         }
 
         /// <summary>
@@ -32,12 +30,6 @@ namespace WixToolset.Core.Link
         /// </summary>
         /// <value>Accessbility of the symbol.</value>
         public AccessModifier Access => this.Symbol.Id.Access;
-
-        /// <summary>
-        /// Gets the name of the symbol.
-        /// </summary>
-        /// <value>Name of the symbol.</value>
-        public string Name { get; }
 
         /// <summary>
         /// Gets the symbol for this symbol.
@@ -57,11 +49,6 @@ namespace WixToolset.Core.Link
         public IEnumerable<SymbolWithSection> PossiblyConflicts => this.possibleConflicts ?? Enumerable.Empty<SymbolWithSection>();
 
         /// <summary>
-        /// Gets any duplicates of this symbol with sections that are redundant.
-        /// </summary>
-        public IEnumerable<SymbolWithSection> Redundants => this.redundants ?? Enumerable.Empty<SymbolWithSection>();
-
-        /// <summary>
         /// Adds a duplicate symbol with sections that is a possible conflict.
         /// </summary>
         /// <param name="symbolWithSection">Symbol with section that is a possible conflict of this symbol.</param>
@@ -76,17 +63,11 @@ namespace WixToolset.Core.Link
         }
 
         /// <summary>
-        /// Adds a duplicate symbol that is redundant.
+        /// Gets the full name of the symbol.
         /// </summary>
-        /// <param name="symbolWithSection">Symbol with section that is redundant of this symbol.</param>
-        public void AddRedundant(SymbolWithSection symbolWithSection)
+        public string GetFullName()
         {
-            if (null == this.redundants)
-            {
-                this.redundants = new HashSet<SymbolWithSection>();
-            }
-
-            this.redundants.Add(symbolWithSection);
+            return String.Concat(this.Symbol.Definition.Name, ":", this.Symbol.Id.Id);
         }
     }
 }
