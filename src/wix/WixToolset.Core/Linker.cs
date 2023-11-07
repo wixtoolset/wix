@@ -177,14 +177,20 @@ namespace WixToolset.Core
                 // metadata.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type);
                 var references = new List<WixSimpleReferenceSymbol>();
+                var identicalDirectoryIds = new HashSet<string>(StringComparer.Ordinal);
 
                 foreach (var section in sections)
                 {
                     foreach (var symbol in section.Symbols)
                     {
-                        if (find.RedundantSymbols.Contains(symbol))
+                        // If this symbol is an identical directory, ensure we only visit
+                        // one (and skip the other identicals with the same id).
+                        if (find.IdenticalDirectorySymbols.Contains(symbol))
                         {
-                            continue;
+                            if (!identicalDirectoryIds.Add(symbol.Id.Id))
+                            {
+                                continue;
+                            }
                         }
 
                         var copySymbol = true; // by default, copy symbols.
@@ -351,22 +357,24 @@ namespace WixToolset.Core
             foreach (var actionSymbol in WindowsInstallerStandard.StandardActions())
             {
                 var symbolWithSection = new SymbolWithSection(null, actionSymbol);
+                var fullName = symbolWithSection.GetFullName();
 
                 // If the action's symbol has not already been defined (i.e. overriden by the user), add it now.
-                if (!symbolsByName.ContainsKey(symbolWithSection.Name))
+                if (!symbolsByName.ContainsKey(fullName))
                 {
-                    symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
+                    symbolsByName.Add(fullName, symbolWithSection);
                 }
             }
 
             foreach (var directorySymbol in WindowsInstallerStandard.StandardDirectories())
             {
                 var symbolWithSection = new SymbolWithSection(null, directorySymbol);
+                var fullName = symbolWithSection.GetFullName();
 
                 // If the directory's symbol has not already been defined (i.e. overriden by the user), add it now.
-                if (!symbolsByName.ContainsKey(symbolWithSection.Name))
+                if (!symbolsByName.ContainsKey(fullName))
                 {
-                    symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
+                    symbolsByName.Add(fullName, symbolWithSection);
                 }
             }
         }

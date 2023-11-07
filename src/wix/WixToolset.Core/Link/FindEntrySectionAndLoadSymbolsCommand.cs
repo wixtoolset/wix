@@ -42,13 +42,13 @@ namespace WixToolset.Core.Link
         /// Gets the collection of redundant symbols that should not be included
         /// in the final output.
         /// </summary>
-        public ISet<IntermediateSymbol> RedundantSymbols { get; private set; }
+        public ISet<IntermediateSymbol> IdenticalDirectorySymbols { get; private set; }
 
         public void Execute()
         {
             var symbolsByName = new Dictionary<string, SymbolWithSection>();
             var possibleConflicts = new HashSet<SymbolWithSection>();
-            var redundantSymbols = new HashSet<IntermediateSymbol>();
+            var identicalDirectorySymbols = new HashSet<IntermediateSymbol>();
 
             if (!Enum.TryParse(this.ExpectedOutputType.ToString(), out SectionType expectedEntrySectionType))
             {
@@ -76,28 +76,27 @@ namespace WixToolset.Core.Link
                     }
                 }
 
-                // Load all the symbols from the section's tables that create symbols.
+                // Load all the symbols from the section's tables that can be referenced (i.e. have an Id).
                 foreach (var symbol in section.Symbols.Where(t => t.Id != null))
                 {
                     var symbolWithSection = new SymbolWithSection(section, symbol);
+                    var fullName = symbolWithSection.GetFullName();
 
-                    if (!symbolsByName.TryGetValue(symbolWithSection.Name, out var existingSymbol))
+                    if (!symbolsByName.TryGetValue(fullName, out var existingSymbol))
                     {
-                        symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
+                        symbolsByName.Add(fullName, symbolWithSection);
                     }
                     else // uh-oh, duplicate symbols.
                     {
                         // If the duplicate symbols are both private directories, there is a chance that they
-                        // point to identical symbols. Identical directory symbols are redundant and will not cause
-                        // conflicts.
+                        // point to identical symbols. Identical directory symbols should be treated as redundant.
+                        // and not cause conflicts.
                         if (AccessModifier.Section == existingSymbol.Access && AccessModifier.Section == symbolWithSection.Access &&
                             SymbolDefinitionType.Directory == existingSymbol.Symbol.Definition.Type && existingSymbol.Symbol.IsIdentical(symbolWithSection.Symbol))
                         {
-                            // Ensure identical symbol's symbol is marked redundant to ensure (should the symbol be
-                            // referenced into the final output) it will not add duplicate primary keys during
-                            // the .IDT importing.
-                            existingSymbol.AddRedundant(symbolWithSection);
-                            redundantSymbols.Add(symbolWithSection.Symbol);
+                            // Ensure identical symbols are tracked to ensure that only one symbol will end up in linked intermediate.
+                            identicalDirectorySymbols.Add(existingSymbol.Symbol);
+                            identicalDirectorySymbols.Add(symbolWithSection.Symbol);
                         }
                         else
                         {
@@ -111,7 +110,7 @@ namespace WixToolset.Core.Link
 
             this.SymbolsByName = symbolsByName;
             this.PossibleConflicts = possibleConflicts;
-            this.RedundantSymbols = redundantSymbols;
+            this.IdenticalDirectorySymbols = identicalDirectorySymbols;
         }
     }
 }

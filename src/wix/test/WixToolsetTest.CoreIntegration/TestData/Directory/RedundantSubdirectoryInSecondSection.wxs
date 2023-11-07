@@ -1,0 +1,26 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="~RedundantSubdirectories" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="12E4699F-E774-4D05-8A01-5BDD41BBA127" Compressed="no">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <Feature Id="ProductFeature">
+            <!-- NotIncludeButFirst will define the subdirectory and IncludedButSecond needs the same symbols, this tests linking order -->
+            <ComponentGroupRef Id="IncludedButSecond" />
+        </Feature>
+    </Package>
+
+    <Fragment Id="NotIncludedButFirst">
+        <ComponentGroup Id="NotIncludedButFirst">
+            <Component Directory="ProgramFilesFolder" Subdirectory="a\b\c">
+                <File Name="notincluded.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment Id="IncludedButSecond">
+        <ComponentGroup Id="IncludedButSecond">
+            <Component Directory="ProgramFilesFolder" Subdirectory="a\b\c">
+                <File Name="included.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
