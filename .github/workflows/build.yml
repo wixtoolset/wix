@@ -28,6 +28,7 @@ jobs:
     runs-on: windows-2022
     permissions:
       id-token: write
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
