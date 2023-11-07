@@ -273,5 +273,52 @@ namespace WixToolsetTest.CoreIntegration
                 }, directoryRows.Select(r => String.Join('\t', r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
             }
         }
+
+        [Fact]
+        public void CanFindRedundantSubdirectoryInSecondSection()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test.msi");
+                var wixpdbPath = Path.ChangeExtension(msiPath, ".wixpdb");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Directory", "RedundantSubdirectoryInSecondSection.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(wixpdbPath);
+                var section = intermediate.Sections.Single();
+
+                var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"dKO7wPCF.XLmq6KnqybHHgcBBqtU:ProgramFilesFolder:a\b\c",
+                    @"ProgramFilesFolder:TARGETDIR:PFiles",
+                    @"TARGETDIR::SourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).OrderBy(s => s).ToArray());
+
+                var data = WindowsInstallerData.Load(wixpdbPath);
+                var directoryRows = data.Tables["Directory"].Rows;
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"d1nVb5_zcCwRCz7i2YXNAofGRmfc:ProgramFilesFolder:a",
+                    @"dijlG.bNicFgvj1_DujiGg9EBGrQ:d1nVb5_zcCwRCz7i2YXNAofGRmfc:b",
+                    @"dKO7wPCF.XLmq6KnqybHHgcBBqtU:dijlG.bNicFgvj1_DujiGg9EBGrQ:c",
+                    "ProgramFilesFolder:TARGETDIR:PFiles",
+                    "TARGETDIR::SourceDir"
+                }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2)).OrderBy(s => s).ToArray());
+            }
+        }
     }
 }

@@ -91,15 +91,16 @@ namespace WixToolset.Core.Link
                     else // display errors for the duplicate symbols.
                     {
                         var accessibleSymbol = accessible[0];
+                        var accessibleFullName = accessibleSymbol.GetFullName();
                         var referencingSourceLineNumber = wixSimpleReferenceRow.SourceLineNumbers?.ToString();
 
                         if (String.IsNullOrEmpty(referencingSourceLineNumber))
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Symbol.SourceLineNumbers, accessibleSymbol.Name));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Symbol.SourceLineNumbers, accessibleFullName));
                         }
                         else
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Symbol.SourceLineNumbers, accessibleSymbol.Name, referencingSourceLineNumber));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Symbol.SourceLineNumbers, accessibleFullName, referencingSourceLineNumber));
                         }
 
                         foreach (var accessibleDuplicate in accessible.Skip(1))
@@ -140,14 +141,6 @@ namespace WixToolset.Core.Link
                     continue;
                 }
 
-                if (this.AccessibleSymbol(referencingSection, dupe))
-                {
-                    accessibleSymbols.Add(dupe);
-                }
-            }
-
-            foreach (var dupe in symbolWithSection.Redundants)
-            {
                 if (this.AccessibleSymbol(referencingSection, dupe))
                 {
                     accessibleSymbols.Add(dupe);
