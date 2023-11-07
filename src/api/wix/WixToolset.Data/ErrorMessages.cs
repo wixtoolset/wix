@@ -867,12 +867,12 @@ namespace WixToolset.Data
 
         public static Message IllegalCodepage(int codepage)
         {
-            return Message(null, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+            return Message(null, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
         public static Message IllegalCodepage(SourceLineNumber sourceLineNumbers, int codepage)
         {
-            return Message(sourceLineNumbers, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+            return Message(sourceLineNumbers, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
         public static Message IllegalCodepageAttribute(SourceLineNumber sourceLineNumbers, string codepage, string elementName, string attributeName)
@@ -1318,7 +1318,7 @@ namespace WixToolset.Data
 
         public static Message InvalidStringForCodepage(SourceLineNumber sourceLineNumbers, string codepage)
         {
-            return Message(sourceLineNumbers, Ids.InvalidStringForCodepage, "A string was provided with characters that are not available in the specified database code page '{0}'. Either change these characters to ones that exist in the database's code page, or update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+            return Message(sourceLineNumbers, Ids.InvalidStringForCodepage, "A string was provided with characters that are not available in the specified database code page '{0}'. Either change these characters to ones that exist in the database's code page, or update the database's code page by modifying one of the following attributes: Package/@Codepage, Module/@Codepage, Patch/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
         public static Message InvalidStubExe(string filename)
