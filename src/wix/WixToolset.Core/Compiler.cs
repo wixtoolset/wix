@@ -514,7 +514,7 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.AppIdIncompatibleAdvertiseState(sourceLineNumbers, node.Name.LocalName, "Advertise", appIdAdvertise.ToString(), advertise.ToString()));
             }
-            else
+            else if (appIdAdvertise != YesNoType.NotSet)
             {
                 advertise = appIdAdvertise;
             }
