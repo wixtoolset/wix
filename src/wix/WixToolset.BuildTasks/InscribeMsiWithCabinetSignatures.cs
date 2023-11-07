@@ -27,8 +27,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
 
             base.BuildCommandLine(commandLineBuilder);
-
-            commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
         }
     }
 }

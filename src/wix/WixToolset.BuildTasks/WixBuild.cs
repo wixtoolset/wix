@@ -82,7 +82,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-bindVariable ", this.CalculateBindVariableStrings());
             commandLineBuilder.AppendArrayIfNotNull("-loc ", this.LocalizationFiles);
             commandLineBuilder.AppendArrayIfNotNull("-lib ", this.LibraryFiles);
-            commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
             commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
         }
 
