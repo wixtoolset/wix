@@ -55,7 +55,7 @@ namespace WixToolset.Data
 
         public static Message AppIdIncompatibleAdvertiseState(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string parentValue)
         {
-            return Message(sourceLineNumbers, Ids.AppIdIncompatibleAdvertiseState, "The {0}/@(1) attribute's value, '{2}' does not match the advertise state on its parent element: '{3}'. (Note: AppIds nested under Fragment, Module, or Product elements must be advertised.)", elementName, attributeName, value, parentValue);
+            return Message(sourceLineNumbers, Ids.AppIdIncompatibleAdvertiseState, "The {0}/@(1) attribute's value, '{2}' does not match the advertise state on its parent element: '{3}'. (Note: AppIds nested under Fragment, Module, or Package elements must be advertised.)", elementName, attributeName, value, parentValue);
         }
 
         public static Message BaselineRequired()
