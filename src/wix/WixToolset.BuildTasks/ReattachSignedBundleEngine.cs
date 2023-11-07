@@ -49,8 +49,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
 
             base.BuildCommandLine(commandLineBuilder);
-
-            commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
         }
 
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
