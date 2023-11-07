@@ -13,39 +13,6 @@ namespace WixToolsetTest.CoreIntegration
     public class MsiQueryFixture
     {
         [Fact]
-        public void PopulatesAppIdTableWhenAdvertised()
-        {
-            var folder = TestData.Get(@"TestData");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "AppId", "Advertised.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", msiPath
-                });
-
-                result.AssertSuccess();
-
-                Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "AppId" });
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "AppId:{D6040299-B15C-4C94-AE26-0C9B60D14C35}\t\t\t\t\t\t",
-                }, results);
-            }
-        }
-
-        [Fact]
         public void PopulatesAppSearchTablesFromComponentSearch()
         {
             var folder = TestData.Get(@"TestData");

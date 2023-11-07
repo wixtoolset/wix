@@ -1,0 +1,19 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="~AppId Top-Level" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="12E4699F-E774-4D05-8A01-5BDD41BBA127" Compressed="no">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <AppId Id="D6040299-B15C-4C94-AE26-0C9B60D14C35" />
+
+        <Feature Id="ProductFeature" Title="MsiPackageTitle">
+            <Component Directory="INSTALLFOLDER">
+                <File Source="test.txt" />
+            </Component>
+        </Feature>
+    </Package>
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFiles6432Folder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>
