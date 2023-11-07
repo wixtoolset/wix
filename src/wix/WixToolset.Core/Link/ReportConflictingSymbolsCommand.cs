@@ -40,7 +40,9 @@ namespace WixToolset.Core.Link
 
                     if (actuallyReferencedDuplicates.Any())
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateSymbol(referencedDuplicate.Symbol.SourceLineNumbers, referencedDuplicate.Name));
+                        var fullName = referencedDuplicate.GetFullName();
+
+                        this.Messaging.Write(ErrorMessages.DuplicateSymbol(referencedDuplicate.Symbol.SourceLineNumbers, fullName));
 
                         foreach (var duplicate in actuallyReferencedDuplicates)
                         {
