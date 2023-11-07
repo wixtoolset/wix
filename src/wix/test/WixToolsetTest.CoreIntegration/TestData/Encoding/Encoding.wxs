@@ -1,0 +1,14 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="Ć Not In 1252 Codepage" Version="3.0.0" Codepage="1252" Manufacturer="Example Company" Language="1033" UpgradeCode="11111111-1111-1111-1111-111111111111">
+        <StandardDirectory Id="ProgramFiles6432Folder">
+            <Directory Id="INSTALLFOLDER" Name="test">
+            </Directory>
+        </StandardDirectory>
+
+        <Feature Id="Main">
+            <Component Directory="INSTALLFOLDER">
+                <File Source="test.txt" />
+            </Component>
+        </Feature>
+    </Package>
+</Wix>

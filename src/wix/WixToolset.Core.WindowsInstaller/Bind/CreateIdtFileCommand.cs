@@ -81,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     catch (EncoderFallbackException)
                     {
-                        this.Messaging.Write(ErrorMessages.InvalidStringForCodepage(row.SourceLineNumbers, Convert.ToString(writer.Encoding.WindowsCodePage, CultureInfo.InvariantCulture)));
+                        this.Messaging.Write(ErrorMessages.InvalidStringForCodepage(row.SourceLineNumbers, Convert.ToString(writer.Encoding.CodePage, CultureInfo.InvariantCulture)));
 
                         rowBytes = convertEncoding.GetBytes(rowString);
                     }
