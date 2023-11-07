@@ -53,8 +53,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-sice ", this.SuppressIces);
 
             base.BuildCommandLine(commandLineBuilder);
-
-            commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
         }
     }
 }
