@@ -162,7 +162,7 @@ namespace WixToolset.Core
 
             target.UpdateLevel(Data.IntermediateLevels.Compiled);
 
-            return this.Messaging.EncounteredError ? null : target;
+            return target;
         }
 
         /// <summary>
