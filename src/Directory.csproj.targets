@@ -1,8 +1,5 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<!--
-  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.csproj.targets
-  then update all of the repos.
--->
+
 <Project>
   <PropertyGroup>
     <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
