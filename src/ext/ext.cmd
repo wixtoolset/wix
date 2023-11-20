@@ -28,9 +28,6 @@ call ComPlus\complus.cmd %_C% || exit /b
 :: Dependency
 call Dependency\dependency.cmd %_C% || exit /b
 
-:: DifxApp
-call DifxApp\difxapp.cmd %_C% || exit /b
-
 :: DirectX
 call DirectX\directx.cmd %_C% || exit /b
 
