@@ -81,6 +81,14 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
         hr = XmlGetYesNoAttribute(pixnExePackage, L"ArpWin64", &pPackage->Exe.fArpWin64);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @ArpWin64.");
 
+        // @ArpUseUninstallString
+        hr = XmlGetYesNoAttribute(pixnExePackage, L"ArpUseUninstallString", &pPackage->Exe.fArpUseUninstallString);
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @ArpWin64.");
+
+        // @UninstallArguments
+        hr = XmlGetAttributeEx(pixnExePackage, L"UninstallArguments", &pPackage->Exe.sczUninstallArguments);
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @UninstallArguments.");
+
         pPackage->Exe.fUninstallable = TRUE;
     }
 
@@ -481,7 +489,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
     else if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action)
     {
-        ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "QuietUninstallString is null.");
+        ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "%hs is null.", pPackage->Exe.fArpUseUninstallString ? "UninstallString" : "QuietUninstallString");
 
         hr = AppParseCommandLine(sczArpUninstallString, &argcArp, &argvArp);
         ExitOnFailure(hr, "Failed to parse QuietUninstallString: %ls.", sczArpUninstallString);
@@ -1122,8 +1130,20 @@ static HRESULT DetectArpEntry(
 
     if (psczQuietUninstallString)
     {
-        hr = RegReadString(hKey, L"QuietUninstallString", psczQuietUninstallString);
-        ExitOnPathFailure(hr, fExists, "Failed to read QuietUninstallString.");
+        LPCWSTR sczUninstallStringName = pPackage->Exe.fArpUseUninstallString ? L"UninstallString" : L"QuietUninstallString";
+
+        hr = RegReadString(hKey, sczUninstallStringName, psczQuietUninstallString);
+        ExitOnPathFailure(hr, fExists, "Failed to read %ls.", sczUninstallStringName);
+
+        // If the uninstall string is an executable path then ensure it is enclosed in quotes
+        if (fExists && *psczQuietUninstallString && (L'\"' != **psczQuietUninstallString) && FileExistsEx(*psczQuietUninstallString, nullptr))
+        {
+            hr = StrAllocPrefix(psczQuietUninstallString, L"\"", 0);
+            ExitOnFailure(hr, "Failed to prepend UninstallString with quote.");
+
+            hr = StrAllocConcat(psczQuietUninstallString, L"\"", 0);
+            ExitOnFailure(hr, "Failed to append quote to UninstallString.");
+        }
     }
 
 LExit:

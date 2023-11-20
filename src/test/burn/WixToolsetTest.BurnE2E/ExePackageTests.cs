@@ -34,6 +34,28 @@ namespace WixToolsetTest.BurnE2E
         }
 
         [RuntimeFact]
+        public void CanInstallAndUninstallPerMachineArpEntryWithUninstallStringExePackage()
+        {
+            var perMachineArpEntryExePackageBundle = this.CreateBundleInstaller(@"PerMachineArpEntryWithUninstallStringExePackage");
+            var arpEntryExePackage = this.CreateArpEntryInstaller(perMachineArpEntryExePackageBundle, "TestExe");
+            var arpId = arpEntryExePackage.ArpId;
+
+            arpEntryExePackage.VerifyRegistered(false);
+
+            var installLogPath = perMachineArpEntryExePackageBundle.Install();
+            perMachineArpEntryExePackageBundle.VerifyRegisteredAndInPackageCache();
+            arpEntryExePackage.VerifyRegistered(true);
+
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"TestExe.exe\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},DisplayVersion,String,1.0.0.0\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},UninstallString,String,\\\""));
+
+            var uninstallLogPath = perMachineArpEntryExePackageBundle.Uninstall();
+            perMachineArpEntryExePackageBundle.VerifyUnregisteredAndRemovedFromPackageCache();
+            arpEntryExePackage.VerifyRegistered(false);
+
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+        }
+
+        [RuntimeFact]
         public void CanRecacheAndReinstallPerMachineArpEntryExePackageOnUninstallRollback()
         {
             var packageTestExe = this.CreatePackageInstaller("PackageTestExe");
