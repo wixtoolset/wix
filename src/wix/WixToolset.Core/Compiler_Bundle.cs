@@ -1997,10 +1997,11 @@ namespace WixToolset.Core
             var bundle = YesNoType.NotSet;
             var slipstream = YesNoType.NotSet;
             var hasPayloadInfo = false;
-            WixBundleExePackageDetectionType? exeDetectionType = WixBundleExePackageDetectionType.None;
+            WixBundleExePackageDetectionType exeDetectionType = WixBundleExePackageDetectionType.None;
             string arpId = null;
             string arpDisplayVersion = null;
             var arpWin64 = YesNoType.NotSet;
+            var arpUseUninstallString = YesNoType.NotSet;
 
             var expectedNetFx4Args = new string[] { "/q", "/norestart" };
 
@@ -2117,6 +2118,7 @@ namespace WixToolset.Core
                         case "DetectCondition":
                             detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                             allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu);
+                            exeDetectionType = WixBundleExePackageDetectionType.Condition;
                             break;
                         case "Protocol":
                             protocol = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2183,11 +2185,6 @@ namespace WixToolset.Core
                 this.Core.ParseExtensionAttribute(node, attribute, contextValues);
             }
 
-            if (packageType == WixBundlePackageType.Exe && (detectCondition != null || uninstallArguments != null))
-            {
-                exeDetectionType = WixBundleExePackageDetectionType.Condition;
-            }
-
             foreach (var child in node.Elements())
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
@@ -2199,25 +2196,17 @@ namespace WixToolset.Core
                             allowed = packageType == WixBundlePackageType.Exe;
                             if (allowed)
                             {
-                                if (exeDetectionType == WixBundleExePackageDetectionType.Arp)
+                                if (exeDetectionType != WixBundleExePackageDetectionType.None)
                                 {
-                                    this.Core.Write(ErrorMessages.TooManyChildren(Preprocessor.GetSourceLineNumbers(child), node.Name.LocalName, child.Name.LocalName));
+                                    this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "DetectCondition"));
                                 }
-                                else if (!exeDetectionType.HasValue || exeDetectionType.Value == WixBundleExePackageDetectionType.Condition)
+                                if (null != uninstallArguments)
                                 {
-                                    exeDetectionType = null;
-                                }
-                                else
-                                {
-                                    if (exeDetectionType.Value != WixBundleExePackageDetectionType.None)
-                                    {
-                                        throw new WixException($"Unexpected WixBundleExePackageDetectionType: {exeDetectionType}");
-                                    }
-
-                                    exeDetectionType = WixBundleExePackageDetectionType.Arp;
+                                    this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "UninstallArguments"));
                                 }
 
-                                this.ParseExePackageArpEntryElement(child, out arpId, out arpDisplayVersion, out arpWin64);
+                                exeDetectionType = WixBundleExePackageDetectionType.Arp;
+                                this.ParseExePackageArpEntryElement(child, out arpId, out arpDisplayVersion, out arpWin64, out uninstallArguments, out arpUseUninstallString);
                             }
                             break;
                         case "SlipstreamMsp":
@@ -2280,6 +2269,11 @@ namespace WixToolset.Core
                     var context = new Dictionary<string, string>() { { "Id", id.Id } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
+            }
+
+            if (packageType == WixBundlePackageType.Exe && exeDetectionType == WixBundleExePackageDetectionType.None && uninstallArguments != null)
+            {
+                exeDetectionType = WixBundleExePackageDetectionType.Condition;
             }
 
             if (id.Id == BurnConstants.BundleDefaultBoundaryId)
@@ -2373,10 +2367,6 @@ namespace WixToolset.Core
                     {
                         this.Core.Write(WarningMessages.ExePackageDetectInformationRecommended(sourceLineNumbers));
                     }
-                }
-                else
-                {
-                    this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "ArpEntry", String.IsNullOrEmpty(detectCondition) ? "UninstallArguments" : "DetectCondition"));
                 }
 
                 if (repairArguments == null && repairCondition != null)
@@ -2497,6 +2487,7 @@ namespace WixToolset.Core
                         WixBundleExePackageAttributes exeAttributes = 0;
                         exeAttributes |= (YesNoType.Yes == bundle) ? WixBundleExePackageAttributes.Bundle : 0;
                         exeAttributes |= (YesNoType.Yes == arpWin64) ? WixBundleExePackageAttributes.ArpWin64 : 0;
+                        exeAttributes |= (YesNoType.Yes == arpUseUninstallString) ? WixBundleExePackageAttributes.ArpUseUninstallString : 0;
 
                         this.Core.AddSymbol(new WixBundleExePackageSymbol(sourceLineNumbers, id)
                         {
@@ -2506,7 +2497,7 @@ namespace WixToolset.Core
                             RepairCommand = repairArguments,
                             UninstallCommand = uninstallArguments,
                             ExeProtocol = protocol,
-                            DetectionType = exeDetectionType.Value,
+                            DetectionType = exeDetectionType,
                             ArpId = arpId,
                             ArpDisplayVersion = arpDisplayVersion,
                         });
@@ -2971,12 +2962,14 @@ namespace WixToolset.Core
             }
         }
 
-        private void ParseExePackageArpEntryElement(XElement node, out string id, out string version, out YesNoType win64)
+        private void ParseExePackageArpEntryElement(XElement node, out string id, out string version, out YesNoType win64, out string uninstallArguments, out YesNoType arpUseUninstallString)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             id = null;
             version = null;
             win64 = YesNoType.NotSet;
+            arpUseUninstallString = YesNoType.NotSet;
+            uninstallArguments = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -2989,6 +2982,12 @@ namespace WixToolset.Core
                             break;
                         case "Version":
                             version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "AdditionalUninstallArguments":
+                            uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UseUninstallString":
+                            arpUseUninstallString = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "Win64":
                             win64 = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);

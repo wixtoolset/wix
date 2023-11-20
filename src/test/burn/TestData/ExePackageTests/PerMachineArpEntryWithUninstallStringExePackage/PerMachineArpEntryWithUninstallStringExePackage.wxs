@@ -1,0 +1,18 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?define ArpId = {21E99C0F-E604-439C-97E0-33B9771394BC}?>
+<?define ArpKeyPath = HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(var.ArpId)?>
+<?define ArpVersion = 1.0.0.0?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <ExePackage Id="TestExe" PerMachine="yes"
+                  InstallArguments="/regw &quot;$(var.ArpKeyPath),DisplayVersion,String,$(var.ArpVersion)&quot; /regw &quot;$(var.ArpKeyPath),UninstallString,String,\&quot;[WixBundleExecutePackageCacheFolder]testexe.exe\&quot; /regd \&quot;$(var.ArpKeyPath)\&quot;&quot;">
+        <ArpEntry Id="$(var.ArpId)" Version="$(var.ArpVersion)" Win64="yes" UseUninstallString="yes" />
+
+        <PayloadGroupRef Id="TestExePayloads_x64" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+</Wix>
