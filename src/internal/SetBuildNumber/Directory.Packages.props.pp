@@ -70,9 +70,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="NuGet.Credentials" Version="6.3.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.3.1" />
-    <PackageVersion Include="NuGet.Versioning" Version="6.3.1" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.3.3" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.3.3" />
+    <PackageVersion Include="NuGet.Versioning" Version="6.3.3" />
   </ItemGroup>
 
   <!--

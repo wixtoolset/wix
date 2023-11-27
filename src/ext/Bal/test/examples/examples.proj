@@ -39,7 +39,12 @@
           Condition="'%(CoreMBAProject.SkipFDD)'==''" />
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x64 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.SkipSCD)'==''" />
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x64 -c $(Configuration) --self-contained true -p:PublishTrimmed=true -p:TrimMode=%(CoreMBAProject.TrimMode) "%(CoreMBAProject.Identity)"'
+    <!--
+    Publishing a library is "undefined" (per https://github.com/dotnet/runtime/issues/91535)
+    and is now a build error. This will go away when BAs go out of proc, so not spending a 
+    lot of time to keep building trimmed in VS 17.8.
+    -->
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x64 -c $(Configuration) --self-contained true -p:PublishTrimmed=false -p:TrimMode=%(CoreMBAProject.TrimMode) "%(CoreMBAProject.Identity)"'
           Condition="'%(CoreMBAProject.TrimMode)'!=''" />
   </Target>
 
