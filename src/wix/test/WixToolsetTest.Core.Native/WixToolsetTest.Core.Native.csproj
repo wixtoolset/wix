@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
     <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
