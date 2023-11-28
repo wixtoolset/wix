@@ -63,7 +63,7 @@ jobs:
           tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
           subscription-id: ${{ secrets.WIX_SIGNING_SUBSCRIPTIONID }}
 
-      - name: Build wix4
+      - name: Build wix5
         shell: cmd
         run: ./src/build_official.cmd
         env:
