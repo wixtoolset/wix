@@ -25,7 +25,7 @@ nuget restore || exit /b
 :: dotnet pack -c %_C% WixBuildTools.MsgGen\WixBuildTools.MsgGen.csproj || exit /b
 :: dotnet pack -c %_C% WixBuildTools.XsdGen\WixBuildTools.XsdGen.csproj || exit /b
 
-msbuild internal_t.proj -p:Configuration=%_C% -nologo -warnaserror -bl:%_L%\internal_build.binlog || exit /b
+msbuild internal_t.proj -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\internal_build.binlog || exit /b
 
 @goto :end
 

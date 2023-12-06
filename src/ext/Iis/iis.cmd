@@ -9,7 +9,7 @@
 @echo Iis.wixext build %_C%
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% -nologo || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -warnaserror || exit /b
 
 :: Test
 dotnet test test\WixToolsetTest.Iis -c %_C% --no-build --nologo || exit /b

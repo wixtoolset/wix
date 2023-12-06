@@ -23,7 +23,7 @@
 nuget restore netcoresearch\packages.config || exit /b
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% -bl:%_L%\ext_netfx_build.binlog || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\ext_netfx_build.binlog || exit /b
 
 :: Test
 dotnet test ^
@@ -31,7 +31,7 @@ dotnet test ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\netfx.wixext.trx" || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Netfx.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true wixext\WixToolset.Netfx.wixext.csproj || exit /b
 
 @goto :end
 

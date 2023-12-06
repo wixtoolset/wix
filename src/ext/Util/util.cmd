@@ -20,7 +20,7 @@
 @echo Building ext\Util %_C% using %_N%
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% -warnaserror -bl:%_L%\ext_util_build.binlog || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\ext_util_build.binlog || exit /b
 
 :: Test
 dotnet test ^
@@ -28,7 +28,7 @@ dotnet test ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\util.wixext.trx" || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Util.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true wixext\WixToolset.Util.wixext.csproj || exit /b
 
 @goto :end
 

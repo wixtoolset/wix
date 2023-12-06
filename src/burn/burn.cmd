@@ -23,7 +23,7 @@
 
 nuget restore || exit /b
 
-msbuild burn_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\burn_build.binlog || exit /b
+msbuild burn_t.proj -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\burn_build.binlog || exit /b
 
 dotnet test ^
  %_B%\x86\BurnUnitTest.dll ^

@@ -9,13 +9,13 @@
 @echo Dependency.wixext build %_C%
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -warnaserror || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.Dependency || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Dependency.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true wixext\WixToolset.Dependency.wixext.csproj || exit /b
 
 @popd
 @endlocal

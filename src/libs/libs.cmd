@@ -19,7 +19,7 @@
 
 @echo Building libs %_C%
 
-msbuild -Restore libs_t.proj -p:Configuration=%_C% -nologo -m -warnaserror -bl:%_L%\libs_build.binlog || exit /b
+msbuild -Restore libs_t.proj -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\libs_build.binlog || exit /b
 
 dotnet test ^
  %_B%\net6.0\WixToolsetTest.Versioning.dll ^
