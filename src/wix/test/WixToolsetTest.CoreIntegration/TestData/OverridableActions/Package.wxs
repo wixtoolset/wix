@@ -36,7 +36,7 @@
         <ComponentGroup Id="Foo2" />
         
         <InstallExecuteSequence>
-            <Custom Action="SetBar" Before="AppSearch" />
+            <Custom Action="override SetBar" Before="AppSearch" />
         </InstallExecuteSequence>
     </Fragment>
 

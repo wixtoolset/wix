@@ -58,8 +58,8 @@ Patch dialog sequence:
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2" Condition="Installed AND PATCH" />
 
             <InstallUISequence>
-                <Show Dialog="WelcomeDlg" Before="WelcomeEulaDlg" Condition="Installed AND PATCH" />
-                <Show Dialog="WelcomeEulaDlg" Before="ProgressDlg" Condition="NOT Installed" />
+                <Show Dialog="override WelcomeDlg" Before="WelcomeEulaDlg" Condition="Installed AND PATCH" />
+                <Show Dialog="override WelcomeEulaDlg" Before="ProgressDlg" Condition="NOT Installed" />
             </InstallUISequence>
 
             <Property Id="ARPNOMODIFY" Value="1" />

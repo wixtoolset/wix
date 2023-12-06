@@ -43,12 +43,17 @@ namespace WixToolset.Core.Link
 
                 if (String.IsNullOrEmpty(parentDirectoryId))
                 {
-                    if (directory.Id.Id != "TARGETDIR")
-                    {
-                        directory.ParentDirectoryRef = "TARGETDIR";
-                    }
+                    parentDirectoryId = this.GetStandardDirectoryParent(directory.Id.Id, platform);
+
+                    directory.ParentDirectoryRef = parentDirectoryId;
+
+                    //if (directory.Id.Id != "TARGETDIR")
+                    //{
+                    //    directory.ParentDirectoryRef = "TARGETDIR";
+                    //}
                 }
-                else
+
+                if (!String.IsNullOrEmpty(parentDirectoryId))
                 {
                     this.EnsureStandardDirectoryAdded(directoryIds, parentDirectoryId, directory.SourceLineNumbers, platform);
                 }

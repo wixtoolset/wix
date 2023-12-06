@@ -2463,6 +2463,7 @@ namespace WixToolset.Core
             foreach (var child in node.Elements())
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                Identifier actionIdentifier = null;
                 var actionName = child.Name.LocalName;
                 string afterAction = null;
                 string beforeAction = null;
@@ -2485,8 +2486,9 @@ namespace WixToolset.Core
                         case "Action":
                             if (customAction)
                             {
-                                actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.CustomAction, actionName);
+                                actionIdentifier = this.Core.GetAttributeIdentifier(childSourceLineNumbers, attrib);
+                                actionName = actionIdentifier.Id;
+                                this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.CustomAction, actionIdentifier.Id);
                             }
                             else
                             {
@@ -2521,7 +2523,8 @@ namespace WixToolset.Core
                         case "Dialog":
                             if (showDialog)
                             {
-                                actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
+                                actionIdentifier = this.Core.GetAttributeIdentifier(childSourceLineNumbers, attrib);
+                                actionName = actionIdentifier.Id;
                                 this.Core.CreateSimpleReference(childSourceLineNumbers, SymbolDefinitions.Dialog, actionName);
                             }
                             else
@@ -2645,7 +2648,17 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        var symbol = this.Core.AddSymbol(new WixActionSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Global, sequenceTable, actionName))
+                        var access = AccessModifier.Global;
+                        if (overridable)
+                        {
+                            access = AccessModifier.Virtual;
+                        }
+                        else if (actionIdentifier != null)
+                        {
+                            access = actionIdentifier.Access;
+                        }
+
+                        var symbol = this.Core.AddSymbol(new WixActionSymbol(childSourceLineNumbers, new Identifier(access, sequenceTable, actionName))
                         {
                             SequenceTable = sequenceTable,
                             Action = actionName,

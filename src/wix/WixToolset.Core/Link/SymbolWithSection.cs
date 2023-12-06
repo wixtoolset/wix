@@ -49,6 +49,11 @@ namespace WixToolset.Core.Link
         public IEnumerable<SymbolWithSection> PossiblyConflicts => this.possibleConflicts ?? Enumerable.Empty<SymbolWithSection>();
 
         /// <summary>
+        ///  Gets the virtual symbol that is overridden by this symbol.
+        /// </summary>
+        public SymbolWithSection Overrides { get; private set; }
+
+        /// <summary>
         /// Adds a duplicate symbol with sections that is a possible conflict.
         /// </summary>
         /// <param name="symbolWithSection">Symbol with section that is a possible conflict of this symbol.</param>
@@ -60,6 +65,20 @@ namespace WixToolset.Core.Link
             }
 
             this.possibleConflicts.Add(symbolWithSection);
+        }
+
+        /// <summary>
+        /// Override a virtual symbol.
+        /// </summary>
+        /// <param name="virtualSymbolWithSection">Virtual symbol with section that is being overridden.</param>
+        public void OverrideVirtualSymbol(SymbolWithSection virtualSymbolWithSection)
+        {
+            if (virtualSymbolWithSection.Access != AccessModifier.Virtual)
+            {
+                throw new InvalidOperationException("Cannot override non-virtual symbols");
+            }
+
+            this.Overrides = virtualSymbolWithSection;
         }
 
         /// <summary>

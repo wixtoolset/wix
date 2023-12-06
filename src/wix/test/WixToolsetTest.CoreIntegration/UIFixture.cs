@@ -2,15 +2,11 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
-    using System;
     using System.IO;
     using System.Linq;
-    using Example.Extension;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using WixToolset.Data;
-    using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class UIFixture
@@ -94,7 +90,7 @@ namespace WixToolsetTest.CoreIntegration
                     21,
                     52
                 }, errors.Select(e => e.Id).ToArray());
-             }
+            }
         }
     }
 }
