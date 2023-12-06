@@ -12,7 +12,9 @@ This repository contains the WiX Toolset codebase.
 
 ## Prerequisites
 
-- Visual Studio 2022 (17.0.4 or higher) with the following installed:
+- Microsoft .NET Framework 3.5 SP1
+- A command line Git client that is in the system path
+- Visual Studio 2022 (17.8.2 or higher) with the following installed:
 
 | Workloads |
 | :-------- |
@@ -22,12 +24,14 @@ This repository contains the WiX Toolset codebase.
 
 | Individual components |
 | :-------------------- |
+| .NET 6.0 Runtime (Long Term Support) |
 | .NET Framework 4.7.2 SDK |
 | .NET Framework 4.7.2 targeting pack |
 | MSVC v141 - VS 2017 C++ ARM64 build tools (v14.16) |
 | MSVC v141 - VS 2017 C++ x64/x86 build tools (v14.16) |
-| MSVC v143 - VS 2022 C++ ARM64 build tools (Latest) |
+| MSVC v143 - VS 2022 C++ ARM64/ARM64EC build tools (Latest) |
 | MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
+| Git for Windows |
 
 - [Download the latest nuget.exe command-line tool](https://www.nuget.org/downloads) and put it in a directory on the path.
 
