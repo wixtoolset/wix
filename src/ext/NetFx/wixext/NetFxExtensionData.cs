@@ -10,8 +10,6 @@ namespace WixToolset.Netfx
     /// </summary>
     public sealed class NetfxExtensionData : BaseExtensionData
     {
-        public override string DefaultCulture => "en-US";
-        
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = NetfxSymbolDefinitions.ByName(name);

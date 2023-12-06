@@ -7,8 +7,6 @@ namespace WixToolset.Firewall
 
     public sealed class FirewallExtensionData : BaseExtensionData
     {
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = FirewallSymbolDefinitions.ByName(name);

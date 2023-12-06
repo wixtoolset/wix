@@ -7,8 +7,6 @@ namespace WixToolset.Util
 
     public sealed class UtilExtensionData : BaseExtensionData
     {
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = UtilSymbolDefinitions.ByName(name);

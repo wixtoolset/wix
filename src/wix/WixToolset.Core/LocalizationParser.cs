@@ -86,6 +86,7 @@ namespace WixToolset.Core
         private static Localization ParseWixLocalizationElement(IMessaging messaging, XElement node)
         {
             var sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
+            var location = LocalizationLocation.Source;
             int? codepage = null;
             int? summaryInformationCodepage = null;
             string culture = null;
@@ -96,6 +97,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
+                        case "ExtensionDefaultCulture":
+                            if (Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib) == YesNoType.Yes)
+                            {
+                                location = LocalizationLocation.ExtensionDefaultCulture;
+                            }
+                            break;
+
                         case "Codepage":
                             codepage = Common.GetValidCodePage(attrib.Value, allowNoChange: true, onlyAnsi: false, sourceLineNumbers);
                             break;
@@ -147,7 +155,7 @@ namespace WixToolset.Core
                 }
             }
 
-            return messaging.EncounteredError ? null : new Localization(codepage, summaryInformationCodepage, culture, variables, localizedControls);
+            return messaging.EncounteredError ? null : new Localization(location, codepage, summaryInformationCodepage, culture, variables, localizedControls);
         }
 
         /// <summary>

@@ -10,12 +10,6 @@ namespace WixToolset.Http
     /// </summary>
     public sealed class HttpExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = HttpSymbolDefinitions.ByName(name);

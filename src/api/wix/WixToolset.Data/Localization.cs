@@ -16,16 +16,30 @@ namespace WixToolset.Data
         private readonly Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
 
         /// <summary>
+        /// Instantiates a new localization object with default location.
+        /// </summary>
+        public Localization(int? codepage, int? summaryInformationCodepage, string culture, IDictionary<string, BindVariable> variables, IDictionary<string, LocalizedControl> localizedControls) : 
+            this(LocalizationLocation.Source, codepage, summaryInformationCodepage, culture, variables, localizedControls)
+        {
+        }
+
+        /// <summary>
         /// Instantiates a new localization object.
         /// </summary>
-        public Localization(int? codepage, int? summaryInformationCodepage, string culture, IDictionary<string, BindVariable> variables, IDictionary<string, LocalizedControl> localizedControls)
+        public Localization(LocalizationLocation location, int? codepage, int? summaryInformationCodepage, string culture, IDictionary<string, BindVariable> variables, IDictionary<string, LocalizedControl> localizedControls)
         {
+            this.Location = location;
             this.Codepage = codepage;
             this.SummaryInformationCodepage = summaryInformationCodepage;
             this.Culture = culture?.ToLowerInvariant() ?? String.Empty;
             this.variables = new Dictionary<string, BindVariable>(variables);
             this.localizedControls = new Dictionary<string, LocalizedControl>(localizedControls);
         }
+
+        /// <summary>
+        /// Gets the location the localization came from.
+        /// </summary>
+        public LocalizationLocation Location { get; private set; }
 
         /// <summary>
         /// Gets the codepage.
@@ -57,9 +71,27 @@ namespace WixToolset.Data
         /// <value>The localized controls.</value>
         public ICollection<KeyValuePair<string, LocalizedControl>> LocalizedControls => this.localizedControls;
 
+        /// <summary>
+        /// Updates the location, if the location is a higher state than the current state.
+        /// </summary>
+        /// <param name="location">Location to update to.</param>
+        /// <returns>This localization object.</returns>
+        public Localization UpdateLocation(LocalizationLocation location)
+        {
+            if (this.Location < location)
+            {
+                this.Location = location;
+            }
+
+            return this;
+        }
+
         internal JsonObject Serialize()
         {
-            var jsonObject = new JsonObject();
+            var jsonObject = new JsonObject()
+            {
+                { "location", this.Location.ToString().ToLowerInvariant() }
+            };
 
             if (this.Codepage.HasValue)
             {
@@ -108,6 +140,7 @@ namespace WixToolset.Data
 
         internal static Localization Deserialize(JsonObject jsonObject)
         {
+            var location = jsonObject.GetEnumOrDefault("location", LocalizationLocation.Source);
             var codepage = jsonObject.GetValueOrDefault("codepage", null);
             var summaryCodepage = jsonObject.GetValueOrDefault("summaryCodepage", null);
             var culture = jsonObject.GetValueOrDefault<string>("culture");
@@ -131,7 +164,7 @@ namespace WixToolset.Data
                 }
             }
 
-            return new Localization(codepage, summaryCodepage, culture, variables, controls);
+            return new Localization(location, codepage, summaryCodepage, culture, variables, controls);
         }
     }
 }

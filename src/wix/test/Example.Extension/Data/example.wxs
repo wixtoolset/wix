@@ -4,11 +4,17 @@
 
     <Binary Id="BinFromWir" SourceFile="example.txt" />
   </Fragment>
+
+  <Fragment>
+    <Property Id="LocalizedProperty" Value="!(loc.ExampleString)" />
+  </Fragment>
+
   <Fragment>
     <BootstrapperApplication Id="fakeba">
       <BootstrapperApplicationDll SourceFile="example.txt" />
     </BootstrapperApplication>
   </Fragment>
+
   <Fragment>
     <BundleExtension Id="ExampleBundleExtension" SourceFile="example.txt" />
   </Fragment>

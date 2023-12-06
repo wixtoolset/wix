@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+<WixLocalization Culture="en-us" ExtensionDefaultCulture="yes" xmlns="http://wixtoolset.org/schemas/v4/wxl">
     <String Id="msierrIISCannotConnect" Overridable="yes" Value="Cannot connect to Internet Information Server.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrIISFailedReadWebSite" Overridable="yes" Value="Failed while processing WebSites.   ([2]   [3]   [4]   [5])" />
     <String Id="msierrIISFailedReadWebDirs" Overridable="yes" Value="Failed while processing WebDirs.  ([2]   [3]   [4]   [5])" />

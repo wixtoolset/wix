@@ -7,8 +7,6 @@ namespace WixToolset.UI
 
     public sealed class UIExtensionData : BaseExtensionData
     {
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = null;

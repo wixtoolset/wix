@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="en-US" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+<WixLocalization Culture="en-US" ExtensionDefaultCulture="yes" xmlns="http://wixtoolset.org/schemas/v4/wxl">
     <String Id="msierrDependencyMissingDependencies" Overridable="yes" Value="If you continue with this install, the product may not work properly because [2] or more dependencies are missing. Do you want to continue with this install anyway?" />
     <String Id="msierrDependencyHasDependents" Overridable="yes" Value="If you continue with this uninstall, [2] or more products may stop working properly. Do you want to continue with this uninstall anyway?" />
 </WixLocalization>

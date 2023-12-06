@@ -1,6 +1,6 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+<WixLocalization Culture="en-us" ExtensionDefaultCulture="yes" xmlns="http://wixtoolset.org/schemas/v4/wxl">
     <String Id="WixSchedHttpUrlReservationsInstall" Overridable="yes" Value="Preparing to configure Windows HTTP Server" />
     <String Id="WixSchedHttpUrlReservationsUninstall" Overridable="yes" Value="Preparing to configure Windows HTTP Server" />
     <String Id="WixRollbackHttpUrlReservationsInstall" Overridable="yes" Value="Rolling back Windows HTTP Server configuration" />

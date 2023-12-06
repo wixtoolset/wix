@@ -11,12 +11,6 @@ namespace WixToolset.Dependency
     public sealed class DependencyExtensionData : BaseExtensionData
     {
         /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture => "en-US";
-
-        /// <summary>
         /// Gets the contained .wixlib content.
         /// </summary>
         /// <param name="symbolDefinitions">Strong typed symbold definitions.</param>
