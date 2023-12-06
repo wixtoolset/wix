@@ -325,12 +325,12 @@ namespace WixToolset.Data
 
         public static Message DuplicateSymbol(SourceLineNumber sourceLineNumbers, string symbolName)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateSymbol, "Duplicate symbol '{0}' found. This typically means that an Id is duplicated. Access modifiers (internal, protected, private) cannot prevent these conflicts. Ensure all your identifiers of a given type (File, Component, Feature) are unique.", symbolName);
+            return Message(sourceLineNumbers, Ids.DuplicateSymbol, "Duplicate symbol '{0}' found. This typically means that an Id is duplicated. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.", symbolName);
         }
 
         public static Message DuplicateSymbol(SourceLineNumber sourceLineNumbers, string symbolName, string referencingSourceLineNumber)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateSymbol, "Duplicate symbol '{0}' referenced by {1}. This typically means that an Id is duplicated. Ensure all your identifiers of a given type (File, Component, Feature) are unique or use an access modifier to scope the identfier.", symbolName, referencingSourceLineNumber);
+            return Message(sourceLineNumbers, Ids.DuplicateSymbol, "Duplicate symbol '{0}' referenced by {1}. This typically means that an Id is duplicated. Ensure all your identifiers of a given type (Directory, File, etc.) are unique or use an access modifier to scope the identfier.", symbolName, referencingSourceLineNumber);
         }
 
         public static Message DuplicateSymbol2(SourceLineNumber sourceLineNumbers)

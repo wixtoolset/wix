@@ -1,4 +1,4 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <UI Id="CustomDialog">
             <Dialog Id="FirstDialog" Width="100" Height="100">
@@ -24,7 +24,7 @@
 
             <InstallUISequence>
                 <Show Dialog="FirstDialog" Before="SecondDialog" Condition="Installed AND PATCH" />
-                <Show Dialog="SecondDialog" Before="ExecuteAction" Condition="NOT Installed" />
+                <Show Dialog="override SecondDialog" Before="ExecuteAction" Condition="NOT Installed" />
             </InstallUISequence>
         </UI>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">

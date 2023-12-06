@@ -108,7 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // the binder.
                 if (requiredActionSymbols.TryGetValue(key, out var requiredActionSymbol))
                 {
-                    if (requiredActionSymbol.Overridable)
+                    if (requiredActionSymbol.Overridable || requiredActionSymbol.Id.Access == AccessModifier.Virtual)
                     {
                         this.Messaging.Write(WarningMessages.SuppressAction(suppressActionSymbol.SourceLineNumbers, suppressActionSymbol.Action, suppressActionSymbol.SequenceTable.ToString()));
                         if (null != requiredActionSymbol.SourceLineNumbers)
@@ -240,7 +240,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Schedule the relatively scheduled actions (by resolving the dependency trees).
                 var previousUsedSequence = 0;
                 var relativeActionSymbols = new List<WixActionSymbol>();
-                for (int j = 0; j < absoluteActionSymbols.Count; j++)
+                for (var j = 0; j < absoluteActionSymbols.Count; j++)
                 {
                     var absoluteActionSymbol = absoluteActionSymbols[j];
 

@@ -133,13 +133,13 @@ namespace WixToolset.Core.Link
 
             foreach (var dupe in symbolWithSection.PossiblyConflicts)
             {
-                // don't count overridable WixActionSymbols
-                var symbolAction = symbolWithSection.Symbol as WixActionSymbol;
-                var dupeAction = dupe.Symbol as WixActionSymbol;
-                if (symbolAction?.Overridable != dupeAction?.Overridable)
-                {
-                    continue;
-                }
+                //// don't count overridable WixActionSymbols
+                //var symbolAction = symbolWithSection.Symbol as WixActionSymbol;
+                //var dupeAction = dupe.Symbol as WixActionSymbol;
+                //if (symbolAction?.Overridable != dupeAction?.Overridable)
+                //{
+                //    continue;
+                //}
 
                 if (this.AccessibleSymbol(referencingSection, dupe))
                 {
@@ -161,6 +161,8 @@ namespace WixToolset.Core.Link
             switch (symbolWithSection.Access)
             {
                 case AccessModifier.Global:
+                case AccessModifier.Virtual:
+                case AccessModifier.Override:
                     return true;
                 case AccessModifier.Library:
                     return symbolWithSection.Section.CompilationId == referencingSection.CompilationId || (null != symbolWithSection.Section.LibraryId && symbolWithSection.Section.LibraryId == referencingSection.LibraryId);

@@ -46,6 +46,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.UncompressedPayloadInContainer, "The payload '{0}' is uncompressed and cannot be added to container '{1}'. Remove its Compressed attribute and provide a @SourceFile value to allow it to be added to a container.", payloadId, containerId);
         }
 
+        public static Message VirtualSymbolNotFoundForOverride(SourceLineNumber sourceLineNumbers, string id)
+        {
+            return Message(sourceLineNumbers, Ids.VirtualSymbolNotFoundForOverride, "Did not find virtual symbol for override symbol '{0}'",id);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -61,6 +66,7 @@ namespace WixToolset.Core
             UncompressedPayloadInContainer = 7005,
             BAContainerCannotContainRemotePayload = 7006,
             DuplicateBindPathVariableOnCommandLine = 7007,
+            VirtualSymbolNotFoundForOverride = 7008,
         } // last available is 7099. 7100 is WindowsInstallerBackendWarnings.
     }
 }

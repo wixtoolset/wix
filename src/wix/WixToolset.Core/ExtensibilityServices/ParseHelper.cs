@@ -423,6 +423,14 @@ namespace WixToolset.Core.ExtensibilityServices
                         access = AccessModifier.Section;
                         break;
 
+                    case "virtual":
+                        access = AccessModifier.Virtual;
+                        break;
+
+                    case "override":
+                        access = AccessModifier.Override;
+                        break;
+
                     default:
                         return null;
                 }

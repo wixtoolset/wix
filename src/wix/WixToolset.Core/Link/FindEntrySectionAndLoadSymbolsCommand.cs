@@ -44,11 +44,19 @@ namespace WixToolset.Core.Link
         /// </summary>
         public ISet<IntermediateSymbol> IdenticalDirectorySymbols { get; private set; }
 
+        /// <summary>
+        /// Gets the collection of overridden symbols that should not be included
+        /// in the final output.
+        /// </summary>
+        public ISet<IntermediateSymbol> OverriddenSymbols { get; private set; }
+
         public void Execute()
         {
             var symbolsByName = new Dictionary<string, SymbolWithSection>();
             var possibleConflicts = new HashSet<SymbolWithSection>();
             var identicalDirectorySymbols = new HashSet<IntermediateSymbol>();
+            var overrideSymbols = new List<SymbolWithSection>();
+            var overriddenSymbols = new HashSet<IntermediateSymbol>();
 
             if (!Enum.TryParse(this.ExpectedOutputType.ToString(), out SectionType expectedEntrySectionType))
             {
@@ -84,15 +92,34 @@ namespace WixToolset.Core.Link
 
                     if (!symbolsByName.TryGetValue(fullName, out var existingSymbol))
                     {
+                        if (symbolWithSection.Access == AccessModifier.Override)
+                        {
+                            overrideSymbols.Add(symbolWithSection);
+                        }
+
                         symbolsByName.Add(fullName, symbolWithSection);
                     }
                     else // uh-oh, duplicate symbols.
                     {
+                        if (AccessModifier.Virtual == existingSymbol.Access && AccessModifier.Override == symbolWithSection.Access)
+                        {
+                            symbolWithSection.OverrideVirtualSymbol(existingSymbol);
+                            symbolsByName[fullName] = symbolWithSection; // replace the virtual symbol with the override symbol.
+
+                            overrideSymbols.Add(symbolWithSection);
+                            overriddenSymbols.Add(existingSymbol.Symbol);
+                        }
+                        else if (AccessModifier.Override == existingSymbol.Access && AccessModifier.Virtual == symbolWithSection.Access)
+                        {
+                            existingSymbol.OverrideVirtualSymbol(symbolWithSection);
+
+                            overriddenSymbols.Add(symbolWithSection.Symbol);
+                        }
                         // If the duplicate symbols are both private directories, there is a chance that they
-                        // point to identical symbols. Identical directory symbols should be treated as redundant.
-                        // and not cause conflicts.
-                        if (AccessModifier.Section == existingSymbol.Access && AccessModifier.Section == symbolWithSection.Access &&
-                            SymbolDefinitionType.Directory == existingSymbol.Symbol.Definition.Type && existingSymbol.Symbol.IsIdentical(symbolWithSection.Symbol))
+                        // point to identical symbols. Identical directory symbols are redundant and will not cause
+                        // conflicts.
+                        else if (AccessModifier.Section == existingSymbol.Access && AccessModifier.Section == symbolWithSection.Access &&
+                                 SymbolDefinitionType.Directory == existingSymbol.Symbol.Definition.Type && existingSymbol.Symbol.IsIdentical(symbolWithSection.Symbol))
                         {
                             // Ensure identical symbols are tracked to ensure that only one symbol will end up in linked intermediate.
                             identicalDirectorySymbols.Add(existingSymbol.Symbol);
@@ -108,9 +135,21 @@ namespace WixToolset.Core.Link
                 }
             }
 
+            // Ensure override symbols actually overrode a virtual symbol.
+            foreach (var symbolWithSection in overrideSymbols)
+            {
+                if (symbolWithSection.Overrides is null)
+                {
+                    var fullName = symbolWithSection.GetFullName();
+
+                    this.Messaging.Write(LinkerErrors.VirtualSymbolNotFoundForOverride(symbolWithSection.Symbol.SourceLineNumbers, fullName));
+                }
+            }
+
             this.SymbolsByName = symbolsByName;
             this.PossibleConflicts = possibleConflicts;
             this.IdenticalDirectorySymbols = identicalDirectorySymbols;
+            this.OverriddenSymbols = overriddenSymbols;
         }
     }
 }
