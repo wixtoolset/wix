@@ -9,16 +9,16 @@
 @echo DirectX.wixext build %_C%
 
 :: Restore
-msbuild -t:Restore -p:Configuration=%_C% || exit /b
+msbuild -t:Restore -p:Configuration=%_C% -tl -nologo -warnaserror || exit /b
 
 :: Build
-msbuild -t:Build -p:Configuration=%_C% test\WixToolsetTest.DirectX\WixToolsetTest.DirectX.csproj || exit /b
+msbuild -t:Build -p:Configuration=%_C% -tl -nologo -warnaserror test\WixToolsetTest.DirectX\WixToolsetTest.DirectX.csproj || exit /b
 
 :: Test
 dotnet test -c %_C% --no-build test\WixToolsetTest.DirectX || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% wixext\WixToolset.DirectX.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror wixext\WixToolset.DirectX.wixext.csproj || exit /b
 
 @popd
 @endlocal

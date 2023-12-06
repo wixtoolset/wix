@@ -23,9 +23,9 @@
 nuget restore dnchost\packages.config || exit /b
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% -bl:%_L%\ext_bal_build.binlog || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\ext_bal_build.binlog || exit /b
 
-msbuild -Restore -p:Configuration=%_C% test\examples\examples.proj -m -bl:%_L%\bal_examples_build.binlog  || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -m -warnaserror test\examples\examples.proj -m -bl:%_L%\bal_examples_build.binlog  || exit /b
 
 :: Test
 dotnet test ^
@@ -35,9 +35,9 @@ dotnet test ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\bal.wixext.trx" || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true wixext\WixToolset.Bal.wixext.csproj || exit /b
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true WixToolset.Dnc.HostGenerator\WixToolset.Dnc.HostGenerator.csproj || exit /b
-msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true WixToolset.Mba.Host\WixToolset.Mba.Host.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true wixext\WixToolset.Bal.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true WixToolset.Dnc.HostGenerator\WixToolset.Dnc.HostGenerator.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true WixToolset.Mba.Host\WixToolset.Mba.Host.csproj || exit /b
 
 @goto :end
 
