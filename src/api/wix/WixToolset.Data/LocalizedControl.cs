@@ -45,7 +45,10 @@ namespace WixToolset.Data
         /// Get key for a localized control.
         /// </summary>
         /// <returns>The localized control id.</returns>
-        public string GetKey() => LocalizedControl.GetKey(this.Dialog, this.Control);
+        public string GetKey()
+        {
+            return LocalizedControl.GetKey(this.Dialog, this.Control);
+        }
 
         /// <summary>
         /// Get key for a localized control.
@@ -53,7 +56,10 @@ namespace WixToolset.Data
         /// <param name="dialog">The optional id of the control's dialog.</param>
         /// <param name="control">The id of the control.</param>
         /// <returns>The localized control id.</returns>
-        public static string GetKey(string dialog, string control) => String.Concat(dialog, "/", control);
+        public static string GetKey(string dialog, string control)
+        {
+            return String.Concat(dialog, "/", control);
+        }
 
         internal JsonObject Serialize()
         {

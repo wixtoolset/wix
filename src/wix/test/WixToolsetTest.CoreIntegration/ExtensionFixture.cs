@@ -18,7 +18,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildAndQuery()
         {
-            var folder = TestData.Get(@"TestData\ExampleExtension");
+            var folder = TestData.Get("TestData", "ExampleExtension");
             var build = new Builder(folder, typeof(ExampleExtensionFactory), new[] { Path.Combine(folder, "data") });
 
             var results = build.BuildAndQuery(Build, "Wix4Example");
@@ -58,7 +58,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildWithExampleExtension()
         {
-            var folder = TestData.Get(@"TestData\ExampleExtension");
+            var folder = TestData.Get("TestData", "ExampleExtension");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -157,6 +157,65 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWithExampleExtensionLocalizedDefault()
+        {
+            var folder = TestData.Get("TestData", "ExampleExtensionLocalized");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "LocalizedPackage.wxs"),
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "extest.msi")
+                });
+
+                result.AssertSuccess();
+
+                var pdb = Intermediate.Load(Path.Combine(intermediateFolder, "bin", "extest.wixpdb"));
+                var section = pdb.Sections.Single();
+
+                var property = section.Symbols.OfType<PropertySymbol>().Single(t => t.Id.Id == "LocalizedProperty");
+                WixAssert.StringEqual("en-us", property.Value);
+            }
+        }
+
+        [Fact]
+        public void CanBuildWithExampleExtensionLocalizedNonDefault()
+        {
+            var folder = TestData.Get("TestData", "ExampleExtensionLocalized");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "LocalizedPackage.wxs"),
+                    "-culture", "ja-jp",
+                    "-ext", ExtensionPaths.ExampleExtensionPath,
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, "bin", "extest.msi")
+                });
+
+                result.AssertSuccess();
+
+                var pdb = Intermediate.Load(Path.Combine(intermediateFolder, "bin", "extest.wixpdb"));
+                var section = pdb.Sections.Single();
+
+                var property = section.Symbols.OfType<PropertySymbol>().Single(t => t.Id.Id == "LocalizedProperty");
+                WixAssert.StringEqual("ja-jp", property.Value);
+            }
+        }
+
+        [Fact]
         public void CanParseCommandLineWithExtension()
         {
             var folder = TestData.Get(@"TestData\ExampleExtension");
@@ -192,7 +251,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CannotBuildWithMissingExtension()
         {
-            var folder = TestData.Get(@"TestData\ExampleExtension");
+            var folder = TestData.Get("TestData", "ExampleExtension");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -213,7 +272,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CannotBuildWithMissingVersionedExtension()
         {
-            var folder = TestData.Get(@"TestData\ExampleExtension");
+            var folder = TestData.Get("TestData", "ExampleExtension");
 
             using (var fs = new DisposableFileSystem())
             {

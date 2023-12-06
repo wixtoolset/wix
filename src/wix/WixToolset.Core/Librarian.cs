@@ -63,6 +63,11 @@ namespace WixToolset.Core
                     return null;
                 }
 
+                foreach (var localization in localizationsByCulture.Values)
+                {
+                    localization.UpdateLocation(LocalizationLocation.Library);
+                }
+
                 trackedFiles = this.ResolveFilePathsToEmbed(context, sections);
 
                 if (this.Messaging.EncounteredError)

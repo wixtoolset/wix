@@ -1,6 +1,7 @@
 // Copyright(c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.IO;
 using WixInternal.Core.TestPackage;
 
 namespace CompileCoreTestExtensionWixlib
@@ -17,8 +18,6 @@ namespace CompileCoreTestExtensionWixlib
             var buildArgs = new List<string>();
             buildArgs.Add("build");
             buildArgs.Add("-bindfiles");
-            buildArgs.Add("-bindpath");
-            buildArgs.Add("Data");
             buildArgs.Add("-intermediateFolder");
             buildArgs.Add(intermediateFolder);
             buildArgs.Add("-o");
@@ -26,6 +25,11 @@ namespace CompileCoreTestExtensionWixlib
 
             foreach (var path in args[2].Split(';'))
             {
+                var folder = Path.GetDirectoryName(Path.GetFullPath(path));
+
+                buildArgs.Add("-bindpath");
+                buildArgs.Add(folder);
+
                 buildArgs.Add(path);
             }
 

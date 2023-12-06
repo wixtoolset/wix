@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="LocalizedPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" Scope="perMachine">
+
+    <PropertyRef Id="LocalizedProperty" />
+
+    <Feature Id="ProductFeature">
+        <Component Directory="INSTALLFOLDER">
+            <File Source="example.txt" />
+        </Component>
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

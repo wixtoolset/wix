@@ -8,6 +8,8 @@
     <OutputType>Exe</OutputType>
     <SignOutput>false</SignOutput>
     <RollForward>Major</RollForward>
+
+    <WixlibPath>$(BaseOutputPath)TestData\$(Configuration)\example.wixlib</WixlibPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,20 +17,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ExtensionWxs Include="..\Example.Extension\Data\example.wxs">
-      <WixlibPath>$(BaseOutputPath)TestData\$(Configuration)\example.wixlib</WixlibPath>
-    </ExtensionWxs>
+    <ExtensionSource Include="..\Example.Extension\Data\example.wxs" />
+    <ExtensionSource Include="..\Example.Extension\Data\example.en-us.wxl" />
+    <ExtensionSource Include="..\Example.Extension\Data\example.ja-jp.wxl" />
   </ItemGroup>
 
   <Target Name="BuildExtensionWixlibs"
           AfterTargets="AfterBuild"
-          Inputs="@(ExtensionWxs)"
-          Outputs="%(ExtensionWxs.WixlibPath)"
+          Inputs="@(ExtensionSource)"
+          Outputs="$(WixlibPath)"
           Condition=" '$(NCrunch)'!='1' ">
 
-    <Exec Command="dotnet @(TargetPathWithTargetPlatformMoniker) &quot;$(IntermediateOutputPath) &quot; &quot;%(ExtensionWxs.WixlibPath)&quot; &quot;%(ExtensionWxs.Filename)%(ExtensionWxs.Extension)&quot;"
-          WorkingDirectory="%(ExtensionWxs.RelativeDir)" />
+    <Exec Command="dotnet @(TargetPathWithTargetPlatformMoniker) &quot;$(IntermediateOutputPath) &quot; &quot;$(WixlibPath)&quot; &quot;@(ExtensionSource)&quot;" />
 
-    <Message Importance="high" Text="@(ExtensionWxs) -&gt; %(ExtensionWxs.WixlibPath)" />
+    <Message Importance="high" Text="@(ExtensionSource) -&gt; $(WixlibPath)" />
   </Target>
 </Project>

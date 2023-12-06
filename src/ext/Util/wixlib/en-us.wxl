@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+<WixLocalization Culture="en-us" ExtensionDefaultCulture="yes" xmlns="http://wixtoolset.org/schemas/v4/wxl">
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="Failed to create user.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="Failed to create user due to invalid password.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Failed to add user to group.  ([2]   [3]   [4]   [5])" />

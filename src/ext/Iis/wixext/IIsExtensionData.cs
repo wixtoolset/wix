@@ -10,12 +10,6 @@ namespace WixToolset.Iis
     /// </summary>
     public sealed class IIsExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = IisSymbolDefinitions.ByName(name);

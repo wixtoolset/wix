@@ -10,12 +10,6 @@ namespace WixToolset.ComPlus
     /// </summary>
     public sealed class ComPlusExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = ComPlusSymbolDefinitions.ByName(name);

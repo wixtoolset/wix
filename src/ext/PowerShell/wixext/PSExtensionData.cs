@@ -10,12 +10,6 @@ namespace WixToolset.PowerShell
     /// </summary>
     public sealed class PSExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture => "en-US";
-
         public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
             return Intermediate.Load(typeof(PSExtensionData).Assembly, "WixToolset.PowerShell.powershell.wixlib", symbolDefinitions);

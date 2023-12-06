@@ -10,12 +10,6 @@ namespace WixToolset.Sql
     /// </summary>
     public sealed class SqlExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture => "en-US";
-
         public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = SqlSymbolDefinitions.ByName(name);

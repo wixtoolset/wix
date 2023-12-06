@@ -10,12 +10,6 @@ namespace WixToolset.Extensibility
     public interface IExtensionData
     {
         /// <summary>
-        /// Gets the optional default culture.
-        /// </summary>
-        /// <value>The optional default culture.</value>
-        string DefaultCulture { get; }
-
-        /// <summary>
         ///
         /// </summary>
         /// <param name="name"></param>
