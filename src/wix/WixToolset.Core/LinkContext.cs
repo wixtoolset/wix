@@ -30,6 +30,10 @@ namespace WixToolset.Core
 
         public string OutputPath { get; set; }
 
+        public Platform Platform { get; set; }
+
+        public bool SkipStdWixlib { get; set; }
+
         public ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
 
         public CancellationToken CancellationToken { get; set; }

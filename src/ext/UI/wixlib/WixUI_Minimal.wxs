@@ -59,7 +59,6 @@ Patch dialog sequence:
 
             <InstallUISequence>
                 <Show Dialog="override WelcomeDlg" Before="WelcomeEulaDlg" Condition="Installed AND PATCH" />
-                <Show Dialog="override WelcomeEulaDlg" Before="ProgressDlg" Condition="NOT Installed" />
             </InstallUISequence>
 
             <Property Id="ARPNOMODIFY" Value="1" />

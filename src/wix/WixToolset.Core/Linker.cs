@@ -11,7 +11,6 @@ namespace WixToolset.Core
     using WixToolset.Core.Link;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -98,8 +97,13 @@ namespace WixToolset.Core
                     }
                 }
 
-                // TODO: Replace this with "std.wixlib"
-                this.LoadStandardSymbols(sections);
+                // Load the standard wixlib.
+                if (!this.Context.SkipStdWixlib)
+                {
+                    var stdlib = WixStandardLibrary.Build(this.Context.Platform);
+
+                    sections.AddRange(stdlib.Sections);
+                }
 
                 var multipleFeatureComponents = new Hashtable();
 
@@ -121,9 +125,6 @@ namespace WixToolset.Core
                         throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
                     }
                 }
-
-                ////// Add the missing standard action and directory symbols.
-                ////this.LoadStandardSymbols(find.SymbolsByName);
 
                 // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
@@ -187,7 +188,6 @@ namespace WixToolset.Core
                 // Create a new section to hold the linked content. Start with the entry section's
                 // metadata.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type);
-                var references = new List<WixSimpleReferenceSymbol>();
                 var identicalDirectoryIds = new HashSet<string>(StringComparer.Ordinal);
 
                 foreach (var section in sections)
@@ -263,13 +263,9 @@ namespace WixToolset.Core
                                 }
                                 break;
 
+                            case SymbolDefinitionType.WixSimpleReference:
                             case SymbolDefinitionType.WixComplexReference:
                                 copySymbol = false;
-                                break;
-
-                            case SymbolDefinitionType.WixSimpleReference:
-                                copySymbol = false;
-                                references.Add(symbol as WixSimpleReferenceSymbol);
                                 break;
 
                             case SymbolDefinitionType.WixVariable:
@@ -308,12 +304,6 @@ namespace WixToolset.Core
                 if (resolvedSection.Type == SectionType.Bundle)
                 {
                     var command = new FlattenAndProcessBundleTablesCommand(resolvedSection, this.Messaging);
-                    command.Execute();
-                }
-                else if (resolvedSection.Type == SectionType.Package || resolvedSection.Type == SectionType.Module)
-                {
-                    // Packages and modules get standard directories add.
-                    var command = new AddRequiredStandardDirectories(resolvedSection, references);
                     command.Execute();
                 }
 
@@ -363,66 +353,6 @@ namespace WixToolset.Core
                 wixVariables.Add(id, symbol);
             }
         }
-
-        /// <summary>
-        /// Load the standard action and directory symbols.
-        /// </summary>
-        /// <param name="symbolsByName">Collection of symbols.</param>
-        //private void LoadStandardSymbols(IDictionary<string, SymbolWithSection> symbolsByName)
-        //{
-        //    foreach (var actionSymbol in WindowsInstallerStandard.StandardActions())
-        //    {
-        //        var symbolWithSection = new SymbolWithSection(null, actionSymbol);
-        //        var fullName = symbolWithSection.GetFullName();
-
-        //        // If the action's symbol has not already been defined (i.e. overriden by the user), add it now.
-        //        if (!symbolsByName.ContainsKey(fullName))
-        //        {
-        //            symbolsByName.Add(fullName, symbolWithSection);
-        //        }
-        //    }
-
-        //    foreach (var directorySymbol in WindowsInstallerStandard.StandardDirectories())
-        //    {
-        //        var symbolWithSection = new SymbolWithSection(null, directorySymbol);
-        //        var fullName = symbolWithSection.GetFullName();
-
-        //        // If the directory's symbol has not already been defined (i.e. overriden by the user), add it now.
-        //        if (!symbolsByName.ContainsKey(fullName))
-        //        {
-        //            symbolsByName.Add(fullName, symbolWithSection);
-        //        }
-        //    }
-        //}
-
-        private void LoadStandardSymbols(List<IntermediateSection> sections)
-        {
-            foreach (var actionSymbol in WindowsInstallerStandard.StandardActions())
-            {
-                var section = new IntermediateSection(actionSymbol.Id.Id, SectionType.Fragment);
-                section.AddSymbol(new WixActionSymbol(null, new Identifier(actionSymbol.Id.Access, actionSymbol.Id.Id))
-                {
-                    Action = actionSymbol.Action,
-                    SequenceTable = actionSymbol.SequenceTable,
-                    Sequence = actionSymbol.Sequence,
-                    Condition = actionSymbol.Condition,
-                });
-
-                sections.Add(section);
-            }
-
-            foreach (var directorySymbol in WindowsInstallerStandard.StandardDirectories())
-            {
-                var section = new IntermediateSection(directorySymbol.Id.Id, SectionType.Fragment);
-                section.AddSymbol(new DirectorySymbol(null, new Identifier(directorySymbol.Id.Access, directorySymbol.Id.Id))
-                {
-                    Name = directorySymbol.Name
-                });
-
-                sections.Add(section);
-            }
-        }
-
 
         /// <summary>
         /// Process the complex references.

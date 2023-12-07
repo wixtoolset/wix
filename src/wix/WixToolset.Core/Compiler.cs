@@ -7129,7 +7129,7 @@ namespace WixToolset.Core
             }
             else if (!WindowsInstallerStandard.IsStandardDirectory(id))
             {
-                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Id", id, String.Join(", \"", WindowsInstallerStandard.StandardDirectories().Select(d => d.Id.Id))));
+                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Id", id, String.Join(", \"", WindowsInstallerStandard.StandardDirectoryIds())));
             }
 
             foreach (var child in node.Elements())

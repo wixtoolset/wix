@@ -423,6 +423,8 @@ namespace WixToolset.Core
                             SymbolPaths = symbols,
                         });
                     }
+
+                    this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixFragment, WixStandardLibraryIdentifiers.WixStandardPackageReferences);
                 }
             }
             finally

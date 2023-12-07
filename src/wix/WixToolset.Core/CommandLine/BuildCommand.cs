@@ -61,6 +61,7 @@ namespace WixToolset.Core.CommandLine
                 new CommandLineHelpSwitch("-loc", "Localization file to use in the build. By default, .wxl files are recognized as localization."),
                 new CommandLineHelpSwitch("-lib", "Library file to use in the build. By default, .wixlib files are recognized as libraries."),
                 new CommandLineHelpSwitch("-src", "Source file to use in the build. By default, .wxs files are recognized as source code."),
+                new CommandLineHelpSwitch("-nostdlib", "Skip use of WiX standard wixlib."),
                 new CommandLineHelpSwitch("-out", "-o", "Path to output the build to."),
                 new CommandLineHelpSwitch("-outputtype", "Explicitly set the output type if it cannot be determined from the output."),
                 new CommandLineHelpSwitch("-pdb", "Optional path to output .wixpdb. Default will write .wixpdb beside output path."),
@@ -278,6 +279,8 @@ namespace WixToolset.Core.CommandLine
             context.IntermediateFolder = this.IntermediateFolder;
             context.Intermediates = intermediates.Concat(libraries).ToList();
             context.OutputPath = this.OutputPath;
+            context.Platform = this.Platform;
+            context.SkipStdWixlib = this.commandLine.SkipStdWixlib;
             context.SymbolDefinitionCreator = creator;
             context.CancellationToken = cancellationToken;
 
@@ -530,6 +533,8 @@ namespace WixToolset.Core.CommandLine
 
             public string TrackingFile { get; private set; }
 
+            public bool SkipStdWixlib { get; set; }
+
             public bool ResetAcls { get; set; }
 
             public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
@@ -683,6 +688,10 @@ namespace WixToolset.Core.CommandLine
 
                         case "src":
                             parser.GetNextArgumentAsFilePathOrError(arg, "source code", this.SourceFilePaths);
+                            return true;
+
+                        case "nostdlib":
+                            this.SkipStdWixlib = true;
                             return true;
 
                         case "o":
