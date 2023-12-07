@@ -1,4 +1,4 @@
-﻿<?define Foo = "Foo" ?>
+<?define Foo = "Foo" ?>
 <?define Foo = "Foo" ?>
 
 <?define Bar = "Bar" ?>
@@ -12,7 +12,6 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
-    
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
@@ -22,8 +21,8 @@
   </Package>
 
   <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
+    <Directory Id="override TARGETDIR" Name="SourceDir">
+      <Directory Id="override ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
       </Directory>
     </Directory>

@@ -2280,10 +2280,10 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 xDirectory = xDirectory.Parent;
             }
 
-            if (xDirectory?.Name.LocalName == "StandardDirectory" && WindowsInstallerStandard.TryGetStandardDirectory(xDirectory.Attribute("Id").Value, out var standardDirectory))
+            if (xDirectory?.Name.LocalName == "StandardDirectory" && WindowsInstallerStandard.TryGetStandardDirectoryName(xDirectory.Attribute("Id").Value, out var standardDirectoryName))
             {
                 sourcePath.Insert(0, Path.DirectorySeparatorChar);
-                sourcePath.Insert(0, standardDirectory.Name);
+                sourcePath.Insert(0, standardDirectoryName);
             }
 
             return sourcePath.ToString();

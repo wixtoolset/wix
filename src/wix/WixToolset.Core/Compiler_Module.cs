@@ -285,6 +285,8 @@ namespace WixToolset.Core
                     }
 
                     this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, this.activeLanguage);
+
+                    this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixFragment, WixStandardLibraryIdentifiers.WixStandardModuleReferences);
                 }
             }
             finally

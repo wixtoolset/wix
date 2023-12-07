@@ -48,6 +48,16 @@ namespace WixToolset.Extensibility.Data
         string OutputPath { get; set; }
 
         /// <summary>
+        /// Gets or sets the platform for the output.
+        /// </summary>
+        Platform Platform { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to skip the standard wixlib.
+        /// </summary>
+        bool SkipStdWixlib { get; set; }
+
+        /// <summary>
         /// Symbol definition creator used to load extension data.
         /// </summary>
         ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }

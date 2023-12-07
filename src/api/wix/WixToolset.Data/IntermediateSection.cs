@@ -70,9 +70,11 @@ namespace WixToolset.Data
         /// Assigns the section to a library.
         /// </summary>
         /// <param name="libraryId">Identifier of the library.</param>
-        public void AssignToLibrary(string libraryId)
+        public IntermediateSection AssignToLibrary(string libraryId)
         {
             this.LibraryId = libraryId;
+
+            return this;
         }
 
         /// <summary>

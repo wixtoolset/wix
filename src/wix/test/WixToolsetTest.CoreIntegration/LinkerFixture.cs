@@ -35,6 +35,7 @@ namespace WixToolsetTest.CoreIntegration
             context.IntermediateFolder = Path.GetTempPath();
             context.Intermediates = new[] { intermediate1, intermediate2 };
             context.OutputPath = Path.Combine(context.IntermediateFolder, "test.msi");
+            context.Platform = Platform.X64;
             context.SymbolDefinitionCreator = creator;
 
             var linker = serviceProvider.GetService<ILinker>();
