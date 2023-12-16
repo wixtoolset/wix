@@ -66,7 +66,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "Duplicate symbol 'WixChainItem:collision' found. This typically means that an Id is duplicated. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                    "Duplicate WixChainItem with identifier 'collision' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
                     "Location of symbol related to previous error.",
                 }, result.Messages.Select(m => m.ToString()).ToArray());
 

@@ -36,7 +36,7 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Gets the collection of possibly conflicting symbols.
         /// </summary>
-        public IEnumerable<SymbolWithSection> PossibleConflicts { get; private set; }
+        public IReadOnlyCollection<SymbolWithSection> PossibleConflicts { get; private set; }
 
         /// <summary>
         /// Gets the collection of redundant symbols that should not be included
@@ -140,9 +140,7 @@ namespace WixToolset.Core.Link
             {
                 if (symbolWithSection.Overrides is null)
                 {
-                    var fullName = symbolWithSection.GetFullName();
-
-                    this.Messaging.Write(LinkerErrors.VirtualSymbolNotFoundForOverride(symbolWithSection.Symbol.SourceLineNumbers, fullName));
+                    this.Messaging.Write(LinkerErrors.VirtualSymbolNotFoundForOverride(symbolWithSection.Symbol));
                 }
             }
 

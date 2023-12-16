@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="Duplicated Override Virtual Symbol" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="virtual TestFolder" Name="First Virtual Test Folder" />
+        </StandardDirectory>
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="virtual TestFolder" Name="Second Virtual Test Folder" />
+        </StandardDirectory>
+    </Package>
+</Wix>

@@ -4,8 +4,8 @@ namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using WixToolset.Data;
     using Xunit;
 
@@ -97,8 +97,16 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath
                 }, out var messages);
 
-                Assert.Equal(2, messages.Where(m => m.Id == (int)ErrorMessages.Ids.DuplicateSymbol).Count());
-                Assert.Equal(2, messages.Where(m => m.Id == (int)ErrorMessages.Ids.DuplicateSymbol2).Count());
+                var errors = messages.Where(m => m.Level == MessageLevel.Error)
+                                     .Select(m => $"ln {m.SourceLineNumbers.LineNumber}: {m}".Replace(baseFolder, "<baseFolder>").Replace(folder, "<sourceFolder>"))
+                                     .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "ln 8: Duplicate Registry with identifier 'regJnkjRU9YGaMJhQOqKmivWKf_VdY' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                    "ln 7: Location of symbol related to previous error.",
+                    "ln 9: Duplicate Registry with identifier 'regJnkjRU9YGaMJhQOqKmivWKf_VdY' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                    "ln 7: Location of symbol related to previous error."
+                }, errors);
             }
         }
 
