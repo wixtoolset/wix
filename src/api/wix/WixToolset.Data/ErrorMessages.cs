@@ -323,21 +323,6 @@ namespace WixToolset.Data
             return Message(null, Ids.DuplicateSourcesForOutput, "Multiple source files ({0}) have resulted in the same output file '{1}'. This is likely because the source files only differ in extension or path. Rename the source files to avoid this problem.", sourceList, outputFile);
         }
 
-        public static Message DuplicateSymbol(SourceLineNumber sourceLineNumbers, string symbolName)
-        {
-            return Message(sourceLineNumbers, Ids.DuplicateSymbol, "Duplicate symbol '{0}' found. This typically means that an Id is duplicated. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.", symbolName);
-        }
-
-        public static Message DuplicateSymbol(SourceLineNumber sourceLineNumbers, string symbolName, string referencingSourceLineNumber)
-        {
-            return Message(sourceLineNumbers, Ids.DuplicateSymbol, "Duplicate symbol '{0}' referenced by {1}. This typically means that an Id is duplicated. Ensure all your identifiers of a given type (Directory, File, etc.) are unique or use an access modifier to scope the identfier.", symbolName, referencingSourceLineNumber);
-        }
-
-        public static Message DuplicateSymbol2(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.DuplicateSymbol2, "Location of symbol related to previous error.");
-        }
-
         public static Message DuplicateTransform(string transform)
         {
             return Message(null, Ids.DuplicateTransform, "The transform {0} was included twice on the command line. Each transform can be applied to a patch only once.", transform);
@@ -2369,8 +2354,6 @@ namespace WixToolset.Data
             InvalidDateTimeFormat = 88,
             MultipleEntrySections = 89,
             MultipleEntrySections2 = 90,
-            DuplicateSymbol = 91,
-            DuplicateSymbol2 = 92,
             MissingEntrySection = 93,
             UnresolvedReference = 94,
             MultiplePrimaryReferences = 95,

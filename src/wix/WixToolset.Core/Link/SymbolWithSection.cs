@@ -6,12 +6,14 @@ namespace WixToolset.Core.Link
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Symbol with section representing a single unique symbol.
     /// </summary>
     internal class SymbolWithSection
     {
+        private List<WixSimpleReferenceSymbol> directReferences;
         private HashSet<SymbolWithSection> possibleConflicts;
 
         /// <summary>
@@ -46,6 +48,11 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Gets any duplicates of this symbol with sections that are possible conflicts.
         /// </summary>
+        public IEnumerable<WixSimpleReferenceSymbol> DirectReferences => this.directReferences ?? Enumerable.Empty<WixSimpleReferenceSymbol>();
+
+        /// <summary>
+        /// Gets any duplicates of this symbol with sections that are possible conflicts.
+        /// </summary>
         public IEnumerable<SymbolWithSection> PossiblyConflicts => this.possibleConflicts ?? Enumerable.Empty<SymbolWithSection>();
 
         /// <summary>
@@ -65,6 +72,20 @@ namespace WixToolset.Core.Link
             }
 
             this.possibleConflicts.Add(symbolWithSection);
+        }
+
+        /// <summary>
+        /// Adds a reference that directly points to this symbol.
+        /// </summary>
+        /// <param name="reference">The direct reference.</param>
+        public void AddDirectReference(WixSimpleReferenceSymbol reference)
+        {
+            if (null == this.directReferences)
+            {
+                this.directReferences = new List<WixSimpleReferenceSymbol>();
+            }
+
+            this.directReferences.Add(reference);
         }
 
         /// <summary>

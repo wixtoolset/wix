@@ -78,8 +78,8 @@ namespace WixToolsetTest.CoreIntegration
             var errors = BuildForFailure("TestData", "AccessModifier", "DuplicateCrossFragmentReference.wxs");
             WixAssert.CompareLineByLine(new[]
             {
-                @"ln 8: Duplicate symbol 'Directory:TestFolder' referenced by <sourceFolder>\DuplicateCrossFragmentReference.wxs(4). This typically means that an Id is duplicated. Ensure all your identifiers of a given type (Directory, File, etc.) are unique or use an access modifier to scope the identfier.",
-                "ln 12: Location of symbol related to previous error."
+                "ln 12: Duplicate Directory with identifier 'TestFolder' referenced by <sourceFolder>\\DuplicateCrossFragmentReference.wxs(4). Ensure all your identifiers of a given type (Directory, File, etc.) are unique or use an access modifier to scope the identfier.",
+                "ln 8: Location of symbol related to previous error."
             }, errors);
         }
 
@@ -89,7 +89,7 @@ namespace WixToolsetTest.CoreIntegration
             var errors = BuildForFailure("TestData", "AccessModifier", "OverrideWithoutVirtualSymbol.wxs");
             WixAssert.CompareLineByLine(new[]
             {
-                "ln 5: Did not find virtual symbol for override symbol 'Directory:TestFolder'",
+                "ln 5: Could not find a virtual symbol to override with the Directory symbol 'TestFolder'. Remove the override access modifier or include the code with the virtual symbol.",
             }, errors);
         }
 
@@ -99,7 +99,40 @@ namespace WixToolsetTest.CoreIntegration
             var errors = BuildForFailure("TestData", "AccessModifier", "DuplicatedOverrideVirtualSymbol.wxs");
             WixAssert.CompareLineByLine(new[]
             {
-                "ln 14: Duplicate symbol 'Directory:TestFolder' found. This typically means that an Id is duplicated. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                "ln 14: Duplicate Directory with identifier 'TestFolder' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                "ln 6: Location of symbol related to previous error."
+            }, errors);
+        }
+
+        [Fact]
+        public void CannotCompileDuplicatedVirtual()
+        {
+            var errors = BuildForFailure("TestData", "AccessModifier", "DuplicatedVirtualSymbol.wxs");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "ln 6: The virtual Directory with identifier 'TestFolder' is duplicated. Ensure identifiers of a given type (Directory, File, etc.) are unique or did you mean to make one an override for the virtual symbol?",
+                "ln 10: Location of symbol related to previous error."
+            }, errors);
+        }
+
+        [Fact]
+        public void CannotCompilePublicWithVirtualSymbol()
+        {
+            var errors = BuildForFailure("TestData", "AccessModifier", "VirtualSymbolWithoutOverride.wxs");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "ln 9: The Directory symbol 'TestFolder' conflicts with a virtual symbol. Use the 'override' access modifier to override the virtual symbol or use a different Id to avoid the conflict.",
+                "ln 5: Location of symbol related to previous error."
+            }, errors);
+        }
+
+        [Fact]
+        public void CannotCompilePublicAndOverrideWithVirtualSymbol()
+        {
+            var errors = BuildForFailure("TestData", "AccessModifier", "DuplicatePublicOverrideVirtualSymbol.wxs");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "ln 14: Duplicate Directory with identifier 'TestFolder' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
                 "ln 6: Location of symbol related to previous error."
             }, errors);
         }
