@@ -69,7 +69,7 @@ DAPI_(HRESULT) LoadSystemLibrary(
     if (vpfnSetDefaultDllDirectories) // LOAD_LIBRARY_SEARCH_SYSTEM32 was added at same time as SetDefaultDllDirectories.
     {
         *phModule = ::LoadLibraryExW(wzModuleName, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
-        AppExitOnNullWithLastError(*phModule, hr, "Failed to get load library with LOAD_LIBRARY_SEARCH_SYSTEM32.");
+        AppExitOnNullWithLastError(*phModule, hr, "Failed to load library with LOAD_LIBRARY_SEARCH_SYSTEM32: %ls.", wzModuleName);
     }
     else
     {
