@@ -240,10 +240,16 @@ namespace WixToolset.Core
                             this.ParseComplianceCheckElement(child);
                             break;
                         case "Component":
-                            this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, CompilerConstants.IntegerNotSet, null, null);
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Product, null, null, CompilerConstants.IntegerNotSet, null, null);
+                            break;
+                        case "ComponentRef":
+                            this.ParseComponentRefElement(child, ComplexReferenceParentType.Product, null, null);
                             break;
                         case "ComponentGroup":
-                            this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, null);
+                            this.ParseComponentGroupElement(child, ComplexReferenceParentType.Product, null);
+                            break;
+                        case "ComponentGroupRef":
+                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Product, null, null);
                             break;
                         case "CustomAction":
                             this.ParseCustomActionElement(child);

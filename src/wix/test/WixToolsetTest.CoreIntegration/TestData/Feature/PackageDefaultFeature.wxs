@@ -1,0 +1,50 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="PackageMissingFeatureComponentMapping" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="12E4699F-E774-4D05-8A01-5BDD41BBA127">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <StandardDirectory Id="ProgramFiles6432Folder">
+            <Directory Id="INSTALLFOLDER" Name="PackageMissingFeatureComponentMapping">
+                <Directory Id="SubFolder" Name="NotMapped">
+                    <Component>
+                        <File Source="test.txt" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </StandardDirectory>
+
+        <Component Directory="INSTALLFOLDER">
+            <File Source="test.txt" />
+        </Component>
+
+        <ComponentRef Id="ComponentInAFragment" />
+        <ComponentGroupRef Id="ComponentGroupInAFragment" />
+        <FeatureGroupRef Id="FeatureGroupInAFragment" />
+    </Package>
+
+    <Fragment>
+        <ComponentGroup Id="ComponentGroupInAFragment" Directory="INSTALLFOLDER">
+            <Component>
+                <File Name="test2.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <!--
+        Keeping the component outside the feature group, to ensure the component
+        comes along for the ride when the empty feature group is referenced.
+        -->
+        <FeatureGroup Id="FeatureGroupInAFragment" />
+
+        <Component Id="AnotherComponentInAFragment" Directory="INSTALLFOLDER">
+            <File Name="test3.txt" Source="test.txt" />
+            <Shortcut Id="AdvertisedShortcut" Advertise="yes" Name="Shortcut" />
+        </Component>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="ComponentInAFragment" Directory="INSTALLFOLDER">
+            <File Name="test4.txt" Source="test.txt" />
+        </Component>
+    </Fragment>
+</Wix>
