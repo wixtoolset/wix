@@ -126,6 +126,14 @@ namespace WixToolset.Core
                     }
                 }
 
+                // If there are no authored features, create a default feature and assign the components to it.
+                if (find.EntrySection.Type == SectionType.Package
+                    && !sections.Where(s => s.Id != WixStandardLibraryIdentifiers.DefaultFeatureName).SelectMany(s => s.Symbols).OfType<FeatureSymbol>().Any())
+                {
+                    var command = new AssignDefaultFeatureCommand(find.EntrySection, sections);
+                    command.Execute();
+                }
+
                 // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
                 var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.SymbolsByName);
@@ -162,7 +170,7 @@ namespace WixToolset.Core
                     return null;
                 }
 
-                // Display an error message for Components that were not referenced by a Feature.
+                // If there are authored features, error for any referenced components that aren't assigned to a feature.
                 foreach (var component in sections.SelectMany(s => s.Symbols.Where(y => y.Definition.Type == SymbolDefinitionType.Component)))
                 {
                     if (!referencedComponents.Contains(component.Id.Id))
@@ -370,7 +378,8 @@ namespace WixToolset.Core
             foreach (var section in sections)
             {
                 // Need ToList since we might want to add symbols while processing.
-                foreach (var wixComplexReferenceRow in section.Symbols.OfType<WixComplexReferenceSymbol>().ToList())
+                var wixComplexReferences = section.Symbols.OfType<WixComplexReferenceSymbol>().ToList();
+                foreach (var wixComplexReferenceRow in wixComplexReferences)
                 {
                     ConnectToFeature connection;
                     switch (wixComplexReferenceRow.ParentType)
@@ -513,6 +522,10 @@ namespace WixToolset.Core
                                     }
 
                                     featuresToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, null, wixComplexReferenceRow.IsPrimary));
+                                    break;
+
+                                case ComplexReferenceChildType.Component:
+                                case ComplexReferenceChildType.ComponentGroup:
                                     break;
 
                                 default:

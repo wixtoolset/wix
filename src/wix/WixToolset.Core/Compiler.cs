@@ -2681,7 +2681,7 @@ namespace WixToolset.Core
         /// <param name="parentLanguage">Optional language of parent (only useful for Modules).</param>
         private void ParseComponentGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, string parentLanguage)
         {
-            Debug.Assert(ComplexReferenceParentType.ComponentGroup == parentType || ComplexReferenceParentType.FeatureGroup == parentType || ComplexReferenceParentType.Feature == parentType || ComplexReferenceParentType.Module == parentType);
+            Debug.Assert(ComplexReferenceParentType.ComponentGroup == parentType || ComplexReferenceParentType.FeatureGroup == parentType || ComplexReferenceParentType.Feature == parentType || ComplexReferenceParentType.Module == parentType || ComplexReferenceParentType.Product == parentType);
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string id = null;
@@ -2730,7 +2730,7 @@ namespace WixToolset.Core
         /// <param name="parentLanguage">Optional language of parent (only useful for Modules).</param>
         private void ParseComponentRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, string parentLanguage)
         {
-            Debug.Assert(ComplexReferenceParentType.FeatureGroup == parentType || ComplexReferenceParentType.ComponentGroup == parentType || ComplexReferenceParentType.Feature == parentType || ComplexReferenceParentType.Module == parentType);
+            Debug.Assert(ComplexReferenceParentType.FeatureGroup == parentType || ComplexReferenceParentType.ComponentGroup == parentType || ComplexReferenceParentType.Feature == parentType || ComplexReferenceParentType.Module == parentType || ComplexReferenceParentType.Product == parentType);
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string id = null;

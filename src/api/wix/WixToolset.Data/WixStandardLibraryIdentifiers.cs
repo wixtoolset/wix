@@ -16,5 +16,10 @@ namespace WixToolset.Data
         /// WiX Standard references for modules.
         /// </summary>
         public static readonly string WixStandardModuleReferences = "WixStandardModuleReferences";
+
+        /// <summary>
+        /// Default feature name.
+        /// </summary>
+        public static readonly string DefaultFeatureName = "WixDefaultFeature";
     }
 }
