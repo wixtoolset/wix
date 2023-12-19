@@ -13,13 +13,13 @@
   </Fragment>
 
   <Fragment>
-    <ComponentGroup Id='CsprojClassLibraryMultiFrameworkNet48' Directory='ApplicationFolder' Subdirectory="net48">
+    <ComponentGroup Id='CsprojClassLibraryMultiFrameworkNet472' Directory='ApplicationFolder' Subdirectory="net472">
       <Component>
-        <File Id="Net48" Source='!(bindpath.CsprojConsoleMultiFramework.net48)CsprojConsoleMultiFramework.exe' />
-        <File Source='!(bindpath.CsprojConsoleMultiFramework.net48)CsprojConsoleMultiFramework.exe.config' />
+        <File Id="Net472" Source='!(bindpath.CsprojConsoleMultiFramework.net472)CsprojConsoleMultiFramework.exe' />
+        <File Source='!(bindpath.CsprojConsoleMultiFramework.net472)CsprojConsoleMultiFramework.exe.config' />
       </Component>
       <Component>
-        <File Source='!(bindpath.CsprojConsoleMultiFramework.net48)CsprojClassLibraryMultiFramework.dll' />
+        <File Source='!(bindpath.CsprojConsoleMultiFramework.net472)CsprojClassLibraryMultiFramework.dll' />
       </Component>
     </ComponentGroup>
   </Fragment>

@@ -1,10 +1,10 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="FullFramework4MBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="E08068E0-4FBA-439D-A1C8-4CD1FE27093F">
         <BootstrapperApplication>
-            <Payload SourceFile="Example.FullFramework4MBA\net48\win-x64\Example.FullFramework4MBA.dll" />
-            <Payload SourceFile="Example.FullFramework4MBA\net48\win-x64\mbanative.dll" />
-            <Payload SourceFile="Example.FullFramework4MBA\net48\win-x64\WixToolset.Mba.Core.dll" />
-            <Payload SourceFile="Example.FullFramework4MBA\net48\win-x64\WixToolset.Mba.Host.config" />
+            <Payload SourceFile="Example.FullFramework4MBA\net472\win-x64\Example.FullFramework4MBA.dll" />
+            <Payload SourceFile="Example.FullFramework4MBA\net472\win-x64\mbanative.dll" />
+            <Payload SourceFile="Example.FullFramework4MBA\net472\win-x64\WixToolset.Mba.Core.dll" />
+            <Payload SourceFile="Example.FullFramework4MBA\net472\win-x64\WixToolset.Mba.Host.config" />
             <bal:WixManagedBootstrapperApplicationHost />
         </BootstrapperApplication>
         <Chain>

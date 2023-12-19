@@ -5,7 +5,7 @@
   <PropertyGroup>
     <RootNamespace>WixToolset.Dtf.Resources</RootNamespace>
     <AssemblyName>WixToolset.Dtf.Resources</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <Description>Classes for reading and writing resource data in executable files</Description>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>

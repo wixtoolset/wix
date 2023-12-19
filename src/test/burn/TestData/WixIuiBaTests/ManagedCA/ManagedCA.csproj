@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net20</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <Description>Sample managed custom actions</Description>
   </PropertyGroup>
 

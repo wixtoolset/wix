@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net35;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
     <AssemblyName>TestBA</AssemblyName>
     <RootNamespace>WixToolset.Test.BA</RootNamespace>
     <DebugType>embedded</DebugType>
@@ -13,7 +13,7 @@
     <RollForward>Major</RollForward>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)'=='net35' ">
+  <ItemGroup Condition=" '$(TargetFramework)'=='net462' ">
     <Content Include="TestBA.BootstrapperCore.config" CopyToOutputDirectory="PreserveNewest" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>

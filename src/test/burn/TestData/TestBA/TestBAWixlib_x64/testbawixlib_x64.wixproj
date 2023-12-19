@@ -7,7 +7,7 @@
     <InstallerPlatform>x64</InstallerPlatform>
   </PropertyGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x64" BindName="net2x64" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net462\win-x64" BindName="net2x64" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net472\win-x64" BindName="net4x64" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net6.0-windows\win-x64" BindName="dncx64" />
   </ItemGroup>
@@ -17,7 +17,7 @@
          the required target framework. Since we want all target frameworks built,
          the above line is shorter.
     <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj">
-      <SetTargetFramework>TargetFramework=net35</SetTargetFramework>
+      <SetTargetFramework>TargetFramework=net462</SetTargetFramework>
     </ProjectReference>
     <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj">
       <SetTargetFramework>TargetFramework=net5.0-windows</SetTargetFramework>

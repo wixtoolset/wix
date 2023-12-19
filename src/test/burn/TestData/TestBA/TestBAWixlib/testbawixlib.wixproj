@@ -6,7 +6,7 @@
     <Cultures>en-us</Cultures>
   </PropertyGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x86" BindName="net2x86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net462\win-x86" BindName="net2x86" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net472\win-x86" BindName="net4x86" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net6.0-windows\win-x86" BindName="dncx86" />
   </ItemGroup>
