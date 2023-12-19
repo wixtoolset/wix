@@ -5,7 +5,7 @@
   <PropertyGroup>
     <AssemblyName>WixToolset.Mba.Host</AssemblyName>
     <RootNamespace>WixToolset.Mba.Host</RootNamespace>
-    <TargetFrameworks>net20</TargetFrameworks>
+    <TargetFrameworks>net462</TargetFrameworks>
     <Description>Managed Bootstrapper Application entry point</Description>
     <DebugType>embedded</DebugType>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>

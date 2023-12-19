@@ -5,7 +5,7 @@
   <PropertyGroup>
     <RootNamespace>WixToolset.Dtf.Compression.Zip</RootNamespace>
     <AssemblyName>WixToolset.Dtf.Compression.Zip</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <Description>Managed libraries for zip archive packing and unpacking</Description>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>

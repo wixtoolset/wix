@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net20</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>Example.FullFramework2MBA</AssemblyName>
     <RootNamespace>Example.FullFramework2MBA</RootNamespace>
     <DebugType>embedded</DebugType>
