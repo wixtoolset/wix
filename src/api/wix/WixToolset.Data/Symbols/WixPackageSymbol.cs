@@ -46,6 +46,12 @@ namespace WixToolset.Data.Symbols
         PerMachine = 0x1,
     }
 
+    public enum WixPackageUpgradeStrategy
+    {
+        None = 0x0,
+        MajorUpgrade = 0x1,
+    }
+
     public class WixPackageSymbol : IntermediateSymbol
     {
         public WixPackageSymbol() : base(SymbolDefinitions.WixPackage, null, null)
@@ -104,6 +110,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixPackageSymbolFields.Codepage];
             set => this.Set((int)WixPackageSymbolFields.Codepage, value);
+        }
+
+        public WixPackageUpgradeStrategy UpgradeStrategy
+        {
+            get => (WixPackageUpgradeStrategy)this.Fields[(int)WixPackageSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixPackageSymbolFields.Attributes, (int)value);
         }
 
         public bool PerMachine => (this.Attributes & WixPackageAttributes.PerMachine) == WixPackageAttributes.PerMachine;
