@@ -90,7 +90,7 @@ namespace WixToolset.Core
                         if (library.Localizations?.Count > 0)
                         {
                             // Include localizations from the extension data and be sure to note that the localization came from
-                            // an extension. It is important to remember whiche localization came from an extension when filtering
+                            // an extension. It is important to remember which localization came from an extension when filtering
                             // localizations during the resolve process later.
                             localizations.AddRange(library.Localizations.Select(l => l.UpdateLocation(LocalizationLocation.Extension)));
                         }
@@ -103,6 +103,11 @@ namespace WixToolset.Core
                     var stdlib = WixStandardLibrary.Build(this.Context.Platform);
 
                     sections.AddRange(stdlib.Sections);
+
+                    if (stdlib.Localizations?.Count > 0)
+                    {
+                        localizations.AddRange(stdlib.Localizations);
+                    }
                 }
 
                 var multipleFeatureComponents = new Hashtable();

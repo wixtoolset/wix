@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.Link
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
@@ -49,20 +50,80 @@ namespace WixToolset.Core.Link
                     }
                 );
             }
+
+            var symbols = this.Sections.SelectMany(section => section.Symbols);
+            var upgradeSymbols = symbols.OfType<UpgradeSymbol>();
+            if (!upgradeSymbols.Any())
+            {
+                var packageSymbol = this.Find.EntrySection.Symbols.OfType<WixPackageSymbol>().FirstOrDefault();
+
+                if (packageSymbol?.UpgradeStrategy == WixPackageUpgradeStrategy.MajorUpgrade
+                    && !String.IsNullOrEmpty(packageSymbol?.UpgradeCode))
+                {
+                    this.AddDefaultMajorUpgrade(packageSymbol);
+                }
+            }
+        }
+
+        private void AddDefaultMajorUpgrade(WixPackageSymbol packageSymbol)
+        {
+            this.AddSymbols(this.Find.EntrySection,
+                new UpgradeSymbol(packageSymbol.SourceLineNumbers)
+                {
+                    UpgradeCode = packageSymbol.UpgradeCode,
+                    MigrateFeatures = true,
+                    ActionProperty = WixUpgradeConstants.UpgradeDetectedProperty,
+                    VersionMax = packageSymbol.Version,
+                    Language = packageSymbol.Language,
+                },
+                new UpgradeSymbol(packageSymbol.SourceLineNumbers)
+                {
+                    UpgradeCode = packageSymbol.UpgradeCode,
+                    VersionMin = packageSymbol.Version,
+                    Language = packageSymbol.Language,
+                    OnlyDetect = true,
+                    ActionProperty = WixUpgradeConstants.DowngradeDetectedProperty,
+                },
+                new LaunchConditionSymbol(packageSymbol.SourceLineNumbers)
+                {
+                    Condition = WixUpgradeConstants.DowngradePreventedCondition,
+                    Description = "!(loc.WixDowngradePreventedMessage)",
+                },
+                new WixActionSymbol(packageSymbol.SourceLineNumbers,
+                    new Identifier(AccessModifier.Global, SequenceTable.InstallExecuteSequence, "RemoveExistingProducts"))
+                {
+                    SequenceTable = SequenceTable.InstallExecuteSequence,
+                    Action = "RemoveExistingProducts",
+                    After = "InstallValidate",
+                },
+                new WixSimpleReferenceSymbol(packageSymbol.SourceLineNumbers)
+                {
+                    Table = SymbolDefinitions.WixAction.Name,
+                    PrimaryKeys = "InstallExecuteSequence/InstallValidate",
+                });
         }
 
         private void AddSymbolsToNewSection(string sectionId, params IntermediateSymbol[] symbols)
         {
             var section = new IntermediateSection(sectionId, SectionType.Fragment);
+
             this.Sections.Add(section);
 
+            this.AddSymbols(section, symbols);
+        }
+
+        private void AddSymbols(IntermediateSection section, params IntermediateSymbol[] symbols)
+        {
             foreach (var symbol in symbols)
             {
                 section.AddSymbol(symbol);
 
-                var symbolWithSection = new SymbolWithSection(section, symbol);
-                var fullName = symbolWithSection.GetFullName();
-                this.Find.SymbolsByName.Add(fullName, symbolWithSection);
+                if (!String.IsNullOrEmpty(symbol.Id?.Id))
+                {
+                    var symbolWithSection = new SymbolWithSection(section, symbol);
+                    var fullName = symbolWithSection.GetFullName();
+                    this.Find.SymbolsByName.Add(fullName, symbolWithSection);
+                }
             }
         }
     }

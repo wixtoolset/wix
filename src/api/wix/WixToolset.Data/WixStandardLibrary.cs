@@ -32,7 +32,17 @@ namespace WixToolset.Data
 
         private static IEnumerable<Localization> YieldLocalizations()
         {
-            var strings = new BindVariable[0];
+            var sourceLineNumber = new SourceLineNumber("wixstd.wixlib");
+
+            var strings = new[] {
+                new BindVariable()
+                {
+                    SourceLineNumbers = sourceLineNumber,
+                    Id = "WixDowngradePreventedMessage",
+                    Value = "A newer version of [ProductName] is already installed.",
+                    Overridable = true,
+                },
+            };
 
             var localizedControls = new LocalizedControl[0];
 

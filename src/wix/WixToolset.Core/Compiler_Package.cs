@@ -41,6 +41,7 @@ namespace WixToolset.Core
             var isPackageNameSet = false;
             var isKeywordsSet = false;
             var isPackageAuthorSet = false;
+            var upgradeStrategy = WixPackageUpgradeStrategy.MajorUpgrade;
 
             this.GetDefaultPlatformAndInstallerVersion(out var platform, out var msiVersion);
 
@@ -110,6 +111,21 @@ namespace WixToolset.Core
                         break;
                     case "UpgradeCode":
                         upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                        break;
+                    case "UpgradeStrategy":
+                        var strategy = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (strategy)
+                        {
+                            case "majorUpgrade":
+                                upgradeStrategy = WixPackageUpgradeStrategy.MajorUpgrade;
+                                break;
+                            case "none":
+                                upgradeStrategy = WixPackageUpgradeStrategy.None;
+                                break;
+                            default:
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, strategy, "majorUpgrade", "none"));
+                                break;
+                        }
                         break;
                     case "Version":
                         version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
@@ -382,6 +398,7 @@ namespace WixToolset.Core
                         Manufacturer = manufacturer,
                         Attributes = isPerMachine ? WixPackageAttributes.PerMachine : WixPackageAttributes.None,
                         Codepage = codepage,
+                        UpgradeStrategy = upgradeStrategy,
                     });
 
                     if (!isCommentsSet)
