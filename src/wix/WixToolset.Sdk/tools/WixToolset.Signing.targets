@@ -62,8 +62,6 @@
       InternalSignMsi;
     </_InternalSignDependsOn>
     <_InternalSignDependsOn Condition=" '$(OutputType)' == 'Bundle' ">
-      GetContainersToSign;
-      InternalSignContainers;
       InscribeBundleEngine;
       InternalSignBundleEngine;
       InscribeBundle;
@@ -96,7 +94,7 @@
 
     <WriteLinesToFile
       File="$(SignedFilePath)"
-      Lines="^$(MSBuildProjectFullPath);@(SignMsm);@(SignCabs);@(SignMsi);@(SignContainers);@(SignBundleEngine);@(SignBundle)"
+      Lines="^$(MSBuildProjectFullPath);@(SignMsm);@(SignCabs);@(SignMsi);@(SignBundleEngine);@(SignBundle)"
       Overwrite="true" />
   </Target>
 
@@ -157,18 +155,6 @@
       Condition=" '@(SignMsi)' != '' " />
 
   <Target
-      Name="GetContainersToSign"
-      Inputs="@(SignTargetPath)"
-      Outputs="$(SignedFilePath)">
-    <!-- TODO: implement signing detached containers -->
-  </Target>
-
-  <Target
-      Name="InternalSignContainers"
-      DependsOnTargets="SignContainers"
-      Condition=" '@(SignContainers)' != '' " />
-
-  <Target
       Name="InternalSignBundleEngine"
       DependsOnTargets="SignBundleEngine"
       Condition=" '@(SignBundleEngine)' != '' " />
@@ -224,8 +210,7 @@
   ================================================================================================
   InscribeBundleEngine
 
-    To be called after signing a bundle's detached containers. Also removes attached container
-    so engine can be signed without attached container.
+    Removes attached container so engine can be signed without attached container.
 
     [IN]
     @(SignTargetPath) - The bundle to inscribe.
