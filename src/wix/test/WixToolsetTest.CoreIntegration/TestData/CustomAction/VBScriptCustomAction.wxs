@@ -1,0 +1,27 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup" />
+            <Component Directory="INSTALLFOLDER">
+                <File Id="VBScript.vbs" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+
+        <Binary Id="Binary1" SourceFile="test.txt" />
+        <CustomAction Id="Action1" VBScriptCall="EntryPoint1" BinaryRef="Binary1" />
+        <CustomAction Id="Action1J" JScriptCall="EntryPoint1" BinaryRef="Binary1" />
+        <CustomAction Id="Action2" VBScriptCall="EntryPoint1" FileRef="VBScript.vbs" />
+        <CustomAction Id="Action2J" JScriptCall="EntryPoint1" FileRef="VBScript.vbs" />
+        <CustomAction Id="Action3" Script="vbscript" ScriptSourceFile="test.txt" />
+        <CustomAction Id="Action3J" Script="jscript" ScriptSourceFile="test.txt" />
+
+        <InstallExecuteSequence>
+            <Custom Action="Action1" After="AppSearch" />
+            <Custom Action="Action1J" After="Action1" />
+            <Custom Action="Action2" After="Action1J" />
+            <Custom Action="Action2J" After="Action2" />
+            <Custom Action="Action3" After="Action2J" />
+            <Custom Action="Action3J" After="Action3" />
+        </InstallExecuteSequence>
+    </Fragment>
+</Wix>

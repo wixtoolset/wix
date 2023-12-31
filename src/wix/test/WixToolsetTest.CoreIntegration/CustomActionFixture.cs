@@ -98,6 +98,34 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void WarnsOnVBScriptCustomAction()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                    {
+                    "build",
+                    Path.Combine(folder, "CustomAction", "VBScriptCustomAction.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                Assert.Equal(1163, result.ExitCode);
+                Assert.Equal(3, result.Messages.Length);
+                Assert.Equal(3, result.Messages.Where(m => m.Id == 1163).Count());
+            }
+        }
+
+        [Fact]
         public void CanDetectCustomActionCycleWithTail()
         {
             var folder = TestData.Get(@"TestData");
