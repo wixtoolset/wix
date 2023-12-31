@@ -96,6 +96,6 @@ namespace WixToolset.Extensibility.Data
         /// Gets or sets whether the decompiler should keep modularization
         /// GUIDs (true) or remove them (default/false).
         /// </summary>
-        bool TreatProductAsModule { get; set; }
+        bool KeepModularizationIds { get; set; }
     }
 }

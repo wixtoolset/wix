@@ -94,21 +94,13 @@ namespace WixToolset.Core.WindowsInstaller
             var extractFilesFolder = context.SuppressExtractCabinets || (String.IsNullOrEmpty(context.CabinetExtractFolder) && String.IsNullOrEmpty(context.ExtractFolder)) ? null :
                 String.IsNullOrEmpty(context.CabinetExtractFolder) ? Path.Combine(context.ExtractFolder, "File") : context.CabinetExtractFolder;
 
-            // IWindowsInstallerDecompileContext.TreatProductAsModule is broken. So broken, in fact,
-            // that it's been broken since WiX v3.0 in 2008. It was introduced (according to lore)
-            // to support Melt, which decompiles merge modules into fragments so you can consume
-            // merge modules without actually going through the black box that is mergemod.dll. But
-            // the name is wrong: It's not TreatProductAsModule; if anything it should instead be
-            // TreatModuleAsProduct, though even that's wrong (because you want a fragment, not a
-            // product/package). In WiX v5, rename to `KeepModularizeIds` (or something better) to
-            // reflect the functionality.
-            var demodularize = !context.TreatProductAsModule;
+            var demodularize = !context.KeepModularizationIds;
             var sectionType = context.DecompileType;
             var unbindCommand = new UnbindDatabaseCommand(this.Messaging, backendHelper, fileSystem, pathResolver, context.DecompilePath, null, sectionType, context.ExtractFolder, extractFilesFolder, context.IntermediateFolder, demodularize, skipSummaryInfo: false);
             var output = unbindCommand.Execute();
             var extractedFilePaths = unbindCommand.ExportedFiles;
 
-            var decompiler = new Decompiler(this.Messaging, backendHelper, decompilerHelper, context.Extensions, context.ExtensionData, context.SymbolDefinitionCreator, context.BaseSourcePath, context.SuppressCustomTables, context.SuppressDroppingEmptyTables, context.SuppressRelativeActionSequencing, context.SuppressUI, context.TreatProductAsModule);
+            var decompiler = new Decompiler(this.Messaging, backendHelper, decompilerHelper, context.Extensions, context.ExtensionData, context.SymbolDefinitionCreator, context.BaseSourcePath, context.SuppressCustomTables, context.SuppressDroppingEmptyTables, context.SuppressRelativeActionSequencing, context.SuppressUI, context.KeepModularizationIds);
             var document = decompiler.Decompile(output);
 
             var result = context.ServiceProvider.GetService<IWindowsInstallerDecompileResult>();

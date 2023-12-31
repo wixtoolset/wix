@@ -43,7 +43,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <summary>
         /// Creates a new decompiler object with a default set of table definitions.
         /// </summary>
-        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IWindowsInstallerDecompilerHelper decompilerHelper, IEnumerable<IWindowsInstallerDecompilerExtension> extensions, IEnumerable<IExtensionData> extensionData, ISymbolDefinitionCreator creator, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressRelativeActionSequencing, bool suppressUI, bool treatProductAsModule)
+        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IWindowsInstallerDecompilerHelper decompilerHelper, IEnumerable<IWindowsInstallerDecompilerExtension> extensions, IEnumerable<IExtensionData> extensionData, ISymbolDefinitionCreator creator, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressRelativeActionSequencing, bool suppressUI, bool keepModularizationIds)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
@@ -56,7 +56,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             this.SuppressDroppingEmptyTables = suppressDroppingEmptyTables;
             this.SuppressRelativeActionSequencing = suppressRelativeActionSequencing;
             this.SuppressUI = suppressUI;
-            this.TreatProductAsModule = treatProductAsModule;
+            this.KeepModularizationIds = keepModularizationIds;
 
             this.ExtensionsByTableName = new Dictionary<string, IWindowsInstallerDecompilerExtension>();
             this.StandardActions = WindowsInstallerStandard.StandardActions().ToDictionary(a => a.Id.Id);
@@ -88,7 +88,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         private bool SuppressUI { get; }
 
-        private bool TreatProductAsModule { get; }
+        private bool KeepModularizationIds { get; }
 
         private OutputType OutputType { get; set; }
 
@@ -1188,7 +1188,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     var fileName = xFile?.Attribute("Name")?.Value;
 
                     // set the source (done here because it requires information from the Directory table)
-                    if (OutputType.Module == this.OutputType && !this.TreatProductAsModule)
+                    if (OutputType.Module == this.OutputType && !this.KeepModularizationIds)
                     {
                         xFile.SetAttributeValue("Source", String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, fileId, '.', this.ModularizationGuid.Substring(1, 36).Replace('-', '_')));
                     }
