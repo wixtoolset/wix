@@ -108,7 +108,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanDecompileMergeModuleWithTreatProductAsModule()
+        public void CanDecompileMergeModuleWithKeepModularizationIds()
         {
             using (var fs = new DisposableFileSystem())
             {
@@ -127,7 +127,7 @@ namespace WixToolsetTest.CoreIntegration
                 context.ExtensionData = extensionManager.GetServices<IExtensionData>();
                 context.DecompilePath = Path.Combine(sourceFolder, "MergeModule1.msm");
                 context.DecompileType = OutputType.Module;
-                context.TreatProductAsModule = true;
+                context.KeepModularizationIds = true;
                 context.IntermediateFolder = intermediateFolder;
                 context.ExtractFolder = outputFolder;
                 context.CabinetExtractFolder = outputFolder;

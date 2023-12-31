@@ -49,6 +49,6 @@ namespace WixToolset.Core.WindowsInstaller
 
         public bool SuppressUI { get; set; }
 
-        public bool TreatProductAsModule { get; set; }
+        public bool KeepModularizationIds { get; set; }
     }
 }
