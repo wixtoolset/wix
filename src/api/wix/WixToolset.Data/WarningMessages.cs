@@ -714,6 +714,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidWixVersion, "Invalid WixVersion '{0}' in {1}/@'{2}'. Comparisons may yield unexpected results.", version, elementName, attributeName);
         }
 
+        public static Message VBScriptIsDeprecated(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.VBScriptIsDeprecated, "VBScript is a deprecated Windows component: https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features. VBScript custom actions might fail on some Windows systems. Rewrite or eliminate VBScript custom actions for best compatibility.");
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -855,6 +860,7 @@ namespace WixToolset.Data
             DiscardedRollbackBoundary2 = 1160,
             ExePackageDetectInformationRecommended = 1161,
             InvalidWixVersion = 1162,
+            VBScriptIsDeprecated = 1163,
         }
     }
 }

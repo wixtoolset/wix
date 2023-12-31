@@ -3447,6 +3447,11 @@ namespace WixToolset.Core
                 }
             }
 
+            if (targetType == CustomActionTargetType.VBScript)
+            {
+                this.Core.Write(WarningMessages.VBScriptIsDeprecated(sourceLineNumbers));
+            }
+
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
             if (inlineScript)
             {
