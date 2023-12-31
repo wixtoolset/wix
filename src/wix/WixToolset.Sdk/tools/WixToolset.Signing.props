@@ -54,18 +54,6 @@
 
   <!--
   ==================================================================================================
-  SignContainers
-
-    Redefine this target in your project in order to sign your bundle's detached containers.
-
-    [IN]
-    @(SignContainers) - detached container files to sign.
-  ==================================================================================================
-  -->
-  <Target Name="SignContainers" />
-
-  <!--
-  ==================================================================================================
   SignBundleEngine
 
     Redefine this target in your project in order to sign your bundle, after it has been inscribed
