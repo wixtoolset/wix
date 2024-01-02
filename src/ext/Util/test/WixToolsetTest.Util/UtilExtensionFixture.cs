@@ -471,53 +471,6 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
-        public void CanBuildBundleWithWarningsWithSearchesUsingDiscouragedVariableNames()
-        {
-            var folder = TestData.Get("TestData", "BundleWithSearches");
-            var rootFolder = TestData.Get();
-            var wixext = Path.Combine(rootFolder, "WixToolset.Util.wixext.dll");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
-                var baFolderPath = Path.Combine(baseFolder, "ba");
-                var extractFolderPath = Path.Combine(baseFolder, "extract");
-
-                var result = WixRunner.Execute(false, new[]
-                {
-                    "build",
-                    Path.Combine(folder, "BundleUsingDiscouragedVariableNames.wxs"),
-                    "-ext", wixext,
-                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", bundlePath,
-                });
-
-                var messages = result.Messages.Select(m => m.ToString()).ToList();
-                messages.Sort();
-
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "The *Search/@Variable attribute's value begins with the reserved prefix 'Wix'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.",
-                }, messages.ToArray());
-
-                result.AssertSuccess();
-
-                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
-                extractResult.AssertSuccess();
-
-                var utilSearches = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/*[self::burn:ExtensionSearch or self::burn:DirectorySearch or self::burn:FileSearch or self::burn:MsiProductSearch or self::burn:RegistrySearch]");
-                WixAssert.CompareLineByLine(new[]
-                {
-                    @"<RegistrySearch Id='wrsvJmsaXS39nKFUh9CVvRE6SSC4qk' Variable='WixCustomVariable' Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Custom' Value='Release' Win64='yes' Type='value' VariableType='string' />",
-                }, utilSearches);
-            }
-        }
-
-        [Fact]
         public void CannotBuildBundleWithSearchesUsingBuiltinVariableNames()
         {
             var folder = TestData.Get("TestData", "BundleWithSearches");

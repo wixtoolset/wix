@@ -109,6 +109,41 @@ namespace WixToolsetTest.Netfx
         }
 
         [Fact]
+        public void CanBuildUsingNetFxSearches()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\UsingNetFxSearches");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var extensionResult = WixRunner.Execute(warningsAsErrors: true, new[]
+                {
+                    "extension", "add",
+                    "WixToolset.Bal.wixext",
+                    "extension", "add",
+                    "WixToolset.Util.wixext",
+                });
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
+                    "-ext", "WixToolset.Bal.wixext",
+                    "-ext", "WixToolset.Util.wixext",
+                    "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundleFile,
+                    "-arch", "x64",
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+            }
+        }
+
+        [Fact]
         public void CanBuildUsingNativeImage()
         {
             var folder = TestData.Get(@"TestData\UsingNativeImage");

@@ -1,0 +1,13 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Bundle Name="NetFxPackageGroup481" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{1A204524-03F4-4641-BDF3-2A272A34A888}">
+        <BootstrapperApplication>
+            <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" Theme="hyperlinkLicense" />
+        </BootstrapperApplication>
+
+        <util:RegistrySearchRef Id="WixNetFramework4xInstalledRelease" />
+
+        <Chain>
+            <PackageGroupRef Id="NetFx481RedistAsPrereq" />
+        </Chain>
+    </Bundle>
+</Wix>
