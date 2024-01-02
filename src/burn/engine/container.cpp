@@ -7,7 +7,8 @@
 
 extern "C" HRESULT ContainersParseFromXml(
     __in BURN_CONTAINERS* pContainers,
-    __in IXMLDOMNode* pixnBundle
+    __in IXMLDOMNode* pixnBundle,
+    __in BURN_EXTENSIONS* pBurnExtensions
     )
 {
     HRESULT hr = S_OK;
@@ -44,12 +45,40 @@ extern "C" HRESULT ContainersParseFromXml(
         hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
         ExitOnFailure(hr, "Failed to get next node.");
 
-        // TODO: Read type from manifest. Today only CABINET is supported.
-        pContainer->type = BURN_CONTAINER_TYPE_CABINET;
-
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &pContainer->sczId);
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
+
+        // @Type
+        pContainer->type = BURN_CONTAINER_TYPE_CABINET; // Default
+        hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Type.");
+        if (fXmlFound && scz && *scz)
+        {
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"Extension", -1))
+            {
+                pContainer->type = BURN_CONTAINER_TYPE_EXTENSION;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"Cabinet", -1))
+            {
+                pContainer->type = BURN_CONTAINER_TYPE_CABINET;
+            }
+            else
+            {
+                hr = E_INVALIDDATA;
+                ExitOnFailure(hr, "Unsupported container type '%ls'.", scz);
+            }
+        }
+
+        if (BURN_CONTAINER_TYPE_EXTENSION == pContainer->type)
+        {
+            // @ExtensionId
+            hr = XmlGetAttributeEx(pixnNode, L"ExtensionId", &scz);
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ExtensionId.");
+
+            hr = BurnExtensionFindById(pBurnExtensions, scz, &pContainer->pExtension);
+            ExitOnRootFailure(hr, "Failed to find bundle extension '%ls' for container '%ls'", scz, pContainer->sczId);
+        }
 
         // @Attached
         hr = XmlGetYesNoAttribute(pixnNode, L"Attached", &pContainer->fAttached);
@@ -139,7 +168,7 @@ extern "C" HRESULT ContainersInitialize(
             // manifest contained and get the offset to the container.
             if (pContainer->fAttached)
             {
-                hr = SectionGetAttachedContainerInfo(pSection, pContainer->dwAttachedIndex, pContainer->type, &pContainer->qwAttachedOffset, &qwSize, &pContainer->fActuallyAttached);
+                hr = SectionGetAttachedContainerInfo(pSection, pContainer->dwAttachedIndex, &pContainer->qwAttachedOffset, &qwSize, &pContainer->fActuallyAttached);
                 ExitOnFailure(hr, "Failed to get attached container information.");
 
                 if (qwSize != pContainer->qwFileSize)
@@ -197,8 +226,14 @@ extern "C" HRESULT ContainerOpenUX(
     container.fAttached = TRUE;
     container.dwAttachedIndex = 0;
 
-    hr = SectionGetAttachedContainerInfo(pSection, container.dwAttachedIndex, container.type, &container.qwAttachedOffset, &container.qwFileSize, &container.fActuallyAttached);
+    hr = SectionGetAttachedContainerInfo(pSection, container.dwAttachedIndex, &container.qwAttachedOffset, &container.qwFileSize, &container.fActuallyAttached);
     ExitOnFailure(hr, "Failed to get container information for UX container.");
+
+    if (BURN_CONTAINER_TYPE_CABINET != pSection->dwFormat)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+        ExitOnRootFailure(hr, "Unexpected UX container format %u. UX container is expected to always be a cabinet file", pSection->dwFormat);
+    }
 
     AssertSz(container.fActuallyAttached, "The BA container must always be found attached.");
 
@@ -223,6 +258,7 @@ extern "C" HRESULT ContainerOpen(
 {
     HRESULT hr = S_OK;
     LARGE_INTEGER li = { };
+    LPWSTR szTempFile = NULL;
 
     // initialize context
     pContext->type = pContainer->type;
@@ -260,10 +296,40 @@ extern "C" HRESULT ContainerOpen(
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractOpen(pContext, wzFilePath);
         break;
+    case BURN_CONTAINER_TYPE_EXTENSION:
+
+        pContext->Bex.pExtension = pContainer->pExtension;
+
+        if (pContainer->fAttached)
+        {
+            hr = BurnExtensionContainerOpenAttached(pContainer->pExtension, pContainer->sczId, pContext->hFile, pContext->qwOffset, pContext->qwSize, pContext);
+            if (FAILED(hr))
+            {
+                LogId(REPORT_STANDARD, MSG_EXT_ATTACHED_CONTAINER_FAILED, pContainer->sczId);
+
+                hr = FileCreateTemp(L"CNTNR", L"dat", &szTempFile, NULL);
+                ExitOnFailure(hr, "Failed to create temporary container file");
+
+                hr = FileCopyPartial(pContext->hFile, pContext->qwOffset, pContext->qwSize, szTempFile);
+                ExitOnFailure(hr, "Failed to write to temporary container file");
+
+                pContext->Bex.szTempContainerPath = szTempFile;
+                szTempFile = NULL;
+
+                hr = BurnExtensionContainerOpen(pContainer->pExtension, pContainer->sczId, pContext->Bex.szTempContainerPath, pContext);
+            }
+        }
+        else
+        {
+            hr = BurnExtensionContainerOpen(pContainer->pExtension, pContainer->sczId, wzFilePath, pContext);
+        }
+        break;
     }
     ExitOnFailure(hr, "Failed to open container.");
 
 LExit:
+    ReleaseStr(szTempFile);
+
     return hr;
 }
 
@@ -278,6 +344,9 @@ extern "C" HRESULT ContainerNextStream(
     {
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractNextStream(pContext, psczStreamName);
+        break;
+    case BURN_CONTAINER_TYPE_EXTENSION:
+        hr = BurnExtensionContainerNextStream(pContext->Bex.pExtension, pContext, psczStreamName);
         break;
     }
 
@@ -297,6 +366,9 @@ extern "C" HRESULT ContainerStreamToFile(
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractStreamToFile(pContext, wzFileName);
         break;
+    case BURN_CONTAINER_TYPE_EXTENSION:
+        hr = BurnExtensionContainerStreamToFile(pContext->Bex.pExtension, pContext, wzFileName);
+        break;
     }
 
 //LExit:
@@ -315,6 +387,9 @@ extern "C" HRESULT ContainerStreamToBuffer(
     {
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractStreamToBuffer(pContext, ppbBuffer, pcbBuffer);
+        break;
+    case BURN_CONTAINER_TYPE_EXTENSION:
+        hr = BurnExtensionContainerStreamToBuffer(pContext->Bex.pExtension, pContext, ppbBuffer, pcbBuffer);
         break;
 
     default:
@@ -337,6 +412,9 @@ extern "C" HRESULT ContainerSkipStream(
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractSkipStream(pContext);
         break;
+    case BURN_CONTAINER_TYPE_EXTENSION:
+        hr = BurnExtensionContainerSkipStream(pContext->Bex.pExtension, pContext);
+        break;
     }
 
 //LExit:
@@ -354,6 +432,15 @@ extern "C" HRESULT ContainerClose(
     {
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractClose(pContext);
+        ExitOnFailure(hr, "Failed to close cabinet.");
+        break;
+    case BURN_CONTAINER_TYPE_EXTENSION:
+        hr = BurnExtensionContainerClose(pContext->Bex.pExtension, pContext);
+        if (pContext->Bex.szTempContainerPath && *pContext->Bex.szTempContainerPath)
+        {
+            FileEnsureDelete(pContext->Bex.szTempContainerPath);
+            ReleaseNullStr(pContext->Bex.szTempContainerPath);
+        }
         ExitOnFailure(hr, "Failed to close cabinet.");
         break;
     }

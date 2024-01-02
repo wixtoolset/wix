@@ -140,6 +140,12 @@ HRESULT DAPI FileWriteHandle(
     __in_bcount_opt(cbData) LPCBYTE pbData,
     __in SIZE_T cbData
     );
+HRESULT DAPI FileCopyPartial(
+    __in HANDLE hSource,
+    __in DWORD64 cbStart,
+    __in DWORD64 cbCopy,
+    __in_z LPCWSTR wzTarget
+    );
 HRESULT DAPI FileCopyUsingHandles(
     __in HANDLE hSource,
     __in HANDLE hTarget,

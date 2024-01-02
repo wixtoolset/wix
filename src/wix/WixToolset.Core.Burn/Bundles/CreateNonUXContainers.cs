@@ -10,12 +10,13 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CreateNonUXContainers
     {
-        public CreateNonUXContainers(IBackendHelper backendHelper, IMessaging messaging, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, IEnumerable<WixBundleContainerSymbol> containerSymbols, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
+        public CreateNonUXContainers(IBackendHelper backendHelper, IMessaging messaging, IEnumerable<IBurnContainerExtension> containerExtensions, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, IEnumerable<WixBundleContainerSymbol> containerSymbols, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
         {
             this.BackendHelper = backendHelper;
             this.Messaging = messaging;
@@ -25,6 +26,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.IntermediateFolder = intermediateFolder;
             this.LayoutFolder = layoutFolder;
             this.DefaultCompressionLevel = defaultCompressionLevel;
+            this.ContainerExtensions = containerExtensions;
         }
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
@@ -40,6 +42,8 @@ namespace WixToolset.Core.Burn.Bundles
         private IBackendHelper BackendHelper { get; }
 
         private IMessaging Messaging { get; }
+
+        private IEnumerable<IBurnContainerExtension> ContainerExtensions { get; }
 
         private WixBootstrapperApplicationDllSymbol BootstrapperApplicationDllSymbol { get; }
 
@@ -137,11 +141,29 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void CreateContainer(WixBundleContainerSymbol container, IEnumerable<WixBundlePayloadSymbol> containerPayloads)
         {
-            var command = new CreateContainerCommand(containerPayloads, container.WorkingPath, this.DefaultCompressionLevel);
-            command.Execute();
+            if (String.IsNullOrEmpty(container.BundleExtensionRef))
+            {
+                var command = new CreateContainerCommand(containerPayloads, container.WorkingPath, this.DefaultCompressionLevel);
+                command.Execute();
 
-            container.Hash = command.Hash;
-            container.Size = command.Size;
+                container.Hash = command.Hash;
+                container.Size = command.Size;
+                return;
+            }
+
+            container.Hash = null;
+            container.Size = 0;
+            IBurnContainerExtension containerExtension = this.ContainerExtensions.FirstOrDefault(ce => (ce.ContainerExtensionIds != null) && ce.ContainerExtensionIds.Contains(container.BundleExtensionRef));
+            if (containerExtension == null)
+            {
+                this.Messaging.Write(ErrorMessages.MissingContainerExtension(container.SourceLineNumbers, container.Id.Id, container.BundleExtensionRef));
+                return;
+            }
+
+            containerExtension.CreateContainer(container, containerPayloads, out string sha512, out long size);
+
+            container.Hash = sha512;
+            container.Size = size;
         }
     }
 }

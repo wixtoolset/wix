@@ -1760,3 +1760,66 @@ LExit:
 
     return hr;
 }
+
+HRESULT DAPI FileCopyPartial(
+    __in HANDLE hSource,
+    __in DWORD64 cbStart,
+    __in DWORD64 cbCopy,
+    __in_z LPCWSTR wzTarget
+    )
+{
+    HRESULT hr = S_OK;
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+    DWORD64 cbCurrPointer = 0;
+    LARGE_INTEGER liMaxRead = {};
+    LARGE_INTEGER liRead = {};
+    LARGE_INTEGER cbData = {};
+    BYTE* pbData = NULL;
+
+    FileExitOnNull(hSource && (hSource != INVALID_HANDLE_VALUE), hr, E_INVALIDARG, "Invalid argument hSource");
+    FileExitOnNull(wzTarget && *wzTarget, hr, E_INVALIDARG, "wzTarget is null");
+
+    hr = FileSetPointer(hSource, 0, &cbCurrPointer, FILE_CURRENT);
+    FileExitOnFailure(hr, "Failed to get current file pointer");
+
+    hr = FileSetPointer(hSource, cbStart, NULL, FILE_BEGIN);
+    FileExitOnFailure(hr, "Failed to set file pointer");
+
+    if (!::GetFileSizeEx(hSource, &liMaxRead))
+    {
+        FileExitWithLastError(hr, "Failed to get size of file");
+    }
+    liMaxRead.QuadPart = min(liMaxRead.QuadPart - cbStart, cbCopy);
+
+    hFile = ::CreateFileW(wzTarget, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    FileExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file: %ls", wzTarget);
+
+    cbData.QuadPart = min(liMaxRead.QuadPart, 1024 * 1024 * 50); // Max 50MB chunks
+    pbData = (BYTE*)MemAlloc((SIZE_T)cbData.QuadPart, FALSE);
+    FileExitOnNull(pbData, hr, E_OUTOFMEMORY, "Failed to allocate memory");
+
+    while (liRead.QuadPart < liMaxRead.QuadPart)
+    {
+        LARGE_INTEGER cbRead = {};
+
+        cbData.QuadPart = min(cbData.QuadPart, liMaxRead.QuadPart - liRead.QuadPart);
+        if (!::ReadFile(hSource, pbData, cbData.LowPart, &cbRead.LowPart, NULL))
+        {
+            FileExitWithLastError(hr, "Failed to read from file");
+        }
+        FileExitOnNull((cbRead.LowPart == cbData.LowPart), hr, E_FAIL, "Failed to read data from file");
+
+        hr = FileWriteHandle(hFile, pbData, cbData.LowPart);
+        FileExitOnFailure(hr, "Failed to write to file");
+
+        liRead.QuadPart += cbRead.LowPart;
+    }
+
+LExit:
+    FileSetPointer(hSource, cbCurrPointer, NULL, FILE_BEGIN); // Recover initial position
+
+    ReleaseMem(pbData);
+    ReleaseFile(hFile);
+
+    return hr;
+}

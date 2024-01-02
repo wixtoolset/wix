@@ -55,6 +55,45 @@ BEEAPI BurnExtensionPerformSearch(
     __in LPWSTR wzSearchId,
     __in LPWSTR wzVariable
     );
+BEEAPI BurnExtensionContainerOpen(
+    __in BURN_EXTENSION* pExtension,
+    __in LPCWSTR wzContainerId,
+    __in LPCWSTR wzFilePath,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+BEEAPI BurnExtensionContainerOpenAttached(
+    __in BURN_EXTENSION* pExtension,
+    __in LPCWSTR wzContainerId,
+    __in HANDLE hBundle,
+    __in DWORD64 qwContainerStartPos,
+    __in DWORD64 qwContainerSize,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+BEEAPI BurnExtensionContainerNextStream(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __inout_z LPWSTR *psczStreamName
+    );
+BEEAPI BurnExtensionContainerStreamToFile(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __in_z LPCWSTR wzFileName
+    );
+BEEAPI BurnExtensionContainerStreamToBuffer(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __inout LPBYTE * ppbBuffer,
+    __inout SIZE_T * pcbBuffer
+    );
+BEEAPI BurnExtensionContainerSkipStream(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+BEEAPI BurnExtensionContainerClose(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+
 #if defined(__cplusplus)
 }
 #endif

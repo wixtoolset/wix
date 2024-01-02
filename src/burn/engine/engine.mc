@@ -1275,3 +1275,9 @@ Language=English
 Skipping MSI property '%1!ls!' because condition '%2!ls!' evaluates to %3!hs!.
 .
 
+MessageId=701
+Severity=Warning
+SymbolicName=MSG_EXT_ATTACHED_CONTAINER_FAILED
+Language=English
+Container extension can not open attached container '%1!ls!'. Unloading the container and retrying.
+.
