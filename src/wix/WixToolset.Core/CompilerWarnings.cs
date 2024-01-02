@@ -46,11 +46,6 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.RequiresKeyNotFound, "The dependency key with identifier {0} was not found in the Wix4Dependency table. Related registry rows will not be removed from authoring.", id);
         }
 
-        public static Message ReservedBurnNamespaceWarning(SourceLineNumber sourceLineNumbers, string element, string attribute, string prefix)
-        {
-            return Message(sourceLineNumbers, Ids.ReservedBurnNamespaceWarning, "The {0}/@{1} attribute's value begins with the reserved prefix '{2}'. Some prefixes are reserved by the WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.", element, attribute, prefix);
-        }
-
         public static Message Win64Component(SourceLineNumber sourceLineNumbers, string componentId)
         {
             return Message(sourceLineNumbers, Ids.Win64Component, "The Provides element should not be authored in the 64-bit component with identifier {0}. The dependency feature may not work if installing this package on 64-bit Windows operating systems prior to Windows 7 and Windows Server 2008 R2. Set the Component/@Bitness attribute to \"always32\" to ensure the dependency feature works correctly on legacy operating systems.", componentId);
@@ -71,7 +66,7 @@ namespace WixToolset.Core
             DirectoryRefStandardDirectoryDeprecated = 5436,
             DefiningStandardDirectoryDeprecated = 5437,
             ReadonlyLogVariableTarget = 5438,
-            ReservedBurnNamespaceWarning = 5439,
+            // DO_NOT_REUSE ReservedBurnNamespaceWarning = 5439,
         } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

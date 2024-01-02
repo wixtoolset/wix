@@ -1773,7 +1773,7 @@ namespace WixToolset.Data
 
         public static Message ReservedNamespaceViolation(SourceLineNumber sourceLineNumbers, string element, string attribute, string prefix)
         {
-            return Message(sourceLineNumbers, Ids.ReservedNamespaceViolation, "The {0}/@{1} attribute's value begins with the reserved prefix '{2}'. Some prefixes are reserved by the Windows Installer and WiX toolset for well-known values. Change your attribute's value to not begin with the same prefix.", element, attribute, prefix);
+            return Message(sourceLineNumbers, Ids.ReservedNamespaceViolation, "The {0}/@{1} attribute's value begins with the reserved prefix '{2}'. Some prefixes are reserved by the Windows Installer and WiX Toolset for well-known values. Change your attribute's value to not begin with the same prefix.", element, attribute, prefix);
         }
 
         public static Message RootFeatureCannotFollowParent(SourceLineNumber sourceLineNumbers)
