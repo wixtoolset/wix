@@ -59,6 +59,7 @@
     <ClCompile Include="MemUtilTest.cpp" />
     <ClCompile Include="MonUtilTest.cpp" />
     <ClCompile Include="PathUtilTest.cpp" />
+    <ClCompile Include="PipeUtilTest.cpp" />
     <ClCompile Include="ProcUtilTest.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

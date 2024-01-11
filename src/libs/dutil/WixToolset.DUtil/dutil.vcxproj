@@ -87,6 +87,7 @@
     <ClCompile Include="path3utl.cpp" />
     <ClCompile Include="pathutil.cpp" />
     <ClCompile Include="perfutil.cpp" />
+    <ClCompile Include="pipeutil.cpp" />
     <ClCompile Include="polcutil.cpp" />
     <ClCompile Include="proc2utl.cpp" />
     <ClCompile Include="proc3utl.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="inc\osutil.h" />
     <ClInclude Include="inc\pathutil.h" />
     <ClInclude Include="inc\perfutil.h" />
+    <ClInclude Include="inc\pipeutil.h" />
     <ClInclude Include="inc\polcutil.h" />
     <ClInclude Include="inc\procutil.h" />
     <ClInclude Include="inc\queutil.h" />

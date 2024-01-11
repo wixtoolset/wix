@@ -414,8 +414,8 @@ extern "C" HRESULT DAPI FileSetPointer(
     Assert(INVALID_HANDLE_VALUE != hFile);
 
     HRESULT hr = S_OK;
-    LARGE_INTEGER liMove;
-    LARGE_INTEGER liNewPosition;
+    LARGE_INTEGER liMove = { };
+    LARGE_INTEGER liNewPosition = { };
 
     liMove.QuadPart = dw64Move;
     if (!::SetFilePointerEx(hFile, liMove, &liNewPosition, dwMoveMethod))
@@ -843,7 +843,7 @@ extern "C" HRESULT DAPI FileCopyUsingHandles(
 {
     HRESULT hr = S_OK;
     DWORD64 cbTotalCopied = 0;
-    BYTE rgbData[4 * 1024];
+    BYTE rgbData[4 * 1024] = { };
     DWORD cbRead = 0;
 
     do
@@ -887,7 +887,7 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
 {
     HRESULT hr = S_OK;
     DWORD64 cbTotalCopied = 0;
-    BYTE rgbData[64 * 1024];
+    BYTE rgbData[64 * 1024] = { };
     DWORD cbRead = 0;
 
     LARGE_INTEGER liSourceSize = { };
