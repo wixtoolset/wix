@@ -78,6 +78,9 @@
     <ClCompile Include="LocUtilTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PipeUtilTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTest.rc">
@@ -94,10 +97,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)xunit.runner.visualstudio.testadapter.dll" />
-    <None Include="$(MSBuildThisFileDirectory)xunit.runner.reporters.net452.dll" />
-    <None Include="$(MSBuildThisFileDirectory)xunit.runner.utility.net452.dll" />
     <None Include="$(MSBuildThisFileDirectory)xunit.abstractions.dll" />
     <None Include="TestData\ApupUtilTests\FeedBv2.0.xml" />
     <None Include="TestData\LocUtilTests\strings.wxl" />
+    <None Include="TestData\LocUtilTests\controls.wxl" />
   </ItemGroup>
 </Project>

@@ -24,6 +24,7 @@
 #include <locutil.h>
 #include <memutil.h>
 #include <pathutil.h>
+#include <pipeutil.h>
 #include <procutil.h>
 #include <strutil.h>
 #include <monutil.h>
