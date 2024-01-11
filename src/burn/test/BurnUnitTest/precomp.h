@@ -59,7 +59,7 @@
 #include "registration.h"
 #include "relatedbundle.h"
 #include "plan.h"
-#include "pipe.h"
+#include "burnpipe.h"
 #include "logging.h"
 #include "cache.h"
 #include "dependency.h"
