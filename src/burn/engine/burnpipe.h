@@ -25,15 +25,6 @@ typedef enum _BURN_PIPE_MESSAGE_TYPE : DWORD
     BURN_PIPE_MESSAGE_TYPE_TERMINATE = 0xF0000003,
 } BURN_PIPE_MESSAGE_TYPE;
 
-typedef struct _BURN_PIPE_MESSAGE
-{
-    DWORD dwMessage;
-    DWORD cbData;
-
-    BOOL fAllocatedData;
-    LPVOID pvData;
-} BURN_PIPE_MESSAGE;
-
 typedef struct _BURN_PIPE_RESULT
 {
     DWORD dwResult;
@@ -42,7 +33,7 @@ typedef struct _BURN_PIPE_RESULT
 
 
 typedef HRESULT (*PFN_PIPE_MESSAGE_CALLBACK)(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );

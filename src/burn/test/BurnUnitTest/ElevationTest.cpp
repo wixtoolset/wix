@@ -16,12 +16,12 @@ static DWORD CALLBACK ElevateTest_ThreadProc(
     __in LPVOID lpThreadParameter
     );
 static HRESULT ProcessParentMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessChildMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
@@ -155,7 +155,7 @@ LExit:
 }
 
 static HRESULT ProcessParentMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID /*pvContext*/,
     __out DWORD* pdwResult
     )
@@ -164,7 +164,7 @@ static HRESULT ProcessParentMessages(
     HRESULT hrResult = E_INVALIDDATA;
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case TEST_CHILD_SENT_MESSAGE_ID:
         if (sizeof(TEST_MESSAGE_DATA) == pMsg->cbData && 0 == memcmp(TEST_MESSAGE_DATA, pMsg->pvData, sizeof(TEST_MESSAGE_DATA)))
@@ -175,7 +175,7 @@ static HRESULT ProcessParentMessages(
 
     default:
         hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Unexpected elevated message sent to parent process, msg: %u", pMsg->dwMessage);
+        ExitOnRootFailure(hr, "Unexpected elevated message sent to parent process, msg: %u", pMsg->dwMessageType);
     }
 
     *pdwResult = static_cast<DWORD>(hrResult);
@@ -185,7 +185,7 @@ LExit:
 }
 
 static HRESULT ProcessChildMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -195,7 +195,7 @@ static HRESULT ProcessChildMessages(
     DWORD dwResult = 0;
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case TEST_PARENT_SENT_MESSAGE_ID:
         // send test message
@@ -205,7 +205,7 @@ static HRESULT ProcessChildMessages(
 
     default:
         hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Unexpected elevated message sent to child process, msg: %u", pMsg->dwMessage);
+        ExitOnRootFailure(hr, "Unexpected elevated message sent to child process, msg: %u", pMsg->dwMessageType);
     }
 
     *pdwResult = dwResult;

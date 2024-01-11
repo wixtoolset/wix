@@ -38,6 +38,7 @@
 #include <memutil.h>
 #include <osutil.h>
 #include <pathutil.h>
+#include <pipeutil.h>
 #include <polcutil.h>
 #include <procutil.h>
 #include <queutil.h>

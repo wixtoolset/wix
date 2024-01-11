@@ -14,7 +14,7 @@ struct BURN_EMBEDDED_CALLBACK_CONTEXT
 // internal function declarations
 
 static HRESULT ProcessEmbeddedMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
@@ -36,7 +36,7 @@ static HRESULT OnEmbeddedProgress(
 // function definitions
 
 /*******************************************************************
- EmbeddedRunBundle - 
+ EmbeddedRunBundle -
 
 *******************************************************************/
 extern "C" HRESULT EmbeddedRunBundle(
@@ -108,7 +108,7 @@ LExit:
 // internal function definitions
 
 static HRESULT ProcessEmbeddedMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -118,7 +118,7 @@ static HRESULT ProcessEmbeddedMessages(
     DWORD dwResult = 0;
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_EMBEDDED_MESSAGE_TYPE_ERROR:
         hr = OnEmbeddedErrorMessage(pContext->pfnGenericMessageHandler, pContext->pvContext, static_cast<BYTE*>(pMsg->pvData), pMsg->cbData, &dwResult);
@@ -131,7 +131,7 @@ static HRESULT ProcessEmbeddedMessages(
         break;
 
     default:
-        LogStringLine(REPORT_DEBUG, "Unexpected embedded message received from child process, msg: %u", pMsg->dwMessage);
+        LogStringLine(REPORT_DEBUG, "Unexpected embedded message received from child process, msg: %u", pMsg->dwMessageType);
         dwResult = (DWORD)E_NOTIMPL;
     }
 
