@@ -133,7 +133,7 @@ static DWORD CALLBACK EmbeddedTest_ThreadProc(
 
     engineState.internalCommand.mode = BURN_MODE_EMBEDDED;
 
-    PipeConnectionInitialize(pConnection);
+    BurnPipeConnectionInitialize(pConnection);
 
     StrAlloc(&pConnection->sczName, MAX_PATH);
     StrAlloc(&pConnection->sczSecret, MAX_PATH);
@@ -145,11 +145,11 @@ static DWORD CALLBACK EmbeddedTest_ThreadProc(
     }
 
     // set up connection with parent bundle runner
-    hr = PipeChildConnect(pConnection, FALSE);
+    hr = BurnPipeChildConnect(pConnection, FALSE);
     ExitOnFailure(hr, "Failed to connect to parent bundle runner.");
 
     // post unknown message
-    hr = PipeSendMessage(pConnection->hPipe, TEST_UNKNOWN_MESSAGE_ID, NULL, 0, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(pConnection->hPipe, TEST_UNKNOWN_MESSAGE_ID, NULL, 0, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to post unknown message to parent bundle runner.");
 
     if (E_NOTIMPL != dwResult)
@@ -162,7 +162,7 @@ static DWORD CALLBACK EmbeddedTest_ThreadProc(
     ExitOnFailure(hr, "Failed to post known message to parent bundle runner.");
 
 LExit:
-    PipeConnectionUninitialize(pConnection);
+    BurnPipeConnectionUninitialize(pConnection);
     ReleaseStr(sczArguments);
 
     return FAILED(hr) ? (DWORD)hr : dwResult;
@@ -179,7 +179,7 @@ static int EmbeddedTest_GenericMessageHandler(
     if (GENERIC_EXECUTE_MESSAGE_ERROR == pMessage->type)
     {
         // post unknown message
-        HRESULT hr = PipeSendMessage(pContext->connection.hPipe, TEST_UNKNOWN_MESSAGE_ID, NULL, 0, NULL, NULL, &dwResult);
+        HRESULT hr = BurnPipeSendMessage(pContext->connection.hPipe, TEST_UNKNOWN_MESSAGE_ID, NULL, 0, NULL, NULL, &dwResult);
         ExitOnFailure(hr, "Failed to post unknown message to embedded bundle.");
 
         if (E_NOTIMPL != dwResult)

@@ -130,7 +130,7 @@ static void LoadEngineState(
                 //
                 // initiate termination
                 //
-                hr = PipeTerminateChildProcess(pConnection, 0, FALSE);
+                hr = BurnPipeTerminateChildProcess(pConnection, 0, FALSE);
                 TestThrowOnFailure(hr, L"Failed to terminate elevated process.");
 
                 // check results
@@ -150,7 +150,7 @@ static void LoadEngineState(
             finally
             {
                 VariablesUninitialize(&engineState.variables);
-                PipeConnectionUninitialize(pConnection);
+                BurnPipeConnectionUninitialize(pConnection);
             }
         }
 
@@ -241,14 +241,14 @@ static DWORD CALLBACK ExitCodeTest_ElevationThreadProc(
     }
 
     // set up connection with per-user process
-    hr = PipeChildConnect(pConnection, TRUE);
+    hr = BurnPipeChildConnect(pConnection, TRUE);
     ExitOnFailure(hr, "Failed to connect to per-user process.");
 
     hr = ElevationChildPumpMessages(pConnection->hPipe, pConnection->hCachePipe, &engineState.approvedExes, &engineState.cache, &engineState.containers, &engineState.packages, &engineState.payloads, &engineState.variables, &engineState.registration, &engineState.userExperience, &hLock, &dwChildExitCode, &fRestart, &fApplying);
     ExitOnFailure(hr, "Failed while pumping messages in child 'process'.");
 
 LExit:
-    PipeConnectionUninitialize(pConnection);
+    BurnPipeConnectionUninitialize(pConnection);
     VariablesUninitialize(&engineState.variables);
     ReleaseStr(sczArguments);
 
@@ -358,7 +358,7 @@ static void LoadEngineState(
 
     VariableInitialize(&pEngineState->variables);
 
-    PipeConnectionInitialize(&pEngineState->companionConnection);
+    BurnPipeConnectionInitialize(&pEngineState->companionConnection);
 
     hr = CacheInitialize(&pEngineState->cache, &pEngineState->internalCommand);
     TestThrowOnFailure(hr, "CacheInitialize failed.");

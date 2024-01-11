@@ -63,7 +63,7 @@ namespace Bootstrapper
                 ShelFunctionOverride(ElevateTest_ShellExecuteExW);
                 CoreFunctionOverride(NULL, ThrdWaitForCompletion);
 
-                PipeConnectionInitialize(pConnection);
+                BurnPipeConnectionInitialize(pConnection);
 
                 //
                 // per-user side setup
@@ -72,13 +72,13 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to elevate.");
 
                 // post execute message
-                hr = PipeSendMessage(pConnection->hPipe, TEST_PARENT_SENT_MESSAGE_ID, NULL, 0, ProcessParentMessages, NULL, &dwResult);
+                hr = BurnPipeSendMessage(pConnection->hPipe, TEST_PARENT_SENT_MESSAGE_ID, NULL, 0, ProcessParentMessages, NULL, &dwResult);
                 TestThrowOnFailure(hr, "Failed to post execute message to per-machine process.");
 
                 //
                 // initiate termination
                 //
-                hr = PipeTerminateChildProcess(pConnection, 666, FALSE);
+                hr = BurnPipeTerminateChildProcess(pConnection, 666, FALSE);
                 TestThrowOnFailure(hr, L"Failed to terminate elevated process.");
 
                 // check flags
@@ -86,7 +86,7 @@ namespace Bootstrapper
             }
             finally
             {
-                PipeConnectionUninitialize(pConnection);
+                BurnPipeConnectionUninitialize(pConnection);
             }
         }
     };
@@ -127,7 +127,7 @@ static DWORD CALLBACK ElevateTest_ThreadProc(
     BURN_PIPE_CONNECTION connection = { };
     BURN_PIPE_RESULT result = { };
 
-    PipeConnectionInitialize(&connection);
+    BurnPipeConnectionInitialize(&connection);
 
     StrAlloc(&connection.sczName, MAX_PATH);
     StrAlloc(&connection.sczSecret, MAX_PATH);
@@ -140,15 +140,15 @@ static DWORD CALLBACK ElevateTest_ThreadProc(
     }
 
     // set up connection with per-user process
-    hr = PipeChildConnect(&connection, TRUE);
+    hr = BurnPipeChildConnect(&connection, TRUE);
     ExitOnFailure(hr, "Failed to connect to per-user process.");
 
     // pump messages
-    hr = PipePumpMessages(connection.hPipe, ProcessChildMessages, static_cast<LPVOID>(connection.hPipe), &result);
+    hr = BurnPipePumpMessages(connection.hPipe, ProcessChildMessages, static_cast<LPVOID>(connection.hPipe), &result);
     ExitOnFailure(hr, "Failed while pumping messages in child 'process'.");
 
 LExit:
-    PipeConnectionUninitialize(&connection);
+    BurnPipeConnectionUninitialize(&connection);
     ReleaseStr(sczArguments);
 
     return FAILED(hr) ? (DWORD)hr : result.dwResult;
@@ -199,7 +199,7 @@ static HRESULT ProcessChildMessages(
     {
     case TEST_PARENT_SENT_MESSAGE_ID:
         // send test message
-        hr = PipeSendMessage(hPipe, TEST_CHILD_SENT_MESSAGE_ID, (LPVOID)TEST_MESSAGE_DATA, sizeof(TEST_MESSAGE_DATA), NULL, NULL, &dwResult);
+        hr = BurnPipeSendMessage(hPipe, TEST_CHILD_SENT_MESSAGE_ID, (LPVOID)TEST_MESSAGE_DATA, sizeof(TEST_MESSAGE_DATA), NULL, NULL, &dwResult);
         ExitOnFailure(hr, "Failed to send message to per-machine process.");
         break;
 

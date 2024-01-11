@@ -227,7 +227,7 @@ extern "C" HRESULT CoreInitializeConstants(
         hr = StrAllocString(&pRegistration->sczBundlePackageAncestors, pRegistration->sczId, 0);
         ExitOnFailure(hr, "Failed to copy self to bundle package ancestors.");
     }
-    
+
     for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
     {
         BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
@@ -2285,7 +2285,7 @@ static HRESULT DetectPackage(
 {
     HRESULT hr = S_OK;
     BOOL fBegan = FALSE;
-    
+
     fBegan = TRUE;
     hr = UserExperienceOnDetectPackageBegin(&pEngineState->userExperience, pPackage->sczId);
     ExitOnRootFailure(hr, "BA aborted detect package begin.");
@@ -2423,7 +2423,7 @@ static DWORD WINAPI LoggingThreadProc(
     BURN_ENGINE_STATE* pEngineState = reinterpret_cast<BURN_ENGINE_STATE*>(lpThreadParameter);
     BURN_PIPE_RESULT result = { };
 
-    hr = PipePumpMessages(pEngineState->companionConnection.hLoggingPipe, NULL, NULL, &result);
+    hr = BurnPipePumpMessages(pEngineState->companionConnection.hLoggingPipe, NULL, NULL, &result);
     ExitOnFailure(hr, "Failed to pump logging messages for elevated process.");
 
     hr = (HRESULT)result.dwResult;

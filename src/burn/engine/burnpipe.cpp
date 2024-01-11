@@ -13,10 +13,10 @@ static HRESULT ChildPipeConnected(
 
 
 /*******************************************************************
- PipeConnectionInitialize - initialize pipe connection data.
+ BurnPipeConnectionInitialize - initialize pipe connection data.
 
 *******************************************************************/
-void PipeConnectionInitialize(
+void BurnPipeConnectionInitialize(
     __in BURN_PIPE_CONNECTION* pConnection
     )
 {
@@ -27,10 +27,10 @@ void PipeConnectionInitialize(
 }
 
 /*******************************************************************
- PipeConnectionUninitialize - free data in a pipe connection.
+ BurnPipeConnectionUninitialize - free data in a pipe connection.
 
 *******************************************************************/
-void PipeConnectionUninitialize(
+void BurnPipeConnectionUninitialize(
     __in BURN_PIPE_CONNECTION* pConnection
     )
 {
@@ -41,14 +41,14 @@ void PipeConnectionUninitialize(
     ReleaseStr(pConnection->sczSecret);
     ReleaseStr(pConnection->sczName);
 
-    PipeConnectionInitialize(pConnection);
+    BurnPipeConnectionInitialize(pConnection);
 }
 
 /*******************************************************************
- PipeSendMessage -
+ BurnPipeSendMessage -
 
 *******************************************************************/
-extern "C" HRESULT PipeSendMessage(
+extern "C" HRESULT BurnPipeSendMessage(
     __in HANDLE hPipe,
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
@@ -64,7 +64,7 @@ extern "C" HRESULT PipeSendMessage(
     hr = PipeWriteMessage(hPipe, dwMessage, pvData, cbData);
     ExitOnFailure(hr, "Failed to write send message to pipe.");
 
-    hr = PipePumpMessages(hPipe, pfnCallback, pvContext, &result);
+    hr = BurnPipePumpMessages(hPipe, pfnCallback, pvContext, &result);
     ExitOnFailure(hr, "Failed to pump messages during send message to pipe.");
 
     *pdwResult = result.dwResult;
@@ -74,10 +74,10 @@ LExit:
 }
 
 /*******************************************************************
- PipePumpMessages -
+ BurnPipePumpMessages -
 
 *******************************************************************/
-extern "C" HRESULT PipePumpMessages(
+extern "C" HRESULT BurnPipePumpMessages(
     __in HANDLE hPipe,
     __in_opt PFN_PIPE_MESSAGE_CALLBACK pfnCallback,
     __in_opt LPVOID pvContext,
@@ -111,7 +111,7 @@ extern "C" HRESULT PipePumpMessages(
             if (!msg.pvData || sizeof(DWORD) != msg.cbData)
             {
                 hr = E_INVALIDARG;
-                ExitOnRootFailure(hr, "No status returned to PipePumpMessages()");
+                ExitOnRootFailure(hr, "No status returned to BurnPipePumpMessages()");
             }
 
             pResult->dwResult = *static_cast<DWORD*>(msg.pvData);
@@ -121,12 +121,12 @@ extern "C" HRESULT PipePumpMessages(
             iData = 0;
 
             hr = BuffReadNumber(static_cast<BYTE*>(msg.pvData), msg.cbData, &iData, &pResult->dwResult);
-            ExitOnFailure(hr, "Failed to read returned result to PipePumpMessages()");
+            ExitOnFailure(hr, "Failed to read returned result to BurnPipePumpMessages()");
 
             if (sizeof(DWORD) * 2 == msg.cbData)
             {
                 hr = BuffReadNumber(static_cast<BYTE*>(msg.pvData), msg.cbData, &iData, (DWORD*)&pResult->fRestart);
-                ExitOnFailure(hr, "Failed to read returned restart to PipePumpMessages()");
+                ExitOnFailure(hr, "Failed to read returned restart to BurnPipePumpMessages()");
             }
 
             ExitFunction1(hr = S_OK); // exit loop.
@@ -165,10 +165,10 @@ LExit:
 }
 
 /*******************************************************************
- PipeCreateNameAndSecret -
+ BurnPipeCreateNameAndSecret -
 
 *******************************************************************/
-extern "C" HRESULT PipeCreateNameAndSecret(
+extern "C" HRESULT BurnPipeCreateNameAndSecret(
     __out_z LPWSTR *psczConnectionName,
     __out_z LPWSTR *psczSecret
     )
@@ -205,10 +205,10 @@ LExit:
 }
 
 /*******************************************************************
- PipeCreatePipes - create the pipes and event to signal child process.
+ BurnPipeCreatePipes - create the pipes and event to signal child process.
 
 *******************************************************************/
-extern "C" HRESULT PipeCreatePipes(
+extern "C" HRESULT BurnPipeCreatePipes(
     __in BURN_PIPE_CONNECTION* pConnection,
     __in BOOL fCompanion
     )
@@ -287,10 +287,10 @@ LExit:
 }
 
 /*******************************************************************
- PipeWaitForChildConnect -
+ BurnPipeWaitForChildConnect -
 
 *******************************************************************/
-extern "C" HRESULT PipeWaitForChildConnect(
+extern "C" HRESULT BurnPipeWaitForChildConnect(
     __in BURN_PIPE_CONNECTION* pConnection
     )
 {
@@ -335,10 +335,10 @@ LExit:
 }
 
 /*******************************************************************
- PipeTerminateLoggingPipe -
+ BurnPipeTerminateLoggingPipe -
 
 *******************************************************************/
-extern "C" HRESULT PipeTerminateLoggingPipe(
+extern "C" HRESULT BurnPipeTerminateLoggingPipe(
     __in HANDLE hLoggingPipe,
     __in DWORD dwParentExitCode
     )
@@ -361,10 +361,10 @@ LExit:
 }
 
 /*******************************************************************
- PipeTerminateChildProcess -
+ BurnPipeTerminateChildProcess -
 
 *******************************************************************/
-extern "C" HRESULT PipeTerminateChildProcess(
+extern "C" HRESULT BurnPipeTerminateChildProcess(
     __in BURN_PIPE_CONNECTION* pConnection,
     __in DWORD dwParentExitCode,
     __in BOOL fRestart
@@ -425,11 +425,11 @@ LExit:
 }
 
 /*******************************************************************
- PipeChildConnect - Called from the child process to connect back
+ BurnPipeChildConnect - Called from the child process to connect back
                     to the pipe provided by the parent process.
 
 *******************************************************************/
-extern "C" HRESULT PipeChildConnect(
+extern "C" HRESULT BurnPipeChildConnect(
     __in BURN_PIPE_CONNECTION* pConnection,
     __in BOOL fCompanion
     )
