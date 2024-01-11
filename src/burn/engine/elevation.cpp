@@ -423,10 +423,10 @@ extern "C" HRESULT ElevationElevate(
     hr = UserExperienceOnElevateBegin(&pEngineState->userExperience);
     ExitOnRootFailure(hr, "BA aborted elevation requirement.");
 
-    hr = PipeCreateNameAndSecret(&pEngineState->companionConnection.sczName, &pEngineState->companionConnection.sczSecret);
+    hr = BurnPipeCreateNameAndSecret(&pEngineState->companionConnection.sczName, &pEngineState->companionConnection.sczSecret);
     ExitOnFailure(hr, "Failed to create pipe name and client token.");
 
-    hr = PipeCreatePipes(&pEngineState->companionConnection, TRUE);
+    hr = BurnPipeCreatePipes(&pEngineState->companionConnection, TRUE);
     ExitOnFailure(hr, "Failed to create pipe and cache pipe.");
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_ELEVATED_ENGINE_STARTING);
@@ -441,7 +441,7 @@ extern "C" HRESULT ElevationElevate(
         {
             LogId(REPORT_STANDARD, MSG_LAUNCH_ELEVATED_ENGINE_SUCCESS);
 
-            hr = PipeWaitForChildConnect(&pEngineState->companionConnection);
+            hr = BurnPipeWaitForChildConnect(&pEngineState->companionConnection);
             if (HRESULT_FROM_WIN32(ERROR_NO_DATA) == hr)
             {
                 hr = E_SUSPECTED_AV_INTERFERENCE;
@@ -466,7 +466,7 @@ extern "C" HRESULT ElevationElevate(
 LExit:
     if (FAILED(hr))
     {
-        PipeConnectionUninitialize(&pEngineState->companionConnection);
+        BurnPipeConnectionUninitialize(&pEngineState->companionConnection);
     }
 
     UserExperienceOnElevateComplete(&pEngineState->userExperience, hr);
@@ -503,7 +503,7 @@ extern "C" HRESULT ElevationApplyInitialize(
     ExitOnFailure(hr, "Failed to write variables.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE, pbData, cbData, ProcessApplyInitializeMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE, pbData, cbData, ProcessApplyInitializeMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -534,7 +534,7 @@ extern "C" HRESULT ElevationApplyUninitialize(
     DWORD dwResult = 0;
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -592,7 +592,7 @@ extern "C" HRESULT ElevationSessionBegin(
     ExitOnFailure(hr, "Failed to write variables.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -638,7 +638,7 @@ extern "C" HRESULT ElevationSessionEnd(
     ExitOnFailure(hr, "Failed to write registration type to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_END, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_END, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -663,7 +663,7 @@ HRESULT ElevationSaveState(
     DWORD dwResult = 0;
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE, pbBuffer, cbBuffer, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE, pbBuffer, cbBuffer, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -687,7 +687,7 @@ extern "C" HRESULT ElevationCachePreparePackage(
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
     // Send message.
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -737,7 +737,7 @@ extern "C" HRESULT ElevationCacheCompletePayload(
     ExitOnFailure(hr, "Failed to write move flag to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD, pbData, cbData, ProcessBurnCacheMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD, pbData, cbData, ProcessBurnCacheMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -775,7 +775,7 @@ extern "C" HRESULT ElevationCacheVerifyPayload(
     ExitOnFailure(hr, "Failed to write payload id to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD, pbData, cbData, ProcessBurnCacheMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD, pbData, cbData, ProcessBurnCacheMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -798,7 +798,7 @@ extern "C" HRESULT ElevationCacheCleanup(
     DWORD dwResult = 0;
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP, NULL, 0, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP, NULL, 0, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -828,7 +828,7 @@ extern "C" HRESULT ElevationProcessDependentRegistration(
     ExitOnFailure(hr, "Failed to write dependent provider key to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_PROCESS_DEPENDENT_REGISTRATION, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_PROCESS_DEPENDENT_REGISTRATION, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_PROCESS_DEPENDENT_REGISTRATION message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -888,7 +888,7 @@ extern "C" HRESULT ElevationExecuteRelatedBundle(
     context.pfnGenericMessageHandler = pfnGenericMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_RELATED_BUNDLE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -952,7 +952,7 @@ extern "C" HRESULT ElevationExecuteBundlePackage(
     context.pfnGenericMessageHandler = pfnGenericMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_BUNDLE_PACKAGE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1007,7 +1007,7 @@ extern "C" HRESULT ElevationExecuteExePackage(
     context.pfnGenericMessageHandler = pfnGenericMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1036,7 +1036,7 @@ extern "C" HRESULT ElevationMsiBeginTransaction(
     hr = BuffWriteString(&pbData, &cbData, pRollbackBoundary->sczLogPath);
     ExitOnFailure(hr, "Failed to write transaction log path to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1072,7 +1072,7 @@ extern "C" HRESULT ElevationMsiCommitTransaction(
     context.pfnMessageHandler = pfnMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1109,7 +1109,7 @@ extern "C" HRESULT ElevationMsiRollbackTransaction(
     context.pfnMessageHandler = pfnMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1196,7 +1196,7 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     context.pfnMessageHandler = pfnMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1276,7 +1276,7 @@ extern "C" HRESULT ElevationExecuteMspPackage(
     context.pfnMessageHandler = pfnMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1328,7 +1328,7 @@ extern "C" HRESULT ElevationExecuteMsuPackage(
     context.pfnGenericMessageHandler = pfnGenericMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE, pbData, cbData, ProcessGenericExecuteMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1381,7 +1381,7 @@ extern "C" HRESULT ElevationUninstallMsiCompatiblePackage(
     context.pfnMessageHandler = pfnMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE, pbData, cbData, ProcessMsiPackageMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_UNINSTALL_MSI_COMPATIBLE_PACKAGE message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1421,7 +1421,7 @@ extern "C" HRESULT ElevationExecutePackageProviderAction(
     }
 
     // Send the message.
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER message to per-machine process.");
 
 LExit:
@@ -1461,7 +1461,7 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
     }
 
     // Send the message.
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY message to per-machine process.");
 
 LExit:
@@ -1488,7 +1488,7 @@ extern "C" HRESULT ElevationCleanCompatiblePackage(
     ExitOnFailure(hr, "Failed to write compatible package id to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CLEAN_COMPATIBLE_PACKAGE message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -1518,7 +1518,7 @@ extern "C" HRESULT ElevationCleanPackage(
     ExitOnFailure(hr, "Failed to write clean package id to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -1552,7 +1552,7 @@ extern "C" HRESULT ElevationLaunchApprovedExe(
     ExitOnFailure(hr, "Failed to write approved exe WaitForInputIdle timeout to message buffer.");
 
     // Send the message.
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE, pbData, cbData, ProcessLaunchApprovedExeMessages, &context, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE, pbData, cbData, ProcessLaunchApprovedExeMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -1617,7 +1617,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
     hCacheThread = ::CreateThread(NULL, 0, ElevatedChildCacheThreadProc, &cacheContext, 0, NULL);
     ExitOnNullWithLastError(hCacheThread, hr, "Failed to create elevated cache thread.");
 
-    hr = PipePumpMessages(hPipe, ProcessElevatedChildMessage, &context, &result);
+    hr = BurnPipePumpMessages(hPipe, ProcessElevatedChildMessage, &context, &result);
     ExitOnFailure(hr, "Failed to pump messages in child process.");
 
     // Wait for the cache thread and verify it gets the right result but don't fail if things
@@ -1705,7 +1705,7 @@ static DWORD WINAPI ElevatedChildCacheThreadProc(
     ExitOnFailure(hr, "Failed to initialize COM.");
     fComInitialized = TRUE;
 
-    hr = PipePumpMessages(pContext->hPipe, ProcessElevatedChildCacheMessage, pContext, &result);
+    hr = BurnPipePumpMessages(pContext->hPipe, ProcessElevatedChildCacheMessage, pContext, &result);
     ExitOnFailure(hr, "Failed to pump messages in child process.");
 
     hr = (HRESULT)result.dwResult;
@@ -3552,7 +3552,7 @@ static HRESULT CALLBACK BurnCacheMessageHandler(
     }
 
     // send message
-    hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send burn cache message to per-user process.");
 
     hr = dwResult;
@@ -3589,7 +3589,7 @@ static DWORD CALLBACK ElevatedProgressRoutine(
     ExitOnFailure(hr, "Failed to write total bytes transferred progress to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send progress routine message to per-user process.");
 
 LExit:
@@ -3664,7 +3664,7 @@ static int GenericExecuteMessageHandler(
     }
 
     // send message
-    hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, reinterpret_cast<DWORD*>(&nResult));
+    hr = BurnPipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, reinterpret_cast<DWORD*>(&nResult));
     ExitOnFailure(hr, "Failed to send message to per-user process.");
 
 LExit:
@@ -3751,7 +3751,7 @@ static int MsiExecuteMessageHandler(
     }
 
     // send message
-    hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, (DWORD*)&nResult);
+    hr = BurnPipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, (DWORD*)&nResult);
     ExitOnFailure(hr, "Failed to send msi message to per-user process.");
 
 LExit:
@@ -3891,7 +3891,7 @@ static HRESULT OnLaunchApprovedExe(
     hr = BuffWriteNumber(&pbSendData, &cbSendData, dwProcessId);
     ExitOnFailure(hr, "Failed to write the approved exe process id to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID, pbSendData, cbSendData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID message to per-user process.");
 
 LExit:
@@ -4032,7 +4032,7 @@ static HRESULT ElevatedOnPauseAUBegin(
     HRESULT hr = S_OK;
     DWORD dwResult = 0;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN, NULL, 0, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN, NULL, 0, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN message to per-user process.");
 
 LExit:
@@ -4052,7 +4052,7 @@ static HRESULT ElevatedOnPauseAUComplete(
     hr = BuffWriteNumber(&pbSendData, &cbSendData, hrStatus);
     ExitOnFailure(hr, "Failed to write the pause au status to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE message to per-user process.");
 
 LExit:
@@ -4068,7 +4068,7 @@ static HRESULT ElevatedOnSystemRestorePointBegin(
     HRESULT hr = S_OK;
     DWORD dwResult = 0;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN, NULL, 0, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN, NULL, 0, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN message to per-user process.");
 
 LExit:
@@ -4088,7 +4088,7 @@ static HRESULT ElevatedOnSystemRestorePointComplete(
     hr = BuffWriteNumber(&pbSendData, &cbSendData, hrStatus);
     ExitOnFailure(hr, "Failed to write the system restore point status to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE message to per-user process.");
 
 LExit:
@@ -4110,7 +4110,7 @@ static HRESULT ElevatedOnExecuteActionComplete(
     hr = BuffWriteNumber(&pbSendData, &cbSendData, restart);
     ExitOnFailure(hr, "Failed to write the restart type to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message to per-user process.");
 
 LExit:

@@ -303,7 +303,7 @@ LExit:
     // end per-machine process if running
     if (!fRunElevated && INVALID_HANDLE_VALUE != engineState.companionConnection.hPipe)
     {
-        PipeTerminateChildProcess(&engineState.companionConnection, *pdwExitCode, engineState.fRestart);
+        BurnPipeTerminateChildProcess(&engineState.companionConnection, *pdwExitCode, engineState.fRestart);
     }
     else if (engineState.fRestart)
     {
@@ -405,8 +405,8 @@ static HRESULT InitializeEngineState(
 
     pEngineState->internalCommand.automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
-    PipeConnectionInitialize(&pEngineState->companionConnection);
-    PipeConnectionInitialize(&pEngineState->embeddedConnection);
+    BurnPipeConnectionInitialize(&pEngineState->companionConnection);
+    BurnPipeConnectionInitialize(&pEngineState->embeddedConnection);
 
     // Retain whether bundle was initially run elevated.
     ProcElevated(::GetCurrentProcess(), &pEngineState->internalCommand.fInitiallyElevated);
@@ -443,8 +443,8 @@ static void UninitializeEngineState(
     ReleaseHandle(pEngineState->elevatedLoggingContext.hLogEvent);
     ReleaseHandle(pEngineState->elevatedLoggingContext.hFinishedEvent);
 
-    PipeConnectionUninitialize(&pEngineState->embeddedConnection);
-    PipeConnectionUninitialize(&pEngineState->companionConnection);
+    BurnPipeConnectionUninitialize(&pEngineState->embeddedConnection);
+    BurnPipeConnectionUninitialize(&pEngineState->companionConnection);
     ReleaseStr(pEngineState->sczBundleEngineWorkingPath)
 
     ReleaseHandle(pEngineState->hMessageWindowThread);
@@ -690,7 +690,7 @@ static HRESULT RunElevated(
     ExitOnFailure(hr, "Failed to open elevated log.");
 
     // connect to per-user process
-    hr = PipeChildConnect(&pEngineState->companionConnection, TRUE);
+    hr = BurnPipeChildConnect(&pEngineState->companionConnection, TRUE);
     ExitOnFailure(hr, "Failed to connect to unelevated process.");
 
     // Set up the context for the logging thread then
@@ -741,7 +741,7 @@ static HRESULT RunEmbedded(
     HRESULT hr = S_OK;
 
     // Connect to parent process.
-    hr = PipeChildConnect(&pEngineState->embeddedConnection, FALSE);
+    hr = BurnPipeChildConnect(&pEngineState->embeddedConnection, FALSE);
     ExitOnFailure(hr, "Failed to connect to parent of embedded process.");
 
     // Do not register the bundle to automatically restart if embedded.
@@ -965,7 +965,7 @@ static HRESULT LogStringOverPipe(
     hr = BuffWriteStringAnsi(&pbData, &cbData, szString);
     ExitOnFailure(hr, "Failed to prepare logging pipe message.");
 
-    hr = PipeSendMessage(hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_LOG), pbData, cbData, NULL, NULL, &dwResult);
+    hr = BurnPipeSendMessage(hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_LOG), pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send logging message over the pipe.");
 
     hr = (HRESULT)dwResult;
@@ -1048,7 +1048,7 @@ LExit:
     LogRedirect(NULL, NULL); // No more messages will be logged over the pipe.
 
     {
-        HRESULT hrTerminate = PipeTerminateLoggingPipe(pContext->hPipe, hr);
+        HRESULT hrTerminate = BurnPipeTerminateLoggingPipe(pContext->hPipe, hr);
         if (FAILED(hrTerminate))
         {
             TraceError(hrTerminate, "Failed to terminate logging pipe.");

@@ -55,16 +55,16 @@ extern "C" HRESULT EmbeddedRunBundle(
     PROCESS_INFORMATION pi = { };
     BURN_PIPE_RESULT result = { };
 
-    PipeConnectionInitialize(pConnection);
+    BurnPipeConnectionInitialize(pConnection);
 
     BURN_EMBEDDED_CALLBACK_CONTEXT context = { };
     context.pfnGenericMessageHandler = pfnGenericMessageHandler;
     context.pvContext = pvContext;
 
-    hr = PipeCreateNameAndSecret(&pConnection->sczName, &pConnection->sczSecret);
+    hr = BurnPipeCreateNameAndSecret(&pConnection->sczName, &pConnection->sczSecret);
     ExitOnFailure(hr, "Failed to create embedded pipe name and client token.");
 
-    hr = PipeCreatePipes(pConnection, FALSE);
+    hr = BurnPipeCreatePipes(pConnection, FALSE);
     ExitOnFailure(hr, "Failed to create embedded pipe.");
 
     hr = StrAllocFormatted(&sczCommand, L"%ls -%ls %ls %ls %u", sczBaseCommand, BURN_COMMANDLINE_SWITCH_EMBEDDED, pConnection->sczName, pConnection->sczSecret, dwCurrentProcessId);
@@ -84,10 +84,10 @@ extern "C" HRESULT EmbeddedRunBundle(
     pConnection->hProcess = pi.hProcess;
     pi.hProcess = NULL;
 
-    hr = PipeWaitForChildConnect(pConnection);
+    hr = BurnPipeWaitForChildConnect(pConnection);
     ExitOnFailure(hr, "Failed to wait for embedded process to connect to pipe.");
 
-    hr = PipePumpMessages(pConnection->hPipe, ProcessEmbeddedMessages, &context, &result);
+    hr = BurnPipePumpMessages(pConnection->hPipe, ProcessEmbeddedMessages, &context, &result);
     ExitOnFailure(hr, "Failed to process messages from embedded message.");
 
     // Get the return code from the embedded process.
@@ -99,7 +99,7 @@ LExit:
     ReleaseHandle(pi.hProcess);
 
     StrSecureZeroFreeString(sczCommand);
-    PipeConnectionUninitialize(pConnection);
+    BurnPipeConnectionUninitialize(pConnection);
 
     return hr;
 }
