@@ -77,7 +77,7 @@
     <ClCompile Include="NetFxChainer.cpp" />
     <ClCompile Include="package.cpp" />
     <ClCompile Include="payload.cpp" />
-    <ClCompile Include="pipe.cpp" />
+    <ClCompile Include="burnpipe.cpp" />
     <ClCompile Include="plan.cpp" />
     <ClCompile Include="platform.cpp" />
     <ClCompile Include="precomp.cpp">
@@ -128,7 +128,7 @@
     <ClInclude Include="netfxchainer.h" />
     <ClInclude Include="package.h" />
     <ClInclude Include="payload.h" />
-    <ClInclude Include="pipe.h" />
+    <ClInclude Include="burnpipe.h" />
     <ClInclude Include="plan.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="precomp.h" />
