@@ -129,43 +129,43 @@ static HRESULT WaitForElevatedChildCacheThread(
     __in DWORD dwExpectedExitCode
     );
 static HRESULT ProcessApplyInitializeMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessBurnCacheMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessGenericExecuteMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessMsiPackageMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessLaunchApprovedExeMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessProgressRoutineMessage(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessElevatedChildMessage(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessElevatedChildCacheMessage(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
@@ -1739,7 +1739,7 @@ LExit:
 }
 
 static HRESULT ProcessApplyInitializeMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -1752,7 +1752,7 @@ static HRESULT ProcessApplyInitializeMessages(
     HRESULT hrBA = S_OK;
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN:
         pContext->fPauseCompleteNeeded = TRUE;
@@ -1801,7 +1801,7 @@ LExit:
 }
 
 static HRESULT ProcessBurnCacheMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -1813,7 +1813,7 @@ static HRESULT ProcessBurnCacheMessages(
     BOOL fProgressRoutine = FALSE;
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_BEGIN:
         // read message parameters
@@ -1872,7 +1872,7 @@ LExit:
 }
 
 static HRESULT ProcessGenericExecuteMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -1885,7 +1885,7 @@ static HRESULT ProcessGenericExecuteMessages(
     LPWSTR* rgwzFiles = NULL;
     GENERIC_EXECUTE_MESSAGE message = { };
 
-    if (BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE == pMsg->dwMessage)
+    if (BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE == pMsg->dwMessageType)
     {
         hr = ProcessExecuteActionCompleteMessage((BYTE*)pMsg->pvData, pMsg->cbData, &pContext->restart, pdwResult);
         ExitOnFailure(hr, "Failed to process BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message.");
@@ -1897,7 +1897,7 @@ static HRESULT ProcessGenericExecuteMessages(
     ExitOnFailure(hr, "Failed to allowed results.");
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS:
         message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
@@ -1979,7 +1979,7 @@ LExit:
 }
 
 static HRESULT ProcessMsiPackageMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -1993,7 +1993,7 @@ static HRESULT ProcessMsiPackageMessages(
     LPWSTR sczMessage = NULL;
     BOOL fRestartManager = FALSE;
 
-    if (BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE == pMsg->dwMessage)
+    if (BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE == pMsg->dwMessageType)
     {
         hr = ProcessExecuteActionCompleteMessage((BYTE*)pMsg->pvData, pMsg->cbData, &pContext->restart, pdwResult);
         ExitOnFailure(hr, "Failed to process BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message.");
@@ -2024,7 +2024,7 @@ static HRESULT ProcessMsiPackageMessages(
     ExitOnFailure(hr, "Failed to read UI flags.");
 
     // Process the rest of the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS:
         // read message parameters
@@ -2093,7 +2093,7 @@ LExit:
 }
 
 static HRESULT ProcessLaunchApprovedExeMessages(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -2104,7 +2104,7 @@ static HRESULT ProcessLaunchApprovedExeMessages(
     DWORD dwProcessId = 0;
 
     // Process the message.
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID:
         // read message parameters
@@ -2126,7 +2126,7 @@ LExit:
 }
 
 static HRESULT ProcessProgressRoutineMessage(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pvContext,
     __out DWORD* pdwResult
@@ -2156,7 +2156,7 @@ LExit:
 }
 
 static HRESULT ProcessElevatedChildMessage(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -2167,7 +2167,7 @@ static HRESULT ProcessElevatedChildMessage(
     BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
     BOOL fSendRestart = FALSE;
 
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION:
         hrResult = OnMsiBeginTransaction(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
@@ -2263,7 +2263,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     default:
-        ExitWithRootFailure(hr, E_INVALIDARG, "Unexpected elevated message sent to child process, msg: %u", pMsg->dwMessage);
+        ExitWithRootFailure(hr, E_INVALIDARG, "Unexpected elevated message sent to child process, msg: %u", pMsg->dwMessageType);
     }
 
     if (fSendRestart)
@@ -2279,7 +2279,7 @@ LExit:
 }
 
 static HRESULT ProcessElevatedChildCacheMessage(
-    __in BURN_PIPE_MESSAGE* pMsg,
+    __in PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     )
@@ -2288,7 +2288,7 @@ static HRESULT ProcessElevatedChildCacheMessage(
     BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_CHILD_MESSAGE_CONTEXT*>(pvContext);
     HRESULT hrResult = S_OK;
 
-    switch (pMsg->dwMessage)
+    switch (pMsg->dwMessageType)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE:
         hrResult = OnCachePreparePackage(pContext->pCache, pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
@@ -2313,7 +2313,7 @@ static HRESULT ProcessElevatedChildCacheMessage(
 
     default:
         hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Unexpected elevated cache message sent to child process, msg: %u", pMsg->dwMessage);
+        ExitOnRootFailure(hr, "Unexpected elevated cache message sent to child process, msg: %u", pMsg->dwMessageType);
     }
 
     *pdwResult = (DWORD)hrResult;

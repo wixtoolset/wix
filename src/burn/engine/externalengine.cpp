@@ -9,7 +9,7 @@ static HRESULT CopyStringToExternal(
     __inout SIZE_T* pcchBuffer
     );
 static HRESULT ProcessUnknownEmbeddedMessages(
-    __in BURN_PIPE_MESSAGE* /*pMsg*/,
+    __in PIPE_MESSAGE* /*pMsg*/,
     __in_opt LPVOID /*pvContext*/,
     __out DWORD* pdwResult
     );
@@ -877,7 +877,7 @@ static HRESULT CopyStringToExternal(
 }
 
 static HRESULT ProcessUnknownEmbeddedMessages(
-    __in BURN_PIPE_MESSAGE* /*pMsg*/,
+    __in PIPE_MESSAGE* /*pMsg*/,
     __in_opt LPVOID /*pvContext*/,
     __out DWORD* pdwResult
     )

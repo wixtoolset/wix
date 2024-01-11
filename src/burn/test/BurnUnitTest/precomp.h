@@ -24,6 +24,7 @@
 #include <logutil.h>
 #include <memutil.h>
 #include <pathutil.h>
+#include <pipeutil.h>
 #include <polcutil.h>
 #include <regutil.h>
 #include <resrutil.h>

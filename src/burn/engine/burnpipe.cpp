@@ -2,40 +2,14 @@
 
 #include "precomp.h"
 
-static const DWORD PIPE_64KB = 64 * 1024;
-static const DWORD PIPE_WAIT_FOR_CONNECTION = 100;   // wait a 10th of a second,
-static const DWORD PIPE_RETRY_FOR_CONNECTION = 1800; // for up to 3 minutes.
+static const LPCWSTR CACHE_PIPE_NAME_FORMAT_STRING = L"%ls.Cache";
+static const LPCWSTR LOGGING_PIPE_NAME_FORMAT_STRING = L"%ls.Log";
 
-static const LPCWSTR PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls";
-static const LPCWSTR CACHE_PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls.Cache";
-static const LPCWSTR LOGGING_PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls.Log";
-
-static HRESULT AllocatePipeMessage(
-    __in DWORD dwMessage,
-    __in_bcount_opt(cbData) LPVOID pvData,
-    __in SIZE_T cbData,
-    __out_bcount(cb) LPVOID* ppvMessage,
-    __out SIZE_T* pcbMessage
-    );
-static void FreePipeMessage(
-    __in BURN_PIPE_MESSAGE *pMsg
-    );
-static HRESULT WritePipeMessage(
-    __in HANDLE hPipe,
-    __in DWORD dwMessage,
-    __in_bcount_opt(cbData) LPVOID pvData,
-    __in SIZE_T cbData
-    );
-static HRESULT GetPipeMessage(
-    __in HANDLE hPipe,
-    __in BURN_PIPE_MESSAGE* pMsg
-    );
 static HRESULT ChildPipeConnected(
     __in HANDLE hPipe,
     __in_z LPCWSTR wzSecret,
     __inout DWORD* pdwProcessId
     );
-
 
 
 /*******************************************************************
@@ -60,9 +34,9 @@ void PipeConnectionUninitialize(
     __in BURN_PIPE_CONNECTION* pConnection
     )
 {
-    ReleaseFileHandle(pConnection->hLoggingPipe);
-    ReleaseFileHandle(pConnection->hCachePipe);
-    ReleaseFileHandle(pConnection->hPipe);
+    ReleasePipeHandle(pConnection->hLoggingPipe);
+    ReleasePipeHandle(pConnection->hCachePipe);
+    ReleasePipeHandle(pConnection->hPipe);
     ReleaseHandle(pConnection->hProcess);
     ReleaseStr(pConnection->sczSecret);
     ReleaseStr(pConnection->sczName);
@@ -71,7 +45,7 @@ void PipeConnectionUninitialize(
 }
 
 /*******************************************************************
- PipeSendMessage - 
+ PipeSendMessage -
 
 *******************************************************************/
 extern "C" HRESULT PipeSendMessage(
@@ -87,7 +61,7 @@ extern "C" HRESULT PipeSendMessage(
     HRESULT hr = S_OK;
     BURN_PIPE_RESULT result = { };
 
-    hr = WritePipeMessage(hPipe, dwMessage, pvData, cbData);
+    hr = PipeWriteMessage(hPipe, dwMessage, pvData, cbData);
     ExitOnFailure(hr, "Failed to write send message to pipe.");
 
     hr = PipePumpMessages(hPipe, pfnCallback, pvContext, &result);
@@ -100,7 +74,7 @@ LExit:
 }
 
 /*******************************************************************
- PipePumpMessages - 
+ PipePumpMessages -
 
 *******************************************************************/
 extern "C" HRESULT PipePumpMessages(
@@ -111,15 +85,15 @@ extern "C" HRESULT PipePumpMessages(
     )
 {
     HRESULT hr = S_OK;
-    BURN_PIPE_MESSAGE msg = { };
+    PIPE_MESSAGE msg = { };
     SIZE_T iData = 0;
     LPSTR sczMessage = NULL;
     DWORD dwResult = 0;
 
     // Pump messages from child process.
-    while (S_OK == (hr = GetPipeMessage(hPipe, &msg)))
+    while (S_OK == (hr = PipeReadMessage(hPipe, &msg)))
     {
-        switch (msg.dwMessage)
+        switch (msg.dwMessageType)
         {
         case BURN_PIPE_MESSAGE_TYPE_LOG:
             iData = 0;
@@ -166,15 +140,15 @@ extern "C" HRESULT PipePumpMessages(
             {
                 hr = E_INVALIDARG;
             }
-            ExitOnFailure(hr, "Failed to process message: %u", msg.dwMessage);
+            ExitOnFailure(hr, "Failed to process message: %u", msg.dwMessageType);
             break;
         }
 
         // post result
-        hr = WritePipeMessage(hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_COMPLETE), &dwResult, sizeof(dwResult));
+        hr = PipeWriteMessage(hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_COMPLETE), &dwResult, sizeof(dwResult));
         ExitOnFailure(hr, "Failed to post result to child process.");
 
-        FreePipeMessage(&msg);
+        ReleasePipeMessage(&msg);
     }
     ExitOnFailure(hr, "Failed to get message over pipe");
 
@@ -185,13 +159,13 @@ extern "C" HRESULT PipePumpMessages(
 
 LExit:
     ReleaseStr(sczMessage);
-    FreePipeMessage(&msg);
+    ReleasePipeMessage(&msg);
 
     return hr;
 }
 
 /*******************************************************************
- PipeCreateNameAndSecret - 
+ PipeCreateNameAndSecret -
 
 *******************************************************************/
 extern "C" HRESULT PipeCreateNameAndSecret(
@@ -247,7 +221,7 @@ extern "C" HRESULT PipeCreatePipes(
     HRESULT hr = S_OK;
     PSECURITY_DESCRIPTOR psd = NULL;
     SECURITY_ATTRIBUTES sa = { };
-    LPWSTR sczFullPipeName = NULL;
+    LPWSTR sczPipeName = NULL;
     HANDLE hPipe = INVALID_HANDLE_VALUE;
     HANDLE hCachePipe = INVALID_HANDLE_VALUE;
     HANDLE hLoggingPipe = INVALID_HANDLE_VALUE;
@@ -269,37 +243,24 @@ extern "C" HRESULT PipeCreatePipes(
     }
 
     // Create the pipe.
-    hr = StrAllocFormatted(&sczFullPipeName, PIPE_NAME_FORMAT_STRING, pConnection->sczName);
-    ExitOnFailure(hr, "Failed to allocate full name of pipe: %ls", pConnection->sczName);
-
-    // TODO: consider using overlapped IO to do waits on the pipe and still be able to cancel and such.
-    hPipe = ::CreateNamedPipeW(sczFullPipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, PIPE_64KB, PIPE_64KB, 1, psd ? &sa : NULL);
-    if (INVALID_HANDLE_VALUE == hPipe)
-    {
-        ExitWithLastError(hr, "Failed to create pipe: %ls", sczFullPipeName);
-    }
+    hr = PipeCreate(pConnection->sczName, psd ? &sa : NULL, &hPipe);
+    ExitOnFailure(hr, "Failed to create pipe: %ls", pConnection->sczName);
 
     if (fCompanion)
     {
         // Create the cache pipe.
-        hr = StrAllocFormatted(&sczFullPipeName, CACHE_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
+        hr = StrAllocFormatted(&sczPipeName, CACHE_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
         ExitOnFailure(hr, "Failed to allocate full name of cache pipe: %ls", pConnection->sczName);
 
-        hCachePipe = ::CreateNamedPipeW(sczFullPipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, PIPE_64KB, PIPE_64KB, 1, NULL);
-        if (INVALID_HANDLE_VALUE == hCachePipe)
-        {
-            ExitWithLastError(hr, "Failed to create cache pipe: %ls", sczFullPipeName);
-        }
+        hr = PipeCreate(sczPipeName, NULL, &hCachePipe);
+        ExitOnFailure(hr, "Failed to create cache pipe: %ls", sczPipeName);
 
         // Create the logging pipe.
-        hr = StrAllocFormatted(&sczFullPipeName, LOGGING_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
+        hr = StrAllocFormatted(&sczPipeName, LOGGING_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
         ExitOnFailure(hr, "Failed to allocate full name of logging pipe: %ls", pConnection->sczName);
 
-        hLoggingPipe = ::CreateNamedPipeW(sczFullPipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, PIPE_64KB, PIPE_64KB, 1, NULL);
-        if (INVALID_HANDLE_VALUE == hLoggingPipe)
-        {
-            ExitWithLastError(hr, "Failed to create logging pipe: %ls", sczFullPipeName);
-        }
+        hr = PipeCreate(sczPipeName, NULL, &hLoggingPipe);
+        ExitOnFailure(hr, "Failed to create logging pipe: %ls", sczPipeName);
     }
 
     pConnection->hLoggingPipe = hLoggingPipe;
@@ -312,10 +273,10 @@ extern "C" HRESULT PipeCreatePipes(
     hPipe = INVALID_HANDLE_VALUE;
 
 LExit:
-    ReleaseFileHandle(hLoggingPipe);
-    ReleaseFileHandle(hCachePipe);
-    ReleaseFileHandle(hPipe);
-    ReleaseStr(sczFullPipeName);
+    ReleasePipeHandle(hLoggingPipe);
+    ReleasePipeHandle(hCachePipe);
+    ReleasePipeHandle(hPipe);
+    ReleaseStr(sczPipeName);
 
     if (psd)
     {
@@ -326,7 +287,7 @@ LExit:
 }
 
 /*******************************************************************
- PipeWaitForChildConnect - 
+ PipeWaitForChildConnect -
 
 *******************************************************************/
 extern "C" HRESULT PipeWaitForChildConnect(
@@ -343,57 +304,9 @@ extern "C" HRESULT PipeWaitForChildConnect(
     for (DWORD i = 0; i < countof(hPipes) && INVALID_HANDLE_VALUE != hPipes[i]; ++i)
     {
         HANDLE hPipe = hPipes[i];
-        DWORD dwPipeState = PIPE_READMODE_BYTE | PIPE_NOWAIT;
 
-        // Temporarily make the pipe non-blocking so we will not get stuck in ::ConnectNamedPipe() forever
-        // if the child decides not to show up.
-        if (!::SetNamedPipeHandleState(hPipe, &dwPipeState, NULL, NULL))
-        {
-            ExitWithLastError(hr, "Failed to set pipe to non-blocking.");
-        }
-
-        // Loop for a while waiting for a connection from child process.
-        DWORD cRetry = 0;
-        do
-        {
-            if (!::ConnectNamedPipe(hPipe, NULL))
-            {
-                DWORD er = ::GetLastError();
-                if (ERROR_PIPE_CONNECTED == er)
-                {
-                    hr = S_OK;
-                    break;
-                }
-                else if (ERROR_PIPE_LISTENING == er)
-                {
-                    if (cRetry < PIPE_RETRY_FOR_CONNECTION)
-                    {
-                        hr = HRESULT_FROM_WIN32(er);
-                    }
-                    else
-                    {
-                        hr = HRESULT_FROM_WIN32(ERROR_TIMEOUT);
-                        break;
-                    }
-
-                    ++cRetry;
-                    ::Sleep(PIPE_WAIT_FOR_CONNECTION);
-                }
-                else
-                {
-                    hr = HRESULT_FROM_WIN32(er);
-                    break;
-                }
-            }
-        } while (HRESULT_FROM_WIN32(ERROR_PIPE_LISTENING) == hr);
+        hr = PipeServerWaitForClientConnect(hPipe);
         ExitOnRootFailure(hr, "Failed to wait for child to connect to pipe.");
-
-        // Put the pipe back in blocking mode.
-        dwPipeState = PIPE_READMODE_BYTE | PIPE_WAIT;
-        if (!::SetNamedPipeHandleState(hPipe, &dwPipeState, NULL, NULL))
-        {
-            ExitWithLastError(hr, "Failed to reset pipe to blocking.");
-        }
 
         // Prove we are the one that created the elevated process by passing the secret.
         hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&cbSecret), sizeof(cbSecret));
@@ -422,7 +335,7 @@ LExit:
 }
 
 /*******************************************************************
- PipeTerminateLoggingPipe - 
+ PipeTerminateLoggingPipe -
 
 *******************************************************************/
 extern "C" HRESULT PipeTerminateLoggingPipe(
@@ -438,7 +351,7 @@ extern "C" HRESULT PipeTerminateLoggingPipe(
     hr = BuffWriteNumber(&pbData, &cbData, dwParentExitCode);
     ExitOnFailure(hr, "Failed to write exit code to message buffer.");
 
-    hr = WritePipeMessage(hLoggingPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_COMPLETE), pbData, cbData);
+    hr = PipeWriteMessage(hLoggingPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_COMPLETE), pbData, cbData);
     ExitOnFailure(hr, "Failed to post complete message to logging pipe.");
 
 LExit:
@@ -448,7 +361,7 @@ LExit:
 }
 
 /*******************************************************************
- PipeTerminateChildProcess - 
+ PipeTerminateChildProcess -
 
 *******************************************************************/
 extern "C" HRESULT PipeTerminateChildProcess(
@@ -472,11 +385,11 @@ extern "C" HRESULT PipeTerminateChildProcess(
     // Send the messages.
     if (INVALID_HANDLE_VALUE != pConnection->hCachePipe)
     {
-        hr = WritePipeMessage(pConnection->hCachePipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_TERMINATE), pbData, cbData);
+        hr = PipeWriteMessage(pConnection->hCachePipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_TERMINATE), pbData, cbData);
         ExitOnFailure(hr, "Failed to post terminate message to child process cache thread.");
     }
 
-    hr = WritePipeMessage(pConnection->hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_TERMINATE), pbData, cbData);
+    hr = PipeWriteMessage(pConnection->hPipe, static_cast<DWORD>(BURN_PIPE_MESSAGE_TYPE_TERMINATE), pbData, cbData);
     ExitOnFailure(hr, "Failed to post terminate message to child process.");
 
     // If we were able to get a handle to the other process, wait for it to exit.
@@ -532,28 +445,7 @@ extern "C" HRESULT PipeChildConnect(
     LPWSTR sczPipeName = NULL;
 
     // Try to connect to the parent.
-    hr = StrAllocFormatted(&sczPipeName, PIPE_NAME_FORMAT_STRING, pConnection->sczName);
-    ExitOnFailure(hr, "Failed to allocate name of parent pipe.");
-
-    hr = E_UNEXPECTED;
-    for (DWORD cRetry = 0; FAILED(hr) && cRetry < PIPE_RETRY_FOR_CONNECTION; ++cRetry)
-    {
-        pConnection->hPipe = ::CreateFileW(sczPipeName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-        if (INVALID_HANDLE_VALUE == pConnection->hPipe)
-        {
-            hr = HRESULT_FROM_WIN32(::GetLastError());
-            if (E_FILENOTFOUND == hr) // if the pipe isn't created, call it a timeout waiting on the parent.
-            {
-                hr = HRESULT_FROM_WIN32(ERROR_TIMEOUT);
-            }
-
-            ::Sleep(PIPE_WAIT_FOR_CONNECTION);
-        }
-        else // we have a connection, go with it.
-        {
-            hr = S_OK;
-        }
-    }
+    hr = PipeClientConnect(pConnection->sczName, &pConnection->hPipe);
     ExitOnRootFailure(hr, "Failed to open parent pipe: %ls", sczPipeName)
 
     // Verify the parent and notify it that the child connected.
@@ -566,11 +458,8 @@ extern "C" HRESULT PipeChildConnect(
         hr = StrAllocFormatted(&sczPipeName, CACHE_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
         ExitOnFailure(hr, "Failed to allocate name of parent cache pipe.");
 
-        pConnection->hCachePipe = ::CreateFileW(sczPipeName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-        if (INVALID_HANDLE_VALUE == pConnection->hCachePipe)
-        {
-            ExitWithLastError(hr, "Failed to open parent cache pipe: %ls", sczPipeName)
-        }
+        hr = PipeClientConnect(sczPipeName, &pConnection->hCachePipe);
+        ExitOnFailure(hr, "Failed to open parent cache pipe: %ls", sczPipeName)
 
         // Verify the parent and notify it that the child connected.
         hr = ChildPipeConnected(pConnection->hCachePipe, pConnection->sczSecret, &pConnection->dwProcessId);
@@ -580,11 +469,8 @@ extern "C" HRESULT PipeChildConnect(
         hr = StrAllocFormatted(&sczPipeName, LOGGING_PIPE_NAME_FORMAT_STRING, pConnection->sczName);
         ExitOnFailure(hr, "Failed to allocate name of parent logging pipe.");
 
-        pConnection->hLoggingPipe = ::CreateFileW(sczPipeName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-        if (INVALID_HANDLE_VALUE == pConnection->hLoggingPipe)
-        {
-            ExitWithLastError(hr, "Failed to open parent logging pipe: %ls", sczPipeName)
-        }
+        hr = PipeClientConnect(sczPipeName, &pConnection->hLoggingPipe);
+        ExitOnFailure(hr, "Failed to open parent cache pipe: %ls", sczPipeName)
 
         // Verify the parent and notify it that the child connected.
         hr = ChildPipeConnected(pConnection->hLoggingPipe, pConnection->sczSecret, &pConnection->dwProcessId);
@@ -596,127 +482,6 @@ extern "C" HRESULT PipeChildConnect(
 
 LExit:
     ReleaseStr(sczPipeName);
-
-    return hr;
-}
-
-
-static HRESULT AllocatePipeMessage(
-    __in DWORD dwMessage,
-    __in_bcount_opt(cbData) LPVOID pvData,
-    __in SIZE_T cbData,
-    __out_bcount(cb) LPVOID* ppvMessage,
-    __out SIZE_T* pcbMessage
-    )
-{
-    HRESULT hr = S_OK;
-    LPVOID pv = NULL;
-    size_t cb = 0;
-    DWORD dwcbData = 0;
-
-    // If no data was provided, ensure the count of bytes is zero.
-    if (!pvData)
-    {
-        cbData = 0;
-    }
-    else if (MAXDWORD < cbData)
-    {
-        ExitWithRootFailure(hr, E_INVALIDDATA, "Pipe message is too large.");
-    }
-
-    hr = ::SizeTAdd(sizeof(dwMessage) + sizeof(dwcbData), cbData, &cb);
-    ExitOnRootFailure(hr, "Failed to calculate total pipe message size");
-
-    dwcbData = (DWORD)cbData;
-
-    // Allocate the message.
-    pv = MemAlloc(cb, FALSE);
-    ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for message.");
-
-    memcpy_s(pv, cb, &dwMessage, sizeof(dwMessage));
-    memcpy_s(static_cast<BYTE*>(pv) + sizeof(dwMessage), cb - sizeof(dwMessage), &dwcbData, sizeof(dwcbData));
-    if (dwcbData)
-    {
-        memcpy_s(static_cast<BYTE*>(pv) + sizeof(dwMessage) + sizeof(dwcbData), cb - sizeof(dwMessage) - sizeof(dwcbData), pvData, dwcbData);
-    }
-
-    *pcbMessage = cb;
-    *ppvMessage = pv;
-    pv = NULL;
-
-LExit:
-    ReleaseMem(pv);
-    return hr;
-}
-
-static void FreePipeMessage(
-    __in BURN_PIPE_MESSAGE *pMsg
-    )
-{
-    if (pMsg->fAllocatedData)
-    {
-        ReleaseNullMem(pMsg->pvData);
-        pMsg->fAllocatedData = FALSE;
-    }
-}
-
-static HRESULT WritePipeMessage(
-    __in HANDLE hPipe,
-    __in DWORD dwMessage,
-    __in_bcount_opt(cbData) LPVOID pvData,
-    __in SIZE_T cbData
-    )
-{
-    HRESULT hr = S_OK;
-    LPVOID pv = NULL;
-    SIZE_T cb = 0;
-
-    hr = AllocatePipeMessage(dwMessage, pvData, cbData, &pv, &cb);
-    ExitOnFailure(hr, "Failed to allocate message to write.");
-
-    // Write the message.
-    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(pv), cb);
-    ExitOnFailure(hr, "Failed to write message type to pipe.");
-
-LExit:
-    ReleaseMem(pv);
-    return hr;
-}
-
-static HRESULT GetPipeMessage(
-    __in HANDLE hPipe,
-    __in BURN_PIPE_MESSAGE* pMsg
-    )
-{
-    HRESULT hr = S_OK;
-    BYTE pbMessageAndByteCount[sizeof(DWORD) + sizeof(DWORD)] = { };
-
-    hr = FileReadHandle(hPipe, pbMessageAndByteCount, sizeof(pbMessageAndByteCount));
-    if (HRESULT_FROM_WIN32(ERROR_BROKEN_PIPE) == hr)
-    {
-        memset(pbMessageAndByteCount, 0, sizeof(pbMessageAndByteCount));
-        hr = S_FALSE;
-    }
-    ExitOnFailure(hr, "Failed to read message from pipe.");
-
-    pMsg->dwMessage = *(DWORD*)(pbMessageAndByteCount);
-    pMsg->cbData = *(DWORD*)(pbMessageAndByteCount + sizeof(DWORD));
-    if (pMsg->cbData)
-    {
-        pMsg->pvData = MemAlloc(pMsg->cbData, FALSE);
-        ExitOnNull(pMsg->pvData, hr, E_OUTOFMEMORY, "Failed to allocate data for message.");
-
-        hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(pMsg->pvData), pMsg->cbData);
-        ExitOnFailure(hr, "Failed to read data for message.");
-
-        pMsg->fAllocatedData = TRUE;
-    }
-
-LExit:
-    if (!pMsg->fAllocatedData && pMsg->pvData)
-    {
-        MemFree(pMsg->pvData);
-    }
 
     return hr;
 }
